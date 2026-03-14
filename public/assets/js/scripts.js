@@ -1,0 +1,289 @@
+/**
+ * Sistema de Assistência Técnica - Main Scripts
+ */
+
+$(document).ready(function () {
+
+    // =====================================================
+    // SIDEBAR TOGGLE
+    // =====================================================
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const mobileToggle = document.getElementById('mobileToggle');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function () {
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
+    }
+
+    if (mobileToggle) {
+        mobileToggle.addEventListener('click', function () {
+            sidebar.classList.toggle('show');
+        });
+    }
+
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', function () {
+            sidebar.classList.remove('show');
+        });
+    }
+
+    // Restore sidebar state
+    if (localStorage.getItem('sidebarCollapsed') === 'true') {
+        sidebar && sidebar.classList.add('collapsed');
+    }
+
+    // =====================================================
+    // DATATABLES INITIALIZATION
+    // =====================================================
+    if ($.fn.DataTable) {
+        $('.datatable').DataTable({
+            language: {
+                url: baseUrl + 'assets/json/pt-BR.json',
+                search: '',
+                searchPlaceholder: 'Buscar...',
+            },
+            pageLength: 25,
+            responsive: true,
+            order: [],
+            dom: '<"row"<"col-md-6"l><"col-md-6"f>>rtip',
+        });
+    }
+
+    // =====================================================
+    // INPUT MASKS
+    // =====================================================
+    if ($.fn.mask) {
+        $('.mask-cpf').mask('000.000.000-00');
+        $('.mask-cnpj').mask('00.000.000/0000-00');
+        $('.mask-telefone').mask('(00) 00000-0000');
+        $('.mask-cep').mask('00000-000');
+        $('.mask-money').mask('#.##0,00', { reverse: true });
+    }
+
+    // Dynamic CPF/CNPJ mask based on person type
+    $('select[name="tipo_pessoa"]').on('change', function () {
+        const campo = $('input[name="cpf_cnpj"]');
+        if ($(this).val() === 'juridica') {
+            campo.mask('00.000.000/0000-00');
+            $('label[for="cpf_cnpj"]').text('CNPJ');
+        } else {
+            campo.mask('000.000.000-00');
+            $('label[for="cpf_cnpj"]').text('CPF');
+        }
+    });
+
+    // =====================================================
+    // CEP LOOKUP (VIA CEP API)
+    // =====================================================
+    const handleCepLookup = function (el) {
+        const $input = $(el);
+        const cep = $input.val().replace(/\D/g, '');
+        const $container = $input.closest('form, .modal-body, .row');
+
+        if (cep.length === 8) {
+            // Adiciona feedback de loading
+            $input.addClass('loading-input').parent().addClass('position-relative');
+            const $spinner = $('<div class="spinner-border spinner-border-sm position-absolute" style="right: 10px; top: 12px; z-index: 5;" role="status"></div>');
+            $input.after($spinner);
+
+            $.getJSON(`https://viacep.com.br/ws/${cep}/json/`, function (data) {
+                $spinner.remove();
+                $input.removeClass('loading-input');
+
+                if (!data.erro) {
+                    // Preenchimento inteligente baseado em nomes ou classes
+                    $container.find('[name="endereco"], .js-logradouro').val(data.logradouro).trigger('change');
+                    $container.find('[name="bairro"], .js-bairro').val(data.bairro).trigger('change');
+                    $container.find('[name="cidade"], .js-cidade').val(data.localidade).trigger('change');
+                    $container.find('[name="uf"], .js-uf').val(data.uf).trigger('change');
+                    
+                    // Foco no número após preenchimento
+                    $container.find('[name="numero"], .js-numero').focus();
+                } else {
+                    alert('CEP não encontrado.');
+                    $input.val('').focus();
+                }
+            }).fail(function() {
+                $spinner.remove();
+                $input.removeClass('loading-input');
+                console.warn('Serviço de CEP temporariamente indisponível.');
+            });
+        }
+    };
+
+    // Gatilho no Blur
+    $(document).on('blur', '.mask-cep, input[name="cep"]', function () {
+        handleCepLookup(this);
+    });
+
+    // Gatilho automático ao completar os 8 dígitos (via mask callback se disponível)
+    if ($.fn.mask) {
+        $('.mask-cep').mask('00000-000', {
+            onComplete: function(cep, e, field) {
+                handleCepLookup(field);
+            }
+        });
+    }
+
+
+
+    // =====================================================
+    // CONFIRM DELETE
+    // =====================================================
+    $(document).on('click', '.btn-delete', function (e) {
+        e.preventDefault();
+        const url = $(this).attr('href');
+        const nome = $(this).data('nome') || 'este registro';
+
+        if (confirm(`Tem certeza que deseja excluir "${nome}"? Esta ação não pode ser desfeita.`)) {
+            window.location.href = url;
+        }
+    });
+
+    // =====================================================
+    // OS ITEM CALCULATIONS
+    // =====================================================
+    $(document).on('input', 'input[name="quantidade"], input[name="valor_unitario"]', function () {
+        const form = $(this).closest('form, .item-row');
+        const qtd = parseFloat(form.find('input[name="quantidade"]').val()) || 0;
+        const unitario = parseFloat(form.find('input[name="valor_unitario"]').val()) || 0;
+        const total = qtd * unitario;
+        form.find('input[name="valor_total"], .item-total').val(total.toFixed(2)).text('R$ ' + total.toFixed(2).replace('.', ','));
+    });
+
+    // =====================================================
+    // FLASH MESSAGE AUTO-DISMISS
+    // =====================================================
+    setTimeout(function () {
+        $('.alert-dismissible').fadeOut(500, function () {
+            $(this).remove();
+        });
+    }, 5000);
+
+    // =====================================================
+    // TOOLTIP INIT
+    // =====================================================
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+});
+
+// Global base URL
+var baseUrl = document.querySelector('meta[name="base-url"]')?.content ||
+    window.location.origin + '/';
+
+/**
+ * Voltar padronizado: usa histórico se disponível, senão vai para URL padrão.
+ * @param {string} defaultUrl
+ * @returns {boolean} false para evitar navegação padrão
+ */
+function resolveFromParam() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const from = params.get('from');
+        if (!from) return null;
+        const url = new URL(from, window.location.origin);
+        if (url.origin !== window.location.origin) return null;
+        return url.href;
+    } catch (e) {
+        return null;
+    }
+}
+
+function goBack(defaultUrl) {
+    const fromTarget = resolveFromParam();
+    if (fromTarget) {
+        window.location.href = fromTarget;
+        return false;
+    }
+
+    try {
+        const ref = document.referrer || '';
+        const sameOrigin = ref && ref.indexOf(window.location.origin) === 0;
+        if (window.history.length > 1 && sameOrigin) {
+            window.history.back();
+            return false;
+        }
+    } catch (e) {
+        // fallback abaixo
+    }
+
+    const target = defaultUrl || (baseUrl + 'dashboard');
+    window.location.href = target;
+    return false;
+}
+
+// Delegated handler for buttons/links with data-back-default
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('[data-back-default]');
+    if (!btn) return;
+    e.preventDefault();
+    const fallback = btn.getAttribute('data-back-default') || (baseUrl + 'dashboard');
+    goBack(fallback);
+});
+
+/**
+ * Função para confirmar o encerramento de registros
+ * @param {string} modulo - O slug do módulo (os, equipamentos, estoque)
+ * @param {number} id - O ID do registro
+ */
+function confirmarEncerramento(modulo, id) {
+    const titulos = {
+        'os': 'Ordem de Serviço',
+        'equipamentos': 'Equipamento',
+        'estoque': 'Peça/Item'
+    };
+    const nome = titulos[modulo] || 'registro';
+    
+    if (confirm(`Deseja realmente encerrar este ${nome}? O registro será mantido para histórico, mas não estará mais disponível para novas operações.`)) {
+        // Redirecionamento ou chamada AJAX para a lógica de encerramento
+        // Por enquanto exibe alerta conforme status da evolução do projeto
+        alert(`A funcionalidade de processamento de encerramento para ${nome} está em fase de implementação técnica. O controle de acesso atual já valida sua permissão para esta ação.`);
+    }
+}
+
+/**
+ * Abre a página de documentação correspondente na mesma aba.
+ * @param {string} page - Slugs ou caminhos curtos (ex: 'equipamentos', 'os')
+ */
+function openDocPage(page) {
+    const baseUrl = document.querySelector('meta[name="base-url"]')?.content || window.location.origin + '/';
+    let path = page;
+
+    // Mapeamento de atalhos para caminhos reais da documentação
+    const mapping = {
+        'equipamentos': '01-manual-do-usuario/equipamentos.md',
+        'ordens-de-servico': '01-manual-do-usuario/ordens-de-servico.md',
+        'dashboard': '01-manual-do-usuario/dashboard.md',
+        'clientes': '01-manual-do-usuario/clientes.md',
+        'estoque': '01-manual-do-usuario/estoque.md',
+        'financeiro': '01-manual-do-usuario/financeiro.md',
+        'relatorios': '01-manual-do-usuario/relatorios.md',
+        'perfil': '01-manual-do-usuario/perfil.md',
+        'fornecedores': '01-manual-do-usuario/fornecedores.md',
+        'funcionarios': '01-manual-do-usuario/funcionarios.md',
+        'servicos': '01-manual-do-usuario/servicos.md',
+        'usuarios': '02-manual-administrador/usuarios-e-permissoes.md',
+        'grupos': '02-manual-administrador/usuarios-e-permissoes.md',
+        'configuracoes': '02-manual-administrador/configuracao-do-sistema.md',
+        'equipamentos-tipos': '06-modulos-do-sistema/equipamentos-tipos.md',
+        'equipamentos-marcas': '06-modulos-do-sistema/equipamentos-marcas.md',
+        'equipamentos-modelos': '06-modulos-do-sistema/equipamentos-modelos.md',
+        'equipamentos-defeitos': '06-modulos-do-sistema/defeitos-comuns.md',
+        'estoque-movimentacoes': '01-manual-do-usuario/estoque.md#movimentacoes',
+        'vendas': '06-modulos-do-sistema/vendas.md'
+    };
+
+    if (mapping[page]) {
+        path = mapping[page];
+    }
+
+    const from = encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
+    window.location.href = `${baseUrl}documentacao?from=${from}#${encodeURIComponent(path)}`;
+}

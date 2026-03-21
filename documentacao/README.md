@@ -43,4 +43,6 @@
 - Gateway local WhatsApp (arquitetura): `07-novas-implementacoes/2026-03-como-foi-implementado-a-api-local-do-whatsapp.md`
 - Gateway local WhatsApp (producao-ready): `07-novas-implementacoes/2026-03-gateway-local-whatsapp-producao.md`
 - Deploy em VPS Linux: `10-deploy/linux-vps-deployment.md`
+- Manual tecnico oficial VPS Ubuntu 24.04 (com troubleshooting real): `10-deploy/manual-tecnico-oficial-vps-ubuntu-24-ci4.md`
+- Script oficial de automacao de deploy: `10-deploy/scripts/install_erp.sh`
 - Roadmap: `09-roadmap/funcionalidades-planejadas.md`

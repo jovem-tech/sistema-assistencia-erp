@@ -301,6 +301,9 @@ function openDocPage(page) {
         'central-mensagens-config': '06-modulos-do-sistema/central-de-mensagens.md#configuracoes',
         'design-system': '06-modulos-do-sistema/design-system.md',
         'estoque-movimentacoes': '01-manual-do-usuario/estoque.md#movimentacoes',
+        'deploy-vps': '10-deploy/manual-tecnico-oficial-vps-ubuntu-24-ci4.md',
+        'deploy-vps-script': '10-deploy/scripts/install_erp.sh',
+        'deploy-vps-guia': '10-deploy/linux-vps-deployment.md',
         'vendas': '06-modulos-do-sistema/vendas.md'
     };
 

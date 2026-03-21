@@ -4,6 +4,13 @@ Atualizado em 17/03/2026.
 
 Este guia resume a entrada em producao do ERP com gateway WhatsApp Node em VPS Linux.
 
+## Guia oficial completo
+
+Para procedimento completo (do zero, com troubleshooting real e validacoes operacionais), use:
+
+- `manual-tecnico-oficial-vps-ubuntu-24-ci4.md`
+- `scripts/install_erp.sh`
+
 ## 1. Requisitos
 
 - Ubuntu 22.04+ ou Debian 12+

@@ -4,6 +4,13 @@ Atualizado em 17/03/2026.
 
 Este guia prepara a aplicacao para producao em VPS Linux (Ubuntu/Debian), mantendo compatibilidade com desenvolvimento local (Windows/XAMPP).
 
+## Guia oficial completo
+
+Para procedimento integral de provisionamento e operacao do ERP CI4 em Ubuntu 24.04, consulte:
+
+- `manual-tecnico-oficial-vps-ubuntu-24-ci4.md`
+- `scripts/install_erp.sh`
+
 ## 1. Arquitetura alvo
 
 Fluxo de mensageria:

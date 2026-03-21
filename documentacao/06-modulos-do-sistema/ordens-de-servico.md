@@ -1,76 +1,80 @@
-# Módulo: Ordens de Serviço
+# Modulo: Ordens de Servico
 
-## Finalidade
+## Objetivo
+Controlar o ciclo completo de atendimento tecnico:
+- recepcao
+- diagnostico
+- orcamento
+- execucao
+- qualidade
+- encerramento
 
-Gerenciar todo o ciclo de vida de um reparo: entrada, diagnóstico, orçamento, aprovação, execução e entrega.
+## Fluxo de status
+Base:
+- `os_status`
+- `os_status_transicoes`
+- `os_status_historico`
 
-## Tabelas Utilizadas
+Campo operacional:
+- `os.estado_fluxo` (`em_atendimento`, `em_execucao`, `pausado`, `pronto`, `encerrado`, `cancelado`)
 
-| Tabela | Papel |
-|--------|-------|
-| `os` | Principal |
-| `os_fotos` | Fotos de entrada tiradas no recebimento |
-| `os_defeitos` | Defeitos selecionados da Base de Defeitos |
-| `os_itens` | Peças e serviços adicionados à OS |
+Servico de regra:
+- `app/Services/OsStatusFlowService.php`
 
-## Relacionamentos
+## Comunicacao WhatsApp integrada
 
-```
-os → clientes     (cliente_id)
-os → equipamentos (equipamento_id)
-os → usuarios     (tecnico_id)
-os → os_fotos     (os_id)
-os → os_defeitos  (os_id)
-os → os_itens     (os_id)
-```
+## Camada de mensageria
+- `WhatsAppService` (fachada da OS)
+- `MensageriaService` (resolucao de provider)
+- contratos:
+  - `WhatsAppProviderInterface` (direto)
+  - `BulkMessageProviderInterface` (massa/futuro)
 
-## Controller
+## Providers diretos
+- `MenuiaProvider`
+- `LocalGatewayProvider` (gateway local Node.js)
+- `WebhookProvider` (customizado)
 
-`app/Controllers/Os.php`
+## Provider de massa (futuro CRM)
+- `MetaOfficialProvider` (stub)
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| `index()` | GET /os | Listagem |
-| `create()` | GET /os/nova | Formulário novo |
-| `store()` | POST /os/salvar | Salva + cria número OS automático |
-| `edit($id)` | GET /os/editar/{id} | Formulário edição |
-| `update($id)` | POST /os/atualizar/{id} | Atualiza |
-| `show($id)` | GET /os/visualizar/{id} | Detalhes completos |
-| `print($id)` | GET /os/imprimir/{id} | Versão de impressão |
-| `updateStatus($id)` | POST /os/status/{id} | Atualiza status via AJAX |
-| `addItem()` | POST /os/item/salvar | Adiciona peça/serviço à OS |
-| `removeItem($id)` | GET /os/item/excluir/{id} | Remove item |
+## Envio suportado na OS
+- texto manual
+- template
+- PDF anexo
+- texto + PDF
 
-## Fluxo de Status
+## Logs de envio
+Tabela principal atual:
+- `mensagens_whatsapp`
 
-```
-abertura → aguardando_analise
-           ↓
-      aguardando_orcamento
-           ↓
-      aguardando_aprovacao ──→ reprovado
-           ↓
-         aprovado
-           ↓
-        em_reparo ←─→ aguardando_peca
-           ↓
-          pronto
-           ↓
-         entregue
-```
+Compatibilidade:
+- `whatsapp_envios`
+- `whatsapp_mensagens`
 
-## Número da OS
+## PDF da OS
+Geracao por `OsPdfService`:
+- abertura
+- orcamento
+- laudo
+- entrega
+- devolucao sem reparo
 
-Gerado automaticamente no padrão: `OS-AAAA-NNNNN`
-Ex: `OS-2026-00042`
+Persistencia:
+- `os_documentos`
+- `public/uploads/os_documentos/OS_<numero_os>/`
 
-## Link de Orçamento
+## Automacao por status
+`Os::triggerAutomaticEventsOnStatus()` pode:
+- gerar PDF automaticamente
+- enviar template WhatsApp automaticamente
 
-Gerado um token único (`token_orcamento`) que permite o cliente aprovar/recusar via URL pública sem login:
-```
-/orcamento/{token}
-```
+## Rotas-chave
+- `POST /os/status/{id}`
+- `POST /os/whatsapp/{id}`
+- `POST /os/pdf/{id}/gerar`
 
-## Permissões Requeridas
-
-`visualizar`, `criar`, `editar`, `excluir`
+## Integracao com CRM e inbox
+- Alteracao de status dispara `CrmService` para registrar eventos/follow-ups no CRM.
+- Mensagens da OS passam a refletir em `mensagens_whatsapp` com `conversa_id` quando houver thread.
+- Conversas da Central podem ser vinculadas a OS para atendimento contextual sem sair do inbox.

@@ -5,7 +5,7 @@
 <div class="page-header d-flex justify-content-between align-items-center">
     <h2><i class="bi bi-cash-stack me-2"></i><?= esc($title) ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sobre RelatÃƒÂ³rios">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sobre RelatÃ³rios">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('relatorios') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('relatorios') ?>">
@@ -18,7 +18,7 @@
     <div class="card-body">
         <form method="GET" action="<?= base_url('relatorios/financial') ?>" class="row g-3">
             <div class="col-md-5">
-                <label for="mes" class="form-label">MÃªs/Ano</label>
+                <label for="mes" class="form-label">Mês/Ano</label>
                 <input type="month" class="form-control" id="mes" name="mes" value="<?= esc($filtro_mes) ?>">
             </div>
             <div class="col-md-7 d-flex align-items-end gap-2">
@@ -53,7 +53,7 @@
     <div class="col-md-4">
         <div class="card glass-card <?= $resumo['lucro'] >= 0 ? 'border-primary' : 'border-warning' ?>">
             <div class="card-body text-center">
-                <h6 class="<?= $resumo['lucro'] >= 0 ? 'text-primary' : 'text-warning' ?> mb-2 uppercase tracking-wider">Resultado MÃªs</h6>
+                <h6 class="<?= $resumo['lucro'] >= 0 ? 'text-primary' : 'text-warning' ?> mb-2 uppercase tracking-wider">Resultado Mês</h6>
                 <h3 class="text-body m-0">R$ <?= number_format($resumo['lucro'], 2, ',', '.') ?></h3>
             </div>
         </div>
@@ -66,7 +66,7 @@
             <table class="table table-hover datatable">
                 <thead>
                     <tr>
-                        <th>DescriÃ§Ã£o</th>
+                        <th>Descrição</th>
                         <th>Tipo</th>
                         <th>Data Venc.</th>
                         <th>Valor</th>

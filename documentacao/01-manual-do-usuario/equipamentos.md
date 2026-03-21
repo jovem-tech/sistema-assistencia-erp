@@ -1,100 +1,121 @@
-# Manual do Usu√°rio ‚Äî Equipamentos
+# Manual do Usu·rio ? Equipamentos
 
-## üìã Vis√£o Geral
+## ? Vis„o Geral
 
-Os Equipamentos s√£o os aparelhos cadastrados no sistema, sempre vinculados a um cliente. Cada equipamento tem ficha t√©cnica, fotos e hist√≥rico de OS.
+Os Equipamentos s„o os aparelhos cadastrados no sistema, sempre vinculados a um cliente. Cada equipamento tem ficha tÈcnica, fotos e histÛrico de OS.
 
 ---
 
-## ‚ûï Cadastrar Novo Equipamento
+## ? Cadastrar Novo Equipamento
 
-**Caminho:** OPERACIONAL ‚Üí Aparelhos / Equip. ‚Üí `+ Novo`
+**Caminho:** OPERACIONAL ? Aparelhos / Equip. ? `+ Novo`
 
 ### Campos
 
-| Campo | Obrigat√≥rio | Descri√ß√£o |
+| Campo | ObrigatÛrio | DescriÁ„o |
 |-------|-------------|-----------|
 | **Tipo** | Sim | Ex: Smartphone, Notebook, Tablet |
 | **Marca** | Sim | Ex: Samsung, Apple, Dell |
 | **Modelo** | Sim | Ex: Galaxy S21, iPhone 15 |
-| Cliente | N√£o | Vincular a um cliente existente ou criar novo no bot√£o `+ Novo` |
-| N¬∫ de S√©rie | N√£o | IMEI ou c√≥digo de s√©rie |
-| Senha de Acesso | N√£o | Altern√¢ncia entre **PIN** e **Alfabeto** |
-| Cor | N√£o | Sele√ß√£o por cat√°logo profissional ou detec√ß√£o por foto |
-| Estado F√≠sico | N√£o | Descri√ß√£o detalhada de danos |
-| Acess√≥rios | N√£o | Clique nos **bot√µes de atalho** para inserir rapidamente: Carregador, Cabo USB, Capa, Chip ou Cart√£o de Mem√≥ria. |
+| Cliente | N„o | Vincular a um cliente existente ou criar novo no bot„o `+ Novo` |
+| N∫ de SÈrie | N„o | IMEI ou cÛdigo de sÈrie |
+| Senha de Acesso | N„o | Altern‚ncia entre **PIN** e **Alfabeto** |
+| Cor | N„o | SeleÁ„o por cat·logo profissional ou detecÁ„o por foto |
+| Estado FÌsico | N„o | DescriÁ„o detalhada de danos |
+| AcessÛrios | N„o | Clique nos **botıes de atalho** para inserir rapidamente: Carregador, Cabo USB, Capa, Chip ou Cart„o de MemÛria. |
 
 ---
 
-## üóÇÔ∏è Organiza√ß√£o em Abas (Tabs)
+## ?? OrganizaÁ„o em Abas (Tabs)
 
-Para facilitar o preenchimento, o formul√°rio agora √© dividido em 3 se√ß√µes:
+Para facilitar o preenchimento, o formul·rio agora È dividido em 3 seÁıes:
 
-1.  **Informa√ß√µes**: Dados de identifica√ß√£o, cliente, s√©rie, senha e acess√≥rios.
-2.  **Cor**: Cat√°logo organizado por fam√≠lias de tons e detec√ß√£o inteligente.
-3.  **Fotos**: Inclus√£o de at√© 4 arquivos com suporte a editor de corte.
+1.  **InformaÁıes**: Dados de identificaÁ„o, cliente, sÈrie, senha e acessÛrios.
+2.  **Cor**: Cat·logo organizado por famÌlias de tons e detecÁ„o inteligente.
+3.  **Fotos**: Inclus„o de atÈ 4 arquivos com suporte a editor de corte.
 
 ### Foto de Perfil do Equipamento
-1. Clique em **`üì∑ Tirar Foto`** ‚Äî abre c√¢mera do dispositivo
-2. Ou clique em **`üñºÔ∏è Galeria`** ‚Äî selecione arquivo do computador
-3. **Editor de imagem abre automaticamente** ‚Äî recorte, rotacione e ajuste
+1. Clique em **`? Tirar Foto`** ? abre c‚mera do dispositivo
+2. Ou clique em **`?? Galeria`** ? selecione arquivo do computador
+3. **Editor de imagem abre automaticamente** ? recorte, rotacione e ajuste
 4. Confirme o corte com **"Finalizar Corte"**
+5. Se o editor de corte n√£o estiver dispon√≠vel no navegador, o sistema usa fallback autom√°tico para n√£o bloquear a inclus√£o da foto.
+6. Ao selecionar v√°rias imagens na galeria, o sistema processa as fotos em sequ√™ncia at√© o limite de 4 arquivos por equipamento.
+
+### OrganizaÁ„o autom·tica das fotos no servidor
+- Cada equipamento salva as fotos em pasta prÛpria dentro de `public/uploads/equipamentos_perfil/`.
+- O nome da pasta segue o padr„o: `modelo-do-equipamento-nome_do_cliente`.
+- Regras do nome:
+  - Modelo: min˙sculo, sem acentos, espaÁos viram `-`.
+  - Cliente: min˙sculo, sem acentos, espaÁos viram `_`.
+  - Com v·rios clientes vinculados, os nomes s„o concatenados com `-`.
+- As fotos usam numeraÁ„o incremental na pasta: `perfil_1`, `perfil_2`, `perfil_3`, `perfil_4`.
+- Esse comportamento vale em cadastro, ediÁ„o, substituiÁ„o e exclus„o.
 
 ---
 
-### üåê Auto-preenchimento via Internet (Ponte de Modelos)
-Ao come√ßar a digitar o **Modelo** (com a Marca j√° selecionada), o sistema oferecer√°:
-1. **Modelos Cadastrados**: Itens que j√° existem na sua base local.
-2. **Sugest√µes da Internet**: Modelos reais buscados em APIs globais (Ex: Mercado Livre/Icecat).
+### ? Auto-preenchimento via Internet (Ponte de Modelos)
+Ao comeÁar a digitar o **Modelo** (com a Marca j· selecionada), o sistema oferecer·:
+1. **Modelos Cadastrados**: Itens que j· existem na sua base local.
+2. **Sugestıes da Internet**: Modelos reais buscados em APIs globais (Ex: Mercado Livre/Icecat).
 
 **Vantagens:**
-- Ao selecionar uma sugest√£o da internet, o sistema **auto-cadastra** o modelo na sua base de forma limpa (sem redund√¢ncias do tipo e marca).
-- Ao clicar no bot√£o `+ Novo` Modelo e preencher, a mesma busca inteligente vai lhe oferecer sugest√µes para garantir que a ortografia esteja perfeita.
-- Reduz drasticamente a digita√ß√£o de modelos duplicados ou com nomes fora do padr√£o.
+- Ao selecionar uma sugest„o da internet, o sistema **auto-cadastra** o modelo na sua base de forma limpa (sem redund‚ncias do tipo e marca).
+- Ao clicar no bot„o `+ Novo` Modelo e preencher, a mesma busca inteligente vai lhe oferecer sugestıes para garantir que a ortografia esteja perfeita.
+- Reduz drasticamente a digitaÁ„o de modelos duplicados ou com nomes fora do padr„o.
 
-> üí° Marcas e Modelos cadastrados ficam instantaneamente dispon√≠veis para todos os futuros cadastros.
+> ? Marcas e Modelos cadastrados ficam instantaneamente disponÌveis para todos os futuros cadastros.
 
 ---
 
-## üé® Seletor de Cor Profissional e Detec√ß√£o Inteligente
+## ? Seletor de Cor Profissional e DetecÁ„o Inteligente
 
-Nosso sistema conta com um seletor de cor inspirado em configuradores modernos (Apple/Samsung), garantindo precis√£o t√©cnica e visual:
+Nosso sistema conta com um seletor de cor inspirado em configuradores modernos (Apple/Samsung), garantindo precis„o tÈcnica e visual:
 
-1.  **Preview Grande**: Veja a cor selecionada em um mostrador grande que exibe o nome t√©cnico, c√≥digo HEX e valores RGB.
-2.  **Cat√°logo de Cores Realistas**: Escolha entre mais de 130 cores comerciais reais (ex: *Midnight, Titanium, Starlight, Sierra Blue, Graphite, Grafite, Prata, etc*), organizadas por categorias.
-3.  **Identifica√ß√£o Autom√°tica**: Ao usar o seletor manual ou digitar um c√≥digo HEX, o sistema identifica automaticamente a cor mais pr√≥xima no cat√°logo profissional e sugere o nome correto.
-4.  **Sugest√µes por Foto**: 
+1.  **Preview Grande**: Veja a cor selecionada em um mostrador grande que exibe o nome tÈcnico, cÛdigo HEX e valores RGB.
+2.  **Cat·logo de Cores Realistas**: Escolha entre mais de 130 cores comerciais reais (ex: *Midnight, Titanium, Starlight, Sierra Blue, Graphite, Grafite, Prata, etc*), organizadas por categorias.
+3.  **IdentificaÁ„o Autom·tica**: Ao usar o seletor manual ou digitar um cÛdigo HEX, o sistema identifica automaticamente a cor mais prÛxima no cat·logo profissional e sugere o nome correto.
+4.  **Sugestıes por Foto**: 
     - Envie a foto do aparelho ou tire uma nova.
-    - Ap√≥s o corte (`Crop`), o sistema escaneia a imagem e sugere a cor predominante.
-    - Clique em **`Aplicar`** para preencher instantaneamente todos os dados t√©cnicos de cor.
-5.  **Cores Pr√≥ximas**: Ao selecionar uma cor, o sistema exibe automaticamente tons semelhantes para facilitar o ajuste fino.
+    - ApÛs o corte (`Crop`), o sistema escaneia a imagem e sugere a cor predominante.
+    - Clique em **`Aplicar`** para preencher instantaneamente todos os dados tÈcnicos de cor.
+5.  **Cores PrÛximas**: Ao selecionar uma cor, o sistema exibe automaticamente tons semelhantes para facilitar o ajuste fino.
 
-**Dica:** O t√©cnico pode sempre editar manualmente o nome da cor sugerida para adicionar detalhes espec√≠ficos.
+**Dica:** O tÈcnico pode sempre editar manualmente o nome da cor sugerida para adicionar detalhes especÌficos.
 
 ---
 
-## üîé Visualizar Equipamento
+## Responsividade da tela de equipamentos
 
-Na tela de detalhes do equipamento voc√™ encontra:
+Melhorias aplicadas:
+
+- A tela de cadastro/edicao agora usa wrapper responsivo (`equip-form-page ds-form-layout`).
+- As abas (`Informacoes`, `Cor`, `Fotos`) suportam rolagem horizontal em telas menores.
+- Acoes da area de fotos (`Capturar`, `Galeria`) reorganizam para coluna no mobile.
+- Grade de miniaturas e rodape de acoes do formulario se ajustam automaticamente por breakpoint.
+
+## ? Visualizar Equipamento
+
+Na tela de detalhes do equipamento vocÍ encontra:
 - **Fotos** com galeria de miniaturas e zoom
-- **Ficha t√©cnica** (tipo, marca, modelo, s√©rie, cor, estado)
-- **Hist√≥rico de OS** vinculadas ao equipamento
+- **Ficha tÈcnica** (tipo, marca, modelo, sÈrie, cor, estado)
+- **HistÛrico de OS** vinculadas ao equipamento
 
 ---
 
-## üîó Vincular a Cliente
+## ? Vincular a Cliente
 
 Um equipamento pode ser vinculado a um cliente na tela de detalhes:
-- Bot√£o **"Vincular Cliente"**
-- O equipamento aparecer√° no perfil do cliente e nas sele√ß√µes de OS
+- Bot„o **"Vincular Cliente"**
+- O equipamento aparecer· no perfil do cliente e nas seleÁıes de OS
 
 ---
 
-## üóÇÔ∏è Categorias Auxiliares
+## ?? Categorias Auxiliares
 
-**Caminho:** OPERACIONAL ‚Üí Aparelhos / Equip. ‚Üí submenu
+**Caminho:** OPERACIONAL ? Aparelhos / Equip. ? submenu
 
-| Item | Fun√ß√£o |
+| Item | FunÁ„o |
 |------|--------|
 | **Tipos** | Gerencia os tipos (Smartphone, Notebook...) |
 | **Marcas** | Lista e cadastra marcas |

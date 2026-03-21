@@ -12,7 +12,7 @@ class OsModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $allowedFields = [
-        'numero_os', 'cliente_id', 'equipamento_id', 'tecnico_id', 'status',
+        'numero_os', 'cliente_id', 'equipamento_id', 'tecnico_id', 'status', 'estado_fluxo', 'status_atualizado_em',
         'prioridade', 'relato_cliente', 'diagnostico_tecnico', 'solucao_aplicada',
         'data_abertura', 'data_entrada', 'data_previsao', 'data_conclusao', 'data_entrega',
         'valor_mao_obra', 'valor_pecas', 'valor_total', 'desconto', 'valor_final',
@@ -35,8 +35,6 @@ class OsModel extends Model
         }
 
         foreach ($data['data'] as $field => $value) {
-            // Converter string vazia para NULL apenas se a coluna permitir NULL
-            // Para simplificar, converteremos campos de FK e datas conhecidos
             if (is_string($value) && trim($value) === '') {
                 $data['data'][$field] = null;
             }
@@ -91,20 +89,54 @@ class OsModel extends Model
         $config = $db->table('configuracoes');
         
         $prefixo = $config->where('chave', 'os_prefixo')->get()->getRow()->valor ?? 'OS';
-        $ano = date('Y');
-        $ultimoRow = $config->where('chave', 'os_ultimo_numero')->get()->getRow();
-        $ultimo = (int)($ultimoRow->valor ?? 0);
-        $novo = $ultimo + 1;
         
-        // Update counter
-        $db->table('configuracoes')->where('chave', 'os_ultimo_numero')->update(['valor' => $novo]);
+        $anoAtualShort = date('y'); // Ex: 26
+        $mesAtual = date('m');      // Ex: 03
         
-        return $prefixo . $ano . str_pad($novo, 4, '0', STR_PAD_LEFT);
+        $configAno = $config->where('chave', 'os_ano')->get()->getRow()->valor ?? '';
+        $configMes = $config->where('chave', 'os_mes')->get()->getRow()->valor ?? '';
+        
+        // Reset sequence if month or year changed
+        if ($anoAtualShort !== $configAno || $mesAtual !== $configMes) {
+            $novo = 1;
+            $db->table('configuracoes')->where('chave', 'os_ultimo_numero')->update(['valor' => $novo]);
+            $db->table('configuracoes')->where('chave', 'os_ano')->update(['valor' => $anoAtualShort]);
+            
+            $checkMes = $db->table('configuracoes')->where('chave', 'os_mes')->get()->getRow();
+            if ($checkMes) {
+                $db->table('configuracoes')->where('chave', 'os_mes')->update(['valor' => $mesAtual]);
+            } else {
+                $db->table('configuracoes')->insert(['chave' => 'os_mes', 'valor' => $mesAtual, 'tipo' => 'numero']);
+            }
+        } else {
+            $ultimoRow = $config->where('chave', 'os_ultimo_numero')->get()->getRow();
+            $ultimo = (int)($ultimoRow->valor ?? 0);
+            $novo = $ultimo + 1;
+            $db->table('configuracoes')->where('chave', 'os_ultimo_numero')->update(['valor' => $novo]);
+        }
+        
+        return $prefixo . $anoAtualShort . $mesAtual . str_pad($novo, 4, '0', STR_PAD_LEFT);
     }
 
     public function getDashboardStats()
     {
         $db = \Config\Database::connect();
+
+        if ($db->fieldExists('estado_fluxo', 'os')) {
+            return [
+                'total_abertas'      => (int)$db->table('os')->whereNotIn('estado_fluxo', ['encerrado', 'cancelado'])->countAllResults(),
+                'aguardando_analise' => (int)$db->table('os')->where('status', 'triagem')->countAllResults(),
+                'em_reparo'          => (int)$db->table('os')->whereIn('status', ['reparo_execucao', 'aguardando_reparo', 'retrabalho'])->countAllResults(),
+                'prontas'            => (int)$db->table('os')->where('estado_fluxo', 'pronto')->countAllResults(),
+                'entregues_hoje'     => (int)$db->table('os')->where('status', 'entregue_reparado')->where('DATE(data_entrega)', date('Y-m-d'))->countAllResults(),
+                'faturamento_mes'    => (float)($db->table('os')
+                                        ->selectSum('valor_final')
+                                        ->where('status', 'entregue_reparado')
+                                        ->where('MONTH(data_entrega)', date('m'))
+                                        ->where('YEAR(data_entrega)', date('Y'))
+                                        ->get()->getRow()->valor_final ?? 0),
+            ];
+        }
 
         return [
             'total_abertas'      => (int)$db->table('os')->whereNotIn('status', ['entregue','cancelado'])->countAllResults(),

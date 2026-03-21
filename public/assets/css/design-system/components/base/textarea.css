@@ -1,0 +1,5 @@
+﻿textarea.form-control {
+    min-height: 110px;
+    resize: vertical;
+    line-height: 1.45;
+}

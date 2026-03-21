@@ -39,12 +39,49 @@ class Admin extends BaseController
         $osModel = new OsModel();
         $db = \Config\Database::connect();
 
-        // OS by status for chart
-        $statusCount = $db->table('os')
-            ->select('status, COUNT(*) as total')
-            ->whereNotIn('status', ['entregue', 'cancelado'])
-            ->groupBy('status')
-            ->get()->getResultArray();
+        $hasEstadoFluxo = $db->fieldExists('estado_fluxo', 'os');
+        $hasStatusTable = $db->tableExists('os_status');
+
+        $statusBuilder = $db->table('os')->select('os.status, COUNT(*) as total');
+        if ($hasStatusTable) {
+            $statusBuilder
+                ->select('COALESCE(os_status.nome, os.status) as status_nome')
+                ->select('COALESCE(os_status.grupo_macro, "outros") as macrofase')
+                ->join('os_status', 'os_status.codigo = os.status', 'left')
+                ->groupBy('os_status.nome')
+                ->groupBy('os_status.grupo_macro');
+        } else {
+            $statusBuilder
+                ->select('os.status as status_nome')
+                ->select('"outros" as macrofase', false);
+        }
+
+        if ($hasEstadoFluxo) {
+            $statusBuilder->whereNotIn('os.estado_fluxo', ['encerrado', 'cancelado']);
+        } else {
+            $statusBuilder->whereNotIn('os.status', ['entregue', 'cancelado']);
+        }
+
+        $statusBuilder->groupBy('os.status');
+        $statusCount = $statusBuilder->get()->getResultArray();
+
+        $macroBuilder = $db->table('os');
+        if ($hasStatusTable) {
+            $macroBuilder
+                ->select('COALESCE(os_status.grupo_macro, "outros") as macrofase, COUNT(*) as total')
+                ->join('os_status', 'os_status.codigo = os.status', 'left')
+                ->groupBy('os_status.grupo_macro');
+        } else {
+            $macroBuilder
+                ->select('"outros" as macrofase, COUNT(*) as total', false)
+                ->groupBy('macrofase');
+        }
+        if ($hasEstadoFluxo) {
+            $macroBuilder->whereNotIn('os.estado_fluxo', ['encerrado', 'cancelado']);
+        } else {
+            $macroBuilder->whereNotIn('os.status', ['entregue', 'cancelado']);
+        }
+        $macroCount = $macroBuilder->get()->getResultArray();
 
         // Monthly revenue for chart (last 6 months)
         $faturamento = [];
@@ -55,7 +92,7 @@ class Admin extends BaseController
 
             $total = $db->table('os')
                 ->selectSum('valor_final')
-                ->where('status', 'entregue')
+                ->whereIn('status', ['entregue_reparado', 'entregue_pagamento_pendente', 'entregue'])
                 ->where('MONTH(data_entrega)', $mes)
                 ->where('YEAR(data_entrega)', $ano)
                 ->get()->getRow()->valor_final ?? 0;
@@ -68,6 +105,7 @@ class Admin extends BaseController
 
         return $this->response->setJSON([
             'status_count' => $statusCount,
+            'macro_count' => $macroCount,
             'faturamento'  => $faturamento,
         ]);
     }

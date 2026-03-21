@@ -6,7 +6,7 @@
         <div class="d-flex justify-content-between align-items-center">
             <h1 class="h3 mb-0 text-gray-800">Gerenciar Usuários</h1>
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('usuarios')" title="Ajuda sobre UsuÃ¡rios e PermissÃµes">
+                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('usuarios')" title="Ajuda sobre Usuários e Permissões">
                     <i class="bi bi-question-circle me-1"></i>Ajuda
                 </button>
             <?php if (can('usuarios', 'criar')): ?>

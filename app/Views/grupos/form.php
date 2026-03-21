@@ -6,7 +6,7 @@
 <div class="page-header d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0"><i class="bi bi-shield-lock me-2"></i><?= $title ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('grupos')" title="Ajuda sobre Grupos e PermissÃµes">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('grupos')" title="Ajuda sobre Grupos e Permissões">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('grupos') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('grupos') ?>"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
@@ -24,7 +24,7 @@
                        placeholder="Ex: Vendedor, Supervisor, Caixa...">
             </div>
             <div class="mb-4">
-                <label class="form-label fw-bold">Descrição <small class="text-muted">(opcional)</small></label>
+                <label class="form-label fw-bold">Descri��o <small class="text-muted">(opcional)</small></label>
                 <textarea name="descricao" class="form-control" rows="2" maxlength="200"
                           placeholder="Descreva brevemente as responsabilidades deste grupo..."><?= esc($grupo['descricao'] ?? old('descricao')) ?></textarea>
             </div>

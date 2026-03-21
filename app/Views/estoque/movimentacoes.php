@@ -4,7 +4,7 @@
 <div class="page-header">
     <h2><i class="bi bi-arrow-left-right me-2"></i><?= $title ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('estoque-movimentacoes')" title="Ajuda sobre MovimentaÃ§Ãµes">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('estoque-movimentacoes')" title="Ajuda sobre Movimentações">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('estoque') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('estoque') ?>"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
@@ -57,7 +57,7 @@
                         <th>Quantidade</th>
                         <th>Motivo</th>
                         <th>OS</th>
-                        <th>Responsável</th>
+                        <th>Respons�vel</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -68,7 +68,7 @@
                             <?php if ($m['tipo'] === 'entrada'): ?>
                                 <span class="badge bg-success">Entrada</span>
                             <?php elseif ($m['tipo'] === 'saida'): ?>
-                                <span class="badge bg-danger">Saída</span>
+                                <span class="badge bg-danger">Sa�da</span>
                             <?php else: ?>
                                 <span class="badge bg-warning text-dark">Ajuste</span>
                             <?php endif; ?>

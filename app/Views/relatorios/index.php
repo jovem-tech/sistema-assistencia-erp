@@ -4,7 +4,7 @@
 
 <div class="page-header d-flex justify-content-between align-items-center">
     <h2><i class="bi bi-file-earmark-bar-graph-fill me-2"></i><?= esc($title) ?></h2>
-    <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sobre RelatÃ³rios">
+    <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sobre Relatórios">
         <i class="bi bi-question-circle me-1"></i>Ajuda
     </button>
 </div>

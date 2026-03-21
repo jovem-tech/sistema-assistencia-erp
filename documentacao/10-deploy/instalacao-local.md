@@ -1,124 +1,68 @@
-# Instalação Local (XAMPP)
+# Instalacao Local (Windows + XAMPP)
 
-## Pré-requisitos
+Atualizado em 17/03/2026.
 
-| Software | Versão Mínima |
-|----------|---------------|
-| **XAMPP** | 8.2+ |
-| **PHP** | 8.2+ |
-| **MySQL / MariaDB** | 10.4+ |
-| **Apache** | 2.4+ |
+## 1. Requisitos
 
----
+- XAMPP (PHP 8.2+)
+- MySQL/MariaDB
+- Node.js 20+
 
-## Passo a Passo
+## 2. ERP local
 
-### 1. Instalar XAMPP
-
-Baixe em: https://www.apachefriends.org
-
-Configure para usar a porta **8081** (ou 8080) para evitar conflito com outras aplicações:
-- Abra `XAMPP Control Panel`
-- Apache → Config → `httpd.conf`
-- Altere `Listen 80` para `Listen 8081`
-
----
-
-### 2. Clonar o Projeto
+1. Importar banco (`database.sql`) se aplicavel.
+2. Configurar `.env` local (`app.baseURL`, banco, etc.).
+3. Rodar migrations:
 
 ```bash
-# Na pasta htdocs do XAMPP
-cd C:\xampp\htdocs
-
-# Clonar repositório (se usar Git)
-git clone https://github.com/seu-usuario/sistema-assistencia.git
-
-# Ou descompacte o ZIP na pasta sistema-assistencia
+C:\xampp\php\php.exe spark migrate
 ```
 
----
+4. Iniciar Apache + MySQL e abrir o host definido em `app.baseURL` (ex.: `http://localhost:8084`).
 
-### 3. Importar o Banco de Dados
-
-1. Abra o phpMyAdmin: `http://localhost/phpmyadmin`
-2. Crie um banco chamado `assistencia_tecnica`
-3. Importe o arquivo SQL: `database.sql`
-
-Ou via linha de comando:
-```bash
-C:\xampp\mysql\bin\mysql.exe -u root assistencia_tecnica < database.sql
-```
-
----
-
-### 4. Executar scripts de atualizaÃ§Ã£o (apÃ³s importar o banco)
-
-1. Acesse no navegador:
-   - `http://localhost:8081/update_equip_db.php` (migra tipos/marcas/modelos)
-   - `http://localhost:8081/update_os_campos.php` (adiciona campos de OS: acessórios e forma de pagamento)
-   - `http://localhost:8081/setup_rbac.php` (cria RBAC e permissÃµes)
-2. Verifique se as mensagens retornaram sucesso.
-
-> **ObservaÃ§Ã£o:** esses scripts sÃ£o idempotentes e podem ser executados mais de uma vez com seguranÃ§a.
-
-### 5. Configurar o `.env`
-
-Copie o arquivo de exemplo:
-```bash
-cp env .env
-```
-
-Edite o `.env`:
-```ini
-CI_ENVIRONMENT = development
-
-app.baseURL = 'http://localhost:8081/'
-
-database.default.hostname = localhost
-database.default.database = assistencia_tecnica
-database.default.username = root
-database.default.password = 
-database.default.DBDriver = MySQLi
-database.default.port     = 3306
-```
-
----
-
-### 6. Configurar Permissões de Pasta
+## 3. Gateway local WhatsApp
 
 ```bash
-# Windows — dar controle total
-icacls "C:\xampp\htdocs\sistema-assistencia\writable" /grant Users:F /T
-icacls "C:\xampp\htdocs\sistema-assistencia\public\uploads" /grant Users:F /T
+cd C:\xampp\htdocs\sistema-assistencia\whatsapp-api
+copy .env.example .env
+npm install
+node server.js
 ```
 
----
+Sugestao minima no `.env` do gateway (ajuste para o mesmo host/porta do ERP):
 
-### 7. Iniciar o Sistema
-
-1. Abra o **XAMPP Control Panel**
-2. Inicie **Apache** e **MySQL**
-3. Acesse: `http://localhost:8081/`
-
----
-
-### 8. Login Inicial
-
-```
-Email: admin@sistema.com
-Senha: admin123
+```env
+NODE_ENV=development
+PORT=3001
+API_TOKEN=TOKEN_FORTE_LOCAL
+ERP_ORIGIN=http://localhost:8084
+ERP_WEBHOOK_URL=http://localhost:8084/webhooks/whatsapp
+ERP_WEBHOOK_TOKEN=SEU_TOKEN_WEBHOOK
+WHATSAPP_SESSION_PATH=./.wwebjs_auth
+SESSION_PATH=./.wwebjs_auth
+LOGS_DIR=./logs
 ```
 
-> ⚠️ **Troque a senha imediatamente após o primeiro acesso!**
+## 4. Configuracao no ERP
 
----
+Em `Configuracoes -> Integracoes WhatsApp`:
 
-## Solução de Problemas
+1. Definir `Canal Direto` como `api_whats_local`.
+2. Preencher:
+   - `whatsapp_local_node_url` (ex.: `http://127.0.0.1:3001`)
+   - `whatsapp_local_node_token` (igual ao `API_TOKEN`)
+   - `whatsapp_local_node_origin` (`http://localhost:8084`)
+   - `whatsapp_local_node_timeout`
+3. Salvar.
+4. Executar:
+   - `Testar conexao`
+   - `Enviar mensagem de teste`
+   - `Gerenciar` para QR/status/restart
 
-| Problema | Solução |
-|----------|---------|
-| Página branca | Verifique `writable/logs/` para erros PHP |
-| Erro 404 | Verifique se `mod_rewrite` está ativo no Apache |
-| Erro de banco | Confirme credenciais no `.env` |
-| Uploads não funcionam | Verifique permissões de `public/uploads/` |
-| CEP não preenche | Verifique conexão com internet (API ViaCEP) |
+## 5. Erros comuns
+
+- `gateway_unreachable`: Node parado, porta ou URL incorreta.
+- `unauthorized`: token salvo no ERP diferente de `API_TOKEN`.
+- `forbidden_origin`: `ERP_ORIGIN` nao inclui o host/porta ativo do ERP (ex.: `http://localhost:8084`).
+- inbound nao chega no CRM/central: `ERP_WEBHOOK_URL` do gateway aponta para host/porta diferente do ERP.
+- `not_ready`: QR ainda nao autenticado.

@@ -4,10 +4,10 @@
 <div class="page-header d-flex justify-content-between align-items-center mb-4">
     <div>
         <h2 class="mb-0"><i class="bi bi-grid-3x3-gap me-2"></i><?= esc($title) ?></h2>
-        <small class="text-muted">Marque as permiss√µes que este grupo dever√° ter por m√≥dulo</small>
+        <small class="text-muted">Marque as permissıes que este grupo dever· ter por mÛdulo</small>
     </div>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('grupos')" title="Ajuda sobre Grupos e Permiss√É¬µes">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('grupos')" title="Ajuda sobre Grupos e Permiss√µes">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('grupos') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('grupos') ?>"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
@@ -23,7 +23,7 @@
                     <thead>
                         <tr>
                             <th class="ps-4 py-3" style="min-width:200px; background:rgba(0,0,0,.2);">
-                                <i class="bi bi-layers me-1 text-info"></i>M√≥dulo
+                                <i class="bi bi-layers me-1 text-info"></i>MÛdulo
                             </th>
                             <?php foreach ($permissoes as $p): ?>
                             <th class="text-center py-3" style="background:rgba(0,0,0,.2); min-width: 110px;">
@@ -55,7 +55,7 @@
                             <td class="text-center align-middle">
                                 <div class="form-check d-flex justify-content-center">
                                     <?php if ($isDisabled): ?>
-                                        <i class="bi bi-dash-circle text-muted" title="N√£o aplic√°vel a Clientes"></i>
+                                        <i class="bi bi-dash-circle text-muted" title="N„o aplic·vel a Clientes"></i>
                                     <?php else: ?>
                                         <input class="form-check-input perm-check" type="checkbox"
                                                name="permissoes[]"
@@ -69,7 +69,7 @@
                                 </div>
                             </td>
                             <?php endforeach; ?>
-                            <!-- Coluna "Todos" por m√≥dulo -->
+                            <!-- Coluna "Todos" por mÛdulo -->
                             <td class="text-center align-middle">
                                 <div class="form-check d-flex justify-content-center">
                                     <?php
@@ -82,7 +82,7 @@
                                            data-modulo="<?= $m['id'] ?>"
                                            <?= $allChecked ? 'checked' : '' ?>
                                            style="width:18px; height:18px; cursor:pointer; opacity:.7;"
-                                           title="Marcar/desmarcar todas as permiss√µes de <?= esc($m['nome']) ?>">
+                                           title="Marcar/desmarcar todas as permissıes de <?= esc($m['nome']) ?>">
                                 </div>
                             </td>
                         </tr>
@@ -96,7 +96,7 @@
                                 <input class="form-check-input check-all-col" type="checkbox"
                                        data-permissao="<?= $p['slug'] ?>"
                                        style="width:18px; height:18px; cursor:pointer; opacity:.7;"
-                                       title="Marcar '<?= esc($p['nome']) ?>'' para todos os m√≥dulos">
+                                       title="Marcar '<?= esc($p['nome']) ?>'' para todos os mÛdulos">
                             </td>
                             <?php endforeach; ?>
                             <td></td>
@@ -110,14 +110,14 @@
     <div class="mt-3 d-flex gap-2 justify-content-end">
         <a href="<?= base_url('grupos') ?>" class="btn btn-outline-secondary">Cancelar</a>
         <button type="submit" class="btn btn-glow px-5">
-            <i class="bi bi-save me-1"></i>Salvar Permiss√µes
+            <i class="bi bi-save me-1"></i>Salvar Permissıes
         </button>
     </div>
 </form>
 
 <?= $this->section('scripts') ?>
 <script>
-// Marcar/desmarcar toda a linha (m√≥dulo)
+// Marcar/desmarcar toda a linha (mÛdulo)
 document.querySelectorAll('.check-all-row').forEach(rowChk => {
     rowChk.addEventListener('change', function() {
         const moduloId = this.dataset.modulo;
@@ -126,7 +126,7 @@ document.querySelectorAll('.check-all-row').forEach(rowChk => {
     });
 });
 
-// Marcar/desmarcar toda a coluna (permiss√£o)
+// Marcar/desmarcar toda a coluna (permiss„o)
 document.querySelectorAll('.check-all-col').forEach(colChk => {
     colChk.addEventListener('change', function() {
         const permSlug = this.dataset.permissao;
@@ -136,7 +136,7 @@ document.querySelectorAll('.check-all-col').forEach(colChk => {
     });
 });
 
-// Quando check individual muda ‚Üí atualiza "todos" da linha
+// Quando check individual muda ? atualiza "todos" da linha
 document.querySelectorAll('.perm-check').forEach(cb => {
     cb.addEventListener('change', () => syncRowCheckboxes());
 });

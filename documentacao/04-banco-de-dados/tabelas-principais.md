@@ -1,201 +1,192 @@
 # Tabelas Principais do Banco de Dados
 
-> Banco: `assistencia_tecnica`
+Base: `assistencia_tecnica`  
+Atualizado em 20/03/2026 (modulo WhatsApp unificado + CRM/Central + contatos)
 
----
+## Nucleo operacional
+- `clientes`
+- `contatos`
+- `equipamentos`
+- `equipamentos_fotos`
+- `os`
+- `os_itens`
+- `os_fotos`
+- `acessorios_os`
+- `fotos_acessorios`
+- `estado_fisico_equipamento`
+- `estado_fisico_fotos`
 
-## `clientes`
+## Fluxo de OS (pre-CRM)
+- `os_status`
+- `os_status_transicoes`
+- `os_status_historico`
 
-| Coluna | Tipo | Nulo | Descrição |
-|--------|------|------|-----------|
-| `id` | INT PK AUTO | NÃO | Identificador único |
-| `tipo_pessoa` | ENUM('fisica','juridica') | NÃO | Tipo de pessoa |
-| `nome_razao` | VARCHAR(100) | NÃO | Nome ou razão social |
-| `cpf_cnpj` | VARCHAR(20) | SIM | CPF ou CNPJ (UNIQUE NULL) |
-| `rg_ie` | VARCHAR(30) | SIM | RG ou inscrição estadual |
-| `email` | VARCHAR(100) | SIM | Email (UNIQUE NULL) |
-| `telefone1` | VARCHAR(20) | NÃO | Telefone principal |
-| `telefone2` | VARCHAR(20) | SIM | Telefone alternativo |
-| `nome_contato` | VARCHAR(100) | SIM | Nome de contato adicional |
-| `telefone_contato` | VARCHAR(20) | SIM | Telefone do contato adicional |
-| `cep` | VARCHAR(9) | SIM | CEP |
-| `endereco` | VARCHAR(150) | SIM | Logradouro |
-| `numero` | VARCHAR(10) | SIM | Número |
-| `complemento` | VARCHAR(50) | SIM | Complemento |
-| `bairro` | VARCHAR(80) | SIM | Bairro |
-| `cidade` | VARCHAR(80) | SIM | Cidade |
-| `uf` | CHAR(2) | SIM | Estado |
-| `observacoes` | TEXT | SIM | Observações gerais |
-| `created_at` | DATETIME | SIM | Data de criação |
-| `updated_at` | DATETIME | SIM | Última atualização |
+## CRM integrado
 
----
+### Timeline e interacoes
+- `crm_eventos`
+- `crm_interacoes`
+- `crm_mensagens`
 
-## `equipamentos`
+### Acompanhamento e pipeline
+- `crm_followups`
+- `crm_pipeline`
+- `crm_pipeline_etapas`
 
-| Coluna | Tipo | Nulo | Descrição |
-|--------|------|------|-----------|
-| `id` | INT PK AUTO | NÃO | ID |
-| `cliente_id` | INT FK | SIM | Vincula ao cliente |
-| `tipo_id` | INT FK | NÃO | Tipo do equipamento |
-| `marca_id` | INT FK | NÃO | Marca |
-| `modelo_id` | INT FK | NÃO | Modelo |
-| `numero_serie` | VARCHAR(100) | SIM | Nº de série |
-| `imei` | VARCHAR(20) | SIM | Identificador móvel |
-| `senha_acesso` | VARCHAR(255) | SIM | PIN ou senha |
-| `cor` | VARCHAR(50) | SIM | Cor em texto (Ex: Preto) |
-| `cor_hex` | VARCHAR(7) | SIM | Cor em HEX (Ex: #000000) |
-| `cor_rgb` | VARCHAR(30) | SIM | Cor em RGB (Ex: 0,0,0) |
-| `estado_fisico` | TEXT | SIM | Descrição do estado físico |
-| `acessorios` | TEXT | SIM | Acessórios acompanhando |
-| `observacoes` | TEXT | SIM | Observações adicionais |
-| `created_at` | DATETIME | — | Criação |
-| `updated_at` | DATETIME | — | Atualização |
+### Segmentacao/expansao
+- `crm_tags`
+- `crm_tags_cliente`
+- `crm_oportunidades`
+- `crm_automacoes`
 
----
+## Central de Mensagens
+- `conversas_whatsapp`
+- `conversa_os`
+- `conversa_tags`
+- `respostas_rapidas_whatsapp`
+- `chatbot_intencoes`
+- `chatbot_faq`
+- `chatbot_fluxos`
+- `chatbot_logs`
+- `chatbot_regras_erp`
+- `mensageria_metricas_diarias`
 
-## `os` (Ordens de Serviço)
+Campos chave em `conversas_whatsapp`:
+- `contato_id`
+- `status` (`aberta`, `aguardando`, `resolvida`, `arquivada`)
+- `responsavel_id`
+- `primeira_mensagem_em`
+- `ultima_mensagem_em`
+- `nao_lidas`
+- `automacao_ativa`
+- `aguardando_humano`
+- `prioridade`
 
-| Coluna | Tipo | Nulo | Descrição |
-|--------|------|------|-----------|
-| `id` | INT PK AUTO | NÃO | ID |
-| `numero_os` | VARCHAR(20) | NÃO | Número único da OS (UNIQUE) |
-| `cliente_id` | INT FK | NÃO | Cliente |
-| `equipamento_id` | INT FK | NÃO | Equipamento |
-| `tecnico_id` | INT FK | SIM | Funcionário técnico responsável |
-| `status` | VARCHAR(30) | NÃO | Status atual da OS |
-| `prioridade` | ENUM | NÃO | baixa/normal/alta/urgente |
-| `relato_cliente` | TEXT | NÃO | Descrição do problema |
-| `diagnostico_tecnico` | TEXT | SIM | Diagnóstico |
-| `solucao_aplicada` | TEXT | SIM | Solução realizada |
-| `acessorios` | TEXT | SIM | Acessórios e componentes recebidos |
-| `forma_pagamento` | VARCHAR(30) | SIM | Forma de pagamento preferida |
-| `data_abertura` | DATETIME | SIM | Data de abertura |
-| `valor_mao_obra` | DECIMAL(10,2) | SIM | Valor do serviço |
-| `valor_pecas` | DECIMAL(10,2) | SIM | Valor das peças |
-| `valor_total` | DECIMAL(10,2) | SIM | Subtotal |
-| `desconto` | DECIMAL(10,2) | SIM | Desconto |
-| `valor_final` | DECIMAL(10,2) | SIM | Total |
-| `orcamento_aprovado` | TINYINT(1) | SIM | Orçamento aprovado |
-| `data_aprovacao` | DATETIME | SIM | Data de aprovação |
-| `orcamento_pdf` | VARCHAR(255) | SIM | PDF do orçamento |
-| `garantia_dias` | INT | SIM | Prazo de garantia |
-| `data_entrada` | DATETIME | NÃO | Data em que o equipamento foi recebido (preenchida automaticamente ao criar a OS) |
-| `data_previsao` | DATE | SIM | Previsão de entrega |
-| `data_conclusao` | DATETIME | SIM | Conclusão do reparo |
-| `data_entrega` | DATETIME | SIM | Entrega ao cliente |
-| `observacoes_internas` | TEXT | SIM | Observações internas |
-| `observacoes_cliente` | TEXT | SIM | Observações para o cliente |
-| `created_at` | DATETIME | — | — |
-| `updated_at` | DATETIME | — | — |
+Campos chave em `contatos`:
+- `cliente_id` (nullable)
+- `telefone`
+- `telefone_normalizado` (unique)
+- `whatsapp_nome_perfil`
+- `origem`
+- `status_relacionamento` (`lead_novo`, `lead_qualificado`, `cliente_convertido`)
+- `engajamento_status` (`ativo`, `em_risco`, `inativo`)
+- `engajamento_recalculado_em`
+- `qualificado_em`
+- `convertido_em`
+- `ultimo_contato_em`
 
----
+Indice operacional:
+- `idx_contatos_status_relacionamento` (filtro e metricas de funil)
+- `idx_contatos_engajamento_status` (segmentacao de recencia/reativacao)
 
-## `acessorios_os`
+Regra de negocio:
+- contato pode existir sem cliente vinculado
+- vinculacao em `clientes` ocorre quando ha conversao operacional (ex.: abertura de OS)
 
-| Coluna | Tipo | Nulo | Descrição |
-|--------|------|------|-----------|
-| `id` | INT PK AUTO | NÃO | ID |
-| `os_id` | INT FK (`os.id`) | NÃO | Ordem de serviço que recebeu o acessório |
-| `descricao` | VARCHAR(255) | NÃO | Texto padronizado exibido no card (ex: "Capinha celular – preta") |
-| `tipo` | VARCHAR(50) | SIM | Identificador do botão (chip, capinha, cabo, etc.) |
-| `valores` | TEXT | SIM | JSON com campos complementares (cor, tipo de cabo, últimos dígitos, etc.) |
-| `created_at` | DATETIME | SIM | Registro criado |
-| `updated_at` | DATETIME | SIM | Última atualização |
+## Mensageria WhatsApp
 
----
+### `mensagens_whatsapp` (log principal)
+Campos relevantes:
+- `conversa_id`
+- `provider`
+- `provider_message_id`
+- `direcao` (`inbound`/`outbound`)
+- `tipo_conteudo` (`texto`, `pdf`, `imagem`, ...)
+- `cliente_id`
+- `os_id`
+- `telefone`
+- `tipo_mensagem`
+- `mensagem`
+- `arquivo`
+- `anexo_path`
+- `mime_type`
+- `status`
+- `resposta_api`
+- `erro`
+- `payload`
+- `lida_em`
+- `enviada_em`
+- `usuario_id`
+- `created_at`
+- `updated_at`
 
-## `fotos_acessorios`
+Observacoes:
+- mensagens inbound com anexo podem ser persistidas sem texto (`mensagem = NULL`), mantendo `arquivo` e `mime_type`.
+- anexos inbound salvos em `public/uploads/whatsapp/inbound/YYYY/MM`.
 
-| Coluna | Tipo | Nulo | Descrição |
-|--------|------|------|-----------|
-| `id` | INT PK AUTO | NÃO | ID |
-| `acessorio_id` | INT FK (`acessorios_os.id`) | NÃO | Acessório vinculado |
-| `arquivo` | VARCHAR(255) | NÃO | Nome do arquivo armazenado em `uploads/acessorios/OS_<numero>` |
-| `created_at` | DATETIME | SIM | Registro criado |
-| `updated_at` | DATETIME | SIM | Última atualização |
+### Outras tabelas de mensageria
+- `whatsapp_envios` (compatibilidade operacional)
+- `whatsapp_mensagens` (legado)
+- `whatsapp_templates`
+- `whatsapp_inbound`
 
----
+### Regras dinamicas de automacao
+Tabela: `chatbot_regras_erp`
 
-## `os_fotos`
+Campos relevantes:
+- `evento_origem` (ex.: `os_status_alterado`, `reparado_disponivel_loja`)
+- `condicao_json`
+- `acao_json`
+- `ativo`
 
-| Coluna | Tipo | Nulo | Descrição |
-|--------|------|------|-----------|
-| `id` | INT PK AUTO | NÃO | ID |
-| `os_id` | INT FK | NÃO | Ordem de serviço |
-| `tipo` | ENUM | NÃO | recepcao / reparo / conclusao |
-| `arquivo` | VARCHAR(255) | NÃO | Nome do arquivo |
-| `created_at` | DATETIME | SIM | Data de envio |
+Acoes suportadas:
+- `template`
+- `followup`
+- `crm_evento`
 
----
+## Documentos PDF
+- `os_documentos`
 
-## `servicos`
+Tipos usados:
+- `abertura`
+- `orcamento`
+- `laudo`
+- `entrega`
+- `devolucao_sem_reparo`
 
-| Coluna | Tipo | Nulo | Descrição |
-|--------|------|------|-----------|
-| `id` | INT PK AUTO | NÃO | ID |
-| `nome` | VARCHAR(100) | NÃO | Nome do serviço |
-| `descricao` | TEXT | SIM | Descrição técnica |
-| `valor` | DECIMAL(10,2) | NÃO | Valor padrão |
-| `status` | VARCHAR(20) | SIM | ativo / inativo |
-| `created_at` | DATETIME | SIM | Criação |
-| `updated_at` | DATETIME | SIM | Atualização |
+## Configuracoes relevantes (`configuracoes`)
 
----
+### Provedor direto
+- `whatsapp_enabled`
+- `whatsapp_direct_provider`
+- `whatsapp_bulk_provider`
 
-## `equipamentos_tipos` / `equipamentos_marcas` / `equipamentos_modelos`
+### Menuia
+- `whatsapp_menuia_url`
+- `whatsapp_menuia_appkey`
+- `whatsapp_menuia_authkey`
 
-```sql
--- Tipos
-id | nome
+### Gateway local (Windows)
+- `whatsapp_local_node_url`
+- `whatsapp_local_node_token`
+- `whatsapp_local_node_origin`
+- `whatsapp_local_node_timeout`
 
--- Marcas  
-id | nome
+### Gateway Linux (VPS)
+- `whatsapp_linux_node_url`
+- `whatsapp_linux_node_token`
+- `whatsapp_linux_node_origin`
+- `whatsapp_linux_node_timeout`
 
--- Modelos
-id | marca_id | nome
-```
+### Webhook/inbound
+- `whatsapp_webhook_token`
+- `whatsapp_webhook_url`
+- `whatsapp_webhook_method`
+- `whatsapp_webhook_headers`
+- `whatsapp_webhook_payload`
 
----
+### CRM (engajamento temporal)
+- `crm_engajamento_ativo_dias`
+- `crm_engajamento_risco_dias`
 
-## `usuarios`
-
-| Coluna | Tipo | Descrição |
-|--------|------|-----------|
-| `id` | INT PK | ID |
-| `nome` | VARCHAR(100) | Nome de exibição |
-| `email` | VARCHAR(100) UNIQUE | Login |
-| `senha` | VARCHAR(255) | Hash bcrypt |
-| `perfil` | ENUM | Perfil legado (admin/tecnico/atendente) |
-| `grupo_id` | INT FK | Grupo de permissões |
-| `ativo` | TINYINT | 1=ativo, 0=bloqueado |
-
----
-
-## `grupos` / `modulos` / `permissoes` / `grupo_permissoes`
-
-```sql
-grupos:
-  id | nome | descricao
-
-modulos:
-  id | nome | slug | icone | ordem_menu | ativo
-
-permissoes:
-  id | nome | slug (visualizar/criar/editar/excluir/importar/exportar/encerrar)
-
-grupo_permissoes:
-  grupo_id | modulo_id | permissao_id
-```
-
----
-
-## `logs`
-
-| Coluna | Tipo | Descrição |
-|--------|------|-----------|
-| `id` | INT PK | ID |
-| `user_id` | INT | Usuário que realizou |
-| `acao` | VARCHAR(100) | Tipo da ação |
-| `descricao` | TEXT | Detalhes |
-| `created_at` | DATETIME | Data/hora |
+## Migrations relacionadas
+- `2026-03-16-090000_PreCrmFoundation.php`
+- `2026-03-16-121500_AddMenuiaDirectAndWhatsappEnvios.php`
+- `2026-03-16-210500_AddLocalGatewayAndMensagensWhatsapp.php`
+- `2026-03-17-100000_AddLinuxGatewayConfig.php`
+- `2026-03-17-120000_CreateCrmAndCentralMensagens.php`
+- `2026-03-17-193000_AddCrmMensagensSeedTagsAutomacoes.php`
+- `2026-03-20-060000_RemoveWhaticketLegacyModule.php`
+- `2026-03-20-070500_CreateContatosAndLinkConversas.php`
+- `2026-03-20-091500_AddContatoLifecycleMarketingFields.php`
+- `2026-03-20-120500_AddContatoEngajamentoLifecycleWindow.php`

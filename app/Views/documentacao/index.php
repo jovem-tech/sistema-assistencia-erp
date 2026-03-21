@@ -348,17 +348,35 @@ function renderTree(array $items): void {
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+    .wiki-layout {
+        height: calc(100vh - 132px);
+    }
+
+    .wiki-content-body {
+        padding: 24px 22px;
+    }
+}
+
 @media (max-width: 768px) {
     .wiki-sidebar {
         position: absolute;
         z-index: 1000;
         height: 100%;
+        width: min(84vw, 300px);
+        min-width: min(84vw, 300px);
         background: var(--sidebar-bg, #1e1e2e);
-        left: -300px;
+        left: -100%;
         transition: left 0.3s ease;
     }
     .wiki-sidebar.mobile-open { left: 0; }
-    .wiki-layout { position: relative; }
+    .wiki-layout {
+        position: relative;
+        height: calc(100vh - 170px);
+    }
+    .wiki-content-body {
+        padding: 18px 14px;
+    }
 }
 </style>
 

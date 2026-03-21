@@ -1,37 +1,46 @@
-# Melhorias na Abertura de OS (Nova)
+# 2026-03 - Melhorias em OS Nova
 
-## Visão Geral
-Atualização de UX da tela `OS > Nova` para reduzir retrabalho, deixar o contexto visível durante o preenchimento e registrar todos os acessórios entregues com fotos.
+## Objetivo
+Padronizar a recepcao de OS com foco em:
+- registro rapido
+- evidencias visuais
+- separacao clara entre dados cadastrais e dados de entrada tecnica
 
-## Principais Mudanças
-- **Resumo lateral completo** mostra cliente, equipamento, técnico, prioridade, status, datas, faults e contadores com indicadores ✓/✕.
-- **Sidebar persistente do equipamento** exibe foto principal, miniaturas e a cor do aparelho, mesmo quando ainda não há imagem carregada.
-- **Upload de fotos repaginado** usa o mesmo painel do cadastro de equipamentos (drag/drop, galeria/câmera, previews clicáveis).
-- **Botões rápidos de acessórios** (chip, capinhas, cabo, carregador, mochilas, entre outros) padronizam o texto e capturam campos extras antes de salvar.
-- **Cor em acessórios com UX padronizada**: o formulário rápido usa seletor de cor e salva apenas o nome da cor no texto final do item (sem “sem cor”, sem hífen e sem exibir HEX).
-- **Tipos de cabo expandidos**: incluída opção `Cabo de força` e, ao selecionar `Outro`, o sistema abre campo manual para detalhar o tipo.
-- **Fotos por acessório** armazenadas sob `uploads/acessorios/OS_<número>` e exibidas tanto na seção de acessórios quanto na aba “Fotos”.
-- **Tabela de suporte para acessórios** (`acessorios_os` e `fotos_acessorios`) permite salvar cada item com metadados e várias imagens.
-- **Campo `data_entrada` na tabela `os`** garante rastreabilidade da data em que o equipamento chegou.
-- **Prazo em dias** agora coloca automaticamente a data de previsão (1, 3, 7 e 30 dias).
-- **Rascunho automático local** com ações de restaurar, descartar e limpar o cache do navegador.
-- **Abas organizadas na abertura** (Dados, Relato e Defeitos, Fotos) com fluxo claramente dividido.
-- **Peças e Orçamento** ficam disponíveis apenas após a OS estar criada (visualização/edição).
+## Entregas implementadas
+- Reorganizacao visual da aba `Dados` em blocos separados:
+  - Cliente/Equipamento/Tecnico
+  - Prioridade/Entrada/Previsao/Status
+  - Estado fisico do equipamento
+  - Acessorios e Componentes (na entrada)
+- Novo bloco `Estado fisico do equipamento` com logica igual a acessorios:
+  - botoes rapidos
+  - criacao de item
+  - editar/remover item
+  - upload de fotos por item (galeria/camera + crop)
+  - opcao `Sem avarias aparentes na entrada`
+- Persistencia de estado fisico na OS:
+  - tabela `estado_fisico_equipamento`
+  - tabela `estado_fisico_fotos`
+  - fotos em `public/uploads/estado_fisico/OS_<numero_os>/`
+- Integracao na visualizacao da OS (`/os/visualizar/{id}`):
+  - secao `Estado fisico na entrada` na aba de informacoes
+  - secao `Fotos do Estado fisico` na aba de fotos
+- Ajuste de limpeza em edicao:
+  - itens removidos saem do banco
+  - arquivos orfaos do estado fisico sao removidos da pasta da OS
 
-## Impacto para Usuários
-- Menos perda de dados em cadastros longos.
-- Visibilidade contínua do contexto da OS enquanto preenche o formulário.
-- Mais agilidade quando o cliente tem apenas um equipamento.
-- Registro visual detalhado dos acessórios, reduzindo dúvidas sobre o que foi entregue.
-
-## Arquivos Atualizados
+## Arquivos de codigo
+- `app/Controllers/Os.php`
 - `app/Views/os/form.php`
 - `app/Views/os/show.php`
-- `app/Controllers/Os.php`
-- `app/Models/OsModel.php`
-- `app/Models/AcessorioOsModel.php`
-- `app/Models/FotoAcessorioModel.php`
-- `database.sql`
-- `update_os_campos.php`
-- `documentacao/01-manual-do-usuario/ordens-de-servico.md`
-- `documentacao/04-banco-de-dados/tabelas-principais.md`
+- `app/Models/EstadoFisicoOsModel.php`
+- `app/Models/FotoEstadoFisicoModel.php`
+- `update_os_estado_fisico.php`
+
+## Validacao recomendada
+1. Abrir `/os/nova`.
+2. Preencher dados obrigatorios.
+3. Adicionar ao menos um item em `Estado fisico do equipamento`.
+4. Anexar fotos por galeria e por camera.
+5. Salvar OS e abrir `/os/visualizar/{id}`.
+6. Confirmar texto e fotos do estado fisico nas abas de informacoes e fotos.

@@ -3,6 +3,10 @@
 namespace App\Controllers;
 
 use App\Models\ClienteModel;
+use App\Models\ConversaWhatsappModel;
+use App\Models\CrmEventoModel;
+use App\Models\CrmFollowupModel;
+use App\Models\CrmInteracaoModel;
 use App\Models\EquipamentoModel;
 use App\Models\OsModel;
 use App\Models\LogModel;
@@ -112,6 +116,73 @@ class Clientes extends BaseController
         $equipamentoModel = new EquipamentoModel();
         $osModel = new OsModel();
 
+        $crmTimeline = [];
+        $crmResumo = [
+            'eventos' => 0,
+            'interacoes' => 0,
+            'followups_pendentes' => 0,
+        ];
+        $conversasCliente = [];
+
+        $eventoModel = new CrmEventoModel();
+        if ($eventoModel->db->tableExists('crm_eventos')) {
+            $eventos = $eventoModel->where('cliente_id', $id)->orderBy('data_evento', 'DESC')->findAll(120);
+            $crmResumo['eventos'] = count($eventos);
+            foreach ($eventos as $e) {
+                $crmTimeline[] = [
+                    'origem' => 'evento',
+                    'titulo' => $e['titulo'] ?? 'Evento CRM',
+                    'descricao' => $e['descricao'] ?? null,
+                    'canal' => $e['origem'] ?? 'crm',
+                    'data' => $e['data_evento'] ?? $e['created_at'] ?? null,
+                ];
+            }
+        }
+
+        $interacaoModel = new CrmInteracaoModel();
+        if ($interacaoModel->db->tableExists('crm_interacoes')) {
+            $interacoes = $interacaoModel->where('cliente_id', $id)->orderBy('data_interacao', 'DESC')->findAll(120);
+            $crmResumo['interacoes'] = count($interacoes);
+            foreach ($interacoes as $it) {
+                $crmTimeline[] = [
+                    'origem' => 'interacao',
+                    'titulo' => 'Interacao: ' . ($it['tipo'] ?? 'registro'),
+                    'descricao' => $it['descricao'] ?? null,
+                    'canal' => $it['canal'] ?? 'crm',
+                    'data' => $it['data_interacao'] ?? $it['created_at'] ?? null,
+                ];
+            }
+        }
+
+        $followModel = new CrmFollowupModel();
+        if ($followModel->db->tableExists('crm_followups')) {
+            $followups = $followModel->where('cliente_id', $id)->orderBy('data_prevista', 'DESC')->findAll(120);
+            $crmResumo['followups_pendentes'] = count(array_filter($followups, static fn ($f) => ($f['status'] ?? '') === 'pendente'));
+            foreach ($followups as $f) {
+                $crmTimeline[] = [
+                    'origem' => 'followup',
+                    'titulo' => 'Follow-up: ' . ($f['titulo'] ?? 'acompanhamento'),
+                    'descricao' => $f['descricao'] ?? null,
+                    'canal' => 'follow-up',
+                    'data' => $f['data_prevista'] ?? $f['created_at'] ?? null,
+                    'status' => $f['status'] ?? null,
+                ];
+            }
+        }
+
+        $conversaModel = new ConversaWhatsappModel();
+        if ($conversaModel->db->tableExists('conversas_whatsapp')) {
+            $conversasCliente = $conversaModel
+                ->where('cliente_id', $id)
+                ->orderBy('ultima_mensagem_em', 'DESC')
+                ->findAll(20);
+        }
+
+        usort($crmTimeline, static function (array $a, array $b): int {
+            return strtotime((string) ($b['data'] ?? '1970-01-01')) <=> strtotime((string) ($a['data'] ?? '1970-01-01'));
+        });
+        $crmTimeline = array_slice($crmTimeline, 0, 150);
+
         $data = [
             'title'        => 'Detalhes do Cliente',
             'cliente'      => $cliente,
@@ -123,6 +194,9 @@ class Clientes extends BaseController
                                      ->where('os.cliente_id', $id)
                                      ->orderBy('os.created_at', 'DESC')
                                      ->findAll(),
+            'crmTimeline' => $crmTimeline,
+            'crmResumo' => $crmResumo,
+            'conversasCliente' => $conversasCliente,
         ];
         return view('clientes/show', $data);
     }

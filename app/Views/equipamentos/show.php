@@ -18,18 +18,10 @@
         <div class="card glass-card h-100">
             <div class="card-body text-center">
                 <div class="mb-4">
-                    <?php 
-                    $principalArr = array_filter($fotos ?? [], fn($f) => $f['is_principal'] == 1);
-                    $fotoPrincipal = !empty($principalArr) ? array_values($principalArr)[0]['arquivo'] : (!empty($fotos) ? $fotos[0]['arquivo'] : null);
-                    
-                    $urlPrincipal = null;
-                    if ($fotoPrincipal) {
-                        if (file_exists('uploads/equipamentos_perfil/' . $fotoPrincipal)) {
-                            $urlPrincipal = base_url('uploads/equipamentos_perfil/' . $fotoPrincipal);
-                        } elseif (file_exists('uploads/equipamentos/' . $fotoPrincipal)) {
-                            $urlPrincipal = base_url('uploads/equipamentos/' . $fotoPrincipal);
-                        }
-                    }
+                    <?php
+                    $principalArr = array_filter($fotos ?? [], fn($f) => (int) ($f['is_principal'] ?? 0) === 1);
+                    $fotoPrincipal = !empty($principalArr) ? array_values($principalArr)[0] : (!empty($fotos) ? $fotos[0] : null);
+                    $urlPrincipal = $fotoPrincipal['url'] ?? null;
                     ?>
                     
                     <?php if ($urlPrincipal): ?>
@@ -61,12 +53,7 @@
                     <h6 class="text-start mb-3 text-body">Galeria (<span id="galleryCount"><?= count($fotos) ?></span>)</h6>
                     <div class="d-flex flex-wrap gap-2 justify-content-center">
                         <?php foreach($fotos as $foto): 
-                            $urlThumb = null;
-                            if (file_exists('uploads/equipamentos_perfil/' . $foto['arquivo'])) {
-                                $urlThumb = base_url('uploads/equipamentos_perfil/' . $foto['arquivo']);
-                            } elseif (file_exists('uploads/equipamentos/' . $foto['arquivo'])) {
-                                $urlThumb = base_url('uploads/equipamentos/' . $foto['arquivo']);
-                            }
+                            $urlThumb = $foto['url'] ?? null;
                         ?>
                             <?php if ($urlThumb): ?>
                             <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= $urlThumb ?>" class="border rounded d-inline-block overflow-hidden" style="width: 60px; height: 60px; cursor: zoom-in;">

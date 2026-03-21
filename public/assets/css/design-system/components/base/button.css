@@ -1,0 +1,63 @@
+﻿.btn {
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-semibold);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+}
+
+.btn:focus-visible {
+    box-shadow: var(--shadow-glow);
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary,
+.btn-glow {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.btn-primary:hover,
+.btn-glow:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: #fff;
+}
+
+.btn-secondary {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-outline-light,
+.btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-outline-light:hover,
+.btn-outline-secondary:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-danger:hover,
+.btn-success:hover,
+.btn-warning:hover {
+    filter: brightness(0.97);
+}
+
+.btn[disabled],
+.btn.disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.btn.ds-loading {
+    pointer-events: none;
+    opacity: 0.75;
+}

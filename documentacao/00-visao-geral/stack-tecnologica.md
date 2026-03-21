@@ -7,6 +7,9 @@
 | **PHP** | 8.2 | Linguagem principal |
 | **CodeIgniter 4** | 4.x | Framework MVC |
 | **MySQL / MariaDB** | 10.x+ | Banco de dados |
+| **Node.js** | 18+ | Gateway local de WhatsApp |
+| **whatsapp-web.js** | 1.23+ | Sessao WhatsApp Web no gateway |
+| **PM2** | 5+ | Supervisao do processo gateway |
 
 ### Padrões CI4 Utilizados
 - **Models** com `allowedFields`, `validationRules`, `beforeInsert/beforeUpdate`
@@ -57,6 +60,11 @@
 | **ViaCEP** | Autopreenchimento de endereço | `https://viacep.com.br/ws/{cep}/json/` |
 | **Google Suggest** | Autocomplete de modelos (proxy no backend) | `https://suggestqueries.google.com/complete/search` |
 | **Google Fonts** | Tipografia | CDN |
+
+## Mensageria WhatsApp (arquitetura atual)
+- **Menuia API**: canal direto 1:1 operacional.
+- **Gateway local Node.js**: canal direto alternativo (API propria com sessao local).
+- **Meta Oficial (futuro CRM)**: canal reservado para massa/campanhas.
 
 ---
 

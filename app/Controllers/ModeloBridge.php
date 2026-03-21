@@ -36,20 +36,27 @@ class ModeloBridge extends BaseController
         $marcaId = (int) ($this->request->getGet('marca_id') ?? 0);
         $tipo    = trim($this->request->getGet('tipo') ?? '');
 
-        // Mínimo de caracteres obrigatório
-        if (strlen($query) < self::MIN_CHARS) {
-            return $this->response->setJSON(['results' => []]);
-        }
-
         // ─── 1. Busca local (prioridade máxima) ──────────────────────────────
-        $modeloModel    = new EquipamentoModeloModel();
-        $queryBuilder   = $modeloModel->select('id, nome as text')->where('ativo', 1)->like('nome', $query);
+        // Regra UX:
+        // - Se já existe marca selecionada, listar modelos locais mesmo sem digitar.
+        // - Digitação com 3+ caracteres segue habilitando busca externa.
+        $modeloModel = new EquipamentoModeloModel();
+        $locais = [];
+
+        $queryBuilder = $modeloModel->select('id, nome as text')->where('ativo', 1);
 
         if ($marcaId > 0) {
             $queryBuilder->where('marca_id', $marcaId);
         }
 
-        $locais = $queryBuilder->orderBy('nome', 'ASC')->limit(10)->find();
+        if ($query !== '') {
+            $queryBuilder->like('nome', $query);
+        }
+
+        if ($marcaId > 0 || $query !== '') {
+            $limit = ($query === '') ? 50 : 10;
+            $locais = $queryBuilder->orderBy('nome', 'ASC')->limit($limit)->find();
+        }
 
         foreach ($locais as &$l) {
             $l['source'] = 'local';
@@ -59,9 +66,9 @@ class ModeloBridge extends BaseController
         }
         unset($l);
 
-        // ─── 2. Busca na internet (apenas quando locais são insuficientes) ───
+        // ─── 2. Busca na internet (somente com 3+ caracteres) ───────────────
         $externos = [];
-        if (count($locais) < self::MAX_SUGESTOES) {
+        if (strlen($query) >= self::MIN_CHARS && count($locais) < self::MAX_SUGESTOES) {
             $externos = $this->buscarSugestoesGoogle($query, $marca, $tipo);
         }
 

@@ -1,0 +1,64 @@
+.ds-token-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.ds-token-item {
+    text-align: center;
+    padding: 10px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+}
+
+.ds-token-swatch {
+    width: 100%;
+    height: 46px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    margin-bottom: 8px;
+}
+
+.ds-token-bg {
+    background: var(--color-bg);
+}
+
+.ds-token-surface {
+    background: var(--color-surface);
+}
+
+.ds-token-muted {
+    background: var(--color-surface-muted);
+}
+
+.ds-token-border {
+    background: linear-gradient(
+        135deg,
+        transparent 45%,
+        var(--color-border) 45%,
+        var(--color-border) 55%,
+        transparent 55%
+    );
+}
+
+.ds-gallery-fake {
+    width: 100%;
+    height: 100%;
+}
+
+.ds-gallery-fake-a {
+    background: linear-gradient(135deg, #5b7cfa, #2cc8ff);
+}
+
+.ds-gallery-fake-b {
+    background: linear-gradient(135deg, #22c55e, #34d399);
+}
+
+.ds-gallery-fake-c {
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+}
+
+.ds-gallery-fake-d {
+    background: linear-gradient(135deg, #ef4444, #ec4899);
+}

@@ -9,6 +9,12 @@ Esta documentação descreve a estrutura completa das tabelas do sistema de Assi
 > **Nota:** O schema evoluiu com RBAC e com a separação de Tipos/Marcas/Modelos.  
 > Se você importou `database.sql`, execute `update_equip_db.php` e `setup_rbac.php`.  
 > Para um resumo atualizado, consulte `documentacao/04-banco-de-dados/tabelas-principais.md`.
+>
+> **Atualizacao 20/03/2026 (modulo WhatsApp unificado):**
+> - O legado Whaticket foi removido do ERP.
+> - Chaves legadas `whatsapp_whaticket_*` foram removidas da tabela `configuracoes`.
+> - Providers legados `whaticket` foram normalizados para `api_whats_local`.
+> - Migration de limpeza: `2026-03-20-060000_RemoveWhaticketLegacyModule.php`.
 
 ---
 
@@ -33,6 +39,10 @@ Esta documentação descreve a estrutura completa das tabelas do sistema de Assi
 18. [equipamentos_defeitos](#18-equipamentos_defeitos)
 19. [equipamento_defeito_procedimentos](#19-equipamento_defeito_procedimentos)
 20. [os_defeitos](#20-os_defeitos)
+21. [acessorios_os](#21-acessorios_os)
+22. [fotos_acessorios](#22-fotos_acessorios)
+23. [estado_fisico_equipamento](#23-estado_fisico_equipamento)
+24. [estado_fisico_fotos](#24-estado_fisico_fotos)
 
 ---
 
@@ -308,7 +318,7 @@ Cadastro de parceiros B2B e Pessoas Jurídicas/Físicas que fornecem suprimentos
 ---
 
 ## 13. funcionarios
-Cadastro individual de força de trabalho técnica e administrativa, com gestão de cargos, salários de operação e datas operacionais RH da empresa.
+Cadastro individual de força de trabalho técnica e administrativa, com gestão de cargos, salários de operação e dats operacionais RH da empresa.
 
 | Campo | Tipo | Restrições | Descrição |
 |-------|------|------------|-----------|
@@ -346,8 +356,6 @@ Tabela-pivô de relacionamento Muito-para-Muitos (N:N) projetada para associar u
 | `equipamento_id` | INT | FK -> equipamentos(id) NOT NULL| Referência obrigatória ao equipamento rastreado. ON DELETE CASCADE. |
 | `cliente_id` | INT | FK -> clientes(id) NOT NULL| Referência obrigatória do sub-cliente vinculado à máquina secundária. ON DELETE CASCADE. |
 | `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Tempo em que a relação foi aceita e vinculada no painel administrativo pela primeira vez. |
-
----
 
 ---
 
@@ -430,6 +438,67 @@ Tabela pivô que vincula defeitos comuns a uma Ordem de Serviço específica.
 | `os_id` | INT | FK -> os(id) | Ordem de Serviço vinculada. |
 | `defeito_id` | INT | FK -> equipamentos_defeitos(id) | Defeito vinculado. |
 | `created_at` | DATETIME | NULL | Data de registro. |
+
+---
+
+## 21. acessorios_os
+Armazena os acessórios específicos que acompanham o equipamento em uma determinada OS.
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|------------|-----------|
+| `id` | INT | PK, AUTO_INCREMENT | Identificador do acessório na OS. |
+| `os_id` | INT | FK -> os(id) | OS vinculada. |
+| `descricao` | VARCHAR(255) | NOT NULL | Descrição do acessório (ex: "Carregador original"). |
+| `created_at` | DATETIME | NULL | Data de registro. |
+
+---
+
+## 22. fotos_acessorios
+Fotos vinculadas a cada acessório recebido na OS.
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|------------|-----------|
+| `id` | INT | PK, AUTO_INCREMENT | Identificador da foto. |
+| `acessorio_id` | INT | FK -> acessorios_os(id) | Acessório vinculado. |
+| `arquivo` | VARCHAR(255) | NOT NULL | Caminho do arquivo da imagem. |
+| `created_at` | DATETIME | NULL | Data de registro. |
+
+---
+
+## 23. estado_fisico_equipamento
+Registro detalhado de anomalias ou estado físico do equipamento no momento da entrada.
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|------------|-----------|
+| `id` | INT | PK, AUTO_INCREMENT | Identificador do registro. |
+| `os_id` | INT | FK -> os(id) | OS vinculada. |
+| `descricao_dano` | VARCHAR(255) | NOT NULL | Descrição da avaria (ex: "Tela riscada"). |
+| `created_at` | DATETIME | NULL | Data de registro. |
+
+---
+
+## 24. estado_fisico_fotos
+Fotos que comprovam o estado físico relatado.
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|------------|-----------|
+| `id` | INT | PK, AUTO_INCREMENT | Identificador da foto. |
+| `estado_fisico_id` | INT | FK -> estado_fisico_equipamento(id) | Registro de estado físico vinculado. |
+| `arquivo` | VARCHAR(255) | NOT NULL | Caminho do arquivo da imagem. |
+| `created_at` | DATETIME | NULL | Data de registro. |
+
+---
+
+## Otimização para Busca Global
+
+A funcionalidade de **Busca Global** na navbar utiliza consultas `LIKE` em diversas tabelas. Para garantir o desempenho, o sistema depende dos seguintes índices:
+
+- **Tabela `clientes`**: `idx_nome`, `idx_cpf`, `idx_telefone`.
+- **Tabela `os`**: `idx_numero`, `idx_status`, `idx_cliente`.
+- **Tabela `equipamentos`**: `numero_serie`, `imei` e vínculos com `clientes`.
+- **Tabela `mensagens_whatsapp`**: Pesquisas por conteúdo de mensagem e telefone.
+
+Recomenda--se monitorar o crescimento destas tabelas para avaliar a necessidade de índices `FULLTEXT` em campos de `texto` (como `os.relato_cliente` ou `mensagens_whatsapp.mensagem`) caso o volume de dados ultrapasse 1 milhão de registros.
 
 ---
 

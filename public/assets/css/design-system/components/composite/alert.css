@@ -1,0 +1,10 @@
+﻿.alert {
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    box-shadow: var(--shadow-sm);
+}
+
+.alert-success { border-color: rgba(15, 157, 88, 0.30); }
+.alert-warning { border-color: rgba(245, 159, 0, 0.30); }
+.alert-danger { border-color: rgba(224, 49, 49, 0.30); }
+.alert-info { border-color: rgba(31, 122, 236, 0.30); }

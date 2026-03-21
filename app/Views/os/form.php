@@ -2,6 +2,51 @@
 $isEdit = isset($os);
 $tipos  = $tipos  ?? [];
 $marcas = $marcas ?? [];
+$relatosRapidos = $relatosRapidos ?? [];
+$statusGrouped = $statusGrouped ?? [];
+$statusDefault = $statusDefault ?? ($isEdit ? (string)($os['status'] ?? 'triagem') : 'triagem');
+
+$statusFlat = [];
+foreach ($statusGrouped as $macro => $items) {
+    if (!is_array($items)) {
+        continue;
+    }
+    foreach ($items as $item) {
+        $codigo = (string) ($item['codigo'] ?? '');
+        if ($codigo === '') {
+            continue;
+        }
+        $statusFlat[$codigo] = [
+            'nome' => (string) ($item['nome'] ?? $codigo),
+            'cor' => (string) ($item['cor'] ?? 'secondary'),
+            'grupo' => (string) $macro,
+        ];
+    }
+}
+$statusDefaultLabel = (string) ($statusFlat[$statusDefault]['nome'] ?? 'Triagem');
+
+$origemConversaId = (int) ($origemConversaId ?? 0);
+$origemContatoId = (int) ($origemContatoId ?? 0);
+$origemConversa = (isset($origemConversa) && is_array($origemConversa)) ? $origemConversa : null;
+$origemContato = (isset($origemContato) && is_array($origemContato)) ? $origemContato : null;
+$clientePreSelecionado = (int) ($clientePreSelecionado ?? 0);
+
+$origemNomeHint = trim((string) ($origemNomeHint ?? ''));
+if ($origemNomeHint === '') {
+    $origemNomeHint = trim((string) ($origemContato['nome'] ?? $origemContato['whatsapp_nome_perfil'] ?? $origemConversa['nome_contato'] ?? ''));
+}
+
+$origemTelefoneHint = preg_replace('/\D+/', '', (string) ($origemTelefoneHint ?? '')) ?? '';
+if ($origemTelefoneHint === '') {
+    $origemTelefoneHint = preg_replace('/\D+/', '', (string) ($origemContato['telefone_normalizado'] ?? $origemContato['telefone'] ?? $origemConversa['telefone'] ?? '')) ?? '';
+}
+
+$isOrigemCentralWhatsapp = !$isEdit
+    && ($origemConversaId > 0 || $origemContatoId > 0 || $clientePreSelecionado > 0 || $origemTelefoneHint !== '' || $origemNomeHint !== '');
+
+$clienteSelecionadoNoForm = $isEdit
+    ? (int) ($os['cliente_id'] ?? 0)
+    : ($clientePreSelecionado > 0 ? $clientePreSelecionado : 0);
 ?>
 
 <?= $this->extend('layouts/main') ?>
@@ -18,12 +63,13 @@ $marcas = $marcas ?? [];
     </a>
 </div>
 
-<!-- LAYOUT PRINCIPAL: SIDEBAR (foto) + CONTEÚDO -->
-<div class="row g-4">
+<!-- LAYOUT PRINCIPAL: SIDEBAR (foto) + CONTE�DO -->
+<div class="os-form-page">
+<div class="row g-4 ds-split-layout">
 
     <!-- SIDEBAR: Painel da foto do equipamento -->
-    <div class="col-md-3" id="sidebarEquipamento">
-        <div class="d-flex flex-column gap-3 sticky-top" style="top: 80px;">
+    <div class="col-12 col-xl-4 col-xxl-3 ds-split-sidebar" id="sidebarEquipamento">
+        <div class="d-flex flex-column gap-3 ds-sticky-panel">
             <div class="card glass-card">
                 <div class="card-body p-3">
                     <h6 class="fw-bold mb-3 text-uppercase text-muted" style="font-size:0.7rem; letter-spacing:1px;">
@@ -50,7 +96,7 @@ $marcas = $marcas ?? [];
 
                     <div id="equipColorInfo" class="d-flex align-items-center gap-2 small text-muted mb-2 d-none">
                         <span id="equipColorSwatch" class="d-inline-block rounded-circle border" style="width: 14px; height: 14px; background: #333;"></span>
-                        <span id="equipColorName">Cor não informada</span>
+                        <span id="equipColorName">Cor n�o informada</span>
                     </div>
 
                     <!-- Miniaturas -->
@@ -60,6 +106,14 @@ $marcas = $marcas ?? [];
                     <div id="equipInfoBox" class="mt-3 p-2 rounded" style="background: rgba(255,255,255,0.04); font-size: 0.78rem; display:none;">
                         <div id="equipInfoContent" class="text-muted"></div>
                     </div>
+                    <?php if (can('equipamentos', 'editar')): ?>
+                    <div class="mt-2">
+                        <button class="btn btn-outline-primary btn-sm w-100 d-none" type="button" id="btnEditarEquipamento"
+                                title="Editar equipamento selecionado">
+                            <i class="bi bi-pencil-square me-1"></i>Editar equipamento
+                        </button>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -72,83 +126,92 @@ $marcas = $marcas ?? [];
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Cliente</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoCliente" class="text-white-50">Não selecionado</span>
-                                <span id="statusCliente" class="text-danger">❌</span>
+                                <span id="resumoCliente" class="text-white-50">N�o selecionado</span>
+                                <span id="statusCliente" class="text-danger">?</span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Equipamento</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoEquipamento" class="text-white-50">Não selecionado</span>
-                                <span id="statusEquipamento" class="text-danger">❌</span>
+                                <span id="resumoEquipamento" class="text-white-50">N�o selecionado</span>
+                                <span id="statusEquipamento" class="text-danger">?</span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Técnico</span>
+                            <span class="text-muted">T�cnico</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoTecnico" class="text-white-50">Não atribuído</span>
-                                <span id="statusTecnico" class="text-danger">❌</span>
+                                <span id="resumoTecnico" class="text-white-50">N�o atribu�do</span>
+                                <span id="statusTecnico" class="text-danger">?</span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Prioridade</span>
                             <span class="d-flex align-items-center gap-2">
                                 <span id="resumoPrioridade" class="badge text-bg-secondary">Normal</span>
-                                <span id="statusPrioridade" class="text-success">✔️</span>
+                                <span id="statusPrioridade" class="text-success">??</span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Status</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoStatus" class="badge text-bg-secondary">Aguard. Análise</span>
-                                <span id="statusStatus" class="text-success">✔️</span>
+                                <span id="resumoStatus" class="badge text-bg-secondary"><?= esc($statusDefaultLabel) ?></span>
+                                <span id="statusStatus" class="text-success">??</span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Entrada</span>
                             <span class="d-flex align-items-center gap-2">
                                 <span id="resumoEntrada" class="text-white-50">-</span>
-                                <span id="statusEntrada" class="text-danger">❌</span>
+                                <span id="statusEntrada" class="text-danger">?</span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Previsão</span>
+                            <span class="text-muted">Previs�o</span>
                             <span class="d-flex align-items-center gap-2">
                                 <span id="resumoPrevisao" class="text-white-50">-</span>
-                                <span id="statusPrevisao" class="text-danger">❌</span>
+                                <span id="statusPrevisao" class="text-danger">?</span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Relato</span>
                             <span class="d-flex align-items-center gap-2">
                                 <span id="resumoRelato" class="text-white-50">Vazio</span>
-                                <span id="statusRelato" class="text-danger">❌</span>
+                                <span id="statusRelato" class="text-danger">?</span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Acessórios</span>
+                            <span class="text-muted">Acess�rios</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoAcessorios" class="text-white-50">Não informado</span>
-                                <span id="statusAcessorios" class="text-danger">❌</span>
+                                <span id="resumoAcessorios" class="text-white-50">N�o informado</span>
+                                <span id="statusAcessorios" class="text-danger">?</span>
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Estado f�sico</span>
+                            <span class="d-flex align-items-center gap-2">
+                                <span id="resumoEstadoFisico" class="text-white-50">N�o informado</span>
+                                <span id="statusEstadoFisico" class="text-danger">?</span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Fotos de entrada</span>
                             <span class="d-flex align-items-center gap-2">
                                 <span id="resumoFotosEntrada" class="text-white-50">0</span>
-                                <span id="statusFotos" class="text-danger">❌</span>
+                                <span id="statusFotos" class="text-danger">?</span>
                             </span>
                         </div>
+                        <?php if ($isEdit): ?>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Defeitos marcados</span>
                             <span class="d-flex align-items-center gap-2">
                                 <span id="resumoDefeitos" class="text-white-50">0</span>
-                                <span id="statusDefeitos" class="text-danger">❌</span>
+                                <span id="statusDefeitos" class="text-danger">?</span>
                             </span>
                         </div>
+                        <?php endif; ?>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Rascunho</span>
-                            <span id="resumoRascunho" class="text-white-50">Não salvo</span>
+                            <span id="resumoRascunho" class="text-white-50">N�o salvo</span>
                         </div>
                     </div>
                 </div>
@@ -156,14 +219,34 @@ $marcas = $marcas ?? [];
         </div>
     </div>
 
-    <!-- ÁREA PRINCIPAL DO FORMULÁRIO -->
-    <div class="col-md-9" id="formCol">
+    <!-- �REA PRINCIPAL DO FORMUL�RIO -->
+    <div class="col-12 col-xl-8 col-xxl-9 ds-split-main" id="formCol">
         <div class="card glass-card">
             <div class="card-body">
                 <form action="<?= $isEdit ? base_url('os/atualizar/' . $os['id']) : base_url('os/salvar') ?>"
-                      method="POST" enctype="multipart/form-data" id="formOs">
+                      method="POST" enctype="multipart/form-data" id="formOs" novalidate>
                     <?= csrf_field() ?>
                     <?php if (!$isEdit): ?>
+                    <input type="hidden" name="origem_conversa_id" value="<?= $origemConversaId > 0 ? $origemConversaId : '' ?>">
+                    <input type="hidden" name="origem_contato_id" value="<?= $origemContatoId > 0 ? $origemContatoId : '' ?>">
+                    <?php if ($isOrigemCentralWhatsapp): ?>
+                    <div class="alert alert-primary d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="small mb-0">
+                            <i class="bi bi-whatsapp me-1"></i>
+                            <strong>Origem Central WhatsApp:</strong>
+                            <?= esc($origemNomeHint !== '' ? $origemNomeHint : 'Contato sem nome') ?>
+                            <?= $origemTelefoneHint !== '' ? ' (' . esc($origemTelefoneHint) . ')' : '' ?>
+                            <?php if ($clienteSelecionadoNoForm > 0): ?>
+                                <span class="badge text-bg-success-subtle text-success-emphasis border ms-2">Cliente ERP pre-selecionado</span>
+                            <?php else: ?>
+                                <span class="badge text-bg-info text-dark ms-2">Contato ainda sem vinculo em clientes</span>
+                            <?php endif; ?>
+                        </div>
+                        <a href="<?= base_url('atendimento-whatsapp') ?>" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-arrow-left me-1"></i>Voltar para Central
+                        </a>
+                    </div>
+                    <?php endif; ?>
                     <div id="osDraftAlert" class="alert alert-info d-flex align-items-center justify-content-between gap-3 d-none">
                         <div class="small mb-0">
                             <i class="bi bi-clock-history me-1"></i>Encontramos um rascunho salvo automaticamente para esta OS.
@@ -175,19 +258,19 @@ $marcas = $marcas ?? [];
                     </div>
                     <?php endif; ?>
 
-                    <ul class="nav nav-tabs mb-3" id="osTabs" role="tablist">
+                    <ul class="nav nav-tabs ds-tabs-scroll mb-3" id="osTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active fw-bold" id="tab-dados-btn" data-bs-toggle="tab" data-bs-target="#tab-dados" type="button" role="tab" aria-controls="tab-dados" aria-selected="true">Dados</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold" id="tab-relato-btn" data-bs-toggle="tab" data-bs-target="#tab-relato" type="button" role="tab" aria-controls="tab-relato" aria-selected="false">Relato e Defeitos</button>
+                            <button class="nav-link fw-bold" id="tab-relato-btn" data-bs-toggle="tab" data-bs-target="#tab-relato" type="button" role="tab" aria-controls="tab-relato" aria-selected="false"><?= $isEdit ? 'Relato e Defeitos' : 'Relato do Cliente' ?></button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link fw-bold" id="tab-fotos-btn" data-bs-toggle="tab" data-bs-target="#tab-fotos" type="button" role="tab" aria-controls="tab-fotos" aria-selected="false">Fotos</button>
                         </li>
                         <?php if ($isEdit): ?>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold" id="tab-financeiro-btn" data-bs-toggle="tab" data-bs-target="#tab-financeiro" type="button" role="tab" aria-controls="tab-financeiro" aria-selected="false">Peças e Orçamento</button>
+                            <button class="nav-link fw-bold" id="tab-financeiro-btn" data-bs-toggle="tab" data-bs-target="#tab-financeiro" type="button" role="tab" aria-controls="tab-financeiro" aria-selected="false">Pe�as e Or�amento</button>
                         </li>
                         <?php endif; ?>
                     </ul>
@@ -195,7 +278,10 @@ $marcas = $marcas ?? [];
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="tab-dados" role="tabpanel" aria-labelledby="tab-dados-btn" tabindex="0">
 
-                    <!-- LINHA 1: Cliente + Equipamento + Técnico -->
+                    <div class="os-data-section mb-4">
+                        <div class="os-data-section-title">
+                            <i class="bi bi-people me-1"></i>Cliente, Equipamento e T�cnico Respons�vel
+                        </div>
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
                             <label class="form-label d-flex align-items-center gap-2">
@@ -211,11 +297,16 @@ $marcas = $marcas ?? [];
                                 <option value="">Selecione o cliente...</option>
                                 <?php foreach ($clientes as $c): ?>
                                 <option value="<?= $c['id'] ?>"
-                                    <?= ($isEdit && $os['cliente_id'] == $c['id']) ? 'selected' : '' ?>>
+                                    <?= ($clienteSelecionadoNoForm === (int) $c['id']) ? 'selected' : '' ?>>
                                     <?= esc($c['nome_razao']) ?>
                                 </option>
                                 <?php endforeach; ?>
                             </select>
+                            <?php if (!$isEdit && $isOrigemCentralWhatsapp && $clienteSelecionadoNoForm <= 0): ?>
+                            <div class="form-text text-warning">
+                                Este contato ainda nao esta vinculado ao cadastro de clientes. Selecione o cliente para abrir a OS.
+                            </div>
+                            <?php endif; ?>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label d-flex align-items-center gap-2">
@@ -238,6 +329,12 @@ $marcas = $marcas ?? [];
                                     data-cor="<?= esc($eq['cor'] ?? '') ?>"
                                     data-cor_hex="<?= esc($eq['cor_hex'] ?? '') ?>"
                                     data-tipo_nome="<?= esc($eq['tipo_nome'] ?? $eq['tipo'] ?? '') ?>"
+                                    data-marca_id="<?= esc($eq['marca_id'] ?? '') ?>"
+                                    data-modelo_id="<?= esc($eq['modelo_id'] ?? '') ?>"
+                                    data-cliente_id="<?= esc($eq['cliente_id'] ?? '') ?>"
+                                    data-senha_acesso="<?= esc($eq['senha_acesso'] ?? '') ?>"
+                                    data-estado_fisico="<?= esc($eq['estado_fisico'] ?? '') ?>"
+                                    data-acessorios="<?= esc($eq['acessorios'] ?? '') ?>"
                                     <?= $os['equipamento_id'] == $eq['id'] ? 'selected' : '' ?>>
                                     <?= esc(($eq['marca_nome'] ?? $eq['marca'] ?? '') . ' ' . ($eq['modelo_nome'] ?? $eq['modelo'] ?? '') . ' (' . ($eq['tipo_nome'] ?? $eq['tipo'] ?? '') . ')') ?>
                                 </option>
@@ -245,9 +342,9 @@ $marcas = $marcas ?? [];
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Técnico Responsável</label>
+                            <label class="form-label">T�cnico Respons�vel</label>
                             <select name="tecnico_id" class="form-select">
-                                <option value="">Não atribuído</option>
+                                <option value="">N�o atribu�do</option>
                                 <?php foreach ($tecnicos as $t): ?>
                                 <option value="<?= $t['id'] ?>"
                                     <?= ($isEdit && ($os['tecnico_id'] ?? '') == $t['id']) ? 'selected' : '' ?>>
@@ -258,7 +355,12 @@ $marcas = $marcas ?? [];
                         </div>
                     </div>
 
-                    <!-- LINHA 2: Prioridade + Data Previsão + Status + Data Entrada -->  
+                    </div>
+
+                    <div class="os-data-section mb-4">
+                        <div class="os-data-section-title">
+                            <i class="bi bi-calendar-check me-1"></i>Prioridade, Entrada, Previs�o e Status
+                        </div>
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
                             <label class="form-label">Prioridade</label>
@@ -275,7 +377,7 @@ $marcas = $marcas ?? [];
                                    value="<?= $isEdit ? ($os['data_entrada'] ?? date('Y-m-d\TH:i')) : date('Y-m-d\TH:i') ?>" required>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Previsão de Entrega</label>
+                            <label class="form-label">Previs�o de Entrega</label>
                             <select id="prazoEntregaSelect" class="form-select mb-2">
                                 <option value="">Prazo (dias)</option>
                                 <option value="1">1 dia</option>
@@ -289,30 +391,37 @@ $marcas = $marcas ?? [];
                         <div class="col-md-3">
                             <label class="form-label">Status</label>
                             <select name="status" class="form-select">
-                                <?php
-                                $statuses = [
-                                    'aguardando_analise'   => 'Aguard. Análise',
-                                    'aguardando_orcamento' => 'Aguard. Orçamento',
-                                    'aguardando_aprovacao' => 'Aguard. Aprovação',
-                                    'aprovado'    => 'Aprovado',
-                                    'reprovado'   => 'Reprovado',
-                                    'em_reparo'   => 'Em Reparo',
-                                    'aguardando_peca' => 'Aguard. Peça',
-                                    'pronto'      => 'Pronto',
-                                    'entregue'    => 'Entregue',
-                                    'cancelado'   => 'Cancelado',
-                                ];
-                                foreach ($statuses as $val => $label): ?>
-                                <option value="<?= $val ?>"
-                                    <?= ($isEdit ? $os['status'] : 'aguardando_analise') === $val ? 'selected' : '' ?>>
-                                    <?= $label ?>
-                                </option>
-                                <?php endforeach; ?>
+                                <?php if (!empty($statusGrouped)): ?>
+                                    <?php foreach ($statusGrouped as $macro => $items): ?>
+                                        <?php if (empty($items) || !is_array($items)) continue; ?>
+                                        <optgroup label="<?= esc(ucwords(str_replace('_', ' ', (string) $macro))) ?>">
+                                            <?php foreach ($items as $item): ?>
+                                                <?php $codigo = (string) ($item['codigo'] ?? ''); ?>
+                                                <?php if ($codigo === '') continue; ?>
+                                                <option value="<?= esc($codigo) ?>" data-status-cor="<?= esc((string) ($item['cor'] ?? 'secondary')) ?>" <?= ((string) ($os['status'] ?? $statusDefault) === $codigo) ? 'selected' : '' ?>>
+                                                    <?= esc((string) ($item['nome'] ?? $codigo)) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </optgroup>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <?php $currStatus = (string) ($os['status'] ?? $statusDefault); ?>
+                                    <option value="triagem" <?= $currStatus === 'triagem' ? 'selected' : '' ?>>Triagem</option>
+                                    <option value="diagnostico" <?= $currStatus === 'diagnostico' ? 'selected' : '' ?>>Diagnostico Tecnico</option>
+                                    <option value="aguardando_orcamento" <?= $currStatus === 'aguardando_orcamento' ? 'selected' : '' ?>>Aguardando Orcamento</option>
+                                    <option value="aguardando_autorizacao" <?= $currStatus === 'aguardando_autorizacao' ? 'selected' : '' ?>>Aguardando Autorizacao</option>
+                                    <option value="reparo_execucao" <?= $currStatus === 'reparo_execucao' ? 'selected' : '' ?>>Em Execucao</option>
+                                    <option value="reparado_disponivel_loja" <?= $currStatus === 'reparado_disponivel_loja' ? 'selected' : '' ?>>Pronto para retirada</option>
+                                    <option value="entregue_reparado" <?= $currStatus === 'entregue_reparado' ? 'selected' : '' ?>>Entregue</option>
+                                    <option value="cancelado" <?= $currStatus === 'cancelado' ? 'selected' : '' ?>>Cancelado</option>
+                                <?php endif; ?>
                             </select>
                         </div>
                     </div>
 
-                    <!-- LINHA EXTRA (edição): Garantia -->
+                    </div>
+
+                    <!-- LINHA EXTRA (edi��o): Garantia -->
                     <?php if ($isEdit): ?>
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
@@ -323,9 +432,48 @@ $marcas = $marcas ?? [];
                     </div>
                     <?php endif; ?>
 
-                    <div class="row g-3 mb-4">
-                        <div class="col-12">
-                            <label class="form-label">Acessórios e Componentes (na entrada)</label>
+                    <div class="os-data-section mb-4">
+                        <div class="os-data-section-title">
+                            <i class="bi bi-shield-exclamation me-1"></i>Estado fisico do equipamento
+                        </div>
+                        <div class="border rounded-3 p-3 bg-white bg-opacity-10">
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="tela_trincada">+ Tela trincada</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="arranhoes">+ Arranhoes</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="carcaca_quebrada">+ Carcaca quebrada</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="vidro_traseiro_quebrado">+ Vidro traseiro quebrado</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="amassado">+ Amassado</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="botao_quebrado">+ Botao quebrado</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="outro">+ Outro dano</button>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="estadoFisicoSemAvarias" value="1">
+                                <label class="form-check-label" for="estadoFisicoSemAvarias">Sem avarias aparentes na entrada</label>
+                            </div>
+                            <div id="estadoFisicoQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong id="estadoFisicoQuickTitle"></strong>
+                                    <button type="button" class="btn-close" id="estadoFisicoQuickClose"></button>
+                                </div>
+                                <div id="estadoFisicoQuickFields" class="row g-2"></div>
+                                <div class="mt-3">
+                                    <button type="button" class="btn btn-sm btn-primary" id="estadoFisicoQuickSave">Salvar item</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="estadoFisicoQuickCancel">Cancelar</button>
+                                </div>
+                            </div>
+                            <div id="estadoFisicoList" class="list-group"></div>
+                            <small class="form-text text-muted mt-3">Registre danos observados na recepcao com foto para evidenciar o estado de entrada.</small>
+                            <textarea name="estado_fisico" id="estadoFisicoInput" class="d-none"><?= $isEdit ? esc($os['estado_fisico'] ?? '') : old('estado_fisico') ?></textarea>
+                            <input type="hidden" name="estado_fisico_data" id="estadoFisicoDataInput">
+                            <input type="file" id="estadoFisicoPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
+                            <div id="estadoFisicoFilesInputs" class="d-none"></div>
+                        </div>
+                    </div>
+
+                    <div class="os-data-section mb-4">
+                            <div class="os-data-section-title">
+                                <i class="bi bi-box-seam me-1"></i>Acess�rios e Componentes (na entrada)
+                            </div>
                             <div class="border rounded-3 p-3 bg-white bg-opacity-10">
                                 <div class="d-flex flex-wrap gap-2 mb-2">
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="chip">+ Chip</button>
@@ -335,7 +483,11 @@ $marcas = $marcas ?? [];
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="bolsa">+ Bolsa notebook</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="cabo">+ Cabo</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="carregador">+ Carregador</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acessório</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acess�rio</button>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="acessoriosSemItens" name="acessorios_sem_itens" value="1" <?= old('acessorios_sem_itens') ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="acessoriosSemItens">Equipamento recebido sem acess�rios</label>
                                 </div>
                                 <div id="acessoriosQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -349,32 +501,63 @@ $marcas = $marcas ?? [];
                                     </div>
                                 </div>
                                 <div id="acessoriosList" class="list-group"></div>
-                                <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acessórios comuns.</small>
-                                <textarea name="acessorios" id="acessoriosInput" class="d-none"><?= $isEdit ? esc($os['acessorios'] ?? '') : '' ?></textarea>
+                                <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acess�rios comuns.</small>
+                                <textarea name="acessorios" id="acessoriosInput" class="d-none"><?= $isEdit ? esc($os['acessorios'] ?? '') : old('acessorios') ?></textarea>
                                 <input type="hidden" name="acessorios_data" id="acessoriosDataInput">
                                 <input type="file" id="acessoriosPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
                                 <div id="acessoriosFilesInputs" class="d-none"></div>
                             </div>
-                        </div>
                     </div>
 
                         </div>
                         <div class="tab-pane fade" id="tab-relato" role="tabpanel" aria-labelledby="tab-relato-btn" tabindex="0">
-                    <!-- Relato do Cliente -->
                     <div class="row g-3 mb-4">
                         <div class="col-12">
                             <label class="form-label">Relato do Cliente *</label>
-                            <textarea name="relato_cliente" class="form-control" rows="3" required><?= $isEdit ? esc($os['relato_cliente']) : old('relato_cliente') ?></textarea>
+                            <?php if (!$isEdit): ?>
+                            <div class="mb-3">
+                                <div id="relatoQuickButtons" class="d-flex flex-wrap gap-2 relato-quick-grid">
+                                    <?php if (!empty($relatosRapidos)): ?>
+                                        <?php foreach ($relatosRapidos as $categoria): ?>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <?= esc($categoria['icone'] ?? '?') ?> <?= esc($categoria['categoria'] ?? 'Relatos') ?>
+                                                </button>
+                                                <ul class="dropdown-menu shadow-sm">
+                                                    <?php foreach (($categoria['itens'] ?? []) as $item): ?>
+                                                        <li>
+                                                            <button type="button" class="dropdown-item btn-relato-opcao" data-relato-opcao="<?= esc($item['texto_relato'] ?? '') ?>">
+                                                                <?= esc($item['texto_relato'] ?? '') ?>
+                                                            </button>
+                                                        </li>
+                                                    <?php endforeach; ?>
+                                                </ul>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <span class="text-muted small">
+                                            Nenhum relato r�pido ativo. Cadastre em
+                                            <a href="<?= base_url('defeitosrelatados') ?>">Defeitos Relatados</a>.
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                <small class="text-muted d-block mt-2">Clique em uma op��o para inserir no relato.</small>
+                            </div>
+                            <?php endif; ?>
+                            <textarea name="relato_cliente" id="relatoClienteInput" class="form-control" rows="6"><?= $isEdit ? esc($os['relato_cliente']) : old('relato_cliente') ?></textarea>
+                            <?php if (!$isEdit): ?>
+                            <small class="text-muted d-block mt-2">Voc� pode complementar manualmente o relato a qualquer momento.</small>
+                            <?php endif; ?>
                         </div>
                     </div>
 
-                    <!-- Defeitos Comuns -->
+                    <?php if ($isEdit): ?>
                     <div class="row g-3 mb-4" id="defeitosSection" style="display:none;">
                         <div class="col-12">
                             <div class="card" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;">
                                 <div class="card-header py-2" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.1);">
                                     <strong><i class="bi bi-bug me-2 text-warning"></i>Defeitos Comuns do Tipo de Equipamento</strong>
-                                    <small class="text-muted ms-2">(opcional — selecione os que se aplicam)</small>
+                                    <small class="text-muted ms-2">(opcional ? selecione os que se aplicam)</small>
                                 </div>
                                 <div class="card-body" id="defeitosContainer">
                                     <span class="text-muted small">Selecione o equipamento para carregar os defeitos...</span>
@@ -382,6 +565,7 @@ $marcas = $marcas ?? [];
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
 
                         </div>
                         <div class="tab-pane fade" id="tab-fotos" role="tabpanel" aria-labelledby="tab-fotos-btn" tabindex="0">
@@ -392,11 +576,17 @@ $marcas = $marcas ?? [];
                         <div class="card-header py-3 d-flex flex-column flex-md-row justify-content-between gap-2" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.1);">
                             <div>
                                 <strong><i class="bi bi-camera me-2 text-info"></i>Fotos de Entrada do Equipamento</strong>
-                                <small class="text-muted ms-2">(opcional — acessórios, estado físico, placa interna, etc.)</small>
+                                <small class="text-muted ms-2">(opcional ? acess�rios, estado f�sico, placa interna, etc.)</small>
                             </div>
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-outline-light btn-sm" id="btnFotosEscolher">
+                            <div class="d-flex justify-content-center justify-content-md-end gap-2 flex-wrap">
+                                <button type="button" class="btn btn-outline-light btn-sm d-none" id="btnFotosEscolher">
                                     <i class="bi bi-folder2-open me-1"></i>Escolher Arquivos
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" id="btnFotosEntradaCamera">
+                                    <i class="bi bi-camera-fill me-1"></i>Capturar Foto
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="btnFotosEntradaGaleria">
+                                    <i class="bi bi-images me-1"></i>Abrir Galeria
                                 </button>
                                 <button type="button" class="btn btn-outline-warning btn-sm" id="btnLimparFotos">
                                     <i class="bi bi-trash me-1"></i>Limpar
@@ -404,17 +594,27 @@ $marcas = $marcas ?? [];
                             </div>
                         </div>
                         <div class="card-body">
+                            <input type="file" id="fotosEntradaGaleriaInput" accept="image/*" multiple class="d-none">
                             <input type="file" name="fotos_entrada[]" id="fotosEntradaInput"
                                    accept="image/jpeg,image/png,image/webp"
                                    multiple class="d-none">
-                            <div id="osFotosDropzone" class="border rounded-4 d-flex align-items-center justify-content-center flex-column gap-2 text-center py-4 mb-3"
+                            <div class="p-3 border rounded bg-light bg-opacity-10 mb-4 text-center py-4" id="fotosEntradaEmptyState" style="display:none;">
+                                <i class="bi bi-cloud-upload display-5 text-muted opacity-25"></i>
+                                <h6 class="mt-3 text-muted mb-1">Nenhuma foto anexada</h6>
+                                <p class="text-muted small mb-0">Use Capturar Foto ou Abrir Galeria para adicionar as imagens da entrada.</p>
+                            </div>
+                            <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-3 mx-auto" style="max-width: 680px;">
+                                <i class="bi bi-info-circle-fill fs-5 me-2"></i>
+                                <div class="small">At&eacute; <strong>4 fotos</strong>, 2MB cada. O sistema abre o ajuste de corte antes de importar.</div>
+                            </div>
+                            <div id="osFotosDropzone" class="border rounded-4 d-none align-items-center justify-content-center flex-column gap-2 text-center py-4 mb-3"
                                  style="min-height: 180px; transition: background 0.2s;">
                                 <i class="bi bi-cloud-upload display-4 text-muted"></i>
                                 <p class="text-muted mb-0 fw-semibold">Clique para selecionar ou arraste arquivos aqui.</p>
-                                <small class="text-muted">Até 4 fotos, 2MB cada.</small>
+                                <small class="text-muted">At� 4 fotos, 2MB cada.</small>
                             </div>
-                            <div id="osFotosPreview" class="d-flex flex-wrap gap-3"></div>
-                            <div id="osFotosExisting" class="d-flex flex-wrap gap-3 mt-3"></div>
+                            <div id="osFotosPreview" class="d-flex flex-wrap justify-content-center gap-3"></div>
+                            <div id="osFotosExisting" class="d-flex flex-wrap justify-content-center gap-3 mt-3"></div>
                         </div>
                     </div>
                         </div>
@@ -427,11 +627,11 @@ $marcas = $marcas ?? [];
                         <div class="col-12">
                             <div class="card" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;">
                                 <div class="card-header py-2" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                    <strong><i class="bi bi-box-seam me-2 text-primary"></i>Peças e Serviços</strong>
+                                    <strong><i class="bi bi-box-seam me-2 text-primary"></i>Pe�as e Servi�os</strong>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted small mb-2">Adicione peças e serviços na tela de visualização da OS.</p>
-                                    <a href="<?= base_url('os/visualizar/' . $os['id']) ?>" class="btn btn-sm btn-outline-info">Abrir OS e lançar itens</a>
+                                    <p class="text-muted small mb-2">Adicione pe�as e servi�os na tela de visualiza��o da OS.</p>
+                                    <a href="<?= base_url('os/visualizar/' . $os['id']) ?>" class="btn btn-sm btn-outline-info">Abrir OS e lan�ar itens</a>
                                 </div>
                             </div>
                         </div>
@@ -443,12 +643,12 @@ $marcas = $marcas ?? [];
                             <select name="forma_pagamento" class="form-select">
                                 <?php
                                 $formas = [
-                                    '' => 'Não definido',
+                                    '' => 'N�o definido',
                                     'dinheiro' => 'Dinheiro',
                                     'pix' => 'Pix',
-                                    'cartao_credito' => 'Cartão de Crédito',
-                                    'cartao_debito' => 'Cartão de Débito',
-                                    'transferencia' => 'Transferência',
+                                    'cartao_credito' => 'Cart�o de Cr�dito',
+                                    'cartao_debito' => 'Cart�o de D�bito',
+                                    'transferencia' => 'Transfer�ncia',
                                     'boleto' => 'Boleto',
                                 ];
                                 foreach ($formas as $val => $label): ?>
@@ -458,14 +658,14 @@ $marcas = $marcas ?? [];
                         </div>
                     </div>
 
-                    <!-- Diagnóstico -->
+                    <!-- Diagn�stico -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">Diagnóstico Técnico</label>
+                            <label class="form-label">Diagn�stico T�cnico</label>
                             <textarea name="diagnostico_tecnico" class="form-control" rows="3"><?= esc($os['diagnostico_tecnico'] ?? '') ?></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Solução Aplicada</label>
+                            <label class="form-label">Solu��o Aplicada</label>
                             <textarea name="solucao_aplicada" class="form-control" rows="3"><?= esc($os['solucao_aplicada'] ?? '') ?></textarea>
                         </div>
                     </div>
@@ -474,11 +674,11 @@ $marcas = $marcas ?? [];
                     <h6 class="text-uppercase text-muted mb-3"><i class="bi bi-currency-dollar me-1"></i>Valores</h6>
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
-                            <label class="form-label">Mão de Obra (R$)</label>
+                            <label class="form-label">M�o de Obra (R$)</label>
                             <input type="number" step="0.01" name="valor_mao_obra" class="form-control" value="<?= $os['valor_mao_obra'] ?? 0 ?>">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Peças (R$)</label>
+                            <label class="form-label">Pe�as (R$)</label>
                             <input type="number" step="0.01" name="valor_pecas" class="form-control" readonly value="<?= $os['valor_pecas'] ?? 0 ?>">
                         </div>
                         <div class="col-md-3">
@@ -491,14 +691,14 @@ $marcas = $marcas ?? [];
                         </div>
                     </div>
 
-                    <!-- Observações -->
+                    <!-- Observa��es -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">Observações Internas</label>
+                            <label class="form-label">Observa��es Internas</label>
                             <textarea name="observacoes_internas" class="form-control" rows="2"><?= esc($os['observacoes_internas'] ?? '') ?></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Observações para o Cliente</label>
+                            <label class="form-label">Observa��es para o Cliente</label>
                             <textarea name="observacoes_cliente" class="form-control" rows="2"><?= esc($os['observacoes_cliente'] ?? '') ?></textarea>
                         </div>
                     </div>
@@ -506,7 +706,7 @@ $marcas = $marcas ?? [];
                     </div>
                     <?php endif; ?>
 
-                    <div class="d-flex gap-3 align-items-center flex-wrap">
+                    <div class="os-form-actions">
                         <button type="submit" class="btn btn-glow">
                             <i class="bi bi-check-lg me-1"></i><?= $isEdit ? 'Atualizar' : 'Abrir OS' ?>
                         </button>
@@ -520,8 +720,9 @@ $marcas = $marcas ?? [];
                 </form>
             </div>
         </div>
-    </div><!-- /formCol -->
+</div><!-- /formCol -->
 </div><!-- /row -->
+</div>
 
 <!-- ===== MODAL: CADASTRAR NOVO CLIENTE ===== -->
 <div class="modal fade" id="modalNovoCliente" tabindex="-1">
@@ -529,7 +730,7 @@ $marcas = $marcas ?? [];
         <div class="modal-content glass-card">
             <div class="modal-header border-bottom">
                 <h5 class="modal-title">
-                    <i class="bi bi-person-plus text-warning me-2"></i>Cadastro Rápido de Cliente
+                    <i class="bi bi-person-plus text-warning me-2"></i>Cadastro R�pido de Cliente
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -538,7 +739,7 @@ $marcas = $marcas ?? [];
                     <?= csrf_field() ?>
                     <div class="row g-3">
                         <div class="col-md-8">
-                            <label class="form-label">Nome / Razão Social *</label>
+                            <label class="form-label">Nome / Raz�o Social *</label>
                             <input type="text" name="nome_razao" class="form-control" required>
                         </div>
                         <div class="col-md-4">
@@ -567,11 +768,11 @@ $marcas = $marcas ?? [];
                             <input type="text" name="cep" class="form-control mask-cep">
                         </div>
                         <div class="col-md-7">
-                            <label class="form-label text-muted">Endereço</label>
+                            <label class="form-label text-muted">Endere�o</label>
                             <input type="text" name="endereco" class="form-control js-logradouro">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label text-muted">Nº</label>
+                            <label class="form-label text-muted">N�</label>
                             <input type="text" name="numero" class="form-control js-numero">
                         </div>
                         <div class="col-md-5">
@@ -614,7 +815,7 @@ $marcas = $marcas ?? [];
                 <form id="formNovoEquipAjax" enctype="multipart/form-data">
                     <?= csrf_field() ?>
                     
-                    <!-- Navegação por Abas no Modal -->
+                    <!-- Navega��o por Abas no Modal -->
                     <ul class="nav nav-pills nav-fill mb-3 bg-light p-1 rounded-3" id="modalEquipTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active small py-1" id="m-info-tab" data-bs-toggle="tab" data-bs-target="#m-info-pane" type="button" role="tab"><i class="bi bi-info-circle me-1"></i>Info</button>
@@ -663,27 +864,27 @@ $marcas = $marcas ?? [];
                                     <input type="hidden" name="modelo_nome_ext" id="novoEquipModeloNomeExt">
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
-                                    <label class="form-label mb-1 small fw-bold">Nº de Série</label>
-                                    <input type="text" name="numero_serie" class="form-control form-control-sm" placeholder="IMEI ou Série">
+                                    <label class="form-label mb-1 small fw-bold">N� de S�rie</label>
+                                    <input type="text" name="numero_serie" class="form-control form-control-sm" placeholder="IMEI ou S�rie">
                                 </div>
                                 <div class="col-12 text-start mt-2">
                                     <label class="form-label mb-1 small d-flex justify-content-between">
                                         <span class="fw-bold">Senha de Acesso</span>
                                         <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-light border py-0 px-2 btn-senha-tipo-os" data-placeholder="Numérico (PIN)" title="PIN/Desenho" style="font-size:0.65rem;">PIN</button>
-                                            <button type="button" class="btn btn-light border py-0 px-2 btn-senha-tipo-os" data-placeholder="Alfanumérico" title="Texto" style="font-size:0.65rem;">TEXTO</button>
+                                            <button type="button" class="btn btn-light border py-0 px-2 btn-senha-tipo-os" data-placeholder="Num�rico (PIN)" title="PIN/Desenho" style="font-size:0.65rem;">PIN</button>
+                                            <button type="button" class="btn btn-light border py-0 px-2 btn-senha-tipo-os" data-placeholder="Alfanum�rico" title="Texto" style="font-size:0.65rem;">TEXTO</button>
                                         </div>
                                     </label>
                                     <input type="text" name="senha_acesso" id="inputSenhaAcessoOS" class="form-control form-control-sm" placeholder="Senha do aparelho">
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
-                                    <label class="form-label mb-1 small fw-bold text-muted">Estado Físico</label>
+                                    <label class="form-label mb-1 small fw-bold text-muted">Estado F�sico</label>
                                     <textarea name="estado_fisico" class="form-control form-control-sm" rows="2" placeholder="Ex: Tela riscada..."></textarea>
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
                                     <label class="form-label mb-1 small fw-bold text-muted d-flex justify-content-between">
-                                        Acessórios
-                                        <span style="font-size:0.6rem;">+ Rápido</span>
+                                        Acess�rios
+                                        <span style="font-size:0.6rem;">+ R�pido</span>
                                     </label>
                                     <textarea name="acessorios" id="textareaAcessoriosOS" class="form-control form-control-sm mb-1" rows="2" placeholder="Cabos, capas..."></textarea>
                                     <div class="d-flex flex-wrap gap-1">
@@ -691,7 +892,7 @@ $marcas = $marcas ?? [];
                                         <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Cabo</button>
                                         <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Capa</button>
                                         <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Chip</button>
-                                        <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Cartão</button>
+                                        <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Cart�o</button>
                                     </div>
                                 </div>
                             </div>
@@ -744,24 +945,23 @@ $marcas = $marcas ?? [];
                                 <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="btnAbrirGaleria">
                                     <i class="bi bi-images me-1"></i>Galeria
                                 </button>
-                                <input type="file" name="foto_perfil" id="novoEquipFoto" class="d-none" accept="image/*">
+                                <input type="file" name="fotos[]" id="novoEquipFoto" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
                             </div>
 
                             <div id="novoEquipFotoPreview" class="mt-2" style="display:none;">
-                                <div class="position-relative d-inline-block shadow rounded border p-1 bg-white">
-                                    <img id="novoEquipFotoImg" src="" style="height:140px; width: 140px; object-fit:cover; border-radius:4px;">
-                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 p-1 py-0 shadow" id="btnRemoverFotoNovoEquip" style="border-radius: 50%;">
-                                        <i class="bi bi-x"></i>
-                                    </button>
-                                </div>
-                                <div class="mt-2 small text-muted">A foto de perfil ajuda na identificação visual rápida.</div>
+                                <div id="novoEquipFotosNovasList" class="d-flex flex-wrap gap-2 justify-content-center"></div>
+                                <div class="mt-2 small text-muted">A foto de perfil ajuda na identifica��o visual r�pida.</div>
                             </div>
                             
                             <div id="fotoVaziaOS" class="py-4 text-muted opacity-50">
                                 <i class="bi bi-image fs-1 d-block"></i>
                                 <span class="small font-monospace">Nenhuma imagem selecionada</span>
                             </div>
-                        </div>
+
+                            <div id="modalEquipFotosExistentesWrap" class="mt-3 d-none">
+                                <div class="small text-muted mb-2">Fotos j� cadastradas neste equipamento</div>
+                                <div id="modalEquipFotosExistentes" class="d-flex flex-wrap gap-2 justify-content-center"></div>
+                            </div>
                     </div>
                     <div id="modalEquipErrors" class="alert alert-danger mt-3 d-none p-2 small"></div>
                 </form>
@@ -818,12 +1018,12 @@ $marcas = $marcas ?? [];
                             <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                         </div>
                     </div>
-                    <!-- Dropdown de sugestões -->
+                    <!-- Dropdown de sugest�es -->
                     <div id="sugestoesNovoModeloOS" class="list-group shadow-lg mt-1 d-none"
                          style="max-height: 220px; overflow-y: auto; border-radius: 8px; z-index: 9999; position: relative;"></div>
                     <div class="form-text mt-1">
                         <i class="bi bi-globe2 me-1 text-info"></i>
-                        Digite 3+ caracteres para ver sugestões da internet
+                        Digite 3+ caracteres para ver sugest�es da internet
                     </div>
                 </div>
                 <div id="errorNovoModeloOS" class="text-danger small mt-2 d-none"></div>
@@ -839,7 +1039,7 @@ $marcas = $marcas ?? [];
 </div>
 
 
-<!-- ===== MODAL: CÂMERA (AUXILIAR) ===== -->
+<!-- ===== MODAL: C�MERA (AUXILIAR) ===== -->
 <div class="modal fade" id="modalCamera" tabindex="-1" style="z-index: 2000;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-card border-0 shadow-lg">
@@ -887,6 +1087,8 @@ $marcas = $marcas ?? [];
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<!-- SweetAlert2 (confirm dialogs) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Cropper.js -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
@@ -899,6 +1101,63 @@ $marcas = $marcas ?? [];
     .custom-color-accordion .list-group-item { transition: all 0.15s ease; cursor: pointer; }
     .custom-color-accordion .list-group-item:hover { background-color: rgba(0,0,0,0.03); transform: translateX(3px); }
     .custom-color-accordion .list-group-item.active { border-left: 3px solid var(--bs-primary) !important; }
+    .relato-quick-grid .dropdown-menu {
+        max-height: 280px;
+        overflow-y: auto;
+    }
+    .os-data-section {
+        border: 1px solid rgba(99, 91, 255, 0.2);
+        border-radius: 12px;
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.03);
+        box-shadow: 0 2px 8px rgba(12, 22, 44, 0.04);
+    }
+    .os-data-section-title {
+        font-size: 0.78rem;
+        letter-spacing: 0.08rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #5f6c86;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+    }
+    .os-data-section + .os-data-section {
+        margin-top: 0.2rem;
+    }
+    .os-data-section .row:last-child {
+        margin-bottom: 0;
+    }
+    .os-form-page .relato-quick-grid .btn-group {
+        flex: 0 0 auto;
+    }
+    .os-form-page #estadoFisicoList .list-group-item,
+    .os-form-page #acessoriosList .list-group-item {
+        padding: 0.8rem;
+    }
+    @media (max-width: 1199.98px) {
+        .os-form-page .os-data-section {
+            padding: 12px;
+        }
+    }
+    @media (max-width: 767.98px) {
+        .os-form-page .os-data-section {
+            border-radius: 10px;
+            padding: 10px;
+        }
+        .os-form-page .os-data-section-title {
+            font-size: 0.72rem;
+            letter-spacing: 0.06rem;
+        }
+        .os-form-page .relato-quick-grid {
+            overflow-x: auto;
+            flex-wrap: nowrap !important;
+            padding-bottom: 4px;
+        }
+        .os-form-page .relato-quick-grid .btn-group {
+            flex: 0 0 auto;
+        }
+    }
 </style>
 
 <script>
@@ -910,24 +1169,51 @@ var defeitosSelecionados = <?= json_encode(array_column($defeitosSelected, 'defe
 var defeitosSelecionados = [];
 <?php endif; ?>
 const existingFotosCount = <?= (int)(count($fotos_entrada ?? [])) ?>;
+const estadoFisicoEntriesServer = <?= json_encode(array_map(static function ($entry) {
+    $values = [];
+    if (!empty($entry['valores'])) {
+        $decoded = json_decode((string) $entry['valores'], true);
+        if (is_array($decoded)) {
+            $values = $decoded;
+        }
+    }
+    return [
+        'id' => 'est_srv_' . ($entry['id'] ?? uniqid()),
+        'text' => trim((string)($entry['descricao_dano'] ?? '')),
+        'key' => $entry['tipo'] ?? 'outro',
+        'values' => $values,
+    ];
+}, $estadoFisicoEntries ?? []), JSON_UNESCAPED_UNICODE) ?>;
 let pendingEquipId = null;
 let pendingDefeitos = null;
 const DRAFT_KEY = 'osDraft_v1';
 const DRAFT_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 let draftSaveTimer = null;
 
-const statusLabels = {
-    aguardando_analise: 'Aguard. Análise',
-    aguardando_orcamento: 'Aguard. Orçamento',
-    aguardando_aprovacao: 'Aguard. Aprovação',
-    aprovado: 'Aprovado',
-    reprovado: 'Reprovado',
-    em_reparo: 'Em Reparo',
-    aguardando_peca: 'Aguard. Peça',
-    pronto: 'Pronto',
-    entregue: 'Entregue',
-    cancelado: 'Cancelado'
-};
+const statusMeta = <?= json_encode($statusFlat, JSON_UNESCAPED_UNICODE) ?> || {};
+const statusLabels = Object.keys(statusMeta).reduce((acc, key) => {
+    acc[key] = statusMeta[key]?.nome || key;
+    return acc;
+}, {});
+
+const statusBadgeClassMap = Object.keys(statusMeta).reduce((acc, key) => {
+    const raw = String(statusMeta[key]?.cor || 'secondary').toLowerCase();
+    const normalized = ({
+        indigo: 'primary',
+        purple: 'primary',
+        orange: 'warning',
+        dark: 'dark',
+        light: 'light text-dark',
+        secondary: 'secondary',
+        primary: 'primary',
+        success: 'success',
+        warning: 'warning',
+        danger: 'danger',
+        info: 'info'
+    })[raw] || 'secondary';
+    acc[key] = 'text-bg-' + normalized;
+    return acc;
+}, {});
 
 const prioridadeLabels = {
     baixa: 'Baixa',
@@ -936,7 +1222,7 @@ const prioridadeLabels = {
     urgente: 'Urgente'
 };
 
-// ─── Select2 ────────────────────────────────────────────────────────────────
+// ??? Select2 ????????????????????????????????????????????????????????????????
 if (typeof $.fn.select2 !== 'undefined') {
     $('#clienteOsSelect').select2({
         theme: 'bootstrap-5',
@@ -944,15 +1230,15 @@ if (typeof $.fn.select2 !== 'undefined') {
         allowClear: true,
         width: '100%'
     }).on('select2:open', function() {
-        // Adiciona um listener para detectar quando o usuário pressiona Enter na busca vazia
-        // ou quando não há resultados. Mas vamos focar no botão fixo.
+        // Adiciona um listener para detectar quando o usu�rio pressiona Enter na busca vazia
+        // ou quando n�o h� resultados. Mas vamos focar no bot�o fixo.
     });
 
-    // Se quiser botão de Add dentro do dropdown Select2, é complexo.
-    // O botão '+ Novo' já resolve bem.
+    // Se quiser bot�o de Add dentro do dropdown Select2, � complexo.
+    // O bot�o '+ Novo' j� resolve bem.
 }
 
-// ─── Modal: Cadastrar Novo Cliente ──────────────────────────────────────────
+// ??? Modal: Cadastrar Novo Cliente ??????????????????????????????????????????
 const btnNovoCliente = document.getElementById('btnNovoCliente');
 if (btnNovoCliente) {
     btnNovoCliente.addEventListener('click', function() {
@@ -989,7 +1275,7 @@ document.getElementById('btnSalvarNovoCliente')?.addEventListener('click', funct
         bootstrap.Modal.getInstance(document.getElementById('modalNovoCliente'))?.hide();
         form.reset();
         
-        // Dispara o change para carregar equipamentos (que virão vazios, claro, mas reseta o combo)
+        // Dispara o change para carregar equipamentos (que vir�o vazios, claro, mas reseta o combo)
         _onClienteChange(res.id);
     })
     .catch(() => {
@@ -998,12 +1284,12 @@ document.getElementById('btnSalvarNovoCliente')?.addEventListener('click', funct
     });
 });
 
-// ─── Sidebar layout toggling ───────────────────────────────────────────────
+// ??? Sidebar layout toggling ???????????????????????????????????????????????
 function showSidebar() {
     const sidebar = document.getElementById('sidebarEquipamento');
     const formCol = document.getElementById('formCol');
     if (sidebar) sidebar.style.display = '';
-    if (formCol) formCol.className = 'col-md-9';
+    if (formCol) formCol.className = 'col-12 col-xl-8 col-xxl-9 ds-split-main';
 }
 function hideSidebar() {
     const mainBox     = document.getElementById('fotoMainBox');
@@ -1057,7 +1343,7 @@ function _setResumoBadge(id, text, cls) {
 function _setFieldStatus(id, ok) {
     const el = document.getElementById(id);
     if (!el) return;
-    el.textContent = ok ? '✔️' : '❌';
+    el.textContent = ok ? '??' : '?';
     el.className = ok ? 'text-success' : 'text-danger';
 }
 
@@ -1069,24 +1355,30 @@ function updateResumo() {
     const statusSel  = document.querySelector('select[name="status"]');
     const entradaInp = document.querySelector('input[name="data_entrada"]');
     const previsaoInp = document.querySelector('input[name="data_previsao"]');
-    const relatoInp  = document.querySelector('textarea[name="relato_cliente"]');
+    const relatoInp  = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
     const acessoriosInp = document.querySelector('textarea[name="acessorios"]');
+    const estadoFisicoInp = document.getElementById('estadoFisicoInput');
+    const estadoFisicoSemAvarias = document.getElementById('estadoFisicoSemAvarias');
 
-    const clienteText = _getSelectedText(clienteSel, 'Não selecionado');
-    const equipText   = _getSelectedText(equipSel, 'Não selecionado');
-    const tecnicoText = _getSelectedText(tecnicoSel, 'Não atribuído');
+    const clienteText = _getSelectedText(clienteSel, 'N�o selecionado');
+    const equipText   = _getSelectedText(equipSel, 'N�o selecionado');
+    const tecnicoText = _getSelectedText(tecnicoSel, 'N�o atribu�do');
     const prioridadeVal = prioridadeSel?.value || 'normal';
-    const statusVal = statusSel?.value || 'aguardando_analise';
+    const statusVal = statusSel?.value || 'triagem';
     const relatoVal = relatoInp?.value?.trim() || '';
     const acessoriosVal = acessoriosInp?.value?.trim() || '';
+    const estadoFisicoVal = estadoFisicoInp?.value?.trim() || '';
 
     document.getElementById('resumoCliente').textContent = clienteText;
     document.getElementById('resumoEquipamento').textContent = equipText;
     document.getElementById('resumoTecnico').textContent = tecnicoText;
     document.getElementById('resumoEntrada').textContent = _formatDateTime(entradaInp?.value);
     document.getElementById('resumoPrevisao').textContent = _formatDate(previsaoInp?.value);
+    const semAcessorios = acessoriosVal.toLowerCase() === 'sem acess�rios';
+    const semAvarias = Boolean(estadoFisicoSemAvarias?.checked) || estadoFisicoVal.toLowerCase() === 'sem avarias aparentes';
     document.getElementById('resumoRelato').textContent = relatoVal ? 'Preenchido' : 'Vazio';
-    document.getElementById('resumoAcessorios').textContent = acessoriosVal ? 'Informado' : 'Não informado';
+    document.getElementById('resumoAcessorios').textContent = semAcessorios ? 'Sem acess�rios' : (acessoriosVal ? 'Informado' : 'N�o informado');
+    document.getElementById('resumoEstadoFisico').textContent = semAvarias ? 'Sem avarias' : (estadoFisicoVal ? 'Informado' : 'N�o informado');
 
     const prioridadeBadgeClass = {
         baixa: 'text-bg-secondary',
@@ -1096,26 +1388,16 @@ function updateResumo() {
     }[prioridadeVal] || 'text-bg-secondary';
     _setResumoBadge('resumoPrioridade', prioridadeLabels[prioridadeVal] || 'Normal', prioridadeBadgeClass);
 
-    const statusBadgeClass = {
-        aguardando_analise: 'text-bg-secondary',
-        aguardando_orcamento: 'text-bg-info',
-        aguardando_aprovacao: 'text-bg-info',
-        aprovado: 'text-bg-success',
-        reprovado: 'text-bg-danger',
-        em_reparo: 'text-bg-warning',
-        aguardando_peca: 'text-bg-warning',
-        pronto: 'text-bg-success',
-        entregue: 'text-bg-primary',
-        cancelado: 'text-bg-dark'
-    }[statusVal] || 'text-bg-secondary';
-    _setResumoBadge('resumoStatus', statusLabels[statusVal] || 'Aguard. Análise', statusBadgeClass);
+    const statusBadgeClass = statusBadgeClassMap[statusVal] || 'text-bg-secondary';
+    _setResumoBadge('resumoStatus', statusLabels[statusVal] || statusVal || 'Triagem', statusBadgeClass);
 
     const defeitosCount = document.querySelectorAll('.chk-defeito-comum:checked').length;
-    document.getElementById('resumoDefeitos').textContent = defeitosCount.toString();
+    const resumoDefeitos = document.getElementById('resumoDefeitos');
+    if (resumoDefeitos) resumoDefeitos.textContent = defeitosCount.toString();
 
-    const fotosInput = document.getElementById('fotosEntradaInput');
-    const fotosCount = fotosInput?.files ? fotosInput.files.length : 0;
-    const totalFotos = existingFotosCount + fotosCount;
+    const totalFotos = (typeof getTotalFotosEntradaResumo === 'function')
+        ? getTotalFotosEntradaResumo()
+        : ((document.getElementById('fotosEntradaInput')?.files?.length || 0) + existingFotosCount);
     document.getElementById('resumoFotosEntrada').textContent = totalFotos.toString();
 
     _setFieldStatus('statusCliente', Boolean(clienteSel?.value));
@@ -1126,10 +1408,46 @@ function updateResumo() {
     _setFieldStatus('statusEntrada', Boolean(entradaInp?.value));
     _setFieldStatus('statusPrevisao', Boolean(previsaoInp?.value));
     _setFieldStatus('statusRelato', Boolean(relatoVal));
-    _setFieldStatus('statusAcessorios', Boolean(acessoriosVal));
+    _setFieldStatus('statusAcessorios', semAcessorios || Boolean(acessoriosVal));
+    _setFieldStatus('statusEstadoFisico', semAvarias || Boolean(estadoFisicoVal));
     _setFieldStatus('statusFotos', totalFotos > 0);
-    _setFieldStatus('statusDefeitos', defeitosCount > 0);
+    if (document.getElementById('statusDefeitos')) {
+        _setFieldStatus('statusDefeitos', defeitosCount > 0);
+    }
 }
+
+const relatoClienteInput = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
+const relatoQuickButtons = document.getElementById('relatoQuickButtons');
+
+function relatoNormalizarTexto(texto) {
+    let valor = String(texto || '').trim();
+    valor = valor.replace(/^Cliente relata:\s*/i, '');
+    valor = valor.replace(/[.;:,\s]+$/g, '').trim();
+    return valor;
+}
+function initRelatoRapidoModule() {
+    if (!relatoClienteInput) return;
+    relatoClienteInput.addEventListener('input', () => {
+        updateResumo();
+        scheduleDraftSave();
+    });
+
+    if (!isEdit && relatoQuickButtons) {
+        relatoQuickButtons.addEventListener('click', event => {
+            const btn = event.target.closest('.btn-relato-opcao');
+            if (!btn) return;
+            const texto = relatoNormalizarTexto(btn.dataset.relatoOpcao || '');
+            if (!texto) return;
+            const linha = /[.!?]$/.test(texto) ? texto : `${texto}.`;
+            const atual = relatoClienteInput.value.trim();
+            relatoClienteInput.value = atual ? `${atual}\n${linha}` : linha;
+            updateResumo();
+            scheduleDraftSave();
+        });
+    }
+}
+
+initRelatoRapidoModule();
 
 const COMMON_ACCESSORY_COLORS = [
     { hex: '#000000', name: 'Preto' },
@@ -1231,7 +1549,7 @@ function composeAccessoryText(base, detail = '') {
 const acessoriosConfig = {
     chip: {
         title: 'Chip',
-        fields: [{ name: 'chip_digits', label: 'Últimos 6 dígitos do chip', placeholder: '123456', max: 6 }],
+        fields: [{ name: 'chip_digits', label: '�ltimos 6 d�gitos do chip', placeholder: '123456', max: 6 }],
         format: values => composeAccessoryText('Chip', values.chip_digits ? ('final ' + values.chip_digits) : '')
     },
     capinha: {
@@ -1268,7 +1586,7 @@ const acessoriosConfig = {
                 { value: 'Micro USB', label: 'Micro USB' },
                 { value: 'Lightning', label: 'Lightning' },
                 { value: 'HDMI', label: 'HDMI' },
-                { value: 'Cabo de força', label: 'Cabo de força' },
+                { value: 'Cabo de for�a', label: 'Cabo de for�a' },
                 { value: 'Outro', label: 'Outro' }
             ]
         }],
@@ -1291,15 +1609,16 @@ const acessoriosConfig = {
         format: values => composeAccessoryText('Carregador', values.tipo_equip)
     },
     outro: {
-        title: 'Outro acessório',
-        fields: [{ name: 'descricao', label: 'Descrição', placeholder: 'Ex: cabo adaptador' }],
-        format: values => `${values.descricao || 'Outro acessório'}`
+        title: 'Outro acess�rio',
+        fields: [{ name: 'descricao', label: 'Descri��o', placeholder: 'Ex: cabo adaptador' }],
+        format: values => `${values.descricao || 'Outro acess�rio'}`
     }
 };
 
 const acessoriosInput = document.getElementById('acessoriosInput');
 const acessoriosDataInput = document.getElementById('acessoriosDataInput');
 const acessoriosList = document.getElementById('acessoriosList');
+const acessoriosSemItensCheckbox = document.getElementById('acessoriosSemItens');
 const acessoriosQuickForm = document.getElementById('acessoriosQuickForm');
 const acessoriosQuickTitle = document.getElementById('acessoriosQuickTitle');
 const acessoriosQuickFields = document.getElementById('acessoriosQuickFields');
@@ -1316,9 +1635,13 @@ let acessoriosCurrentKey = null;
 let acessoriosPhotoTarget = null;
 let acessorioCropQueue = [];
 let acessorioCropEntryId = null;
+const ACCESSORIOS_SEM_ITENS_TEXT = 'Sem acess�rios';
 
 const initialAcessoriosText = acessoriosInput?.value?.trim() || '';
-if (initialAcessoriosText) {
+if (acessoriosSemItensCheckbox && initialAcessoriosText.toLowerCase() === ACCESSORIOS_SEM_ITENS_TEXT.toLowerCase()) {
+    acessoriosSemItensCheckbox.checked = true;
+}
+if (initialAcessoriosText && initialAcessoriosText.toLowerCase() !== ACCESSORIOS_SEM_ITENS_TEXT.toLowerCase()) {
     initialAcessoriosText.split(/\r?\n/).filter(Boolean).forEach(text => {
         acessoriosEntries.push({ id: `acc_${Date.now()}_${Math.random().toString(36).slice(2)}`, text, key: 'outro' });
     });
@@ -1328,8 +1651,37 @@ function generateEntryId() {
     return `acc_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 }
 
+function isAcessoriosSemItensChecked() {
+    return Boolean(acessoriosSemItensCheckbox?.checked);
+}
+
+function clearAllAcessorios() {
+    acessoriosEntries.forEach(entry => removeAcessorioFileInput(entry.id));
+    acessoriosEntries = [];
+}
+
+function refreshAcessoriosSemItensUi() {
+    const isSemItens = isAcessoriosSemItensChecked();
+    document.querySelectorAll('[data-acessorio-key]').forEach(btn => {
+        btn.disabled = isSemItens;
+    });
+    if (isSemItens) {
+        closeAcessoriosForm();
+    }
+}
+
 function syncAcessoriosInput() {
     if (!acessoriosInput) return;
+    if (isAcessoriosSemItensChecked()) {
+        acessoriosInput.value = ACCESSORIOS_SEM_ITENS_TEXT;
+        if (acessoriosDataInput) {
+            acessoriosDataInput.value = JSON.stringify([]);
+        }
+        updateResumo();
+        scheduleDraftSave();
+        return;
+    }
+
     acessoriosInput.value = acessoriosEntries.map(entry => entry.text).join('\n');
     if (acessoriosDataInput) {
         acessoriosDataInput.value = JSON.stringify(acessoriosEntries.map(entry => ({
@@ -1412,6 +1764,14 @@ function renderAcessoriosPhotos(entryId, container) {
 function renderAcessoriosList() {
     if (!acessoriosList) return;
     acessoriosList.innerHTML = '';
+    if (isAcessoriosSemItensChecked()) {
+        const item = document.createElement('div');
+        item.className = 'list-group-item text-muted';
+        item.textContent = 'Marcado como sem acess�rios.';
+        acessoriosList.appendChild(item);
+        return;
+    }
+
     acessoriosEntries.forEach((entry, index) => {
         const cleanText = (entry.text || '').replace(/\s*\(#[0-9a-fA-F]{6}\)/g, '');
         if (cleanText !== entry.text) {
@@ -1424,6 +1784,7 @@ function renderAcessoriosList() {
                 <span class="fw-semibold">${cleanText}</span>
                 <div class="d-flex gap-1">
                     <button type="button" class="btn btn-outline-info btn-sm btn-add-foto" data-entry="${entry.id}"><i class="bi bi-camera"></i> Adicionar foto</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-camera" data-entry="${entry.id}"><i class="bi bi-camera-video"></i> C�mera</button>
                     <button type="button" class="btn btn-outline-secondary btn-sm btn-edit-acessorio" data-index="${index}"><i class="bi bi-pencil"></i></button>
                     <button type="button" class="btn btn-outline-danger btn-sm btn-remove-acessorio" data-index="${index}"><i class="bi bi-trash"></i></button>
                 </div>
@@ -1435,9 +1796,7 @@ function renderAcessoriosList() {
         ensureAcessorioFileInput(entry.id);
         renderAcessoriosPhotos(entry.id, photosContainer);
     });
-    const totalPhotos = Object.keys(acessoriosPhotos).reduce((sum, id) => sum + (acessoriosPhotos[id].files.length || 0), 0);
-    document.getElementById('resumoFotosEntrada').textContent = totalPhotos.toString();
-    _setFieldStatus('statusFotos', totalPhotos > 0);
+    updateResumo();
 }
 
 function closeAcessoriosForm() {
@@ -1562,7 +1921,7 @@ function openAcessoriosForm(key, index = null) {
             const dropdownId = `acessorioColorQuick_${field.name}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
             quickColorsMobile.innerHTML = `
                 <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" id="${dropdownId}" data-bs-toggle="dropdown" aria-expanded="false">
-                    Cores rápidas
+                    Cores r�pidas
                 </button>
                 <ul class="dropdown-menu w-100" aria-labelledby="${dropdownId}"></ul>
             `;
@@ -1639,6 +1998,7 @@ function openAcessoriosForm(key, index = null) {
 }
 
 function handleAcessoriosButtonClick(event) {
+    if (isAcessoriosSemItensChecked()) return;
     const key = event.currentTarget.dataset.acessorioKey;
     if (!key) return;
     openAcessoriosForm(key);
@@ -1654,6 +2014,7 @@ function collectFormValues() {
 }
 
 function handleAcessoriosSave() {
+    if (isAcessoriosSemItensChecked()) return;
     const key = acessoriosCurrentKey;
     const config = acessoriosConfig[key];
     if (!config) return;
@@ -1708,19 +2069,54 @@ function handleEditAcessorio(event) {
 }
 
 function openAcessorioPhotoInput(entryId) {
+    closeImageModalIfOpen();
     acessoriosPhotoTarget = entryId;
     acessoriosPhotoInput.dataset.entryId = entryId;
     acessoriosPhotoInput?.click();
 }
 
+function openAcessorioCameraCapture(entryId) {
+    if (!entryId) return;
+    acessorioCropEntryId = entryId;
+    acessorioCropQueue = [];
+    openCameraCapture({ type: 'acessorio', entryId });
+}
+
+function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+async function processNextAcessorioCrop() {
+    if (!acessorioCropEntryId) return;
+    if (!acessorioCropQueue.length) {
+        hideModalSafe(modalCrop, '#modalCropEquip');
+        return;
+    }
+    const nextFile = acessorioCropQueue.shift();
+    try {
+        const source = await readFileAsDataUrl(nextFile);
+        openCropper(source, { type: 'acessorio' });
+    } catch (e) {
+        processNextAcessorioCrop();
+    }
+}
+
 function handlePhotoInputChange() {
     const entryId = this.dataset.entryId;
     if (!entryId) return;
-    const dt = acessoriosPhotos[entryId] || new DataTransfer();
-    Array.from(this.files).forEach(file => dt.items.add(file));
-    acessoriosPhotos[entryId] = dt;
-    ensureAcessorioFileInput(entryId);
-    renderAcessoriosList();
+    const files = Array.from(this.files || []).filter(file => (file.type || '').startsWith('image/'));
+    if (!files.length) {
+        this.value = '';
+        return;
+    }
+    acessorioCropEntryId = entryId;
+    acessorioCropQueue = files.slice();
+    processNextAcessorioCrop();
     this.value = '';
 }
 
@@ -1746,6 +2142,58 @@ function handleRemovePhoto(event) {
 document.querySelectorAll('[data-acessorio-key]').forEach(btn => {
     btn.addEventListener('click', handleAcessoriosButtonClick);
 });
+acessoriosSemItensCheckbox?.addEventListener('change', () => {
+    const enableSemItens = Boolean(acessoriosSemItensCheckbox.checked);
+    if (!enableSemItens) {
+        refreshAcessoriosSemItensUi();
+        renderAcessoriosList();
+        syncAcessoriosInput();
+        return;
+    }
+
+    if (!acessoriosEntries.length) {
+        refreshAcessoriosSemItensUi();
+        renderAcessoriosList();
+        syncAcessoriosInput();
+        return;
+    }
+
+    const applySemItens = () => {
+        clearAllAcessorios();
+        refreshAcessoriosSemItensUi();
+        renderAcessoriosList();
+        syncAcessoriosInput();
+    };
+
+    if (window.Swal && typeof window.Swal.fire === 'function') {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Marcar como sem acess�rios?',
+            text: 'Os acess�rios j� adicionados ser�o removidos.',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, marcar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            customClass: { popup: 'glass-card' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                applySemItens();
+                return;
+            }
+            acessoriosSemItensCheckbox.checked = false;
+            refreshAcessoriosSemItensUi();
+        });
+        return;
+    }
+
+    const confirmed = confirm('Marcar como sem acess�rios vai remover os acess�rios j� adicionados. Deseja continuar?');
+    if (confirmed) {
+        applySemItens();
+        return;
+    }
+    acessoriosSemItensCheckbox.checked = false;
+    refreshAcessoriosSemItensUi();
+});
 acessoriosQuickSave?.addEventListener('click', handleAcessoriosSave);
 acessoriosQuickCancel?.addEventListener('click', handleAcessoriosCancel);
 acessoriosQuickClose?.addEventListener('click', handleAcessoriosCancel);
@@ -1756,12 +2204,496 @@ document.addEventListener('click', event => {
     if (editBtn) handleEditAcessorio({ currentTarget: editBtn });
     const addPhotoBtn = event.target.closest('.btn-add-foto');
     if (addPhotoBtn) openAcessorioPhotoInput(addPhotoBtn.dataset.entry);
+    const addPhotoCameraBtn = event.target.closest('.btn-add-foto-camera');
+    if (addPhotoCameraBtn) openAcessorioCameraCapture(addPhotoCameraBtn.dataset.entry);
     const removePhotoBtn = event.target.closest('.btn-remove-foto-accessorio');
     if (removePhotoBtn) handleRemovePhoto({ currentTarget: removePhotoBtn });
+    const removeEstadoBtn = event.target.closest('.btn-remove-estado');
+    if (removeEstadoBtn) handleRemoveEstadoFisico({ currentTarget: removeEstadoBtn });
+    const editEstadoBtn = event.target.closest('.btn-edit-estado');
+    if (editEstadoBtn) handleEditEstadoFisico({ currentTarget: editEstadoBtn });
+    const addEstadoPhotoBtn = event.target.closest('.btn-add-foto-estado');
+    if (addEstadoPhotoBtn) openEstadoFisicoPhotoInput(addEstadoPhotoBtn.dataset.entry);
+    const addEstadoPhotoCameraBtn = event.target.closest('.btn-add-foto-camera-estado');
+    if (addEstadoPhotoCameraBtn) openEstadoFisicoCameraCapture(addEstadoPhotoCameraBtn.dataset.entry);
+    const removeEstadoPhotoBtn = event.target.closest('.btn-remove-foto-estado');
+    if (removeEstadoPhotoBtn) handleRemoveEstadoFisicoPhoto({ currentTarget: removeEstadoPhotoBtn });
 });
 acessoriosPhotoInput?.addEventListener('change', handlePhotoInputChange);
+
+const estadoFisicoConfig = {
+    tela_trincada: {
+        title: 'Tela trincada',
+        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: canto superior direito' }],
+        format: values => composeAccessoryText('Tela trincada', values.detalhe)
+    },
+    arranhoes: {
+        title: 'Arranhoes',
+        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: tampa e lateral' }],
+        format: values => composeAccessoryText('Arranhoes', values.detalhe)
+    },
+    carcaca_quebrada: {
+        title: 'Carcaca quebrada',
+        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: quina inferior' }],
+        format: values => composeAccessoryText('Carcaca quebrada', values.detalhe)
+    },
+    vidro_traseiro_quebrado: {
+        title: 'Vidro traseiro quebrado',
+        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: fissura central' }],
+        format: values => composeAccessoryText('Vidro traseiro quebrado', values.detalhe)
+    },
+    amassado: {
+        title: 'Amassado',
+        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: lateral esquerda' }],
+        format: values => composeAccessoryText('Amassado', values.detalhe)
+    },
+    botao_quebrado: {
+        title: 'Botao quebrado',
+        fields: [{ name: 'detalhe', label: 'Qual botao?', placeholder: 'Ex: power' }],
+        format: values => composeAccessoryText('Botao quebrado', values.detalhe)
+    },
+    outro: {
+        title: 'Outro dano',
+        fields: [{ name: 'descricao', label: 'Descricao', placeholder: 'Ex: camera traseira quebrada' }],
+        format: values => values.descricao || 'Outro dano'
+    }
+};
+
+const estadoFisicoInput = document.getElementById('estadoFisicoInput');
+const estadoFisicoDataInput = document.getElementById('estadoFisicoDataInput');
+const estadoFisicoList = document.getElementById('estadoFisicoList');
+const estadoFisicoSemAvariasCheckbox = document.getElementById('estadoFisicoSemAvarias');
+const estadoFisicoQuickForm = document.getElementById('estadoFisicoQuickForm');
+const estadoFisicoQuickTitle = document.getElementById('estadoFisicoQuickTitle');
+const estadoFisicoQuickFields = document.getElementById('estadoFisicoQuickFields');
+const estadoFisicoQuickSave = document.getElementById('estadoFisicoQuickSave');
+const estadoFisicoQuickCancel = document.getElementById('estadoFisicoQuickCancel');
+const estadoFisicoQuickClose = document.getElementById('estadoFisicoQuickClose');
+const estadoFisicoPhotoInput = document.getElementById('estadoFisicoPhotoInput');
+const estadoFisicoFilesInputs = document.getElementById('estadoFisicoFilesInputs');
+const estadoFisicoPhotos = {};
+const estadoFisicoFileInputs = {};
+let estadoFisicoEntries = [];
+let estadoFisicoEditing = null;
+let estadoFisicoCurrentKey = null;
+let estadoFisicoCropQueue = [];
+let estadoFisicoCropEntryId = null;
+const ESTADO_FISICO_SEM_AVARIAS_TEXT = 'Sem avarias aparentes';
+
+const initialEstadoFisicoText = estadoFisicoInput?.value?.trim() || '';
+if (Array.isArray(estadoFisicoEntriesServer) && estadoFisicoEntriesServer.length) {
+    estadoFisicoEntries = estadoFisicoEntriesServer
+        .filter(entry => String(entry?.text || '').trim() !== '')
+        .map(entry => ({
+            id: entry.id || generateEstadoFisicoEntryId(),
+            text: String(entry.text || '').trim(),
+            key: entry.key || 'outro',
+            values: entry.values || {}
+        }));
+}
+if (estadoFisicoSemAvariasCheckbox && initialEstadoFisicoText.toLowerCase() === ESTADO_FISICO_SEM_AVARIAS_TEXT.toLowerCase()) {
+    estadoFisicoSemAvariasCheckbox.checked = true;
+}
+if (!estadoFisicoEntries.length && initialEstadoFisicoText && initialEstadoFisicoText.toLowerCase() !== ESTADO_FISICO_SEM_AVARIAS_TEXT.toLowerCase()) {
+    initialEstadoFisicoText.split(/\r?\n/).filter(Boolean).forEach(text => {
+        estadoFisicoEntries.push({ id: `est_${Date.now()}_${Math.random().toString(36).slice(2)}`, text, key: 'outro' });
+    });
+}
+
+function generateEstadoFisicoEntryId() {
+    return `est_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+}
+
+function isEstadoFisicoSemAvariasChecked() {
+    return Boolean(estadoFisicoSemAvariasCheckbox?.checked);
+}
+
+function clearAllEstadoFisico() {
+    estadoFisicoEntries.forEach(entry => removeEstadoFisicoFileInput(entry.id));
+    estadoFisicoEntries = [];
+}
+
+function refreshEstadoFisicoSemAvariasUi() {
+    const isSemAvarias = isEstadoFisicoSemAvariasChecked();
+    document.querySelectorAll('[data-estado-key]').forEach(btn => {
+        btn.disabled = isSemAvarias;
+    });
+    if (isSemAvarias) {
+        closeEstadoFisicoForm();
+    }
+}
+
+function syncEstadoFisicoInput() {
+    if (!estadoFisicoInput) return;
+    if (isEstadoFisicoSemAvariasChecked()) {
+        estadoFisicoInput.value = ESTADO_FISICO_SEM_AVARIAS_TEXT;
+        if (estadoFisicoDataInput) {
+            estadoFisicoDataInput.value = JSON.stringify([{
+                id: 'sem_avarias',
+                text: ESTADO_FISICO_SEM_AVARIAS_TEXT,
+                key: 'sem_avarias',
+                values: {}
+            }]);
+        }
+        updateResumo();
+        scheduleDraftSave();
+        return;
+    }
+
+    estadoFisicoInput.value = estadoFisicoEntries.map(entry => entry.text).join('\n');
+    if (estadoFisicoDataInput) {
+        estadoFisicoDataInput.value = JSON.stringify(estadoFisicoEntries.map(entry => ({
+            id: entry.id,
+            text: entry.text,
+            key: entry.key || 'outro',
+            values: entry.values || {}
+        })));
+    }
+    updateResumo();
+    scheduleDraftSave();
+}
+
+function ensureEstadoFisicoFileInput(entryId) {
+    if (!estadoFisicoFilesInputs) return null;
+    let input = estadoFisicoFileInputs[entryId];
+    if (!input) {
+        input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.name = `fotos_estado_fisico[${entryId}][]`;
+        input.id = `estado_fisico_files_${entryId}`;
+        input.className = 'd-none';
+        estadoFisicoFilesInputs.appendChild(input);
+        estadoFisicoFileInputs[entryId] = input;
+    }
+    const dt = estadoFisicoPhotos[entryId];
+    if (dt) {
+        input.files = dt.files;
+    }
+    return input;
+}
+
+function removeEstadoFisicoFileInput(entryId) {
+    const input = estadoFisicoFileInputs[entryId];
+    if (input) {
+        input.remove();
+        delete estadoFisicoFileInputs[entryId];
+    }
+    delete estadoFisicoPhotos[entryId];
+}
+
+function renderEstadoFisicoPhotos(entryId, container) {
+    if (!container) return;
+    container.innerHTML = '';
+    const dt = estadoFisicoPhotos[entryId];
+    if (!dt) return;
+
+    Array.from(dt.files).forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const thumb = document.createElement('div');
+            thumb.className = 'border rounded overflow-hidden position-relative';
+            thumb.style.cssText = 'width:70px; height:70px;';
+
+            const preview = document.createElement('div');
+            preview.className = 'w-100 h-100 overflow-hidden position-relative image-preview';
+            preview.style.cursor = 'zoom-in';
+            preview.setAttribute('data-bs-toggle', 'modal');
+            preview.setAttribute('data-bs-target', '#imageModal');
+            preview.setAttribute('data-img-src', e.target.result);
+            preview.innerHTML = `<img src="${e.target.result}" class="w-100 h-100 object-fit-cover">`;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-sm btn-outline-light position-absolute top-0 end-0 m-1 btn-remove-foto-estado';
+            removeBtn.dataset.entry = entryId;
+            removeBtn.dataset.index = index;
+            removeBtn.innerHTML = '<i class="bi bi-x"></i>';
+
+            thumb.appendChild(preview);
+            thumb.appendChild(removeBtn);
+            container.appendChild(thumb);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function renderEstadoFisicoList() {
+    if (!estadoFisicoList) return;
+    estadoFisicoList.innerHTML = '';
+
+    if (isEstadoFisicoSemAvariasChecked()) {
+        const item = document.createElement('div');
+        item.className = 'list-group-item text-muted';
+        item.textContent = 'Marcado como sem avarias aparentes.';
+        estadoFisicoList.appendChild(item);
+        updateResumo();
+        return;
+    }
+
+    estadoFisicoEntries.forEach((entry, index) => {
+        const item = document.createElement('div');
+        item.className = 'list-group-item';
+        item.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-semibold">${entry.text}</span>
+                <div class="d-flex gap-1">
+                    <button type="button" class="btn btn-outline-info btn-sm btn-add-foto-estado" data-entry="${entry.id}"><i class="bi bi-camera"></i> Adicionar foto</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-camera-estado" data-entry="${entry.id}"><i class="bi bi-camera-video"></i> C�mera</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm btn-edit-estado" data-index="${index}"><i class="bi bi-pencil"></i></button>
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-remove-estado" data-index="${index}"><i class="bi bi-trash"></i></button>
+                </div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap mt-2" data-estado-photos-container="${entry.id}"></div>
+        `;
+        estadoFisicoList.appendChild(item);
+        const photosContainer = item.querySelector(`[data-estado-photos-container="${entry.id}"]`);
+        ensureEstadoFisicoFileInput(entry.id);
+        renderEstadoFisicoPhotos(entry.id, photosContainer);
+    });
+    updateResumo();
+}
+
+function closeEstadoFisicoForm() {
+    estadoFisicoQuickForm?.classList.add('d-none');
+    estadoFisicoQuickFields.innerHTML = '';
+    estadoFisicoEditing = null;
+}
+
+function openEstadoFisicoForm(key, index = null) {
+    const config = estadoFisicoConfig[key];
+    if (!config) return;
+    estadoFisicoCurrentKey = key;
+    estadoFisicoQuickTitle.textContent = config.title;
+    estadoFisicoQuickFields.innerHTML = '';
+
+    config.fields.forEach(field => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'col-md-8';
+        const label = document.createElement('label');
+        label.className = 'form-label small';
+        label.textContent = field.label;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-control form-control-sm';
+        input.placeholder = field.placeholder || '';
+        input.name = field.name;
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+        estadoFisicoQuickFields.appendChild(wrapper);
+    });
+
+    if (index !== null) {
+        estadoFisicoEditing = index;
+        const values = estadoFisicoEntries[index].values || {};
+        config.fields.forEach(field => {
+            const el = estadoFisicoQuickFields.querySelector(`[name="${field.name}"]`);
+            if (el) el.value = values[field.name] || '';
+        });
+    }
+
+    estadoFisicoQuickForm?.classList.remove('d-none');
+}
+
+function collectEstadoFisicoFormValues() {
+    const values = {};
+    estadoFisicoQuickFields.querySelectorAll('input, select').forEach(input => {
+        if (!input.name) return;
+        values[input.name] = input.value.trim();
+    });
+    return values;
+}
+
+function handleEstadoFisicoSave() {
+    if (isEstadoFisicoSemAvariasChecked()) return;
+    const key = estadoFisicoCurrentKey;
+    const config = estadoFisicoConfig[key];
+    if (!config) return;
+    const values = collectEstadoFisicoFormValues();
+    const text = config.format(values).trim();
+    if (!text) return;
+
+    if (estadoFisicoEditing !== null) {
+        estadoFisicoEntries[estadoFisicoEditing] = { ...estadoFisicoEntries[estadoFisicoEditing], text, values, key };
+    } else {
+        estadoFisicoEntries.push({ id: generateEstadoFisicoEntryId(), text, values, key });
+    }
+    renderEstadoFisicoList();
+    syncEstadoFisicoInput();
+    closeEstadoFisicoForm();
+}
+
+function handleRemoveEstadoFisico(event) {
+    const index = parseInt(event.currentTarget.dataset.index, 10);
+    if (Number.isNaN(index)) return;
+    const entry = estadoFisicoEntries[index];
+    if (!entry) return;
+    removeEstadoFisicoFileInput(entry.id);
+    estadoFisicoEntries.splice(index, 1);
+    renderEstadoFisicoList();
+    syncEstadoFisicoInput();
+}
+
+function handleEditEstadoFisico(event) {
+    const index = parseInt(event.currentTarget.dataset.index, 10);
+    const entry = estadoFisicoEntries[index];
+    if (!entry) return;
+    const key = entry.key || 'outro';
+    openEstadoFisicoForm(key, index);
+}
+
+function openEstadoFisicoPhotoInput(entryId) {
+    closeImageModalIfOpen();
+    estadoFisicoPhotoInput.dataset.entryId = entryId;
+    estadoFisicoPhotoInput?.click();
+}
+
+function openEstadoFisicoCameraCapture(entryId) {
+    if (!entryId) return;
+    estadoFisicoCropEntryId = entryId;
+    estadoFisicoCropQueue = [];
+    openCameraCapture({ type: 'estado_fisico', entryId });
+}
+
+async function processNextEstadoFisicoCrop() {
+    if (!estadoFisicoCropEntryId) return;
+    if (!estadoFisicoCropQueue.length) {
+        hideModalSafe(modalCrop, '#modalCropEquip');
+        return;
+    }
+
+    const nextFile = estadoFisicoCropQueue.shift();
+    try {
+        const source = await readFileAsDataUrl(nextFile);
+        openCropper(source, { type: 'estado_fisico' });
+    } catch (e) {
+        processNextEstadoFisicoCrop();
+    }
+}
+
+function handleEstadoFisicoPhotoInputChange() {
+    const entryId = this.dataset.entryId;
+    if (!entryId) return;
+    const files = Array.from(this.files || []).filter(file => (file.type || '').startsWith('image/'));
+    if (!files.length) {
+        this.value = '';
+        return;
+    }
+    estadoFisicoCropEntryId = entryId;
+    estadoFisicoCropQueue = files.slice();
+    processNextEstadoFisicoCrop();
+    this.value = '';
+}
+
+function handleRemoveEstadoFisicoPhoto(event) {
+    const entryId = event.currentTarget.dataset.entry;
+    const index = parseInt(event.currentTarget.dataset.index, 10);
+    const dt = estadoFisicoPhotos[entryId];
+    if (!dt) return;
+
+    const newDt = new DataTransfer();
+    Array.from(dt.files).forEach((file, idx) => {
+        if (idx !== index) newDt.items.add(file);
+    });
+
+    if (!newDt.files.length) {
+        delete estadoFisicoPhotos[entryId];
+        removeEstadoFisicoFileInput(entryId);
+    } else {
+        estadoFisicoPhotos[entryId] = newDt;
+        ensureEstadoFisicoFileInput(entryId);
+    }
+    renderEstadoFisicoList();
+    syncEstadoFisicoInput();
+}
+
+document.querySelectorAll('[data-estado-key]').forEach(btn => {
+    btn.addEventListener('click', event => {
+        if (isEstadoFisicoSemAvariasChecked()) return;
+        const key = event.currentTarget.dataset.estadoKey;
+        if (!key) return;
+        openEstadoFisicoForm(key);
+    });
+});
+
+estadoFisicoSemAvariasCheckbox?.addEventListener('change', () => {
+    const enableSemAvarias = Boolean(estadoFisicoSemAvariasCheckbox.checked);
+    if (!enableSemAvarias) {
+        refreshEstadoFisicoSemAvariasUi();
+        renderEstadoFisicoList();
+        syncEstadoFisicoInput();
+        return;
+    }
+
+    if (!estadoFisicoEntries.length) {
+        refreshEstadoFisicoSemAvariasUi();
+        renderEstadoFisicoList();
+        syncEstadoFisicoInput();
+        return;
+    }
+
+    const applySemAvarias = () => {
+        clearAllEstadoFisico();
+        refreshEstadoFisicoSemAvariasUi();
+        renderEstadoFisicoList();
+        syncEstadoFisicoInput();
+    };
+
+    if (window.Swal && typeof window.Swal.fire === 'function') {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Marcar como sem avarias?',
+            text: 'Os registros de estado fisico ja adicionados serao removidos.',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, marcar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            customClass: { popup: 'glass-card' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                applySemAvarias();
+                return;
+            }
+            estadoFisicoSemAvariasCheckbox.checked = false;
+            refreshEstadoFisicoSemAvariasUi();
+        });
+        return;
+    }
+
+    const confirmed = confirm('Marcar como sem avarias remove os registros adicionados. Deseja continuar?');
+    if (confirmed) {
+        applySemAvarias();
+        return;
+    }
+    estadoFisicoSemAvariasCheckbox.checked = false;
+    refreshEstadoFisicoSemAvariasUi();
+});
+
+estadoFisicoQuickSave?.addEventListener('click', handleEstadoFisicoSave);
+estadoFisicoQuickCancel?.addEventListener('click', closeEstadoFisicoForm);
+estadoFisicoQuickClose?.addEventListener('click', closeEstadoFisicoForm);
+estadoFisicoPhotoInput?.addEventListener('change', handleEstadoFisicoPhotoInputChange);
+
+refreshEstadoFisicoSemAvariasUi();
+renderEstadoFisicoList();
+syncEstadoFisicoInput();
+refreshAcessoriosSemItensUi();
 renderAcessoriosList();
 syncAcessoriosInput();
+
+function getTotalAcessoriosFotos() {
+    return Object.keys(acessoriosPhotos).reduce((sum, id) => sum + (acessoriosPhotos[id]?.files?.length || 0), 0);
+}
+
+function getTotalEstadoFisicoFotos() {
+    return Object.keys(estadoFisicoPhotos).reduce((sum, id) => sum + (estadoFisicoPhotos[id]?.files?.length || 0), 0);
+}
+
+function getTotalFotosEntradaResumo() {
+    const fotosEntradaNovas = document.getElementById('fotosEntradaInput')?.files?.length || 0;
+    const fotosEntradaExistentes = existingFotosCount || 0;
+    return fotosEntradaNovas + fotosEntradaExistentes + getTotalAcessoriosFotos() + getTotalEstadoFisicoFotos();
+}
 
 function _setResumoRascunho(text) {
     const el = document.getElementById('resumoRascunho');
@@ -1776,8 +2708,9 @@ function _collectDraft() {
     const statusSel  = document.querySelector('select[name="status"]');
     const entradaInp = document.querySelector('input[name="data_entrada"]');
     const previsaoInp = document.querySelector('input[name="data_previsao"]');
-    const relatoInp  = document.querySelector('textarea[name="relato_cliente"]');
+    const relatoInp  = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
     const acessoriosInp = document.querySelector('textarea[name="acessorios"]');
+    const estadoFisicoInp = document.querySelector('textarea[name="estado_fisico"]');
     const formaPagamentoSel = document.querySelector('select[name="forma_pagamento"]');
 
     return {
@@ -1786,11 +2719,14 @@ function _collectDraft() {
         equipamento_id: equipSel?.value || '',
         tecnico_id: tecnicoSel?.value || '',
         prioridade: prioridadeSel?.value || 'normal',
-        status: statusSel?.value || 'aguardando_analise',
+        status: statusSel?.value || 'triagem',
         data_entrada: entradaInp?.value || '',
         data_previsao: previsaoInp?.value || '',
         relato_cliente: relatoInp?.value || '',
         acessorios: acessoriosInp?.value || '',
+        acessorios_sem_itens: acessoriosSemItensCheckbox?.checked ? '1' : '0',
+        estado_fisico: estadoFisicoInp?.value || '',
+        estado_fisico_sem_avarias: estadoFisicoSemAvariasCheckbox?.checked ? '1' : '0',
         forma_pagamento: formaPagamentoSel?.value || '',
         defeitos: Array.from(document.querySelectorAll('.chk-defeito-comum:checked')).map(el => el.value)
     };
@@ -1805,6 +2741,9 @@ function _hasDraftData(data) {
         data.data_previsao ||
         data.relato_cliente?.trim() ||
         data.acessorios?.trim() ||
+        data.acessorios_sem_itens === '1' ||
+        data.estado_fisico?.trim() ||
+        data.estado_fisico_sem_avarias === '1' ||
         data.forma_pagamento?.trim() ||
         (data.defeitos && data.defeitos.length)
     );
@@ -1815,7 +2754,7 @@ function saveDraftNow() {
     const data = _collectDraft();
     if (!_hasDraftData(data)) {
         localStorage.removeItem(DRAFT_KEY);
-        _setResumoRascunho('Não salvo');
+        _setResumoRascunho('N�o salvo');
         return;
     }
     localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
@@ -1857,17 +2796,53 @@ function _applyDraft(data) {
     const statusSel  = document.querySelector('select[name="status"]');
     const entradaInp = document.querySelector('input[name="data_entrada"]');
     const previsaoInp = document.querySelector('input[name="data_previsao"]');
-    const relatoInp  = document.querySelector('textarea[name="relato_cliente"]');
+    const relatoInp  = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
     const acessoriosInp = document.querySelector('textarea[name="acessorios"]');
+    const estadoFisicoInp = document.querySelector('textarea[name="estado_fisico"]');
     const formaPagamentoSel = document.querySelector('select[name="forma_pagamento"]');
 
     if (tecnicoSel) tecnicoSel.value = data.tecnico_id || '';
     if (prioridadeSel) prioridadeSel.value = data.prioridade || 'normal';
-    if (statusSel) statusSel.value = data.status || 'aguardando_analise';
+    if (statusSel) statusSel.value = data.status || 'triagem';
     if (entradaInp && data.data_entrada) entradaInp.value = data.data_entrada;
     if (previsaoInp) previsaoInp.value = data.data_previsao || '';
     if (relatoInp) relatoInp.value = data.relato_cliente || '';
     if (acessoriosInp) acessoriosInp.value = data.acessorios || '';
+    if (estadoFisicoInp) estadoFisicoInp.value = data.estado_fisico || '';
+    if (acessoriosSemItensCheckbox) {
+        const semItens = String(data.acessorios_sem_itens || '') === '1'
+            || String(data.acessorios || '').trim().toLowerCase() === ACCESSORIOS_SEM_ITENS_TEXT.toLowerCase();
+        acessoriosSemItensCheckbox.checked = semItens;
+        clearAllAcessorios();
+        if (!semItens) {
+            const draftAcessorios = String(data.acessorios || '').trim();
+            if (draftAcessorios) {
+                draftAcessorios.split(/\r?\n/).filter(Boolean).forEach(text => {
+                    acessoriosEntries.push({ id: generateEntryId(), text, key: 'outro' });
+                });
+            }
+        }
+        refreshAcessoriosSemItensUi();
+        renderAcessoriosList();
+        syncAcessoriosInput();
+    }
+    if (estadoFisicoSemAvariasCheckbox) {
+        const semAvarias = String(data.estado_fisico_sem_avarias || '') === '1'
+            || String(data.estado_fisico || '').trim().toLowerCase() === ESTADO_FISICO_SEM_AVARIAS_TEXT.toLowerCase();
+        estadoFisicoSemAvariasCheckbox.checked = semAvarias;
+        clearAllEstadoFisico();
+        if (!semAvarias) {
+            const draftEstadoFisico = String(data.estado_fisico || '').trim();
+            if (draftEstadoFisico) {
+                draftEstadoFisico.split(/\r?\n/).filter(Boolean).forEach(text => {
+                    estadoFisicoEntries.push({ id: generateEstadoFisicoEntryId(), text, key: 'outro' });
+                });
+            }
+        }
+        refreshEstadoFisicoSemAvariasUi();
+        renderEstadoFisicoList();
+        syncEstadoFisicoInput();
+    }
     if (formaPagamentoSel) formaPagamentoSel.value = data.forma_pagamento || '';
 
     pendingDefeitos = Array.isArray(data.defeitos) ? data.defeitos : [];
@@ -1897,7 +2872,7 @@ function _applyPendingDefeitos() {
     pendingDefeitos = null;
 }
 
-// Rascunho automático para nova OS
+// Rascunho autom�tico para nova OS
 if (!isEdit) {
     const draftData = _loadDraft();
     const draftAlert = document.getElementById('osDraftAlert');
@@ -1914,22 +2889,174 @@ if (!isEdit) {
         document.getElementById('btnDescartarRascunho')?.addEventListener('click', () => {
             localStorage.removeItem(DRAFT_KEY);
             draftAlert.classList.add('d-none');
-            _setResumoRascunho('Não salvo');
+            _setResumoRascunho('N�o salvo');
         });
     } else {
-        _setResumoRascunho('Não salvo');
+        _setResumoRascunho('N�o salvo');
     }
 
     document.getElementById('btnLimparRascunho')?.addEventListener('click', () => {
         localStorage.removeItem(DRAFT_KEY);
-        _setResumoRascunho('Não salvo');
+        _setResumoRascunho('N�o salvo');
     });
 }
 
-document.getElementById('formOs')?.addEventListener('submit', () => {
-    localStorage.removeItem(DRAFT_KEY);
-    _setResumoRascunho('Não salvo');
-});
+function clearValidationMarks() {
+    document.querySelectorAll('.is-invalid, .border-danger, .border-warning').forEach(el => {
+        el.classList.remove('is-invalid', 'border-danger', 'border-warning');
+    });
+}
+
+function markInvalid(el) {
+    if (!el) return;
+    el.classList.add('is-invalid', 'border', 'border-danger');
+}
+
+function markWarning(el) {
+    if (!el) return;
+    el.classList.add('border', 'border-warning');
+}
+
+function getTotalEntradaFotos() {
+    try {
+        if (typeof getTotalFotosEntradaResumo === 'function') {
+            return getTotalFotosEntradaResumo();
+        }
+        return (osFotosExistingData?.length || 0) + (osDataTransfer?.files?.length || 0);
+    } catch (_) {
+        return 0;
+    }
+}
+
+const formOs = document.getElementById('formOs');
+if (formOs) {
+    formOs.addEventListener('submit', (e) => {
+        if (formOs.dataset.bypassValidation === '1') return;
+        e.preventDefault();
+        clearValidationMarks();
+
+        const goToField = (el, tabBtnId) => {
+            const tabBtn = document.getElementById(tabBtnId);
+            tabBtn?.click();
+            el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el?.focus({ preventScroll: true });
+        };
+
+        const requiredFields = [
+            { selector: '#clienteOsSelect', label: 'Cliente', tabBtnId: 'tab-dados-btn' },
+            { selector: '#equipamentoSelect', label: 'Equipamento', tabBtnId: 'tab-dados-btn' },
+            { selector: 'select[name="tecnico_id"]', label: 'Tecnico', tabBtnId: 'tab-dados-btn' },
+            { selector: 'input[name="data_entrada"]', label: 'Data de Entrada', tabBtnId: 'tab-dados-btn' },
+            { selector: '#relatoClienteInput', label: 'Relato do Cliente', tabBtnId: 'tab-relato-btn' },
+        ];
+
+        const optionalChecks = [
+            { selector: 'input[name="data_previsao"]', label: 'Previsao de Entrega', tabBtnId: 'tab-dados-btn', isMissing: (el) => !el?.value },
+            {
+                selector: '#acessoriosSemItens',
+                label: 'Acessorios/Componentes',
+                tabBtnId: 'tab-dados-btn',
+                isMissing: () => !isAcessoriosSemItensChecked() && !((acessoriosInput?.value || '').trim())
+            },
+            {
+                selector: '#estadoFisicoSemAvarias',
+                label: 'Estado fisico',
+                tabBtnId: 'tab-dados-btn',
+                isMissing: () => !isEstadoFisicoSemAvariasChecked() && !((estadoFisicoInput?.value || '').trim())
+            },
+            { selector: '#osFotosPreview', label: 'Fotos de Entrada', tabBtnId: 'tab-fotos-btn', isMissing: () => getTotalEntradaFotos() === 0 },
+        ];
+
+        const missingRequired = [];
+        let firstFocus = null;
+        let firstTabBtn = null;
+
+        requiredFields.forEach((field) => {
+            const el = document.querySelector(field.selector);
+            const empty = !el || !String(el.value || '').trim();
+            if (empty) {
+                missingRequired.push(field.label);
+                markInvalid(el);
+                if (!firstFocus) firstFocus = el;
+                if (!firstTabBtn) firstTabBtn = document.getElementById(field.tabBtnId);
+            }
+        });
+
+        if (missingRequired.length) {
+            const openRequiredFocus = () => {
+                if (firstFocus) {
+                    goToField(firstFocus, firstTabBtn?.id || 'tab-dados-btn');
+                    markInvalid(firstFocus);
+                }
+            };
+            if (window.Swal && typeof window.Swal.fire === 'function') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Complete os obrigatorios',
+                    html: `Faltam: <strong>${missingRequired.join(', ')}</strong>.`,
+                    confirmButtonText: 'Ir para o campo',
+                    customClass: { popup: 'glass-card' }
+                }).then(openRequiredFocus);
+            } else {
+                alert(`Campos obrigatorios pendentes: ${missingRequired.join(', ')}.`);
+                openRequiredFocus();
+            }
+            return;
+        }
+
+        const missingOptional = optionalChecks.filter((check) => {
+            const el = document.querySelector(check.selector);
+            return check.isMissing(el);
+        });
+
+        if (missingOptional.length) {
+            const labels = missingOptional.map((m) => m.label).join(', ');
+            const firstMissing = missingOptional[0];
+            const target = document.querySelector(firstMissing.selector);
+            const proceedWithoutOptional = () => {
+                formOs.dataset.bypassValidation = '1';
+                localStorage.removeItem(DRAFT_KEY);
+                _setResumoRascunho('Nao salvo');
+                formOs.submit();
+            };
+            const fillOptional = () => {
+                markWarning(target);
+                goToField(target, firstMissing.tabBtnId);
+            };
+            if (window.Swal && typeof window.Swal.fire === 'function') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Itens pendentes',
+                    html: `${labels}.<br>Quer preencher agora?`,
+                    showCancelButton: true,
+                    confirmButtonText: 'Ir para pendencia',
+                    cancelButtonText: 'Prosseguir assim',
+                    reverseButtons: true,
+                    customClass: { popup: 'glass-card' }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fillOptional();
+                        return;
+                    }
+                    proceedWithoutOptional();
+                });
+            } else {
+                const wantsFill = confirm(`Ha itens pendentes: ${labels}. Deseja ir para a pendencia agora?`);
+                if (wantsFill) {
+                    fillOptional();
+                } else {
+                    proceedWithoutOptional();
+                }
+            }
+            return;
+        }
+
+        formOs.dataset.bypassValidation = '1';
+        localStorage.removeItem(DRAFT_KEY);
+        _setResumoRascunho('Nao salvo');
+        formOs.submit();
+    });
+}
 
 const prazoEntregaSelect = document.getElementById('prazoEntregaSelect');
 prazoEntregaSelect?.addEventListener('change', function() {
@@ -1950,8 +3077,8 @@ prazoEntregaSelect?.addEventListener('change', function() {
     }
 });
 
-// ─── Carrega fotos do equipamento ──────────────────────────────────────────
-function carregarFotosEquipamento(equipId, equipData) {
+// ??? Carrega fotos do equipamento ??????????????????????????????????????????
+function carregarFotosEquipamentoLegacy(equipId, equipData) {
     const mainBox     = document.getElementById('fotoMainBox');
     const img         = document.getElementById('fotoPrincipalImg');
     const placeholder = document.getElementById('fotoPlaceholder');
@@ -1974,7 +3101,7 @@ function carregarFotosEquipamento(equipId, equipData) {
             ${equipData.tipo  ? `<div class="mt-1"><i class="bi bi-cpu me-1"></i>${equipData.tipo}</div>` : ''}
         `;
         const corHex = equipData.cor_hex || '#2a2a2a';
-        const corNome = equipData.cor || 'Cor não informada';
+        const corNome = equipData.cor || 'Cor n�o informada';
         if (colorSwatch) colorSwatch.style.background = corHex;
         if (colorName) colorName.textContent = corNome;
         if (colorInfo) colorInfo.classList.remove('d-none');
@@ -2028,7 +3155,109 @@ function carregarFotosEquipamento(equipId, equipData) {
     });
 }
 
-// ─── Select de cliente → carrega equipamentos ─────────────────────────────
+// ??? Select de cliente ? carrega equipamentos ?????????????????????????????
+// Override com renderizacao reativa e anti-cache para fotos do equipamento.
+let equipamentoFotosVersion = Date.now();
+function bumpEquipamentoFotosVersion() {
+    equipamentoFotosVersion = Date.now();
+}
+
+function withFotoVersion(url, version = equipamentoFotosVersion) {
+    if (!url) return '';
+    const value = String(url);
+    const separator = value.includes('?') ? '&' : '?';
+    return `${value}${separator}v=${version}`;
+}
+
+function renderFotosEquipamentoSidebar(fotos, equipData) {
+    const mainBox     = document.getElementById('fotoMainBox');
+    const img         = document.getElementById('fotoPrincipalImg');
+    const placeholder = document.getElementById('fotoPlaceholder');
+    const minis       = document.getElementById('fotosMiniaturas');
+    const infoBox     = document.getElementById('equipInfoBox');
+    const infoContent = document.getElementById('equipInfoContent');
+    const colorInfo   = document.getElementById('equipColorInfo');
+    const colorSwatch = document.getElementById('equipColorSwatch');
+    const colorName   = document.getElementById('equipColorName');
+
+    showSidebar();
+
+    if (equipData) {
+        infoBox.style.display = '';
+        infoContent.innerHTML = `
+            <div><i class="bi bi-tag me-1"></i><strong>${equipData.marca || ''} ${equipData.modelo || ''}</strong></div>
+            ${equipData.serie ? `<div class="mt-1"><i class="bi bi-upc me-1"></i>S/N: ${equipData.serie}</div>` : ''}
+            ${equipData.tipo  ? `<div class="mt-1"><i class="bi bi-cpu me-1"></i>${equipData.tipo}</div>` : ''}
+        `;
+        const corHex = equipData.cor_hex || '#2a2a2a';
+        const corNome = equipData.cor || 'Cor nao informada';
+        if (colorSwatch) colorSwatch.style.background = corHex;
+        if (colorName) colorName.textContent = corNome;
+        if (colorInfo) colorInfo.classList.remove('d-none');
+    }
+
+    minis.innerHTML = '';
+    const lista = Array.isArray(fotos) ? fotos : [];
+    if (!lista.length) {
+        mainBox.classList.add('d-none');
+        placeholder.classList.remove('d-none');
+        placeholder.classList.add('d-flex');
+        if (equipData?.cor_hex) {
+            placeholder.style.background = equipData.cor_hex;
+            placeholder.style.border = '2px solid rgba(0,0,0,0.2)';
+            placeholder.style.color = '#fff';
+        }
+        return;
+    }
+
+    const principal = lista.find(f => Number(f.is_principal) === 1) || lista[0];
+    const principalUrl = withFotoVersion(principal.url);
+    img.src = principalUrl;
+    document.getElementById('fotoPrincipalLink')?.setAttribute('data-img-src', principalUrl);
+    mainBox.classList.remove('d-none');
+    placeholder.classList.add('d-none');
+    placeholder.classList.remove('d-flex');
+    placeholder.style.background = 'rgba(255,255,255,0.04)';
+    placeholder.style.color = '';
+
+    lista.forEach((foto) => {
+        const thumbUrl = withFotoVersion(foto.url);
+        const isPrincipal = Number(foto.is_principal) === 1;
+        const el = document.createElement('div');
+        el.className = 'border rounded overflow-hidden shadow-sm hover-elevate cursor-pointer';
+        el.style.cssText = `width:45px;height:45px;cursor:pointer;transition:all 0.2s;border-color:${isPrincipal ? 'var(--primary)' : 'rgba(255,255,255,0.1)'};`;
+        el.innerHTML = `<img src="${thumbUrl}" class="w-100 h-100 object-fit-cover" alt="Miniatura do equipamento">`;
+        el.addEventListener('click', () => {
+            img.style.opacity = '0.4';
+            setTimeout(() => {
+                img.src = thumbUrl;
+                document.getElementById('fotoPrincipalLink')?.setAttribute('data-img-src', thumbUrl);
+                img.style.opacity = '1';
+            }, 120);
+            minis.querySelectorAll('div').forEach(m => { m.style.borderColor = 'rgba(255,255,255,0.1)'; });
+            el.style.borderColor = 'var(--primary)';
+        });
+        minis.appendChild(el);
+    });
+}
+
+function carregarFotosEquipamento(equipId, equipData, fotosOverride = null) {
+    if (Array.isArray(fotosOverride)) {
+        bumpEquipamentoFotosVersion();
+        renderFotosEquipamentoSidebar(fotosOverride, equipData);
+        return;
+    }
+    fetch(`${BASE_URL}equipamentos/fotos/${equipId}?v=${Date.now()}`)
+        .then(r => r.json())
+        .then(fotos => {
+            bumpEquipamentoFotosVersion();
+            renderFotosEquipamentoSidebar(fotos, equipData);
+        })
+        .catch(() => {
+            renderFotosEquipamentoSidebar([], equipData);
+        });
+}
+
 function _onClienteChange(clienteId) {
     const equipamentoSelect = document.getElementById('equipamentoSelect');
     if (!equipamentoSelect) return;
@@ -2045,6 +3274,7 @@ function _onClienteChange(clienteId) {
     if (!clienteId) {
         equipamentoSelect.innerHTML = '<option value="">Selecione o cliente primeiro...</option>';
         equipamentoSelect.disabled = false;
+        if (typeof setEquipamentoEditButtonState === 'function') setEquipamentoEditButtonState();
         updateResumo();
         scheduleDraftSave();
         return;
@@ -2060,12 +3290,18 @@ function _onClienteChange(clienteId) {
     })
     .then(r => r.json())
     .then(equipamentos => {
+        if (window._osEquipamentosCache) {
+            Object.keys(window._osEquipamentosCache).forEach(key => delete window._osEquipamentosCache[key]);
+        }
         const autoSelectId = equipamentos.length === 1 ? equipamentos[0].id : null;
         if (equipamentos.length === 0) {
             equipamentoSelect.innerHTML = '<option value="">Nenhum equipamento vinculado</option>';
         } else {
             equipamentoSelect.innerHTML = '<option value="">Selecione o equipamento...</option>';
             equipamentos.forEach(eq => {
+                if (window._osEquipamentosCache) {
+                    window._osEquipamentosCache[String(eq.id)] = eq;
+                }
                 const nome = (eq.marca_nome || '') + ' ' + (eq.modelo_nome || '') + ' (' + (eq.tipo_nome || eq.tipo || '') + ')';
                 const opt  = new Option(nome, eq.id);
                 opt.dataset.tipo      = eq.tipo_id || '';
@@ -2075,6 +3311,12 @@ function _onClienteChange(clienteId) {
                 opt.dataset.cor       = eq.cor || '';
                 opt.dataset.cor_hex   = eq.cor_hex || '';
                 opt.dataset.tipo_nome = eq.tipo_nome || '';
+                opt.dataset.marca_id  = eq.marca_id || '';
+                opt.dataset.modelo_id = eq.modelo_id || '';
+                opt.dataset.cliente_id = eq.cliente_id || '';
+                opt.dataset.senha_acesso = eq.senha_acesso || '';
+                opt.dataset.estado_fisico = eq.estado_fisico || '';
+                opt.dataset.acessorios = eq.acessorios || '';
                 equipamentoSelect.appendChild(opt);
             });
         }
@@ -2102,12 +3344,14 @@ function _onClienteChange(clienteId) {
                 pendingEquipId = null;
             }
         }
+        if (typeof setEquipamentoEditButtonState === 'function') setEquipamentoEditButtonState();
         updateResumo();
         scheduleDraftSave();
     })
     .catch(() => {
         equipamentoSelect.innerHTML = '<option value="">Erro ao carregar.</option>';
         equipamentoSelect.disabled = false;
+        if (typeof setEquipamentoEditButtonState === 'function') setEquipamentoEditButtonState();
     });
 }
 
@@ -2122,7 +3366,7 @@ if (typeof $.fn.select2 !== 'undefined') {
     });
 }
 
-// ─── Handler de mudança de equipamento ──────────────────────────────────
+// ??? Handler de mudan�a de equipamento ??????????????????????????????????
 function _onEquipamentoChange(id, opt) {
     const tipoId = opt ? opt.getAttribute('data-tipo') : null;
     carregarDefeitos(tipoId);
@@ -2138,21 +3382,22 @@ function _onEquipamentoChange(id, opt) {
     } else {
         hideSidebar();
     }
+    if (typeof setEquipamentoEditButtonState === 'function') setEquipamentoEditButtonState();
     updateResumo();
     scheduleDraftSave();
 }
 
-// ─── Listener vanilla do equipamentoSelect (usado quando Select2 ainda não foi inicializado) ───
+// ??? Listener vanilla do equipamentoSelect (usado quando Select2 ainda n�o foi inicializado) ???
 const equipSelect = document.getElementById('equipamentoSelect');
 if (equipSelect) {
     equipSelect.addEventListener('change', function() {
-        // Apenas disparado quando Select2 não está ativo
+        // Apenas disparado quando Select2 n�o est� ativo
         if (!$(this).data('select2')) {
             _onEquipamentoChange(this.value, this.options[this.selectedIndex]);
         }
     });
 
-    // Na edição, carrega automaticamente
+    // Na edi��o, carrega automaticamente
     if (isEdit && equipSelect.value) {
         const opt = equipSelect.options[equipSelect.selectedIndex];
         const tipoId = opt ? opt.getAttribute('data-tipo') : null;
@@ -2170,12 +3415,8 @@ if (equipSelect) {
     }
 }
 
-// Atualiza resumo e rascunho conforme alterações no formulário
+// Atualiza resumo e rascunho conforme altera��es no formul�rio
 ['input', 'change'].forEach(evt => {
-    document.querySelector('textarea[name="relato_cliente"]')?.addEventListener(evt, () => {
-        updateResumo();
-        scheduleDraftSave();
-    });
     document.querySelector('textarea[name="acessorios"]')?.addEventListener(evt, () => {
         updateResumo();
         scheduleDraftSave();
@@ -2209,16 +3450,67 @@ if (equipSelect) {
     });
 });
 
-// ─── Preview fotos de entrada ─────────────────────────────────────────────
+// ??? Preview fotos de entrada ?????????????????????????????????????????????
 const osFotosExistingData = <?= json_encode(array_map(fn($f) => ['url' => $f['url']], $fotos_entrada ?? [])) ?>;
 const osFotosMaxFiles = 4;
+const osFotoMaxSizeMb = 2;
 const fotosEntradaInput = document.getElementById('fotosEntradaInput');
+const fotosEntradaGaleriaInput = document.getElementById('fotosEntradaGaleriaInput');
 const osFotosPreview = document.getElementById('osFotosPreview');
 const osFotosExisting = document.getElementById('osFotosExisting');
 const osFotosDropzone = document.getElementById('osFotosDropzone');
+const fotosEntradaEmptyState = document.getElementById('fotosEntradaEmptyState');
 const btnFotosEscolher = document.getElementById('btnFotosEscolher');
+const btnFotosEntradaCamera = document.getElementById('btnFotosEntradaCamera');
+const btnFotosEntradaGaleria = document.getElementById('btnFotosEntradaGaleria');
 const btnLimparFotos = document.getElementById('btnLimparFotos');
 const osDataTransfer = new DataTransfer();
+let fotosEntradaCropQueue = [];
+
+function syncFotosEntradaInput() {
+    if (fotosEntradaInput) {
+        fotosEntradaInput.files = osDataTransfer.files;
+    }
+}
+
+function toggleFotosEntradaEmptyState() {
+    if (!fotosEntradaEmptyState) return;
+    const totalPhotos = osFotosExistingData.length + osDataTransfer.files.length;
+    fotosEntradaEmptyState.style.display = totalPhotos > 0 ? 'none' : 'block';
+}
+
+function queueFotosEntradaFromFiles(files) {
+    const incoming = Array.from(files || []).filter(file => file.type?.startsWith('image/'));
+    if (!incoming.length) return;
+
+    const disponivel = osFotosMaxFiles - osDataTransfer.files.length;
+    if (disponivel <= 0) {
+        showWarningDialog(`Voce pode enviar ate ${osFotosMaxFiles} fotos no total.`);
+        return;
+    }
+
+    fotosEntradaCropQueue = incoming.slice(0, disponivel);
+    if (incoming.length > disponivel) {
+        showWarningDialog(`Somente ${disponivel} foto(s) cabem agora (limite de ${osFotosMaxFiles}).`);
+    }
+    processNextFotoEntradaCrop();
+}
+
+function processNextFotoEntradaCrop() {
+    if (!fotosEntradaCropQueue.length) {
+        hideModalSafe(modalCrop, '#modalCropEquip');
+        return;
+    }
+    const nextFile = fotosEntradaCropQueue.shift();
+    if (nextFile.size > (osFotoMaxSizeMb * 1024 * 1024)) {
+        showWarningDialog(`Cada foto deve ter no maximo ${osFotoMaxSizeMb}MB.`);
+        processNextFotoEntradaCrop();
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => openCropper(e.target.result, { type: 'entrada' });
+    reader.readAsDataURL(nextFile);
+}
 
 function renderExistingFotos() {
     if (!osFotosExisting) return;
@@ -2262,21 +3554,21 @@ function renderNewFotos() {
 }
 
 function updatePhotoState() {
-    const totalPhotos = osFotosExistingData.length + osDataTransfer.files.length;
-    _setFieldStatus('statusFotos', totalPhotos > 0);
-    document.getElementById('resumoFotosEntrada').textContent = totalPhotos.toString();
+    toggleFotosEntradaEmptyState();
     updateResumo();
 }
 
 function clearNewFotos() {
     osDataTransfer.items.clear();
-    fotosEntradaInput.value = '';
+    fotosEntradaCropQueue = [];
+    if (fotosEntradaInput) fotosEntradaInput.value = '';
+    if (fotosEntradaGaleriaInput) fotosEntradaGaleriaInput.value = '';
     renderNewFotos();
     updatePhotoState();
     scheduleDraftSave();
 }
 
-osFotosDropzone?.addEventListener('click', () => fotosEntradaInput?.click());
+osFotosDropzone?.addEventListener('click', () => fotosEntradaGaleriaInput?.click());
 osFotosDropzone?.addEventListener('dragover', e => {
     e.preventDefault();
     osFotosDropzone.classList.add('border-primary');
@@ -2287,28 +3579,17 @@ osFotosDropzone?.addEventListener('dragleave', () => {
 osFotosDropzone?.addEventListener('drop', e => {
     e.preventDefault();
     osFotosDropzone.classList.remove('border-primary');
-    const files = Array.from(e.dataTransfer.files).slice(0, osFotosMaxFiles);
-    files.forEach(file => osDataTransfer.items.add(file));
-    fotosEntradaInput.files = osDataTransfer.files;
-    renderNewFotos();
-    updatePhotoState();
-    scheduleDraftSave();
+    queueFotosEntradaFromFiles(e.dataTransfer.files);
 });
-btnFotosEscolher?.addEventListener('click', () => fotosEntradaInput?.click());
+btnFotosEscolher?.addEventListener('click', () => fotosEntradaGaleriaInput?.click());
+btnFotosEntradaGaleria?.addEventListener('click', () => fotosEntradaGaleriaInput?.click());
+btnFotosEntradaCamera?.addEventListener('click', () => openCameraCapture({ type: 'entrada', entryId: null }));
 btnLimparFotos?.addEventListener('click', clearNewFotos);
 
-fotosEntradaInput?.addEventListener('change', function() {
-    const incoming = Array.from(this.files);
-    if (osDataTransfer.files.length + incoming.length > osFotosMaxFiles) {
-        alert(`Você pode enviar até ${osFotosMaxFiles} fotos no total.`);
-        return;
-    }
-    incoming.forEach(file => osDataTransfer.items.add(file));
-    this.files = osDataTransfer.files;
-    renderNewFotos();
-    updatePhotoState();
+fotosEntradaGaleriaInput?.addEventListener('change', function() {
+    queueFotosEntradaFromFiles(this.files);
+    this.value = '';
 });
-
 osFotosPreview?.addEventListener('click', function(event) {
     const remover = event.target.closest('.btn-remover-foto-nova');
     if (!remover) return;
@@ -2319,63 +3600,425 @@ osFotosPreview?.addEventListener('click', function(event) {
     });
     osDataTransfer.items.clear();
     Array.from(dt.files).forEach(f => osDataTransfer.items.add(f));
-    fotosEntradaInput.files = osDataTransfer.files;
+    syncFotosEntradaInput();
     renderNewFotos();
     updatePhotoState();
+    scheduleDraftSave();
 });
-
-const osExistingFotosCount = osFotosExistingData.length;
-const updateResumoPhotos = () => {
-    const total = osExistingFotosCount + osDataTransfer.files.length;
-    document.getElementById('resumoFotosEntrada').textContent = total.toString();
-    _setFieldStatus('statusFotos', total > 0);
-};
 renderExistingFotos();
 renderNewFotos();
-updateResumoPhotos();
+updatePhotoState();
 
-// ─── Modal: Cadastrar Novo Equipamento ─────────────────────────────────────
+// ??? Modal: Cadastrar Novo Equipamento ?????????????????????????????????????
+const osEquipamentosCache = window._osEquipamentosCache || (window._osEquipamentosCache = {});
 const btnNovoEquip = document.getElementById('btnNovoEquipamento');
-if (btnNovoEquip) {
-    btnNovoEquip.addEventListener('click', function() {
-        // Injeta o cliente selecionado no formulário do modal
-        const clienteId = document.getElementById('clienteOsSelect').value;
-        if (!clienteId) {
-            alert('Selecione um cliente primeiro para cadastrar o equipamento.');
-            return;
-        }
-        let hiddenInput = document.getElementById('novoEquipClienteId');
-        if (!hiddenInput) {
-            hiddenInput = document.createElement('input');
-            hiddenInput.type  = 'hidden';
-            hiddenInput.name  = 'cliente_id';
-            hiddenInput.id    = 'novoEquipClienteId';
-            document.getElementById('formNovoEquipAjax').appendChild(hiddenInput);
-        }
-        hiddenInput.value = clienteId;
+const btnEditarEquip = document.getElementById('btnEditarEquipamento');
+const modalNovoEquipamentoEl = document.getElementById('modalNovoEquipamento');
+const modalNovoEquipamento = modalNovoEquipamentoEl ? new bootstrap.Modal(modalNovoEquipamentoEl) : null;
+const formNovoEquipAjax = document.getElementById('formNovoEquipAjax');
+const labelModalNovoEquip = document.getElementById('labelModalNovoEquip');
+const btnSalvarNovoEquip = document.getElementById('btnSalvarNovoEquip');
+const modalEquipFotosExistentesWrap = document.getElementById('modalEquipFotosExistentesWrap');
+const modalEquipFotosExistentes = document.getElementById('modalEquipFotosExistentes');
+const novoEquipFotosNovasList = document.getElementById('novoEquipFotosNovasList');
+let equipamentoModalMode = 'create';
+let equipamentoEditId = null;
+let modalEquipExistingFotos = [];
+let modalEquipFotosVersion = Date.now();
+const novoEquipFotosMaxFiles = 4;
+const novoEquipFotosDataTransfer = new DataTransfer();
+let novoEquipFotoCropQueue = [];
 
-        new bootstrap.Modal(document.getElementById('modalNovoEquipamento')).show();
-        
-        // Inicializa Select2 para elementos dentro do modal
-        $('.select2-modal').select2({
-            theme: 'bootstrap-5',
-            dropdownParent: $('#modalNovoEquipamento'),
-            width: '100%',
-            placeholder: 'Escolha...'
+function bumpModalEquipFotosVersion() {
+    modalEquipFotosVersion = Date.now();
+}
+
+function showWarningDialog(message, title = 'Aten��o') {
+    if (window.Swal && typeof window.Swal.fire === 'function') {
+        Swal.fire({
+            icon: 'warning',
+            title,
+            text: message,
+            confirmButtonText: 'OK',
+            customClass: { popup: 'glass-card' }
         });
+        return;
+    }
+    alert(message);
+}
+
+function ensureModalEquipSelect2() {
+    $('.select2-modal').select2({
+        theme: 'bootstrap-5',
+        dropdownParent: $('#modalNovoEquipamento'),
+        width: '100%',
+        placeholder: 'Escolha...'
     });
 }
 
-// ─── Cadastro Rápido de Marcas e Modelos (Dentro da OS) ────────────────────
+function ensureNovoEquipClienteInput(clienteId) {
+    if (!formNovoEquipAjax) return;
+    let hiddenInput = document.getElementById('novoEquipClienteId');
+    if (!hiddenInput) {
+        hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'cliente_id';
+        hiddenInput.id = 'novoEquipClienteId';
+        formNovoEquipAjax.appendChild(hiddenInput);
+    }
+    hiddenInput.value = clienteId || '';
+}
+
+function setEquipamentoEditButtonState() {
+    if (!btnEditarEquip) return;
+    const equipId = document.getElementById('equipamentoSelect')?.value || '';
+    const hasEquipamento = Boolean(String(equipId).trim());
+    btnEditarEquip.classList.toggle('d-none', !hasEquipamento);
+}
+
+function syncNovoEquipFotosInput() {
+    if (!novoEquipFoto) return;
+    novoEquipFoto.files = novoEquipFotosDataTransfer.files;
+}
+
+function resetNovoEquipPreview() {
+    novoEquipFotosDataTransfer.items.clear();
+    novoEquipFotoCropQueue = [];
+    if (novoEquipFoto) {
+        novoEquipFoto.value = '';
+        syncNovoEquipFotosInput();
+    }
+    renderNovoEquipFotosNovas();
+    const fotoVazia = document.getElementById('fotoVaziaOS');
+    if (fotoVazia) fotoVazia.style.display = (modalEquipExistingFotos.length || novoEquipFotosDataTransfer.files.length) ? 'none' : 'block';
+}
+
+function getTotalModalEquipFotos() {
+    return (modalEquipExistingFotos?.length || 0) + (novoEquipFotosDataTransfer?.files?.length || 0);
+}
+
+function renderNovoEquipFotosNovas() {
+    if (!previewDiv || !novoEquipFotosNovasList) return;
+    const files = Array.from(novoEquipFotosDataTransfer.files || []);
+    novoEquipFotosNovasList.innerHTML = '';
+
+    if (!files.length) {
+        previewDiv.style.display = 'none';
+        const fotoVazia = document.getElementById('fotoVaziaOS');
+        if (fotoVazia) fotoVazia.style.display = modalEquipExistingFotos.length ? 'none' : 'block';
+        return;
+    }
+
+    previewDiv.style.display = 'block';
+    const fotoVazia = document.getElementById('fotoVaziaOS');
+    if (fotoVazia) fotoVazia.style.display = 'none';
+
+    files.forEach((file, index) => {
+        const objectUrl = URL.createObjectURL(file);
+        const isPrincipal = index === 0 && !modalEquipExistingFotos.some(f => Number(f.is_principal) === 1);
+        const thumb = document.createElement('div');
+        thumb.className = 'position-relative d-inline-block shadow rounded border p-1 bg-white';
+        thumb.style.cssText = `width:96px;height:96px;border-color:${isPrincipal ? 'var(--primary)' : 'rgba(0,0,0,.1)'};`;
+        thumb.innerHTML = `
+            <img src="${objectUrl}" class="w-100 h-100" style="object-fit:cover; border-radius:4px;" alt="Nova foto do equipamento">
+            ${isPrincipal ? '<span class="badge text-bg-primary position-absolute top-0 start-0 m-1" style="font-size:0.55rem;">Principal</span>' : ''}
+            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 p-1 py-0 shadow btn-remover-foto-nova-equip" data-index="${index}" style="border-radius:50%;">
+                <i class="bi bi-x"></i>
+            </button>
+        `;
+        const img = thumb.querySelector('img');
+        img?.addEventListener('load', () => URL.revokeObjectURL(objectUrl), { once: true });
+        novoEquipFotosNovasList.appendChild(thumb);
+    });
+}
+
+function processNextNovoEquipCrop() {
+    if (!novoEquipFotoCropQueue.length) {
+        hideModalSafe(modalCrop, '#modalCropEquip');
+        return;
+    }
+    const nextFile = novoEquipFotoCropQueue.shift();
+    const reader = new FileReader();
+    reader.onload = e => openCropper(e.target.result, { type: 'equipamento' });
+    reader.onerror = () => processNextNovoEquipCrop();
+    reader.readAsDataURL(nextFile);
+}
+
+function queueNovoEquipFotosFromFiles(files) {
+    const incoming = Array.from(files || []).filter(file => (file.type || '').startsWith('image/'));
+    if (!incoming.length) return;
+
+    const available = novoEquipFotosMaxFiles - getTotalModalEquipFotos();
+    if (available <= 0) {
+        showWarningDialog(`Voce pode manter ate ${novoEquipFotosMaxFiles} fotos por equipamento.`);
+        return;
+    }
+
+    novoEquipFotoCropQueue = incoming.slice(0, available);
+    if (incoming.length > available) {
+        showWarningDialog(`Somente ${available} foto(s) cabem agora (limite de ${novoEquipFotosMaxFiles} por equipamento).`);
+    }
+
+    processNextNovoEquipCrop();
+}
+
+function renderModalEquipFotosExistentes(fotos = []) {
+    if (!modalEquipFotosExistentesWrap || !modalEquipFotosExistentes) return;
+
+    modalEquipFotosExistentes.innerHTML = '';
+    const lista = Array.isArray(fotos) ? fotos : [];
+    modalEquipExistingFotos = lista;
+    if (equipamentoModalMode !== 'edit' || !lista.length) {
+        modalEquipFotosExistentesWrap.classList.add('d-none');
+        return;
+    }
+
+    modalEquipFotosExistentesWrap.classList.remove('d-none');
+    lista.forEach((foto, index) => {
+        const fotoUrl = withFotoVersion(foto.url || '', modalEquipFotosVersion);
+        const isPrincipal = Number(foto.is_principal) === 1 || index === 0;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'position-relative border rounded overflow-hidden';
+        wrapper.style.cssText = `width:84px;height:84px;border-color:${isPrincipal ? 'var(--primary)' : 'rgba(255,255,255,0.15)'};`;
+
+        const thumb = document.createElement('a');
+        thumb.href = 'javascript:void(0)';
+        thumb.className = 'd-block w-100 h-100';
+        thumb.style.cssText = 'cursor:zoom-in;';
+        thumb.setAttribute('data-bs-toggle', 'modal');
+        thumb.setAttribute('data-bs-target', '#imageModal');
+        thumb.setAttribute('data-img-src', fotoUrl);
+
+        thumb.innerHTML = `
+            <img src="${fotoUrl}" class="w-100 h-100 object-fit-cover" alt="Foto do equipamento">
+            ${isPrincipal ? '<span class="badge text-bg-primary position-absolute top-0 start-0 m-1" style="font-size:0.55rem;">Principal</span>' : ''}
+        `;
+
+        wrapper.appendChild(thumb);
+
+        const fotoId = Number(foto.id || 0);
+        if (fotoId > 0) {
+            if (!isPrincipal) {
+                const btnPrincipal = document.createElement('button');
+                btnPrincipal.type = 'button';
+                btnPrincipal.className = 'btn btn-sm btn-primary position-absolute bottom-0 end-0 m-1 py-0 px-1 btn-definir-principal-foto-existente-equip';
+                btnPrincipal.dataset.fotoId = String(fotoId);
+                btnPrincipal.title = 'Definir como principal';
+                btnPrincipal.innerHTML = '<i class="bi bi-star"></i>';
+                wrapper.appendChild(btnPrincipal);
+            }
+
+            const btnDelete = document.createElement('button');
+            btnDelete.type = 'button';
+            btnDelete.className = 'btn btn-sm btn-danger position-absolute top-0 end-0 m-1 py-0 px-1 btn-remover-foto-existente-equip';
+            btnDelete.dataset.fotoId = String(fotoId);
+            btnDelete.title = 'Excluir foto';
+            btnDelete.innerHTML = '<i class="bi bi-trash"></i>';
+            wrapper.appendChild(btnDelete);
+        }
+
+        modalEquipFotosExistentes.appendChild(wrapper);
+    });
+}
+
+async function reloadModalEquipFotosExistentes() {
+    if (!equipamentoEditId) return;
+    try {
+        const response = await fetch(`${BASE_URL}equipamentos/fotos/${equipamentoEditId}?v=${Date.now()}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const fotos = await response.json();
+        bumpModalEquipFotosVersion();
+        bumpEquipamentoFotosVersion();
+        renderModalEquipFotosExistentes(fotos);
+        renderNovoEquipFotosNovas();
+
+        const selectedEq = getSelectedEquipamentoData();
+        if (selectedEq && String(selectedEq.id || '') === String(equipamentoEditId)) {
+            carregarFotosEquipamento(equipamentoEditId, {
+                marca: selectedEq.marca_nome || selectedEq.marca || '',
+                modelo: selectedEq.modelo_nome || selectedEq.modelo || '',
+                serie: selectedEq.numero_serie || selectedEq.serie || '',
+                tipo: selectedEq.tipo_nome || selectedEq.tipo || '',
+                cor: selectedEq.cor || '',
+                cor_hex: selectedEq.cor_hex || ''
+            }, fotos);
+        }
+    } catch (_) {
+        showWarningDialog('Nao foi possivel atualizar a lista de fotos do equipamento.', 'Falha ao atualizar');
+    }
+}
+
+function setNovoEquipModalMode(mode) {
+    equipamentoModalMode = mode === 'edit' ? 'edit' : 'create';
+    if (equipamentoModalMode === 'edit') {
+        if (labelModalNovoEquip) {
+            labelModalNovoEquip.innerHTML = '<i class="bi bi-pencil-square text-primary me-2"></i>Editar Equipamento';
+        }
+        if (btnSalvarNovoEquip) {
+            btnSalvarNovoEquip.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Salvar Altera��es';
+        }
+        return;
+    }
+    equipamentoEditId = null;
+    if (labelModalNovoEquip) {
+        labelModalNovoEquip.innerHTML = '<i class="bi bi-plus-circle text-warning me-2"></i>Cadastrar Novo Equipamento';
+    }
+    if (btnSalvarNovoEquip) {
+        btnSalvarNovoEquip.innerHTML = '<i class="bi bi-check-lg me-1"></i>Cadastrar Equipamento';
+    }
+    renderModalEquipFotosExistentes([]);
+}
+setEquipamentoEditButtonState();
+
+function resetNovoEquipModalForm() {
+    if (!formNovoEquipAjax) return;
+    formNovoEquipAjax.reset();
+    $('#novoEquipModeloNomeExt').val('');
+    $('#novoEquipModelo').html('<option value="">Modelo...</option>');
+    $('#novoEquipMarca').val('').trigger('change');
+    $('#novoEquipTipo').val('');
+    updateColorUIOS('#1A1A1A', 'Preto');
+    resetNovoEquipPreview();
+    renderModalEquipFotosExistentes([]);
+    const errors = document.getElementById('modalEquipErrors');
+    if (errors) {
+        errors.classList.add('d-none');
+        errors.innerHTML = '';
+    }
+}
+
+function fillNovoEquipModalFromData(eq) {
+    if (!eq || !formNovoEquipAjax) return;
+    const clienteAtual = document.getElementById('clienteOsSelect')?.value || '';
+    ensureNovoEquipClienteInput(eq.cliente_id || clienteAtual);
+
+    $('#novoEquipTipo').val(eq.tipo_id ? String(eq.tipo_id) : '');
+    $('#novoEquipMarca').val(eq.marca_id ? String(eq.marca_id) : '').trigger('change');
+    initModeloSelect2();
+
+    setTimeout(() => {
+        const modeloSelect = $('#novoEquipModelo');
+        const modeloId = eq.modelo_id ? String(eq.modelo_id) : '';
+        const modeloNome = eq.modelo_nome || eq.modelo || '';
+        if (modeloId) {
+            if (!modeloSelect.find(`option[value="${modeloId}"]`).length) {
+                modeloSelect.append(new Option(modeloNome || 'Modelo', modeloId, false, false));
+            }
+            modeloSelect.val(modeloId).trigger('change');
+        } else if (modeloNome) {
+            modeloSelect.val(modeloNome).trigger('change');
+        }
+    }, 120);
+
+    const numeroSerie = formNovoEquipAjax.querySelector('input[name="numero_serie"]');
+    const senhaAcesso = formNovoEquipAjax.querySelector('input[name="senha_acesso"]');
+    const estadoFisico = formNovoEquipAjax.querySelector('textarea[name="estado_fisico"]');
+    const acessoriosEquip = formNovoEquipAjax.querySelector('textarea[name="acessorios"]');
+
+    if (numeroSerie) numeroSerie.value = eq.numero_serie || '';
+    if (senhaAcesso) senhaAcesso.value = eq.senha_acesso || '';
+    if (estadoFisico) estadoFisico.value = eq.estado_fisico || '';
+    if (acessoriosEquip) acessoriosEquip.value = eq.acessorios || '';
+
+    updateColorUIOS(eq.cor_hex || '#1A1A1A', eq.cor || 'Preto');
+    resetNovoEquipPreview();
+
+    fetch(`${BASE_URL}equipamentos/fotos/${eq.id}?v=${Date.now()}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(fotos => {
+        bumpModalEquipFotosVersion();
+        renderModalEquipFotosExistentes(fotos);
+        renderNovoEquipFotosNovas();
+        if (!Array.isArray(fotos) || !fotos.length) return;
+        const principal = fotos.find(f => Number(f.is_principal) === 1) || fotos[0];
+        if (!principal?.url) return;
+        const fotoVazia = document.getElementById('fotoVaziaOS');
+        if (fotoVazia) fotoVazia.style.display = 'none';
+    })
+    .catch(() => {
+        renderModalEquipFotosExistentes([]);
+        renderNovoEquipFotosNovas();
+    });
+}
+
+function getSelectedEquipamentoData() {
+    const equipSelect = document.getElementById('equipamentoSelect');
+    const selectedId = equipSelect?.value ? String(equipSelect.value) : '';
+    if (!selectedId) return null;
+
+    if (osEquipamentosCache[selectedId]) {
+        return osEquipamentosCache[selectedId];
+    }
+
+    const opt = equipSelect?.options?.[equipSelect.selectedIndex];
+    if (!opt) return null;
+    return {
+        id: selectedId,
+        cliente_id: opt.dataset.cliente_id || document.getElementById('clienteOsSelect')?.value || '',
+        tipo_id: opt.dataset.tipo || '',
+        marca_id: opt.dataset.marca_id || '',
+        modelo_id: opt.dataset.modelo_id || '',
+        marca_nome: opt.dataset.marca || '',
+        modelo_nome: opt.dataset.modelo || '',
+        tipo_nome: opt.dataset.tipo_nome || '',
+        numero_serie: opt.dataset.serie || '',
+        cor: opt.dataset.cor || '',
+        cor_hex: opt.dataset.cor_hex || '',
+        senha_acesso: opt.dataset.senha_acesso || '',
+        estado_fisico: opt.dataset.estado_fisico || '',
+        acessorios: opt.dataset.acessorios || ''
+    };
+}
+
+function openNovoEquipamentoModal() {
+    const clienteId = document.getElementById('clienteOsSelect')?.value || '';
+    if (!clienteId) {
+        showWarningDialog('Selecione um cliente primeiro para cadastrar o equipamento.');
+        return;
+    }
+    setNovoEquipModalMode('create');
+    resetNovoEquipModalForm();
+    ensureNovoEquipClienteInput(clienteId);
+    ensureModalEquipSelect2();
+    initModeloSelect2();
+    modalNovoEquipamento?.show();
+}
+
+function openEditarEquipamentoModal() {
+    const selectedEq = getSelectedEquipamentoData();
+    if (!selectedEq || !selectedEq.id) {
+        showWarningDialog('Selecione um equipamento para editar.');
+        return;
+    }
+    equipamentoEditId = selectedEq.id;
+    setNovoEquipModalMode('edit');
+    resetNovoEquipModalForm();
+    ensureModalEquipSelect2();
+    initModeloSelect2();
+    fillNovoEquipModalFromData(selectedEq);
+    modalNovoEquipamento?.show();
+}
+
+btnNovoEquip?.addEventListener('click', openNovoEquipamentoModal);
+btnEditarEquip?.addEventListener('click', openEditarEquipamentoModal);
+modalNovoEquipamentoEl?.addEventListener('hidden.bs.modal', () => {
+    setNovoEquipModalMode('create');
+    resetNovoEquipModalForm();
+});
+
+// ??? Cadastro R�pido de Marcas e Modelos (Dentro da OS) ????????????????????
 const modalNovaMarca = new bootstrap.Modal(document.getElementById('modalNovaMarcaOS'));
 const modalNovoModelo = new bootstrap.Modal(document.getElementById('modalNovoModeloOS'));
 
 document.getElementById('btnNovaMarcaOS')?.addEventListener('click', () => modalNovaMarca.show());
 document.getElementById('btnNovoModeloOS')?.addEventListener('click', () => {
     const marcaId = $('#novoEquipMarca').val();
-    if (!marcaId) { alert('Selecione uma marca primeiro!'); return; }
+    if (!marcaId) { showWarningDialog('Selecione uma marca primeiro!'); return; }
     
-    // Mostra o nome da marca no modal para conferência
+    // Mostra o nome da marca no modal para confer�ncia
     const marcaNome = $('#novoEquipMarca option:selected').text();
     document.getElementById('displayMarcaOS').value = marcaNome;
     
@@ -2437,7 +4080,7 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
     .finally(() => this.disabled = false);
 });
 
-// ─── Autocomplete inteligente no modal "Novo Modelo" ─────────────────────────
+// ??? Autocomplete inteligente no modal "Novo Modelo" ?????????????????????????
 (function() {
     let debounceTimerModelo = null;
     const inputModelo    = document.getElementById('inputNovoModeloOS');
@@ -2454,12 +4097,12 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
         groups.forEach(group => {
             if (!group.children || group.children.length === 0) return;
 
-            // Cabeçalho do grupo
+            // Cabe�alho do grupo
             const header = document.createElement('div');
             header.className = 'list-group-item list-group-item-secondary py-1 px-3';
             header.style.cssText = 'font-size:0.7rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; pointer-events:none;';
-            const icon = group.text.includes('Cadastrados') ? '📋' : '🌐';
-            header.textContent = icon + ' ' + group.text.replace(/^[📋🌐] /, '');
+            const icon = group.text.includes('Cadastrados') ? '?' : '?';
+            header.textContent = icon + ' ' + group.text.replace(/^[??] /, '');
             sugestoesBox.appendChild(header);
 
             // Itens do grupo
@@ -2501,7 +4144,7 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
         if (total > 0) {
             sugestoesBox.classList.remove('d-none');
         } else {
-            sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugestão. Digite e salve manualmente.</div>';
+            sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugest�o. Digite e salve manualmente.</div>';
             sugestoesBox.classList.remove('d-none');
         }
     }
@@ -2564,10 +4207,10 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
 })();
 
 
-// Lógica de Cores no Modal (Igual ao cadastro de equipamentos)
-// ═══════════════════════════════════════════════════════════
+// L�gica de Cores no Modal (Igual ao cadastro de equipamentos)
+// ???????????????????????????????????????????????????????????
 // SELETOR DE COR PROFISSIONAL (OS Modal)
-// ═══════════════════════════════════════════════════════════
+// ???????????????????????????????????????????????????????????
 
 const PROFESSIONAL_COLORS_OS = [
     { category: 'Neutras (Preto, Branco, Cinza)', colors: [
@@ -2577,8 +4220,8 @@ const PROFESSIONAL_COLORS_OS = [
     ]},
     { category: 'Azuis e Marinhos', colors: [
         { hex: '#191970', name: 'Azul Meia-Noite' }, { hex: '#000080', name: 'Azul Marinho' }, { hex: '#0000FF', name: 'Azul Puro' },
-        { hex: '#4169E1', name: 'Azul Real' }, { hex: '#1E90FF', name: 'Azul Céu' }, { hex: '#87CEEB', name: 'Azul Celeste' },
-        { hex: '#5F9EA0', name: 'Azul Petróleo' },
+        { hex: '#4169E1', name: 'Azul Real' }, { hex: '#1E90FF', name: 'Azul C�u' }, { hex: '#87CEEB', name: 'Azul Celeste' },
+        { hex: '#5F9EA0', name: 'Azul Petr�leo' },
     ]},
     { category: 'Verdes e Mentas', colors: [
         { hex: '#006400', name: 'Verde Escuro' }, { hex: '#2E8B57', name: 'Verde Floresta' }, { hex: '#008000', name: 'Verde Puro' },
@@ -2592,9 +4235,9 @@ const PROFESSIONAL_COLORS_OS = [
         { hex: '#DAA520', name: 'Dourado' }, { hex: '#FFD700', name: 'Dourado Vivo' }, { hex: '#FFFF00', name: 'Amarelo' },
         { hex: '#F5F5DC', name: 'Bege' }, { hex: '#FFF8DC', name: 'Marfim' },
     ]},
-    { category: 'Roxos, Pinks e Lilás', colors: [
-        { hex: '#4B0082', name: 'Índigo' }, { hex: '#2D1B69', name: 'Violeta' }, { hex: '#800080', name: 'Roxo Puro' },
-        { hex: '#DA70D6', name: 'Lilás' }, { hex: '#FF1493', name: 'Pink' }, { hex: '#AA336A', name: 'Rose Gold' },
+    { category: 'Roxos, Pinks e Lil�s', colors: [
+        { hex: '#4B0082', name: '�ndigo' }, { hex: '#2D1B69', name: 'Violeta' }, { hex: '#800080', name: 'Roxo Puro' },
+        { hex: '#DA70D6', name: 'Lil�s' }, { hex: '#FF1493', name: 'Pink' }, { hex: '#AA336A', name: 'Rose Gold' },
     ]},
 ];
 
@@ -2725,7 +4368,7 @@ $('#corNomeInputOS').on('input', function() {
 buildCatalogOS();
 updateColorUIOS('#1A1A1A', 'Preto');
 
-// ─── LÓGICA DE DETECÇÃO DE COR INTELIGENTE NA IMAGEM (OS Modal) ───────────────
+// ??? L�GICA DE DETEC��O DE COR INTELIGENTE NA IMAGEM (OS Modal) ???????????????
 const smartColorMapOS = {
     '#1C1C1E': 'Midnight',
     '#F2F2F4': 'Starlight',
@@ -2813,11 +4456,11 @@ function detectDominantColorOS(sourceCanvas) {
         $('#smartColorContainerOS').removeClass('d-none');
 
     } catch (e) {
-        console.warn('Erro na detecção de cor: ', e);
+        console.warn('Erro na detec��o de cor: ', e);
     }
 }
 
-// ─── LÓGICA DE SENHA E ACESSÓRIOS (MODAL OS) ───────────────────────
+// ??? L�GICA DE SENHA E ACESS�RIOS (MODAL OS) ???????????????????????
 $(document).on('click', '.btn-senha-tipo-os', function() {
     const placeholder = $(this).data('placeholder');
     $('#inputSenhaAcessoOS').attr('placeholder', placeholder).focus();
@@ -2853,44 +4496,223 @@ $('#btnAcceptColorOS').click(function() {
     }, 1500);
 });
 
-// ─── Lógica de Câmera, Galeria e Cropper ─────────────────────────────
-const modalCamera    = new bootstrap.Modal(document.getElementById('modalCamera'));
-const modalCrop      = new bootstrap.Modal(document.getElementById('modalCropEquip'));
+// ??? L�gica de C�mera, Galeria e Cropper ?????????????????????????????
+const modalCameraEl  = document.getElementById('modalCamera');
+const modalCropEl    = document.getElementById('modalCropEquip');
+
+function hoistModalToBody(modalEl, zIndex = null) {
+    if (!modalEl) return null;
+    if (modalEl.parentElement !== document.body) {
+        document.body.appendChild(modalEl);
+    }
+    if (zIndex !== null) {
+        modalEl.style.zIndex = String(zIndex);
+    }
+    return modalEl;
+}
+
+hoistModalToBody(modalCameraEl, 2000);
+hoistModalToBody(modalCropEl, 2100);
+
+const modalCamera    = modalCameraEl ? bootstrap.Modal.getOrCreateInstance(modalCameraEl) : null;
+const modalCrop      = modalCropEl ? bootstrap.Modal.getOrCreateInstance(modalCropEl) : null;
+const modalCropTitle = document.getElementById('modalCropTitle');
 const videoCamera    = document.getElementById('videoCamera');
 const canvasCamera   = document.getElementById('canvasCamera');
 const btnCapturar     = document.getElementById('btnCapturar');
 const novoEquipFoto  = document.getElementById('novoEquipFoto');
-const previewImg     = document.getElementById('novoEquipFotoImg');
 const previewDiv     = document.getElementById('novoEquipFotoPreview');
 const imgToCrop      = document.getElementById('imgToCrop');
 let streamCamera     = null;
 let cropper          = null;
+let cropContext      = { type: 'equipamento' };
+let cameraCaptureContext = { type: 'equipamento', entryId: null };
+let cropperUnavailableWarned = false;
+let cropModalFailureWarned = false;
+let activeCropToken = 0;
+
+function cleanupStuckModalArtifacts() {
+    const openModals = Array.from(document.querySelectorAll('.modal.show'));
+    const backdrops = Array.from(document.querySelectorAll('.modal-backdrop'));
+
+    if (!openModals.length) {
+        backdrops.forEach(el => el.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('padding-right');
+        document.body.style.removeProperty('overflow');
+        return;
+    }
+
+    const allowedBackdrops = openModals.length;
+    if (backdrops.length > allowedBackdrops) {
+        backdrops.slice(0, backdrops.length - allowedBackdrops).forEach(el => el.remove());
+    }
+}
+
+function scheduleModalCleanup() {
+    window.setTimeout(cleanupStuckModalArtifacts, 140);
+}
+
+function resetModalNodeState(modalEl) {
+    if (!modalEl) return;
+    modalEl.classList.remove('show');
+    modalEl.style.display = 'none';
+    modalEl.setAttribute('aria-hidden', 'true');
+    modalEl.removeAttribute('aria-modal');
+}
+
+function hideModalSafe(modalInstance, modalSelector) {
+    try {
+        const active = document.activeElement;
+        const modalEl = modalSelector ? document.querySelector(modalSelector) : null;
+        if (active && modalEl && modalEl.contains(active) && typeof active.blur === 'function') {
+            active.blur();
+        }
+    } catch (_) {}
+    modalInstance?.hide();
+    scheduleModalCleanup();
+}
+
+function closeImageModalIfOpen() {
+    const imageModalEl = document.getElementById('imageModal');
+    if (!imageModalEl) {
+        scheduleModalCleanup();
+        return;
+    }
+
+    try {
+        const active = document.activeElement;
+        if (active && imageModalEl.contains(active) && typeof active.blur === 'function') {
+            active.blur();
+        }
+    } catch (_) {}
+
+    try {
+        const imageModalInstance = bootstrap.Modal.getInstance(imageModalEl);
+        imageModalInstance?.hide();
+    } catch (err) {
+        console.error('[OS Nova] falha ao ocultar imageModal', err);
+    }
+
+    imageModalEl.classList.remove('show');
+    imageModalEl.style.display = 'none';
+    imageModalEl.setAttribute('aria-hidden', 'true');
+    imageModalEl.removeAttribute('aria-modal');
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('padding-right');
+    document.body.style.removeProperty('overflow');
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    scheduleModalCleanup();
+}
+
+document.addEventListener('hidden.bs.modal', scheduleModalCleanup);
 
 document.getElementById('btnAbrirGaleria')?.addEventListener('click', () => novoEquipFoto.click());
 
-document.getElementById('btnAbrirCamera')?.addEventListener('click', async () => {
+async function openCameraCapture(context = { type: 'equipamento', entryId: null }) {
+    closeImageModalIfOpen();
+    cameraCaptureContext = context;
     try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+            console.error('[OS Nova] navigator.mediaDevices.getUserMedia indisponivel');
+            showWarningDialog('Este dispositivo ou navegador nao permite acesso a camera.', 'Camera indisponivel');
+            return;
+        }
+
+        if (streamCamera) {
+            streamCamera.getTracks().forEach(track => track.stop());
+            streamCamera = null;
+        }
+
         streamCamera = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        videoCamera.srcObject = streamCamera;
-        modalCamera.show();
+        if (videoCamera) {
+            videoCamera.srcObject = streamCamera;
+            const playPromise = videoCamera.play?.();
+            if (playPromise && typeof playPromise.catch === 'function') {
+                playPromise.catch(err => console.error('[OS Nova] falha ao iniciar preview da camera', err));
+            }
+        }
+
+        resetModalNodeState(modalCameraEl);
+        try {
+            bootstrap.Modal.getInstance(modalCameraEl)?.dispose();
+        } catch (error) {
+            console.error('[OS Nova] falha ao descartar instancia anterior do modal da camera', error);
+        }
+
+        const cameraModalInstance = modalCameraEl ? new bootstrap.Modal(modalCameraEl) : null;
+        cameraModalInstance?.show();
+
+        window.setTimeout(() => {
+            if (!modalCameraEl) return;
+            if (modalCameraEl.classList.contains('show') && window.getComputedStyle(modalCameraEl).display !== 'none') {
+                return;
+            }
+            console.error('[OS Nova] modal da camera nao abriu corretamente', {
+                context,
+                display: modalCameraEl.style.display,
+                computedDisplay: window.getComputedStyle(modalCameraEl).display,
+                classes: modalCameraEl.className
+            });
+            showWarningDialog('Nao foi possivel abrir a interface da camera. Tente pela galeria enquanto ajustamos este fluxo.', 'Falha ao abrir camera');
+        }, 1000);
     } catch (err) {
-        alert('Não foi possível acessar a câmera: ' + err.message);
+        console.error('[OS Nova] falha ao acessar camera', err);
+        showWarningDialog('Nao foi possivel acessar a camera: ' + err.message, 'Camera indisponivel');
     }
+}
+
+document.getElementById('btnAbrirCamera')?.addEventListener('click', async () => {
+    openCameraCapture({ type: 'equipamento', entryId: null });
 });
 
-document.getElementById('modalCamera').addEventListener('hidden.bs.modal', () => {
+modalCameraEl?.addEventListener('shown.bs.modal', () => {
+    console.info('[OS Nova] modal da camera exibido com sucesso');
+});
+
+modalCameraEl?.addEventListener('hidden.bs.modal', () => {
     if (streamCamera) {
         streamCamera.getTracks().forEach(track => track.stop());
         streamCamera = null;
     }
+    if (videoCamera) {
+        videoCamera.srcObject = null;
+    }
+    if (cameraCaptureContext.type === 'acessorio' && cropContext.type !== 'acessorio') {
+        acessorioCropEntryId = null;
+        acessorioCropQueue = [];
+    }
+    if (cameraCaptureContext.type === 'estado_fisico' && cropContext.type !== 'estado_fisico') {
+        estadoFisicoCropEntryId = null;
+        estadoFisicoCropQueue = [];
+    }
+    if (cameraCaptureContext.type === 'entrada' && cropContext.type !== 'entrada') {
+        fotosEntradaCropQueue = [];
+    }
+    cameraCaptureContext = { type: 'equipamento', entryId: null };
+    scheduleModalCleanup();
 });
 
-function openCropper(source) {
-    imgToCrop.src = source;
-    modalCrop.show();
+function setCropContext(context = { type: 'equipamento' }) {
+    cropContext = context || { type: 'equipamento' };
+    if (modalCropTitle) {
+        if (cropContext.type === 'acessorio') {
+            modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto do Acessorio';
+        } else if (cropContext.type === 'estado_fisico') {
+            modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto do Estado Fisico';
+        } else if (cropContext.type === 'entrada') {
+            modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto de Entrada da OS';
+        } else {
+            modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto do Equipamento';
+        }
+    }
 }
 
-document.getElementById('modalCropEquip').addEventListener('shown.bs.modal', () => {
+function createCropperInstance() {
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
     cropper = new Cropper(imgToCrop, {
         viewMode: 1,
         dragMode: 'move',
@@ -2903,6 +4725,221 @@ document.getElementById('modalCropEquip').addEventListener('shown.bs.modal', () 
         cropBoxResizable: true,
         toggleDragModeOnDblclick: false,
     });
+}
+
+function isCropModalVisible() {
+    if (!modalCropEl) return false;
+    const dialog = modalCropEl.querySelector('.modal-dialog');
+    if (!modalCropEl.classList.contains('show') || !dialog) return false;
+    const rect = dialog.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+}
+
+function appendBlobToCurrentPhotoContext(blob, canvas) {
+    if (!blob) {
+        console.error('[OS Nova] blob vazio ao anexar foto', cropContext);
+        showWarningDialog('Nao foi possivel gerar a imagem selecionada.');
+        return;
+    }
+
+    if (cropContext.type === 'acessorio' && acessorioCropEntryId) {
+        const entryId = acessorioCropEntryId;
+        const dt = acessoriosPhotos[entryId] || new DataTransfer();
+        const fileName = `acessorio_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+        const file = new File([blob], fileName, { type: 'image/jpeg' });
+        dt.items.add(file);
+        acessoriosPhotos[entryId] = dt;
+        ensureAcessorioFileInput(entryId);
+        renderAcessoriosList();
+        scheduleDraftSave();
+
+        if (acessorioCropQueue.length > 0) {
+            processNextAcessorioCrop();
+        } else {
+            acessorioCropEntryId = null;
+            hideModalSafe(modalCrop, '#modalCropEquip');
+        }
+        return;
+    }
+
+    if (cropContext.type === 'estado_fisico' && estadoFisicoCropEntryId) {
+        const entryId = estadoFisicoCropEntryId;
+        const dt = estadoFisicoPhotos[entryId] || new DataTransfer();
+        const fileName = `estado_fisico_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+        const file = new File([blob], fileName, { type: 'image/jpeg' });
+        dt.items.add(file);
+        estadoFisicoPhotos[entryId] = dt;
+        ensureEstadoFisicoFileInput(entryId);
+        renderEstadoFisicoList();
+        syncEstadoFisicoInput();
+        scheduleDraftSave();
+
+        if (estadoFisicoCropQueue.length > 0) {
+            processNextEstadoFisicoCrop();
+        } else {
+            estadoFisicoCropEntryId = null;
+            hideModalSafe(modalCrop, '#modalCropEquip');
+        }
+        return;
+    }
+
+    if (cropContext.type === 'entrada') {
+        if (osDataTransfer.files.length >= osFotosMaxFiles) {
+            showWarningDialog(`Voce pode enviar ate ${osFotosMaxFiles} fotos no total.`);
+            hideModalSafe(modalCrop, '#modalCropEquip');
+            return;
+        }
+
+        const fileName = `entrada_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+        const file = new File([blob], fileName, { type: 'image/jpeg' });
+        osDataTransfer.items.add(file);
+        syncFotosEntradaInput();
+        renderNewFotos();
+        updatePhotoState();
+        scheduleDraftSave();
+
+        if (fotosEntradaCropQueue.length > 0) {
+            processNextFotoEntradaCrop();
+        } else {
+            hideModalSafe(modalCrop, '#modalCropEquip');
+        }
+        return;
+    }
+
+    if (getTotalModalEquipFotos() >= novoEquipFotosMaxFiles) {
+        showWarningDialog(`Voce pode manter ate ${novoEquipFotosMaxFiles} fotos por equipamento.`);
+        hideModalSafe(modalCrop, '#modalCropEquip');
+        return;
+    }
+
+    const fileName = `equipamento_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+    const file = new File([blob], fileName, { type: 'image/jpeg' });
+    novoEquipFotosDataTransfer.items.add(file);
+    syncNovoEquipFotosInput();
+    detectDominantColorOS(canvas);
+    renderNovoEquipFotosNovas();
+
+    if (novoEquipFotoCropQueue.length > 0) {
+        processNextNovoEquipCrop();
+        return;
+    }
+
+    hideModalSafe(modalCrop, '#modalCropEquip');
+}
+
+function fallbackCropperFromSource(source, context, warnMessage = null) {
+    setCropContext(context);
+
+    if (warnMessage && !cropModalFailureWarned) {
+        cropModalFailureWarned = true;
+        showWarningDialog(warnMessage);
+    }
+
+    const img = new Image();
+    img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || img.width || 1024;
+        canvas.height = img.naturalHeight || img.height || 1024;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('[OS Nova] Canvas nao disponivel no fallback de imagem', context);
+            showWarningDialog('Nao foi possivel processar a imagem selecionada.');
+            hideModalSafe(modalCrop, '#modalCropEquip');
+            return;
+        }
+
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => appendBlobToCurrentPhotoContext(blob, canvas), 'image/jpeg', 0.9);
+    };
+    img.onerror = () => {
+        console.error('[OS Nova] erro ao carregar imagem no fallback visual', context);
+        showWarningDialog('Nao foi possivel carregar a imagem para envio.');
+        hideModalSafe(modalCrop, '#modalCropEquip');
+    };
+    img.src = source;
+}
+
+function openCropper(source, context = { type: 'equipamento' }) {
+    closeImageModalIfOpen();
+    const cropToken = ++activeCropToken;
+    if (!source) {
+        console.error('[OS Nova] openCropper chamado sem source', context);
+        return;
+    }
+    if (!imgToCrop || !modalCropEl) {
+        console.error('[OS Nova] elementos do editor de corte indisponiveis', { hasImage: Boolean(imgToCrop), hasModal: Boolean(modalCropEl), context });
+        fallbackCropperFromSource(source, context, 'Editor visual indisponivel no momento. A foto sera adicionada sem corte.');
+        return;
+    }
+    if (typeof window.Cropper === 'undefined') {
+        console.error('[OS Nova] Cropper nao disponivel, ativando fallback');
+        if (!cropperUnavailableWarned) {
+            cropperUnavailableWarned = true;
+            showWarningDialog('Editor de corte indisponivel. A foto sera adicionada sem corte.');
+        }
+        fallbackCropperFromSource(source, context);
+        return;
+    }
+
+    setCropContext(context);
+    try {
+        cropper?.destroy();
+    } catch (error) {
+        console.error('[OS Nova] falha ao destruir cropper anterior', error);
+    }
+    cropper = null;
+    imgToCrop.onload = null;
+    imgToCrop.onerror = null;
+    imgToCrop.src = source;
+    imgToCrop.dataset.cropToken = String(cropToken);
+
+    const cropModalInstance = bootstrap.Modal.getOrCreateInstance(modalCropEl);
+    cropModalInstance.show();
+
+    window.setTimeout(() => {
+        if (cropToken !== activeCropToken) return;
+        if (cropper || isCropModalVisible()) return;
+        console.error('[OS Nova] modal de crop nao abriu corretamente, ativando fallback', {
+            context,
+            display: modalCropEl.style.display,
+            computedDisplay: window.getComputedStyle(modalCropEl).display,
+            classes: modalCropEl.className
+        });
+        hideModalSafe(cropModalInstance, '#modalCropEquip');
+        fallbackCropperFromSource(source, context, 'Editor visual indisponivel no momento. A foto sera adicionada sem corte.');
+    }, 1200);
+}
+
+document.getElementById('modalCropEquip').addEventListener('shown.bs.modal', () => {
+    if (typeof window.Cropper === 'undefined') {
+        return;
+    }
+
+    const initCropperWhenReady = () => {
+        try {
+            createCropperInstance();
+        } catch (error) {
+            console.error('[OS Nova] falha ao inicializar cropper no modal visivel', error);
+            hideModalSafe(bootstrap.Modal.getOrCreateInstance(modalCropEl), '#modalCropEquip');
+            fallbackCropperFromSource(imgToCrop?.src || '', cropContext, 'Falha no editor visual. A foto sera adicionada sem corte.');
+        }
+    };
+
+    if (imgToCrop?.complete && Number(imgToCrop?.naturalWidth || 0) > 0) {
+        initCropperWhenReady();
+        return;
+    }
+
+    imgToCrop.onload = () => {
+        imgToCrop.onload = null;
+        initCropperWhenReady();
+    };
+    imgToCrop.onerror = (error) => {
+        imgToCrop.onerror = null;
+        console.error('[OS Nova] falha ao carregar imagem para o cropper', error);
+        hideModalSafe(bootstrap.Modal.getOrCreateInstance(modalCropEl), '#modalCropEquip');
+        fallbackCropperFromSource(imgToCrop?.src || '', cropContext, 'Falha ao carregar a imagem para corte. A foto sera adicionada sem corte.');
+    };
 });
 
 document.getElementById('modalCropEquip').addEventListener('hidden.bs.modal', () => {
@@ -2910,65 +4947,353 @@ document.getElementById('modalCropEquip').addEventListener('hidden.bs.modal', ()
         cropper.destroy();
         cropper = null;
     }
+    if (cropContext.type === 'acessorio') {
+        acessorioCropQueue = [];
+        acessorioCropEntryId = null;
+    }
+    if (cropContext.type === 'estado_fisico') {
+        estadoFisicoCropQueue = [];
+        estadoFisicoCropEntryId = null;
+    }
+    if (cropContext.type === 'entrada') {
+        fotosEntradaCropQueue = [];
+    }
+    if (cropContext.type === 'equipamento') {
+        novoEquipFotoCropQueue = [];
+    }
+    setCropContext({ type: 'equipamento' });
+    scheduleModalCleanup();
 });
 
-document.getElementById('btnRotateLeft')?.addEventListener('click', () => cropper.rotate(-90));
-document.getElementById('btnRotateRight')?.addEventListener('click', () => cropper.rotate(90));
+document.getElementById('btnRotateLeft')?.addEventListener('click', () => {
+    if (cropper && typeof cropper.rotate === 'function') {
+        cropper.rotate(-90);
+    }
+});
+document.getElementById('btnRotateRight')?.addEventListener('click', () => {
+    if (cropper && typeof cropper.rotate === 'function') {
+        cropper.rotate(90);
+    }
+});
 
 btnCapturar?.addEventListener('click', () => {
     const context = canvasCamera.getContext('2d');
-    canvasCamera.width  = videoCamera.videoWidth;
-    canvasCamera.height = videoCamera.videoHeight;
+    if (!context || !videoCamera) {
+        console.error('[OS Nova] camera indisponivel para captura');
+        showWarningDialog('Nao foi possivel capturar a foto pela camera.', 'Camera indisponivel');
+        return;
+    }
+    canvasCamera.width  = videoCamera.videoWidth || 1280;
+    canvasCamera.height = videoCamera.videoHeight || 720;
     context.drawImage(videoCamera, 0, 0, canvasCamera.width, canvasCamera.height);
     
     const dataUrl = canvasCamera.toDataURL('image/jpeg');
-    modalCamera.hide();
-    openCropper(dataUrl);
+    hideModalSafe(bootstrap.Modal.getOrCreateInstance(modalCameraEl), '#modalCamera');
+    if (cameraCaptureContext.type === 'acessorio' && cameraCaptureContext.entryId) {
+        acessorioCropEntryId = cameraCaptureContext.entryId;
+        acessorioCropQueue = [];
+        openCropper(dataUrl, { type: 'acessorio' });
+        return;
+    }
+    if (cameraCaptureContext.type === 'estado_fisico' && cameraCaptureContext.entryId) {
+        estadoFisicoCropEntryId = cameraCaptureContext.entryId;
+        estadoFisicoCropQueue = [];
+        openCropper(dataUrl, { type: 'estado_fisico' });
+        return;
+    }
+    if (cameraCaptureContext.type === 'entrada') {
+        openCropper(dataUrl, { type: 'entrada' });
+        return;
+    }
+    openCropper(dataUrl, { type: 'equipamento' });
 });
 
 document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
+    if (!cropper) return;
     const canvas = cropper.getCroppedCanvas({
-        width: 1024, // Limita o tamanho para não sobrecarregar
+        width: 1024, // Limita o tamanho para n�o sobrecarregar
         height: 1024,
         imageSmoothingEnabled: true,
         imageSmoothingQuality: 'high',
     });
 
     canvas.toBlob((blob) => {
-        const file = new File([blob], "equipamento_perfil.jpg", { type: "image/jpeg" });
-        const dt = new DataTransfer();
-        dt.items.add(file);
-        novoEquipFoto.files = dt.files;
+        if (!blob) return;
+        if (cropContext.type === 'acessorio' && acessorioCropEntryId) {
+            const entryId = acessorioCropEntryId;
+            const dt = acessoriosPhotos[entryId] || new DataTransfer();
+            const fileName = `acessorio_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+            const file = new File([blob], fileName, { type: 'image/jpeg' });
+            dt.items.add(file);
+            acessoriosPhotos[entryId] = dt;
+            ensureAcessorioFileInput(entryId);
+            renderAcessoriosList();
+            scheduleDraftSave();
+
+            if (acessorioCropQueue.length > 0) {
+                processNextAcessorioCrop();
+            } else {
+                acessorioCropEntryId = null;
+                hideModalSafe(modalCrop, '#modalCropEquip');
+            }
+            return;
+        }
+
+        if (cropContext.type === 'estado_fisico' && estadoFisicoCropEntryId) {
+            const entryId = estadoFisicoCropEntryId;
+            const dt = estadoFisicoPhotos[entryId] || new DataTransfer();
+            const fileName = `estado_fisico_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+            const file = new File([blob], fileName, { type: 'image/jpeg' });
+            dt.items.add(file);
+            estadoFisicoPhotos[entryId] = dt;
+            ensureEstadoFisicoFileInput(entryId);
+            renderEstadoFisicoList();
+            syncEstadoFisicoInput();
+            scheduleDraftSave();
+
+            if (estadoFisicoCropQueue.length > 0) {
+                processNextEstadoFisicoCrop();
+            } else {
+                estadoFisicoCropEntryId = null;
+                hideModalSafe(modalCrop, '#modalCropEquip');
+            }
+            return;
+        }
+
+    if (cropContext.type === 'entrada') {
+        if (osDataTransfer.files.length >= osFotosMaxFiles) {
+            showWarningDialog(`Voce pode enviar ate ${osFotosMaxFiles} fotos no total.`);
+            hideModalSafe(modalCrop, '#modalCropEquip');
+            return;
+        }
+
+            const fileName = `entrada_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+            const file = new File([blob], fileName, { type: 'image/jpeg' });
+            osDataTransfer.items.add(file);
+            syncFotosEntradaInput();
+            renderNewFotos();
+            updatePhotoState();
+            scheduleDraftSave();
+
+            if (fotosEntradaCropQueue.length > 0) {
+                processNextFotoEntradaCrop();
+            } else {
+                hideModalSafe(modalCrop, '#modalCropEquip');
+            }
+            return;
+        }
+
+        if (getTotalModalEquipFotos() >= novoEquipFotosMaxFiles) {
+            showWarningDialog(`Voce pode manter ate ${novoEquipFotosMaxFiles} fotos por equipamento.`);
+            hideModalSafe(modalCrop, '#modalCropEquip');
+            return;
+        }
+
+        const fileName = `equipamento_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+        const file = new File([blob], fileName, { type: 'image/jpeg' });
+        novoEquipFotosDataTransfer.items.add(file);
+        syncNovoEquipFotosInput();
         
-        detectDominantColorOS(canvas); // <--- Inicia a detecção de cor automática na OS
+        detectDominantColorOS(canvas); // <--- Inicia a detec��o de cor autom�tica na OS
 
         // Preview Final
-        previewImg.src = URL.createObjectURL(blob);
-        previewDiv.style.display = 'block';
-        document.getElementById('fotoVaziaOS').style.display = 'none';
-        modalCrop.hide();
+        renderNovoEquipFotosNovas();
+
+        if (novoEquipFotoCropQueue.length > 0) {
+            processNextNovoEquipCrop();
+            return;
+        }
+        hideModalSafe(modalCrop, '#modalCropEquip');
     }, 'image/jpeg', 0.9);
 });
 
-document.getElementById('btnRemoverFotoNovoEquip')?.addEventListener('click', function() {
-    novoEquipFoto.value = '';
-    previewDiv.style.display = 'none';
-    previewImg.src = '';
-    document.getElementById('fotoVaziaOS').style.display = 'block';
-});
+const btnConfirmCropOriginal = document.getElementById('btnConfirmCrop');
+if (btnConfirmCropOriginal && btnConfirmCropOriginal.parentNode) {
+    const btnConfirmCropSafe = btnConfirmCropOriginal.cloneNode(true);
+    btnConfirmCropOriginal.parentNode.replaceChild(btnConfirmCropSafe, btnConfirmCropOriginal);
+    btnConfirmCropSafe.addEventListener('click', () => {
+        if (!cropper) return;
+        const canvas = cropper.getCroppedCanvas({
+            width: 1024,
+            height: 1024,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high',
+        });
 
-// Preview/Editor ao escolher da galeria
+        if (!canvas) {
+            console.error('[OS Nova] getCroppedCanvas retornou vazio', cropContext);
+            showWarningDialog('Nao foi possivel preparar a imagem selecionada.');
+            return;
+        }
+
+        canvas.toBlob((blob) => {
+            appendBlobToCurrentPhotoContext(blob, canvas);
+        }, 'image/jpeg', 0.9);
+    });
+}
+
 novoEquipFoto?.addEventListener('change', function() {
-    if (this.files && this.files[0]) {
-        const reader = new FileReader();
-        reader.onload = e => {
-            openCropper(e.target.result);
-        };
-        reader.readAsDataURL(this.files[0]);
-    }
+    queueNovoEquipFotosFromFiles(this.files);
+    this.value = '';
 });
 
-// ─── Select2 Híbrido: Modelos via API ──────────────────────────────────────
+async function deleteModalEquipFotoExistente(fotoId) {
+    if (!fotoId) return;
+
+    let confirmado = false;
+    if (window.Swal && typeof window.Swal.fire === 'function') {
+        const result = await Swal.fire({
+            icon: 'warning',
+            title: 'Excluir foto?',
+            text: 'Essa foto sera removida permanentemente do equipamento.',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, excluir',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            customClass: { popup: 'glass-card' }
+        });
+        confirmado = !!result.isConfirmed;
+    } else {
+        confirmado = confirm('Essa foto sera removida permanentemente. Deseja continuar?');
+    }
+
+    if (!confirmado) return;
+
+    const previousFotos = Array.isArray(modalEquipExistingFotos) ? [...modalEquipExistingFotos] : [];
+    const semFoto = previousFotos.filter(f => Number(f.id || 0) !== Number(fotoId));
+    if (semFoto.length && !semFoto.some(f => Number(f.is_principal) === 1)) {
+        semFoto[0] = { ...semFoto[0], is_principal: 1 };
+    }
+    bumpModalEquipFotosVersion();
+    renderModalEquipFotosExistentes(semFoto);
+    renderNovoEquipFotosNovas();
+    syncSidebarFotosFromModal(semFoto);
+
+    const fd = new FormData();
+    fd.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+
+    try {
+        const response = await fetch(`${BASE_URL}equipamentos/deletar-foto/${fotoId}`, {
+            method: 'POST',
+            body: fd,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const res = await response.json();
+        if (!res || res.success !== true) {
+            throw new Error(res?.message || 'Nao foi possivel excluir a foto.');
+        }
+
+        if (Array.isArray(res.fotos)) {
+            bumpModalEquipFotosVersion();
+            bumpEquipamentoFotosVersion();
+            renderModalEquipFotosExistentes(res.fotos);
+            renderNovoEquipFotosNovas();
+            syncSidebarFotosFromModal(res.fotos);
+        } else {
+            await reloadModalEquipFotosExistentes();
+        }
+        if (window.Swal && typeof window.Swal.fire === 'function') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Foto excluida',
+                timer: 1200,
+                showConfirmButton: false,
+                customClass: { popup: 'glass-card' }
+            });
+        }
+    } catch (error) {
+        bumpModalEquipFotosVersion();
+        renderModalEquipFotosExistentes(previousFotos);
+        renderNovoEquipFotosNovas();
+        syncSidebarFotosFromModal(previousFotos);
+        showWarningDialog(error?.message || 'Nao foi possivel excluir a foto.', 'Falha na exclusao');
+    }
+}
+
+function syncSidebarFotosFromModal(fotos) {
+    const selectedEq = getSelectedEquipamentoData();
+    if (!selectedEq || !selectedEq.id) return;
+    if (equipamentoEditId && String(selectedEq.id) !== String(equipamentoEditId)) return;
+
+    bumpEquipamentoFotosVersion();
+    carregarFotosEquipamento(selectedEq.id, {
+        marca: selectedEq.marca_nome || selectedEq.marca || '',
+        modelo: selectedEq.modelo_nome || selectedEq.modelo || '',
+        serie: selectedEq.numero_serie || selectedEq.serie || '',
+        tipo: selectedEq.tipo_nome || selectedEq.tipo || '',
+        cor: selectedEq.cor || '',
+        cor_hex: selectedEq.cor_hex || ''
+    }, fotos);
+}
+
+async function definirModalEquipFotoPrincipal(fotoId) {
+    if (!fotoId) return;
+    const fd = new FormData();
+    fd.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+
+    try {
+        const response = await fetch(`${BASE_URL}equipamentos/foto-principal/${fotoId}`, {
+            method: 'POST',
+            body: fd,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const res = await response.json();
+        if (!res || res.success !== true) {
+            throw new Error(res?.message || 'Nao foi possivel definir a foto principal.');
+        }
+
+        const fotos = Array.isArray(res.fotos) ? res.fotos : [];
+        bumpModalEquipFotosVersion();
+        bumpEquipamentoFotosVersion();
+        renderModalEquipFotosExistentes(fotos);
+        renderNovoEquipFotosNovas();
+        syncSidebarFotosFromModal(fotos);
+    } catch (error) {
+        showWarningDialog(error?.message || 'Nao foi possivel definir a foto principal.', 'Falha ao atualizar');
+    }
+}
+
+document.addEventListener('click', async function(event) {
+    const definirPrincipalBtn = event.target.closest('.btn-definir-principal-foto-existente-equip');
+    if (definirPrincipalBtn) {
+        event.preventDefault();
+        event.stopPropagation();
+        const fotoId = parseInt(definirPrincipalBtn.dataset.fotoId, 10);
+        if (!Number.isNaN(fotoId)) {
+            await definirModalEquipFotoPrincipal(fotoId);
+        }
+        return;
+    }
+
+    const removeExistingFotoBtn = event.target.closest('.btn-remover-foto-existente-equip');
+    if (removeExistingFotoBtn) {
+        event.preventDefault();
+        event.stopPropagation();
+        const fotoId = parseInt(removeExistingFotoBtn.dataset.fotoId, 10);
+        if (!Number.isNaN(fotoId)) {
+            await deleteModalEquipFotoExistente(fotoId);
+        }
+        return;
+    }
+
+    const removeNovoEquipFotoBtn = event.target.closest('.btn-remover-foto-nova-equip');
+    if (!removeNovoEquipFotoBtn) return;
+
+    const index = parseInt(removeNovoEquipFotoBtn.dataset.index, 10);
+    if (Number.isNaN(index)) return;
+
+    const nextDt = new DataTransfer();
+    Array.from(novoEquipFotosDataTransfer.files).forEach((file, fileIndex) => {
+        if (fileIndex !== index) nextDt.items.add(file);
+    });
+
+    novoEquipFotosDataTransfer.items.clear();
+    Array.from(nextDt.files).forEach(file => novoEquipFotosDataTransfer.items.add(file));
+    syncNovoEquipFotosInput();
+    renderNovoEquipFotosNovas();
+});
+
+// ??? Select2 H�brido: Modelos via API ??????????????????????????????????????
 function initModeloSelect2() {
     var modeloSel = $('#novoEquipModelo');
 
@@ -2982,7 +5307,7 @@ function initModeloSelect2() {
         placeholder: 'Busque ou selecione o modelo...',
         allowClear: true,
         dropdownParent: $('#modalNovoEquipamento'),
-        tags: true, // HABILITA EDIÇÃO E NOVAS TAGS LIVRES
+        tags: true, // HABILITA EDI��O E NOVAS TAGS LIVRES
         createTag: function(params) {
             var term = $.trim(params.term);
             if (term === '') return null;
@@ -2995,11 +5320,11 @@ function initModeloSelect2() {
         ajax: {
             url: BASE_URL + 'api/modelos/buscar',
             dataType: 'json',
-            delay: 400,
+            delay: 250,
             data: function (params) {
                 var tipoNome = $('#novoEquipTipo option:selected').text().trim();
                 return {
-                    q:        params.term,
+                    q:        params.term || '',
                     marca_id: $('#novoEquipMarca').val(),
                     marca:    $('#novoEquipMarca option:selected').text().trim(),
                     tipo:     tipoNome !== 'Selecione o Tipo...' ? tipoNome : ''
@@ -3010,15 +5335,15 @@ function initModeloSelect2() {
             },
             cache: true
         },
-        minimumInputLength: 3,
+        minimumInputLength: 0,
         language: {
             inputTooShort: function (args) {
                 var restante = args.minimum - args.input.length;
                 return `Digite mais ${restante} caractere(s) para buscar...`;
             },
-            searching: function() { return '<i class="bi bi-globe2 me-1"></i> Buscando modelos na internet...'; },
-            noResults: function()  { return 'Nenhuma sugestão encontrada. Use o botão <strong>+ Novo</strong> para cadastrar manualmente.'; },
-            errorLoading: function() { return 'Erro ao consultar. Verifique sua conexão.'; }
+            searching: function() { return '<i class="bi bi-search me-1"></i> Buscando modelos...'; },
+            noResults: function()  { return 'Nenhuma sugest�o encontrada. Use o bot�o <strong>+ Novo</strong> para cadastrar manualmente.'; },
+            errorLoading: function() { return 'Erro ao consultar. Verifique sua conex�o.'; }
         },
         templateResult: function (data) {
             if (data.loading) return data.text;
@@ -3028,7 +5353,7 @@ function initModeloSelect2() {
                 return $(`
                 <div>
                     <strong class="d-block text-primary"><i class="bi bi-pencil-square me-1"></i> "${data.text}"</strong>
-                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (edição manual)</small>
+                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (edi��o manual)</small>
                 </div>`);
             }
 
@@ -3046,7 +5371,7 @@ function initModeloSelect2() {
     }).on('select2:select', function (e) {
         var data = e.params.data;
         // Armazena o nome real do modelo externo para auto-cadastro no backend
-        // Se for newTag, já vai salvar pelo próprio texto sendo o ID
+        // Se for newTag, j� vai salvar pelo pr�prio texto sendo o ID
         if (data.id && String(data.id).indexOf('EXT|') === 0) {
             $('#novoEquipModeloNomeExt').val(data.text);
         } else {
@@ -3078,54 +5403,107 @@ $('#novoEquipMarca').on('change', function() {
 
 // Salvar equipamento via AJAX
 document.getElementById('btnSalvarNovoEquip')?.addEventListener('click', function() {
-    const form   = document.getElementById('formNovoEquipAjax');
+    const form = document.getElementById('formNovoEquipAjax');
     const errors = document.getElementById('modalEquipErrors');
+    if (!form || !errors) return;
     errors.classList.add('d-none');
 
     const formData = new FormData(form);
 
-    // Se for modelo externo (Ponte), enviamos o texto original para auto-cadastro
     const modeloId = $('#novoEquipModelo').val();
-    if (modeloId && modeloId.startsWith('EXT|')) {
+    if (modeloId && String(modeloId).startsWith('EXT|')) {
         formData.append('modelo_nome_ext', $('#novoEquipModelo option:selected').text());
     }
-    fetch(`${BASE_URL}equipamentos/salvar-ajax`, {
+
+    const isEditMode = equipamentoModalMode === 'edit' && !!equipamentoEditId;
+    const url = isEditMode
+        ? `${BASE_URL}equipamentos/atualizar-ajax/${equipamentoEditId}`
+        : `${BASE_URL}equipamentos/salvar-ajax`;
+
+    fetch(url, {
         method: 'POST',
-        body:   formData,
+        body: formData,
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(r => r.json())
     .then(res => {
         if (res.status !== 'success') {
-            errors.innerHTML = Object.values(res.errors || {}).join('<br>');
+            errors.innerHTML = Object.values(res.errors || {}).join('<br>') || (res.message || 'Erro ao salvar equipamento.');
             errors.classList.remove('d-none');
             return;
         }
 
-        const eq = res.equipamento;
-        const nome = (eq.marca_nome || '') + ' ' + (eq.modelo_nome || '') + ' (' + (eq.tipo_nome || '') + ')';
+        const eq = res.equipamento || {};
+        const eqId = String(eq.id || equipamentoEditId || '');
+        if (!eqId) {
+            throw new Error('Resposta sem identificador do equipamento.');
+        }
 
-        // Adiciona ao select de equipamentos
+        const nome = `${eq.marca_nome || ''} ${eq.modelo_nome || ''} (${eq.tipo_nome || ''})`.trim();
         const sel = document.getElementById('equipamentoSelect');
-        const opt = new Option(nome, eq.id, true, true);
-        opt.dataset.tipo      = eq.tipo_id || '';
-        opt.dataset.marca     = eq.marca_nome || '';
-        opt.dataset.modelo    = eq.modelo_nome || '';
-        opt.dataset.serie     = eq.numero_serie || '';
-        opt.dataset.cor       = eq.cor || '';
-        opt.dataset.cor_hex   = eq.cor_hex || '';
-        opt.dataset.tipo_nome = eq.tipo_nome || '';
-        sel.appendChild(opt);
-        sel.value = eq.id;
-        carregarFotosEquipamento(eq.id, { marca: eq.marca_nome, modelo: eq.modelo_nome, tipo: eq.tipo_nome, cor: eq.cor, cor_hex: eq.cor_hex });
+        if (!sel) return;
 
-        // Carrega defeitos para o novo tipo
+        let opt = Array.from(sel.options).find(o => String(o.value) === eqId);
+        if (!opt) {
+            opt = new Option(nome, eqId, true, true);
+            sel.appendChild(opt);
+        }
+        opt.text = nome;
+        opt.value = eqId;
+        opt.dataset.tipo = eq.tipo_id || '';
+        opt.dataset.marca = eq.marca_nome || '';
+        opt.dataset.modelo = eq.modelo_nome || '';
+        opt.dataset.serie = eq.numero_serie || '';
+        opt.dataset.cor = eq.cor || '';
+        opt.dataset.cor_hex = eq.cor_hex || '';
+        opt.dataset.tipo_nome = eq.tipo_nome || '';
+        opt.dataset.marca_id = eq.marca_id || '';
+        opt.dataset.modelo_id = eq.modelo_id || '';
+        opt.dataset.cliente_id = eq.cliente_id || '';
+        opt.dataset.senha_acesso = eq.senha_acesso || '';
+        opt.dataset.estado_fisico = eq.estado_fisico || '';
+        opt.dataset.acessorios = eq.acessorios || '';
+
+        osEquipamentosCache[eqId] = eq;
+        const fotosAtualizadas = Array.isArray(res.fotos) ? res.fotos : null;
+
+        if (typeof $.fn.select2 !== 'undefined' && $('#equipamentoSelect').hasClass('select2-hidden-accessible')) {
+            $('#equipamentoSelect').val(eqId).trigger('change');
+        } else {
+            sel.value = eqId;
+            _onEquipamentoChange(eqId, opt);
+        }
+
+        if (fotosAtualizadas) {
+            bumpModalEquipFotosVersion();
+            bumpEquipamentoFotosVersion();
+            renderModalEquipFotosExistentes(fotosAtualizadas);
+            renderNovoEquipFotosNovas();
+        }
+
+        carregarFotosEquipamento(eqId, {
+            marca: eq.marca_nome,
+            modelo: eq.modelo_nome,
+            tipo: eq.tipo_nome,
+            cor: eq.cor,
+            cor_hex: eq.cor_hex
+        }, fotosAtualizadas);
+
         if (eq.tipo_id) carregarDefeitos(eq.tipo_id);
 
-        // Fecha modal
         bootstrap.Modal.getInstance(document.getElementById('modalNovoEquipamento'))?.hide();
-        form.reset();
-        document.getElementById('novoEquipFotoPreview').style.display = 'none';
+
+        if (window.Swal && typeof window.Swal.fire === 'function') {
+            const hasWarning = Boolean(res.warning);
+            Swal.fire({
+                icon: hasWarning ? 'warning' : 'success',
+                title: isEditMode ? 'Equipamento atualizado' : 'Equipamento cadastrado',
+                text: hasWarning ? String(res.warning) : undefined,
+                timer: hasWarning ? undefined : 1400,
+                showConfirmButton: hasWarning,
+                customClass: { popup: 'glass-card' }
+            });
+        }
     })
     .catch(() => {
         errors.innerHTML = 'Erro inesperado. Tente novamente.';
@@ -3133,10 +5511,11 @@ document.getElementById('btnSalvarNovoEquip')?.addEventListener('click', functio
     });
 });
 
-// ─── carregarDefeitos ──────────────────────────────────────────────────────
+// ??? carregarDefeitos ??????????????????????????????????????????????????????
 function carregarDefeitos(tipoId) {
     const section   = document.getElementById('defeitosSection');
     const container = document.getElementById('defeitosContainer');
+    if (!section || !container) return;
     if (!tipoId) { section.style.display = 'none'; return; }
 
     container.innerHTML = '<div class="text-muted small"><i class="bi bi-hourglass-split me-1"></i>Carregando defeitos...</div>';
@@ -3188,7 +5567,8 @@ function carregarDefeitos(tipoId) {
         // Auto-fill relato
         container.querySelectorAll('.chk-defeito-comum').forEach(chk => {
             chk.addEventListener('change', function() {
-                const relato = document.querySelector('textarea[name="relato_cliente"]');
+                const relato = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
+                if (!relato) return;
                 const nome   = this.getAttribute('data-nome');
                 const desc   = this.getAttribute('data-desc');
                 const tag    = `[DEFEITO: ${nome}]${desc ? ' - ' + desc : ''}`;
@@ -3203,7 +5583,7 @@ function carregarDefeitos(tipoId) {
             });
         });
 
-        // Botão de procedimentos
+        // Bot�o de procedimentos
         container.querySelectorAll('.btn-ver-procedimentos-os').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -3217,7 +5597,7 @@ function carregarDefeitos(tipoId) {
     .catch(() => { container.innerHTML = '<span class="text-danger small">Erro ao carregar defeitos.</span>'; });
 }
 
-// ─── Modal de visualização de procedimentos ───────────────────────────────
+// ??? Modal de visualiza��o de procedimentos ???????????????????????????????
 function abrirProcedimentosViewOnly(defeitoId, nome) {
     const modalHtml = `
     <div class="modal fade" id="modalViewProcedimentos" tabindex="-1">
@@ -3267,11 +5647,10 @@ function abrirProcedimentosViewOnly(defeitoId, nome) {
     });
 }
 
-// ─── Modal de Visualização de Imagem (Lightbox) ───────────────────────────
+// ??? Modal de Visualiza��o de Imagem (Lightbox) ???????????????????????????
 updateResumo();
 document.addEventListener('DOMContentLoaded', function() {
-    const modalHtml = `
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true" style="z-index: 2000;">
+    const modalInnerHtml = `
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content bg-transparent border-0">
                 <div class="modal-body text-center p-0 position-relative">
@@ -3281,20 +5660,51 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             </div>
-        </div>
-    </div>`;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+        </div>`;
 
-    const imageModal = document.getElementById('imageModal');
+    let imageModal = document.getElementById('imageModal');
+    if (!imageModal) {
+        imageModal = document.createElement('div');
+        imageModal.className = 'modal fade';
+        imageModal.id = 'imageModal';
+        imageModal.tabIndex = -1;
+        imageModal.setAttribute('aria-hidden', 'true');
+        imageModal.style.zIndex = '2000';
+        imageModal.innerHTML = modalInnerHtml;
+        document.body.appendChild(imageModal);
+    } else if (!imageModal.querySelector('#modalImagePreview')) {
+        imageModal.classList.add('modal', 'fade');
+        imageModal.tabIndex = -1;
+        imageModal.setAttribute('aria-hidden', 'true');
+        if (!imageModal.style.zIndex) imageModal.style.zIndex = '2000';
+        imageModal.innerHTML = modalInnerHtml;
+    }
+
+    if (imageModal.dataset.initialized === '1') return;
+    imageModal.dataset.initialized = '1';
+
     imageModal.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
-        const imgSrc = button.getAttribute('data-img-src');
+        const imgSrc = button?.getAttribute('data-img-src') || '';
+        if (!imgSrc) {
+            console.error('[OS Nova] tentativa de abrir lightbox sem data-img-src');
+            event.preventDefault();
+            scheduleModalCleanup();
+            return;
+        }
         const modalImg = imageModal.querySelector('#modalImagePreview');
         modalImg.src = imgSrc;
     });
     imageModal.addEventListener('hidden.bs.modal', function () {
+        try {
+            const active = document.activeElement;
+            if (active && imageModal.contains(active) && typeof active.blur === 'function') {
+                active.blur();
+            }
+        } catch (_) {}
         const modalImg = imageModal.querySelector('#modalImagePreview');
         modalImg.src = '';
+        scheduleModalCleanup();
     });
 });
 </script>

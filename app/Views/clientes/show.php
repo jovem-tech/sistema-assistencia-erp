@@ -158,6 +158,124 @@
                 </div>
             </div>
         </div>
+
+        <div class="card glass-card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0"><i class="bi bi-graph-up-arrow me-2"></i>CRM - Relacionamento</h5>
+                <div class="d-flex gap-2">
+                    <a href="<?= base_url('crm/timeline?cliente_id=' . $cliente['id']) ?>" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-clock-history me-1"></i>Timeline
+                    </a>
+                    <a href="<?= base_url('crm/interacoes?cliente_id=' . $cliente['id']) ?>" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-chat-left-text me-1"></i>Interacoes
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 mb-3">
+                    <div class="col-12 col-md-4">
+                        <div class="border rounded p-2 h-100">
+                            <div class="small text-muted">Eventos CRM</div>
+                            <div class="fs-5 fw-bold"><?= (int) ($crmResumo['eventos'] ?? 0) ?></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="border rounded p-2 h-100">
+                            <div class="small text-muted">Interacoes CRM</div>
+                            <div class="fs-5 fw-bold"><?= (int) ($crmResumo['interacoes'] ?? 0) ?></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="border rounded p-2 h-100">
+                            <div class="small text-muted">Follow-ups pendentes</div>
+                            <div class="fs-5 fw-bold"><?= (int) ($crmResumo['followups_pendentes'] ?? 0) ?></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border rounded p-2">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0"><i class="bi bi-list-stars me-1"></i>Timeline CRM</h6>
+                        <a href="<?= base_url('crm/followups') ?>" class="btn btn-sm btn-outline-warning">
+                            <i class="bi bi-calendar-check me-1"></i>Follow-ups
+                        </a>
+                    </div>
+                    <div style="max-height: 320px; overflow-y: auto;">
+                        <?php if (empty($crmTimeline ?? [])): ?>
+                            <div class="text-muted small py-2">Sem eventos de relacionamento para este cliente.</div>
+                        <?php else: ?>
+                            <ul class="list-group list-group-flush">
+                                <?php foreach (($crmTimeline ?? []) as $linha): ?>
+                                    <li class="list-group-item px-0 py-2">
+                                        <div class="d-flex justify-content-between align-items-start gap-2">
+                                            <div>
+                                                <div class="fw-semibold small"><?= esc($linha['titulo'] ?? 'Evento CRM') ?></div>
+                                                <?php if (!empty($linha['descricao'])): ?>
+                                                    <div class="small text-muted"><?= esc($linha['descricao']) ?></div>
+                                                <?php endif; ?>
+                                                <div class="small text-muted">
+                                                    Canal: <?= esc($linha['canal'] ?? 'crm') ?>
+                                                    <?php if (!empty($linha['status'])): ?>
+                                                        | Status: <?= esc($linha['status']) ?>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                            <div class="small text-muted text-nowrap">
+                                                <?= esc(!empty($linha['data']) ? formatDate($linha['data'], true) : '-') ?>
+                                            </div>
+                                        </div>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="border rounded p-2 mt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0"><i class="bi bi-whatsapp me-1"></i>Conversas WhatsApp</h6>
+                        <a href="<?= base_url('atendimento-whatsapp') ?>" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-arrow-up-right-square me-1"></i>Abrir Central
+                        </a>
+                    </div>
+                    <?php if (empty($conversasCliente ?? [])): ?>
+                        <div class="text-muted small py-1">Nenhuma conversa vinculada a este cliente.</div>
+                    <?php else: ?>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Telefone</th>
+                                        <th>Status</th>
+                                        <th>Nao lidas</th>
+                                        <th>Ultima msg</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach (($conversasCliente ?? []) as $cv): ?>
+                                        <tr>
+                                            <td><?= esc($cv['telefone'] ?? '-') ?></td>
+                                            <td><?= esc(ucfirst((string) ($cv['status'] ?? 'aberta'))) ?></td>
+                                            <td>
+                                                <?php $n = (int) ($cv['nao_lidas'] ?? 0); ?>
+                                                <span class="badge <?= $n > 0 ? 'bg-danger' : 'bg-secondary' ?>"><?= $n ?></span>
+                                            </td>
+                                            <td><?= esc(!empty($cv['ultima_mensagem_em']) ? formatDate($cv['ultima_mensagem_em'], true) : '-') ?></td>
+                                            <td class="text-end">
+                                                <a href="<?= base_url('atendimento-whatsapp?conversa_id=' . (int) $cv['id']) ?>" class="btn btn-sm btn-outline-success">
+                                                    <i class="bi bi-box-arrow-up-right"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

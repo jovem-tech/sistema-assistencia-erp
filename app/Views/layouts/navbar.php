@@ -1,4 +1,5 @@
 <!-- Top Navbar -->
+<!-- Top Navbar -->
 <nav class="top-navbar">
     <div class="navbar-left">
         <button class="btn btn-link mobile-toggle" id="mobileToggle">
@@ -7,12 +8,111 @@
         <h4 class="page-title mb-0"><?= $title ?? '' ?></h4>
     </div>
     
+    <!-- Busca Global -->
+    <div class="navbar-search-wrapper">
+        <div class="search-input-group">
+            <div class="dropdown h-100">
+                <button class="btn btn-link search-filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                    <span class="filter-label d-none d-lg-inline">Tudo</span>
+                    <i class="bi bi-funnel d-lg-none"></i>
+                </button>
+                <ul class="dropdown-menu search-filter-menu p-2">
+                    <li>
+                        <a class="dropdown-item filter-all active" href="javascript:void(0)" data-filter="all">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="all" id="filter-all" checked>
+                                <label class="form-check-label w-100 cursor-pointer" for="filter-all">
+                                    <i class="bi bi-grid-fill me-2"></i>Tudo
+                                </label>
+                            </div>
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" href="javascript:void(0)" data-filter="os">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="os" id="filter-os">
+                                <label class="form-check-label w-100 cursor-pointer" for="filter-os">
+                                    <i class="bi bi-file-earmark-text me-2"></i>OS
+                                </label>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="javascript:void(0)" data-filter="clientes">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="clientes" id="filter-clientes">
+                                <label class="form-check-label w-100 cursor-pointer" for="filter-clientes">
+                                    <i class="bi bi-people me-2"></i>Clientes
+                                </label>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="javascript:void(0)" data-filter="whatsapp">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="whatsapp" id="filter-whatsapp">
+                                <label class="form-check-label w-100 cursor-pointer" for="filter-whatsapp">
+                                    <i class="bi bi-whatsapp me-2"></i>WhatsApp
+                                </label>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="javascript:void(0)" data-filter="equipamentos">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="equipamentos" id="filter-equipamentos">
+                                <label class="form-check-label w-100 cursor-pointer" for="filter-equipamentos">
+                                    <i class="bi bi-laptop me-2"></i>Equipamentos
+                                </label>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="javascript:void(0)" data-filter="servicos">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="servicos" id="filter-servicos">
+                                <label class="form-check-label w-100 cursor-pointer" for="filter-servicos">
+                                    <i class="bi bi-tools me-2"></i>Serviços
+                                </label>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="javascript:void(0)" data-filter="pecas">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="pecas" id="filter-pecas">
+                                <label class="form-check-label w-100 cursor-pointer" for="filter-pecas">
+                                    <i class="bi bi-box-seam me-2"></i>Peças
+                                </label>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <i class="bi bi-search search-icon ms-2"></i>
+            <input type="text" class="search-input" placeholder="O que você procura?" autocomplete="off">
+            <div class="search-results-container shadow-lg">
+                <div class="search-loading-state d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Buscando...</span>
+                    </div>
+                </div>
+                <div class="search-empty-state d-none">
+                    <i class="bi bi-search"></i>
+                    <p>Nenhum resultado encontrado.</p>
+                </div>
+                <div class="search-results-list"></div>
+            </div>
+        </div>
+    </div>
+    
     <div class="navbar-right">
         <!-- Quick Actions -->
         <div class="navbar-actions">
             <?php if (can('os', 'criar')): ?>
             <a href="<?= base_url('os/nova') ?>" class="btn btn-glow btn-sm" title="Nova OS">
-                <i class="bi bi-plus-lg me-1"></i> Nova OS
+                <i class="bi bi-plus-lg me-1"></i><span class="nav-action-label">Nova OS</span>
             </a>
             <?php endif; ?>
         </div>

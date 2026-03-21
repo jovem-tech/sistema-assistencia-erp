@@ -124,3 +124,19 @@ _modules/*
 
 /results/
 /phpunit*.xml
+
+#-------------------------
+# Custom Project Paths
+#-------------------------
+public/uploads/*
+!public/uploads/index.html
+whatsapp-api/node_modules/
+whatsapp-api/.env
+whatsapp-api/tokens/
+whatsapp-api/dist/
+whatsapp-api/.wwebjs_auth/
+whatsapp-api/.wwebjs_cache/
+.agents/
+*.log
+error_log
+.gemini/

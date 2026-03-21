@@ -5,7 +5,7 @@
 <div class="page-header d-flex justify-content-between align-items-center">
     <h2><i class="bi bi-box-seam me-2"></i><?= esc($title) ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sobre RelatÃƒÂ³rios">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sobre RelatÃ³rios">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('relatorios') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('relatorios') ?>">
@@ -20,7 +20,7 @@
             <div class="col-md-6">
                 <label for="tipo" class="form-label">Filtro de Estoque</label>
                 <select class="form-select" id="tipo" name="tipo">
-                    <option value="todos" <?= $filtro_tipo === 'todos' ? 'selected' : '' ?>>Todas as PeÃ§as</option>
+                    <option value="todos" <?= $filtro_tipo === 'todos' ? 'selected' : '' ?>>Todas as Peças</option>
                     <option value="baixo" <?= $filtro_tipo === 'baixo' ? 'selected' : '' ?>>Estoque Baixo</option>
                 </select>
             </div>
@@ -42,10 +42,10 @@
             <table class="table table-hover datatable">
                 <thead>
                     <tr>
-                        <th>CÃ³d/ID</th>
-                        <th>PeÃ§a/Produto</th>
+                        <th>Cód/ID</th>
+                        <th>Peça/Produto</th>
                         <th>Qtd. Atual</th>
-                        <th>Qtd. MÃ­nima</th>
+                        <th>Qtd. Mínima</th>
                         <th>Status</th>
                     </tr>
                 </thead>

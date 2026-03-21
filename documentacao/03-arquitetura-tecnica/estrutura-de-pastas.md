@@ -1,104 +1,150 @@
-# Estrutura de Pastas
+# Estrutura de Pastas (resumo tecnico)
 
-## Raiz do Projeto
+Atualizado em 20/03/2026.
 
-```
+```text
 sistema-assistencia/
-├── app/                    ← Código do aplicativo
-│   ├── Config/             ← Configurações CI4
-│   │   ├── Routes.php      ← TODAS as rotas do sistema
-│   │   ├── Database.php    ← Conexão MySQL
-│   │   └── Filters.php     ← Registro de AuthFilter e PermissionFilter
-│   │
-│   ├── Controllers/        ← Lógica de negócio
-│   │   ├── Admin.php
-│   │   ├── Auth.php
-│   │   ├── Clientes.php
-│   │   ├── Equipamentos.php
-│   │   ├── EquipamentosMarcas.php
-│   │   ├── EquipamentosModelos.php
-│   │   ├── EquipamentosDefeitos.php
-│   │   ├── EquipamentosTipos.php
-│   │   ├── Estoque.php
-│   │   ├── Financeiro.php
-│   │   ├── Fornecedores.php
-│   │   ├── Funcionarios.php
-│   │   ├── Grupos.php
-│   │   ├── Os.php
-│   │   ├── Orcamento.php
-│   │   ├── Perfil.php
-│   │   ├── Relatorios.php
-│   │   ├── Servicos.php
-│   │   ├── Usuarios.php
-│   │   └── Vendas.php
-│   │
-│   ├── Filters/            ← Middlewares de autenticação
-│   │   ├── AuthFilter.php       ← Verifica sessão ativa
-│   │   └── PermissionFilter.php ← Verifica permissão RBAC
-│   │
-│   ├── Helpers/
-│   │   └── sistema_helper.php  ← Funções globais (formatDate, can, getStatusBadge...)
-│   │
-│   ├── Models/             ← Acesso ao banco de dados
-│   │   ├── ClienteModel.php
-│   │   ├── ConfiguracaoModel.php
-│   │   ├── EquipamentoModel.php
-│   │   ├── EstoqueModel.php
-│   │   ├── FinanceiroModel.php
-│   │   ├── GrupoModel.php
-│   │   ├── LogModel.php
-│   │   ├── OsModel.php
-│   │   ├── ServicoModel.php
-│   │   └── UsuarioModel.php
-│   │
-│   └── Views/              ← Templates HTML/PHP
-│       ├── layouts/
-│       │   ├── main.php    ← Layout base (head, scripts, navbar, sidebar)
-│       │   ├── sidebar.php ← Menu lateral
-│       │   └── navbar.php  ← Barra superior
-│       ├── auth/           ← Login, recuperação de senha
-│       ├── clientes/       ← index.php, form.php, show.php
-│       ├── equipamentos/   ← index.php, form.php, show.php
-│       ├── os/             ← index.php, form.php, show.php, print.php
-│       ├── servicos/
-│       ├── estoque/
-│       ├── financeiro/
-│       ├── relatorios/
-│       ├── usuarios/
-│       ├── grupos/
-│       └── configuracoes/
-│
-├── documentacao/           ← Esta documentação
-│
-├── public/                 ← Arquivos servidos pelo Apache (raiz web)
-│   ├── index.php           ← Ponto de entrada CI4
-│   ├── favicon.ico
-│   ├── assets/
-│   │   ├── css/estilo.css  ← Design system Glassmorphism
-│   │   ├── js/scripts.js   ← Scripts globais
-│   │   └── json/pt-BR.json ← Tradução DataTables
-│   └── uploads/
-│       ├── equipamentos/   ← Fotos dos equipamentos
-│       └── sistema/        ← Logo e ícone da empresa
-│
-├── writable/               ← Logs, cache, sessões (CI4)
-│   ├── logs/
-│   ├── cache/
-│   └── session/
-│
-├── .env                    ← Variáveis de ambiente (NÃO versionar)
-├── .htaccess               ← Rewrite rules Apache
-└── spark                   ← CLI do CodeIgniter 4
+|-- app/
+|   |-- Controllers/
+|   |   |-- Os.php
+|   |   |-- Configuracoes.php
+|   |   |-- WhatsAppWebhook.php
+|   |   |-- Crm.php
+|   |   |-- Contatos.php
+|   |   `-- CentralMensagens.php
+|   |
+|   |-- Services/
+|   |   |-- OsStatusFlowService.php
+|   |   |-- OsPdfService.php
+|   |   |-- WhatsAppService.php
+|   |   |-- MensageriaService.php
+|   |   |-- CrmService.php
+|   |   |-- CentralMensagensService.php
+|   |   |-- ChatbotService.php
+|   |   |-- IntencaoService.php
+|   |   |-- MetricasMensageriaService.php
+|   |   `-- WhatsApp/
+|   |       |-- WhatsAppProviderInterface.php
+|   |       |-- BulkMessageProviderInterface.php
+|   |       |-- MenuiaProvider.php
+|   |       |-- LocalGatewayProvider.php
+|   |       |-- WebhookProvider.php
+|   |       |-- MetaOfficialProvider.php
+|   |       |-- NullProvider.php
+|   |       `-- NullBulkProvider.php
+|   |
+|   |-- Models/
+|   |   |-- OsStatusModel.php
+|   |   |-- OsStatusTransicaoModel.php
+|   |   |-- OsStatusHistoricoModel.php
+|   |   |-- MensagemWhatsappModel.php
+|   |   |-- WhatsappInboundModel.php
+|   |   |-- ConversaWhatsappModel.php
+|   |   |-- ContatoModel.php
+|   |   |-- ConversaOsModel.php
+|   |   |-- ConversaTagModel.php
+|   |   |-- RespostaRapidaWhatsappModel.php
+|   |   |-- ChatbotIntencaoModel.php
+|   |   |-- ChatbotFaqModel.php
+|   |   |-- ChatbotFluxoModel.php
+|   |   |-- ChatbotLogModel.php
+|   |   |-- ChatbotRegraErpModel.php
+|   |   |-- MensageriaMetricaDiariaModel.php
+|   |   |-- CrmEventoModel.php
+|   |   |-- CrmInteracaoModel.php
+|   |   |-- CrmFollowupModel.php
+|   |   |-- CrmPipelineModel.php
+|   |   |-- CrmPipelineEtapaModel.php
+|   |   `-- CrmTagModel.php
+|   |
+|   |-- Database/Migrations/
+|   |   |-- 2026-03-16-090000_PreCrmFoundation.php
+|   |   |-- 2026-03-16-121500_AddMenuiaDirectAndWhatsappEnvios.php
+|   |   |-- 2026-03-16-210500_AddLocalGatewayAndMensagensWhatsapp.php
+|   |   |-- 2026-03-17-100000_AddLinuxGatewayConfig.php
+|   |   |-- 2026-03-17-120000_CreateCrmAndCentralMensagens.php
+|   |   |-- 2026-03-17-193000_AddCrmMensagensSeedTagsAutomacoes.php
+|   |   |-- 2026-03-17-235500_AddCentralAtendimentoInteligente.php
+|   |   |-- 2026-03-20-070500_CreateContatosAndLinkConversas.php
+|   |   |-- 2026-03-20-091500_AddContatoLifecycleMarketingFields.php
+|   |   `-- 2026-03-20-120500_AddContatoEngajamentoLifecycleWindow.php
+|   |
+|   `-- Views/
+|       |-- crm/
+|       |   |-- timeline.php
+|       |   |-- interacoes.php
+|       |   |-- followups.php
+|       |   |-- pipeline.php
+|       |   |-- campanhas.php
+|       |   |-- metricas_marketing.php
+|       |   `-- clientes_inativos.php
+|       |-- contatos/
+|       |   |-- index.php
+|       |   `-- form.php
+|       `-- central_mensagens/
+|           |-- index.php
+|           |-- chatbot.php
+|           |-- faq.php
+|           |-- respostas_rapidas.php
+|           |-- fluxos.php
+|           |-- filas.php
+|           |-- metricas.php
+|           |-- configuracoes.php
+|           `-- _menu.php
+|
+|-- whatsapp-api/
+|   |-- server.js
+|   |-- package.json
+|   |-- ecosystem.config.js
+|   |-- install-whatsapp-api.sh
+|   |-- .env.example
+|   |-- .wwebjs_auth/
+|   `-- logs/
+|
+|-- scripts/
+|   `-- install-vps.sh
+|
+`-- public/uploads/
+    |-- os_documentos/
+    |-- acessorios/
+    |-- estado_fisico/
+    `-- equipamentos_perfil/
 ```
 
----
+## Camada de mensageria
+Fluxo interno:
+`Controller -> WhatsAppService -> MensageriaService -> Provider`
 
-## Arquivos Críticos
+Beneficios:
+- desacoplamento por provider
+- troca de provider sem alterar regra de negocio
+- padronizacao de logs operacionais
 
-| Arquivo | Modificar com cuidado |
-|---------|----------------------|
-| `app/Config/Routes.php` | Qualquer rota nova exige entrada aqui |
-| `app/Helpers/sistema_helper.php` | Funções globais usadas em Views e Controllers |
-| `public/assets/css/estilo.css` | Design system — mudanças afetam todo o sistema |
-| `public/assets/js/scripts.js` | Scripts globais (máscaras, CEP, DataTables) |
-| `.env` | Credenciais do banco — nunca subir para repositório |
+Providers diretos:
+- `menuia`
+- `api_whats_local` (ambiente local Windows)
+- `api_whats_linux` (producao VPS Linux)
+- `webhook` (integracao custom)
+
+Provider de massa (futuro CRM):
+- `meta_oficial`
+
+## Camada CRM operacional
+Fluxo resumido:
+`Eventos da OS + WhatsApp + Chatbot -> CrmService/CentralMensagensService -> timeline, follow-ups, pipeline e metricas`
+
+Objetivo:
+- transformar evento operacional em relacionamento rastreavel
+- manter cliente/OS/conversa sincronizados na mesma base
+
+## Gateway Node (servico externo interno)
+Fluxo:
+`ERP (proxy PHP) -> API Node (/status,/qr,/restart,/create-message) -> whatsapp-web.js`
+
+Caracteristicas:
+- auth por token (`X-Api-Token`/Bearer)
+- CORS/origem restritos por `ERP_ORIGIN`
+- rate limit em endpoints sensiveis
+- logs em `whatsapp-api/logs/gateway.log`
+- sessao persistente em `.wwebjs_auth`
+- execucao recomendada com PM2

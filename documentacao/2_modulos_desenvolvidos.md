@@ -48,3 +48,10 @@ Controla as saídas, os desdobramentos faturados a partir das aprovações de or
 Uma página coringa restrita apenas a `Admins` (`app/Controllers/Configuracoes.php`). Permite de forma simples ajustar:
 - Logomarca da empresa, Telefone, WhatsApp Institucional e Endereço Físico (propagável e visível nos relatórios para envio externo).
 - **Tema Customizável**: Controle entre o CSS de fundo `dark` e `light` via Helper (`get_theme()`), refletido instantaneamente em todo UI de base.
+
+## 8. Central de Mensagens (WhatsApp OS)
+O centro de comunicação inteligente do sistema (`app/Controllers/CentralMensagens.php`).
+- **Inbox "WhatsApp OS"**: Interface profissional em 3 colunas (Conversas, Chatroom e Contexto) para gestão de atendimentos em tempo real.
+- **Chatbot Inteligente**: Motor de automação baseado em intenções e regras do ERP para responder clientes 24h por dia.
+- **Integração CRM**: Cada mensagem enviada ou recebida alimenta automaticamente a Timeline e as Interações do cliente no CRM.
+- **Métricas e FAQ**: Painéis de produtividade e base de conhecimento dinâmica para suporte ao atendimento.

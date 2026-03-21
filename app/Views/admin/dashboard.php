@@ -2,6 +2,7 @@
 
 <?= $this->section('content') ?>
 
+<div class="dashboard-page ds-dashboard-layout">
 <div class="page-header d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
     <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('dashboard')" title="Ajuda sobre o Dashboard">
@@ -49,7 +50,7 @@
         <div class="stat-card stat-card-warning">
             <div class="stat-card-body">
                 <div class="stat-info">
-                    <span class="stat-label">Aguardando Análise</span>
+                    <span class="stat-label">Em Triagem</span>
                     <h2 class="stat-value"><?= $stats['aguardando_analise'] ?? 0 ?></h2>
                 </div>
                 <div class="stat-icon">
@@ -57,7 +58,7 @@
                 </div>
             </div>
             <div class="stat-card-footer">
-                <a href="<?= base_url('os?status=aguardando_analise') ?>"><i class="bi bi-arrow-right me-1"></i>Ver pendentes</a>
+                <a href="<?= base_url('os?status=triagem') ?>"><i class="bi bi-arrow-right me-1"></i>Ver pendentes</a>
             </div>
         </div>
     </div>
@@ -109,7 +110,7 @@
 <div class="row g-4 mb-4">
     <!-- Financial Summary -->
     <div class="col-xl-4">
-        <div class="card glass-card h-100">
+        <div class="card glass-card h-100 ds-table-responsive-card">
             <div class="card-header">
                 <h5 class="card-title mb-0"><i class="bi bi-wallet2 me-2"></i>Resumo Financeiro</h5>
             </div>
@@ -215,7 +216,7 @@
 <?php if (!empty($estoque_baixo)): ?>
 <div class="row g-4">
     <div class="col-12">
-        <div class="card glass-card border-warning">
+        <div class="card glass-card border-warning ds-table-responsive-card">
             <div class="card-header bg-warning bg-opacity-10">
                 <h5 class="card-title mb-0 text-warning">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>Alerta de Estoque Baixo
@@ -257,6 +258,8 @@
     </div>
 </div>
 <?php endif; ?>
+
+</div>
 
 <?= $this->endSection() ?>
 
@@ -303,29 +306,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Status Chart
-            const statusLabels = {
-                'aguardando_analise': 'Aguard. Análise',
-                'aguardando_orcamento': 'Aguard. Orçamento',
-                'aguardando_aprovacao': 'Aguard. Aprovação',
-                'aprovado': 'Aprovado',
-                'em_reparo': 'Em Reparo',
-                'aguardando_peca': 'Aguard. Peça',
-                'pronto': 'Pronto',
+                        // Macrofases da OS (Status operacional)
+            const macroLabels = {
+                recepcao: 'Recepção',
+                diagnostico: 'Diagnóstico',
+                orcamento: 'Orçamento',
+                execucao: 'Execução',
+                interrupcao: 'Interrupção',
+                qualidade: 'Qualidade',
+                concluido: 'Concluído',
+                finalizado_sem_reparo: 'Finalizado sem reparo',
+                encerrado: 'Encerrado',
+                cancelado: 'Cancelado',
+                outros: 'Outros',
             };
-            const statusColors = [
-                '#f59e0b', '#8b5cf6', '#3b82f6', '#10b981', 
-                '#6366f1', '#ef4444', '#22c55e'
+            const macroColors = [
+                '#6b7280', '#3b82f6', '#8b5cf6', '#f59e0b',
+                '#fb923c', '#0ea5e9', '#22c55e', '#ef4444',
+                '#14532d', '#374151', '#64748b'
             ];
+            const macroData = (data.macro_count && data.macro_count.length > 0)
+                ? data.macro_count
+                : data.status_count;
 
             const ctxStatus = document.getElementById('chartStatus').getContext('2d');
             new Chart(ctxStatus, {
                 type: 'doughnut',
                 data: {
-                    labels: data.status_count.map(s => statusLabels[s.status] || s.status),
+                    labels: macroData.map(s => {
+                        const key = s.macrofase || s.status || 'outros';
+                        return macroLabels[key] || key;
+                    }),
                     datasets: [{
-                        data: data.status_count.map(s => s.total),
-                        backgroundColor: statusColors.slice(0, data.status_count.length),
+                        data: macroData.map(s => s.total),
+                        backgroundColor: macroColors.slice(0, macroData.length),
                         borderWidth: 0,
                         hoverOffset: 10
                     }]
@@ -347,4 +361,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?= $this->endSection() ?>
-

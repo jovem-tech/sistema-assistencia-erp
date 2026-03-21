@@ -3,9 +3,9 @@
 <?= $this->section('content') ?>
 
 <div class="page-header d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0"><i class="bi bi-gear-wide-connected me-2"></i>ServiÃ§os</h2>
+    <h2 class="mb-0"><i class="bi bi-gear-wide-connected me-2"></i>Serviços</h2>
     <div>
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('servicos')" title="Ajuda sobre ServiÃƒÂ§os">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('servicos')" title="Ajuda sobre ServiÃ§os">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <?php if (can('servicos', 'exportar')): ?>
@@ -20,7 +20,7 @@
         <?php endif; ?>
         <?php if (can('servicos', 'criar')): ?>
         <a href="<?= base_url('servicos/novo') ?>" class="btn btn-primary btn-glow">
-            <i class="bi bi-plus-lg me-1"></i>Novo ServiÃ§o
+            <i class="bi bi-plus-lg me-1"></i>Novo Serviço
         </a>
         <?php endif; ?>
     </div>
@@ -34,10 +34,10 @@
                     <tr>
                         <th width="50">ID</th>
                         <th>Nome</th>
-                        <th>DescriÃ§Ã£o</th>
-                        <th>Valor PadrÃ£o</th>
+                        <th>Descrição</th>
+                        <th>Valor Padrão</th>
                         <th>Status</th>
-                        <th width="150" class="text-center">AÃ§Ãµes</th>
+                        <th width="150" class="text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -81,12 +81,12 @@
     </div>
 </div>
 
-<!-- Modal de ImportaÃ§Ã£o CSV -->
+<!-- Modal de Importação CSV -->
 <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content card-custom">
             <div class="modal-header border-bottom">
-                <h5 class="modal-title" id="importModalLabel"><i class="bi bi-cloud-arrow-up me-2"></i>Importar ServiÃ§os (CSV)</h5>
+                <h5 class="modal-title" id="importModalLabel"><i class="bi bi-cloud-arrow-up me-2"></i>Importar Serviços (CSV)</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="<?= base_url('servicos/importar') ?>" method="POST" enctype="multipart/form-data">
@@ -94,7 +94,7 @@
                 <div class="modal-body">
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle-fill me-2"></i>
-                        Para importar mÃºltiplos serviÃ§os, baixe o modelo em CSV, preencha e faÃ§a o upload.
+                        Para importar múltiplos serviços, baixe o modelo em CSV, preencha e faça o upload.
                     </div>
                     
                     <div class="text-center mb-4">
@@ -111,7 +111,7 @@
                 <div class="modal-footer border-top">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-success btn-glow">
-                        <i class="bi bi-upload me-2"></i>Iniciar ImportaÃ§Ã£o
+                        <i class="bi bi-upload me-2"></i>Iniciar Importação
                     </button>
                 </div>
             </form>

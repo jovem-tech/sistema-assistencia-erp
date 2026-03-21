@@ -1,0 +1,72 @@
+﻿:root {
+    --color-primary: #635bff;
+    --color-primary-hover: #524ae3;
+    --color-success: #0f9d58;
+    --color-warning: #f59f00;
+    --color-danger: #e03131;
+    --color-info: #1f7aec;
+
+    --color-bg: #f7f9fc;
+    --color-surface: #ffffff;
+    --color-surface-muted: #f0f4fa;
+    --color-border: #e6e8ec;
+
+    --color-text: #1a1f36;
+    --color-text-muted: #6b7280;
+
+    --color-sidebar-bg: #ffffff;
+    --color-sidebar-border: #e6e8ec;
+
+    /* Backward compatibility tokens used by legacy styles */
+    --primary: var(--color-primary);
+    --primary-hover: var(--color-primary-hover);
+    --primary-glow: rgba(99, 91, 255, 0.24);
+    --secondary: #4f46e5;
+    --success: var(--color-success);
+    --danger: var(--color-danger);
+    --warning: var(--color-warning);
+    --info: var(--color-info);
+    --teal: #14b8a6;
+    --orange: #f97316;
+    --purple: #7c3aed;
+    --indigo: #4f46e5;
+
+    --bg-primary: var(--color-bg);
+    --bg-secondary: var(--color-surface);
+    --bg-tertiary: var(--color-surface-muted);
+    --bg-card: rgba(255, 255, 255, 0.92);
+    --bg-glass: rgba(255, 255, 255, 0.86);
+
+    --text-primary: var(--color-text);
+    --text-secondary: var(--color-text-muted);
+    --text-muted: #8792a2;
+
+    --border-color: var(--color-border);
+    --border-glow: rgba(99, 91, 255, 0.28);
+}
+
+[data-theme="dark"],
+[data-bs-theme="dark"] {
+    --color-bg: #0f172a;
+    --color-surface: #1e293b;
+    --color-surface-muted: #334155;
+    --color-border: rgba(148, 163, 184, 0.16);
+
+    --color-text: #f1f5f9;
+    --color-text-muted: #94a3b8;
+
+    --color-sidebar-bg: rgba(15, 23, 42, 0.92);
+    --color-sidebar-border: rgba(148, 163, 184, 0.16);
+
+    --bg-primary: var(--color-bg);
+    --bg-secondary: var(--color-surface);
+    --bg-tertiary: var(--color-surface-muted);
+    --bg-card: rgba(30, 41, 59, 0.86);
+    --bg-glass: rgba(30, 41, 59, 0.74);
+
+    --text-primary: var(--color-text);
+    --text-secondary: var(--color-text-muted);
+    --text-muted: #64748b;
+
+    --primary-glow: rgba(99, 91, 255, 0.34);
+}

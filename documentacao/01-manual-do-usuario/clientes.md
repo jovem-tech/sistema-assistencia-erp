@@ -1,97 +1,64 @@
-# Manual do Usuário — Clientes
+# Manual do Usuario - Clientes
 
-## 📋 Visão Geral
+Atualizado em 20/03/2026.
 
-O módulo de Clientes centraliza o cadastro de pessoas físicas e jurídicas que utilizam os serviços da assistência técnica.
+## Visao geral
+O modulo de Clientes centraliza o cadastro formal de pessoas fisicas e juridicas atendidas pela assistencia tecnica.
 
----
+Regra operacional atual:
+- contatos vindos do WhatsApp entram primeiro em `Pessoas -> Contatos`
+- o registro vira cliente quando existir vinculo operacional (principalmente abertura de OS)
 
-## 🔍 Listagem de Clientes
+## Listagem de clientes
+Caminho: `COMERCIAL -> Pessoas -> Clientes`
 
-**Caminho:** COMERCIAL → Pessoas → Clientes
-
-A tela exibe uma tabela com todos os clientes cadastrados contendo:
-- Nome / Razão Social
+A tela mostra:
+- nome/razao social
 - CPF/CNPJ
-- Telefone
-- Cidade/UF
-- Total de OS abertas
-- Ações (Visualizar, Editar, Excluir)
+- telefone
+- cidade/UF
+- acoes (visualizar, editar, excluir)
 
-Use a **barra de busca** para filtrar por nome, CPF, telefone ou e-mail.
+Use a busca para filtrar por nome, documento, telefone ou e-mail.
 
----
+## Cadastrar novo cliente
+Caminho: `Clientes -> + Novo Cliente`
 
-## ➕ Cadastrar Novo Cliente
+Campos obrigatorios:
+- `nome_razao`
+- `telefone1`
 
-**Caminho:** Clientes → botão `+ Novo Cliente`
+Campos opcionais:
+- tipo pessoa (fisica/juridica)
+- CPF/CNPJ
+- RG/IE
+- telefone2
+- email
+- contato alternativo
+- endereco completo (com apoio de CEP)
 
-### Campos Obrigatórios *(marcados com \*)*
-| Campo | Descrição |
-|-------|-----------|
-| **Nome / Razão Social \*** | Nome completo ou razão social da empresa |
-| **Telefone 1 \*** | Telefone principal de contato |
+## Visualizar cliente
+Na acao `Visualizar`, o ERP exibe:
+- dados cadastrais
+- historico de OS
+- equipamentos vinculados
+- bloco CRM (eventos, interacoes, follow-ups)
 
-### Campos Opcionais
-| Campo | Descrição |
-|-------|-----------|
-| Tipo de Pessoa | Física (padrão) ou Jurídica |
-| CPF / CNPJ | Documento do cliente |
-| RG / IE | Identidade ou inscrição estadual |
-| Telefone 2 | Telefone alternativo |
-| Email | Endereço de e-mail |
+## Cadastro rapido durante abertura de OS
+Na tela de nova OS existe botao `Novo` ao lado do campo cliente.
+Ao salvar o modal rapido, o cliente ja volta selecionado no formulario.
 
-### Contato Adicional *(Opcional)*
-| Campo | Descrição |
-|-------|-----------|
-| Nome do Contato | Nome de terceiro (Ex: Esposa, Filho, Vizinho) |
-| Telefone do Contato | Telefone do contato alternativo |
+## Importacao em lote (CSV)
+Caminho: `Clientes -> Importar CSV`
 
-### Endereço *(Opcional — preenchimento automático por CEP)*
-| Campo | Descrição |
-|-------|-----------|
-| CEP | Ao digitar, preenche endereço automaticamente (ViaCEP) |
-| Endereço | Rua / Avenida |
-| Número | Número do imóvel |
-| Complemento | Apto, Sala, etc. |
-| Bairro | Bairro |
-| Cidade | Cidade |
-| UF | Estado (preenchido pelo CEP) |
+Fluxo:
+1. baixar modelo
+2. preencher dados
+3. enviar arquivo
+4. validar e importar
 
-> 💡 **Dica de CEP:** Ao digitar o CEP completo, o sistema consulta a API ViaCEP e preenche Endereço, Bairro, Cidade e UF automaticamente. O cursor vai direto para o campo **Número**.
+Linhas sem nome ou telefone principal sao descartadas.
 
----
-
-## 🔎 Visualizar Detalhes do Cliente
-
-Clique no ícone de olho 👁️ na listagem para ver o perfil completo do cliente:
-
-- **Dados cadastrais** (tipo, CPF, telefones, endereço)
-- **Contato adicional** (quando cadastrado)
-- **Histórico de Ordens de Serviço** — Todas as OS do cliente
-- **Equipamentos vinculados** — Aparelhos cadastrados
-
----
-
-## 📋 Cadastro Rápido (durante abertura de OS)
-
-Na tela de **Nova OS**, clique no botão `+ Novo` ao lado do campo **Cliente** para abrir um modal de cadastro rápido. Após salvar, o cliente já aparece selecionado no formulário da OS.
-
----
-
-## 📥 Importação em Massa (CSV)
-
-**Caminho:** Clientes → botão `Importar CSV`
-
-1. Baixe o **Modelo CSV** clicando em "Baixar Modelo"
-2. Preencha o arquivo seguindo os cabeçalhos
-3. Envie o arquivo na tela de importação
-4. O sistema valida e importa os registros válidos
-
-> ⚠️ Linhas sem **Nome** ou **Telefone 1** serão ignoradas.
-
----
-
-## ❌ Excluir Cliente
-
-> **Atenção:** A exclusão é permanente. Clientes com OS vinculadas não devem ser excluídos — use observações para registrar situações especiais.
+## Exclusao
+Evite excluir clientes com historico operacional.
+Quando necessario, prefira manter cadastro e registrar observacoes.

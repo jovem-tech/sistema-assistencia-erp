@@ -1,0 +1,22 @@
+﻿.card,
+.glass-card {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+    border-bottom: 1px solid var(--border-color);
+    background: transparent;
+    padding: var(--space-4);
+}
+
+.card-body {
+    padding: var(--space-4);
+}
+
+.card-footer {
+    border-top: 1px solid var(--border-color);
+    background: transparent;
+}

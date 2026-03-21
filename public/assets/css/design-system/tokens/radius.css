@@ -1,0 +1,8 @@
+﻿:root {
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --transition-fast: 160ms ease;
+    --transition-base: 240ms ease;
+}

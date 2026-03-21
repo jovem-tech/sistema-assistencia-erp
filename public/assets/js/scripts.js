@@ -1,5 +1,5 @@
 /**
- * Sistema de Assistência Técnica - Main Scripts
+ * Sistema de AssistÃªncia TÃ©cnica - Main Scripts
  */
 
 $(document).ready(function () {
@@ -101,16 +101,16 @@ $(document).ready(function () {
                     $container.find('[name="cidade"], .js-cidade').val(data.localidade).trigger('change');
                     $container.find('[name="uf"], .js-uf').val(data.uf).trigger('change');
                     
-                    // Foco no número após preenchimento
+                    // Foco no nÃºmero apÃ³s preenchimento
                     $container.find('[name="numero"], .js-numero').focus();
                 } else {
-                    alert('CEP não encontrado.');
+                    alert('CEP nÃ£o encontrado.');
                     $input.val('').focus();
                 }
             }).fail(function() {
                 $spinner.remove();
                 $input.removeClass('loading-input');
-                console.warn('Serviço de CEP temporariamente indisponível.');
+                console.warn('ServiÃ§o de CEP temporariamente indisponÃ­vel.');
             });
         }
     };
@@ -120,7 +120,7 @@ $(document).ready(function () {
         handleCepLookup(this);
     });
 
-    // Gatilho automático ao completar os 8 dígitos (via mask callback se disponível)
+    // Gatilho automÃ¡tico ao completar os 8 dÃ­gitos (via mask callback se disponÃ­vel)
     if ($.fn.mask) {
         $('.mask-cep').mask('00000-000', {
             onComplete: function(cep, e, field) {
@@ -139,7 +139,7 @@ $(document).ready(function () {
         const url = $(this).attr('href');
         const nome = $(this).data('nome') || 'este registro';
 
-        if (confirm(`Tem certeza que deseja excluir "${nome}"? Esta ação não pode ser desfeita.`)) {
+        if (confirm(`Tem certeza que deseja excluir "${nome}"? Esta aÃ§Ã£o nÃ£o pode ser desfeita.`)) {
             window.location.href = url;
         }
     });
@@ -179,9 +179,9 @@ var baseUrl = document.querySelector('meta[name="base-url"]')?.content ||
     window.location.origin + '/';
 
 /**
- * Voltar padronizado: usa histórico se disponível, senão vai para URL padrão.
+ * Voltar padronizado: usa histÃ³rico se disponÃ­vel, senÃ£o vai para URL padrÃ£o.
  * @param {string} defaultUrl
- * @returns {boolean} false para evitar navegação padrão
+ * @returns {boolean} false para evitar navegaÃ§Ã£o padrÃ£o
  */
 function resolveFromParam() {
     try {
@@ -229,39 +229,40 @@ document.addEventListener('click', function (e) {
 });
 
 /**
- * Função para confirmar o encerramento de registros
- * @param {string} modulo - O slug do módulo (os, equipamentos, estoque)
+ * FunÃ§Ã£o para confirmar o encerramento de registros
+ * @param {string} modulo - O slug do mÃ³dulo (os, equipamentos, estoque)
  * @param {number} id - O ID do registro
  */
 function confirmarEncerramento(modulo, id) {
     const titulos = {
-        'os': 'Ordem de Serviço',
+        'os': 'Ordem de ServiÃ§o',
         'equipamentos': 'Equipamento',
-        'estoque': 'Peça/Item'
+        'estoque': 'PeÃ§a/Item'
     };
     const nome = titulos[modulo] || 'registro';
     
-    if (confirm(`Deseja realmente encerrar este ${nome}? O registro será mantido para histórico, mas não estará mais disponível para novas operações.`)) {
-        // Redirecionamento ou chamada AJAX para a lógica de encerramento
-        // Por enquanto exibe alerta conforme status da evolução do projeto
-        alert(`A funcionalidade de processamento de encerramento para ${nome} está em fase de implementação técnica. O controle de acesso atual já valida sua permissão para esta ação.`);
+    if (confirm(`Deseja realmente encerrar este ${nome}? O registro serÃ¡ mantido para histÃ³rico, mas nÃ£o estarÃ¡ mais disponÃ­vel para novas operaÃ§Ãµes.`)) {
+        // Redirecionamento ou chamada AJAX para a lÃ³gica de encerramento
+        // Por enquanto exibe alerta conforme status da evoluÃ§Ã£o do projeto
+        alert(`A funcionalidade de processamento de encerramento para ${nome} estÃ¡ em fase de implementaÃ§Ã£o tÃ©cnica. O controle de acesso atual jÃ¡ valida sua permissÃ£o para esta aÃ§Ã£o.`);
     }
 }
 
 /**
- * Abre a página de documentação correspondente na mesma aba.
+ * Abre a pÃ¡gina de documentaÃ§Ã£o correspondente na mesma aba.
  * @param {string} page - Slugs ou caminhos curtos (ex: 'equipamentos', 'os')
  */
 function openDocPage(page) {
     const baseUrl = document.querySelector('meta[name="base-url"]')?.content || window.location.origin + '/';
     let path = page;
 
-    // Mapeamento de atalhos para caminhos reais da documentação
+    // Mapeamento de atalhos para caminhos reais da documentaÃ§Ã£o
     const mapping = {
         'equipamentos': '01-manual-do-usuario/equipamentos.md',
         'ordens-de-servico': '01-manual-do-usuario/ordens-de-servico.md',
         'dashboard': '01-manual-do-usuario/dashboard.md',
         'clientes': '01-manual-do-usuario/clientes.md',
+        'contatos': '01-manual-do-usuario/contatos.md',
         'estoque': '01-manual-do-usuario/estoque.md',
         'financeiro': '01-manual-do-usuario/financeiro.md',
         'relatorios': '01-manual-do-usuario/relatorios.md',
@@ -276,6 +277,29 @@ function openDocPage(page) {
         'equipamentos-marcas': '06-modulos-do-sistema/equipamentos-marcas.md',
         'equipamentos-modelos': '06-modulos-do-sistema/equipamentos-modelos.md',
         'equipamentos-defeitos': '06-modulos-do-sistema/defeitos-comuns.md',
+        'defeitos-relatados': '06-modulos-do-sistema/defeitos-relatados.md',
+        'crm': '06-modulos-do-sistema/crm.md',
+        'crm-campanhas': '06-modulos-do-sistema/crm.md#campanhas',
+        'crm-metricas-marketing': '06-modulos-do-sistema/crm.md#metricas-marketing',
+        'crm-clientes-inativos': '06-modulos-do-sistema/crm.md#clientes-inativos',
+        'whatsapp': '06-modulos-do-sistema/whatsapp.md',
+        'atendimento-whatsapp': '06-modulos-do-sistema/central-de-mensagens.md',
+        'atendimento-whatsapp-chatbot': '06-modulos-do-sistema/central-de-mensagens.md#chatbot',
+        'atendimento-whatsapp-metricas': '06-modulos-do-sistema/central-de-mensagens.md#metricas',
+        'atendimento-whatsapp-filas': '06-modulos-do-sistema/central-de-mensagens.md#filas',
+        'atendimento-whatsapp-faq': '06-modulos-do-sistema/central-de-mensagens.md#faq',
+        'atendimento-whatsapp-fluxos': '06-modulos-do-sistema/central-de-mensagens.md#fluxos',
+        'atendimento-whatsapp-respostas': '06-modulos-do-sistema/central-de-mensagens.md#respostas-rapidas',
+        'atendimento-whatsapp-config': '06-modulos-do-sistema/central-de-mensagens.md#configuracoes',
+        'central-mensagens': '06-modulos-do-sistema/central-de-mensagens.md',
+        'central-mensagens-chatbot': '06-modulos-do-sistema/central-de-mensagens.md#chatbot',
+        'central-mensagens-metricas': '06-modulos-do-sistema/central-de-mensagens.md#metricas',
+        'central-mensagens-filas': '06-modulos-do-sistema/central-de-mensagens.md#filas',
+        'central-mensagens-faq': '06-modulos-do-sistema/central-de-mensagens.md#faq',
+        'central-mensagens-fluxos': '06-modulos-do-sistema/central-de-mensagens.md#fluxos',
+        'central-mensagens-respostas': '06-modulos-do-sistema/central-de-mensagens.md#respostas-rapidas',
+        'central-mensagens-config': '06-modulos-do-sistema/central-de-mensagens.md#configuracoes',
+        'design-system': '06-modulos-do-sistema/design-system.md',
         'estoque-movimentacoes': '01-manual-do-usuario/estoque.md#movimentacoes',
         'vendas': '06-modulos-do-sistema/vendas.md'
     };
@@ -287,3 +311,4 @@ function openDocPage(page) {
     const from = encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
     window.location.href = `${baseUrl}documentacao?from=${from}#${encodeURIComponent(path)}`;
 }
+

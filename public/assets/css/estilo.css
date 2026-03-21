@@ -438,7 +438,8 @@ a:hover {
 .sidebar.collapsed .brand-text,
 .sidebar.collapsed .nav-link span,
 .sidebar.collapsed .nav-section,
-.sidebar.collapsed .user-info {
+.sidebar.collapsed .user-info,
+.sidebar.collapsed .logout-text {
     display: none;
 }
 

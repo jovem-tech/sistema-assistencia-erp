@@ -1,221 +1,563 @@
-<!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark" data-bs-theme="dark">
+<!doctype html>
+<html lang="pt-BR" data-theme="light" data-bs-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Design System - AssistTech</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom CSS -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Design System | Sistema de Assistencia</title>
+
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/sweetalert2/sweetalert2.min.css" rel="stylesheet">
     <link href="assets/css/estilo.css" rel="stylesheet">
+    <link href="assets/css/design-system/index.css" rel="stylesheet">
+
     <style>
-        body { padding: 40px; }
-        .ds-section { margin-bottom: 60px; }
-        .ds-title { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; color: var(--primary); }
-        .color-box { height: 60px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        body.ds-preview {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .ds-preview main.page-content {
+            min-height: 100vh;
+        }
+
+        .ds-hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .ds-hero h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .ds-hero p {
+            margin: 6px 0 0 0;
+            color: var(--text-muted);
+            max-width: 760px;
+        }
+
+        .ds-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .ds-section-title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ds-meta-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 12px;
+        }
+
+        .ds-meta-item {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-tertiary);
+            padding: 10px 12px;
+        }
+
+        .ds-meta-item small {
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .ds-code {
+            margin: 0;
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            background: rgba(0, 0, 0, 0.04);
+            font-size: 0.82rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .ds-mini-shell {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: var(--bg-card);
+        }
+
+        .ds-mini-shell-head {
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            padding: 10px 12px;
+            font-weight: 600;
+            font-size: 0.86rem;
+        }
+
+        .ds-mini-shell-body {
+            padding: 12px;
+        }
+
+        .ds-gallery-thumb img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+
+        .ds-state-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 8px;
+        }
+
+        .ds-state-pill {
+            border: 1px dashed var(--border-color);
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        @media (max-width: 991.98px) {
+            .ds-hero {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .ds-hero h1 {
+                font-size: 1.35rem;
+            }
+        }
     </style>
 </head>
-<body class="page-content" style="margin-left: 0; min-height: 100vh;">
-
-    <div class="page-header justify-content-between align-items-center mb-5">
+<body class="ds-preview">
+<main class="page-content">
+    <section class="ds-hero">
         <div>
-            <h1 style="font-weight: 800; background: linear-gradient(135deg, var(--text-primary), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">AssistTech</h1>
-            <h3 class="text-secondary">UI/UX Design System</h3>
+            <span class="ds-kicker"><i class="bi bi-grid-1x2-fill"></i> Padrao oficial de interface</span>
+            <h1>Design System - Sistema de Assistencia</h1>
+            <p>Esta pagina e a referencia unica para padrao visual, comportamento responsivo e componentes reutilizaveis.
+                Todo modulo novo deve seguir estas estruturas.</p>
         </div>
-        <a href="index.php" class="btn btn-outline-light"><i class="bi bi-arrow-left"></i> Voltar ao Sistema</a>
-    </div>
-
-    <!-- Cores -->
-    <div class="ds-section glass-card">
-        <div class="card-header"><h3 class="card-title ds-title"><i class="bi bi-palette"></i> 1. Paleta de Cores e Temas</h3></div>
-        <div class="card-body row text-white text-center">
-            <div class="col-md-2"><div class="color-box" style="background: var(--primary);">Primary</div></div>
-            <div class="col-md-2"><div class="color-box" style="background: var(--secondary);">Secondary</div></div>
-            <div class="col-md-2"><div class="color-box" style="background: var(--success);">Success</div></div>
-            <div class="col-md-2"><div class="color-box" style="background: var(--danger);">Danger</div></div>
-            <div class="col-md-2"><div class="color-box" style="background: var(--warning);">Warning</div></div>
-            <div class="col-md-2"><div class="color-box" style="background: var(--info);">Info</div></div>
-            
-            <div class="col-md-4 mt-4"><div class="color-box" style="background: var(--bg-primary);">Background Primary</div><small class="text-secondary">Fundo Geral</small></div>
-            <div class="col-md-4 mt-4"><div class="color-box" style="background: var(--bg-secondary);">Background Secondary</div><small class="text-secondary">Modais / Elementos em destaque</small></div>
-            <div class="col-md-4 mt-4"><div class="color-box" style="background: var(--bg-glass); border: 1px solid var(--border-color);">Background Glass</div><small class="text-secondary">Cards de base (.glass-card)</small></div>
+        <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnToggleThemeDs">
+                <i class="bi bi-circle-half me-1"></i>Alternar tema
+            </button>
+            <a class="btn btn-glow btn-sm" href="index.php">
+                <i class="bi bi-arrow-left me-1"></i>Voltar ao sistema
+            </a>
         </div>
-    </div>
+    </section>
 
-    <!-- Tipografia -->
-    <div class="ds-section glass-card">
-        <div class="card-header"><h3 class="card-title ds-title"><i class="bi bi-type"></i> 2. Tipografia (Familia: Inter)</h3></div>
+    <section class="card glass-card mb-4">
+        <div class="card-header">
+            <h2 class="ds-section-title"><i class="bi bi-info-circle"></i> Regras obrigatorias</h2>
+        </div>
         <div class="card-body">
-            <h1 class="mb-3">Heading 1 - Titulos Principais</h1>
-            <h2 class="mb-3">Heading 2 - Titulos Secundários</h2>
-            <h3 class="mb-3">Heading 3 - Destaques Internos</h3>
-            <p class="text-primary mt-4 mb-2">Cor primária (.text-primary)</p>
-            <p class="text-secondary mb-2" style="color: var(--text-secondary) !important">Texto secundário/mutado usado em labels e instruções auxiliares.</p>
-            <p>Corpo de texto normal da aplicação. O sistema usa <code>14px</code> como tamanho base da fonte, excelente para leitura de dashboards e grandes volumes de informação sem pesar na tela.</p>
+            <div class="ds-meta-list">
+                <div class="ds-meta-item">
+                    <small>Alertas e confirmacoes</small>
+                    <strong>Usar SweetAlert2 (`Swal.fire`)</strong>
+                </div>
+                <div class="ds-meta-item">
+                    <small>Upload de fotos</small>
+                    <strong>Fluxo unico: galeria + camera + crop + preview</strong>
+                </div>
+                <div class="ds-meta-item">
+                    <small>Responsividade</small>
+                    <strong>Padrao `responsive-layout.css` + classes DS</strong>
+                </div>
+                <div class="ds-meta-item">
+                    <small>Tabelas</small>
+                    <strong>`ds-table-responsive-card` no mobile</strong>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Botões -->
-    <div class="ds-section glass-card">
-        <div class="card-header"><h3 class="card-title ds-title"><i class="bi bi-hand-index"></i> 3. Botões e Ações</h3></div>
-        <div class="card-body">
-            <p class="mb-3 text-secondary">Ações principais:</p>
-            <button class="btn btn-glow me-2 mb-3"><i class="bi bi-stars"></i> Botão Glow (btn-glow)</button>
-            <button class="btn btn-primary me-2 mb-3">Botão Primary Padrão</button>
-            
-            <p class="mt-2 mb-3 text-secondary">Ações secundárias e estados:</p>
-            <button class="btn btn-outline-light me-2 mb-3">Botão Outline Dark</button>
-            <button class="btn btn-success me-2 mb-3">Sucesso Salvar</button>
-            <button class="btn btn-danger me-2 mb-3">Ação Destrutiva</button>
-            <button class="btn btn-warning me-2 mb-3">Alerta/Amarelo</button>
-            <button class="btn btn-info me-2 mb-3 text-white">Informativo</button>
-        </div>
-    </div>
-
-    <!-- Cards e Containers -->
-    <div class="ds-section">
-        <h3 class="ds-title"><i class="bi bi-window-stack"></i> 4. Estruturas, Painéis e Cards</h3>
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="glass-card h-100">
-                    <div class="card-header">
-                        <h4 class="card-title"><i class="bi bi-window"></i> Base de Tela (.glass-card)</h4>
-                    </div>
-                    <div class="card-body">
-                        Utilize a classe <code>.glass-card</code> para as janelas e conteineres de agrupamento principais da aplicação. O efeito Glassmorphism é responsivo ao hover (borda de contorno se ilumina), e o painel embasa perfeitamente por cima do background noturno geral.
-                        <br><br>
-                        <button class="btn btn-glow mt-3">Ação Dentro do Card</button>
+    <section class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h2 class="ds-section-title"><i class="bi bi-droplet-half"></i> 1. Tokens de cor</h2>
+                </div>
+                <div class="card-body">
+                    <div class="ds-token-grid">
+                        <div class="ds-token-item"><div class="ds-token-swatch bg-primary"></div><small>--color-primary</small></div>
+                        <div class="ds-token-item"><div class="ds-token-swatch bg-success"></div><small>--color-success</small></div>
+                        <div class="ds-token-item"><div class="ds-token-swatch bg-warning"></div><small>--color-warning</small></div>
+                        <div class="ds-token-item"><div class="ds-token-swatch bg-danger"></div><small>--color-danger</small></div>
+                        <div class="ds-token-item"><div class="ds-token-swatch bg-info"></div><small>--color-info</small></div>
+                        <div class="ds-token-item"><div class="ds-token-swatch ds-token-bg"></div><small>--color-bg</small></div>
+                        <div class="ds-token-item"><div class="ds-token-swatch ds-token-surface"></div><small>--color-surface</small></div>
+                        <div class="ds-token-item"><div class="ds-token-swatch ds-token-muted"></div><small>--color-surface-muted</small></div>
+                        <div class="ds-token-item"><div class="ds-token-swatch ds-token-border"></div><small>--color-border</small></div>
                     </div>
                 </div>
             </div>
-            
-            <div class="col-md-3 mb-4">
-                <div class="stat-card stat-card-success mb-3">
-                    <div class="stat-card-body">
-                        <div>
-                            <span class="stat-label">Lucros do Dia</span>
-                            <h3 class="stat-value">R$ 1.250</h3>
+        </div>
+
+        <div class="col-12 col-xl-6">
+            <div class="card glass-card h-100">
+                <div class="card-header">
+                    <h2 class="ds-section-title"><i class="bi bi-type"></i> 2. Tipografia</h2>
+                </div>
+                <div class="card-body">
+                    <h1 class="mb-2">Heading 1</h1>
+                    <h2 class="mb-2">Heading 2</h2>
+                    <h3 class="mb-2">Heading 3</h3>
+                    <h4 class="mb-3">Heading 4</h4>
+                    <p class="mb-1">Texto base de conteudo para formularios, cards e tabelas.</p>
+                    <p class="text-muted mb-0">Texto auxiliar para status, dicas e mensagens de suporte.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6">
+            <div class="card glass-card h-100">
+                <div class="card-header">
+                    <h2 class="ds-section-title"><i class="bi bi-hand-index-thumb"></i> 3. Botoes</h2>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-primary">Primary</button>
+                        <button type="button" class="btn btn-secondary">Secondary</button>
+                        <button type="button" class="btn btn-outline-secondary">Outline</button>
+                        <button type="button" class="btn btn-success">Success</button>
+                        <button type="button" class="btn btn-warning">Warning</button>
+                        <button type="button" class="btn btn-danger">Danger</button>
+                        <button type="button" class="btn btn-light">Ghost</button>
+                        <button type="button" class="btn btn-glow">Glow</button>
+                        <button type="button" class="btn btn-primary ds-loading" disabled>
+                            <span class="spinner-border spinner-border-sm me-2"></span>Loading
+                        </button>
+                    </div>
+                    <hr>
+                    <div class="ds-state-grid">
+                        <div class="ds-state-pill">default</div>
+                        <div class="ds-state-pill">hover</div>
+                        <div class="ds-state-pill">active</div>
+                        <div class="ds-state-pill">focus</div>
+                        <div class="ds-state-pill">disabled</div>
+                        <div class="ds-state-pill">loading</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h2 class="ds-section-title"><i class="bi bi-ui-checks-grid"></i> 4. Formulario padrao</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <label class="form-label">Cliente</label>
+                            <input class="form-control" type="text" placeholder="Digite o cliente">
                         </div>
-                        <i class="bi bi-currency-dollar stat-icon"></i>
-                    </div>
-                    <div class="stat-card-footer">
-                        <a href="#">Movimentações <i class="bi bi-arrow-right"></i></a>
-                    </div>
-                </div>
-                
-                <div class="stat-card stat-card-warning">
-                    <div class="stat-card-body">
-                        <div>
-                            <span class="stat-label">Pedidos Pendentes</span>
-                            <h3 class="stat-value">5 un</h3>
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <label class="form-label">Equipamento</label>
+                            <select class="form-select">
+                                <option>Selecione...</option>
+                                <option>Notebook</option>
+                                <option>Celular</option>
+                            </select>
                         </div>
-                        <i class="bi bi-clock-history stat-icon"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 mb-4">
-                <div class="stat-card stat-card-primary h-100">
-                    <div class="stat-card-body" style="height: 100%;">
-                        <div>
-                            <span class="stat-label">Equipamentos em Reparo</span>
-                            <h3 class="stat-value mt-2 mb-3" style="font-size: 3rem;">14</h3>
-                            <p class="text-secondary m-0" style="font-size: 11px;">Comparado a ontem</p>
-                            <p class="text-success m-0" style="font-size: 11px;"><i class="bi bi-arrow-up"></i> 12%</p>
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select">
+                                <option>Triagem</option>
+                                <option>Diagnostico</option>
+                                <option>Aguardando peca</option>
+                            </select>
                         </div>
-                        <i class="bi bi-tools stat-icon" style="opacity: 0.3; align-self: flex-start;"></i>
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <label class="form-label">Previsao</label>
+                            <input class="form-control" type="date">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Relato do cliente</label>
+                            <textarea class="form-control" rows="3" placeholder="Descreva o relato do cliente"></textarea>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="dsSwitchAcessorio">
+                                <label class="form-check-label" for="dsSwitchAcessorio">Sem acessorios</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <input type="text" class="form-control is-invalid" value="Campo invalido de exemplo">
+                            <div class="invalid-feedback d-block">Mensagem de validacao para campo obrigatorio.</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Formulários -->
-    <div class="ds-section glass-card">
-        <div class="card-header"><h3 class="card-title ds-title"><i class="bi bi-input-cursor-text"></i> 5. Inputs e Formulários</h3></div>
+    <section class="row g-4 mb-4">
+        <div class="col-12 col-xl-7">
+            <div class="card glass-card h-100">
+                <div class="card-header">
+                    <h2 class="ds-section-title"><i class="bi bi-layout-text-window-reverse"></i> 5. Tabs + tabela responsiva</h2>
+                </div>
+                <div class="card-body ds-table-responsive-card">
+                    <ul class="nav nav-tabs ds-tabs-scroll mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#ds-tab-1" type="button">Dados</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ds-tab-2" type="button">Fotos</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ds-tab-3" type="button">Valores</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ds-tab-4" type="button">Historico</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="ds-tab-1">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th>N OS</th>
+                                        <th>Cliente</th>
+                                        <th>Equipamento</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Valor</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td data-label="N OS">#OS20260001</td>
+                                        <td data-label="Cliente">Mariana Rosa</td>
+                                        <td data-label="Equipamento">ASUS K43U</td>
+                                        <td data-label="Status"><span class="badge text-bg-warning">Triagem</span></td>
+                                        <td class="text-end" data-label="Valor">R$ 0,00</td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="N OS">#OS20260002</td>
+                                        <td data-label="Cliente">Davi Oliveira</td>
+                                        <td data-label="Equipamento">Oppo Find X9 Pro</td>
+                                        <td data-label="Status"><span class="badge text-bg-info">Orcamento</span></td>
+                                        <td class="text-end" data-label="Valor">R$ 420,00</td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="N OS">#OS20260003</td>
+                                        <td data-label="Cliente">Otavio Santos</td>
+                                        <td data-label="Equipamento">Moto G1</td>
+                                        <td data-label="Status"><span class="badge text-bg-success">Pronto</span></td>
+                                        <td class="text-end" data-label="Valor">R$ 260,00</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="ds-tab-2">
+                            <p class="text-muted mb-0">Use galeria padrao com preview, principal, remocao e cache busting com <code>?v=timestamp</code>.</p>
+                        </div>
+                        <div class="tab-pane fade" id="ds-tab-3">
+                            <p class="text-muted mb-0">Valores devem seguir campos padrao e badges sem estilos locais isolados.</p>
+                        </div>
+                        <div class="tab-pane fade" id="ds-tab-4">
+                            <p class="text-muted mb-0">Historico de status, WhatsApp e documentos segue cards padronizados.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-5">
+            <div class="card glass-card h-100">
+                <div class="card-header">
+                    <h2 class="ds-section-title"><i class="bi bi-images"></i> 6. Galeria e feedback</h2>
+                </div>
+                <div class="card-body">
+                    <div class="ds-gallery mb-3">
+                        <div class="ds-gallery-thumb is-primary"><div class="ds-gallery-fake ds-gallery-fake-a"></div></div>
+                        <div class="ds-gallery-thumb"><div class="ds-gallery-fake ds-gallery-fake-b"></div></div>
+                        <div class="ds-gallery-thumb"><div class="ds-gallery-fake ds-gallery-fake-c"></div></div>
+                        <div class="ds-gallery-thumb"><div class="ds-gallery-fake ds-gallery-fake-d"></div></div>
+                    </div>
+                    <div class="alert alert-success mb-2"><i class="bi bi-check-circle me-2"></i>Acao concluida com sucesso.</div>
+                    <div class="alert alert-warning mb-2"><i class="bi bi-exclamation-triangle me-2"></i>Existem itens opcionais pendentes.</div>
+                    <div class="alert alert-danger mb-3"><i class="bi bi-x-circle me-2"></i>Campo obrigatorio nao preenchido.</div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-success btn-sm" id="btnSwalSuccess">Swal sucesso</button>
+                        <button type="button" class="btn btn-warning btn-sm" id="btnSwalWarning">Swal pendencia</button>
+                        <button type="button" class="btn btn-danger btn-sm" id="btnSwalError">Swal erro</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-4">
+        <div class="col-12 col-xl-6">
+            <div class="card glass-card h-100">
+                <div class="card-header">
+                    <h2 class="ds-section-title"><i class="bi bi-columns-gap"></i> 7. Layout responsivo padrao</h2>
+                </div>
+                <div class="card-body">
+                    <div class="ds-mini-shell mb-3">
+                        <div class="ds-mini-shell-head">Exemplo: split layout (OS Nova / OS Visualizar)</div>
+                        <div class="ds-mini-shell-body">
+                            <div class="row g-3 ds-split-layout">
+                                <div class="col-12 col-xl-4 col-xxl-3 ds-split-sidebar">
+                                    <div class="p-2 border rounded">Sidebar card</div>
+                                </div>
+                                <div class="col-12 col-xl-8 col-xxl-9 ds-split-main">
+                                    <div class="p-2 border rounded">Conteudo principal</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <pre class="ds-code">&lt;div class="row g-4 ds-split-layout"&gt;
+  &lt;div class="col-12 col-xl-4 col-xxl-3 ds-split-sidebar"&gt;...&lt;/div&gt;
+  &lt;div class="col-12 col-xl-8 col-xxl-9 ds-split-main"&gt;...&lt;/div&gt;
+&lt;/div&gt;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6">
+            <div class="card glass-card h-100">
+                <div class="card-header">
+                    <h2 class="ds-section-title"><i class="bi bi-camera"></i> 8. Fluxo oficial de fotos</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-3">
+                        <li>Escolha por <strong>Galeria</strong> ou <strong>Camera</strong>.</li>
+                        <li>Abra o modal de <strong>crop</strong> antes de salvar.</li>
+                        <li>Mostre preview com acoes de remover e definir principal.</li>
+                        <li>Atualize miniaturas e foto principal em tempo real.</li>
+                        <li>Use cache busting na URL quando alterar imagem: <code>?v=timestamp</code>.</li>
+                        <li>Mensagens de erro e confirmacao via <code>Swal.fire</code>.</li>
+                    </ul>
+                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#dsModalSample">
+                        <i class="bi bi-window me-1"></i>Ver modal padrao
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="card glass-card mb-4">
+        <div class="card-header">
+            <h2 class="ds-section-title"><i class="bi bi-check2-square"></i> Checklist de conformidade</h2>
+        </div>
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Input de Texto Comum (.form-control)</label>
-                    <input type="text" class="form-control" placeholder="Digite seu nome ou e-mail...">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Seletor de Opções (.form-select)</label>
-                    <select class="form-select">
-                        <option>Selecione um status...</option>
-                        <option>Aberto</option>
-                        <option>Orçamento</option>
-                        <option>Concluído</option>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Área de Texto Maior (textarea)</label>
-                    <textarea class="form-control" rows="3" placeholder="Insira as notas de reparo aqui..."></textarea>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-check-label d-block mb-3">Caixas de Seleção Integradas (Checkboxes / Switches)</label>
-                    <div class="form-check form-check-inline me-4">
-                        <input class="form-check-input" type="checkbox" id="check1" checked>
-                        <label class="form-check-label" for="check1">Garantia Ativa</label>
+            <div class="row g-2">
+                <div class="col-12 col-md-6 col-xl-3"><div class="ds-meta-item">1. Usa tokens e classes DS</div></div>
+                <div class="col-12 col-md-6 col-xl-3"><div class="ds-meta-item">2. Sem CSS inline desnecessario</div></div>
+                <div class="col-12 col-md-6 col-xl-3"><div class="ds-meta-item">3. Sem alert/confirm nativo</div></div>
+                <div class="col-12 col-md-6 col-xl-3"><div class="ds-meta-item">4. Fluxo de fotos padrao unico</div></div>
+                <div class="col-12 col-md-6 col-xl-3"><div class="ds-meta-item">5. Tabs com ds-tabs-scroll</div></div>
+                <div class="col-12 col-md-6 col-xl-3"><div class="ds-meta-item">6. Tabela mobile card</div></div>
+                <div class="col-12 col-md-6 col-xl-3"><div class="ds-meta-item">7. Split layout em forms complexos</div></div>
+                <div class="col-12 col-md-6 col-xl-3"><div class="ds-meta-item">8. Acessibilidade minima (label, foco, aria)</div></div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div class="modal fade" id="dsModalSample" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal padrao (Design System)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">Use modais com largura responsiva, corpo rolavel e acoes claras no rodape.</p>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label">Campo exemplo</label>
+                        <input class="form-control" type="text" placeholder="Digite aqui">
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="check2">
-                        <label class="form-check-label" for="check2">Limpeza Gratuita</label>
-                    </div>
-                    
-                    <div class="form-check form-switch mt-4">
-                        <input class="form-check-input" type="checkbox" role="switch" id="switch1" checked>
-                        <label class="form-check-label fw-bold" for="switch1">Permitir Acesso Admin</label>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label">Tipo</label>
+                        <select class="form-select">
+                            <option>Opcao 1</option>
+                            <option>Opcao 2</option>
+                        </select>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Badges e Alertas -->
-    <div class="ds-section glass-card">
-        <div class="card-header"><h3 class="card-title ds-title"><i class="bi bi-info-square"></i> 6. Status e Alertas Flash</h3></div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5 class="text-white mb-3">Badges de Status / Labels</h5>
-                    <div class="d-flex flex-wrap gap-2 mb-4">
-                        <span class="badge bg-success">ORÇAMENTO APROVADO</span>
-                        <span class="badge bg-secondary">A INICIAR</span>
-                        <span class="badge bg-warning">AGUARDANDO PEÇAS</span>
-                        <span class="badge bg-danger">CANCELADO</span>
-                        <span class="badge bg-info">REPARO ANDAMENTO</span>
-                        <span class="badge bg-purple">PRONTO PARA ENTREGA</span>
-                        <span class="badge bg-indigo">STATUS PERSONALIZADO</span>
-                    </div>
-                    
-                    <h5 class="text-white mb-3 mt-4">Ícones Circulares (Ex: Tabela de Ações)</h5>
-                    <div class="action-btns d-flex gap-2">
-                        <button class="btn btn-sm btn-outline-light"><i class="bi bi-eye"></i></button>
-                        <button class="btn btn-sm btn-outline-light text-primary"><i class="bi bi-pencil"></i></button>
-                        <button class="btn btn-sm btn-outline-light text-danger"><i class="bi bi-trash"></i></button>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <h5 class="text-white mb-3">Janelas de Alerta Flash (CodeIgniter Messages)</h5>
-                    <div class="alert alert-success animate-slide-in p-3 rounded mb-3">
-                        <i class="bi bi-check-circle-fill me-2 border-end border-success pe-2 me-2"></i> Ordem de serviço criada com sucesso! O cliente foi notificado.
-                    </div>
-                    <div class="alert alert-danger p-3 rounded mb-3">
-                        <i class="bi bi-exclamation-triangle-fill me-2 border-end border-danger pe-2 me-2"></i> Ocorreu um erro no banco de dados ao tentar excluir o cliente.
-                    </div>
-                    <div class="alert alert-warning p-3 rounded mb-3">
-                        <i class="bi bi-exclamation-circle-fill me-2 border-end border-warning pe-2 me-2"></i> O estoque da peça 'Placa Mãe Lenovo' encontra-se em nível crítico.
-                    </div>
-                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-glow">Salvar alteracoes</button>
             </div>
         </div>
     </div>
+</div>
 
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/sweetalert2/sweetalert2.all.min.js"></script>
+<script>
+    (function () {
+        const html = document.documentElement;
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || savedTheme === 'light') {
+            html.setAttribute('data-theme', savedTheme);
+            html.setAttribute('data-bs-theme', savedTheme);
+        }
+
+        const toggle = document.getElementById('btnToggleThemeDs');
+        if (toggle) {
+            toggle.addEventListener('click', function () {
+                const current = html.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+                const next = current === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', next);
+                html.setAttribute('data-bs-theme', next);
+                localStorage.setItem('theme', next);
+            });
+        }
+
+        function showSwal(icon, title, text) {
+            if (window.Swal && typeof window.Swal.fire === 'function') {
+                window.Swal.fire({
+                    icon: icon,
+                    title: title,
+                    text: text,
+                    confirmButtonText: 'Ok',
+                    customClass: { confirmButton: 'btn btn-glow px-4' },
+                    buttonsStyling: false
+                });
+            }
+        }
+
+        document.getElementById('btnSwalSuccess')?.addEventListener('click', function () {
+            showSwal('success', 'Sucesso', 'Acao concluida no padrao do sistema.');
+        });
+        document.getElementById('btnSwalWarning')?.addEventListener('click', function () {
+            showSwal('warning', 'Pendencias', 'Existem campos opcionais ainda nao preenchidos.');
+        });
+        document.getElementById('btnSwalError')?.addEventListener('click', function () {
+            showSwal('error', 'Erro', 'Nao foi possivel concluir a operacao.');
+        });
+    })();
+</script>
 </body>
 </html>

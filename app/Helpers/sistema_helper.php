@@ -5,20 +5,65 @@
  */
 function getStatusBadge($status)
 {
-    $badges = [
-        'aguardando_analise'   => '<span class="badge bg-warning text-dark">Aguard. Análise</span>',
-        'aguardando_orcamento' => '<span class="badge bg-info">Aguard. Orçamento</span>',
-        'aguardando_aprovacao' => '<span class="badge bg-purple">Aguard. Aprovação</span>',
-        'aprovado'             => '<span class="badge bg-primary">Aprovado</span>',
-        'reprovado'            => '<span class="badge bg-danger">Reprovado</span>',
-        'em_reparo'            => '<span class="badge bg-indigo">Em Reparo</span>',
-        'aguardando_peca'      => '<span class="badge bg-orange">Aguard. Peça</span>',
-        'pronto'               => '<span class="badge bg-success">Pronto</span>',
-        'entregue'             => '<span class="badge bg-teal">Entregue</span>',
-        'cancelado'            => '<span class="badge bg-secondary">Cancelado</span>',
+    static $dynamicCache = null;
+
+    if ($dynamicCache === null) {
+        $dynamicCache = [];
+        try {
+            $db = \Config\Database::connect();
+            if ($db->tableExists('os_status')) {
+                $rows = $db->table('os_status')
+                    ->select('codigo, nome, cor, icone')
+                    ->where('ativo', 1)
+                    ->get()
+                    ->getResultArray();
+                foreach ($rows as $row) {
+                    $dynamicCache[$row['codigo']] = $row;
+                }
+            }
+        } catch (\Throwable $e) {
+            $dynamicCache = [];
+        }
+    }
+
+    if (isset($dynamicCache[$status])) {
+        $row = $dynamicCache[$status];
+        $rawColor = strtolower(trim((string) ($row['cor'] ?? 'secondary')) ?: 'secondary');
+        $colorMap = [
+            'indigo' => 'primary',
+            'purple' => 'primary',
+            'orange' => 'warning text-dark',
+            'dark' => 'dark',
+            'light' => 'light text-dark',
+            'secondary' => 'secondary',
+            'primary' => 'primary',
+            'success' => 'success',
+            'warning' => 'warning text-dark',
+            'danger' => 'danger',
+            'info' => 'info text-dark',
+        ];
+        $color = $colorMap[$rawColor] ?? 'secondary';
+        $icon = trim((string) ($row['icone'] ?? ''));
+        $iconHtml = $icon !== '' ? '<i class="bi ' . esc($icon) . ' me-1"></i>' : '';
+        $colorClass = str_starts_with($color, 'bg-') ? $color : ('bg-' . $color);
+        return '<span class="badge ' . esc($colorClass) . '">' . $iconHtml . esc($row['nome'] ?? $status) . '</span>';
+    }
+
+    $legacy = [
+        'aguardando_analise' => 'Aguard. Analise',
+        'aguardando_orcamento' => 'Aguard. Orcamento',
+        'aguardando_aprovacao' => 'Aguard. Aprovacao',
+        'aprovado' => 'Aprovado',
+        'reprovado' => 'Reprovado',
+        'em_reparo' => 'Em Reparo',
+        'aguardando_peca' => 'Aguard. Peca',
+        'pronto' => 'Pronto',
+        'entregue' => 'Entregue',
+        'cancelado' => 'Cancelado',
     ];
 
-    return $badges[$status] ?? '<span class="badge bg-secondary">' . ucfirst(str_replace('_', ' ', $status)) . '</span>';
+    $label = $legacy[$status] ?? ucfirst(str_replace('_', ' ', (string) $status));
+    return '<span class="badge bg-secondary">' . esc($label) . '</span>';
 }
 
 /**
@@ -26,7 +71,7 @@ function getStatusBadge($status)
  */
 function formatMoney($value)
 {
-    return 'R$ ' . number_format((float)$value, 2, ',', '.');
+    return 'R$ ' . number_format((float) $value, 2, ',', '.');
 }
 
 /**
@@ -34,7 +79,9 @@ function formatMoney($value)
  */
 function formatDate($date, $withTime = false)
 {
-    if (empty($date)) return '-';
+    if (empty($date)) {
+        return '-';
+    }
     $format = $withTime ? 'd/m/Y H:i' : 'd/m/Y';
     return date($format, strtotime($date));
 }
@@ -45,9 +92,9 @@ function formatDate($date, $withTime = false)
 function getPriorityBadge($priority)
 {
     $badges = [
-        'baixa'   => '<span class="badge bg-secondary">Baixa</span>',
-        'normal'  => '<span class="badge bg-info">Normal</span>',
-        'alta'    => '<span class="badge bg-warning text-dark">Alta</span>',
+        'baixa' => '<span class="badge bg-secondary">Baixa</span>',
+        'normal' => '<span class="badge bg-info">Normal</span>',
+        'alta' => '<span class="badge bg-warning text-dark">Alta</span>',
         'urgente' => '<span class="badge bg-danger">Urgente</span>',
     ];
 
@@ -60,28 +107,31 @@ function getPriorityBadge($priority)
 function getEquipTipo($tipo)
 {
     $tipos = [
-        'notebook'    => 'Notebook',
-        'desktop'     => 'Desktop',
-        'celular'     => 'Celular',
-        'tablet'      => 'Tablet',
-        'impressora'  => 'Impressora',
-        'outros'      => 'Outros',
+        'notebook' => 'Notebook',
+        'desktop' => 'Desktop',
+        'celular' => 'Celular',
+        'tablet' => 'Tablet',
+        'impressora' => 'Impressora',
+        'outros' => 'Outros',
     ];
 
-    return $tipos[$tipo] ?? ucfirst($tipo);
+    return $tipos[$tipo] ?? ucfirst((string) $tipo);
 }
 
 /**
- * Obter valor de configuração
+ * Obter valor de configuracao
  */
-function get_config($chave, $default = null) {
-    if(!function_exists('model')) return $default;
+function get_config($chave, $default = null)
+{
+    if (!function_exists('model')) {
+        return $default;
+    }
     try {
         $db = \Config\Database::connect();
         $builder = $db->table('configuracoes');
         $row = $builder->where('chave', $chave)->get()->getRow();
         return $row ? $row->valor : $default;
-    } catch(\Exception $e) {
+    } catch (\Exception $e) {
         return $default;
     }
 }
@@ -89,17 +139,14 @@ function get_config($chave, $default = null) {
 /**
  * Retorna o tema atual configurado (light ou dark)
  */
-function get_theme() {
+function get_theme()
+{
     $theme = get_config('tema', 'dark');
     return $theme === 'light' ? 'light' : 'dark';
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// RBAC — Sistema de controle de acesso baseado em grupos
-// ════════════════════════════════════════════════════════════════════════════
-
 /**
- * Carrega e cacheia no session o mapa de permissões do usuário logado.
+ * Carrega e cacheia no session o mapa de permissoes do usuario logado.
  * Estrutura: ['clientes' => ['visualizar', 'criar', 'editar'], ...]
  */
 function loadUserPermissions(): array
@@ -111,9 +158,8 @@ function loadUserPermissions(): array
 
     $grupoId = session()->get('user_grupo_id');
     if (!$grupoId) {
-        // Admin legado (perfil=admin sem grupo): acesso total
         if (session()->get('user_perfil') === 'admin') {
-            return ['*' => ['*']]; // wildcard
+            return ['*' => ['*']];
         }
         return [];
     }
@@ -140,22 +186,20 @@ function loadUserPermissions(): array
 }
 
 /**
- * Verifica se o usuário logado pode executar uma ação em um módulo.
- * Uso: can('clientes', 'editar')
+ * Verifica se o usuario logado pode executar uma acao em um modulo.
  */
 function can(string $modulo, string $acao): bool
 {
     $permissions = loadUserPermissions();
+    if (isset($permissions['*'])) {
+        return true;
+    }
 
-    // Wildcard admin
-    if (isset($permissions['*'])) return true;
-
-    return isset($permissions[$modulo]) && in_array($acao, $permissions[$modulo]);
+    return isset($permissions[$modulo]) && in_array($acao, $permissions[$modulo], true);
 }
 
 /**
- * Verifica se o usuário pode visualizar (acessar) um módulo.
- * Uso: canModule('financeiro')
+ * Verifica se o usuario pode visualizar (acessar) um modulo.
  */
 function canModule(string $modulo): bool
 {
@@ -163,8 +207,7 @@ function canModule(string $modulo): bool
 }
 
 /**
- * Força recarregamento do cache de permissões na sessão.
- * Chamar após alterar grup_permissoes de um usuário ativo.
+ * Forca recarregamento do cache de permissoes na sessao.
  */
 function refreshPermissions(): void
 {
@@ -172,13 +215,12 @@ function refreshPermissions(): void
 }
 
 /**
- * Aborta a requisição com erro 403 se o usuário não tiver a permissão.
- * Uso em controllers: requirePermission('financeiro', 'excluir');
+ * Aborta a requisicao com erro 403 se o usuario nao tiver a permissao.
  */
 function requirePermission(string $modulo, string $acao = 'visualizar'): void
 {
     if (!can($modulo, $acao)) {
-        session()->setFlashdata('error', 'Acesso negado. Você não tem permissão para esta ação.');
+        session()->setFlashdata('error', 'Acesso negado. Voce nao tem permissao para esta acao.');
         header('Location: ' . base_url('dashboard'));
         exit;
     }

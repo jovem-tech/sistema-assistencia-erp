@@ -4,9 +4,9 @@
 <div class="page-header mb-4 d-flex justify-content-between align-items-center">
     <h2 class="mb-0">
         <i class="bi bi-gear-wide-connected me-2"></i>
-        <?= isset($servico) ? 'Editar Servi√ßo' : 'Novo Servi√ßo' ?>
+        <?= isset($servico) ? 'Editar ServiÁo' : 'Novo ServiÁo' ?>
     </h2>
-    <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('servicos')" title="Ajuda sobre Servi√É¬ßos">
+    <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('servicos')" title="Ajuda sobre Servi√ßos">
         <i class="bi bi-question-circle me-1"></i>Ajuda
     </button>
 </div>
@@ -19,18 +19,18 @@
                     <?= csrf_field() ?>
                     
                     <div class="mb-3">
-                        <label class="form-label">Nome do Servi√ßo <span class="text-danger">*</span></label>
+                        <label class="form-label">Nome do ServiÁo <span class="text-danger">*</span></label>
                         <input type="text" name="nome" class="form-control" value="<?= old('nome', $servico['nome'] ?? '') ?>" required placeholder="Ex: Troca de Tela">
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Descri√ß√£o</label>
-                        <textarea name="descricao" class="form-control" rows="3" placeholder="Detalhes t√©cnicos do servi√ßo..."><?= old('descricao', $servico['descricao'] ?? '') ?></textarea>
+                        <label class="form-label">DescriÁ„o</label>
+                        <textarea name="descricao" class="form-control" rows="3" placeholder="Detalhes tÈcnicos do serviÁo..."><?= old('descricao', $servico['descricao'] ?? '') ?></textarea>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Valor Padr√£o (R$) <span class="text-danger">*</span></label>
+                            <label class="form-label">Valor Padr„o (R$) <span class="text-danger">*</span></label>
                             <input type="text" name="valor" class="form-control money" value="<?= old('valor', isset($servico) ? number_format($servico['valor'], 2, ',', '.') : '') ?>" required>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -49,7 +49,7 @@
                             <i class="bi bi-arrow-left me-1"></i>Voltar
                         </a>
                         <button type="submit" class="btn btn-primary btn-glow px-4">
-                            <i class="bi bi-save me-1"></i>Salvar Servi√ßo
+                            <i class="bi bi-save me-1"></i>Salvar ServiÁo
                         </button>
                     </div>
                 </form>

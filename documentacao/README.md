@@ -1,37 +1,46 @@
-# 📚 Documentação — Sistema de Assistência Técnica (ERP)
+# Documentacao - Sistema de Assistencia Tecnica
 
-> **Jovem Tech** · Versão 2.0 · Março 2026
+> Jovem Tech - Atualizado em 20/03/2026
 
-Bem-vindo à documentação oficial do sistema. Use o índice abaixo para navegar.
+## Estrutura
 
----
+| Pasta | Conteudo principal |
+|---|---|
+| `00-visao-geral` | contexto do produto e stack |
+| `01-manual-do-usuario` | operacao por modulo |
+| `02-manual-administrador` | configuracao e administracao |
+| `03-arquitetura-tecnica` | organizacao do codigo e componentes |
+| `04-banco-de-dados` | tabelas e modelagem |
+| `05-api` | rotas HTTP internas |
+| `06-modulos-do-sistema` | visao tecnica por modulo |
+| `07-novas-implementacoes` | historico de entregas |
+| `08-correcoes` | historico de bugfix |
+| `09-roadmap` | planejamento futuro |
+| `10-deploy` | instalacao e publicacao |
+| `11-padroes` | convencoes de projeto |
 
-## 🗂️ Estrutura da Documentação
-
-| Pasta | Conteúdo |
-|-------|----------|
-| [00-visao-geral](./00-visao-geral/sobre-o-sistema.md) | O que é o sistema, stack, arquitetura |
-| [01-manual-do-usuario](./01-manual-do-usuario/dashboard.md) | Como usar cada módulo do sistema |
-| [02-manual-administrador](./02-manual-administrador/configuracao-do-sistema.md) | Configurações, usuários, permissões |
-| [03-arquitetura-tecnica](./03-arquitetura-tecnica/estrutura-de-pastas.md) | Código-fonte, padrões, autenticação |
-| [04-banco-de-dados](./04-banco-de-dados/tabelas-principais.md) | Tabelas, relacionamentos, diagramas |
-| [05-api](./05-api/rotas.md) | Endpoints, autenticação, exemplos |
-| [06-modulos-do-sistema](./06-modulos-do-sistema/clientes.md) | Documentação técnica de cada módulo |
-| [07-novas-implementacoes](./07-novas-implementacoes/) | Histórico de funcionalidades adicionadas |
-| [08-correcoes](./08-correcoes/) | Histórico de bugs corrigidos |
-| [09-roadmap](./09-roadmap/funcionalidades-planejadas.md) | Planejamento futuro |
-| [10-deploy](./10-deploy/instalacao-local.md) | Como instalar e configurar |
-| [11-padroes](./11-padroes/padrao-commits.md) | Convenções do projeto |
-
----
-
-## 🚀 Acesso Rápido
-
-- **Abrir OS rápido:** [Manual de OS](./01-manual-do-usuario/ordens-de-servico.md)
-- **Adicionar usuário:** [Manual de Administrador](./02-manual-administrador/usuarios-e-permissoes.md)
-- **Instalar na produção:** [Deploy](./10-deploy/deploy-producao.md)
-- **Erros conhecidos:** [Correções](./08-correcoes/)
-
----
-
-*Última atualização: Março 2026*
+## Leitura rapida recomendada
+- Operacao de OS: `01-manual-do-usuario/ordens-de-servico.md`
+- Operacao de Contatos: `01-manual-do-usuario/contatos.md`
+- Configuracao pre-CRM: `02-manual-administrador/configuracao-do-sistema.md`
+- Fluxo tecnico pre-CRM: `06-modulos-do-sistema/ordens-de-servico.md`
+- Modulo WhatsApp: `06-modulos-do-sistema/whatsapp.md`
+- Modulo CRM: `06-modulos-do-sistema/crm.md`
+- Modulo Contatos (tecnico): `06-modulos-do-sistema/contatos.md`
+- CRM - Metricas Marketing: `06-modulos-do-sistema/crm.md#metricas-marketing`
+- Central de Mensagens: `06-modulos-do-sistema/central-de-mensagens.md`
+- Central - Chatbot: `06-modulos-do-sistema/central-de-mensagens.md#chatbot`
+- Central - Metricas: `06-modulos-do-sistema/central-de-mensagens.md#metricas`
+- Central - Filas: `06-modulos-do-sistema/central-de-mensagens.md#filas`
+- Central - FAQ: `06-modulos-do-sistema/central-de-mensagens.md#faq`
+- Banco pre-CRM: `04-banco-de-dados/tabelas-principais.md`
+- Rotas pre-CRM: `05-api/rotas.md`
+- Correcao Central (erros + observabilidade + clientes novos + funil): `08-correcoes/2026-03-20-central-mensagens-codigos-erro-observabilidade-clientes-novos.md`
+- Correcao CRM/Contatos (engajamento temporal configuravel): `08-correcoes/2026-03-20-engajamento-temporal-contatos-crm.md`
+- Entrega pre-CRM base: `07-novas-implementacoes/2026-03-pre-crm-foundation-os-whatsapp-pdf.md`
+- Entrega CRM + Central: `07-novas-implementacoes/2026-03-crm-central-mensagens-integrados.md`
+- Evolucao faseada da Central de Atendimento: `07-novas-implementacoes/2026-03-central-atendimento-inteligente-faseada.md`
+- Gateway local WhatsApp (arquitetura): `07-novas-implementacoes/2026-03-como-foi-implementado-a-api-local-do-whatsapp.md`
+- Gateway local WhatsApp (producao-ready): `07-novas-implementacoes/2026-03-gateway-local-whatsapp-producao.md`
+- Deploy em VPS Linux: `10-deploy/linux-vps-deployment.md`
+- Roadmap: `09-roadmap/funcionalidades-planejadas.md`

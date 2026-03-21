@@ -1,0 +1,6 @@
+﻿.ds-gallery-board {
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--bg-tertiary);
+    padding: var(--space-4);
+}

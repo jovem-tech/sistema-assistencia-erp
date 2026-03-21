@@ -1,0 +1,17 @@
+﻿.table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text-primary);
+    --bs-table-border-color: var(--border-color);
+}
+
+.table thead th {
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: var(--font-weight-bold);
+}
+
+.table-hover > tbody > tr:hover > * {
+    background: color-mix(in srgb, var(--primary) 6%, transparent);
+}

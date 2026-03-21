@@ -4,7 +4,7 @@
 <div class="page-header d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0"><i class="bi bi-shield-lock me-2"></i>Grupos de Acesso</h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('grupos')" title="Ajuda sobre Grupos e PermissÃµes">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('grupos')" title="Ajuda sobre Grupos e Permissões">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <?php if (can('grupos', 'criar')): ?>
@@ -32,11 +32,11 @@
                         <?php endif; ?>
                     </div>
                 </div>
-                <p class="text-muted small flex-grow-1"><?= esc($g['descricao'] ?: 'Sem descrição.') ?></p>
+                <p class="text-muted small flex-grow-1"><?= esc($g['descricao'] ?: 'Sem descri��o.') ?></p>
                 <div class="d-flex gap-2 mt-2">
                     <?php if (can('grupos', 'editar')): ?>
                     <a href="<?= base_url('grupos/' . $g['id'] . '/permissoes') ?>" class="btn btn-sm btn-glow flex-grow-1">
-                        <i class="bi bi-grid-3x3-gap me-1"></i>Permissões
+                        <i class="bi bi-grid-3x3-gap me-1"></i>Permiss�es
                     </a>
                     <a href="<?= base_url('grupos/editar/' . $g['id']) ?>" class="btn btn-sm btn-outline-secondary" title="Editar nome">
                         <i class="bi bi-pencil"></i>

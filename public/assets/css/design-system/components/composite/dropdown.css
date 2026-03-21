@@ -1,0 +1,17 @@
+﻿.dropdown-menu {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    background: var(--bg-secondary);
+}
+
+.dropdown-item {
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}

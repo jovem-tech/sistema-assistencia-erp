@@ -17,9 +17,9 @@
     <div class="sidebar-menu">
         <ul class="nav flex-column">
 
-            <!-- ── VISÃO GERAL ────────────────────────── -->
+            <!-- ?? VIS�O GERAL ?????????????????????????? -->
             <?php if (canModule('dashboard')): ?>
-            <li class="nav-section">VISÃO GERAL</li>
+            <li class="nav-section">VIS�O GERAL</li>
             <li class="nav-item">
                 <a class="nav-link <?= uri_string() === 'dashboard' ? 'active' : '' ?>" href="<?= base_url('dashboard') ?>">
                     <i class="bi bi-grid-1x2-fill"></i>
@@ -28,7 +28,7 @@
             </li>
             <?php endif; ?>
 
-            <!-- ── OPERACIONAL ────────────────────────── -->
+            <!-- ?? OPERACIONAL ?????????????????????????? -->
             <?php 
             $showOperacional = canModule('os') || canModule('servicos') || canModule('estoque') || canModule('equipamentos') || canModule('defeitos');
             ?>
@@ -39,7 +39,7 @@
             <li class="nav-item">
                 <a class="nav-link <?= str_starts_with(uri_string(), 'os') ? 'active' : '' ?>" href="<?= base_url('os') ?>">
                     <i class="bi bi-clipboard-check-fill"></i>
-                    <span>Ordens de Serviço</span>
+                    <span>Ordens de Servi�o</span>
                 </a>
             </li>
             <?php endif; ?>
@@ -48,7 +48,7 @@
             <li class="nav-item">
                 <a class="nav-link <?= str_starts_with(uri_string(), 'servicos') ? 'active' : '' ?>" href="<?= base_url('servicos') ?>">
                     <i class="bi bi-gear-wide-connected"></i>
-                    <span>Serviços</span>
+                    <span>Servi�os</span>
                 </a>
             </li>
             <?php endif; ?>
@@ -57,7 +57,7 @@
             <li class="nav-item">
                 <a class="nav-link <?= str_starts_with(uri_string(), 'estoque') ? 'active' : '' ?>" href="<?= base_url('estoque') ?>">
                     <i class="bi bi-box-seam-fill"></i>
-                    <span>Estoque de Peças</span>
+                    <span>Estoque de Pe�as</span>
                 </a>
             </li>
             <?php endif; ?>
@@ -93,16 +93,37 @@
             <?php endif; ?>
 
             <?php if (canModule('defeitos')): ?>
+            <?php
+            $isConhecimentoActive = str_starts_with(uri_string(), 'equipamentosdefeitos')
+                || str_starts_with(uri_string(), 'defeitosrelatados');
+            ?>
             <li class="nav-item">
-                <a class="nav-link <?= str_starts_with(uri_string(), 'equipamentosdefeitos') ? 'active' : '' ?>" href="<?= base_url('equipamentosdefeitos') ?>">
-                    <i class="bi bi-bug-fill"></i>
-                    <span>Base de Defeitos</span>
+                <a class="nav-link <?= $isConhecimentoActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#conhecimentoSubmenu" role="button">
+                    <i class="bi bi-journal-bookmark-fill"></i>
+                    <span class="d-flex justify-content-between w-100 align-items-center">
+                        Gest�o de Conhecimento
+                        <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
+                    </span>
                 </a>
+                <div class="collapse <?= $isConhecimentoActive ? 'show' : '' ?>" id="conhecimentoSubmenu">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'equipamentosdefeitos') ? 'active' : '' ?>" href="<?= base_url('equipamentosdefeitos') ?>">
+                                <i class="bi bi-bug-fill"></i><span>Base de Defeitos</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'defeitosrelatados') ? 'active' : '' ?>" href="<?= base_url('defeitosrelatados') ?>">
+                                <i class="bi bi-chat-square-text-fill"></i><span>Defeitos Relatados</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
             <?php endif; ?>
             <?php endif; ?>
 
-            <!-- ── COMERCIAL ──────────────────────────── -->
+            <!-- ?? COMERCIAL ???????????????????????????? -->
             <?php 
             $showComercial = canModule('clientes') || canModule('fornecedores') || canModule('funcionarios') || canModule('vendas');
             ?>
@@ -113,6 +134,7 @@
             <?php if (canModule('clientes') || canModule('fornecedores') || canModule('funcionarios')): ?>
             <?php 
             $isPessoasActive = str_starts_with(uri_string(), 'clientes') 
+                || str_starts_with(uri_string(), 'contatos')
                 || str_starts_with(uri_string(), 'fornecedores') 
                 || str_starts_with(uri_string(), 'funcionarios'); 
             ?>
@@ -128,14 +150,100 @@
                     <ul class="nav flex-column">
                         <?php if (canModule('clientes')): ?>
                         <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'clientes') ? 'active' : '' ?>" href="<?= base_url('clientes') ?>"><i class="bi bi-person-badge"></i><span>Clientes</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'contatos') ? 'active' : '' ?>" href="<?= base_url('contatos') ?>"><i class="bi bi-journal-bookmark"></i><span>Contatos</span></a></li>
                         <?php endif; ?>
                         
                         <?php if (canModule('funcionarios')): ?>
-                        <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'funcionarios') ? 'active' : '' ?>" href="<?= base_url('funcionarios') ?>"><i class="bi bi-person-workspace"></i><span>Equipe Técnico</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'funcionarios') ? 'active' : '' ?>" href="<?= base_url('funcionarios') ?>"><i class="bi bi-person-workspace"></i><span>Equipe T�cnico</span></a></li>
                         <?php endif; ?>
                         <?php if (canModule('fornecedores')): ?>
                         <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'fornecedores') ? 'active' : '' ?>" href="<?= base_url('fornecedores') ?>"><i class="bi bi-truck"></i><span>Fornecedores</span></a></li>
                         <?php endif; ?>
+                    </ul>
+                </div>
+            </li>
+            <?php endif; ?>
+
+            <?php if (canModule('clientes')): ?>
+            <?php
+            $isCrmActive = str_starts_with(uri_string(), 'crm');
+            ?>
+            <li class="nav-item">
+                <a class="nav-link <?= $isCrmActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#crmSubmenu" role="button">
+                    <i class="bi bi-diagram-3-fill"></i>
+                    <span class="d-flex justify-content-between w-100 align-items-center">
+                        CRM
+                        <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
+                    </span>
+                </a>
+                <div class="collapse <?= $isCrmActive ? 'show' : '' ?>" id="crmSubmenu">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link <?= uri_string() === 'crm/clientes' ? 'active' : '' ?>" href="<?= base_url('crm/clientes') ?>">
+                                <i class="bi bi-people"></i><span>Lista de Clientes</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= uri_string() === 'crm/timeline' ? 'active' : '' ?>" href="<?= base_url('crm/timeline') ?>">
+                                <i class="bi bi-clock-history"></i><span>Timeline</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= uri_string() === 'crm/interacoes' ? 'active' : '' ?>" href="<?= base_url('crm/interacoes') ?>">
+                                <i class="bi bi-chat-left-text"></i><span>Interacoes</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= uri_string() === 'crm/followups' ? 'active' : '' ?>" href="<?= base_url('crm/followups') ?>">
+                                <i class="bi bi-calendar-check"></i><span>Follow-ups</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= uri_string() === 'crm/pipeline' ? 'active' : '' ?>" href="<?= base_url('crm/pipeline') ?>">
+                                <i class="bi bi-kanban"></i><span>Pipeline</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= uri_string() === 'crm/campanhas' ? 'active' : '' ?>" href="<?= base_url('crm/campanhas') ?>">
+                                <i class="bi bi-megaphone"></i><span>Campanhas</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= uri_string() === 'crm/metricas-marketing' ? 'active' : '' ?>" href="<?= base_url('crm/metricas-marketing') ?>">
+                                <i class="bi bi-bar-chart-line"></i><span>Metricas Marketing</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= uri_string() === 'crm/clientes-inativos' ? 'active' : '' ?>" href="<?= base_url('crm/clientes-inativos') ?>">
+                                <i class="bi bi-person-x"></i><span>Clientes Inativos</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <?php
+            $isCentralMensagensActive = str_starts_with(uri_string(), 'central-mensagens')
+                || str_starts_with(uri_string(), 'atendimento-whatsapp');
+            ?>
+            <li class="nav-item">
+                <a class="nav-link <?= $isCentralMensagensActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#centralMensagensSubmenu" role="button">
+                    <i class="bi bi-whatsapp"></i>
+                    <span class="d-flex justify-content-between w-100 align-items-center">
+                        Atendimento WhatsApp
+                        <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
+                    </span>
+                </a>
+                <div class="collapse <?= $isCentralMensagensActive ? 'show' : '' ?>" id="centralMensagensSubmenu">
+                    <ul class="nav flex-column">
+                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp' || uri_string() === 'central-mensagens') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp') ?>"><i class="bi bi-inboxes"></i><span>Inbox WhatsApp</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/chatbot' || uri_string() === 'central-mensagens/chatbot') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/chatbot') ?>"><i class="bi bi-robot"></i><span>Chatbot / Automacao</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/metricas' || uri_string() === 'central-mensagens/metricas') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/metricas') ?>"><i class="bi bi-graph-up"></i><span>Metricas</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/respostas-rapidas' || uri_string() === 'central-mensagens/respostas-rapidas') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/respostas-rapidas') ?>"><i class="bi bi-chat-dots"></i><span>Respostas Rapidas</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/fluxos' || uri_string() === 'central-mensagens/fluxos') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/fluxos') ?>"><i class="bi bi-diagram-2"></i><span>Fluxos de Atendimento</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/faq' || uri_string() === 'central-mensagens/faq') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/faq') ?>"><i class="bi bi-question-circle"></i><span>FAQ / Base de Conhecimento</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/filas' || uri_string() === 'central-mensagens/filas') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/filas') ?>"><i class="bi bi-people"></i><span>Filas e Responsaveis</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/configuracoes' || uri_string() === 'central-mensagens/configuracoes') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/configuracoes') ?>"><i class="bi bi-sliders"></i><span>Configuracoes</span></a></li>
                     </ul>
                 </div>
             </li>
@@ -152,9 +260,9 @@
             <?php endif; ?>
 
 
-            <!-- ── GESTÃO & RESULTADOS ──────────────────── -->
+            <!-- ?? GEST�O & RESULTADOS ???????????????????? -->
             <?php if (canModule('financeiro') || canModule('relatorios')): ?>
-            <li class="nav-section">GESTÃO & RESULTADOS</li>
+            <li class="nav-section">GEST�O & RESULTADOS</li>
             
             <?php if (canModule('financeiro')): ?>
             <li class="nav-item">
@@ -169,15 +277,15 @@
             <li class="nav-item">
                 <a class="nav-link <?= uri_string() === 'relatorios' ? 'active' : '' ?>" href="<?= base_url('relatorios') ?>">
                     <i class="bi bi-graph-up-arrow"></i>
-                    <span>Relatórios</span>
+                    <span>Relat�rios</span>
                 </a>
             </li>
             <?php endif; ?>
             <?php endif; ?>
 
-            <!-- ── CONFIGURAÇÕES ──────────────────────── -->
+            <!-- ?? CONFIGURA��ES ???????????????????????? -->
             <?php if (canModule('configuracoes') || canModule('usuarios') || canModule('grupos')): ?>
-            <li class="nav-section">CONFIGURAÇÕES</li>
+            <li class="nav-section">CONFIGURA��ES</li>
 
             <?php if (canModule('configuracoes')): ?>
             <li class="nav-item">
@@ -193,7 +301,7 @@
                 <a class="nav-link collapsed" data-bs-toggle="collapse" href="#menuSeguranca" role="button">
                     <i class="bi bi-shield-lock-fill"></i>
                     <span class="d-flex justify-content-between w-100 align-items-center">
-                        Segurança
+                        Seguran�a
                         <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
                     </span>
                 </a>
@@ -201,12 +309,12 @@
                     <ul class="nav flex-column">
                         <?php if (canModule('usuarios')): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('usuarios') ?>">Usuários</a>
+                            <a class="nav-link" href="<?= base_url('usuarios') ?>">Usu�rios</a>
                         </li>
                         <?php endif; ?>
                         <?php if (canModule('grupos')): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('grupos') ?>">Níveis de Acesso</a>
+                            <a class="nav-link" href="<?= base_url('grupos') ?>">N�veis de Acesso</a>
                         </li>
                         <?php endif; ?>
                     </ul>
@@ -216,9 +324,15 @@
 
             <?php if (session()->get('user_grupo_id') == 1 || can('configuracoes', 'visualizar')): ?>
             <li class="nav-item">
+                <a class="nav-link <?= uri_string() === 'design-system' ? 'active' : '' ?>" href="<?= base_url('design-system') ?>">
+                    <i class="bi bi-palette2"></i>
+                    <span>Design System</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link <?= uri_string() === 'documentacao' ? 'active' : '' ?>" href="<?= base_url('documentacao') ?>">
                     <i class="bi bi-journal-richtext"></i>
-                    <span>Documentação</span>
+                    <span>Documenta��o</span>
                 </a>
             </li>
             <?php endif; ?>
@@ -227,21 +341,10 @@
     </div>
 
     <div class="sidebar-footer">
-        <div class="user-mini-profile">
-            <div class="user-avatar overflow-hidden d-flex align-items-center justify-content-center">
-                <a href="<?= base_url('perfil') ?>" class="text-white text-decoration-none" style="display: block;">
-                    <?php if (session()->get('user_foto') && file_exists('uploads/usuarios/' . session()->get('user_foto'))): ?>
-                        <img src="<?= base_url('uploads/usuarios/' . session()->get('user_foto')) ?>" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-                    <?php else: ?>
-                        <i class="bi bi-person-circle fs-3 align-middle"></i>
-                    <?php endif; ?>
-                </a>
-            </div>
-            <div class="user-info">
-                <span class="user-name"><?= esc(session()->get('user_nome') ?? 'Usuário') ?></span>
-                <span class="user-role"><?= esc(session()->get('user_grupo_nome') ?: ucfirst(session()->get('user_perfil') ?? '')) ?></span>
-            </div>
-        </div>
+        <a href="<?= base_url('logout') ?>" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 py-2 logout-btn" title="Sair do Sistema">
+            <i class="bi bi-box-arrow-left fs-5"></i>
+            <span class="logout-text">Sair do Sistema</span>
+        </a>
     </div>
 </nav>
 

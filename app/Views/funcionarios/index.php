@@ -6,7 +6,7 @@
         <div class="d-flex justify-content-between align-items-center">
             <h1 class="h3 mb-0">Funcionários</h1>
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('funcionarios')" title="Ajuda sobre FuncionÃ¡rios">
+                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('funcionarios')" title="Ajuda sobre Funcionários">
                     <i class="bi bi-question-circle me-1"></i>Ajuda
                 </button>
             <?php if (can('funcionarios', 'criar')): ?>

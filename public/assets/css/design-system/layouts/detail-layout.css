@@ -1,0 +1,12 @@
+﻿.ds-detail-layout .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.ds-detail-layout .detail-meta {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}

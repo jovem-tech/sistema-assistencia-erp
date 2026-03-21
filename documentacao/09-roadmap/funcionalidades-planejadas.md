@@ -1,78 +1,50 @@
-# Roadmap — Funcionalidades Planejadas
+# Roadmap - Funcionalidades Planejadas
 
-> Atualizado: Março 2026
+Atualizado em 17/03/2026.
 
----
+## Concluido (fundacao pre-CRM + CRM operacional inicial)
+- fluxo de OS por macrofases com transicoes validas
+- historico de status (`os_status_historico`)
+- templates WhatsApp por evento
+- envio WhatsApp com texto e PDF
+- geracao/versionamento de PDFs da OS
+- log operacional de mensageria
+- gateway local WhatsApp hardenizado para producao
+- camada desacoplada de mensageria (`MensageriaService` + providers)
+- base CRM integrada ao ERP:
+  - timeline
+  - interacoes
+  - follow-ups
+  - pipeline operacional
+- central de mensagens integrada:
+  - lista de conversas
+  - thread
+  - vinculo com cliente/OS
+  - envio de PDF pela conversa
+  - chatbot com intencoes e FAQ configuraveis
+  - filas e responsaveis
+  - metricas operacionais de atendimento
+  - fluxos de atendimento e respostas rapidas
+  - inbound com midia (imagem/PDF) persistido na thread
+  - badges de operacao (SLA, prioridade, bot, aguardando humano)
+  - motor de regras ERP dinamico para automacoes de mensagem/follow-up/evento
+  - busca global inteligente (navbar): OS, Clientes, Equipamentos, WhatsApp, Módulos, Serviços e Peças
 
-## 🟢 Concluído (Março 2026)
+## Em andamento
+- unificacao de consulta entre `mensagens_whatsapp` e analiticos de atendimento
+- refinamento de templates por tipo de cliente/etapa
+- evolucao do painel de contexto da conversa para multi-OS
+- automacao por horario/SLA em camadas (regra + fila)
 
-- [x] Sistema base de OS com fluxo completo
-- [x] RBAC com permissões granulares por módulo
-- [x] Importação/Exportação CSV em Clientes, Estoque, Serviços
-- [x] Módulo de Serviços (catálogo de reparos padronizados)
-- [x] Base de Defeitos com procedimentos de solução
-- [x] Dashboard com KPIs e gráficos
-- [x] Relatórios por OS, Financeiro, Estoque e Clientes
-- [x] Upload e edição de fotos de equipamentos (Cropper.js)
-- [x] Câmera nativa no cadastro de equipamentos
-- [x] Autopreenchimento de endereço por CEP (ViaCEP)
-- [x] Contato adicional no cadastro de cliente
-- [x] Cadastro rápido de cliente/equipamento/marca/modelo (modais)
-- [x] Link de aprovação de orçamento sem login
-- [x] Design system Glassmorphism com Dark/Light mode
+## Proxima etapa estrategica (CRM avancado)
+- automacoes por SLA com fila de jobs
+- roteamento de conversa por atendente/equipe
+- tags e segmentacao comercial completa
+- campanhas e reativacao com provider de massa oficial
+- notificacoes em tempo real (websocket/push interno)
 
----
-
-## 🔵 Em Desenvolvimento
-
-- [ ] **Módulo de Vendas** — Balcão de vendas de peças e acessórios
-- [ ] **Impressão de Etiqueta** — Etiqueta com QR Code da OS para colagem no equipamento
-- [ ] **Notificações internas** — Alertas de OS com prazo vencido
-
----
-
-## 🟡 Planejado (próximas versões)
-
-### Comunicação
-- [ ] **Integração WhatsApp (WhatsApp Business API)**
-  - Notificação automática quando OS muda de status
-  - Envio do link de orçamento diretamente pelo sistema
-- [ ] **Envio de E-mail automático**
-  - Aviso de OS pronta para retirada
-  - Notificação de prazo de garantia
-
-### Mobile
-- [ ] **App PWA para Técnico**
-  - Visualizar e atualizar OS pelo celular
-  - Tirar fotos direto do celular e vincular à OS
-  - Modo offline com sincronização posterior
-
-### Financeiro
-- [ ] **Integração com PIX**
-  - Geração de QR Code para pagamento
-  - Confirmação automática de pagamento via webhook
-- [ ] **Emissão de NFS-e** (Nota Fiscal de Serviço eletrônica)
-  - Integração com prefeitura via API
-
-### Relatórios Avançados
-- [ ] **Dashboard Gerencial** com indicadores de produtividade por técnico
-- [ ] **Relatório de Tempo Médio de Reparo** por tipo de equipamento
-- [ ] **Previsão de Demanda** baseada em histórico
-
-### Clientes
-- [ ] **Portal do Cliente** — Área onde o cliente acompanha suas OS com login simplificado
-- [ ] **Programa de Fidelidade** — Pontuação por OS realizadas
-
-### Infraestrutura
-- [ ] **Multi-empresa** — Suporte a múltiplas filiais no mesmo sistema
-- [ ] **API REST pública** — Para integração com outros sistemas
-- [ ] **Backup automático** — Agendamento de backup do banco em nuvem
-
----
-
-## ⚫ Backlog (sem data definida)
-
-- [ ] Assinatura digital do cliente na OS (tablet/celular)
-- [ ] Controle de acesso por IP/localização
-- [ ] Integração fiscal (SEFAZ) para emissão de NF-e
-- [ ] App Android nativo para técnicos de campo
+## Backlog tecnico
+- provider oficial Meta para massa/campanhas
+- webhooks inbound completos (entrega/leitura/resposta)
+- retries com politicas configuraveis
+- observabilidade do gateway (metricas e alertas)

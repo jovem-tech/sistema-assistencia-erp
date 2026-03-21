@@ -1,0 +1,23 @@
+{
+  "name": "whatsapp-api-gateway",
+  "version": "1.1.0",
+  "description": "Custom WhatsApp Gateway for Sistema de Assistencia",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:dev": "node server.js",
+    "pm2:start": "pm2 start ecosystem.config.js --env production",
+    "pm2:restart": "pm2 restart whatsapp-local-gateway",
+    "pm2:logs": "pm2 logs whatsapp-local-gateway"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.1.0",
+    "qrcode": "^1.5.4",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.23.0"
+  }
+}

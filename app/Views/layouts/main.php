@@ -11,26 +11,26 @@
     <?php else: ?>
     <link rel="icon" href="<?= base_url('favicon.ico') ?>">
     <?php endif; ?>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= base_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>" rel="stylesheet">
     
     <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?= base_url('assets/vendor/bootstrap-icons/css/bootstrap-icons.css') ?>" rel="stylesheet">
     
     <!-- DataTables CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="<?= base_url('assets/vendor/datatables/css/dataTables.bootstrap5.min.css') ?>" rel="stylesheet">
     
     <!-- Select2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <link href="<?= base_url('assets/vendor/select2/css/select2.min.css') ?>" rel="stylesheet" />
+    <link rel="stylesheet" href="<?= base_url('assets/vendor/select2-bootstrap-5-theme/css/select2-bootstrap-5-theme.min.css') ?>" />
+    <link rel="stylesheet" href="<?= base_url('assets/vendor/sweetalert2/sweetalert2.min.css') ?>" />
 
     <!-- Custom CSS -->
     <link href="<?= base_url('assets/css/estilo.css') ?>" rel="stylesheet">
+    <link href="<?= base_url('assets/css/design-system/index.css') ?>" rel="stylesheet">
+    <link href="<?= base_url('assets/css/global-search.css') ?>" rel="stylesheet">
 </head>
-<body>
+<body class="ds-app-shell">
     <div class="app-wrapper">
         <!-- Sidebar -->
         <?= $this->include('layouts/sidebar') ?>
@@ -79,26 +79,28 @@
     </div>
     
     <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="<?= base_url('assets/vendor/jquery/jquery-3.7.1.min.js') ?>"></script>
     
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= base_url('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
     
     <!-- DataTables JS -->
-    <script src="https://cdn.jsdelivr.net/npm/datatables.net@1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="<?= base_url('assets/vendor/datatables/js/jquery.dataTables.min.js') ?>"></script>
+    <script src="<?= base_url('assets/vendor/datatables/js/dataTables.bootstrap5.min.js') ?>"></script>
     
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="<?= base_url('assets/vendor/chart.js/chart.umd.min.js') ?>"></script>
     
     <!-- jQuery Mask -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin@1.14.16/dist/jquery.mask.min.js"></script>
+    <script src="<?= base_url('assets/vendor/jquery-mask-plugin/jquery.mask.min.js') ?>"></script>
     
     <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="<?= base_url('assets/vendor/select2/js/select2.min.js') ?>"></script>
+    <script src="<?= base_url('assets/vendor/sweetalert2/sweetalert2.all.min.js') ?>"></script>
     
     <!-- Custom JS -->
     <script src="<?= base_url('assets/js/scripts.js') ?>"></script>
+    <script src="<?= base_url('assets/js/global-search.js') ?>"></script>
     
     <?= $this->renderSection('scripts') ?>
 </body>

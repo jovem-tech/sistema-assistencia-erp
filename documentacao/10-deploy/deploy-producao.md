@@ -1,90 +1,125 @@
-# Deploy em Produção
+# Deploy em Producao (VPS Linux)
 
-## Requisitos do Servidor
+Atualizado em 17/03/2026.
 
-| Item | Mínimo Recomendado |
-|------|--------------------|
-| PHP | 8.2+ com extensões: mysqli, gd, fileinfo, mbstring |
-| MySQL | 8.0+ ou MariaDB 10.6+ |
-| Apache | 2.4+ com `mod_rewrite` ativo |
-| RAM | 1GB+ |
-| Disco | 10GB+ (para uploads de fotos) |
-| HTTPS | Obrigatório em produção |
+Este guia resume a entrada em producao do ERP com gateway WhatsApp Node em VPS Linux.
 
----
+## 1. Requisitos
 
-## Configuração do `.env` para Produção
+- Ubuntu 22.04+ ou Debian 12+
+- PHP 8.2+
+- MySQL/MariaDB
+- Apache ou Nginx com HTTPS
+- Node.js 20+
+- PM2
 
-```ini
-CI_ENVIRONMENT = production
+## 2. ERP (CodeIgniter)
 
-app.baseURL = 'https://seudominio.com/'
+1. Publicar codigo do ERP.
+2. Configurar `.env` de producao (URL, banco, seguranca).
+3. Executar migrations:
 
-database.default.hostname = localhost
-database.default.database = nome_banco_producao
-database.default.username = usuario_banco
-database.default.password = senha_forte_aqui
-database.default.DBDriver = MySQLi
-
-# Segurança
-encryption.key = SUA_CHAVE_ALEATORIA_64_CHARS_AQUI
-```
-
----
-
-## Configuração Apache (Virtual Host)
-
-```apache
-<VirtualHost *:443>
-    ServerName seudominio.com
-    DocumentRoot /var/www/html/sistema-assistencia/public
-
-    <Directory /var/www/html/sistema-assistencia/public>
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    SSLEngine on
-    SSLCertificateFile    /etc/ssl/certs/seudominio.crt
-    SSLCertificateKeyFile /etc/ssl/private/seudominio.key
-</VirtualHost>
-```
-
----
-
-## Checklist de Deploy
-
-```
-[ ] Copiar arquivos para servidor (excluir: .git, documentacao/, tmp_*.php)
-[ ] Configurar .env com dados de produção
-[ ] Importar banco de dados
-[ ] Executar `update_equip_db.php`, `update_os_campos.php` e `setup_rbac.php` (e remover scripts após uso)
-[ ] Permissões: chmod -R 755 . && chmod -R 777 writable/ public/uploads/
-[ ] Testar login e acesso ao sistema
-[ ] Trocar senha do admin padrão
-[ ] Ativar HTTPS
-[ ] Configurar backup automático do banco
-[ ] Testar upload de fotos
-[ ] Verificar logs em writable/logs/
-```
-
----
-
-## Backup
-
-### Banco de Dados (manual)
 ```bash
-mysqldump -u usuario -p assistencia_tecnica > backup_$(date +%Y%m%d).sql
+php spark migrate
 ```
 
-### Arquivos de Upload
+4. Garantir escrita em:
+- `writable/`
+- `public/uploads/`
+
+## 3. Gateway WhatsApp (Node)
+
+Pasta recomendada:
+
+`/sistema/whatsapp-api`
+
+### 3.1 Instalacao automatica
+
 ```bash
-tar -czf uploads_$(date +%Y%m%d).tar.gz public/uploads/
+cd /sistema/whatsapp-api
+chmod +x install-whatsapp-api.sh
+./install-whatsapp-api.sh /sistema/whatsapp-api whatsapp-gateway
 ```
 
-### Automatizar (cron Linux)
+Opcao recomendada (instalador unificado ERP + opcao de gateway):
+
 ```bash
-# Backup diário às 2h da manhã
-0 2 * * * mysqldump -u usuario -pSENHA assistencia_tecnica > /backups/db_$(date +\%Y\%m\%d).sql
-0 2 * * * tar -czf /backups/uploads_$(date +\%Y\%m\%d).tar.gz /var/www/html/sistema-assistencia/public/uploads/
+cd /sistema
+chmod +x scripts/install-vps.sh
+./scripts/install-vps.sh /sistema /sistema/whatsapp-api whatsapp-gateway
 ```
+
+### 3.2 Variaveis obrigatorias (`.env`)
+
+```env
+NODE_ENV=production
+HOST=127.0.0.1
+PORT=3001
+API_TOKEN=TOKEN_FORTE_AQUI
+ERP_ORIGIN=https://erp.seudominio.com,https://crm.seudominio.com
+WHATSAPP_SESSION_PATH=./.wwebjs_auth
+SESSION_PATH=./.wwebjs_auth
+WHATSAPP_CLIENT_ID=erp-gateway-prod
+LOGS_DIR=./logs
+```
+
+Token forte:
+
+```bash
+openssl rand -hex 32
+```
+
+### 3.3 Operacao PM2
+
+```bash
+pm2 status whatsapp-gateway
+pm2 logs whatsapp-gateway
+pm2 restart whatsapp-gateway
+pm2 save
+```
+
+## 4. Configuracao no ERP
+
+Em `Configuracoes -> Integracoes WhatsApp`:
+
+1. Definir `Canal Direto`:
+   - `api_whats_linux` para VPS
+2. Preencher:
+   - `whatsapp_linux_node_url`
+   - `whatsapp_linux_node_token`
+   - `whatsapp_linux_node_origin`
+   - `whatsapp_linux_node_timeout`
+3. Salvar.
+4. Rodar:
+   - `Testar conexao`
+   - `Enviar mensagem de teste`
+   - `Gerenciar` (QR/status/restart)
+
+## 5. Compatibilidade com desenvolvimento local
+
+No Windows/XAMPP, manter:
+- provider direto `api_whats_local`
+- chaves `whatsapp_local_node_*`
+
+No Linux/producao, usar:
+- provider direto `api_whats_linux`
+- chaves `whatsapp_linux_node_*`
+
+O ERP continua usando a mesma camada (`MensageriaService`) sem alterar regra de negocio.
+
+## 6. Checklist de seguranca
+
+- `API_TOKEN` forte e nao vazio
+- `ERP_ORIGIN` restrito aos dominios do ERP/CRM
+- porta do gateway sem exposicao publica direta
+- HTTPS ativo no ERP
+- logs ativos:
+  - ERP: tabelas de mensageria
+  - gateway: `whatsapp-api/logs/gateway.log`
+
+## 7. Troubleshooting
+
+- `gateway_unreachable`: Node parado, URL incorreta ou bloqueio de rede
+- `unauthorized`: token ERP diferente de `API_TOKEN`
+- `forbidden_origin`: origem ERP nao incluida em `ERP_ORIGIN`
+- `not_ready`: sessao WhatsApp sem autenticacao (QR pendente)

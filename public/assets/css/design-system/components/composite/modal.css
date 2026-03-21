@@ -1,0 +1,15 @@
+﻿.modal-content {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
+    background: var(--bg-secondary);
+}
+
+.modal-header,
+.modal-footer {
+    border-color: var(--border-color);
+}
+
+.modal-title {
+    font-weight: var(--font-weight-bold);
+}

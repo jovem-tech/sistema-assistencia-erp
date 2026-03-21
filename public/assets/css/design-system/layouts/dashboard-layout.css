@@ -1,0 +1,7 @@
+﻿.ds-dashboard-layout .page-header {
+    margin-bottom: var(--space-5);
+}
+
+.ds-dashboard-layout .stat-card {
+    border-radius: var(--radius-lg);
+}

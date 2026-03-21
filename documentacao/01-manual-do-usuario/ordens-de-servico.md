@@ -1,158 +1,180 @@
-# Manual do Usuário — Ordens de Serviço
+# Manual do Usuario - Ordens de Servico
 
-## 📋 Visão Geral
+## Visao geral
+A Ordem de Servico (OS) e o registro principal do atendimento tecnico, da recepcao do equipamento ate a entrega.
 
-A Ordem de Serviço (OS) é o **documento central** do sistema. Registra todo o ciclo de vida de um reparo: da entrada do equipamento à entrega ao cliente.
+### Identificador Unico (Numero da OS)
+O sistema utiliza um padrao inteligente para numeracao: **`OSYYMMSSSS`**
+- **YY**: Ano (Ex: 26)
+- **MM**: Mes (Ex: 03)
+- **SSSS**: Sequencia numerica (Ex: 0001)
 
----
+Este numero e gerado automaticamente e a **sequencia reseta para 0001 no inicio de cada mes**, facilitando a organizacao e o controle de volume.
 
-## 📊 Status das OS
+## Abertura de nova OS
+Caminho: `Ordens de Servico > + Nova OS`
 
-| Status | Descrição |
-|--------|-----------|
-| 🟡 **Aguard. Análise** | OS aberta, aguardando técnico avaliar |
-| 🟠 **Aguard. Orçamento** | Técnico diagnosticou, orçando peças/serviços |
-| 🔵 **Aguard. Aprovação** | Orçamento enviado ao cliente aguardando resposta |
-| 🟢 **Aprovado** | Cliente aprovou, reparo autorizado |
-| 🔴 **Reprovado** | Cliente não aprovou o orçamento |
-| 🔧 **Em Reparo** | Técnico executando o reparo |
-| ⏳ **Aguard. Peça** | Reparo pausado aguardando peça |
-| ✅ **Pronto** | Reparo concluído, aguardando retirada |
-| 📦 **Entregue** | Equipamento devolvido ao cliente |
-| ❌ **Cancelado** | OS cancelada |
+### Estrutura por abas
+- `Dados`
+- `Relato do Cliente`
+- `Fotos`
 
----
+Na aba `Dados`, o formulario foi separado em blocos visuais para reduzir erro de preenchimento:
+- Cliente, Equipamento e Tecnico Responsavel
+- Prioridade, Data de Entrada, Previsao e Status
+- Estado fisico do equipamento
+- Acessorios e Componentes (na entrada)
 
-## ➕ Abrir Nova OS
+## Campos principais da abertura
+| Campo | Obrigatorio | Uso |
+|---|---|---|
+| Cliente | Sim | Cliente dono da OS |
+| Equipamento | Sim | Equipamento vinculado ao cliente |
+| Tecnico Responsavel | Nao | Tecnico que assume a OS |
+| Prioridade | Sim | Baixa/Normal/Alta/Urgente |
+| Data de Entrada | Sim | Data/hora de recebimento |
+| Previsao de Entrega | Nao | Data prevista para retorno |
+| Status | Sim | Estado inicial da OS |
+| Relato do Cliente | Sim | Texto informado na recepcao |
+| Estado fisico na entrada | Nao | Danos visuais observados |
+| Acessorios na entrada | Nao | Itens recebidos com o equipamento |
 
-**Caminho:** Menu → Ordens de Serviço → `+ Nova OS`
+## Registro de acessorios
+O bloco `Acessorios e Componentes (na entrada)` usa botoes de insercao rapida.
 
-### Passo a Passo
+Fluxo:
+1. Clique em um botao rapido (`+ Chip`, `+ Capinha celular`, `+ Cabo`, etc.).
+2. Preencha campos complementares quando existirem.
+3. Salve o item.
+4. Edite/remova quando necessario.
+5. Adicione fotos por `Galeria` ou `Camera`.
 
-O cadastro na abertura está organizado em abas para facilitar o preenchimento:
-- **Dados** (Cliente, Equipamento, Técnico, Prioridade, Datas, Status e Acessórios)
-- **Relato e Defeitos**
-- **Fotos**
+Regras:
+- Opcao `Equipamento recebido sem acessorios` marca a entrada sem itens.
+- Fotos por acessorio usam crop/preview antes de salvar.
+- Se o editor visual nao abrir corretamente, o sistema usa fallback automatico e adiciona a foto sem corte para nao travar a tela.
+- Imagens ficam em `uploads/acessorios/OS_<numero_os>/`.
 
-**1. Selecionar Cliente**
-- Busque pelo nome, CPF ou telefone no campo Select2
-- Não encontrou? Clique em `+ Novo` para cadastrar rapidamente
+## Registro de estado fisico
+O bloco `Estado fisico do equipamento` usa a mesma logica de item dinamico dos acessorios.
 
-**2. Selecionar Equipamento**
-- Após selecionar o cliente, os equipamentos vinculados aparecem automaticamente
-- Não tem equipamento? Clique em `+ Novo` para cadastrar.
-- **Dica**: O novo modal de cadastro de equipamento dentro da OS agora é organizado por **Abas** e inclui o **Seletor Profissional de Cores** e os **Atalhos de Acessórios**, exatamente como no cadastro principal.
+Fluxo:
+1. Clique em um botao rapido (`+ Tela trincada`, `+ Arranhoes`, `+ Carcaca quebrada`, `+ Outro dano`).
+2. Salve o item.
+3. Edite/remova o item quando necessario.
+4. Adicione fotos por item com `Galeria` ou `Camera`.
 
-**3. Informações da OS**
-| Campo | Obrigatório | Descrição |
-|-------|-------------|-----------|
-| Técnico Responsável | Não | Seleciona apenas funcionários ativos com cargo "Técnico" |
-| Prioridade | Sim | Baixa / Normal / Alta / Urgente |
-| Data de Entrada | Sim | Preenchida automaticamente |
-| Previsão de Entrega | Não | Data prometida ao cliente (pode usar prazo em dias) |
-| Status | Sim | Estado atual da OS |
-| Relato do Cliente | Sim | O que o cliente descreveu do problema |
-| Acessórios | Não | Itens recebidos junto ao equipamento |
+Regra especial:
+- `Sem avarias aparentes na entrada` substitui os itens cadastrados (com confirmacao).
+- Se o editor visual nao abrir corretamente, o sistema usa fallback automatico e adiciona a foto sem corte para nao travar a tela.
 
-### Registro guiado de Acessórios
+Armazenamento de fotos:
+- `uploads/estado_fisico/OS_<numero_os>/estado_<slug_os>_<sequencia>.<ext>`
 
-O painel “Acessórios e Componentes (na entrada)” agora inclui **botões rápidos** para padronizar o registro de itens comuns. Cada clique abre um mini formulário e salva o texto com formato consistente (ex: “Chip final 123456”, “Capinha celular rosa”, “Cabo USB-C”). Os botões disponíveis são:
+## Relato do cliente
+Na abertura da OS, o relato pode ser montado com selecao rapida por categoria.
 
-- `+ CHIP` (solicita os últimos seis dígitos)
-- `+ CAPINHA CELULAR` (abre seletor de cor e campo de apoio)
-- `+ CAPA`, `+ MOCHILA` e `+ BOLSA NOTEBOOK` (cadastram o objeto e registram cor quando informada)
-- `+ CABO` (tipos rápidos: USB-C, Micro USB, Lightning, HDMI, Cabo de força e opção `Outro` com campo manual)
-- `+ CARREGADOR` (define automaticamente o tipo de equipamento associado)
-- `+ OUTRO ACESSÓRIO` (permite descrição livre para itens fora da lista)
+Fonte dos itens:
+- Modulo `Gestao de Conhecimento > Defeitos Relatados`
 
-Cada acessório aparece em uma lista abaixo com ações de editar, remover e adicionar fotos, além de mostrar miniaturas. Ao adicionar imagens são exibidos previews com botão de remoção e clique para ampliar em modal, exatamente como os uploads de equipamento.
+Comportamento:
+- Clicar em uma opcao adiciona a frase no textarea.
+- O tecnico pode editar manualmente o texto livremente.
 
-Regras de escrita da cor:
-- O sistema não usa mais “sem cor”.
-- O texto não usa hífen para separar descrição e cor.
-- Quando houver cor, é salvo e exibido apenas o **nome da cor** (sem código hexadecimal), por exemplo: `Capinha celular Azul Céu`.
-- Quando não houver cor, o item fica apenas com a descrição base, por exemplo: `Capinha celular` ou `Mochila`.
-- O seletor de cor oferece **atalhos rápidos** com 12 cores comuns: Preto, Marrom, Azul claro, Verde claro, Rosa, Vermelho, Laranja, Amarelo, Verde, Azul, Roxo/Violeta e Branco.
-- Em telas maiores, os atalhos de cores ficam alinhados **lado a lado**.
-- Em telas menores, os atalhos ficam agrupados no botão **Cores rápidas**.
+## Aba Fotos (abertura)
+O upload de fotos de entrada usa o padrao unico do sistema:
+- Galeria
+- Camera
+- Crop antes de salvar
+- Preview com remocao
+- Fallback automatico sem corte quando o modal/editor visual falhar
 
-Essa escolha gera:
+Observacao tecnica de UX:
+- A abertura do editor de corte na OS segue o mesmo comportamento do cadastro de equipamentos (`/equipamentos/novo`), para manter consistencia entre os fluxos de foto do sistema.
+- A abertura da camera na OS reutiliza o mesmo padrao de modal controlado e, se o navegador bloquear a interface da camera, o sistema informa o motivo por alerta e pelo console.
 
-- um `acessorio_data` estruturado no formulário para persistência
-- registros nas novas tabelas `acessorios_os` e `fotos_acessorios`
-- arquivos armazenados em `uploads/acessorios/OS_<Número da OS>/acessorio_<Número>_<Sequência>.jpg`
+## Visualizacao da OS
+Caminho: `/os/visualizar/{id}`
 
-Esse histórico visual complementa o relato do cliente e evita dúvidas sobre o que foi entregue.
+Agora a OS exibe o estado fisico em dois pontos:
+- `Informacoes > Estado fisico na entrada` (descricao + fotos por item)
+- `Fotos de Entrada > Fotos do Estado fisico`
 
-**4. Fotos de Entrada**
-- Registre fotos do estado físico do equipamento ao recebê-lo
-- O upload agora usa o mesmo modelo do cadastro de equipamentos (área central com drag/drop, botões de galeria/câmera e visualização direta das miniaturas).
-- A seção de acessórios ganhou botões rápidos; ao clicar em cada botão o sistema abre campos complementares (chip, cor da capinha, tipo de cabo etc.) e lista os itens criados com controles de edição/remoção.
-- Botões: `📷 Tirar Foto` (câmera) ou `🖼️ Galeria` (arquivo)
-- Após escolher, um **editor de imagem** abre para recortar e ajustar a foto
+Tambem exibe:
+- Fotos da entrada geral
+- Fotos de acessorios
 
-**5. Defeitos Comuns**
-- Após selecionar o equipamento, a **Base de Defeitos** carrega automaticamente
-- Marque os defeitos reportados pelo cliente
+## Listagem de OS responsiva
+Caminho: `/os`
 
-**6. Prazo de Entrega**
-- Use o menu de prazos (1, 3, 7 e 30 dias) para preencher automaticamente a data de previsão
+Melhorias aplicadas:
+- Filtros superiores reorganizados por breakpoint (desktop/notebook/tablet/mobile) sem sobreposicao.
+- Colunas menos criticas sao ocultadas automaticamente conforme largura:
+  - ate 1499px: oculta `Relato`
+  - ate 1279px: oculta `Valor Total`
+  - ate 1023px: oculta `Equipamento`
+  - ate 859px: oculta `Data Abertura`
+- Em mobile, linhas da tabela viram blocos/cartoes com label por campo.
+- Acoes continuam acessiveis no fim do bloco, otimizadas para toque.
 
-**7. Peças e Orçamento**
-- Esta etapa não aparece na abertura da OS.
-- Peças, serviços e valores são lançados após a OS estar criada, na tela de visualização/edição.
-- **Forma de Pagamento**: pode ser registrada na edição da OS para facilitar o faturamento.
+## Responsividade da abertura de OS
+Caminho: `/os/nova`
 
----
+Melhorias aplicadas:
+- Layout principal padronizado com coluna lateral + formulario (`ds-split-layout`).
+- Em notebook: coluna lateral reduzida com formulario mais amplo.
+- Em tablet/mobile: empilhamento automatico (lateral acima, formulario abaixo).
+- Abas com rolagem horizontal (`ds-tabs-scroll`) para evitar quebra visual.
+- Blocos de dados (`os-data-section`) com espacamento ajustado por breakpoint.
+- Botoes de acao da OS (`Abrir`, `Cancelar`, `Limpar rascunho`) com comportamento empilhado no mobile.
 
-## Recursos de Apoio na Abertura
-- **Resumo da OS (lateral)**: mostra cliente, equipamento, técnico, prioridade, status, datas e contadores de fotos/defeitos.
-- **Indicadores de preenchimento**: cada linha do resumo exibe ✔️ ou ❌ conforme o campo esteja completo.
-- **Fotos do equipamento (lateral)**: exibem a foto principal e miniaturas assim que um equipamento é selecionado.
-- **Miniaturas laterais clicáveis** abrem o zoom da mesma maneira que o card de fotos central.
-- **Cor do equipamento**: quando não há foto, o quadro usa a cor do equipamento; com foto, a cor aparece abaixo.
-- **Seleção inteligente**: quando existe apenas 1 equipamento do cliente, ele pode ser selecionado automaticamente.
-- **Rascunho automático**: durante a criação, o sistema salva um rascunho localmente e permite restaurar ou descartar.
-- **Limpar rascunho**: botão no rodapé do formulário remove o rascunho salvo.
+## Responsividade da visualizacao de OS
+Caminho: `/os/visualizar/{id}`
 
-## ✏️ Editar / Atualizar OS
+Melhorias aplicadas:
+- Estrutura principal convertida para split responsivo (painel de fotos + conteudo).
+- Cards de status/PDF/WhatsApp com reorganizacao 1-2-3 colunas por breakpoint.
+- Formulario rapido de status com quebra inteligente (sem apertar select e botao).
+- Tabs de secoes com navegacao horizontal em telas menores.
 
-**Campos adicionais disponíveis na edição:**
-- **Diagnóstico Técnico** — O que o técnico encontrou
-- **Solução Aplicada** — O que foi feito
-- **Mão de Obra (R$)** — Valor do serviço
-- **Peças (R$)** — Calculado automaticamente dos itens
-- **Desconto (R$)** — Desconto concedido
-- **Valor Final (R$)** — Total calculado automaticamente
-- **Garantia (dias)** — Prazo de garantia do reparo
-- **Observações Internas** — Notas para a equipe (não aparecem no orçamento)
-- **Observações para o Cliente** — Aparece na impressão
+## Edicao da OS
+Na edicao (`/os/editar/{id}`), os dados de abertura podem ser ajustados e os registros de estado fisico/acessorios sao persistidos novamente.
 
----
+## Fluxo operacional por macrofases
+O status da OS foi padronizado em macrofases:
+- recepcao
+- diagnostico
+- orcamento
+- execucao
+- interrupcao
+- qualidade
+- concluido
+- finalizado_sem_reparo
+- encerrado
+- cancelado
 
-## 🖨️ Imprimir OS / Orçamento
+## Regras de transicao de status
+- O sistema valida transicoes permitidas entre status.
+- Mudancas invalidas sao bloqueadas.
+- Cada alteracao gera registro no historico da OS com usuario e data/hora.
 
-Na tela de visualização da OS, clique em **Imprimir** para gerar um documento PDF com:
-- Dados do cliente e equipamento
-- Relato do problema
-- Diagnóstico e solução
-- Valores
-- Assinatura do cliente
+## Comunicacao WhatsApp na OS
+Na tela de visualizacao (`/os/visualizar/{id}`):
+- Bloco `WhatsApp` para envio manual por template ou texto livre.
+- Opcao de selecionar um PDF ja gerado da OS para enviar junto como anexo.
+- Botao rapido de envio WhatsApp em cada documento da lista `Documentos PDF`.
+- Historico de envios da OS com status e tipo de conteudo (texto, pdf ou texto+pdf).
+- Envio automatico em status-chave (quando configurado): abertura, aguardando autorizacao, aguardando peca, pronto para retirada e entrega.
 
----
+## Documentos PDF da OS
+Na tela de visualizacao (`/os/visualizar/{id}`):
+- Bloco `Documentos PDF` para gerar e listar versoes.
+- Tipos disponiveis:
+  - abertura
+  - orcamento
+  - laudo
+  - entrega
+  - devolucao_sem_reparo
 
-## 🔗 Link de Aprovação de Orçamento
-
-O sistema gera um link único que pode ser enviado ao cliente por WhatsApp ou e-mail. O cliente acessa, vê o orçamento e pode **Aprovar** ou **Recusar** sem precisar de login.
-
----
-
-## 📊 Histórico de OS (Listagem)
-
-Filtros disponíveis:
-- Por técnico
-- Por status
-- Por período (data de entrada)
-- Por cliente
-
-Use o **DataTables** para busca rápida por número da OS, cliente ou equipamento.
+Os arquivos ficam em:
+- `public/uploads/os_documentos/OS_<numero_os>/`

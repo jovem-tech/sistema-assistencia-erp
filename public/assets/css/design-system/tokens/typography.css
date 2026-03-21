@@ -1,0 +1,32 @@
+﻿:root {
+    --font-family-base: "Manrope", "Plus Jakarta Sans", "Segoe UI", sans-serif;
+    --font-family-mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+
+    --font-size-xs: 12px;
+    --font-size-sm: 13px;
+    --font-size-md: 14px;
+    --font-size-lg: 16px;
+    --font-size-xl: 20px;
+    --font-size-2xl: 28px;
+
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+}
+
+body {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-md);
+    color: var(--text-primary);
+    background: var(--bg-primary);
+}
+
+h1, .h1 { font-size: var(--font-size-2xl); font-weight: var(--font-weight-extrabold); }
+h2, .h2 { font-size: 24px; font-weight: var(--font-weight-bold); }
+h3, .h3 { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); }
+h4, .h4 { font-size: 18px; font-weight: var(--font-weight-semibold); }
+
+.text-muted, small, .form-text {
+    color: var(--text-secondary) !important;
+}

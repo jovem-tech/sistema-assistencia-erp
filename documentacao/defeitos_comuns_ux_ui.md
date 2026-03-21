@@ -1,39 +1,39 @@
-# Documenta√ß√£o da Tela de Defeitos Comuns (Refatora√ß√£o UI/UX)
+# DocumentaÁ„o da Tela de Defeitos Comuns (RefatoraÁ„o UI/UX)
 
-O m√≥dulo de **Defeitos Comuns** (`/equipamentosdefeitos`) foi recentemente reestruturado para evoluir de um formato de _Simple-List_ para uma interface moderna e inteligente inspirada em pain√©is SaaS. Nenhuma regra de neg√≥cio ou l√≥gica do banco de dados precisou ser adulterada.
+O mÛdulo de **Defeitos Comuns** (`/equipamentosdefeitos`) foi recentemente reestruturado para evoluir de um formato de _Simple-List_ para uma interface moderna e inteligente inspirada em painÈis SaaS. Nenhuma regra de negÛcio ou lÛgica do banco de dados precisou ser adulterada.
 
-Abaixo est√° o descritivo de componentes alterados no arquivo `app/Views/equipamentos_defeitos/index.php`.
+Abaixo est· o descritivo de componentes alterados no arquivo `app/Views/equipamentos_defeitos/index.php`.
 
-## 1. Modifica√ß√µes Visuais implementadas
+## 1. ModificaÁıes Visuais implementadas
 
 *   **Grid System Responsivo:**
-    A antiga listagem vertical (tags `<ul>` cont√≠nua) foi substitu√≠da por um layout din√¢mico responsivo atrav√©s da classe `.row.g-3`. Agora os cards ocupam e preenchem eficientemente o espa√ßo vago na tela (`col-md-6 col-lg-4 col-xl-3`).
-*   **Mapeamento Sem√¢ntico de √çcones:**
-    A string original resgatada pelo SQL com o nome limpo do equipamento (ex: "Celular, Desktop") foi interligada dinamicamente com um array `$iconMap`. Isso proporcionou o surgimento autom√°tico do Glyph (√çcone SVG do *Bootstrap Icons*) ao lado do t√≠tulo correspondente de cada agrupamento. Tipos como "Notebok" receberam `bi-laptop`, Celulares `bi-phone` e afins.
+    A antiga listagem vertical (tags `<ul>` contÌnua) foi substituÌda por um layout din‚mico responsivo atravÈs da classe `.row.g-3`. Agora os cards ocupam e preenchem eficientemente o espaÁo vago na tela (`col-md-6 col-lg-4 col-xl-3`).
+*   **Mapeamento Sem‚ntico de Õcones:**
+    A string original resgatada pelo SQL com o nome limpo do equipamento (ex: "Celular, Desktop") foi interligada dinamicamente com um array `$iconMap`. Isso proporcionou o surgimento autom·tico do Glyph (Õcone SVG do *Bootstrap Icons*) ao lado do tÌtulo correspondente de cada agrupamento. Tipos como "Notebok" receberam `bi-laptop`, Celulares `bi-phone` e afins.
 *   **Badge Analytics Interativo:**
-    Criou-se l√≥gica (`count`) direto na View. Para a √°rea interna de cada bloco de equipamentos, renderiza-se os contadores individualizados `<Hardware (3)>` e `<Software (1)>` em tags `<span class="badge">`.
-*   **A√ß√µes e √Årea Truncada:**
-    O bot√£o "Editar" e "Excluir" abandonaram o padr√£o de layout horizontal na lateral e passam a morar nativamente dentro de um *Options Dropdown* (Os Tr√™s Pontinhos Verticais no canto superior direito do bal√£o do Card do respectivo defeito). 
-    A altura do card e texto foi engessada utilizando o hack visual do motor CSS WebKit (`-webkit-line-clamp: 3`) contendo excesso de conte√∫do no texto de **Descri√ß√£o**.
+    Criou-se lÛgica (`count`) direto na View. Para a ·rea interna de cada bloco de equipamentos, renderiza-se os contadores individualizados `<Hardware (3)>` e `<Software (1)>` em tags `<span class="badge">`.
+*   **AÁıes e ¡rea Truncada:**
+    O bot„o "Editar" e "Excluir" abandonaram o padr„o de layout horizontal na lateral e passam a morar nativamente dentro de um *Options Dropdown* (Os TrÍs Pontinhos Verticais no canto superior direito do bal„o do Card do respectivo defeito). 
+    A altura do card e texto foi engessada utilizando o hack visual do motor CSS WebKit (`-webkit-line-clamp: 3`) contendo excesso de conte˙do no texto de **DescriÁ„o**.
 
 ## 2. Comportamento Operacional (Status das Funcionalidades)
 
-Toda a estrutura sub-base √© fundamentada utilizando estritamente l√≥gica pura de Javascript/DOM, sem onerar a aplica√ß√£o com processamentos pesados de plugins de terceiros de UI.
+Toda a estrutura sub-base È fundamentada utilizando estritamente lÛgica pura de Javascript/DOM, sem onerar a aplicaÁ„o com processamentos pesados de plugins de terceiros de UI.
 
-### üü¢ O que EST√Å funcionando plenamente (Fun√ß√µes Ativas):
+### ? O que EST¡ funcionando plenamente (FunÁıes Ativas):
 *   **Filtro/Busca Front-end:**
-    O componente `<input type="text" id="buscaDefeitos">` monitora ativamente as entradas digitadas (`keyup`). O Javascript implementado varre em tempo real (sem enviar query ao Backend) os t√≠tulos (`.defect-title`) e descri√ß√µes (`.defect-desc`). Os cards ou os grupos principais de equipamentos desaparecem suavemente via *display:none* quando n√£o cruzam com o termo pesquisado. Funciona com case-insensitive.
-*   **Anima√ß√£o Hover:**
-    Efeitos de _Mouse Enter_ e _Mouse Leave_ processam de forma natural sobre cada Card (item solto), elevando o *margin* e acentuando a sombra (`box-shadow`), dando profundidade e confirmando a √°rea clic√°vel ou zona focada da a√ß√£o.
-*   **Prote√ß√£o via RBAC (Grupos):**
-    O menu retr√°til `Dropdown` para editar ou destruir um defeito ainda permanece encapsulado pelas chaves ativas do Sistema de Autentica√ß√£o (`can('equipamentos', 'editar')`). Se o cargo do operador contiver a limita√ß√£o de exclus√£o, apenas a tag local n√£o ser√° disposta pra ele.
+    O componente `<input type="text" id="buscaDefeitos">` monitora ativamente as entradas digitadas (`keyup`). O Javascript implementado varre em tempo real (sem enviar query ao Backend) os tÌtulos (`.defect-title`) e descriÁıes (`.defect-desc`). Os cards ou os grupos principais de equipamentos desaparecem suavemente via *display:none* quando n„o cruzam com o termo pesquisado. Funciona com case-insensitive.
+*   **AnimaÁ„o Hover:**
+    Efeitos de _Mouse Enter_ e _Mouse Leave_ processam de forma natural sobre cada Card (item solto), elevando o *margin* e acentuando a sombra (`box-shadow`), dando profundidade e confirmando a ·rea clic·vel ou zona focada da aÁ„o.
+*   **ProteÁ„o via RBAC (Grupos):**
+    O menu retr·til `Dropdown` para editar ou destruir um defeito ainda permanece encapsulado pelas chaves ativas do Sistema de AutenticaÁ„o (`can('equipamentos', 'editar')`). Se o cargo do operador contiver a limitaÁ„o de exclus„o, apenas a tag local n„o ser· disposta pra ele.
 *   **Modal Form:**
-    Os modais originais flutuantes de Cadastro `(novoDefeitoModal)` permanecem entocadas no fim do arquivo HTML e s√£o perfeitamente abertos atrav√©s da marca√ß√£o visual sem√¢ntica do Bootstrap no Header.
+    Os modais originais flutuantes de Cadastro `(novoDefeitoModal)` permanecem entocadas no fim do arquivo HTML e s„o perfeitamente abertos atravÈs da marcaÁ„o visual sem‚ntica do Bootstrap no Header.
 *   **Base de Conhecimento (Procedimentos):**
-    O painel de procedimentos t√©cnicos (`#procedimentosModal`) est√° totalmente operacional. T√©cnicos podem adicionar, editar e excluir passos de diagn√≥stico em tempo real via AJAX. O sistema sinaliza visualmente nos cards a quantidade de passos cadastrados (`3 passo(s)`).
+    O painel de procedimentos tÈcnicos (`#procedimentosModal`) est· totalmente operacional. TÈcnicos podem adicionar, editar e excluir passos de diagnÛstico em tempo real via AJAX. O sistema sinaliza visualmente nos cards a quantidade de passos cadastrados (`3 passo(s)`).
 
-### üî¥ O que N√ÉO FUNCIONA (Futuro Blueprint):
-*   **Selo "Tempo M√©dio" e "Pre√ßo M√©dio":** 
-    As marca√ß√µes de selo de tempo e valor desenhadas no rodap√© do card continuam sendo **Mockups** para expans√£o futura do sistema.
-*   **Bot√£o Atalho `<i class="bi-plus">OS</i>`:** 
-    Este bot√£o no rodap√© do mini-card est√° reservado para integra√ß√£o futura direta com o fluxo de abertura de OS, permanecendo inativo nesta vers√£o.
+### ? O que N√O FUNCIONA (Futuro Blueprint):
+*   **Selo "Tempo MÈdio" e "PreÁo MÈdio":** 
+    As marcaÁıes de selo de tempo e valor desenhadas no rodapÈ do card continuam sendo **Mockups** para expans„o futura do sistema.
+*   **Bot„o Atalho `<i class="bi-plus">OS</i>`:** 
+    Este bot„o no rodapÈ do mini-card est· reservado para integraÁ„o futura direta com o fluxo de abertura de OS, permanecendo inativo nesta vers„o.

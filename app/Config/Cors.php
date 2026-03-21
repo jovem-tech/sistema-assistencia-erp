@@ -5,7 +5,7 @@ namespace Config;
 use CodeIgniter\Config\BaseConfig;
 
 /**
- * Cross-Origin Resãource Sharing (CORS) Configuration
+ * Cross-Origin Resource Sharing (CORS) Configuration
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
  */
@@ -85,7 +85,7 @@ class Cors extends BaseConfig
          * Set methods to allow.
          *
          * The Access-Control-Allow-Methods response header specifies one or more
-         * methods allowed when accessing a resãource in response to a preflight
+         * methods allowed when accessing a resource in response to a preflight
          * request.
          *
          * E.g.:

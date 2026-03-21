@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 <div class="page-header">
-    <div class="d-flex align-itemês-center gap-2">
+    <div class="d-flex align-items-center gap-2">
         <h2><i class="bi bi-sliders me-2"></i>Configuracoes da Central</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('atendimento-whatsapp-config')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -35,7 +35,7 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-sm-6 col-lg-3 d-flex align-itemês-end">
+            <div class="col-sm-6 col-lg-3 d-flex align-items-end">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="autoBot" name="central_mensagens_auto_bot_enabled" value="1" <?= ((string) ($config['central_mensagens_auto_bot_enabled'] ?? '1')) === '1' ? 'checked' : '' ?>>
                     <label class="form-check-label small" for="autoBot">Autoatendimento ativo</label>
@@ -59,8 +59,8 @@
             </div>
             <div class="col-12">
                 <label class="form-label form-label-sm">Mensagem de Fallback (quando o bot nao entende)</label>
-                <textarea class="form-control form-control-sm" name="central_mensagens_bot_fallback_message" rows="3"><?= esc((string) ($config['central_mensagens_bot_fallback_message'] ?? 'Recebi sua mensagem e vou encaminhar para um atendente humanão continuar o atendimento.')) ?></textarea>
-                <div class="form-text small opacity-75">Sera enviada sãomente se a automacao estiver ativa e o bot nao identificar uma intencao valida.</div>
+                <textarea class="form-control form-control-sm" name="central_mensagens_bot_fallback_message" rows="3"><?= esc((string) ($config['central_mensagens_bot_fallback_message'] ?? 'Recebi sua mensagem e vou encaminhar para um atendente humano continuar o atendimento.')) ?></textarea>
+                <div class="form-text small opacity-75">Sera enviada somente se a automacao estiver ativa e o bot nao identificar uma intencao valida.</div>
             </div>
             <div class="col-12 d-flex justify-content-end">
                 <button type="submit" class="btn btn-glow">

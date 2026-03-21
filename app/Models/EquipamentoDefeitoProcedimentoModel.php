@@ -10,7 +10,7 @@ class EquipamentoDefeitoProcedimentoModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $useSãoftDeletes   = true;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
         'defeito_id',

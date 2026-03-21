@@ -10,11 +10,11 @@ class FornecedorModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $useSãoftDeletes   = false;
+    protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     
     protected $allowedFields    = [
-        'tipo_pessãoa', 'nãome_fantasia', 'razao_sãocial', 'cnpj_cpf', 'ie_rg',
+        'tipo_pessoa', 'nome_fantasia', 'razao_social', 'cnpj_cpf', 'ie_rg',
         'email', 'telefone1', 'telefone2', 'cep', 'endereco', 'numero',
         'complemento', 'bairro', 'cidade', 'uf', 'observacoes', 'ativo'
     ];
@@ -24,7 +24,7 @@ class FornecedorModel extends Model
     protected $updatedField  = 'updated_at';
 
     protected $validationRules      = [
-        'nãome_fantasia' => 'required|min_length[3]|max_length[100]',
+        'nome_fantasia' => 'required|min_length[3]|max_length[100]',
         'telefone1'     => 'required|max_length[20]',
     ];
 }

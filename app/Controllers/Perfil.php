@@ -27,25 +27,25 @@ class Perfil extends BaseController
         $usuario = $model->find($userId);
 
         $rules = [
-            'nãome'  => 'required|min_length[3]|max_length[100]',
+            'nome'  => 'required|min_length[3]|max_length[100]',
             'email' => "required|valid_email|is_unique[usuarios.email,id,{$userId}]",
         ];
 
         $postData = $this->request->getPost();
 
         // Password change logic
-        if (!empty($postData['senha_atual']) || !empty($postData['nãova_senha'])) {
-            if (empty($postData['senha_atual']) || empty($postData['nãova_senha'])) {
-                return redirect()->back()->withInput()->with('error', 'Para alterar a senha, informe a senha atual e a nãova.');
+        if (!empty($postData['senha_atual']) || !empty($postData['nova_senha'])) {
+            if (empty($postData['senha_atual']) || empty($postData['nova_senha'])) {
+                return redirect()->back()->withInput()->with('error', 'Para alterar a senha, informe a senha atual e a nova.');
             }
 
             if (!password_verify($postData['senha_atual'], $usuario['senha'])) {
                 return redirect()->back()->withInput()->with('error', 'A senha atual está incorreta.');
             }
 
-            $rules['nãova_senha'] = 'min_length[6]';
-            if ($postData['nãova_senha'] !== $postData['confirma_senha']) {
-                return redirect()->back()->withInput()->with('error', 'A nãova senha e a confirmação não coincidem.');
+            $rules['nova_senha'] = 'min_length[6]';
+            if ($postData['nova_senha'] !== $postData['confirma_senha']) {
+                return redirect()->back()->withInput()->with('error', 'A nova senha e a confirmação não coincidem.');
             }
         }
 
@@ -54,13 +54,13 @@ class Perfil extends BaseController
         }
 
         $updateData = [
-            'nãome'     => $postData['nãome'],
+            'nome'     => $postData['nome'],
             'email'    => $postData['email'],
             'telefone' => $postData['telefone'],
         ];
 
-        if (!empty($postData['nãova_senha'])) {
-            $updateData['senha'] = password_hash($postData['nãova_senha'], PASSWORD_DEFAULT);
+        if (!empty($postData['nova_senha'])) {
+            $updateData['senha'] = password_hash($postData['nova_senha'], PASSWORD_DEFAULT);
         }
 
         // Handle photo upload
@@ -92,13 +92,13 @@ class Perfil extends BaseController
         $model->update($userId, $updateData);
 
         // Update session name for immediate reflection
-        session()->set('user_nãome', $postData['nãome']);
+        session()->set('user_nome', $postData['nome']);
         session()->set('user_email', $postData['email']);
 
         if (class_exists('App\Models\LogModel')) {
             LogModel::registrar('perfil', 'Usuário atualizou o próprio perfil');
         }
 
-        return redirect()->to('/perfil')->with('success', 'Perfil atualizado com sucessão!');
+        return redirect()->to('/perfil')->with('success', 'Perfil atualizado com sucesso!');
     }
 }

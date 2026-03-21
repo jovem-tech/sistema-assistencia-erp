@@ -37,9 +37,9 @@ class CrmService
             return null;
         }
 
-        $payload = $data['payload_jsãon'] ?? null;
+        $payload = $data['payload_json'] ?? null;
         if (is_array($payload)) {
-            $payload = jsãon_encode($payload, JSON_UNESCAPED_UNICODE);
+            $payload = json_encode($payload, JSON_UNESCAPED_UNICODE);
         }
 
         $insert = [
@@ -53,7 +53,7 @@ class CrmService
             'origem' => (string) ($data['origem'] ?? 'sistema'),
             'usuario_id' => $data['usuario_id'] ?? null,
             'data_evento' => (string) ($data['data_evento'] ?? date('Y-m-d H:i:s')),
-            'payload_jsãon' => $payload,
+            'payload_json' => $payload,
         ];
 
         return $this->eventoModel->insert($insert, true) ?: null;
@@ -65,9 +65,9 @@ class CrmService
             return null;
         }
 
-        $payload = $data['payload_jsãon'] ?? null;
+        $payload = $data['payload_json'] ?? null;
         if (is_array($payload)) {
-            $payload = jsãon_encode($payload, JSON_UNESCAPED_UNICODE);
+            $payload = json_encode($payload, JSON_UNESCAPED_UNICODE);
         }
 
         $insert = [
@@ -79,7 +79,7 @@ class CrmService
             'canal' => (string) ($data['canal'] ?? 'sistema'),
             'usuario_id' => $data['usuario_id'] ?? null,
             'data_interacao' => (string) ($data['data_interacao'] ?? date('Y-m-d H:i:s')),
-            'payload_jsãon' => $payload,
+            'payload_json' => $payload,
         ];
 
         return $this->interacaoModel->insert($insert, true) ?: null;
@@ -131,7 +131,7 @@ class CrmService
             'origem' => 'os',
             'usuario_id' => $usuarioId,
             'data_evento' => date('Y-m-d H:i:s'),
-            'payload_jsãon' => $payload,
+            'payload_json' => $payload,
         ]);
     }
 
@@ -146,7 +146,7 @@ class CrmService
             return;
         }
 
-        $etapa = $this->resãolvePipelineStage((string) ($os['status'] ?? ''), (string) ($os['estado_fluxo'] ?? ''));
+        $etapa = $this->resolvePipelineStage((string) ($os['status'] ?? ''), (string) ($os['estado_fluxo'] ?? ''));
         $existing = $this->pipelineModel->where('os_id', $osId)->first();
         $payload = [
             'cliente_id' => $os['cliente_id'] ?? null,
@@ -196,9 +196,9 @@ class CrmService
         );
 
         $map = [
-            'triagem' => ['os_aberta', 'OS aberta', 'OS registrada não atendimento'],
-            'diagnãostico' => ['diagnãostico_iniciado', 'Diagnãostico iniciado', 'Diagnãostico tecnico em andamento'],
-            'aguardando_autorizacao' => ['orcamento_aguardando', 'Aguardando autorizacao', 'Orcamento aguardando retornão do cliente'],
+            'triagem' => ['os_aberta', 'OS aberta', 'OS registrada no atendimento'],
+            'diagnostico' => ['diagnostico_iniciado', 'Diagnostico iniciado', 'Diagnostico tecnico em andamento'],
+            'aguardando_autorizacao' => ['orcamento_aguardando', 'Aguardando autorizacao', 'Orcamento aguardando retorno do cliente'],
             'aguardando_peca' => ['os_pausada_peca', 'Aguardando peca', 'Atendimento pausado aguardando peca'],
             'reparado_disponivel_loja' => ['equipamento_pronto', 'Equipamento pronto', 'Equipamento pronto para retirada'],
             'entregue_reparado' => ['os_entregue', 'Equipamento entregue', 'Atendimento finalizado com entrega'],
@@ -264,13 +264,13 @@ class CrmService
         ];
 
         foreach ($rules as $rule) {
-            $cond = $this->decodeJsãon((string) ($rule['condicao_jsãon'] ?? ''), []);
+            $cond = $this->decodeJson((string) ($rule['condicao_json'] ?? ''), []);
             if (!$this->ruleMatches($cond, $context, $os)) {
                 continue;
             }
             $summary['matched']++;
 
-            $action = $this->decodeJsãon((string) ($rule['acao_jsãon'] ?? ''), []);
+            $action = $this->decodeJson((string) ($rule['acao_json'] ?? ''), []);
             $result = $this->executeRuleAction($rule, $action, $os, $context, $usuarioId);
 
             if (!empty($result['executed'])) {
@@ -320,7 +320,7 @@ class CrmService
                     'cliente_id' => $os['cliente_id'] ?? null,
                     'os_id' => $osId > 0 ? $osId : null,
                     'titulo' => trim((string) ($action['titulo'] ?? 'Follow-up automatico de atendimento')),
-                    'descricao' => trim((string) ($action['descricao'] ?? ('Regra automatica: ' . (string) ($rule['nãome'] ?? '')))),
+                    'descricao' => trim((string) ($action['descricao'] ?? ('Regra automatica: ' . (string) ($rule['nome'] ?? '')))),
                     'data_prevista' => date('Y-m-d H:i:s', $timestamp),
                     'status' => trim((string) ($action['status'] ?? 'pendente')),
                     'usuario_responsavel' => $usuarioId,
@@ -338,14 +338,14 @@ class CrmService
                     'equipamento_id' => $os['equipamento_id'] ?? null,
                     'os_id' => $osId > 0 ? $osId : null,
                     'tipo_evento' => trim((string) ($action['tipo_evento'] ?? 'evento_automatico')),
-                    'titulo' => trim((string) ($action['titulo'] ?? ('Evento automatico: ' . (string) ($rule['nãome'] ?? '')))),
+                    'titulo' => trim((string) ($action['titulo'] ?? ('Evento automatico: ' . (string) ($rule['nome'] ?? '')))),
                     'descricao' => trim((string) ($action['descricao'] ?? 'Evento disparado por regra ERP.')),
                     'origem' => 'automacao_erp',
                     'usuario_id' => $usuarioId,
                     'data_evento' => date('Y-m-d H:i:s'),
-                    'payload_jsãon' => [
+                    'payload_json' => [
                         'rule_id' => (int) ($rule['id'] ?? 0),
-                        'rule_name' => (string) ($rule['nãome'] ?? ''),
+                        'rule_name' => (string) ($rule['nome'] ?? ''),
                         'context' => $context,
                     ],
                 ]);
@@ -355,7 +355,7 @@ class CrmService
             }
 
             $templateCodeRaw = trim((string) ($action['template'] ?? ''));
-            $templateCode = $this->resãolveTemplateCode($templateCodeRaw !== '' ? $templateCodeRaw : $this->legacyTemplateCodeForStatus($status));
+            $templateCode = $this->resolveTemplateCode($templateCodeRaw !== '' ? $templateCodeRaw : $this->legacyTemplateCodeForStatus($status));
             if ($templateCode === '') {
                 return $result;
             }
@@ -434,25 +434,25 @@ class CrmService
                 $field = substr($key, 0, -3);
                 $current = strtolower(trim((string) ($bag[$field] ?? '')));
                 $expectedList = is_array($expectedValue) ? $expectedValue : [$expectedValue];
-                $nãormalizedList = array_map(
+                $normalizedList = array_map(
                     static fn ($item) => strtolower(trim((string) $item)),
                     $expectedList
                 );
-                if (!in_array($current, $nãormalizedList, true)) {
+                if (!in_array($current, $normalizedList, true)) {
                     return false;
                 }
                 continue;
             }
 
-            if (str_ends_with($key, '_nãot_in')) {
+            if (str_ends_with($key, '_not_in')) {
                 $field = substr($key, 0, -7);
                 $current = strtolower(trim((string) ($bag[$field] ?? '')));
                 $expectedList = is_array($expectedValue) ? $expectedValue : [$expectedValue];
-                $nãormalizedList = array_map(
+                $normalizedList = array_map(
                     static fn ($item) => strtolower(trim((string) $item)),
                     $expectedList
                 );
-                if (in_array($current, $nãormalizedList, true)) {
+                if (in_array($current, $normalizedList, true)) {
                     return false;
                 }
                 continue;
@@ -472,14 +472,14 @@ class CrmService
      * @param array<string,mixed> $default
      * @return array<string,mixed>
      */
-    private function decodeJsãon(string $raw, array $default = []): array
+    private function decodeJson(string $raw, array $default = []): array
     {
         $raw = trim($raw);
         if ($raw === '') {
             return $default;
         }
 
-        $decoded = jsãon_decode($raw, true);
+        $decoded = json_decode($raw, true);
         return is_array($decoded) ? $decoded : $default;
     }
 
@@ -494,7 +494,7 @@ class CrmService
             return;
         }
 
-        $template = $this->resãolveTemplateCode($template);
+        $template = $this->resolveTemplateCode($template);
         if ($template === '') {
             return;
         }
@@ -542,7 +542,7 @@ class CrmService
                 'cliente_id' => $os['cliente_id'] ?? null,
                 'os_id' => $osId,
                 'titulo' => 'Cobrar aprovacao do orcamento',
-                'descricao' => 'Contato de retornão para aprovacao da OS ' . ($os['numero_os'] ?? '#' . $osId),
+                'descricao' => 'Contato de retorno para aprovacao da OS ' . ($os['numero_os'] ?? '#' . $osId),
                 'data_prevista' => date('Y-m-d H:i:s', strtotime('+2 days')),
                 'status' => 'pendente',
                 'usuario_responsavel' => $usuarioId,
@@ -594,7 +594,7 @@ class CrmService
         return (string) ($map[$statusCode] ?? '');
     }
 
-    private function resãolveTemplateCode(string $raw): string
+    private function resolveTemplateCode(string $raw): string
     {
         $raw = strtolower(trim($raw));
         if ($raw === '') {
@@ -606,18 +606,18 @@ class CrmService
             'orcamento_enviado' => 'aguardando_autorizacao',
         ];
 
-        $resãolved = $alias[$raw] ?? $raw;
+        $resolved = $alias[$raw] ?? $raw;
 
         if (!$this->dbTableExists('whatsapp_templates')) {
-            return $resãolved;
+            return $resolved;
         }
 
         $exists = $this->osModel->db->table('whatsapp_templates')
-            ->where('codigo', $resãolved)
+            ->where('codigo', $resolved)
             ->where('ativo', 1)
             ->countAllResults();
         if ($exists > 0) {
-            return $resãolved;
+            return $resolved;
         }
 
         return '';
@@ -638,7 +638,7 @@ class CrmService
         }
     }
 
-    private function resãolvePipelineStage(string $statusCode, string $estadoFluxo): string
+    private function resolvePipelineStage(string $statusCode, string $estadoFluxo): string
     {
         $statusCode = strtolower(trim($statusCode));
         $estadoFluxo = strtolower(trim($estadoFluxo));
@@ -650,16 +650,16 @@ class CrmService
         $macro = strtolower(trim((string) ($statusRow['grupo_macro'] ?? '')));
 
         return match (true) {
-            $statusCode === 'triagem' => 'nãovo_atendimento',
+            $statusCode === 'triagem' => 'novo_atendimento',
             in_array($macro, ['recepcao'], true) => 'equipamento_recebido',
-            in_array($macro, ['diagnãostico'], true) => 'em_diagnãostico',
+            in_array($macro, ['diagnostico'], true) => 'em_diagnostico',
             in_array($macro, ['orcamento'], true) => 'aguardando_aprovacao',
             in_array($macro, ['execucao', 'qualidade'], true) => 'em_reparo',
             in_array($macro, ['concluido'], true) => 'pronto_retirada',
             in_array($macro, ['encerrado', 'cancelado', 'finalizado_sem_reparo'], true) => 'entregue',
             $estadoFluxo === 'pronto' => 'pronto_retirada',
             $estadoFluxo === 'encerrado' => 'entregue',
-            default => 'nãovo_atendimento',
+            default => 'novo_atendimento',
         };
     }
 }

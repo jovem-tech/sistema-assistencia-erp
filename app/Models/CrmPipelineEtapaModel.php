@@ -11,7 +11,7 @@ class CrmPipelineEtapaModel extends Model
     protected $returnType = 'array';
     protected $allowedFields = [
         'codigo',
-        'nãome',
+        'nome',
         'ordem',
         'ativo',
     ];

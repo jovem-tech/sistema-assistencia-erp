@@ -28,26 +28,26 @@ class Usuarios extends BaseController
 
     public function datatable()
     {
-        // JOIN com grupos para mostrar o nãome real do grupo
+        // JOIN com grupos para mostrar o nome real do grupo
         $builder = $this->usuarioModel
-            ->select('usuarios.*, COALESCE(grupos.nãome, usuarios.perfil) as grupo_nãome, grupos.id as gid')
+            ->select('usuarios.*, COALESCE(grupos.nome, usuarios.perfil) as grupo_nome, grupos.id as gid')
             ->join('grupos', 'grupos.id = usuarios.grupo_id', 'left');
 
-        $columns    = ['usuarios.id', 'usuarios.nãome', 'usuarios.email', 'grupos.nãome', 'usuarios.ativo'];
-        $searchable = ['usuarios.nãome', 'usuarios.email', 'usuarios.telefone', 'grupos.nãome'];
+        $columns    = ['usuarios.id', 'usuarios.nome', 'usuarios.email', 'grupos.nome', 'usuarios.ativo'];
+        $searchable = ['usuarios.nome', 'usuarios.email', 'usuarios.telefone', 'grupos.nome'];
 
         return $this->respondDatatable($builder, $columns, $searchable, function ($row) {
 
-            // Cor do badge baseada não nãome do grupo
-            $grupoNãome = $row['grupo_nãome'] ?? $row['perfil'] ?? '-';
-            $color = match(strtolower($grupoNãome)) {
+            // Cor do badge baseada no nome do grupo
+            $grupoNome = $row['grupo_nome'] ?? $row['perfil'] ?? '-';
+            $color = match(strtolower($grupoNome)) {
                 'administrador' => '#ef4444',  // vermelho
                 'técnico'       => '#6366f1',  // indigo
                 'atendente'     => '#0ea5e9',  // azul
                 default         => '#8b5cf6',  // roxo para grupos customizados
             };
-            $grupoBadge = '<span class="badge" style="background:' . $color . '22; color:' . $color . '; border:1px sãolid ' . $color . '44; font-size:.78rem;">'
-                        . esc($grupoNãome)
+            $grupoBadge = '<span class="badge" style="background:' . $color . '22; color:' . $color . '; border:1px solid ' . $color . '44; font-size:.78rem;">'
+                        . esc($grupoNome)
                         . '</span>';
 
             $statusBadge = $row['ativo']
@@ -65,7 +65,7 @@ class Usuarios extends BaseController
 
             return [
                 $row['id'],
-                '<div class="fw-semibold">' . esc($row['nãome']) . '</div><small class="text-muted">' . esc($row['telefone']) . '</small>',
+                '<div class="fw-semibold">' . esc($row['nome']) . '</div><small class="text-muted">' . esc($row['telefone']) . '</small>',
                 esc($row['email']),
                 $grupoBadge,
                 $statusBadge,
@@ -79,8 +79,8 @@ class Usuarios extends BaseController
     {
         $grupoModel = new GrupoModel();
         $data = [
-            'title'  => 'Nãovo Usuário',
-            'grupos' => $grupoModel->orderBy('nãome')->findAll(),
+            'title'  => 'Novo Usuário',
+            'grupos' => $grupoModel->orderBy('nome')->findAll(),
         ];
         return view('usuarios/form', $data);
     }
@@ -88,10 +88,10 @@ class Usuarios extends BaseController
     public function store()
     {
         $rules = [
-            'nãome'     => 'required|min_length[3]|max_length[100]',
+            'nome'     => 'required|min_length[3]|max_length[100]',
             'email'    => 'required|valid_email|is_unique[usuarios.email]',
             'senha'    => 'required|min_length[6]',
-            'grupo_id' => 'required|is_natural_não_zero',
+            'grupo_id' => 'required|is_natural_no_zero',
         ];
 
         if (!$this->validate($rules)) {
@@ -100,14 +100,14 @@ class Usuarios extends BaseController
 
         $post = $this->request->getPost();
 
-        // Resãolve perfil legado a partir do grupo
+        // Resolve perfil legado a partir do grupo
         $grupoModel = new GrupoModel();
         $grupo = $grupoModel->find($post['grupo_id']);
         $perfilMap = ['Administrador' => 'admin', 'Técnico' => 'tecnico', 'Atendente' => 'atendente'];
-        $perfil = $perfilMap[$grupo['nãome'] ?? ''] ?? 'atendente';
+        $perfil = $perfilMap[$grupo['nome'] ?? ''] ?? 'atendente';
 
         $data = [
-            'nãome'     => $post['nãome'],
+            'nome'     => $post['nome'],
             'email'    => $post['email'],
             'telefone' => $post['telefone'] ?? null,
             'senha'    => password_hash($post['senha'], PASSWORD_DEFAULT),
@@ -117,9 +117,9 @@ class Usuarios extends BaseController
         ];
 
         $this->usuarioModel->insert($data);
-        LogModel::registrar('usuario_add', "Usuário criado: {$data['nãome']}");
+        LogModel::registrar('usuario_add', "Usuário criado: {$data['nome']}");
 
-        return redirect()->to('/usuarios')->with('success', 'Usuário criado com sucessão!');
+        return redirect()->to('/usuarios')->with('success', 'Usuário criado com sucesso!');
     }
 
     public function edit($id = null)
@@ -133,7 +133,7 @@ class Usuarios extends BaseController
         $data = [
             'title'   => 'Editar Usuário',
             'usuario' => $usuario,
-            'grupos'  => $grupoModel->orderBy('nãome')->findAll(),
+            'grupos'  => $grupoModel->orderBy('nome')->findAll(),
         ];
         return view('usuarios/form', $data);
     }
@@ -147,9 +147,9 @@ class Usuarios extends BaseController
         }
 
         $rules = [
-            'nãome'     => 'required|min_length[3]|max_length[100]',
+            'nome'     => 'required|min_length[3]|max_length[100]',
             'email'    => "required|valid_email|is_unique[usuarios.email,id,{$id}]",
-            'grupo_id' => 'required|is_natural_não_zero',
+            'grupo_id' => 'required|is_natural_no_zero',
         ];
 
         $postData = $this->request->getPost();
@@ -162,14 +162,14 @@ class Usuarios extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // Resãolve perfil legado a partir do grupo
+        // Resolve perfil legado a partir do grupo
         $grupoModel = new GrupoModel();
         $grupo = $grupoModel->find($postData['grupo_id']);
         $perfilMap = ['Administrador' => 'admin', 'Técnico' => 'tecnico', 'Atendente' => 'atendente'];
-        $perfil = $perfilMap[$grupo['nãome'] ?? ''] ?? 'atendente';
+        $perfil = $perfilMap[$grupo['nome'] ?? ''] ?? 'atendente';
 
         $updateData = [
-            'nãome'     => $postData['nãome'],
+            'nome'     => $postData['nome'],
             'email'    => $postData['email'],
             'telefone' => $postData['telefone'] ?? null,
             'grupo_id' => (int)$postData['grupo_id'],
@@ -189,15 +189,15 @@ class Usuarios extends BaseController
             refreshPermissions();
         }
 
-        LogModel::registrar('usuario_edit', "Usuário editado: {$postData['nãome']}");
+        LogModel::registrar('usuario_edit', "Usuário editado: {$postData['nome']}");
 
-        return redirect()->to('/usuarios')->with('success', 'Usuário atualizado com sucessão!');
+        return redirect()->to('/usuarios')->with('success', 'Usuário atualizado com sucesso!');
     }
 
     public function delete($id = null)
     {
         if ($id == session('user_id')) {
-            return redirect()->to('/usuarios')->with('error', 'Vocêê não pode excluir a si mesmo.');
+            return redirect()->to('/usuarios')->with('error', 'Você não pode excluir a si mesmo.');
         }
 
         $usuario = $this->usuarioModel->find($id);
@@ -209,9 +209,9 @@ class Usuarios extends BaseController
         $this->usuarioModel->delete($id);
 
         if (class_exists('App\Models\LogModel')) {
-            LogModel::registrar('usuario_del', "Usuário excluído: {$usuario['nãome']}");
+            LogModel::registrar('usuario_del', "Usuário excluído: {$usuario['nome']}");
         }
 
-        return redirect()->to('/usuarios')->with('success', 'Usuário excluído com sucessão!');
+        return redirect()->to('/usuarios')->with('success', 'Usuário excluído com sucesso!');
     }
 }

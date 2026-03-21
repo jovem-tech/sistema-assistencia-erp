@@ -4,14 +4,14 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class FotoAcessãorioModel extends Model
+class FotoAcessorioModel extends Model
 {
-    protected $table = 'fotos_acessãorios';
+    protected $table = 'fotos_acessorios';
     protected $primaryKey = 'id';
     protected $returnType = 'array';
-    protected $useSãoftDeletes = false;
+    protected $useSoftDeletes = false;
     protected $protectFields = true;
-    protected $allowedFields = ['acessãorio_id', 'arquivo', 'created_at', 'updated_at'];
+    protected $allowedFields = ['acessorio_id', 'arquivo', 'created_at', 'updated_at'];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';

@@ -49,7 +49,7 @@ class CentralMensagensService
         $this->crmService = new CrmService();
     }
 
-    public function nãormalizePhone(string $phone): string
+    public function normalizePhone(string $phone): string
     {
         $digits = preg_replace('/\D+/', '', $phone) ?? '';
         if ($digits === '') {
@@ -58,40 +58,40 @@ class CentralMensagensService
         return str_starts_with($digits, '55') ? $digits : ('55' . $digits);
     }
 
-    public function resãolveConversationForOutgoing(
+    public function resolveConversationForOutgoing(
         string $phone,
         ?int $clienteId = null,
         ?int $osId = null,
         string $provider = 'menuia',
-        ?string $nãomeContato = null
+        ?string $nomeContato = null
     ): ?array {
         if (!$this->conversaModel->db->tableExists('conversas_whatsapp')) {
             return null;
         }
 
         $autoBotEnabled = (string) get_config('central_mensagens_auto_bot_enabled', '1') === '1';
-        $nãormalized = $this->nãormalizePhone($phone);
-        if ($nãormalized === '') {
+        $normalized = $this->normalizePhone($phone);
+        if ($normalized === '') {
             return null;
         }
 
-        $contato = $this->resãolveContatoByPhone($nãormalized, $nãomeContato, $clienteId);
+        $contato = $this->resolveContatoByPhone($normalized, $nomeContato, $clienteId);
         $contatoId = (int) ($contato['id'] ?? 0) ?: null;
         $clienteIdContato = (int) ($contato['cliente_id'] ?? 0) ?: null;
         if (!$clienteId && $clienteIdContato) {
             $clienteId = $clienteIdContato;
         }
 
-        $conversa = $this->conversaModel->findByPhone($nãormalized);
+        $conversa = $this->conversaModel->findByPhone($normalized);
         if (!$conversa) {
             if (!$clienteId) {
-                $cliente = $this->findClienteByPhone($nãormalized);
+                $cliente = $this->findClienteByPhone($normalized);
                 $clienteId = (int) ($cliente['id'] ?? 0) ?: null;
-                $nãomeContato = $nãomeContato ?: ($cliente['nãome_razao'] ?? null);
+                $nomeContato = $nomeContato ?: ($cliente['nome_razao'] ?? null);
             }
 
-            if (!$nãomeContato && $contato && !empty($contato['nãome'])) {
-                $nãomeContato = (string) $contato['nãome'];
+            if (!$nomeContato && $contato && !empty($contato['nome'])) {
+                $nomeContato = (string) $contato['nome'];
             }
 
             if ($contatoId && !$clienteId && $clienteIdContato) {
@@ -106,8 +106,8 @@ class CentralMensagensService
                 'cliente_id' => $clienteId,
                 'contato_id' => $contatoId,
                 'os_id_principal' => $osId,
-                'telefone' => $nãormalized,
-                'nãome_contato' => $nãomeContato,
+                'telefone' => $normalized,
+                'nome_contato' => $nomeContato,
                 'status' => 'aberta',
                 'ultima_mensagem_em' => date('Y-m-d H:i:s'),
                 'primeira_mensagem_em' => date('Y-m-d H:i:s'),
@@ -115,8 +115,8 @@ class CentralMensagensService
                 'origem_provider' => $provider,
                 'canal' => 'whatsapp',
                 'automacao_ativa' => $autoBotEnabled ? 1 : 0,
-                'aguardando_humanão' => $autoBotEnabled ? 0 : 1,
-                'prioridade' => 'nãormal',
+                'aguardando_humano' => $autoBotEnabled ? 0 : 1,
+                'prioridade' => 'normal',
             ], true);
 
             if (!$conversaId) {
@@ -129,8 +129,8 @@ class CentralMensagensService
                 'ultima_mensagem_em' => date('Y-m-d H:i:s'),
                 'origem_provider' => $provider,
             ];
-            if ($nãomeContato && empty($conversa['nãome_contato'])) {
-                $update['nãome_contato'] = $nãomeContato;
+            if ($nomeContato && empty($conversa['nome_contato'])) {
+                $update['nome_contato'] = $nomeContato;
             }
             if ($contatoId && empty($conversa['contato_id'])) {
                 $update['contato_id'] = $contatoId;
@@ -152,10 +152,10 @@ class CentralMensagensService
         }
 
         if ($conversa && !$contatoId) {
-            $nãomeContatoSync = trim((string) ($conversa['nãome_contato'] ?? $nãomeContato ?? ''));
-            $contatoSync = $this->resãolveContatoByPhone(
-                (string) ($conversa['telefone'] ?? $nãormalized),
-                $nãomeContatoSync !== '' ? $nãomeContatoSync : null,
+            $nomeContatoSync = trim((string) ($conversa['nome_contato'] ?? $nomeContato ?? ''));
+            $contatoSync = $this->resolveContatoByPhone(
+                (string) ($conversa['telefone'] ?? $normalized),
+                $nomeContatoSync !== '' ? $nomeContatoSync : null,
                 (int) ($conversa['cliente_id'] ?? 0) ?: null
             );
             $contatoId = (int) ($contatoSync['id'] ?? 0) ?: null;
@@ -233,12 +233,12 @@ class CentralMensagensService
         if ($hasMedia && $message !== '') {
             $messageCompact = preg_replace('/\s+/', '', $message) ?? '';
             if (strlen($messageCompact) > 800 && preg_match('/^[A-Za-z0-9+\/=]+$/', substr($messageCompact, 0, 800))) {
-                // Evita poluir o chat com base64 indevido não campo textual.
+                // Evita poluir o chat com base64 indevido no campo textual.
                 $message = '';
             }
         }
 
-        $phone = $this->nãormalizePhone($phoneRef);
+        $phone = $this->normalizePhone($phoneRef);
         if ($phone === '') {
             return null;
         }
@@ -256,7 +256,7 @@ class CentralMensagensService
 
             if ($existing) {
                 $updates = [
-                    'payload' => jsãon_encode($payload, JSON_UNESCAPED_UNICODE),
+                    'payload' => json_encode($payload, JSON_UNESCAPED_UNICODE),
                 ];
                 if ($isOutbound) {
                     $updates['direcao'] = 'outbound';
@@ -304,7 +304,7 @@ class CentralMensagensService
                             'provider_message_id' => $messageId,
                             'status' => 'enviada',
                             'enviada_em' => date('Y-m-d H:i:s'),
-                            'payload' => jsãon_encode($payload, JSON_UNESCAPED_UNICODE),
+                            'payload' => json_encode($payload, JSON_UNESCAPED_UNICODE),
                         ]);
 
                         $conversaCandidate = (int) ($candidate['conversa_id'] ?? 0);
@@ -324,13 +324,13 @@ class CentralMensagensService
         $clienteId = $cliente ? (int) $cliente['id'] : null;
         $osId = $clienteId ? $this->findOpenOsByCliente($clienteId) : null;
         $profileName = $this->extractProfileNameFromPayload($payload);
-        $nãomeContato = $cliente['nãome_razao'] ?? $profileName ?? null;
-        $conversa = $this->resãolveConversationForOutgoing($phone, $clienteId, $osId, $provider, $nãomeContato);
+        $nomeContato = $cliente['nome_razao'] ?? $profileName ?? null;
+        $conversa = $this->resolveConversationForOutgoing($phone, $clienteId, $osId, $provider, $nomeContato);
         $conversaId = (int) ($conversa['id'] ?? 0) ?: null;
         $mediaSaved = $hasMedia ? $this->saveInboundMedia($mediaBase64, $mimeType, $mediaFilename, $phone) : null;
         $arquivoInbound = $mediaSaved['arquivo'] ?? null;
         $mimeInbound = $mediaSaved['mime_type'] ?? ($mimeType !== '' ? $mimeType : null);
-        $tipoConteudo = $this->resãolveInboundContentType($tipoConteudoPayload, $mimeInbound, $arquivoInbound);
+        $tipoConteudo = $this->resolveInboundContentType($tipoConteudoPayload, $mimeInbound, $arquivoInbound);
 
         $insert = [
             'conversa_id' => $conversaId,
@@ -342,12 +342,12 @@ class CentralMensagensService
             'cliente_id' => $clienteId,
             'os_id' => $osId,
             'telefone' => $phone,
-            'tipo_mensagem' => $isOutbound ? 'outbound_externão' : 'inbound',
+            'tipo_mensagem' => $isOutbound ? 'outbound_externo' : 'inbound',
             'mensagem' => $message !== '' ? $message : null,
             'arquivo' => $arquivoInbound,
             'anexo_path' => $arquivoInbound,
             'status' => $isOutbound ? 'enviada' : 'recebida',
-            'payload' => jsãon_encode($payload, JSON_UNESCAPED_UNICODE),
+            'payload' => json_encode($payload, JSON_UNESCAPED_UNICODE),
             'lida_em' => $isOutbound ? date('Y-m-d H:i:s') : null,
             'enviada_em' => $isOutbound ? date('Y-m-d H:i:s') : null,
             'recebida_em' => $isOutbound ? null : date('Y-m-d H:i:s'),
@@ -375,7 +375,7 @@ class CentralMensagensService
 
         $descricaoEvento = $message !== ''
             ? $message
-            : ('Arquivo ' . ($isOutbound ? 'enviado' : 'recebido') . ' via WhatsApp: ' . ($mediaFilename !== '' ? $mediaFilename : 'sem_nãome'));
+            : ('Arquivo ' . ($isOutbound ? 'enviado' : 'recebido') . ' via WhatsApp: ' . ($mediaFilename !== '' ? $mediaFilename : 'sem_nome'));
 
         if ($isOutbound) {
             $this->crmService->registerInteraction([
@@ -387,7 +387,7 @@ class CentralMensagensService
                 'canal' => 'whatsapp',
                 'usuario_id' => $usuarioId,
                 'data_interacao' => date('Y-m-d H:i:s'),
-                'payload_jsãon' => $payload,
+                'payload_json' => $payload,
             ]);
 
             $this->crmService->registerEvent([
@@ -400,7 +400,7 @@ class CentralMensagensService
                 'origem' => 'whatsapp',
                 'usuario_id' => $usuarioId,
                 'data_evento' => date('Y-m-d H:i:s'),
-                'payload_jsãon' => $payload,
+                'payload_json' => $payload,
             ]);
 
             $this->registerCrmMensagem([
@@ -413,7 +413,7 @@ class CentralMensagensService
                 'conteudo' => $descricaoEvento,
                 'arquivo' => $arquivoInbound,
                 'status' => 'enviada',
-                'payload_jsãon' => $payload,
+                'payload_json' => $payload,
                 'usuario_id' => $usuarioId,
             ]);
         } else {
@@ -426,7 +426,7 @@ class CentralMensagensService
                 'canal' => 'whatsapp',
                 'usuario_id' => $usuarioId,
                 'data_interacao' => date('Y-m-d H:i:s'),
-                'payload_jsãon' => $payload,
+                'payload_json' => $payload,
             ]);
 
             $this->crmService->registerEvent([
@@ -434,12 +434,12 @@ class CentralMensagensService
                 'os_id' => $osId,
                 'conversa_id' => $conversaId,
                 'tipo_evento' => 'whatsapp_recebida',
-                'titulo' => 'Mensagem recebida não WhatsApp',
+                'titulo' => 'Mensagem recebida no WhatsApp',
                 'descricao' => $descricaoEvento,
                 'origem' => 'whatsapp',
                 'usuario_id' => $usuarioId,
                 'data_evento' => date('Y-m-d H:i:s'),
-                'payload_jsãon' => $payload,
+                'payload_json' => $payload,
             ]);
 
             $this->registerCrmMensagem([
@@ -452,7 +452,7 @@ class CentralMensagensService
                 'conteudo' => $descricaoEvento,
                 'arquivo' => $arquivoInbound,
                 'status' => 'recebida',
-                'payload_jsãon' => $payload,
+                'payload_json' => $payload,
                 'usuario_id' => $usuarioId,
             ]);
 
@@ -491,7 +491,7 @@ class CentralMensagensService
             'canal' => 'whatsapp',
             'usuario_id' => $usuarioId,
             'data_interacao' => date('Y-m-d H:i:s'),
-            'payload_jsãon' => $payload,
+            'payload_json' => $payload,
         ]);
 
         $this->crmService->registerEvent([
@@ -499,12 +499,12 @@ class CentralMensagensService
             'os_id' => $osId,
             'conversa_id' => $conversaId,
             'tipo_evento' => 'whatsapp_enviada',
-            'titulo' => 'Mensagem enviada não WhatsApp',
+            'titulo' => 'Mensagem enviada no WhatsApp',
             'descricao' => $mensagem !== '' ? $mensagem : ('Envio tipo: ' . $tipoMensagem),
             'origem' => 'whatsapp',
             'usuario_id' => $usuarioId,
             'data_evento' => date('Y-m-d H:i:s'),
-            'payload_jsãon' => $payload,
+            'payload_json' => $payload,
         ]);
 
         if ($conversaId) {
@@ -523,7 +523,7 @@ class CentralMensagensService
             'conteudo' => $mensagem,
             'arquivo' => $payload['arquivo'] ?? null,
             'status' => !empty($payload['ok']) ? 'enviada' : 'erro',
-            'payload_jsãon' => $payload,
+            'payload_json' => $payload,
             'usuario_id' => $usuarioId,
         ]);
     }
@@ -610,13 +610,13 @@ class CentralMensagensService
         $beforeStatus = (string) ($conversa['status'] ?? 'aberta');
         $beforeResponsavel = (int) ($conversa['responsavel_id'] ?? 0);
         $beforeAutomacao = (int) ($conversa['automacao_ativa'] ?? 1);
-        $beforeAguardandoHumanão = (int) ($conversa['aguardando_humanão'] ?? 0);
-        $beforePrioridade = (string) ($conversa['prioridade'] ?? 'nãormal');
+        $beforeAguardandoHumano = (int) ($conversa['aguardando_humano'] ?? 0);
+        $beforePrioridade = (string) ($conversa['prioridade'] ?? 'normal');
 
         $updates = [];
         if (array_key_exists('status', $payload)) {
             $status = strtolower(trim((string) $payload['status']));
-            if (in_array($status, ['aberta', 'aguardando', 'resãolvida', 'arquivada'], true)) {
+            if (in_array($status, ['aberta', 'aguardando', 'resolvida', 'arquivada'], true)) {
                 $updates['status'] = $status;
             }
         }
@@ -629,18 +629,18 @@ class CentralMensagensService
         if (array_key_exists('automacao_ativa', $payload)) {
             $automacaoAtiva = (int) $payload['automacao_ativa'] === 1 ? 1 : 0;
             $updates['automacao_ativa'] = $automacaoAtiva;
-            if ($automacaoAtiva === 1 && !array_key_exists('aguardando_humanão', $payload)) {
-                $updates['aguardando_humanão'] = 0;
+            if ($automacaoAtiva === 1 && !array_key_exists('aguardando_humano', $payload)) {
+                $updates['aguardando_humano'] = 0;
             }
         }
 
-        if (array_key_exists('aguardando_humanão', $payload)) {
-            $updates['aguardando_humanão'] = (int) $payload['aguardando_humanão'] === 1 ? 1 : 0;
+        if (array_key_exists('aguardando_humano', $payload)) {
+            $updates['aguardando_humano'] = (int) $payload['aguardando_humano'] === 1 ? 1 : 0;
         }
 
         if (array_key_exists('prioridade', $payload)) {
             $prioridade = strtolower(trim((string) $payload['prioridade']));
-            if (in_array($prioridade, ['baixa', 'nãormal', 'alta', 'urgente'], true)) {
+            if (in_array($prioridade, ['baixa', 'normal', 'alta', 'urgente'], true)) {
                 $updates['prioridade'] = $prioridade;
             }
         }
@@ -672,7 +672,7 @@ class CentralMensagensService
         $afterStatus = (string) ($after['status'] ?? $beforeStatus);
         $afterResponsavel = (int) ($after['responsavel_id'] ?? 0);
         $afterAutomacao = (int) ($after['automacao_ativa'] ?? $beforeAutomacao);
-        $afterAguardandoHumanão = (int) ($after['aguardando_humanão'] ?? $beforeAguardandoHumanão);
+        $afterAguardandoHumano = (int) ($after['aguardando_humano'] ?? $beforeAguardandoHumano);
         $afterPrioridade = (string) ($after['prioridade'] ?? $beforePrioridade);
 
         if ($beforeStatus !== $afterStatus) {
@@ -686,7 +686,7 @@ class CentralMensagensService
                 'origem' => 'central_mensagens',
                 'usuario_id' => $usuarioId,
                 'data_evento' => date('Y-m-d H:i:s'),
-                'payload_jsãon' => [
+                'payload_json' => [
                     'before' => $beforeStatus,
                     'after' => $afterStatus,
                 ],
@@ -706,7 +706,7 @@ class CentralMensagensService
                 'origem' => 'central_mensagens',
                 'usuario_id' => $usuarioId,
                 'data_evento' => date('Y-m-d H:i:s'),
-                'payload_jsãon' => [
+                'payload_json' => [
                     'before' => $beforeResponsavel > 0 ? $beforeResponsavel : null,
                     'after' => $afterResponsavel > 0 ? $afterResponsavel : null,
                 ],
@@ -724,27 +724,27 @@ class CentralMensagensService
                 'origem' => 'central_mensagens',
                 'usuario_id' => $usuarioId,
                 'data_evento' => date('Y-m-d H:i:s'),
-                'payload_jsãon' => [
+                'payload_json' => [
                     'before' => $beforeAutomacao,
                     'after' => $afterAutomacao,
                 ],
             ]);
         }
 
-        if ($beforeAguardandoHumanão !== $afterAguardandoHumanão) {
+        if ($beforeAguardandoHumano !== $afterAguardandoHumano) {
             $this->crmService->registerEvent([
                 'cliente_id' => $after['cliente_id'] ?? null,
                 'os_id' => $after['os_id_principal'] ?? null,
                 'conversa_id' => $conversaId,
-                'tipo_evento' => 'conversa_aguardando_humanão_atualizada',
-                'titulo' => 'Escalonamento humanão atualizado',
-                'descricao' => $afterAguardandoHumanão === 1 ? 'Conversa marcada como aguardando atendente humanão.' : 'Conversa removida da fila de espera humana.',
+                'tipo_evento' => 'conversa_aguardando_humano_atualizada',
+                'titulo' => 'Escalonamento humano atualizado',
+                'descricao' => $afterAguardandoHumano === 1 ? 'Conversa marcada como aguardando atendente humano.' : 'Conversa removida da fila de espera humana.',
                 'origem' => 'central_mensagens',
                 'usuario_id' => $usuarioId,
                 'data_evento' => date('Y-m-d H:i:s'),
-                'payload_jsãon' => [
-                    'before' => $beforeAguardandoHumanão,
-                    'after' => $afterAguardandoHumanão,
+                'payload_json' => [
+                    'before' => $beforeAguardandoHumano,
+                    'after' => $afterAguardandoHumano,
                 ],
             ]);
         }
@@ -760,7 +760,7 @@ class CentralMensagensService
                 'origem' => 'central_mensagens',
                 'usuario_id' => $usuarioId,
                 'data_evento' => date('Y-m-d H:i:s'),
-                'payload_jsãon' => [
+                'payload_json' => [
                     'before' => $beforePrioridade,
                     'after' => $afterPrioridade,
                 ],
@@ -799,9 +799,9 @@ class CentralMensagensService
         }
 
         return $this->usuarioModel
-            ->select('id, nãome, email')
+            ->select('id, nome, email')
             ->where('ativo', 1)
-            ->orderBy('nãome', 'ASC')
+            ->orderBy('nome', 'ASC')
             ->findAll();
     }
 
@@ -813,7 +813,7 @@ class CentralMensagensService
         }
         $rows = $this->inboundModel->where('processado', 0)->orderBy('id', 'ASC')->findAll($limit);
         foreach ($rows as $row) {
-            $payload = jsãon_decode((string) ($row['payload'] ?? ''), true);
+            $payload = json_decode((string) ($row['payload'] ?? ''), true);
             if (!is_array($payload)) {
                 $payload = [];
             }
@@ -837,23 +837,23 @@ class CentralMensagensService
     private function syncGatewayHistoryIfNeeded(bool $force = false): int
     {
         $provider = trim((string) get_config('whatsapp_direct_provider', get_config('whatsapp_provider', 'menuia')));
-        if (!in_array($provider, ['api_whats_local', 'local_nãode', 'api_whats_linux'], true)) {
+        if (!in_array($provider, ['api_whats_local', 'local_node', 'api_whats_linux'], true)) {
             return 0;
         }
 
         $cacheKey = 'cm_gateway_history_sync_at';
-        $nãow = time();
+        $now = time();
         try {
             $cache = cache();
             if ($cache) {
                 $last = (int) ($cache->get($cacheKey) ?? 0);
-                if (!$force && $last > 0 && ($nãow - $last) < 8) {
+                if (!$force && $last > 0 && ($now - $last) < 8) {
                     return 0;
                 }
-                $cache->save($cacheKey, $nãow, 15);
+                $cache->save($cacheKey, $now, 15);
             }
         } catch (\Throwable $e) {
-            // segue sem cache casão o serviço esteja indisponível
+            // segue sem cache caso o serviço esteja indisponível
         }
 
         $baseUrl = '';
@@ -863,16 +863,16 @@ class CentralMensagensService
         $providerId = 'api_whats_local';
 
         if ($provider === 'api_whats_linux') {
-            $baseUrl = trim((string) get_config('whatsapp_linux_nãode_url', 'http://127.0.0.1:3001'));
-            $token = trim((string) get_config('whatsapp_linux_nãode_token', ''));
-            $origin = trim((string) get_config('whatsapp_linux_nãode_origin', base_url('/')));
-            $timeout = max(5, (int) get_config('whatsapp_linux_nãode_timeout', 20));
+            $baseUrl = trim((string) get_config('whatsapp_linux_node_url', 'http://127.0.0.1:3001'));
+            $token = trim((string) get_config('whatsapp_linux_node_token', ''));
+            $origin = trim((string) get_config('whatsapp_linux_node_origin', base_url('/')));
+            $timeout = max(5, (int) get_config('whatsapp_linux_node_timeout', 20));
             $providerId = 'api_whats_linux';
         } else {
-            $baseUrl = trim((string) get_config('whatsapp_local_nãode_url', 'http://127.0.0.1:3001'));
-            $token = trim((string) get_config('whatsapp_local_nãode_token', ''));
-            $origin = trim((string) get_config('whatsapp_local_nãode_origin', base_url('/')));
-            $timeout = max(5, (int) get_config('whatsapp_local_nãode_timeout', 20));
+            $baseUrl = trim((string) get_config('whatsapp_local_node_url', 'http://127.0.0.1:3001'));
+            $token = trim((string) get_config('whatsapp_local_node_token', ''));
+            $origin = trim((string) get_config('whatsapp_local_node_origin', base_url('/')));
+            $timeout = max(5, (int) get_config('whatsapp_local_node_timeout', 20));
             $providerId = 'api_whats_local';
         }
 
@@ -882,8 +882,8 @@ class CentralMensagensService
 
         $endpoint = rtrim($baseUrl, '/') . '/sync-chat-history?limit_chats=20&per_chat=20&max_total=300&since_seconds=172800';
         $headers = [
-            'Accept: application/jsãon',
-            'Content-Type: application/jsãon',
+            'Accept: application/json',
+            'Content-Type: application/json',
         ];
         if ($token !== '') {
             $headers[] = 'X-Api-Token: ' . $token;
@@ -912,24 +912,24 @@ class CentralMensagensService
             return 0;
         }
 
-        $jsãon = jsãon_decode((string) $raw, true);
-        if (!is_array($jsãon) || empty($jsãon['success'])) {
+        $json = json_decode((string) $raw, true);
+        if (!is_array($json) || empty($json['success'])) {
             return 0;
         }
 
-        $itemês = $jsãon['data']['itemês'] ?? [];
-        if (!is_array($itemês) || empty($itemês)) {
+        $items = $json['data']['items'] ?? [];
+        if (!is_array($items) || empty($items)) {
             return 0;
         }
 
         $count = 0;
-        foreach ($itemês as $payload) {
+        foreach ($items as $payload) {
             if (!is_array($payload)) {
                 continue;
             }
             $providerFromPayload = trim((string) ($payload['provider'] ?? ''));
-            $sãourceProvider = $providerFromPayload !== '' ? $providerFromPayload : $providerId;
-            $ok = $this->registerInboundFromPayload($payload, $sãourceProvider);
+            $sourceProvider = $providerFromPayload !== '' ? $providerFromPayload : $providerId;
+            $ok = $this->registerInboundFromPayload($payload, $sourceProvider);
             if ($ok) {
                 $count++;
             }
@@ -959,24 +959,24 @@ class CentralMensagensService
             ->first();
     }
 
-    private function resãolveContatoByPhone(string $phone, ?string $nãomeContato = null, ?int $clienteId = null): ?array
+    private function resolveContatoByPhone(string $phone, ?string $nomeContato = null, ?int $clienteId = null): ?array
     {
         if (!$this->contatoModel->db->tableExists('contatos')) {
             return null;
         }
 
-        $nãormalized = preg_replace('/\D+/', '', $phone) ?? '';
-        if ($nãormalized === '') {
+        $normalized = preg_replace('/\D+/', '', $phone) ?? '';
+        if ($normalized === '') {
             return null;
         }
 
-        $safeNãome = $this->sanitizeProfileName($nãomeContato);
-        $nãow = date('Y-m-d H:i:s');
+        $safeNome = $this->sanitizeProfileName($nomeContato);
+        $now = date('Y-m-d H:i:s');
 
-        $contato = $this->contatoModel->findByPhone($nãormalized);
+        $contato = $this->contatoModel->findByPhone($normalized);
         if (!$contato) {
-            $suffix = substr($nãormalized, -11);
-            if ($suffix !== '' && $suffix !== $nãormalized) {
+            $suffix = substr($normalized, -11);
+            if ($suffix !== '' && $suffix !== $normalized) {
                 $contato = $this->contatoModel->findByPhone($suffix);
             }
         }
@@ -988,29 +988,29 @@ class CentralMensagensService
             }
 
             $updates = [
-                'ultimo_contato_em' => $nãow,
+                'ultimo_contato_em' => $now,
             ];
             if ($clienteId && (int) ($contato['cliente_id'] ?? 0) <= 0) {
                 $updates = $this->contatoModel->buildClienteConvertidoPayload($clienteId, $updates);
             }
-            if ($safeNãome && empty($contato['nãome'])) {
-                $updates['nãome'] = $safeNãome;
+            if ($safeNome && empty($contato['nome'])) {
+                $updates['nome'] = $safeNome;
             }
-            if ($safeNãome && empty($contato['whatsapp_nãome_perfil'])) {
-                $updates['whatsapp_nãome_perfil'] = $safeNãome;
+            if ($safeNome && empty($contato['whatsapp_nome_perfil'])) {
+                $updates['whatsapp_nome_perfil'] = $safeNome;
             }
             if (
                 !$clienteId
                 && (int) ($contato['cliente_id'] ?? 0) <= 0
-                && $safeNãome !== ''
+                && $safeNome !== ''
             ) {
                 $updates = $this->contatoModel->buildLeadPayload($updates, true);
             }
             if (empty($contato['telefone'])) {
-                $updates['telefone'] = $nãormalized;
+                $updates['telefone'] = $normalized;
             }
-            if (empty($contato['telefone_nãormalizado'])) {
-                $updates['telefone_nãormalizado'] = $nãormalized;
+            if (empty($contato['telefone_normalizado'])) {
+                $updates['telefone_normalizado'] = $normalized;
             }
 
             if (!empty($updates)) {
@@ -1021,18 +1021,18 @@ class CentralMensagensService
         }
 
         $insertPayload = [
-            'nãome' => $safeNãome ?: null,
-            'telefone' => $nãormalized,
-            'telefone_nãormalizado' => $nãormalized,
-            'whatsapp_nãome_perfil' => $safeNãome ?: null,
+            'nome' => $safeNome ?: null,
+            'telefone' => $normalized,
+            'telefone_normalizado' => $normalized,
+            'whatsapp_nome_perfil' => $safeNome ?: null,
             'origem' => 'whatsapp',
-            'ultimo_contato_em' => $nãow,
+            'ultimo_contato_em' => $now,
         ];
 
         if ($clienteId) {
             $insertPayload = $this->contatoModel->buildClienteConvertidoPayload($clienteId, $insertPayload);
         } else {
-            $insertPayload = $this->contatoModel->buildLeadPayload($insertPayload, $safeNãome !== '');
+            $insertPayload = $this->contatoModel->buildLeadPayload($insertPayload, $safeNome !== '');
         }
 
         $insertId = (int) $this->contatoModel->insert($insertPayload, true);
@@ -1049,7 +1049,7 @@ class CentralMensagensService
         $row = $this->osModel
             ->select('id')
             ->where('cliente_id', $clienteId)
-            ->whereNãotIn('estado_fluxo', ['encerrado', 'cancelado'])
+            ->whereNotIn('estado_fluxo', ['encerrado', 'cancelado'])
             ->orderBy('id', 'DESC')
             ->first();
 
@@ -1129,7 +1129,7 @@ class CentralMensagensService
         return substr($value, 0, 120);
     }
 
-    private function resãolveInboundContentType(string $payloadType, ?string $mimeType, ?string $arquivo): string
+    private function resolveInboundContentType(string $payloadType, ?string $mimeType, ?string $arquivo): string
     {
         if ($payloadType !== '' && $payloadType !== 'chat') {
             if (str_contains($payloadType, 'image')) {
@@ -1169,7 +1169,7 @@ class CentralMensagensService
     }
 
     /**
-     * @return array{arquivo:string,mime_type:string,tipo_conteudo:string,arquivo_nãome:string,tamanho_bytes:int}|null
+     * @return array{arquivo:string,mime_type:string,tipo_conteudo:string,arquivo_nome:string,tamanho_bytes:int}|null
      */
     private function saveInboundMedia(string $base64, string $mimeType, string $filename, string $phone): ?array
     {
@@ -1222,7 +1222,7 @@ class CentralMensagensService
     /**
      * Armazena arquivo enviado via Central de Mensagens por telefone/tipo.
      *
-     * @return array{arquivo:string,mime_type:string,tipo_conteudo:string,arquivo_nãome:string,tamanho_bytes:int}|null
+     * @return array{arquivo:string,mime_type:string,tipo_conteudo:string,arquivo_nome:string,tamanho_bytes:int}|null
      */
     public function storeOutboundUpload(UploadedFile $file, string $phone): ?array
     {
@@ -1256,15 +1256,15 @@ class CentralMensagensService
     /**
      * Copia arquivo existente (ex.: PDF da OS) para estrutura organizada da Central.
      *
-     * @return array{arquivo:string,mime_type:string,tipo_conteudo:string,arquivo_nãome:string,tamanho_bytes:int}|null
+     * @return array{arquivo:string,mime_type:string,tipo_conteudo:string,arquivo_nome:string,tamanho_bytes:int}|null
      */
     public function copyFileToPhoneMedia(
-        string $sãourcePath,
+        string $sourcePath,
         string $phone,
         ?string $originalName = null,
         ?string $forcedMime = null
     ): ?array {
-        $path = trim($sãourcePath);
+        $path = trim($sourcePath);
         if ($path === '' || !is_file($path)) {
             return null;
         }
@@ -1298,7 +1298,7 @@ class CentralMensagensService
     }
 
     /**
-     * @return array{arquivo:string,mime_type:string,tipo_conteudo:string,arquivo_nãome:string,tamanho_bytes:int}|null
+     * @return array{arquivo:string,mime_type:string,tipo_conteudo:string,arquivo_nome:string,tamanho_bytes:int}|null
      */
     private function storeBinaryForPhone(string $phone, string $binary, string $mime, string $filename): ?array
     {
@@ -1323,9 +1323,9 @@ class CentralMensagensService
         $destName = $safeName;
         $seq = 1;
         while (is_file($targetDir . DIRECTORY_SEPARATOR . $destName)) {
-            $nameNãoExt = pathinfo($safeName, PATHINFO_FILENAME);
+            $nameNoExt = pathinfo($safeName, PATHINFO_FILENAME);
             $extension = pathinfo($safeName, PATHINFO_EXTENSION);
-            $destName = $nameNãoExt . '_' . $seq . ($extension !== '' ? ('.' . $extension) : '');
+            $destName = $nameNoExt . '_' . $seq . ($extension !== '' ? ('.' . $extension) : '');
             $seq++;
         }
 
@@ -1339,7 +1339,7 @@ class CentralMensagensService
             'arquivo' => $relativeDir . '/' . $destName,
             'mime_type' => $mime,
             'tipo_conteudo' => $this->tipoConteudoByMime($mime, $destName),
-            'arquivo_nãome' => $destName,
+            'arquivo_nome' => $destName,
             'tamanho_bytes' => strlen($binary),
         ];
     }
@@ -1438,9 +1438,9 @@ class CentralMensagensService
             'conteudo' => $payload['conteudo'] ?? null,
             'arquivo' => $payload['arquivo'] ?? null,
             'status' => (string) ($payload['status'] ?? 'registrada'),
-            'payload_jsãon' => is_array($payload['payload_jsãon'] ?? null)
-                ? jsãon_encode($payload['payload_jsãon'], JSON_UNESCAPED_UNICODE)
-                : ($payload['payload_jsãon'] ?? null),
+            'payload_json' => is_array($payload['payload_json'] ?? null)
+                ? json_encode($payload['payload_json'], JSON_UNESCAPED_UNICODE)
+                : ($payload['payload_json'] ?? null),
             'usuario_id' => $payload['usuario_id'] ?? null,
             'data_mensagem' => date('Y-m-d H:i:s'),
         ];

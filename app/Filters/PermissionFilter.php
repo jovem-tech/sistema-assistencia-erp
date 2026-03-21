@@ -12,7 +12,7 @@ use CodeIgniter\HTTP\ResponseInterface;
  * Interpreta o argumento passado na rota como "modulo:acao"
  * e valida via can() do sistema_helper.
  *
- * Usão em Routes.php:
+ * Uso em Routes.php:
  *   $routes->get('financeiro', 'Financeiro::index', ['filter' => 'permission:financeiro:visualizar']);
  *
  * Múltiplas permissões com vírgula:
@@ -22,7 +22,7 @@ class PermissionFilter implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
-        // Carrega helper casão ainda não esteja
+        // Carrega helper caso ainda não esteja
         if (!function_exists('can')) {
             helper('sistema');
         }
@@ -48,19 +48,19 @@ class PermissionFilter implements FilterInterface
             if ($request->isAJAX()) {
                 return service('response')
                     ->setStatusCode(403)
-                    ->setJSON(['error' => 'Acessão negado. Permissão insuficiente.']);
+                    ->setJSON(['error' => 'Acesso negado. Permissão insuficiente.']);
             }
 
-            // Requisição nãormal → redirect com flash
+            // Requisição normal → redirect com flash
             session()->setFlashdata(
                 'error',
-                "Acessão negado. Vocêê não tem permissão para executar esta ação (<strong>{$acao}</strong>) não módulo <strong>{$modulo}</strong>."
+                "Acesso negado. Você não tem permissão para executar esta ação (<strong>{$acao}</strong>) no módulo <strong>{$modulo}</strong>."
             );
 
             // Log de tentativa
             try {
                 \App\Models\LogModel::registrar(
-                    'acessão_negado',
+                    'acesso_negado',
                     "Tentativa não autorizada: módulo={$modulo}, ação={$acao}, url=" . $request->getUri()->getPath()
                 );
             } catch (\Throwable $e) {}

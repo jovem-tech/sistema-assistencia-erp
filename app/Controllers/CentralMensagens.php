@@ -52,7 +52,7 @@ class CentralMensagens extends BaseController
         $usuariosAtivos = [];
         $usuarioModel = new UsuarioModel();
         if ($usuarioModel->db->tableExists('usuarios')) {
-            $usuariosAtivos = $usuarioModel->select('id, nãome')->where('ativo', 1)->orderBy('nãome', 'ASC')->findAll();
+            $usuariosAtivos = $usuarioModel->select('id, nome')->where('ativo', 1)->orderBy('nome', 'ASC')->findAll();
         }
 
         $tagsAtivas = [];
@@ -83,7 +83,7 @@ class CentralMensagens extends BaseController
         return view('central_mensagens/index', [
             'title' => 'Central de Mensagens',
             'respostasRapidas' => $respostasRapidas,
-            'statusConversaOptions' => ['aberta', 'aguardando', 'resãolvida', 'arquivada'],
+            'statusConversaOptions' => ['aberta', 'aguardando', 'resolvida', 'arquivada'],
             'usuariosAtivos' => $usuariosAtivos,
             'tagsAtivas' => $tagsAtivas,
             'autoSyncSeconds' => $autoSyncSeconds,
@@ -94,7 +94,7 @@ class CentralMensagens extends BaseController
                 ? (can('clientes', 'criar') || can('clientes', 'editar'))
                 : true,
             'currentUserId' => (int) (session()->get('user_id') ?? 0),
-            'currentUserName' => (string) (session()->get('user_nãome') ?? ''),
+            'currentUserName' => (string) (session()->get('user_nome') ?? ''),
             'cmActive' => 'conversas',
         ]);
     }
@@ -119,7 +119,7 @@ class CentralMensagens extends BaseController
         $logModel = new ChatbotLogModel();
         if ($logModel->db->tableExists('chatbot_logs')) {
             $logs = $logModel
-                ->select('chatbot_logs.*, conversas_whatsapp.telefone, clientes.nãome_razao as cliente_nãome')
+                ->select('chatbot_logs.*, conversas_whatsapp.telefone, clientes.nome_razao as cliente_nome')
                 ->join('conversas_whatsapp', 'conversas_whatsapp.id = chatbot_logs.conversa_id', 'left')
                 ->join('clientes', 'clientes.id = chatbot_logs.cliente_id', 'left')
                 ->orderBy('chatbot_logs.id', 'DESC')
@@ -187,7 +187,7 @@ class CentralMensagens extends BaseController
         $status = trim((string) $this->request->getGet('status'));
         $prioridade = trim((string) $this->request->getGet('prioridade'));
         $responsavelId = (int) ($this->request->getGet('responsavel_id') ?? 0);
-        $aguardandoHumanão = (string) $this->request->getGet('aguardando_humanão') === '1';
+        $aguardandoHumano = (string) $this->request->getGet('aguardando_humano') === '1';
 
         $conversaModel = new ConversaWhatsappModel();
         if (!$this->isCentralDisponivel($conversaModel)) {
@@ -195,7 +195,7 @@ class CentralMensagens extends BaseController
         }
 
         $builder = $conversaModel
-            ->select('conversas_whatsapp.*, clientes.nãome_razao as cliente_nãome, os.numero_os, usuarios.nãome as responsavel_nãome')
+            ->select('conversas_whatsapp.*, clientes.nome_razao as cliente_nome, os.numero_os, usuarios.nome as responsavel_nome')
             ->join('clientes', 'clientes.id = conversas_whatsapp.cliente_id', 'left')
             ->join('os', 'os.id = conversas_whatsapp.os_id_principal', 'left')
             ->join('usuarios', 'usuarios.id = conversas_whatsapp.responsavel_id', 'left');
@@ -209,8 +209,8 @@ class CentralMensagens extends BaseController
         if ($responsavelId > 0) {
             $builder->where('conversas_whatsapp.responsavel_id', $responsavelId);
         }
-        if ($aguardandoHumanão) {
-            $builder->where('conversas_whatsapp.aguardando_humanão', 1);
+        if ($aguardandoHumano) {
+            $builder->where('conversas_whatsapp.aguardando_humano', 1);
         }
 
         $conversas = $builder
@@ -219,9 +219,9 @@ class CentralMensagens extends BaseController
             ->findAll(400);
 
         $usuariosAtivos = (new UsuarioModel())
-            ->select('id, nãome')
+            ->select('id, nome')
             ->where('ativo', 1)
-            ->orderBy('nãome', 'ASC')
+            ->orderBy('nome', 'ASC')
             ->findAll();
 
         return view('central_mensagens/filas', [
@@ -232,7 +232,7 @@ class CentralMensagens extends BaseController
             'filtro_status' => $status,
             'filtro_prioridade' => $prioridade,
             'filtro_responsavel_id' => $responsavelId,
-            'filtro_aguardando_humanão' => $aguardandoHumanão,
+            'filtro_aguardando_humano' => $aguardandoHumano,
         ]);
     }
 
@@ -260,7 +260,7 @@ class CentralMensagens extends BaseController
             'recebidas' => [
                 'titulo'   => 'Mensagens Recebidas',
                 'valor'    => (int) ($raw['mensagens_recebidas'] ?? 0),
-                'subtexto' => 'Demanda total inbound não período',
+                'subtexto' => 'Demanda total inbound no período',
                 'status'   => 'info',
                 'icone'    => 'bi-chat-left-text',
                 'tooltip'  => 'Quantidade total de mensagens enviadas pelos clientes para a central.'
@@ -276,18 +276,18 @@ class CentralMensagens extends BaseController
             'automaticas' => [
                 'titulo'   => 'Respostas Automáticas',
                 'valor'    => (int) ($raw['mensagens_automaticas'] ?? 0),
-                'subtexto' => 'Interações resãolvidas pelo Chatbot',
+                'subtexto' => 'Interações resolvidas pelo Chatbot',
                 'status'   => 'primary',
                 'icone'    => 'bi-robot',
                 'tooltip'  => 'Mensagens disparadas automaticamente pelo sistema de automação.'
             ],
             'aguardando' => [
                 'titulo'   => 'Aguardando Atendimento',
-                'valor'    => (int) ($raw['conversas_aguardando_humanão'] ?? 0),
+                'valor'    => (int) ($raw['conversas_aguardando_humano'] ?? 0),
                 'subtexto' => 'Clientes na fila de espera',
-                'status'   => ($raw['conversas_aguardando_humanão'] ?? 0) > 5 ? 'danger' : 'warning',
+                'status'   => ($raw['conversas_aguardando_humano'] ?? 0) > 5 ? 'danger' : 'warning',
                 'icone'    => 'bi-people',
-                'tooltip'  => 'Conversas que sãolicitaram transbordo humanão e ainda não foram atendidas.'
+                'tooltip'  => 'Conversas que solicitaram transbordo humano e ainda não foram atendidas.'
             ],
             'taxa_automacao' => [
                 'titulo'   => 'Taxa de Automação',
@@ -341,18 +341,18 @@ class CentralMensagens extends BaseController
 
         $id = (int) ($this->request->getPost('id') ?? 0);
         $codigo = strtolower(trim((string) $this->request->getPost('codigo')));
-        $nãome = trim((string) $this->request->getPost('nãome'));
+        $nome = trim((string) $this->request->getPost('nome'));
         $gatilhos = $this->parseListInput((string) $this->request->getPost('gatilhos'));
 
-        if ($codigo === '' || $nãome === '') {
-            return $this->respondAction(false, 'Codigo e nãome da intencao sao obrigatorios.', '/atendimento-whatsapp/chatbot');
+        if ($codigo === '' || $nome === '') {
+            return $this->respondAction(false, 'Codigo e nome da intencao sao obrigatorios.', '/atendimento-whatsapp/chatbot');
         }
 
         $payload = [
             'codigo' => $codigo,
-            'nãome' => $nãome,
+            'nome' => $nome,
             'descricao' => trim((string) $this->request->getPost('descricao')) ?: null,
-            'gatilhos_jsãon' => !empty($gatilhos) ? jsãon_encode($gatilhos, JSON_UNESCAPED_UNICODE) : null,
+            'gatilhos_json' => !empty($gatilhos) ? json_encode($gatilhos, JSON_UNESCAPED_UNICODE) : null,
             'resposta_padrao' => trim((string) $this->request->getPost('resposta_padrao')) ?: null,
             'exige_consulta_erp' => (int) ($this->request->getPost('exige_consulta_erp') ? 1 : 0),
             'acao_sistema' => trim((string) $this->request->getPost('acao_sistema')) ?: null,
@@ -362,7 +362,7 @@ class CentralMensagens extends BaseController
 
         if ($id > 0) {
             $model->update($id, $payload);
-            return $this->respondAction(true, 'Intencao atualizada com sucessão.', '/atendimento-whatsapp/chatbot');
+            return $this->respondAction(true, 'Intencao atualizada com sucesso.', '/atendimento-whatsapp/chatbot');
         }
 
         $exists = $model->where('codigo', $codigo)->first();
@@ -371,7 +371,7 @@ class CentralMensagens extends BaseController
         }
 
         $model->insert($payload);
-        return $this->respondAction(true, 'Intencao criada com sucessão.', '/atendimento-whatsapp/chatbot');
+        return $this->respondAction(true, 'Intencao criada com sucesso.', '/atendimento-whatsapp/chatbot');
     }
 
     public function toggleIntencao(int $id)
@@ -390,7 +390,7 @@ class CentralMensagens extends BaseController
     {
         $model = new ChatbotIntencaoModel();
         if ($model->delete($id)) {
-            return $this->respondAction(true, 'Intencao excluida com sucessão.', '/atendimento-whatsapp/chatbot');
+            return $this->respondAction(true, 'Intencao excluida com sucesso.', '/atendimento-whatsapp/chatbot');
         }
         return $this->respondAction(false, 'Nao foi possivel excluir a intencao.', '/atendimento-whatsapp/chatbot');
     }
@@ -403,27 +403,27 @@ class CentralMensagens extends BaseController
         }
 
         $id = (int) ($this->request->getPost('id') ?? 0);
-        $nãome = trim((string) $this->request->getPost('nãome'));
+        $nome = trim((string) $this->request->getPost('nome'));
         $eventoOrigem = trim((string) $this->request->getPost('evento_origem'));
-        if ($nãome === '' || $eventoOrigem === '') {
-            return $this->respondAction(false, 'Nãome e evento de origem sao obrigatorios.', '/atendimento-whatsapp/chatbot');
+        if ($nome === '' || $eventoOrigem === '') {
+            return $this->respondAction(false, 'Nome e evento de origem sao obrigatorios.', '/atendimento-whatsapp/chatbot');
         }
 
         $payload = [
-            'nãome' => $nãome,
+            'nome' => $nome,
             'evento_origem' => $eventoOrigem,
-            'condicao_jsãon' => $this->parseJsãonInput((string) $this->request->getPost('condicao_jsãon')),
-            'acao_jsãon' => $this->parseJsãonInput((string) $this->request->getPost('acao_jsãon')),
+            'condicao_json' => $this->parseJsonInput((string) $this->request->getPost('condicao_json')),
+            'acao_json' => $this->parseJsonInput((string) $this->request->getPost('acao_json')),
             'ativo' => (int) ($this->request->getPost('ativo') ? 1 : 0),
         ];
 
         if ($id > 0) {
             $model->update($id, $payload);
-            return $this->respondAction(true, 'Regra ERP atualizada com sucessão.', '/atendimento-whatsapp/chatbot');
+            return $this->respondAction(true, 'Regra ERP atualizada com sucesso.', '/atendimento-whatsapp/chatbot');
         }
 
         $model->insert($payload);
-        return $this->respondAction(true, 'Regra ERP criada com sucessão.', '/atendimento-whatsapp/chatbot');
+        return $this->respondAction(true, 'Regra ERP criada com sucesso.', '/atendimento-whatsapp/chatbot');
     }
 
     public function toggleRegraErp(int $id)
@@ -442,7 +442,7 @@ class CentralMensagens extends BaseController
     {
         $model = new ChatbotRegraErpModel();
         if ($model->delete($id)) {
-            return $this->respondAction(true, 'Regra ERP excluida com sucessão.', '/atendimento-whatsapp/chatbot');
+            return $this->respondAction(true, 'Regra ERP excluida com sucesso.', '/atendimento-whatsapp/chatbot');
         }
         return $this->respondAction(false, 'Nao foi possivel excluir a regra ERP.', '/atendimento-whatsapp/chatbot');
     }
@@ -466,18 +466,18 @@ class CentralMensagens extends BaseController
             'pergunta' => $pergunta,
             'resposta' => $resposta,
             'categoria' => trim((string) $this->request->getPost('categoria')) ?: null,
-            'palavras_chave_jsãon' => !empty($palavras) ? jsãon_encode($palavras, JSON_UNESCAPED_UNICODE) : null,
+            'palavras_chave_json' => !empty($palavras) ? json_encode($palavras, JSON_UNESCAPED_UNICODE) : null,
             'ordem' => (int) ($this->request->getPost('ordem') ?? 0),
             'ativo' => (int) ($this->request->getPost('ativo') ? 1 : 0),
         ];
 
         if ($id > 0) {
             $model->update($id, $payload);
-            return $this->respondAction(true, 'FAQ atualizado com sucessão.', '/atendimento-whatsapp/faq');
+            return $this->respondAction(true, 'FAQ atualizado com sucesso.', '/atendimento-whatsapp/faq');
         }
 
         $model->insert($payload);
-        return $this->respondAction(true, 'FAQ criado com sucessão.', '/atendimento-whatsapp/faq');
+        return $this->respondAction(true, 'FAQ criado com sucesso.', '/atendimento-whatsapp/faq');
     }
 
     public function toggleFaq(int $id)
@@ -543,29 +543,29 @@ class CentralMensagens extends BaseController
         }
 
         $id = (int) ($this->request->getPost('id') ?? 0);
-        $nãome = trim((string) $this->request->getPost('nãome'));
+        $nome = trim((string) $this->request->getPost('nome'));
         $tipo = trim((string) $this->request->getPost('tipo_fluxo'));
-        if ($nãome === '' || $tipo === '') {
-            return $this->respondAction(false, 'Nãome e tipo de fluxo sao obrigatorios.', '/atendimento-whatsapp/fluxos');
+        if ($nome === '' || $tipo === '') {
+            return $this->respondAction(false, 'Nome e tipo de fluxo sao obrigatorios.', '/atendimento-whatsapp/fluxos');
         }
 
         $etapas = $this->parseListInput((string) $this->request->getPost('etapas'));
         $payload = [
-            'nãome' => $nãome,
+            'nome' => $nome,
             'descricao' => trim((string) $this->request->getPost('descricao')) ?: null,
             'tipo_fluxo' => $tipo,
-            'etapas_jsãon' => !empty($etapas) ? jsãon_encode($etapas, JSON_UNESCAPED_UNICODE) : null,
+            'etapas_json' => !empty($etapas) ? json_encode($etapas, JSON_UNESCAPED_UNICODE) : null,
             'ordem' => (int) ($this->request->getPost('ordem') ?? 0),
             'ativo' => (int) ($this->request->getPost('ativo') ? 1 : 0),
         ];
 
         if ($id > 0) {
             $model->update($id, $payload);
-            return $this->respondAction(true, 'Fluxo atualizado com sucessão.', '/atendimento-whatsapp/fluxos');
+            return $this->respondAction(true, 'Fluxo atualizado com sucesso.', '/atendimento-whatsapp/fluxos');
         }
 
         $model->insert($payload);
-        return $this->respondAction(true, 'Fluxo criado com sucessão.', '/atendimento-whatsapp/fluxos');
+        return $this->respondAction(true, 'Fluxo criado com sucesso.', '/atendimento-whatsapp/fluxos');
     }
 
     public function toggleFluxo(int $id)
@@ -592,7 +592,7 @@ class CentralMensagens extends BaseController
             'responsavel_id' => (int) ($this->request->getPost('responsavel_id') ?? 0),
             'prioridade' => trim((string) $this->request->getPost('prioridade')),
             'automacao_ativa' => (int) ($this->request->getPost('automacao_ativa') ? 1 : 0),
-            'aguardando_humanão' => (int) ($this->request->getPost('aguardando_humanão') ? 1 : 0),
+            'aguardando_humano' => (int) ($this->request->getPost('aguardando_humano') ? 1 : 0),
         ];
 
         $ok = (new CentralMensagensService())->updateConversationMeta($conversaId, $payload, session()->get('user_id') ?: null);
@@ -600,10 +600,10 @@ class CentralMensagens extends BaseController
             return $this->respondAction(false, 'Nao foi possivel atualizar a fila da conversa.', '/atendimento-whatsapp/filas');
         }
 
-        return $this->respondAction(true, 'Fila da conversa atualizada com sucessão.', '/atendimento-whatsapp/filas');
+        return $this->respondAction(true, 'Fila da conversa atualizada com sucesso.', '/atendimento-whatsapp/filas');
     }
 
-    public function consãolidarMetricasDiarias()
+    public function consolidarMetricasDiarias()
     {
         $dataRef = trim((string) $this->request->getPost('data_referencia'));
         if ($dataRef === '') {
@@ -621,7 +621,7 @@ class CentralMensagens extends BaseController
         $post = $this->request->getPost();
 
         foreach ($defaults as $key => $default) {
-            // Se a chave não existe não POST e é um checkbox conhecido, valor é '0'
+            // Se a chave não existe no POST e é um checkbox conhecido, valor é '0'
             if (!isset($post[$key]) && $key === 'central_mensagens_auto_bot_enabled') {
                 $value = '0';
             } else {
@@ -631,7 +631,7 @@ class CentralMensagens extends BaseController
             $configModel->setConfig($key, (string) $value, 'texto');
         }
 
-        return $this->respondAction(true, 'Configuracoes da Central salvas com sucessão.', '/atendimento-whatsapp/configuracoes');
+        return $this->respondAction(true, 'Configuracoes da Central salvas com sucesso.', '/atendimento-whatsapp/configuracoes');
     }
 
     public function conversas()
@@ -644,9 +644,9 @@ class CentralMensagens extends BaseController
 
             $q = trim((string) $this->request->getGet('q'));
             $status = trim((string) $this->request->getGet('status'));
-            $sãomenteNaoLidas = (string) $this->request->getGet('nao_lidas') === '1';
+            $somenteNaoLidas = (string) $this->request->getGet('nao_lidas') === '1';
             $osAbertas = (string) $this->request->getGet('com_os_aberta') === '1';
-            $clientesNãovos = (string) $this->request->getGet('clientes_nãovos') === '1';
+            $clientesNovos = (string) $this->request->getGet('clientes_novos') === '1';
             $responsavelId = (int) ($this->request->getGet('responsavel_id') ?? 0);
             $tagId = (int) ($this->request->getGet('tag_id') ?? 0);
             $limit = min(300, max(20, (int) ($this->request->getGet('limit') ?? 120)));
@@ -658,21 +658,21 @@ class CentralMensagens extends BaseController
             $contatosSelect = $contatosTableExists
                 ? (
                     'contatos.id as contato_id,
-                    contatos.nãome as contato_nãome,
-                    contatos.whatsapp_nãome_perfil as contato_perfil_nãome,
+                    contatos.nome as contato_nome,
+                    contatos.whatsapp_nome_perfil as contato_perfil_nome,
                     contatos.cliente_id as contato_cliente_id,
                     ' . ($contatosStatusFieldExists
                         ? 'contatos.status_relacionamento as contato_status_relacionamento'
                         : 'NULL as contato_status_relacionamento')
                 )
                 : 'NULL as contato_id,
-                    NULL as contato_nãome,
-                    NULL as contato_perfil_nãome,
+                    NULL as contato_nome,
+                    NULL as contato_perfil_nome,
                     NULL as contato_cliente_id,
                     NULL as contato_status_relacionamento';
             $builder = $model
                 ->select(
-                    'conversas_whatsapp.*, clientes.nãome_razao as cliente_nãome, os.numero_os, os.estado_fluxo, usuarios.nãome as responsavel_nãome,
+                    'conversas_whatsapp.*, clientes.nome_razao as cliente_nome, os.numero_os, os.estado_fluxo, usuarios.nome as responsavel_nome,
                     ' . $contatosSelect
                     . ($mensagensTableExists ? ',
                     (SELECT mw.id FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_id,
@@ -694,27 +694,27 @@ class CentralMensagens extends BaseController
                 $builder->groupStart();
                 $builder
                     ->like('conversas_whatsapp.telefone', $q)
-                    ->orLike('conversas_whatsapp.nãome_contato', $q)
-                    ->orLike('clientes.nãome_razao', $q)
+                    ->orLike('conversas_whatsapp.nome_contato', $q)
+                    ->orLike('clientes.nome_razao', $q)
                     ->orLike('os.numero_os', $q);
                 if ($contatosTableExists) {
                     $builder
-                        ->orLike('contatos.nãome', $q)
-                        ->orLike('contatos.whatsapp_nãome_perfil', $q);
+                        ->orLike('contatos.nome', $q)
+                        ->orLike('contatos.whatsapp_nome_perfil', $q);
                 }
                 $builder->groupEnd();
             }
             if ($status !== '') {
                 $builder->where('conversas_whatsapp.status', $status);
             }
-            if ($sãomenteNaoLidas) {
+            if ($somenteNaoLidas) {
                 $builder->where('conversas_whatsapp.nao_lidas >', 0);
             }
             if ($osAbertas) {
                 $builder->where('os.estado_fluxo IS NOT NULL', null, false)
-                    ->whereNãotIn('os.estado_fluxo', ['encerrado', 'cancelado']);
+                    ->whereNotIn('os.estado_fluxo', ['encerrado', 'cancelado']);
             }
-            if ($clientesNãovos) {
+            if ($clientesNovos) {
                 $builder->where('conversas_whatsapp.cliente_id IS NULL', null, false);
                 if ($contatosTableExists) {
                     $builder->where('contatos.cliente_id IS NULL', null, false);
@@ -728,20 +728,20 @@ class CentralMensagens extends BaseController
                     ->where('conversa_tags.tag_id', $tagId);
             }
 
-            $itemês = $builder
+            $items = $builder
                 ->orderBy('conversas_whatsapp.ultima_mensagem_em', 'DESC')
                 ->orderBy('ultima_mensagem_id', 'DESC')
                 ->orderBy('conversas_whatsapp.id', 'DESC')
                 ->findAll($limit);
 
             return $this->apiSuccess('CM_CONVERSAS_LIST_OK', [
-                'itemês' => $itemês,
-                'count' => count($itemês),
+                'items' => $items,
+                'count' => count($items),
             ]);
         } catch (Throwable $e) {
             return $this->apiError(
                 'CM_CONVERSAS_LIST_ERROR',
-                'Nao foi possivel carregar as conversas não momento.',
+                'Nao foi possivel carregar as conversas no momento.',
                 500,
                 [
                     'endpoint' => $endpoint,
@@ -750,7 +750,7 @@ class CentralMensagens extends BaseController
                         'status' => (string) $this->request->getGet('status'),
                         'nao_lidas' => (string) $this->request->getGet('nao_lidas'),
                         'com_os_aberta' => (string) $this->request->getGet('com_os_aberta'),
-                        'clientes_nãovos' => (string) $this->request->getGet('clientes_nãovos'),
+                        'clientes_novos' => (string) $this->request->getGet('clientes_novos'),
                         'responsavel_id' => (int) ($this->request->getGet('responsavel_id') ?? 0),
                         'tag_id' => (int) ($this->request->getGet('tag_id') ?? 0),
                         'contatos_table_exists' => (new ConversaWhatsappModel())->db->tableExists('contatos'),
@@ -798,7 +798,7 @@ class CentralMensagens extends BaseController
         } catch (Throwable $e) {
             return $this->apiError(
                 'CM_CONVERSA_THREAD_ERROR',
-                'Nao foi possivel carregar a conversa não momento.',
+                'Nao foi possivel carregar a conversa no momento.',
                 500,
                 [
                     'endpoint' => $endpoint,
@@ -809,9 +809,9 @@ class CentralMensagens extends BaseController
         }
     }
 
-    public function conversaNãovas(int $id)
+    public function conversaNovas(int $id)
     {
-        $endpoint = 'conversa_nãovas';
+        $endpoint = 'conversa_novas';
 
         try {
             $service = new CentralMensagensService();
@@ -942,7 +942,7 @@ class CentralMensagens extends BaseController
                 ],
                 $e
             );
-            $errorPayload = jsãon_encode([
+            $errorPayload = json_encode([
                 'ok' => false,
                 'code' => 'CM_CONVERSA_STREAM_INCREMENTAL_ERROR',
                 'status' => 500,
@@ -959,10 +959,10 @@ class CentralMensagens extends BaseController
             return $this->response
                 ->setStatusCode(200)
                 ->setHeader('Content-Type', 'text/event-stream; charset=UTF-8')
-                ->setHeader('Cache-Control', 'não-cache, não-store, must-revalidate')
-                ->setHeader('Pragma', 'não-cache')
+                ->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+                ->setHeader('Pragma', 'no-cache')
                 ->setHeader('Expires', '0')
-                ->setHeader('X-Accel-Buffering', 'não')
+                ->setHeader('X-Accel-Buffering', 'no')
                 ->setBody($errorBody);
         }
         if (!empty($mensagens)) {
@@ -974,7 +974,7 @@ class CentralMensagens extends BaseController
             $latestId = (int) end($mensagens)['id'];
         }
 
-        $readyPayload = jsãon_encode([
+        $readyPayload = json_encode([
             'ok' => true,
             'conversa_id' => $id,
             'ts' => date('c'),
@@ -986,7 +986,7 @@ class CentralMensagens extends BaseController
         $body .= 'data: ' . $readyPayload . "\n\n";
 
         if (!empty($mensagens)) {
-            $mêsgPayload = jsãon_encode([
+            $msgPayload = json_encode([
                 'ok' => true,
                 'conversa' => $conversa,
                 'latest_id' => $latestId,
@@ -994,9 +994,9 @@ class CentralMensagens extends BaseController
                 'mensagens' => $mensagens,
             ], JSON_UNESCAPED_UNICODE);
             $body .= "event: mensagens\n";
-            $body .= 'data: ' . $mêsgPayload . "\n\n";
+            $body .= 'data: ' . $msgPayload . "\n\n";
         } else {
-            $pingPayload = jsãon_encode([
+            $pingPayload = json_encode([
                 'ts' => date('c'),
                 'latest_id' => $latestId,
             ], JSON_UNESCAPED_UNICODE);
@@ -1011,20 +1011,20 @@ class CentralMensagens extends BaseController
             return $this->response
                 ->setStatusCode(200)
                 ->setHeader('Content-Type', 'text/event-stream; charset=UTF-8')
-                ->setHeader('Cache-Control', 'não-cache, não-store, must-revalidate')
-                ->setHeader('Pragma', 'não-cache')
+                ->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+                ->setHeader('Pragma', 'no-cache')
                 ->setHeader('Expires', '0')
-                ->setHeader('X-Accel-Buffering', 'não')
+                ->setHeader('X-Accel-Buffering', 'no')
                 ->setBody($body);
         }
 
         return $this->response
             ->setStatusCode(200)
             ->setHeader('Content-Type', 'text/event-stream; charset=UTF-8')
-            ->setHeader('Cache-Control', 'não-cache, não-store, must-revalidate')
-            ->setHeader('Pragma', 'não-cache')
+            ->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->setHeader('Pragma', 'no-cache')
             ->setHeader('Expires', '0')
-            ->setHeader('X-Accel-Buffering', 'não')
+            ->setHeader('X-Accel-Buffering', 'no')
             ->setBody($body);
     }
 
@@ -1070,7 +1070,7 @@ class CentralMensagens extends BaseController
 
             $service = new CentralMensagensService();
             if (!$conversa) {
-                $conversa = $service->resãolveConversationForOutgoing($phone, null, $osId > 0 ? $osId : null, (string) get_config('whatsapp_direct_provider', 'menuia'));
+                $conversa = $service->resolveConversationForOutgoing($phone, null, $osId > 0 ? $osId : null, (string) get_config('whatsapp_direct_provider', 'menuia'));
             }
             if (!$conversa) {
                 return $this->apiError(
@@ -1095,7 +1095,7 @@ class CentralMensagens extends BaseController
             $arquivoRelative = '';
             $arquivoMime = '';
             $arquivoTipoConteudo = 'texto';
-            $arquivoNãome = '';
+            $arquivoNome = '';
             $arquivoBytes = 0;
 
             if ($hasUpload) {
@@ -1116,7 +1116,7 @@ class CentralMensagens extends BaseController
                 $arquivoPath = FCPATH . ltrim($arquivoRelative, '/\\');
                 $arquivoMime = (string) ($stored['mime_type'] ?? '');
                 $arquivoTipoConteudo = (string) ($stored['tipo_conteudo'] ?? 'arquivo');
-                $arquivoNãome = (string) ($stored['arquivo_nãome'] ?? basename($arquivoRelative));
+                $arquivoNome = (string) ($stored['arquivo_nome'] ?? basename($arquivoRelative));
                 $arquivoBytes = (int) ($stored['tamanho_bytes'] ?? 0);
             } elseif ($documentoId > 0) {
                 $doc = (new OsDocumentoModel())->where('id', $documentoId)->first();
@@ -1132,22 +1132,22 @@ class CentralMensagens extends BaseController
                         ]
                     );
                 }
-                $sãourceRelative = (string) $doc['arquivo'];
-                $sãourcePath = FCPATH . ltrim($sãourceRelative, '/\\');
-                if (!is_file($sãourcePath)) {
+                $sourceRelative = (string) $doc['arquivo'];
+                $sourcePath = FCPATH . ltrim($sourceRelative, '/\\');
+                if (!is_file($sourcePath)) {
                     return $this->apiError(
                         'CM_ENVIO_PDF_MISSING_FILE',
-                        'Arquivo PDF nao encontrado não disco.',
+                        'Arquivo PDF nao encontrado no disco.',
                         422,
                         [
                             'endpoint' => $endpoint,
                             'conversa_id' => $conversaId,
                             'documento_id' => $documentoId,
-                            'arquivo' => $sãourceRelative,
+                            'arquivo' => $sourceRelative,
                         ]
                     );
                 }
-                $stored = $service->copyFileToPhoneMedia($sãourcePath, $phone, basename($sãourcePath), 'application/pdf');
+                $stored = $service->copyFileToPhoneMedia($sourcePath, $phone, basename($sourcePath), 'application/pdf');
                 if (!$stored || empty($stored['arquivo'])) {
                     return $this->apiError(
                         'CM_ENVIO_PDF_PREPARE_FAILED',
@@ -1164,7 +1164,7 @@ class CentralMensagens extends BaseController
                 $arquivoPath = FCPATH . ltrim($arquivoRelative, '/\\');
                 $arquivoMime = (string) ($stored['mime_type'] ?? 'application/pdf');
                 $arquivoTipoConteudo = (string) ($stored['tipo_conteudo'] ?? 'pdf');
-                $arquivoNãome = (string) ($stored['arquivo_nãome'] ?? basename($arquivoRelative));
+                $arquivoNome = (string) ($stored['arquivo_nome'] ?? basename($arquivoRelative));
                 $arquivoBytes = (int) ($stored['tamanho_bytes'] ?? 0);
                 if ($osId <= 0) {
                     $osId = (int) ($doc['os_id'] ?? 0);
@@ -1184,7 +1184,7 @@ class CentralMensagens extends BaseController
                     'arquivo' => $arquivoRelative,
                     'mime_type' => $arquivoMime !== '' ? $arquivoMime : null,
                     'tipo_conteudo' => $arquivoTipoConteudo !== '' ? $arquivoTipoConteudo : null,
-                    'arquivo_nãome' => $arquivoNãome !== '' ? $arquivoNãome : null,
+                    'arquivo_nome' => $arquivoNome !== '' ? $arquivoNome : null,
                     'arquivo_tamanho' => $arquivoBytes > 0 ? $arquivoBytes : null,
                     'conversa_id' => $conversaId,
                     'enviada_por_bot' => false,
@@ -1206,7 +1206,7 @@ class CentralMensagens extends BaseController
             }
 
             return $this->apiSuccess('CM_ENVIO_OK', [
-                'message' => 'Mensagem enviada com sucessão.',
+                'message' => 'Mensagem enviada com sucesso.',
                 'conversa_id' => $conversaId,
                 'result' => $result,
             ]);
@@ -1263,7 +1263,7 @@ class CentralMensagens extends BaseController
             (new ConversaWhatsappModel())->update($conversaId, ['cliente_id' => $os['cliente_id'] ?? null]);
 
             return $this->apiSuccess('CM_VINCULO_OK', [
-                'message' => 'Conversa vinculada a OS com sucessão.',
+                'message' => 'Conversa vinculada a OS com sucesso.',
                 'conversa_id' => $conversaId,
                 'os_id' => $osId,
             ]);
@@ -1325,7 +1325,7 @@ class CentralMensagens extends BaseController
 
             $tagIdsRaw = $this->request->getPost('tag_ids');
             if (is_string($tagIdsRaw)) {
-                $decoded = jsãon_decode($tagIdsRaw, true);
+                $decoded = json_decode($tagIdsRaw, true);
                 $tagIdsRaw = is_array($decoded) ? $decoded : [];
             }
             if (!is_array($tagIdsRaw)) {
@@ -1337,7 +1337,7 @@ class CentralMensagens extends BaseController
                 'responsavel_id' => (int) ($this->request->getPost('responsavel_id') ?? 0),
                 'tag_ids' => $tagIdsRaw,
                 'automacao_ativa' => (int) ($this->request->getPost('automacao_ativa') ? 1 : 0),
-                'aguardando_humanão' => (int) ($this->request->getPost('aguardando_humanão') ? 1 : 0),
+                'aguardando_humano' => (int) ($this->request->getPost('aguardando_humano') ? 1 : 0),
                 'prioridade' => trim((string) $this->request->getPost('prioridade')),
             ];
 
@@ -1382,7 +1382,7 @@ class CentralMensagens extends BaseController
         if (!$canWriteContato) {
             return $this->apiError(
                 'CM_CONTATO_FORBIDDEN',
-                'Vocêe nao possui permissao para salvar contatos nesta conversa.',
+                'Voce nao possui permissao para salvar contatos nesta conversa.',
                 403,
                 [
                     'endpoint' => $endpoint,
@@ -1406,7 +1406,7 @@ class CentralMensagens extends BaseController
                 );
             }
 
-            $telefone = $this->nãormalizePhone((string) ($conversa['telefone'] ?? ''));
+            $telefone = $this->normalizePhone((string) ($conversa['telefone'] ?? ''));
             if ($telefone === '') {
                 return $this->apiError(
                     'CM_CONTATO_PHONE_REQUIRED',
@@ -1419,12 +1419,12 @@ class CentralMensagens extends BaseController
                 );
             }
 
-            $nãomeInput = trim((string) ($this->request->getPost('nãome') ?? $this->request->getPost('nãome_contato') ?? ''));
-            if ($nãomeInput === '') {
-                $nãomeInput = trim((string) ($conversa['nãome_contato'] ?? ''));
+            $nomeInput = trim((string) ($this->request->getPost('nome') ?? $this->request->getPost('nome_contato') ?? ''));
+            if ($nomeInput === '') {
+                $nomeInput = trim((string) ($conversa['nome_contato'] ?? ''));
             }
-            if ($nãomeInput !== '' && $this->isLikelyPhoneValue($nãomeInput)) {
-                $nãomeInput = '';
+            if ($nomeInput !== '' && $this->isLikelyPhoneValue($nomeInput)) {
+                $nomeInput = '';
             }
 
             $contatoModel = new ContatoModel();
@@ -1441,25 +1441,25 @@ class CentralMensagens extends BaseController
             }
             $contato = $contatoModel->findByPhone($telefone);
             $contatoId = 0;
-            $nãow = date('Y-m-d H:i:s');
+            $now = date('Y-m-d H:i:s');
             $clienteIdConversa = (int) ($conversa['cliente_id'] ?? 0);
 
             if ($contato) {
                 $contatoId = (int) ($contato['id'] ?? 0);
                 $updates = [
-                    'ultimo_contato_em' => $nãow,
+                    'ultimo_contato_em' => $now,
                 ];
 
-                if ($nãomeInput !== '' && empty($contato['nãome'])) {
-                    $updates['nãome'] = $nãomeInput;
+                if ($nomeInput !== '' && empty($contato['nome'])) {
+                    $updates['nome'] = $nomeInput;
                 }
-                if ($nãomeInput !== '' && empty($contato['whatsapp_nãome_perfil'])) {
-                    $updates['whatsapp_nãome_perfil'] = $nãomeInput;
+                if ($nomeInput !== '' && empty($contato['whatsapp_nome_perfil'])) {
+                    $updates['whatsapp_nome_perfil'] = $nomeInput;
                 }
 
                 if ($clienteIdConversa > 0 && (int) ($contato['cliente_id'] ?? 0) <= 0) {
                     $updates = $contatoModel->buildClienteConvertidoPayload($clienteIdConversa, $updates);
-                } elseif ((int) ($contato['cliente_id'] ?? 0) <= 0 && $nãomeInput !== '') {
+                } elseif ((int) ($contato['cliente_id'] ?? 0) <= 0 && $nomeInput !== '') {
                     $updates = $contatoModel->buildLeadPayload($updates, true);
                 }
 
@@ -1468,17 +1468,17 @@ class CentralMensagens extends BaseController
                 }
             } else {
                 $insert = [
-                    'nãome' => $nãomeInput !== '' ? $nãomeInput : null,
+                    'nome' => $nomeInput !== '' ? $nomeInput : null,
                     'telefone' => $telefone,
-                    'telefone_nãormalizado' => $telefone,
-                    'whatsapp_nãome_perfil' => $nãomeInput !== '' ? $nãomeInput : null,
+                    'telefone_normalizado' => $telefone,
+                    'whatsapp_nome_perfil' => $nomeInput !== '' ? $nomeInput : null,
                     'origem' => 'whatsapp',
-                    'ultimo_contato_em' => $nãow,
+                    'ultimo_contato_em' => $now,
                 ];
                 if ($clienteIdConversa > 0) {
                     $insert = $contatoModel->buildClienteConvertidoPayload($clienteIdConversa, $insert);
                 } else {
-                    $insert = $contatoModel->buildLeadPayload($insert, $nãomeInput !== '');
+                    $insert = $contatoModel->buildLeadPayload($insert, $nomeInput !== '');
                 }
 
                 $contatoId = (int) $contatoModel->insert($insert, true);
@@ -1531,16 +1531,16 @@ class CentralMensagens extends BaseController
             if ((int) ($conversa['cliente_id'] ?? 0) <= 0 && $clienteIdContato > 0) {
                 $updateConversa['cliente_id'] = $clienteIdContato;
             }
-            if ($nãomeInput !== '' && (empty($conversa['nãome_contato']) || $this->isLikelyPhoneValue((string) $conversa['nãome_contato']))) {
-                $updateConversa['nãome_contato'] = $nãomeInput;
+            if ($nomeInput !== '' && (empty($conversa['nome_contato']) || $this->isLikelyPhoneValue((string) $conversa['nome_contato']))) {
+                $updateConversa['nome_contato'] = $nomeInput;
             }
             $conversaModel->update($id, $updateConversa);
 
             return $this->apiSuccess('CM_CONTATO_LINKED_OK', [
-                'message' => 'Contato salvo e vinculado com sucessão na conversa.',
+                'message' => 'Contato salvo e vinculado com sucesso na conversa.',
                 'conversa_id' => $id,
                 'contato_id' => $contatoId,
-                'contato_nãome' => (string) ($contato['nãome'] ?? $contato['whatsapp_nãome_perfil'] ?? $conversa['nãome_contato'] ?? ''),
+                'contato_nome' => (string) ($contato['nome'] ?? $contato['whatsapp_nome_perfil'] ?? $conversa['nome_contato'] ?? ''),
                 'cliente_id' => (int) ($contato['cliente_id'] ?? 0) ?: null,
             ]);
         } catch (Throwable $e) {
@@ -1616,13 +1616,13 @@ class CentralMensagens extends BaseController
             ];
         }
 
-        $ctxJsãon = jsãon_encode($ctx, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        log_message('error', '[CentralMensagens][' . $code . '] ' . $message . ' | context=' . (string) $ctxJsãon);
+        $ctxJson = json_encode($ctx, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        log_message('error', '[CentralMensagens][' . $code . '] ' . $message . ' | context=' . (string) $ctxJson);
 
         try {
             $logModel = new LogModel();
             if ($logModel->db->tableExists('logs')) {
-                $descricao = $message . ' | ' . (string) $ctxJsãon;
+                $descricao = $message . ' | ' . (string) $ctxJson;
                 $descricao = function_exists('mb_substr')
                     ? mb_substr($descricao, 0, 65500)
                     : substr($descricao, 0, 65500);
@@ -1640,14 +1640,14 @@ class CentralMensagens extends BaseController
         }
     }
 
-    private function nãormalizePhone(string $phone): string
+    private function normalizePhone(string $phone): string
     {
         return preg_replace('/\D+/', '', $phone) ?? '';
     }
 
     private function isLikelyPhoneValue(string $value): bool
     {
-        $digits = $this->nãormalizePhone($value);
+        $digits = $this->normalizePhone($value);
         if ($digits === '') {
             return false;
         }
@@ -1670,7 +1670,7 @@ class CentralMensagens extends BaseController
         if ($contatoId > 0 && $contatoModel->db->tableExists('contatos')) {
             $contato = $contatoModel->find($contatoId);
         } elseif ($contatoModel->db->tableExists('contatos')) {
-            $telefone = $this->nãormalizePhone((string) ($conversa['telefone'] ?? ''));
+            $telefone = $this->normalizePhone((string) ($conversa['telefone'] ?? ''));
             if ($telefone !== '') {
                 $contato = $contatoModel->findByPhone($telefone);
                 if ($contato) {
@@ -1752,7 +1752,7 @@ class CentralMensagens extends BaseController
         return [
             'cliente' => $cliente,
             'contato' => $contato,
-            'cliente_nãovo' => $clienteId <= 0,
+            'cliente_novo' => $clienteId <= 0,
             'os' => $osList,
             'os_principal' => $osPrincipal,
             'os_vinculadas' => $osVinculadas,
@@ -1760,14 +1760,14 @@ class CentralMensagens extends BaseController
             'followups' => $followups,
             'meta' => [
                 'status' => (string) ($conversa['status'] ?? 'aberta'),
-                'status_options' => ['aberta', 'aguardando', 'resãolvida', 'arquivada'],
+                'status_options' => ['aberta', 'aguardando', 'resolvida', 'arquivada'],
                 'responsavel_id' => (int) ($conversa['responsavel_id'] ?? 0),
                 'responsaveis' => $service->getResponsaveisAtivos(),
                 'tags' => $service->getConversaTagIds((int) $conversa['id']),
                 'tag_catalogo' => $service->getTagCatalog(),
                 'automacao_ativa' => (int) ($conversa['automacao_ativa'] ?? 1),
-                'aguardando_humanão' => (int) ($conversa['aguardando_humanão'] ?? 0),
-                'prioridade' => (string) ($conversa['prioridade'] ?? 'nãormal'),
+                'aguardando_humano' => (int) ($conversa['aguardando_humano'] ?? 0),
+                'prioridade' => (string) ($conversa['prioridade'] ?? 'normal'),
             ],
         ];
     }
@@ -1786,7 +1786,7 @@ class CentralMensagens extends BaseController
             'central_mensagens_horario_inicio' => '08:00',
             'central_mensagens_horario_fim' => '18:00',
             'central_mensagens_dias_uteis' => '1,2,3,4,5,6',
-            'central_mensagens_bot_fallback_message' => 'Recebi sua mensagem e vou encaminhar para um atendente humanão continuar o atendimento.',
+            'central_mensagens_bot_fallback_message' => 'Recebi sua mensagem e vou encaminhar para um atendente humano continuar o atendimento.',
         ];
     }
 
@@ -1815,15 +1815,15 @@ class CentralMensagens extends BaseController
             return [];
         }
 
-        $decoded = jsãon_decode($raw, true);
+        $decoded = json_decode($raw, true);
         if (is_array($decoded)) {
-            $itemês = $decoded;
+            $items = $decoded;
         } else {
-            $itemês = preg_split('/[\r\n,;]+/', $raw) ?: [];
+            $items = preg_split('/[\r\n,;]+/', $raw) ?: [];
         }
 
         $out = [];
-        foreach ($itemês as $item) {
+        foreach ($items as $item) {
             $item = trim((string) $item);
             if ($item !== '') {
                 $out[] = $item;
@@ -1832,24 +1832,24 @@ class CentralMensagens extends BaseController
         return array_values(array_unique($out));
     }
 
-    private function parseJsãonInput(string $raw): ?string
+    private function parseJsonInput(string $raw): ?string
     {
         $raw = trim($raw);
         if ($raw === '') {
             return null;
         }
 
-        $decoded = jsãon_decode($raw, true);
-        if (jsãon_last_error() === JSON_ERROR_NONE) {
-            return jsãon_encode($decoded, JSON_UNESCAPED_UNICODE);
+        $decoded = json_decode($raw, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return json_encode($decoded, JSON_UNESCAPED_UNICODE);
         }
 
         $fallback = $this->parseListInput($raw);
         if (!empty($fallback)) {
-            return jsãon_encode($fallback, JSON_UNESCAPED_UNICODE);
+            return json_encode($fallback, JSON_UNESCAPED_UNICODE);
         }
 
-        return jsãon_encode(['raw' => $raw], JSON_UNESCAPED_UNICODE);
+        return json_encode(['raw' => $raw], JSON_UNESCAPED_UNICODE);
     }
 
     private function respondAction(bool $ok, string $message, string $redirect)

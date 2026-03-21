@@ -44,7 +44,7 @@ class AddCentralAtendimentoInteligente extends Migration
         $this->safeDropColumn('conversas_whatsapp', 'canal');
         $this->safeDropColumn('conversas_whatsapp', 'primeira_mensagem_em');
         $this->safeDropColumn('conversas_whatsapp', 'automacao_ativa');
-        $this->safeDropColumn('conversas_whatsapp', 'aguardando_humanão');
+        $this->safeDropColumn('conversas_whatsapp', 'aguardando_humano');
         $this->safeDropColumn('conversas_whatsapp', 'prioridade');
     }
 
@@ -57,10 +57,10 @@ class AddCentralAtendimentoInteligente extends Migration
         $this->safeAddColumn('conversas_whatsapp', 'canal', "VARCHAR(30) NOT NULL DEFAULT 'whatsapp' AFTER origem_provider");
         $this->safeAddColumn('conversas_whatsapp', 'primeira_mensagem_em', "DATETIME NULL AFTER ultima_mensagem_em");
         $this->safeAddColumn('conversas_whatsapp', 'automacao_ativa', "TINYINT(1) NOT NULL DEFAULT 1 AFTER nao_lidas");
-        $this->safeAddColumn('conversas_whatsapp', 'aguardando_humanão', "TINYINT(1) NOT NULL DEFAULT 0 AFTER automacao_ativa");
-        $this->safeAddColumn('conversas_whatsapp', 'prioridade', "VARCHAR(30) NOT NULL DEFAULT 'nãormal' AFTER aguardando_humanão");
+        $this->safeAddColumn('conversas_whatsapp', 'aguardando_humano', "TINYINT(1) NOT NULL DEFAULT 0 AFTER automacao_ativa");
+        $this->safeAddColumn('conversas_whatsapp', 'prioridade', "VARCHAR(30) NOT NULL DEFAULT 'normal' AFTER aguardando_humano");
 
-        $this->safeCreateIndex('conversas_whatsapp', 'idx_conv_automacao_humanão', '(automacao_ativa, aguardando_humanão)');
+        $this->safeCreateIndex('conversas_whatsapp', 'idx_conv_automacao_humano', '(automacao_ativa, aguardando_humano)');
         $this->safeCreateIndex('conversas_whatsapp', 'idx_conv_prioridade', '(prioridade, ultima_mensagem_em)');
     }
 
@@ -75,8 +75,8 @@ class AddCentralAtendimentoInteligente extends Migration
         $this->safeAddColumn('mensagens_whatsapp', 'enviada_por_bot', 'TINYINT(1) NOT NULL DEFAULT 0 AFTER usuario_id');
         $this->safeAddColumn('mensagens_whatsapp', 'enviada_por_usuario_id', 'INT(11) NULL AFTER enviada_por_bot');
 
-        $this->safeCreateIndex('mensagens_whatsapp', 'idx_mêsgw_conversa_direcao', '(conversa_id, direcao, created_at)');
-        $this->safeCreateIndex('mensagens_whatsapp', 'idx_mêsgw_bot', '(enviada_por_bot, created_at)');
+        $this->safeCreateIndex('mensagens_whatsapp', 'idx_msgw_conversa_direcao', '(conversa_id, direcao, created_at)');
+        $this->safeCreateIndex('mensagens_whatsapp', 'idx_msgw_bot', '(enviada_por_bot, created_at)');
     }
 
     private function patchRespostasRapidasWhatsapp(): void
@@ -107,7 +107,7 @@ class AddCentralAtendimentoInteligente extends Migration
                 'constraint' => 80,
                 'null' => false,
             ],
-            'nãome' => [
+            'nome' => [
                 'type' => 'VARCHAR',
                 'constraint' => 140,
                 'null' => false,
@@ -116,7 +116,7 @@ class AddCentralAtendimentoInteligente extends Migration
                 'type' => 'TEXT',
                 'null' => true,
             ],
-            'gatilhos_jsãon' => [
+            'gatilhos_json' => [
                 'type' => 'LONGTEXT',
                 'null' => true,
             ],
@@ -187,7 +187,7 @@ class AddCentralAtendimentoInteligente extends Migration
                 'constraint' => 80,
                 'null' => true,
             ],
-            'palavras_chave_jsãon' => [
+            'palavras_chave_json' => [
                 'type' => 'LONGTEXT',
                 'null' => true,
             ],
@@ -229,7 +229,7 @@ class AddCentralAtendimentoInteligente extends Migration
                 'unsigned' => true,
                 'auto_increment' => true,
             ],
-            'nãome' => [
+            'nome' => [
                 'type' => 'VARCHAR',
                 'constraint' => 140,
                 'null' => false,
@@ -243,7 +243,7 @@ class AddCentralAtendimentoInteligente extends Migration
                 'constraint' => 60,
                 'null' => false,
             ],
-            'etapas_jsãon' => [
+            'etapas_json' => [
                 'type' => 'LONGTEXT',
                 'null' => true,
             ],
@@ -330,7 +330,7 @@ class AddCentralAtendimentoInteligente extends Migration
                 'constraint' => 40,
                 'default' => 'manual',
             ],
-            'escalado_humanão' => [
+            'escalado_humano' => [
                 'type' => 'TINYINT',
                 'constraint' => 1,
                 'default' => 0,
@@ -340,7 +340,7 @@ class AddCentralAtendimentoInteligente extends Migration
                 'constraint' => 11,
                 'null' => true,
             ],
-            'payload_jsãon' => [
+            'payload_json' => [
                 'type' => 'LONGTEXT',
                 'null' => true,
             ],
@@ -358,7 +358,7 @@ class AddCentralAtendimentoInteligente extends Migration
         $this->forge->addKey(['created_at']);
         $this->forge->addKey(['conversa_id', 'created_at']);
         $this->forge->addKey(['intencao_detectada', 'created_at']);
-        $this->forge->addKey(['escalado_humanão', 'created_at']);
+        $this->forge->addKey(['escalado_humano', 'created_at']);
         $this->forge->createTable('chatbot_logs', true);
     }
 
@@ -375,7 +375,7 @@ class AddCentralAtendimentoInteligente extends Migration
                 'unsigned' => true,
                 'auto_increment' => true,
             ],
-            'nãome' => [
+            'nome' => [
                 'type' => 'VARCHAR',
                 'constraint' => 180,
                 'null' => false,
@@ -385,11 +385,11 @@ class AddCentralAtendimentoInteligente extends Migration
                 'constraint' => 80,
                 'null' => false,
             ],
-            'condicao_jsãon' => [
+            'condicao_json' => [
                 'type' => 'LONGTEXT',
                 'null' => true,
             ],
-            'acao_jsãon' => [
+            'acao_json' => [
                 'type' => 'LONGTEXT',
                 'null' => true,
             ],
@@ -470,12 +470,12 @@ class AddCentralAtendimentoInteligente extends Migration
                 'constraint' => '10,2',
                 'default' => 0,
             ],
-            'taxa_resãolucao_automatica' => [
+            'taxa_resolucao_automatica' => [
                 'type' => 'DECIMAL',
                 'constraint' => '6,2',
                 'default' => 0,
             ],
-            'taxa_escalonamento_humanão' => [
+            'taxa_escalonamento_humano' => [
                 'type' => 'DECIMAL',
                 'constraint' => '6,2',
                 'default' => 0,
@@ -502,21 +502,21 @@ class AddCentralAtendimentoInteligente extends Migration
         }
 
         $rows = [
-            ['consultar_status_os', 'Consultar status da OS', 'Perguntas sãobre andamento e status do reparo', ['status', 'andamento', 'ficou pronto', 'ja ficou pronto', 'já ficou pronto', 'como esta', 'como está', 'minha os'], true, 'consultar_os_status', 10],
-            ['consultar_orcamento', 'Consultar orcamento', 'Perguntas sãobre valor e orcamento', ['orcamento', 'orçamento', 'valor', 'preco', 'preço', 'quanto ficou'], true, 'consultar_orcamento', 20],
+            ['consultar_status_os', 'Consultar status da OS', 'Perguntas sobre andamento e status do reparo', ['status', 'andamento', 'ficou pronto', 'ja ficou pronto', 'já ficou pronto', 'como esta', 'como está', 'minha os'], true, 'consultar_os_status', 10],
+            ['consultar_orcamento', 'Consultar orcamento', 'Perguntas sobre valor e orcamento', ['orcamento', 'orçamento', 'valor', 'preco', 'preço', 'quanto ficou'], true, 'consultar_orcamento', 20],
             ['aprovar_orcamento', 'Aprovar orcamento', 'Cliente informa aprovacao do orcamento', ['aprovar', 'aprovado', 'autorizo', 'pode fazer', 'segue com reparo'], true, 'aprovar_orcamento', 30],
             ['recusar_orcamento', 'Recusar orcamento', 'Cliente informa recusa do orcamento', ['recusar', 'nao aprovo', 'não aprovo', 'cancelar reparo', 'nao quero', 'não quero'], true, 'recusar_orcamento', 40],
-            ['consultar_previsao', 'Consultar previsao', 'Perguntas sãobre previsao de entrega', ['previsao', 'previsão', 'prazo', 'quando fica pronto', 'quando fica'], true, 'consultar_previsao', 50],
-            ['horario_atendimento', 'Horario de atendimento', 'Perguntas sãobre horario da loja', ['horario', 'horário', 'abre', 'funcionamento', 'que horas'], false, 'faq_horario', 60],
-            ['endereco_loja', 'Endereco da loja', 'Perguntas sãobre localizacao', ['endereco', 'endereço', 'localizacao', 'localização', 'onde fica', 'como chegar'], false, 'faq_endereco', 70],
-            ['formas_pagamento', 'Formas de pagamento', 'Perguntas sãobre pagamento e parcelamento', ['pagamento', 'pix', 'cartao', 'cartão', 'parcelar', 'dinheiro'], false, 'faq_pagamento', 80],
-            ['garantia', 'Garantia do servico', 'Perguntas sãobre garantia do reparo', ['garantia', 'retornão', 'garantido'], true, 'consultar_garantia', 90],
-            ['falar_humanão', 'Falar com atendente', 'Cliente sãolicita atendimento humanão', ['atendente', 'humanão', 'suporte', 'falar com alguem', 'falar com alguém', 'vendedor'], false, 'escalar_humanão', 100],
+            ['consultar_previsao', 'Consultar previsao', 'Perguntas sobre previsao de entrega', ['previsao', 'previsão', 'prazo', 'quando fica pronto', 'quando fica'], true, 'consultar_previsao', 50],
+            ['horario_atendimento', 'Horario de atendimento', 'Perguntas sobre horario da loja', ['horario', 'horário', 'abre', 'funcionamento', 'que horas'], false, 'faq_horario', 60],
+            ['endereco_loja', 'Endereco da loja', 'Perguntas sobre localizacao', ['endereco', 'endereço', 'localizacao', 'localização', 'onde fica', 'como chegar'], false, 'faq_endereco', 70],
+            ['formas_pagamento', 'Formas de pagamento', 'Perguntas sobre pagamento e parcelamento', ['pagamento', 'pix', 'cartao', 'cartão', 'parcelar', 'dinheiro'], false, 'faq_pagamento', 80],
+            ['garantia', 'Garantia do servico', 'Perguntas sobre garantia do reparo', ['garantia', 'retorno', 'garantido'], true, 'consultar_garantia', 90],
+            ['falar_humano', 'Falar com atendente', 'Cliente solicita atendimento humano', ['atendente', 'humano', 'suporte', 'falar com alguem', 'falar com alguém', 'vendedor'], false, 'escalar_humano', 100],
         ];
 
         $table = $this->db->table('chatbot_intencoes');
-        $nãow = date('Y-m-d H:i:s');
-        foreach ($rows as [$codigo, $nãome, $descricao, $gatilhos, $exigeConsultaErp, $acaoSistema, $ordem]) {
+        $now = date('Y-m-d H:i:s');
+        foreach ($rows as [$codigo, $nome, $descricao, $gatilhos, $exigeConsultaErp, $acaoSistema, $ordem]) {
             $exists = $table->where('codigo', $codigo)->countAllResults();
             if ($exists > 0) {
                 continue;
@@ -524,16 +524,16 @@ class AddCentralAtendimentoInteligente extends Migration
 
             $table->insert([
                 'codigo' => $codigo,
-                'nãome' => $nãome,
+                'nome' => $nome,
                 'descricao' => $descricao,
-                'gatilhos_jsãon' => jsãon_encode($gatilhos, JSON_UNESCAPED_UNICODE),
+                'gatilhos_json' => json_encode($gatilhos, JSON_UNESCAPED_UNICODE),
                 'resposta_padrao' => null,
                 'exige_consulta_erp' => $exigeConsultaErp ? 1 : 0,
                 'acao_sistema' => $acaoSistema,
                 'ordem' => $ordem,
                 'ativo' => 1,
-                'created_at' => $nãow,
-                'updated_at' => $nãow,
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
         }
     }
@@ -545,14 +545,14 @@ class AddCentralAtendimentoInteligente extends Migration
         }
 
         $rows = [
-            ['Qual o horario de atendimento?', 'Nãossão horario de atendimento e de segunda a sexta das 08:00 as 18:00 e sabado das 08:00 as 12:00.', 'Atendimento', ['horario', 'abre', 'funcionamento', 'sábado'], 10],
-            ['Qual o endereco da loja?', 'Vocêe encontra nãossa loja não endereco cadastrado não ERP. Se preferir, sãolicite um atendente para enviar a localizacao não mapa.', 'Atendimento', ['endereco', 'localizacao', 'onde fica'], 20],
+            ['Qual o horario de atendimento?', 'Nosso horario de atendimento e de segunda a sexta das 08:00 as 18:00 e sabado das 08:00 as 12:00.', 'Atendimento', ['horario', 'abre', 'funcionamento', 'sábado'], 10],
+            ['Qual o endereco da loja?', 'Voce encontra nossa loja no endereco cadastrado no ERP. Se preferir, solicite um atendente para enviar a localizacao no mapa.', 'Atendimento', ['endereco', 'localizacao', 'onde fica'], 20],
             ['Quais formas de pagamento sao aceitas?', 'Aceitamos PIX, cartao de debito, cartao de credito e dinheiro. Parcelamento sujeito as regras da loja.', 'Financeiro', ['pagamento', 'pix', 'cartao', 'parcelar'], 30],
-            ['Como funciona a garantia do reparo?', 'A garantia varia conforme o servico executado e pecas aplicadas. Possão consultar sua OS e informar o prazo exato.', 'Garantia', ['garantia', 'retornão', 'prazo de garantia'], 40],
+            ['Como funciona a garantia do reparo?', 'A garantia varia conforme o servico executado e pecas aplicadas. Posso consultar sua OS e informar o prazo exato.', 'Garantia', ['garantia', 'retorno', 'prazo de garantia'], 40],
         ];
 
         $table = $this->db->table('chatbot_faq');
-        $nãow = date('Y-m-d H:i:s');
+        $now = date('Y-m-d H:i:s');
         foreach ($rows as [$pergunta, $resposta, $categoria, $palavrasChave, $ordem]) {
             $exists = $table->where('pergunta', $pergunta)->countAllResults();
             if ($exists > 0) {
@@ -563,11 +563,11 @@ class AddCentralAtendimentoInteligente extends Migration
                 'pergunta' => $pergunta,
                 'resposta' => $resposta,
                 'categoria' => $categoria,
-                'palavras_chave_jsãon' => jsãon_encode($palavrasChave, JSON_UNESCAPED_UNICODE),
+                'palavras_chave_json' => json_encode($palavrasChave, JSON_UNESCAPED_UNICODE),
                 'ordem' => $ordem,
                 'ativo' => 1,
-                'created_at' => $nãow,
-                'updated_at' => $nãow,
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
         }
     }
@@ -580,38 +580,38 @@ class AddCentralAtendimentoInteligente extends Migration
 
         $rows = [
             [
-                'nãome' => 'Acompanhamento de OS',
-                'descricao' => 'Fluxo para respostas automaticas sãobre status, previsao e orientacao de retirada.',
+                'nome' => 'Acompanhamento de OS',
+                'descricao' => 'Fluxo para respostas automaticas sobre status, previsao e orientacao de retirada.',
                 'tipo_fluxo' => 'operacional',
-                'etapas_jsãon' => jsãon_encode(['recepcao', 'diagnãostico', 'orcamento', 'execucao', 'pronto_retirada', 'entregue'], JSON_UNESCAPED_UNICODE),
+                'etapas_json' => json_encode(['recepcao', 'diagnostico', 'orcamento', 'execucao', 'pronto_retirada', 'entregue'], JSON_UNESCAPED_UNICODE),
                 'ordem' => 10,
             ],
             [
-                'nãome' => 'Aprovacao de Orcamento',
+                'nome' => 'Aprovacao de Orcamento',
                 'descricao' => 'Fluxo para capturar aprovacao/recusa e acionar equipe humana quando necessario.',
                 'tipo_fluxo' => 'orcamento',
-                'etapas_jsãon' => jsãon_encode(['aguardando_autorizacao', 'resposta_cliente', 'confirmacao_humana'], JSON_UNESCAPED_UNICODE),
+                'etapas_json' => json_encode(['aguardando_autorizacao', 'resposta_cliente', 'confirmacao_humana'], JSON_UNESCAPED_UNICODE),
                 'ordem' => 20,
             ],
             [
-                'nãome' => 'Pos-atendimento',
+                'nome' => 'Pos-atendimento',
                 'descricao' => 'Fluxo de follow-up apos entrega para medir satisfacao e fidelizacao.',
                 'tipo_fluxo' => 'relacionamento',
-                'etapas_jsãon' => jsãon_encode(['entrega', 'pesquisa_satisfacao', 'fidelizacao'], JSON_UNESCAPED_UNICODE),
+                'etapas_json' => json_encode(['entrega', 'pesquisa_satisfacao', 'fidelizacao'], JSON_UNESCAPED_UNICODE),
                 'ordem' => 30,
             ],
         ];
 
         $table = $this->db->table('chatbot_fluxos');
-        $nãow = date('Y-m-d H:i:s');
+        $now = date('Y-m-d H:i:s');
         foreach ($rows as $row) {
-            $exists = $table->where('nãome', $row['nãome'])->countAllResults();
+            $exists = $table->where('nome', $row['nome'])->countAllResults();
             if ($exists > 0) {
                 continue;
             }
             $row['ativo'] = 1;
-            $row['created_at'] = $nãow;
-            $row['updated_at'] = $nãow;
+            $row['created_at'] = $now;
+            $row['updated_at'] = $now;
             $table->insert($row);
         }
     }
@@ -624,41 +624,41 @@ class AddCentralAtendimentoInteligente extends Migration
 
         $rows = [
             [
-                'nãome' => 'Avisão de equipamento pronto para retirada',
+                'nome' => 'Aviso de equipamento pronto para retirada',
                 'evento_origem' => 'os_status_alterado',
-                'condicao_jsãon' => jsãon_encode(['status' => 'reparado_disponivel_loja'], JSON_UNESCAPED_UNICODE),
-                'acao_jsãon' => jsãon_encode(['tipo' => 'template', 'template' => 'pronto_retirada', 'pdf_tipo' => 'laudo'], JSON_UNESCAPED_UNICODE),
+                'condicao_json' => json_encode(['status' => 'reparado_disponivel_loja'], JSON_UNESCAPED_UNICODE),
+                'acao_json' => json_encode(['tipo' => 'template', 'template' => 'pronto_retirada', 'pdf_tipo' => 'laudo'], JSON_UNESCAPED_UNICODE),
             ],
             [
-                'nãome' => 'Avisão de orcamento aguardando autorizacao',
+                'nome' => 'Aviso de orcamento aguardando autorizacao',
                 'evento_origem' => 'os_status_alterado',
-                'condicao_jsãon' => jsãon_encode(['status' => 'aguardando_autorizacao'], JSON_UNESCAPED_UNICODE),
-                'acao_jsãon' => jsãon_encode(['tipo' => 'template', 'template' => 'aguardando_autorizacao'], JSON_UNESCAPED_UNICODE),
+                'condicao_json' => json_encode(['status' => 'aguardando_autorizacao'], JSON_UNESCAPED_UNICODE),
+                'acao_json' => json_encode(['tipo' => 'template', 'template' => 'aguardando_autorizacao'], JSON_UNESCAPED_UNICODE),
             ],
             [
-                'nãome' => 'Pos-atendimento automatico apos entrega',
+                'nome' => 'Pos-atendimento automatico apos entrega',
                 'evento_origem' => 'os_status_alterado',
-                'condicao_jsãon' => jsãon_encode(['status' => 'entregue_reparado'], JSON_UNESCAPED_UNICODE),
-                'acao_jsãon' => jsãon_encode(['tipo' => 'followup', 'delay_days' => 7], JSON_UNESCAPED_UNICODE),
+                'condicao_json' => json_encode(['status' => 'entregue_reparado'], JSON_UNESCAPED_UNICODE),
+                'acao_json' => json_encode(['tipo' => 'followup', 'delay_days' => 7], JSON_UNESCAPED_UNICODE),
             ],
         ];
 
         $table = $this->db->table('chatbot_regras_erp');
-        $nãow = date('Y-m-d H:i:s');
+        $now = date('Y-m-d H:i:s');
         foreach ($rows as $row) {
-            $exists = $table->where('nãome', $row['nãome'])->countAllResults();
+            $exists = $table->where('nome', $row['nome'])->countAllResults();
             if ($exists > 0) {
                 continue;
             }
 
             $table->insert([
-                'nãome' => $row['nãome'],
+                'nome' => $row['nome'],
                 'evento_origem' => $row['evento_origem'],
-                'condicao_jsãon' => $row['condicao_jsãon'],
-                'acao_jsãon' => $row['acao_jsãon'],
+                'condicao_json' => $row['condicao_json'],
+                'acao_json' => $row['acao_json'],
                 'ativo' => 1,
-                'created_at' => $nãow,
-                'updated_at' => $nãow,
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
         }
     }
@@ -696,7 +696,7 @@ class AddCentralAtendimentoInteligente extends Migration
         try {
             $this->db->query("CREATE INDEX {$name} ON {$table} {$columnsSql}");
         } catch (\Throwable $e) {
-            // ignãore duplicated index or unsupported engine errors
+            // ignore duplicated index or unsupported engine errors
         }
     }
 }

@@ -19,9 +19,9 @@ class ChatbotLogModel extends Model
         'confianca',
         'resposta_gerada',
         'tipo_resposta',
-        'escalado_humanão',
+        'escalado_humano',
         'usuario_responsavel',
-        'payload_jsãon',
+        'payload_json',
     ];
 
     protected $useTimestamps = true;

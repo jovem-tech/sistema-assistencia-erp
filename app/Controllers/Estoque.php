@@ -20,7 +20,7 @@ class Estoque extends BaseController
     {
         $data = [
             'title' => 'Estoque de Peças',
-            'pecas' => $this->model->where('ativo', 1)->orderBy('nãome', 'ASC')->findAll(),
+            'pecas' => $this->model->where('ativo', 1)->orderBy('nome', 'ASC')->findAll(),
         ];
         return view('estoque/index', $data);
     }
@@ -28,7 +28,7 @@ class Estoque extends BaseController
     public function create()
     {
         $data = [
-            'title'  => 'Nãova Peça',
+            'title'  => 'Nova Peça',
             'codigo' => $this->model->generateCodigo(),
         ];
         return view('estoque/form', $data);
@@ -37,7 +37,7 @@ class Estoque extends BaseController
     public function store()
     {
         $rules = [
-            'nãome'        => 'required',
+            'nome'        => 'required',
             'preco_custo' => 'required',
             'preco_venda' => 'required',
         ];
@@ -52,10 +52,10 @@ class Estoque extends BaseController
         }
 
         $this->model->insert($dados);
-        LogModel::registrar('peca_criada', 'Peça cadastrada: ' . $dados['nãome']);
+        LogModel::registrar('peca_criada', 'Peça cadastrada: ' . $dados['nome']);
 
         return redirect()->to('/estoque')
-            ->with('success', 'Peça cadastrada com sucessão!');
+            ->with('success', 'Peça cadastrada com sucesso!');
     }
 
     public function edit($id)
@@ -80,7 +80,7 @@ class Estoque extends BaseController
         LogModel::registrar('peca_atualizada', 'Peça atualizada ID: ' . $id);
 
         return redirect()->to('/estoque')
-            ->with('success', 'Peça atualizada com sucessão!');
+            ->with('success', 'Peça atualizada com sucesso!');
     }
 
     public function delete($id)
@@ -89,7 +89,7 @@ class Estoque extends BaseController
         LogModel::registrar('peca_desativada', 'Peça desativada ID: ' . $id);
 
         return redirect()->to('/estoque')
-            ->with('success', 'Peça removida com sucessão!');
+            ->with('success', 'Peça removida com sucesso!');
     }
 
     public function movement()
@@ -111,21 +111,21 @@ class Estoque extends BaseController
         ]);
 
         // Update quantity
-        $nãovaQtd = $peca['quantidade_atual'];
+        $novaQtd = $peca['quantidade_atual'];
         if ($dados['tipo'] === 'entrada') {
-            $nãovaQtd += $dados['quantidade'];
+            $novaQtd += $dados['quantidade'];
         } elseif ($dados['tipo'] === 'saida') {
-            $nãovaQtd -= $dados['quantidade'];
+            $novaQtd -= $dados['quantidade'];
         } else {
-            $nãovaQtd = $dados['quantidade']; // ajuste
+            $novaQtd = $dados['quantidade']; // ajuste
         }
 
-        $this->model->update($dados['peca_id'], ['quantidade_atual' => max(0, $nãovaQtd)]);
+        $this->model->update($dados['peca_id'], ['quantidade_atual' => max(0, $novaQtd)]);
 
-        LogModel::registrar('estoque_movimentacao', ucfirst($dados['tipo']) . ' de ' . $dados['quantidade'] . ' unid. - ' . $peca['nãome']);
+        LogModel::registrar('estoque_movimentacao', ucfirst($dados['tipo']) . ' de ' . $dados['quantidade'] . ' unid. - ' . $peca['nome']);
 
         return redirect()->to('/estoque')
-            ->with('success', 'Movimentação registrada com sucessão!');
+            ->with('success', 'Movimentação registrada com sucesso!');
     }
 
     public function movements($id)
@@ -134,7 +134,7 @@ class Estoque extends BaseController
         $peca = $this->model->find($id);
 
         $data = [
-            'title'         => 'Movimentações - ' . ($peca['nãome'] ?? ''),
+            'title'         => 'Movimentações - ' . ($peca['nome'] ?? ''),
             'peca'          => $peca,
             'movimentacoes' => $movModel->getByPeca($id),
         ];
@@ -152,7 +152,7 @@ class Estoque extends BaseController
     {
         requirePermission('estoque', 'exportar');
 
-        $pecas = $this->model->where('ativo', 1)->orderBy('nãome', 'ASC')->findAll();
+        $pecas = $this->model->where('ativo', 1)->orderBy('nome', 'ASC')->findAll();
 
         $filename = 'estoque_pecas_' . date('Y-m-d_H-i') . '.csv';
         header('Content-Type: text/csv; charset=utf-8');
@@ -162,13 +162,13 @@ class Estoque extends BaseController
         fputs($f, "\xEF\xBB\xBF"); // BOM for Excel
 
         // Headers
-        fputcsv($f, ['Código', 'Cód. Fabricante', 'Nãome', 'Categoria', 'Modelos Compatíveis', 'Fornecedor', 'Localização', 'Custo', 'Venda', 'Qtd Atual', 'Mínimo', 'Observações'], ';');
+        fputcsv($f, ['Código', 'Cód. Fabricante', 'Nome', 'Categoria', 'Modelos Compatíveis', 'Fornecedor', 'Localização', 'Custo', 'Venda', 'Qtd Atual', 'Mínimo', 'Observações'], ';');
 
         foreach ($pecas as $p) {
             fputcsv($f, [
                 $p['codigo'],
                 $p['codigo_fabricante'],
-                $p['nãome'],
+                $p['nome'],
                 $p['categoria'],
                 $p['modelos_compativeis'],
                 $p['fornecedor'],
@@ -196,9 +196,9 @@ class Estoque extends BaseController
         $f = fopen('php://output', 'w');
         fputs($f, "\xEF\xBB\xBF");
 
-        fputcsv($f, ['codigo', 'codigo_fabricante', 'nãome', 'categoria', 'modelos_compativeis', 'fornecedor', 'localizacao', 'preco_custo', 'preco_venda', 'quantidade_atual', 'estoque_minimo', 'observacoes'], ';');
+        fputcsv($f, ['codigo', 'codigo_fabricante', 'nome', 'categoria', 'modelos_compativeis', 'fornecedor', 'localizacao', 'preco_custo', 'preco_venda', 'quantidade_atual', 'estoque_minimo', 'observacoes'], ';');
         fputcsv($f, ['PC00001', 'SN123456', 'Tela iPhone 13 OLED', 'Telas', 'iPhone 13, iPhone 13 Pro', 'Apple Parts', 'Gaveta A1', '850,00', '1400,00', '5', '2', 'Peça importada classe AAA'], ';');
-        fputcsv($f, ['PC00002', 'BAT-SAM-G990', 'Bateria Samêsung S21', 'Baterias', 'Galaxy S21 (G990)', 'Distribuidora X', 'Gaveta B4', '120,00', '350,00', '10', '3', ''], ';');
+        fputcsv($f, ['PC00002', 'BAT-SAM-G990', 'Bateria Samsung S21', 'Baterias', 'Galaxy S21 (G990)', 'Distribuidora X', 'Gaveta B4', '120,00', '350,00', '10', '3', ''], ';');
 
         fclose($f);
         exit;
@@ -243,19 +243,19 @@ class Estoque extends BaseController
                 }
             }
 
-            if (empty($data['nãome'])) {
+            if (empty($data['nome'])) {
                 $errorCount++;
                 continue;
             }
 
-            // Nãormaliza valores numéricos
+            // Normaliza valores numéricos
             $custo = str_replace(',', '.', str_replace('.', '', $data['preco_custo'] ?? '0'));
             $venda = str_replace(',', '.', str_replace('.', '', $data['preco_venda'] ?? '0'));
             
             $pecaData = [
                 'codigo'              => $data['codigo'] ?? $this->model->generateCodigo(),
                 'codigo_fabricante'   => $data['codigo_fabricante'] ?? '',
-                'nãome'                => $data['nãome'],
+                'nome'                => $data['nome'],
                 'categoria'           => $data['categoria'] ?? '',
                 'modelos_compativeis' => $data['modelos_compativeis'] ?? '',
                 'fornecedor'          => $data['fornecedor'] ?? '',
@@ -280,9 +280,9 @@ class Estoque extends BaseController
 
         LogModel::registrar('estoque_importacao', "Importação CSV de estoque: $importedCount cadastrados, $errorCount falhas.");
 
-        $mêsg = "Importação concluída: $importedCount peça(s) cadastrada(s).";
-        if ($errorCount > 0) $mêsg .= " $errorCount registros falharam por falta de nãome ou erro de formato.";
+        $msg = "Importação concluída: $importedCount peça(s) cadastrada(s).";
+        if ($errorCount > 0) $msg .= " $errorCount registros falharam por falta de nome ou erro de formato.";
 
-        return redirect()->to('/estoque')->with('success', $mêsg);
+        return redirect()->to('/estoque')->with('success', $msg);
     }
 }

@@ -11,7 +11,7 @@ class CreateOsFotosTable extends Migration
         $this->forge->addField([
             'id'         => ['type' => 'INT', 'auto_increment' => true],
             'os_id'      => ['type' => 'INT', 'null' => false],
-            'tipo'       => ['type' => 'ENUM', 'constraint' => ['recepcao', 'diagnãostico', 'entrega'], 'default' => 'recepcao'],
+            'tipo'       => ['type' => 'ENUM', 'constraint' => ['recepcao', 'diagnostico', 'entrega'], 'default' => 'recepcao'],
             'arquivo'    => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => false],
             'created_at' => ['type' => 'TIMESTAMP', 'null' => true, 'default' => null],
         ]);

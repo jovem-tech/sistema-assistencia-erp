@@ -19,15 +19,15 @@ $formatCategoria = static function (string $value) use ($categoriaLabelMap): str
 };
 ?>
 
-<div class="page-header d-flex justify-content-between align-itemês-center mb-4">
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0"><i class="bi bi-chat-square-text me-2"></i>Defeitos Relatados</h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('defeitos-relatados')" title="Ajuda sãobre relatos do cliente">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('defeitos-relatados')" title="Ajuda sobre relatos do cliente">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <?php if (can('defeitos', 'criar')): ?>
-        <a href="<?= base_url('defeitosrelatados/nãovo') ?>" class="btn btn-primary btn-glow">
-            <i class="bi bi-plus-lg me-1"></i>Nãovo Relato
+        <a href="<?= base_url('defeitosrelatados/novo') ?>" class="btn btn-primary btn-glow">
+            <i class="bi bi-plus-lg me-1"></i>Novo Relato
         </a>
         <?php endif; ?>
     </div>
@@ -35,7 +35,7 @@ $formatCategoria = static function (string $value) use ($categoriaLabelMap): str
 
 <div class="card glass-card">
     <div class="card-body">
-        <form method="get" action="<?= base_url('defeitosrelatados') ?>" class="row g-2 align-itemês-end mb-3">
+        <form method="get" action="<?= base_url('defeitosrelatados') ?>" class="row g-2 align-items-end mb-3">
             <div class="col-md-4 col-lg-3">
                 <label for="filtroCategoria" class="form-label mb-1">Filtrar por categoria</label>
                 <select class="form-select form-select-sm" id="filtroCategoria" name="categoria">

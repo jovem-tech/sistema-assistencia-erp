@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 <div class="page-header">
-    <div class="d-flex align-itemês-center gap-2">
+    <div class="d-flex align-items-center gap-2">
         <h2><i class="bi bi-robot me-2"></i>Chatbot e Automacao 24h</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('atendimento-whatsapp-chatbot')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -25,8 +25,8 @@
                         <input type="text" name="codigo" class="form-control form-control-sm" placeholder="consultar_status_os" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label form-label-sm">Nãome</label>
-                        <input type="text" name="nãome" class="form-control form-control-sm" placeholder="Consultar status da OS" required>
+                        <label class="form-label form-label-sm">Nome</label>
+                        <input type="text" name="nome" class="form-control form-control-sm" placeholder="Consultar status da OS" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label form-label-sm">Acao Sistema</label>
@@ -44,19 +44,19 @@
                         <label class="form-label form-label-sm">Ordem</label>
                         <input type="number" name="ordem" class="form-control form-control-sm" value="0">
                     </div>
-                    <div class="col-md-3 d-flex align-itemês-end">
+                    <div class="col-md-3 d-flex align-items-end">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="exige_consulta_erp" value="1" id="chkConsultaErp">
                             <label class="form-check-label small" for="chkConsultaErp">Consulta ERP</label>
                         </div>
                     </div>
-                    <div class="col-md-3 d-flex align-itemês-end">
+                    <div class="col-md-3 d-flex align-items-end">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="ativo" value="1" id="chkIntencaoAtiva" checked>
                             <label class="form-check-label small" for="chkIntencaoAtiva">Ativa</label>
                         </div>
                     </div>
-                    <div class="col-md-4 d-flex align-itemês-end justify-content-end gap-2">
+                    <div class="col-md-4 d-flex align-items-end justify-content-end gap-2">
                         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="resetFormIntencao()">
                             <i class="bi bi-x-circle"></i>
                         </button>
@@ -71,7 +71,7 @@
                         <thead>
                             <tr>
                                 <th>Codigo</th>
-                                <th>Nãome</th>
+                                <th>Nome</th>
                                 <th>Gatilhos</th>
                                 <th>Acao Sistema</th>
                                 <th class="text-center">Ativo</th>
@@ -83,8 +83,8 @@
                                 <?php foreach ($intencoes as $i): ?>
                                     <tr>
                                         <td><code><?= esc($i['codigo']) ?></code></td>
-                                        <td><?= esc($i['nãome']) ?></td>
-                                        <td class="small text-muted text-truncate" style="max-width:220px;"><?= esc((string) $i['gatilhos_jsãon']) ?></td>
+                                        <td><?= esc($i['nome']) ?></td>
+                                        <td class="small text-muted text-truncate" style="max-width:220px;"><?= esc((string) $i['gatilhos_json']) ?></td>
                                         <td class="text-center">
                                             <form action="<?= base_url('atendimento-whatsapp/chatbot/intencao/toggle/' . (int) $i['id']) ?>" method="post" class="d-inline">
                                                 <?= csrf_field() ?>
@@ -95,7 +95,7 @@
                                         </td>
                                         <td class="text-end">
                                             <div class="btn-group btn-group-sm">
-                                                <button type="button" class="btn btn-outline-primary" onclick='editIntencao(<?= jsãon_encode($i, JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>
+                                                <button type="button" class="btn btn-outline-primary" onclick='editIntencao(<?= json_encode($i, JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
                                                 <button type="button" class="btn btn-outline-danger" onclick="deleteIntencao(<?= (int) $i['id'] ?>)">
@@ -123,8 +123,8 @@
                     <?= csrf_field() ?>
                     <input type="hidden" name="id" id="regraId" value="0">
                     <div class="col-md-6">
-                        <label class="form-label form-label-sm">Nãome</label>
-                        <input type="text" name="nãome" class="form-control form-control-sm" required>
+                        <label class="form-label form-label-sm">Nome</label>
+                        <input type="text" name="nome" class="form-control form-control-sm" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label form-label-sm">Evento origem</label>
@@ -132,13 +132,13 @@
                     </div>
                     <div class="col-12">
                         <label class="form-label form-label-sm">Condicao JSON</label>
-                        <textarea name="condicao_jsãon" class="form-control form-control-sm" rows="2" placeholder='{"status":"reparado_disponivel_loja"}'></textarea>
+                        <textarea name="condicao_json" class="form-control form-control-sm" rows="2" placeholder='{"status":"reparado_disponivel_loja"}'></textarea>
                     </div>
                     <div class="col-12">
                         <label class="form-label form-label-sm">Acao JSON</label>
-                        <textarea name="acao_jsãon" class="form-control form-control-sm" rows="2" placeholder='{"tipo":"template","template":"equipamento_pronto"}'></textarea>
+                        <textarea name="acao_json" class="form-control form-control-sm" rows="2" placeholder='{"tipo":"template","template":"equipamento_pronto"}'></textarea>
                     </div>
-                    <div class="col-12 d-flex justify-content-between align-itemês-center">
+                    <div class="col-12 d-flex justify-content-between align-items-center">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="ativo" value="1" id="chkRegraAtiva" checked>
                             <label class="form-check-label small" for="chkRegraAtiva">Ativa</label>
@@ -156,7 +156,7 @@
                     <table class="table table-sm align-middle">
                         <thead>
                             <tr>
-                                <th>Nãome</th>
+                                <th>Nome</th>
                                 <th>Evento</th>
                                 <th class="text-center">Ativo</th>
                                 <th class="text-end">Acoes</th>
@@ -166,7 +166,7 @@
                             <?php if (!empty($regras)): ?>
                                 <?php foreach ($regras as $r): ?>
                                     <tr>
-                                        <td><?= esc($r['nãome']) ?></td>
+                                        <td><?= esc($r['nome']) ?></td>
                                         <td class="text-center">
                                             <form action="<?= base_url('atendimento-whatsapp/chatbot/regra/toggle/' . (int) $r['id']) ?>" method="post" class="d-inline">
                                                 <?= csrf_field() ?>
@@ -177,7 +177,7 @@
                                         </td>
                                         <td class="text-end">
                                             <div class="btn-group btn-group-sm">
-                                                <button type="button" class="btn btn-outline-primary" onclick='editRegra(<?= jsãon_encode($r, JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>
+                                                <button type="button" class="btn btn-outline-primary" onclick='editRegra(<?= json_encode($r, JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
                                                 <button type="button" class="btn btn-outline-danger" onclick="deleteRegra(<?= (int) $r['id'] ?>)">
@@ -215,10 +215,10 @@
                                 <?php foreach ($logs as $l): ?>
                                     <tr>
                                         <td class="small"><?= esc(date('d/m H:i', strtotime((string) $l['created_at']))) ?></td>
-                                        <td class="small"><?= esc((string) ($l['cliente_nãome'] ?: $l['telefone'] ?: '-')) ?></td>
+                                        <td class="small"><?= esc((string) ($l['cliente_nome'] ?: $l['telefone'] ?: '-')) ?></td>
                                         <td class="small"><code><?= esc((string) ($l['intencao_detectada'] ?? '-')) ?></code></td>
                                         <td class="small"><?= esc((string) ($l['confianca'] ?? '-')) ?></td>
-                                        <td class="small"><?= (int) ($l['escalado_humanão'] ?? 0) === 1 ? 'Sim' : 'Nao' ?></td>
+                                        <td class="small"><?= (int) ($l['escalado_humano'] ?? 0) === 1 ? 'Sim' : 'Nao' ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
@@ -239,13 +239,13 @@ function editIntencao(data) {
     const form = document.getElementById('formIntencao');
     document.getElementById('intencaoId').value = data.id;
     form.querySelector('[name="codigo"]').value = data.codigo || '';
-    form.querySelector('[name="nãome"]').value = data.nãome || '';
+    form.querySelector('[name="nome"]').value = data.nome || '';
     form.querySelector('[name="acao_sistema"]').value = data.acao_sistema || '';
     
     // Parse gatilhos do JSON
     let gatilhos = '';
     try {
-        const arr = JSON.parse(data.gatilhos_jsãon);
+        const arr = JSON.parse(data.gatilhos_json);
         if (Array.isArray(arr)) gatilhos = arr.join(', ');
     } catch(e) {}
     form.querySelector('[name="gatilhos"]').value = gatilhos;
@@ -295,13 +295,13 @@ function deleteIntencao(id) {
 function editRegra(data) {
     const form = document.getElementById('formRegra');
     document.getElementById('regraId').value = data.id;
-    form.querySelector('[name="nãome"]').value = data.nãome || '';
+    form.querySelector('[name="nome"]').value = data.nome || '';
     form.querySelector('[name="evento_origem"]').value = data.evento_origem || '';
-    form.querySelector('[name="condicao_jsãon"]').value = data.condicao_jsãon || '';
-    form.querySelector('[name="acao_jsãon"]').value = data.acao_jsãon || '';
+    form.querySelector('[name="condicao_json"]').value = data.condicao_json || '';
+    form.querySelector('[name="acao_json"]').value = data.acao_json || '';
     form.querySelector('[name="ativo"]').checked = parseInt(data.ativo) === 1;
     
-    form.querySelector('[name="nãome"]').focus();
+    form.querySelector('[name="nome"]').focus();
     form.classList.add('border', 'border-primary', 'p-2', 'rounded');
 }
 

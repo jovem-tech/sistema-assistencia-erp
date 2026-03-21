@@ -36,22 +36,22 @@ class Contatos extends BaseController
         }
 
         $builder = $this->model
-            ->select('contatos.*, clientes.nãome_razao as cliente_nãome')
+            ->select('contatos.*, clientes.nome_razao as cliente_nome')
             ->join('clientes', 'clientes.id = contatos.cliente_id', 'left');
 
         if ($q !== '') {
             $builder->groupStart()
-                ->like('contatos.nãome', $q)
+                ->like('contatos.nome', $q)
                 ->orLike('contatos.telefone', $q)
                 ->orLike('contatos.email', $q)
-                ->orLike('contatos.whatsapp_nãome_perfil', $q)
-                ->orLike('clientes.nãome_razao', $q)
+                ->orLike('contatos.whatsapp_nome_perfil', $q)
+                ->orLike('clientes.nome_razao', $q)
                 ->groupEnd();
         }
 
         if ($vinculo === 'cliente') {
             $builder->where('contatos.cliente_id >', 0);
-        } elseif ($vinculo === 'nãovo') {
+        } elseif ($vinculo === 'novo') {
             $builder->where('contatos.cliente_id IS NULL', null, false);
         }
 
@@ -102,7 +102,7 @@ class Contatos extends BaseController
         requirePermission('clientes', 'criar');
 
         return view('contatos/form', [
-            'title' => 'Nãovo Contato',
+            'title' => 'Novo Contato',
             'contato' => null,
             'supportsLifecycle' => $this->model->supportsLifecycleFields(),
         ]);
@@ -113,36 +113,36 @@ class Contatos extends BaseController
         requirePermission('clientes', 'criar');
 
         $telefone = trim((string) $this->request->getPost('telefone'));
-        $telefoneNãormalizado = $this->model->nãormalizePhone($telefone);
-        if ($telefoneNãormalizado === '' || strlen($telefoneNãormalizado) < 8) {
+        $telefoneNormalizado = $this->model->normalizePhone($telefone);
+        if ($telefoneNormalizado === '' || strlen($telefoneNormalizado) < 8) {
             return redirect()->back()->withInput()->with('error', 'Informe um telefone valido para o contato.');
         }
 
-        $existente = $this->model->findByPhone($telefoneNãormalizado);
+        $existente = $this->model->findByPhone($telefoneNormalizado);
         if ($existente) {
             return redirect()->back()->withInput()->with('error', 'Ja existe um contato com este telefone.');
         }
 
         $payload = [
-            'nãome' => trim((string) $this->request->getPost('nãome')) ?: null,
+            'nome' => trim((string) $this->request->getPost('nome')) ?: null,
             'telefone' => $telefone,
-            'telefone_nãormalizado' => $telefoneNãormalizado,
+            'telefone_normalizado' => $telefoneNormalizado,
             'email' => trim((string) $this->request->getPost('email')) ?: null,
             'origem' => trim((string) $this->request->getPost('origem')) ?: 'manual',
             'observacoes' => trim((string) $this->request->getPost('observacoes')) ?: null,
             'ultimo_contato_em' => $this->request->getPost('ultimo_contato_em') ?: null,
-            'whatsapp_nãome_perfil' => trim((string) $this->request->getPost('whatsapp_nãome_perfil')) ?: null,
+            'whatsapp_nome_perfil' => trim((string) $this->request->getPost('whatsapp_nome_perfil')) ?: null,
         ];
 
-        $nãomeBase = (string) ($payload['nãome'] ?? $payload['whatsapp_nãome_perfil'] ?? '');
-        $payload = $this->model->buildLeadPayload($payload, $this->isNãomeCompletoValido($nãomeBase));
+        $nomeBase = (string) ($payload['nome'] ?? $payload['whatsapp_nome_perfil'] ?? '');
+        $payload = $this->model->buildLeadPayload($payload, $this->isNomeCompletoValido($nomeBase));
 
         $id = (int) $this->model->insert($payload, true);
         if ($id <= 0) {
             return redirect()->back()->withInput()->with('error', 'Nao foi possivel salvar o contato.');
         }
 
-        return redirect()->to('/contatos')->with('success', 'Contato cadastrado com sucessão.');
+        return redirect()->to('/contatos')->with('success', 'Contato cadastrado com sucesso.');
     }
 
     public function edit(int $id)
@@ -171,33 +171,33 @@ class Contatos extends BaseController
         }
 
         $telefone = trim((string) $this->request->getPost('telefone'));
-        $telefoneNãormalizado = $this->model->nãormalizePhone($telefone);
-        if ($telefoneNãormalizado === '' || strlen($telefoneNãormalizado) < 8) {
+        $telefoneNormalizado = $this->model->normalizePhone($telefone);
+        if ($telefoneNormalizado === '' || strlen($telefoneNormalizado) < 8) {
             return redirect()->back()->withInput()->with('error', 'Informe um telefone valido para o contato.');
         }
 
-        $existente = $this->model->findByPhone($telefoneNãormalizado);
+        $existente = $this->model->findByPhone($telefoneNormalizado);
         if ($existente && (int) ($existente['id'] ?? 0) !== $id) {
             return redirect()->back()->withInput()->with('error', 'Ja existe outro contato com este telefone.');
         }
 
         $payload = [
-            'nãome' => trim((string) $this->request->getPost('nãome')) ?: null,
+            'nome' => trim((string) $this->request->getPost('nome')) ?: null,
             'telefone' => $telefone,
-            'telefone_nãormalizado' => $telefoneNãormalizado,
+            'telefone_normalizado' => $telefoneNormalizado,
             'email' => trim((string) $this->request->getPost('email')) ?: null,
             'origem' => trim((string) $this->request->getPost('origem')) ?: ($contato['origem'] ?? 'manual'),
             'observacoes' => trim((string) $this->request->getPost('observacoes')) ?: null,
             'ultimo_contato_em' => $this->request->getPost('ultimo_contato_em') ?: null,
-            'whatsapp_nãome_perfil' => trim((string) $this->request->getPost('whatsapp_nãome_perfil')) ?: null,
+            'whatsapp_nome_perfil' => trim((string) $this->request->getPost('whatsapp_nome_perfil')) ?: null,
         ];
 
         $clienteIdContato = (int) ($contato['cliente_id'] ?? 0);
         if ($clienteIdContato > 0) {
             $payload = $this->model->buildClienteConvertidoPayload($clienteIdContato, $payload);
         } else {
-            $nãomeBase = (string) ($payload['nãome'] ?? $payload['whatsapp_nãome_perfil'] ?? '');
-            $payload = $this->model->buildLeadPayload($payload, $this->isNãomeCompletoValido($nãomeBase));
+            $nomeBase = (string) ($payload['nome'] ?? $payload['whatsapp_nome_perfil'] ?? '');
+            $payload = $this->model->buildLeadPayload($payload, $this->isNomeCompletoValido($nomeBase));
         }
 
         $ok = $this->model->update($id, $payload);
@@ -205,7 +205,7 @@ class Contatos extends BaseController
             return redirect()->back()->withInput()->with('error', 'Nao foi possivel atualizar o contato.');
         }
 
-        return redirect()->to('/contatos')->with('success', 'Contato atualizado com sucessão.');
+        return redirect()->to('/contatos')->with('success', 'Contato atualizado com sucesso.');
     }
 
     public function delete(int $id)
@@ -232,12 +232,12 @@ class Contatos extends BaseController
         }
 
         $this->model->delete($id);
-        return redirect()->to('/contatos')->with('success', 'Contato excluido com sucessão.');
+        return redirect()->to('/contatos')->with('success', 'Contato excluido com sucesso.');
     }
 
-    private function isNãomeCompletoValido(string $nãome): bool
+    private function isNomeCompletoValido(string $nome): bool
     {
-        $raw = trim($nãome);
+        $raw = trim($nome);
         if ($raw === '') {
             return false;
         }
@@ -266,6 +266,6 @@ class Contatos extends BaseController
         $configModel = new ConfiguracaoModel();
         $ativoDias = (int) $configModel->get('crm_engajamento_ativo_dias', '30');
         $riscoDias = (int) $configModel->get('crm_engajamento_risco_dias', '90');
-        return ContatoModel::nãormalizeEngajamentoPeriodos($ativoDias, $riscoDias);
+        return ContatoModel::normalizeEngajamentoPeriodos($ativoDias, $riscoDias);
     }
 }

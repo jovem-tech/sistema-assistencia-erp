@@ -10,10 +10,10 @@ class ClienteModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSãoftDeletes = false;
+    protected $useSoftDeletes = false;
     protected $allowedFields = [
-        'tipo_pessãoa', 'nãome_razao', 'cpf_cnpj', 'rg_ie', 'email',
-        'telefone1', 'telefone2', 'nãome_contato', 'telefone_contato', 'cep', 'endereco', 'numero',
+        'tipo_pessoa', 'nome_razao', 'cpf_cnpj', 'rg_ie', 'email',
+        'telefone1', 'telefone2', 'nome_contato', 'telefone_contato', 'cep', 'endereco', 'numero',
         'complemento', 'bairro', 'cidade', 'uf', 'observacoes'
     ];
     protected $useTimestamps = true;
@@ -21,7 +21,7 @@ class ClienteModel extends Model
     protected $updatedField = 'updated_at';
 
     protected $validationRules = [
-        'nãome_razao' => 'required|min_length[3]|max_length[100]',
+        'nome_razao' => 'required|min_length[3]|max_length[100]',
         'telefone1'  => 'required|max_length[20]',
     ];
 
@@ -30,7 +30,7 @@ class ClienteModel extends Model
 
     protected function nullifyEmptyFields(array $data)
     {
-        $fieldsToNullify = ['cpf_cnpj', 'email', 'telefone2', 'nãome_contato', 'telefone_contato', 'rg_ie', 'cep', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'uf', 'observacoes'];
+        $fieldsToNullify = ['cpf_cnpj', 'email', 'telefone2', 'nome_contato', 'telefone_contato', 'rg_ie', 'cep', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'uf', 'observacoes'];
         foreach ($fieldsToNullify as $field) {
             if (isset($data['data'][$field]) && trim($data['data'][$field]) === '') {
                 $data['data'][$field] = null;
@@ -41,11 +41,11 @@ class ClienteModel extends Model
 
     public function search($term)
     {
-        return $this->like('nãome_razao', $term)
+        return $this->like('nome_razao', $term)
                     ->orLike('cpf_cnpj', $term)
                     ->orLike('telefone1', $term)
                     ->orLike('email', $term)
-                    ->orderBy('nãome_razao', 'ASC')
+                    ->orderBy('nome_razao', 'ASC')
                     ->findAll(20);
     }
 
@@ -54,7 +54,7 @@ class ClienteModel extends Model
         return $this->select('clientes.*, COUNT(os.id) as total_os')
                     ->join('os', 'os.cliente_id = clientes.id', 'left')
                     ->groupBy('clientes.id')
-                    ->orderBy('clientes.nãome_razao', 'ASC')
+                    ->orderBy('clientes.nome_razao', 'ASC')
                     ->findAll();
     }
 }

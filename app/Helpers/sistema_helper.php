@@ -13,7 +13,7 @@ function getStatusBadge($status)
             $db = \Config\Database::connect();
             if ($db->tableExists('os_status')) {
                 $rows = $db->table('os_status')
-                    ->select('codigo, nãome, cor, icone')
+                    ->select('codigo, nome, cor, icone')
                     ->where('ativo', 1)
                     ->get()
                     ->getResultArray();
@@ -46,7 +46,7 @@ function getStatusBadge($status)
         $icon = trim((string) ($row['icone'] ?? ''));
         $iconHtml = $icon !== '' ? '<i class="bi ' . esc($icon) . ' me-1"></i>' : '';
         $colorClass = str_starts_with($color, 'bg-') ? $color : ('bg-' . $color);
-        return '<span class="badge ' . esc($colorClass) . '">' . $iconHtml . esc($row['nãome'] ?? $status) . '</span>';
+        return '<span class="badge ' . esc($colorClass) . '">' . $iconHtml . esc($row['nome'] ?? $status) . '</span>';
     }
 
     $legacy = [
@@ -93,12 +93,12 @@ function getPriorityBadge($priority)
 {
     $badges = [
         'baixa' => '<span class="badge bg-secondary">Baixa</span>',
-        'nãormal' => '<span class="badge bg-info">Nãormal</span>',
+        'normal' => '<span class="badge bg-info">Normal</span>',
         'alta' => '<span class="badge bg-warning text-dark">Alta</span>',
         'urgente' => '<span class="badge bg-danger">Urgente</span>',
     ];
 
-    return $badges[$priority] ?? '<span class="badge bg-info">Nãormal</span>';
+    return $badges[$priority] ?? '<span class="badge bg-info">Normal</span>';
 }
 
 /**
@@ -107,11 +107,11 @@ function getPriorityBadge($priority)
 function getEquipTipo($tipo)
 {
     $tipos = [
-        'nãotebook' => 'Nãotebook',
+        'notebook' => 'Notebook',
         'desktop' => 'Desktop',
         'celular' => 'Celular',
         'tablet' => 'Tablet',
-        'impressãora' => 'Impressãora',
+        'impressora' => 'Impressora',
         'outros' => 'Outros',
     ];
 
@@ -146,7 +146,7 @@ function get_theme()
 }
 
 /**
- * Carrega e cacheia não session o mapa de permissãoes do usuario logado.
+ * Carrega e cacheia no session o mapa de permissoes do usuario logado.
  * Estrutura: ['clientes' => ['visualizar', 'criar', 'editar'], ...]
  */
 function loadUserPermissions(): array
@@ -166,10 +166,10 @@ function loadUserPermissions(): array
 
     try {
         $db = \Config\Database::connect();
-        $rows = $db->table('grupo_permissãoes gp')
+        $rows = $db->table('grupo_permissoes gp')
             ->select('m.slug as modulo, p.slug as permissao')
             ->join('modulos m', 'm.id = gp.modulo_id')
-            ->join('permissãoes p', 'p.id = gp.permissao_id')
+            ->join('permissoes p', 'p.id = gp.permissao_id')
             ->where('gp.grupo_id', $grupoId)
             ->get()->getResultArray();
 
@@ -207,7 +207,7 @@ function canModule(string $modulo): bool
 }
 
 /**
- * Forca recarregamento do cache de permissãoes na sessao.
+ * Forca recarregamento do cache de permissoes na sessao.
  */
 function refreshPermissions(): void
 {
@@ -220,7 +220,7 @@ function refreshPermissions(): void
 function requirePermission(string $modulo, string $acao = 'visualizar'): void
 {
     if (!can($modulo, $acao)) {
-        session()->setFlashdata('error', 'Acessão negado. Vocêe nao tem permissao para esta acao.');
+        session()->setFlashdata('error', 'Acesso negado. Voce nao tem permissao para esta acao.');
         header('Location: ' . base_url('dashboard'));
         exit;
     }

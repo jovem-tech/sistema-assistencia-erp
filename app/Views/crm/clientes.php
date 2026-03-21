@@ -2,8 +2,8 @@
 
 <?= $this->section('content') ?>
 
-<div class="page-header d-flex justify-content-between align-itemês-center mb-4">
-    <div class="d-flex align-itemês-center gap-3">
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
         <h2 class="mb-0"><i class="bi bi-people-fill me-2"></i>CRM - Gestão de Clientes</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('crm')">
             <i class="bi bi-question-circle me-1"></i> Ajuda
@@ -16,12 +16,12 @@
     <div class="col-12">
         <div class="card glass-card shadow-sm border-0">
             <div class="card-body">
-                <form action="" method="GET" class="row g-3 align-itemês-end">
+                <form action="" method="GET" class="row g-3 align-items-end">
                     <div class="col-12 col-md-5">
                         <label class="form-label fw-bold small">Pesquisar Cliente</label>
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                            <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Nãome, Telefone ou CPF/CNPJ..." value="<?= esc($filtro_q ?? '') ?>">
+                            <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Nome, Telefone ou CPF/CNPJ..." value="<?= esc($filtro_q ?? '') ?>">
                         </div>
                     </div>
                     <div class="col-12 col-md-3">
@@ -34,12 +34,12 @@
                         </select>
                     </div>
                     <div class="col-12 col-md-2">
-                        <button type="submit" class="btn btn-primary w-100 btn-glow h-100 d-flex align-itemês-center justify-content-center">
+                        <button type="submit" class="btn btn-primary w-100 btn-glow h-100 d-flex align-items-center justify-content-center">
                             <i class="bi bi-filter me-2"></i>Filtrar
                         </button>
                     </div>
                     <div class="col-12 col-md-2">
-                         <a href="<?= base_url('crm/clientes') ?>" class="btn btn-outline-secondary w-100 h-100 d-flex align-itemês-center justify-content-center">
+                         <a href="<?= base_url('crm/clientes') ?>" class="btn btn-outline-secondary w-100 h-100 d-flex align-items-center justify-content-center">
                             <i class="bi bi-x-circle me-2"></i>Limpar
                         </a>
                     </div>
@@ -76,12 +76,12 @@
                         <?php foreach ($clientes as $c): ?>
                             <tr>
                                 <td class="ps-4">
-                                    <div class="d-flex align-itemês-center">
+                                    <div class="d-flex align-items-center">
                                         <div class="avatar-circle me-3">
-                                            <?= strtoupper(substr($c['nãome_razao'], 0, 1)) ?>
+                                            <?= strtoupper(substr($c['nome_razao'], 0, 1)) ?>
                                         </div>
                                         <div>
-                                            <div class="fw-bold"><?= esc($c['nãome_razao']) ?></div>
+                                            <div class="fw-bold"><?= esc($c['nome_razao']) ?></div>
                                             <small class="text-muted"><?= esc($c['cpf_cnpj'] ?? 'Sem documento') ?></small>
                                         </div>
                                     </div>
@@ -142,7 +142,7 @@
     color: white;
     border-radius: 50%;
     display: flex;
-    align-itemês: center;
+    align-items: center;
     justify-content: center;
     font-weight: 700;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -150,7 +150,7 @@
 .btn-primary-light {
     background: #eef2ff;
     color: #4f46e5;
-    border: 1px sãolid #e0e7ff;
+    border: 1px solid #e0e7ff;
 }
 .btn-primary-light:hover {
     background: #4f46e5;
@@ -159,7 +159,7 @@
 .btn-secondary-light {
     background: #f8fafc;
     color: #64748b;
-    border: 1px sãolid #e2e8f0;
+    border: 1px solid #e2e8f0;
 }
 .btn-secondary-light:hover {
     background: #64748b;

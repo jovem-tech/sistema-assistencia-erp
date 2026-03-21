@@ -40,7 +40,7 @@ class CreateContatosAndLinkConversas extends Migration
                 'constraint' => 11,
                 'null' => true,
             ],
-            'nãome' => [
+            'nome' => [
                 'type' => 'VARCHAR',
                 'constraint' => 150,
                 'null' => true,
@@ -50,7 +50,7 @@ class CreateContatosAndLinkConversas extends Migration
                 'constraint' => 30,
                 'null' => false,
             ],
-            'telefone_nãormalizado' => [
+            'telefone_normalizado' => [
                 'type' => 'VARCHAR',
                 'constraint' => 20,
                 'null' => false,
@@ -60,7 +60,7 @@ class CreateContatosAndLinkConversas extends Migration
                 'constraint' => 120,
                 'null' => true,
             ],
-            'whatsapp_nãome_perfil' => [
+            'whatsapp_nome_perfil' => [
                 'type' => 'VARCHAR',
                 'constraint' => 140,
                 'null' => true,
@@ -89,7 +89,7 @@ class CreateContatosAndLinkConversas extends Migration
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->addUniqueKey('telefone_nãormalizado');
+        $this->forge->addUniqueKey('telefone_normalizado');
         $this->forge->addKey('cliente_id');
         $this->forge->addKey(['origem', 'ultimo_contato_em']);
         $this->forge->createTable('contatos', true);
@@ -108,7 +108,7 @@ class CreateContatosAndLinkConversas extends Migration
         try {
             $this->db->query('CREATE INDEX idx_conversas_whatsapp_contato ON conversas_whatsapp (contato_id)');
         } catch (\Throwable $e) {
-            // ignãora indice existente
+            // ignora indice existente
         }
     }
 
@@ -122,7 +122,7 @@ class CreateContatosAndLinkConversas extends Migration
         }
 
         $rows = $this->db->table('conversas_whatsapp')
-            ->select('id, cliente_id, telefone, nãome_contato, created_at, updated_at, ultima_mensagem_em')
+            ->select('id, cliente_id, telefone, nome_contato, created_at, updated_at, ultima_mensagem_em')
             ->orderBy('id', 'ASC')
             ->get()
             ->getResultArray();
@@ -133,28 +133,28 @@ class CreateContatosAndLinkConversas extends Migration
 
         foreach ($rows as $row) {
             $telefone = trim((string) ($row['telefone'] ?? ''));
-            $nãormalizado = $this->nãormalizePhone($telefone);
-            if ($nãormalizado === '') {
+            $normalizado = $this->normalizePhone($telefone);
+            if ($normalizado === '') {
                 continue;
             }
 
-            $nãomeContato = trim((string) ($row['nãome_contato'] ?? ''));
-            if ($this->isLikelyPhoneValue($nãomeContato)) {
-                $nãomeContato = '';
+            $nomeContato = trim((string) ($row['nome_contato'] ?? ''));
+            if ($this->isLikelyPhoneValue($nomeContato)) {
+                $nomeContato = '';
             }
 
             $contato = $this->db->table('contatos')
-                ->where('telefone_nãormalizado', $nãormalizado)
+                ->where('telefone_normalizado', $normalizado)
                 ->get()
                 ->getRowArray();
 
             if (!$contato) {
                 $this->db->table('contatos')->insert([
                     'cliente_id' => (int) ($row['cliente_id'] ?? 0) ?: null,
-                    'nãome' => $nãomeContato !== '' ? $nãomeContato : null,
-                    'telefone' => $telefone !== '' ? $telefone : $nãormalizado,
-                    'telefone_nãormalizado' => $nãormalizado,
-                    'whatsapp_nãome_perfil' => $nãomeContato !== '' ? $nãomeContato : null,
+                    'nome' => $nomeContato !== '' ? $nomeContato : null,
+                    'telefone' => $telefone !== '' ? $telefone : $normalizado,
+                    'telefone_normalizado' => $normalizado,
+                    'whatsapp_nome_perfil' => $nomeContato !== '' ? $nomeContato : null,
                     'origem' => 'whatsapp',
                     'ultimo_contato_em' => $row['ultima_mensagem_em'] ?? null,
                     'created_at' => $row['created_at'] ?? date('Y-m-d H:i:s'),
@@ -169,11 +169,11 @@ class CreateContatosAndLinkConversas extends Migration
                 if ((int) ($contato['cliente_id'] ?? 0) <= 0 && (int) ($row['cliente_id'] ?? 0) > 0) {
                     $update['cliente_id'] = (int) $row['cliente_id'];
                 }
-                if (empty($contato['nãome']) && $nãomeContato !== '') {
-                    $update['nãome'] = $nãomeContato;
+                if (empty($contato['nome']) && $nomeContato !== '') {
+                    $update['nome'] = $nomeContato;
                 }
-                if (empty($contato['whatsapp_nãome_perfil']) && $nãomeContato !== '') {
-                    $update['whatsapp_nãome_perfil'] = $nãomeContato;
+                if (empty($contato['whatsapp_nome_perfil']) && $nomeContato !== '') {
+                    $update['whatsapp_nome_perfil'] = $nomeContato;
                 }
                 if (empty($contato['telefone']) && $telefone !== '') {
                     $update['telefone'] = $telefone;
@@ -197,14 +197,14 @@ class CreateContatosAndLinkConversas extends Migration
         }
     }
 
-    private function nãormalizePhone(string $phone): string
+    private function normalizePhone(string $phone): string
     {
         return preg_replace('/\D+/', '', $phone) ?? '';
     }
 
     private function isLikelyPhoneValue(string $value): bool
     {
-        $digits = $this->nãormalizePhone($value);
+        $digits = $this->normalizePhone($value);
         if ($digits === '') {
             return false;
         }

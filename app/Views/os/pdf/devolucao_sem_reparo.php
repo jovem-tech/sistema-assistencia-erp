@@ -12,22 +12,22 @@
 </div>
 
 <table class="grid">
-    <tr><td class="label">Cliente</td><td><?= esc($os['cliente_nãome']) ?></td><td class="label">Equipamento</td><td><?= esc(trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))) ?></td></tr>
+    <tr><td class="label">Cliente</td><td><?= esc($os['cliente_nome']) ?></td><td class="label">Equipamento</td><td><?= esc(trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))) ?></td></tr>
     <tr><td class="label">Status final</td><td><?= esc($os['status']) ?></td><td class="label">Numero OS</td><td><?= esc($os['numero_os']) ?></td></tr>
 </table>
 
 <div class="section-title">Motivo da devolucao sem reparo</div>
-<div><?= nl2br(esc($os['observacoes_cliente'] ?? $os['diagnãostico_tecnico'] ?? 'Nao informado.')) ?></div>
+<div><?= nl2br(esc($os['observacoes_cliente'] ?? $os['diagnostico_tecnico'] ?? 'Nao informado.')) ?></div>
 
 <div class="section-title">Justificativa tecnica/comercial</div>
 <div><?= nl2br(esc($os['observacoes_internas'] ?? 'Nao informada.')) ?></div>
 
 <div class="section-title">Registro de itens recebidos</div>
-<?php if (empty($payload['acessãorios'])): ?>
-<div class="muted">Sem acessãorios registrados.</div>
+<?php if (empty($payload['acessorios'])): ?>
+<div class="muted">Sem acessorios registrados.</div>
 <?php else: ?>
 <ul>
-<?php foreach ($payload['acessãorios'] as $acc): ?>
+<?php foreach ($payload['acessorios'] as $acc): ?>
 <li><?= esc($acc['descricao'] ?? '-') ?></li>
 <?php endforeach; ?>
 </ul>

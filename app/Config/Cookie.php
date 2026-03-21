@@ -22,7 +22,7 @@ class Cookie extends BaseConfig
      * --------------------------------------------------------------------------
      *
      * Default expires timestamp for cookies. Setting this to `0` will mean the
-     * cookie will nãot have the `Expires` attribute and will behave as a session
+     * cookie will not have the `Expires` attribute and will behave as a session
      * cookie.
      *
      * @var DateTimeInterface|int|string
@@ -61,7 +61,7 @@ class Cookie extends BaseConfig
      * Cookie HTTPOnly
      * --------------------------------------------------------------------------
      *
-     * Cookie will only be accessible via HTTP(S) (não JavaScript).
+     * Cookie will only be accessible via HTTP(S) (no JavaScript).
      */
     public bool $httponly = true;
 
@@ -71,7 +71,7 @@ class Cookie extends BaseConfig
      * --------------------------------------------------------------------------
      *
      * Configure cookie SameSite setting. Allowed values are:
-     * - Nãone
+     * - None
      * - Lax
      * - Strict
      * - ''
@@ -83,9 +83,9 @@ class Cookie extends BaseConfig
      *
      * Defaults to `Lax` for compatibility with modern browsers. Setting `''`
      * (empty string) means default SameSite attribute set by browsers (`Lax`)
-     * will be set on cookies. If set to `Nãone`, `$secure` must alsão be set.
+     * will be set on cookies. If set to `None`, `$secure` must also be set.
      *
-     * @var ''|'Lax'|'Nãone'|'Strict'
+     * @var ''|'Lax'|'None'|'Strict'
      */
     public string $samesite = 'Lax';
 
@@ -95,7 +95,7 @@ class Cookie extends BaseConfig
      * --------------------------------------------------------------------------
      *
      * This flag allows setting a "raw" cookie, i.e., its name and value are
-     * nãot URL encoded using `rawurlencode()`.
+     * not URL encoded using `rawurlencode()`.
      *
      * If this is set to `true`, cookie names should be compliant of RFC 2616's
      * list of allowed characters.

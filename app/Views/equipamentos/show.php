@@ -1,10 +1,10 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<div class="page-header d-flex justify-content-between align-itemês-center">
+<div class="page-header d-flex justify-content-between align-items-center">
     <h2><i class="bi bi-display me-2"></i><?= esc($title) ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('equipamentos')" title="Ajuda sãobre Equipamentos">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('equipamentos')" title="Ajuda sobre Equipamentos">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('equipamentos/editar/' . $equipamento['id']) ?>" class="btn btn-glow"><i class="bi bi-pencil me-1"></i>Editar</a>
@@ -25,11 +25,11 @@
                     ?>
                     
                     <?php if ($urlPrincipal): ?>
-                        <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= $urlPrincipal ?>" class="rounded bg-body-tertiary d-flex align-itemês-center justify-content-center overflow-hidden mx-auto border text-decoration-nãone" style="width: 200px; height: 200px; display: block; cursãor: zoom-in;">
+                        <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= $urlPrincipal ?>" class="rounded bg-body-tertiary d-flex align-items-center justify-content-center overflow-hidden mx-auto border text-decoration-none" style="width: 200px; height: 200px; display: block; cursor: zoom-in;">
                             <img src="<?= $urlPrincipal ?>" alt="Foto Principal" style="max-width: 100%; max-height: 100%; object-fit: cover;">
                         </a>
                     <?php else: ?>
-                        <div class="rounded bg-body-tertiary d-flex align-itemês-center justify-content-center mx-auto border text-body-secondary" style="width: 200px; height: 200px;">
+                        <div class="rounded bg-body-tertiary d-flex align-items-center justify-content-center mx-auto border text-body-secondary" style="width: 200px; height: 200px;">
                             <div class="text-center">
                                 <i class="bi bi-camera fs-1"></i>
                                 <div class="mt-2">Sem foto</div>
@@ -38,11 +38,11 @@
                     <?php endif; ?>
                 </div>
 
-                <h4 class="mb-1 text-body"><?= esc($equipamento['marca_nãome'] ?? 'Sem Marca') ?> <?= esc($equipamento['modelo_nãome'] ?? 'Sem Modelo') ?></h4>
-                <div class="text-body-secondary mb-3"><?= esc($equipamento['tipo_nãome'] ?? '') ?></div>
+                <h4 class="mb-1 text-body"><?= esc($equipamento['marca_nome'] ?? 'Sem Marca') ?> <?= esc($equipamento['modelo_nome'] ?? 'Sem Modelo') ?></h4>
+                <div class="text-body-secondary mb-3"><?= esc($equipamento['tipo_nome'] ?? '') ?></div>
                 
                 <?php if (!empty($equipamento['cor'])): ?>
-                <div class="d-inline-flex align-itemês-center bg-body-tertiary px-3 py-1 rounded-pill border text-body">
+                <div class="d-inline-flex align-items-center bg-body-tertiary px-3 py-1 rounded-pill border text-body">
                     <span class="d-inline-block rounded-circle me-2 border shadow-sm" style="width: 16px; height: 16px; background-color: <?= esc($equipamento['cor_hex'] ?? '#ccc') ?>;"></span>
                     <span><?= esc($equipamento['cor']) ?></span>
                 </div>
@@ -56,7 +56,7 @@
                             $urlThumb = $foto['url'] ?? null;
                         ?>
                             <?php if ($urlThumb): ?>
-                            <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= $urlThumb ?>" class="border rounded d-inline-block overflow-hidden" style="width: 60px; height: 60px; cursãor: zoom-in;">
+                            <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= $urlThumb ?>" class="border rounded d-inline-block overflow-hidden" style="width: 60px; height: 60px; cursor: zoom-in;">
                                 <img src="<?= $urlThumb ?>" class="w-100 h-100 object-fit-cover" title="<?= $foto['is_principal'] ? 'Principal' : 'Foto' ?>">
                             </a>
                             <?php endif; ?>
@@ -81,19 +81,19 @@
                                 <table class="table table-sm table-borderless mb-0" style="--bs-table-bg: transparent;">
                                     <tbody>
                                         <tr>
-                                            <th class="ps-0 w-40 text-body-secondary fw-nãormal">Nº Série:</th>
+                                            <th class="ps-0 w-40 text-body-secondary fw-normal">Nº Série:</th>
                                             <td class="fw-medium text-body"><?= !empty($equipamento['numero_serie']) ? esc($equipamento['numero_serie']) : '<span class="text-body-secondary opacity-50">N/I</span>' ?></td>
                                         </tr>
                                         <tr>
-                                            <th class="ps-0 text-body-secondary fw-nãormal">IMEI:</th>
+                                            <th class="ps-0 text-body-secondary fw-normal">IMEI:</th>
                                             <td class="fw-medium text-body"><?= !empty($equipamento['imei']) ? esc($equipamento['imei']) : '<span class="text-body-secondary opacity-50">N/I</span>' ?></td>
                                         </tr>
                                         <tr>
-                                            <th class="ps-0 text-body-secondary fw-nãormal">Senha Acessão:</th>
-                                            <td class="fw-medium text-body"><?= !empty($equipamento['senha_acessão']) ? esc($equipamento['senha_acessão']) : '<span class="text-body-secondary opacity-50">N/I</span>' ?></td>
+                                            <th class="ps-0 text-body-secondary fw-normal">Senha Acesso:</th>
+                                            <td class="fw-medium text-body"><?= !empty($equipamento['senha_acesso']) ? esc($equipamento['senha_acesso']) : '<span class="text-body-secondary opacity-50">N/I</span>' ?></td>
                                         </tr>
                                         <tr>
-                                            <th class="ps-0 text-body-secondary fw-nãormal">Cadastrado:</th>
+                                            <th class="ps-0 text-body-secondary fw-normal">Cadastrado:</th>
                                             <td class="fw-medium text-body"><?= date('d/m/Y H:i', strtotime($equipamento['created_at'])) ?></td>
                                         </tr>
                                     </tbody>
@@ -101,19 +101,19 @@
                             </div>
                             
                             <div class="col-md-6 ps-md-4">
-                                <h5 class="text-primary mb-3"><i class="bi bi-persãon-badge me-2"></i>Proprietário e Vínculos</h5>
-                                <div class="d-flex align-itemês-center mb-3">
-                                    <div class="bg-primary text-white rounded-circle d-flex align-itemês-center justify-content-center me-3 flex-shrink-0" title="Proprietário Principal" style="width:40px; height:40px;">
+                                <h5 class="text-primary mb-3"><i class="bi bi-person-badge me-2"></i>Proprietário e Vínculos</h5>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" title="Proprietário Principal" style="width:40px; height:40px;">
                                         <i class="bi bi-star-fill fs-5"></i>
                                     </div>
                                     <div class="flex-grow-1">
-                                        <h6 class="mb-0 fw-bold"><a href="<?= base_url('clientes/visualizar/' . $equipamento['cliente_id']) ?>" class="text-decoration-nãone text-body"><?= esc($equipamento['cliente_nãome']) ?></a></h6>
+                                        <h6 class="mb-0 fw-bold"><a href="<?= base_url('clientes/visualizar/' . $equipamento['cliente_id']) ?>" class="text-decoration-none text-body"><?= esc($equipamento['cliente_nome']) ?></a></h6>
                                         <small class="text-muted">Proprietário Principal</small>
                                     </div>
                                 </div>
                                 <hr class="border-secondary opacity-25">
                                 
-                                <div class="d-flex justify-content-between align-itemês-center mb-2">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
                                     <h6 class="text-body fw-bold mb-0">Clientes Vinculados</h6>
                                     <?php if(can('equipamentos', 'editar')): ?>
                                         <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#vincularClienteModal">
@@ -127,10 +127,10 @@
                                 <?php else: ?>
                                     <ul class="list-group list-group-flush bg-transparent">
                                         <?php foreach($vinculados as $vinc): ?>
-                                            <li class="list-group-item bg-transparent px-0 py-2 d-flex justify-content-between align-itemês-center border-bottom border-secondary border-opacity-25">
+                                            <li class="list-group-item bg-transparent px-0 py-2 d-flex justify-content-between align-items-center border-bottom border-secondary border-opacity-25">
                                                 <div>
-                                                    <i class="bi bi-persãon me-2 text-body-secondary"></i>
-                                                    <a href="<?= base_url('clientes/visualizar/' . $vinc['id']) ?>" class="text-decoration-nãone text-body"><?= esc($vinc['nãome_razao']) ?></a>
+                                                    <i class="bi bi-person me-2 text-body-secondary"></i>
+                                                    <a href="<?= base_url('clientes/visualizar/' . $vinc['id']) ?>" class="text-decoration-none text-body"><?= esc($vinc['nome_razao']) ?></a>
                                                 </div>
                                                 <?php if(can('equipamentos', 'editar')): ?>
                                                     <a href="<?= base_url('equipamentos/desvincular-cliente/' . $equipamento['id'] . '/' . $vinc['id']) ?>" class="btn btn-sm btn-link text-danger p-0" title="Desvincular Cliente" onclick="return confirm('Tem certeza que deseja desvincular este cliente do equipamento?');"><i class="bi bi-x-circle"></i></a>
@@ -143,7 +143,7 @@
                             </div>
                         </div>
 
-                        <?php if(!empty($equipamento['estado_fisico']) || !empty($equipamento['acessãorios']) || !empty($equipamento['observacoes'])): ?>
+                        <?php if(!empty($equipamento['estado_fisico']) || !empty($equipamento['acessorios']) || !empty($equipamento['observacoes'])): ?>
                         <div class="mt-4 pt-4 border-top">
                             <?php if(!empty($equipamento['estado_fisico'])): ?>
                             <div class="mb-3">
@@ -152,10 +152,10 @@
                             </div>
                             <?php endif; ?>
                             
-                            <?php if(!empty($equipamento['acessãorios'])): ?>
+                            <?php if(!empty($equipamento['acessorios'])): ?>
                             <div class="mb-3">
                                 <h6 class="text-warning mb-1">Acessórios Informados</h6>
-                                <p class="text-body-secondary small mb-0"><?= nl2br(esc($equipamento['acessãorios'])) ?></p>
+                                <p class="text-body-secondary small mb-0"><?= nl2br(esc($equipamento['acessorios'])) ?></p>
                             </div>
                             <?php endif; ?>
 
@@ -175,9 +175,9 @@
             <div class="col-12 pt-3">
                 <div class="card glass-card">
                     <div class="card-header border-bottom pb-3">
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <h5 class="mb-0 text-primary"><i class="bi bi-clipboard-data me-2"></i>Ordens de Serviço Vinculadas</h5>
-                            <a href="<?= base_url('os/nãova?equipamento=' . $equipamento['id']) ?>" class="btn btn-sm btn-glow"><i class="bi bi-plus me-1"></i>Nãova OS</a>
+                            <a href="<?= base_url('os/nova?equipamento=' . $equipamento['id']) ?>" class="btn btn-sm btn-glow"><i class="bi bi-plus me-1"></i>Nova OS</a>
                         </div>
                     </div>
                     <div class="card-body p-0">
@@ -201,7 +201,7 @@
                                     <tbody>
                                         <?php foreach($ordens as $os): ?>
                                             <tr>
-                                                <td class="fw-bold"><a href="<?= base_url('os/visualizar/' . $os['id']) ?>" class="text-decoration-nãone text-body">#<?= esc($os['numero_os']) ?></a></td>
+                                                <td class="fw-bold"><a href="<?= base_url('os/visualizar/' . $os['id']) ?>" class="text-decoration-none text-body">#<?= esc($os['numero_os']) ?></a></td>
                                                 <td>
                                                     <span class="badge status-<?= $os['status'] ?>">
                                                         <?= ucfirst(str_replace('_', ' ', $os['status'])) ?>
@@ -232,7 +232,7 @@
         <div class="modal-content bg-transparent border-0">
             <div class="modal-body text-center p-0 position-relative">
                 <div class="d-inline-block position-relative">
-                    <button type="button" class="btn-close position-absãolute" data-bs-dismiss="modal" aria-label="Close" style="top: 10px; right: 10px; z-index: 1055; filter: invert(1); opacity: 1; background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5);"></button>
+                    <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" aria-label="Close" style="top: 10px; right: 10px; z-index: 1055; filter: invert(1); opacity: 1; background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5);"></button>
                     <img src="" id="modalImagePreview" class="img-fluid rounded shadow-lg" style="max-height: 85vh; object-fit: contain; background: rgba(0,0,0,0.8);">
                 </div>
             </div>
@@ -246,20 +246,20 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-card border-secondary">
             <div class="modal-header border-bottom border-secondary border-opacity-25">
-                <h5 class="modal-title text-body" id="vincularClienteModalLabel"><i class="bi bi-link-45deg me-2 text-primary"></i> Vincular Nãovo Cliente</h5>
+                <h5 class="modal-title text-body" id="vincularClienteModalLabel"><i class="bi bi-link-45deg me-2 text-primary"></i> Vincular Novo Cliente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="<?= base_url('equipamentos/vincular-cliente') ?>" method="POST">
                 <?= csrf_field() ?>
                 <input type="hidden" name="equipamento_id" value="<?= $equipamento['id'] ?>">
                 <div class="modal-body">
-                    <p class="text-muted small mb-3">Selecione um cliente para autorizar o usão deste equipamento. Ele passará a aparecer na lista de equipamentos do cliente ao abrir nãovas Ordens de Serviço.</p>
+                    <p class="text-muted small mb-3">Selecione um cliente para autorizar o uso deste equipamento. Ele passará a aparecer na lista de equipamentos do cliente ao abrir novas Ordens de Serviço.</p>
                     <div class="mb-3">
                         <label for="cliente_id" class="form-label text-body">Selecione o Cliente</label>
                         <select class="form-select" id="cliente_id" name="cliente_id" required>
                             <option value="">Buscar cliente...</option>
                             <?php foreach($clientes_all as $cli): ?>
-                                <option value="<?= $cli['id'] ?>"><?= esc($cli['nãome_razao']) ?> <?= !empty($cli['cpf_cnpj']) ? '('.$cli['cpf_cnpj'].')' : '' ?></option>
+                                <option value="<?= $cli['id'] ?>"><?= esc($cli['nome_razao']) ?> <?= !empty($cli['cpf_cnpj']) ? '('.$cli['cpf_cnpj'].')' : '' ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -294,7 +294,7 @@
             });
         }
         
-        // Ativar select2 casão esteja dispon vel globalmente
+        // Ativar select2 caso esteja dispon vel globalmente
         if(typeof jQuery !== 'undefined' && $.fn.select2) {
             $('#cliente_id').select2({
                 dropdownParent: $('#vincularClienteModal'),

@@ -13,10 +13,10 @@ class View extends BaseView
 {
     /**
      * When false, the view method will clear the data between each
-     * call. This keeps your data safe and ensures there is não accidental
-     * leaking between calls, são you would need to explicitly pass the data
+     * call. This keeps your data safe and ensures there is no accidental
+     * leaking between calls, so you would need to explicitly pass the data
      * to each view. You might prefer to have the data stick around between
-     * calls são that it is available to all views. If that is the case,
+     * calls so that it is available to all views. If that is the case,
      * set $saveData to true.
      *
      * @var bool
@@ -68,7 +68,7 @@ class View extends BaseView
      *   app/Views/{$appOverridesFolder}/{Namespace}/{view_path}.{php|html...}
      *
      * This allows application-level overrides for package or module views
-     * without modifying vendor sãource files.
+     * without modifying vendor source files.
      *
      * Examples:
      *   'overrides' -> app/Views/overrides/Example/Blog/post/card.php

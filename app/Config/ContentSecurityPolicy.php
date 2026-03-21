@@ -44,11 +44,11 @@ class ContentSecurityPolicy extends BaseConfig
 
     // -------------------------------------------------------------------------
     // CSP DIRECTIVES SETTINGS
-    // NOTE: once you set a policy to 'nãone', it cannãot be further restricted
+    // NOTE: once you set a policy to 'none', it cannot be further restricted
     // -------------------------------------------------------------------------
 
     /**
-     * Will default to `'self'` if nãot overridden
+     * Will default to `'self'` if not overridden
      *
      * @var list<string>|string|null
      */
@@ -62,14 +62,14 @@ class ContentSecurityPolicy extends BaseConfig
     public $scriptSrc = 'self';
 
     /**
-     * Specifies valid sãources for JavaScript <script> elements.
+     * Specifies valid sources for JavaScript <script> elements.
      *
      * @var list<string>|string
      */
     public array|string $scriptSrcElem = 'self';
 
     /**
-     * Specifies valid sãources for JavaScript inline event
+     * Specifies valid sources for JavaScript inline event
      * handlers and JavaScript URLs.
      *
      * @var list<string>|string
@@ -84,14 +84,14 @@ class ContentSecurityPolicy extends BaseConfig
     public $styleSrc = 'self';
 
     /**
-     * Specifies valid sãources for stylesheets <link> elements.
+     * Specifies valid sources for stylesheets <link> elements.
      *
      * @var list<string>|string
      */
     public array|string $styleSrcElem = 'self';
 
     /**
-     * Specifies valid sãources for stylesheets inline
+     * Specifies valid sources for stylesheets inline
      * style attributes and `<style>` elements.
      *
      * @var list<string>|string
@@ -108,7 +108,7 @@ class ContentSecurityPolicy extends BaseConfig
     /**
      * Restricts the URLs that can appear in a page's `<base>` element.
      *
-     * Will default to self if nãot overridden
+     * Will default to self if not overridden
      *
      * @var list<string>|string|null
      */
@@ -123,7 +123,7 @@ class ContentSecurityPolicy extends BaseConfig
 
     /**
      * Limits the origins that you can connect to (via XHR,
-     * WebSãockets, and EventSãource).
+     * WebSockets, and EventSource).
      *
      * @var list<string>|string
      */
@@ -144,10 +144,10 @@ class ContentSecurityPolicy extends BaseConfig
     public $formAction = 'self';
 
     /**
-     * Specifies the sãources that can embed the current page.
+     * Specifies the sources that can embed the current page.
      * This directive applies to `<frame>`, `<iframe>`, `<embed>`,
      * and `<applet>` tags. This directive can't be used in
-     * `<meta>` tags and applies only to nãon-HTML resãources.
+     * `<meta>` tags and applies only to non-HTML resources.
      *
      * @var list<string>|string|null
      */
@@ -200,17 +200,17 @@ class ContentSecurityPolicy extends BaseConfig
     public $sandbox;
 
     /**
-     * Nãonce placeholder for style tags.
+     * Nonce placeholder for style tags.
      */
-    public string $styleNãonceTag = '{csp-style-nãonce}';
+    public string $styleNonceTag = '{csp-style-nonce}';
 
     /**
-     * Nãonce placeholder for script tags.
+     * Nonce placeholder for script tags.
      */
-    public string $scriptNãonceTag = '{csp-script-nãonce}';
+    public string $scriptNonceTag = '{csp-script-nonce}';
 
     /**
-     * Replace nãonce tag automatically?
+     * Replace nonce tag automatically?
      */
-    public bool $autoNãonce = true;
+    public bool $autoNonce = true;
 }

@@ -10,10 +10,10 @@ class EquipamentoModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSãoftDeletes = false;
+    protected $useSoftDeletes = false;
     protected $allowedFields = [
         'cliente_id', 'tipo_id', 'marca_id', 'modelo_id', 'cor', 'cor_hex', 'cor_rgb', 'numero_serie',
-        'imei', 'senha_acessão', 'estado_fisico', 'acessãorios', 'observacoes'
+        'imei', 'senha_acesso', 'estado_fisico', 'acessorios', 'observacoes'
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
@@ -28,7 +28,7 @@ class EquipamentoModel extends Model
 
     public function getByCliente($clienteId)
     {
-        return $this->select('equipamentos.*, tipos.nãome as tipo_nãome, marcas.nãome as marca_nãome, modelos.nãome as modelo_nãome')
+        return $this->select('equipamentos.*, tipos.nome as tipo_nome, marcas.nome as marca_nome, modelos.nome as modelo_nome')
                     ->join('equipamentos_tipos tipos', 'tipos.id = equipamentos.tipo_id', 'left')
                     ->join('equipamentos_marcas marcas', 'marcas.id = equipamentos.marca_id', 'left')
                     ->join('equipamentos_modelos modelos', 'modelos.id = equipamentos.modelo_id', 'left')
@@ -44,7 +44,7 @@ class EquipamentoModel extends Model
 
     public function getWithCliente($id = null)
     {
-        $builder = $this->select('equipamentos.*, clientes.nãome_razao as cliente_nãome, tipos.nãome as tipo_nãome, marcas.nãome as marca_nãome, modelos.nãome as modelo_nãome')
+        $builder = $this->select('equipamentos.*, clientes.nome_razao as cliente_nome, tipos.nome as tipo_nome, marcas.nome as marca_nome, modelos.nome as modelo_nome')
                         ->join('clientes', 'clientes.id = equipamentos.cliente_id', 'left')
                         ->join('equipamentos_tipos tipos', 'tipos.id = equipamentos.tipo_id', 'left')
                         ->join('equipamentos_marcas marcas', 'marcas.id = equipamentos.marca_id', 'left')

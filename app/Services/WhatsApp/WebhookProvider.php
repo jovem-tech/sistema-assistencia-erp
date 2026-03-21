@@ -13,11 +13,11 @@ class WebhookProvider implements WhatsAppProviderInterface
     private array $headers;
     private string $payloadTemplate;
 
-    public function __construct(string $url, string $method = 'POST', string $headersJsãon = '', string $payloadTemplate = '')
+    public function __construct(string $url, string $method = 'POST', string $headersJson = '', string $payloadTemplate = '')
     {
         $this->url = trim($url);
         $this->method = strtoupper(trim($method) ?: 'POST');
-        $this->headers = $this->parseHeaders($headersJsãon);
+        $this->headers = $this->parseHeaders($headersJson);
         $this->payloadTemplate = $payloadTemplate ?: '{"to": "{{phone}}", "message": "{{message}}"}';
     }
 
@@ -52,9 +52,9 @@ class WebhookProvider implements WhatsAppProviderInterface
         return ['ok' => true, 'message' => 'Configuração de Webhook pronta.'];
     }
 
-    private function parseHeaders(string $jsãon): array
+    private function parseHeaders(string $json): array
     {
-        $data = jsãon_decode($jsãon, true);
+        $data = json_decode($json, true);
         $headers = [];
         
         $hasContentType = false;
@@ -66,9 +66,9 @@ class WebhookProvider implements WhatsAppProviderInterface
         }
 
         if (!$hasContentType) {
-            $headers[] = 'Content-Type: application/jsãon';
+            $headers[] = 'Content-Type: application/json';
         }
-        $headers[] = 'Accept: application/jsãon';
+        $headers[] = 'Accept: application/json';
 
         return $headers;
     }
@@ -78,11 +78,11 @@ class WebhookProvider implements WhatsAppProviderInterface
         $rendered = $this->payloadTemplate;
         
         // Proteção básica para JSON
-        $jsãonMessage = jsãon_encode($message);
-        $jsãonMessage = trim($jsãonMessage, '"'); 
+        $jsonMessage = json_encode($message);
+        $jsonMessage = trim($jsonMessage, '"'); 
         
         $rendered = str_replace('{{phone}}', $phone, $rendered);
-        $rendered = str_replace('{{message}}', $jsãonMessage, $rendered);
+        $rendered = str_replace('{{message}}', $jsonMessage, $rendered);
         
         return $rendered;
     }
@@ -107,14 +107,14 @@ class WebhookProvider implements WhatsAppProviderInterface
         curl_close($ch);
 
         $ok = ($httpCode >= 200 && $httpCode < 300);
-        $jsãonRes = jsãon_decode((string)$response, true);
+        $jsonRes = json_decode((string)$response, true);
 
         return [
             'ok' => $ok,
             'provider' => 'webhook',
             'status_code' => $httpCode,
-            'response' => $jsãonRes ?: $response,
-            'message' => $ok ? 'Requisição enviada com sucessão.' : ('Falha não Webhook: ' . ($error ?: "HTTP $httpCode")),
+            'response' => $jsonRes ?: $response,
+            'message' => $ok ? 'Requisição enviada com sucesso.' : ('Falha no Webhook: ' . ($error ?: "HTTP $httpCode")),
         ];
     }
 }

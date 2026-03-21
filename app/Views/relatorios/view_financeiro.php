@@ -2,10 +2,10 @@
 
 <?= $this->section('content') ?>
 
-<div class="page-header d-flex justify-content-between align-itemês-center">
+<div class="page-header d-flex justify-content-between align-items-center">
     <h2><i class="bi bi-cash-stack me-2"></i><?= esc($title) ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sãobre Relatórios">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sobre Relatórios">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('relatorios') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('relatorios') ?>">
@@ -18,10 +18,10 @@
     <div class="card-body">
         <form method="GET" action="<?= base_url('relatorios/financial') ?>" class="row g-3">
             <div class="col-md-5">
-                <label for="mes" class="form-label">M�s/Anão</label>
+                <label for="mes" class="form-label">M�s/Ano</label>
                 <input type="month" class="form-control" id="mes" name="mes" value="<?= esc($filtro_mes) ?>">
             </div>
-            <div class="col-md-7 d-flex align-itemês-end gap-2">
+            <div class="col-md-7 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-filter me-1"></i>Filtrar
                 </button>
@@ -86,7 +86,7 @@
                                 <?php endif; ?>
                             </td>
                             <td><?= date('d/m/Y', strtotime($l['data_vencimento'])) ?></td>
-                            <td class="font-monãospace">R$ <?= number_format($l['valor'], 2, ',', '.') ?></td>
+                            <td class="font-monospace">R$ <?= number_format($l['valor'], 2, ',', '.') ?></td>
                             <td>
                                 <?php if ($l['status'] === 'pago'): ?>
                                     <span class="badge bg-success">Pago</span>

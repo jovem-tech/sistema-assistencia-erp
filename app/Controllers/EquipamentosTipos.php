@@ -19,7 +19,7 @@ class EquipamentosTipos extends BaseController
     {
         $data = [
             'title' => 'Tipos de Equipamento',
-            'tipos' => $this->model->orderBy('nãome', 'ASC')->findAll(),
+            'tipos' => $this->model->orderBy('nome', 'ASC')->findAll(),
         ];
         return view('equipamentos_tipos/index', $data);
     }
@@ -27,20 +27,20 @@ class EquipamentosTipos extends BaseController
     public function store()
     {
         $rules = [
-            'nãome' => 'required|max_length[100]|is_unique[equipamentos_tipos.nãome]'
+            'nome' => 'required|max_length[100]|is_unique[equipamentos_tipos.nome]'
         ];
 
         if (!$this->validate($rules)) {
-            return redirect()->back()->with('error', 'O tipo de equipamento já existe ou o nãome é inválido.');
+            return redirect()->back()->with('error', 'O tipo de equipamento já existe ou o nome é inválido.');
         }
 
         $dados = $this->request->getPost();
         
         $this->model->insert($dados);
         
-        LogModel::registrar('equipamento_tipo_criado', 'Tipo de Equipamento adicionado: ' . $dados['nãome']);
+        LogModel::registrar('equipamento_tipo_criado', 'Tipo de Equipamento adicionado: ' . $dados['nome']);
 
-        return redirect()->to('/equipamentostipos')->with('success', 'Tipo de equipamento adicionado com sucessão!');
+        return redirect()->to('/equipamentostipos')->with('success', 'Tipo de equipamento adicionado com sucesso!');
     }
 
     public function delete($id)
@@ -49,7 +49,7 @@ class EquipamentosTipos extends BaseController
         if ($tipo) {
             $this->model->delete($id);
             LogModel::registrar('equipamento_tipo_excluido', 'Tipo de Equipamento excluido ID: ' . $id);
-            return redirect()->to('/equipamentostipos')->with('success', 'Tipo excluído com sucessão!');
+            return redirect()->to('/equipamentostipos')->with('success', 'Tipo excluído com sucesso!');
         }
         
         return redirect()->to('/equipamentostipos')->with('error', 'Registro não encontrado.');

@@ -17,7 +17,7 @@
     }
     .cm-page-header {
         display: flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: space-between;
         gap: .75rem;
         flex-wrap: wrap;
@@ -29,15 +29,15 @@
     }
     .cm-page-actions {
         display: flex;
-        align-itemês: center;
+        align-items: center;
         gap: .5rem;
         flex-wrap: wrap;
     }
     .cm-page-actions .btn {
-        white-space: nãowrap;
+        white-space: nowrap;
     }
     .cm-page-actions-mobile {
-        display: nãone;
+        display: none;
     }
     .central-mensagens-wrapper {
         display: flex;
@@ -50,7 +50,7 @@
         overflow: hidden;
         background: var(--bs-body-bg);
         margin-top: 0;
-        border: 1px sãolid var(--bs-border-color-translucent);
+        border: 1px solid var(--bs-border-color-translucent);
         border-radius: 18px;
         box-shadow: 0 6px 24px rgba(15, 23, 42, .08);
     }
@@ -66,7 +66,7 @@
         width: clamp(300px, 28%, 420px);
         max-width: clamp(300px, 28%, 420px);
         flex: 0 0 clamp(300px, 28%, 420px);
-        border-right: 1px sãolid var(--bs-border-color-translucent);
+        border-right: 1px solid var(--bs-border-color-translucent);
     }
     .coluna-chat {
         flex: 1 1 clamp(520px, 44%, 940px);
@@ -78,7 +78,7 @@
         width: clamp(300px, 28%, 420px);
         max-width: clamp(300px, 28%, 420px);
         flex: 0 0 clamp(300px, 28%, 420px);
-        border-left: 1px sãolid var(--bs-border-color-translucent);
+        border-left: 1px solid var(--bs-border-color-translucent);
     }
     .cm-col-left,
     .cm-col-chat,
@@ -106,7 +106,7 @@
     }
     .cm-panel .card-header {
         flex: 0 0 auto;
-        border-bottom: 1px sãolid var(--bs-border-color-translucent);
+        border-bottom: 1px solid var(--bs-border-color-translucent);
         padding: .65rem .75rem;
     }
     .cm-panel .card-body {
@@ -129,20 +129,20 @@
         background: color-mix(in srgb, var(--bs-body-bg) 95%, transparent);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px sãolid var(--bs-border-color-translucent);
+        border-bottom: 1px solid var(--bs-border-color-translucent);
         display: flex;
         flex-wrap: wrap;
-        align-itemês: center;
+        align-items: center;
         gap: .5rem;
     }
     .cm-filter-q { flex: 1 1 180px; min-width: 140px; }
     .cm-filter-select { flex: 1 1 110px; min-width: 100px; max-width: 180px; }
     .cm-filter-checks { 
         display: flex; 
-        align-itemês: center; 
+        align-items: center; 
         gap: .75rem; 
         padding: 0 .25rem;
-        white-space: nãowrap;
+        white-space: nowrap;
     }
     .cm-filter-btn { flex: 0 0 auto; }
     
@@ -153,7 +153,7 @@
         .cm-filter-btn { flex: 1 0 100%; }
     }
     .cm-conversa-item {
-        cursãor: pointer;
+        cursor: pointer;
         transition: border-color .15s ease, transform .15s ease, background-color .15s ease;
     }
     .cm-conversa-item:hover {
@@ -186,14 +186,14 @@
     }
     .cm-thread-tools {
         display: inline-flex;
-        align-itemês: center;
+        align-items: center;
         gap: .4rem;
     }
     .cm-mobile-list-trigger,
     .cm-mobile-context-trigger {
-        display: nãone !important;
+        display: none !important;
     }
-    .cm-mêsg-wrap {
+    .cm-msg-wrap {
         flex: 1 1 auto;
         min-height: 0;
         overflow-y: auto;
@@ -205,35 +205,35 @@
         transition: background-color .3s ease;
     }
     
-    .cm-mêsg-wrap::before {
+    .cm-msg-wrap::before {
         content: "";
-        position: absãolute;
+        position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
         background-image: url('<?= base_url('assets/img/sistema/whatsapp_chat_bg.png') ?>');
         background-repeat: repeat;
         background-size: 420px;
         opacity: 0.06; /* Efeito doodle sutil */
-        pointer-events: nãone;
+        pointer-events: none;
         z-index: 1;
     }
 
-    [data-bs-theme="dark"] .cm-mêsg-wrap {
+    [data-bs-theme="dark"] .cm-msg-wrap {
         background-color: #0b141a; /* Verde escuro profundo do WhatsApp */
     }
     
-    [data-bs-theme="dark"] .cm-mêsg-wrap::before {
+    [data-bs-theme="dark"] .cm-msg-wrap::before {
         opacity: 0.04;
         filter: invert(1); /* Inverte para branco em fundo escuro */
     }
 
-    .cm-mêsg-row {
+    .cm-msg-row {
         display: flex;
         margin-bottom: .6rem;
         position: relative;
         z-index: 2; /* Acima do doodle */
     }
-    .cm-mêsg-row.inbound { justify-content: flex-start; }
-    .cm-mêsg-row.outbound { justify-content: flex-end; }
+    .cm-msg-row.inbound { justify-content: flex-start; }
+    .cm-msg-row.outbound { justify-content: flex-end; }
     .cm-bubble {
         max-width: min(78%, 720px);
         padding: 10px 12px;
@@ -250,53 +250,53 @@
     .cm-bubble.outbound {
         background: #d9fdd3;
         color: #1f1f1f;
-        border: 1px sãolid #cdeec7;
+        border: 1px solid #cdeec7;
         border-top-right-radius: 4px;
     }
-    .cm-mêsg-head {
+    .cm-msg-head {
         display: flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: space-between;
         gap: 8px;
         margin-bottom: 6px;
         font-size: 11px;
         opacity: .9;
     }
-    .cm-mêsg-origin {
+    .cm-msg-origin {
         display: inline-flex;
-        align-itemês: center;
+        align-items: center;
         gap: 4px;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: .3px;
     }
-    .cm-mêsg-meta {
+    .cm-msg-meta {
         font-size: 11px;
         opacity: .75;
         margin-top: 4px;
     }
-    .cm-bubble.outbound .cm-mêsg-meta { color: #3f4b3f; }
-    .cm-bubble.outbound .cm-mêsg-origin { color: #1f6f2f; }
-    .cm-bubble.inbound .cm-mêsg-origin { color: #3f4952; }
-    .cm-bubble.inbound .cm-mêsg-meta { color: #5f6770; }
+    .cm-bubble.outbound .cm-msg-meta { color: #3f4b3f; }
+    .cm-bubble.outbound .cm-msg-origin { color: #1f6f2f; }
+    .cm-bubble.inbound .cm-msg-origin { color: #3f4952; }
+    .cm-bubble.inbound .cm-msg-meta { color: #5f6770; }
     .cm-bubble.outbound.cm-origin-sistema {
         background: #e8f1ff;
         border-color: #cfe1ff;
     }
-    .cm-bubble.outbound.cm-origin-sistema .cm-mêsg-origin { color: #1d4ed8; }
-    .cm-bubble.outbound.cm-origin-sistema .cm-mêsg-meta { color: #334155; }
-    .cm-bubble.outbound.cm-origin-externão {
+    .cm-bubble.outbound.cm-origin-sistema .cm-msg-origin { color: #1d4ed8; }
+    .cm-bubble.outbound.cm-origin-sistema .cm-msg-meta { color: #334155; }
+    .cm-bubble.outbound.cm-origin-externo {
         background: #d9fdd3;
         border-color: #cdeec7;
     }
-    .cm-bubble.outbound.cm-origin-externão .cm-mêsg-origin { color: #1f6f2f; }
+    .cm-bubble.outbound.cm-origin-externo .cm-msg-origin { color: #1f6f2f; }
     .cm-bubble.outbound.cm-origin-chatbot {
         background: #f1eaff;
         border-color: #ddd0ff;
     }
-    .cm-bubble.outbound.cm-origin-chatbot .cm-mêsg-origin { color: #6d28d9; }
-    .cm-bubble.outbound.cm-origin-chatbot .cm-mêsg-meta { color: #5b21b6; }
-    .cm-mêsg-via {
+    .cm-bubble.outbound.cm-origin-chatbot .cm-msg-origin { color: #6d28d9; }
+    .cm-bubble.outbound.cm-origin-chatbot .cm-msg-meta { color: #5b21b6; }
+    .cm-msg-via {
         border-radius: 999px;
         font-size: 10px;
         font-weight: 700;
@@ -304,31 +304,31 @@
         text-transform: lowercase;
         letter-spacing: .2px;
     }
-    .cm-mêsg-via.cm-via-sistema {
+    .cm-msg-via.cm-via-sistema {
         color: #1d4ed8;
         background: #dbeafe;
     }
-    .cm-mêsg-via.cm-via-externão {
+    .cm-msg-via.cm-via-externo {
         color: #166534;
         background: #dcfce7;
     }
-    .cm-mêsg-via.cm-via-chatbot {
+    .cm-msg-via.cm-via-chatbot {
         color: #6d28d9;
         background: #ede9fe;
     }
     .cm-bubble.inbound .cm-reply-btn { opacity: .85; }
     .cm-bubble.inbound:hover .cm-reply-btn { opacity: 1; }
-    .cm-mêsg-unread-sep {
+    .cm-msg-unread-sep {
         text-align: center;
         margin: 8px 0 12px;
     }
-    .cm-mêsg-unread-sep span {
+    .cm-msg-unread-sep span {
         display: inline-block;
         font-size: 11px;
         font-weight: 600;
         color: #b42318;
         background: #fff5f5;
-        border: 1px sãolid #fecaca;
+        border: 1px solid #fecaca;
         border-radius: 999px;
         padding: 2px 8px;
     }
@@ -343,7 +343,7 @@
         max-height: min(46vh, 240px);
         object-fit: cover;
         border-radius: 10px;
-        border: 1px sãolid rgba(255,255,255,.15);
+        border: 1px solid rgba(255,255,255,.15);
         transition: transform .18s ease, box-shadow .18s ease;
     }
     .cm-media-image-link:hover .cm-media-image-thumb {
@@ -354,13 +354,13 @@
         max-width: min(100%, 320px);
         max-height: min(50vh, 280px);
         border-radius: 10px;
-        border: 1px sãolid rgba(255,255,255,.15);
+        border: 1px solid rgba(255,255,255,.15);
         background: #000;
     }
     .cm-audio-shell {
         min-width: 230px;
         max-width: 320px;
-        border: 1px sãolid rgba(108, 117, 125, .2);
+        border: 1px solid rgba(108, 117, 125, .2);
         border-radius: 12px;
         padding: 8px 10px;
         background: rgba(255,255,255,.06);
@@ -377,7 +377,7 @@
         background: var(--bs-primary);
         color: #fff;
         display: inline-flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: center;
         flex: 0 0 32px;
     }
@@ -389,13 +389,13 @@
         text-align: right;
     }
     .cm-file-card {
-        border: 1px sãolid rgba(108, 117, 125, .25);
+        border: 1px solid rgba(108, 117, 125, .25);
         border-radius: 10px;
         padding: 8px;
         background: rgba(255,255,255,.04);
     }
     .cm-file-card .btn {
-        white-space: nãowrap;
+        white-space: nowrap;
     }
     .cm-upload-chip {
         border: 1px dashed rgba(108, 117, 125, .45);
@@ -409,7 +409,7 @@
     }
     .cm-messages-form {
         margin-top: auto;
-        border-top: 1px sãolid var(--bs-border-color-translucent);
+        border-top: 1px solid var(--bs-border-color-translucent);
         padding: .75rem 1rem;
         background: var(--bs-body-bg);
         position: sticky;
@@ -418,7 +418,7 @@
     }
     .cm-compose-bar {
         display: flex;
-        align-itemês: flex-end;
+        align-items: flex-end;
         gap: .75rem;
         width: 100%;
         position: relative;
@@ -434,15 +434,15 @@
     }
     .cm-compose-textarea {
         border-radius: 22px !important;
-        border: 1px sãolid var(--bs-border-color-translucent) !important;
+        border: 1px solid var(--bs-border-color-translucent) !important;
         background: var(--bs-tertiary-bg) !important;
         padding: 9px 16px !important;
         min-height: 44px !important;
         max-height: 180px !important;
-        resize: nãone !important;
+        resize: none !important;
         line-height: 1.5;
         font-size: .95rem;
-        box-shadow: nãone !important;
+        box-shadow: none !important;
         transition: border-color .15s ease;
     }
     .cm-compose-textarea:focus {
@@ -450,14 +450,14 @@
         background: var(--bs-body-bg) !important;
     }
     .cm-anexo-preview {
-        position: absãolute;
+        position: absolute;
         bottom: 100%;
         left: 0;
         right: 0;
         margin-bottom: .5rem;
         padding: .5rem;
         background: var(--bs-body-bg);
-        border: 1px sãolid var(--bs-border-color-translucent);
+        border: 1px solid var(--bs-border-color-translucent);
         border-radius: 12px;
         box-shadow: 0 -4px 12px rgba(0,0,0,.06);
         z-index: 5;
@@ -485,7 +485,7 @@
         height: 42px;
         border-radius: 50% !important;
         display: flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: center;
         padding: 0 !important;
         font-size: 1.25rem;
@@ -501,14 +501,14 @@
 
     /* Menu de Anexos Estilizado (Glassmorphism) */
     .cm-attach-menu {
-        position: absãolute;
+        position: absolute;
         bottom: calc(100% + 12px);
         left: 0;
         min-width: 240px;
         background: var(--bg-glass);
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
-        border: 1px sãolid var(--bs-border-color-translucent);
+        border: 1px solid var(--bs-border-color-translucent);
         border-radius: 16px;
         box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
         padding: 0.6rem;
@@ -521,7 +521,7 @@
 
     .cm-attach-item {
         display: flex;
-        align-itemês: center;
+        align-items: center;
         gap: 12px;
         width: 100%;
         padding: 0.65rem 1rem;
@@ -549,7 +549,7 @@
         background: rgba(255, 255, 255, 0.1);
     }
 
-    /* Animação para menus que sãobem */
+    /* Animação para menus que sobem */
     @keyframes cm-fade-up {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -559,7 +559,7 @@
         height: 44px;
         border-radius: 50% !important;
         display: flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: center;
         padding: 0 !important;
         background: var(--bs-primary) !important;
@@ -575,7 +575,7 @@
         box-shadow: 0 4px 12px rgba(99, 91, 255, .42) !important;
     }
     .cm-jump-bottom {
-        position: absãolute;
+        position: absolute;
         right: 1.5rem;
         bottom: 95px;
         z-index: 100;
@@ -583,11 +583,11 @@
         height: 42px;
         border-radius: 50% !important;
         display: flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: center;
         padding: 0 !important;
         background: var(--bs-primary) !important;
-        border: 1px sãolid rgba(255,255,255,.2) !important;
+        border: 1px solid rgba(255,255,255,.2) !important;
         box-shadow: 0 4px 12px rgba(0,0,0,.15) !important;
         color: #fff !important;
         transition: transform .15s ease, opacity .15s ease, color .15s ease;
@@ -598,12 +598,12 @@
         text-align: center;
     }
     .cm-compose-meta-panel {
-        position: absãolute;
+        position: absolute;
         bottom: 100%;
         left: 0;
         right: 0;
         background: var(--bs-body-bg);
-        border: 1px sãolid var(--bs-border-color-translucent);
+        border: 1px solid var(--bs-border-color-translucent);
         border-radius: 16px;
         box-shadow: 0 -4px 16px rgba(0,0,0,.1);
         padding: .85rem;
@@ -615,7 +615,7 @@
     }
     .cm-meta-group { flex: 1; min-width: 0; }
     .cm-capture-panel {
-        position: absãolute;
+        position: absolute;
         bottom: 0;
         left: 0;
         right: 0;
@@ -624,7 +624,7 @@
         z-index: 1050;
         display: flex;
         flex-direction: column;
-        align-itemês: center;
+        align-items: center;
         justify-content: center;
         padding: 2rem;
         border-radius: inherit;
@@ -641,10 +641,10 @@
     .cm-messages-form {
         position: relative;
     }
-    /* Esconder o que sãobrar fora da barra quando gravando para não poluir visual */
+    /* Esconder o que sobrar fora da barra quando gravando para não poluir visual */
     .cm-messages-form.is-recording .cm-compose-bar {
         visibility: hidden;
-        pointer-events: nãone;
+        pointer-events: none;
     }
     .cm-capture-video {
         max-width: 100%;
@@ -655,7 +655,7 @@
     }
     .cm-capture-controls {
         display: flex;
-        align-itemês: center;
+        align-items: center;
         gap: 1rem;
         flex-wrap: wrap;
         justify-content: center;
@@ -675,11 +675,11 @@
     }
     .cm-anexo-chip {
         display: flex;
-        align-itemês: center;
+        align-items: center;
         gap: .5rem;
         padding: .4rem .6rem;
         background: var(--bs-secondary-bg);
-        border: 1px sãolid var(--bs-border-color-translucent);
+        border: 1px solid var(--bs-border-color-translucent);
         border-radius: 10px;
         font-size: .82rem;
         max-width: 100%;
@@ -688,7 +688,7 @@
     .cm-anexo-chip-info {
         flex: 1;
         min-width: 0;
-        white-space: nãowrap;
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
@@ -709,7 +709,7 @@
     [data-bs-theme="dark"] .cm-bubble.inbound {
         background: rgba(248, 249, 250, .08);
         color: #e5e7eb;
-        border: 1px sãolid rgba(248, 249, 250, .1);
+        border: 1px solid rgba(248, 249, 250, .1);
     }
     [data-bs-theme="dark"] .cm-bubble.outbound {
         background: rgba(34, 197, 94, .15);
@@ -726,22 +726,22 @@
         border-color: rgba(196, 181, 253, .4);
         color: #ede9fe;
     }
-    [data-bs-theme="dark"] .cm-mêsg-via.cm-via-sistema {
+    [data-bs-theme="dark"] .cm-msg-via.cm-via-sistema {
         color: #dbeafe;
         background: rgba(30, 64, 175, .45);
     }
-    [data-bs-theme="dark"] .cm-mêsg-via.cm-via-externão {
+    [data-bs-theme="dark"] .cm-msg-via.cm-via-externo {
         color: #dcfce7;
         background: rgba(22, 101, 52, .45);
     }
-    [data-bs-theme="dark"] .cm-mêsg-via.cm-via-chatbot {
+    [data-bs-theme="dark"] .cm-msg-via.cm-via-chatbot {
         color: #ede9fe;
         background: rgba(76, 29, 149, .45);
     }
     [data-bs-theme="dark"] .central-mensagens-wrapper {
         background: var(--bs-body-bg);
     }
-    [data-bs-theme="dark"] .cm-mêsg-unread-sep span {
+    [data-bs-theme="dark"] .cm-msg-unread-sep span {
         background: rgba(127, 29, 29, .25);
         border-color: rgba(252, 165, 165, .45);
         color: #fecaca;
@@ -755,7 +755,7 @@
             border-radius: 0;
             border-left: 0;
             border-right: 0;
-            box-shadow: nãone;
+            box-shadow: none;
         }
         .coluna-conversas,
         .coluna-chat {
@@ -763,7 +763,7 @@
             max-width: 100%;
             flex: 0 0 auto;
             border-right: 0;
-            border-top: 1px sãolid var(--bs-border-color-translucent);
+            border-top: 1px solid var(--bs-border-color-translucent);
             min-height: 0;
             overflow-y: visible;
         }
@@ -782,7 +782,7 @@
         .cm-mobile-list-trigger,
         .cm-mobile-context-trigger {
             display: inline-flex !important;
-            align-itemês: center;
+            align-items: center;
             justify-content: center;
         }
         .cm-bubble {
@@ -799,10 +799,10 @@
     }
     @media (max-width: 767.98px) {
         .cm-page-header {
-            align-itemês: flex-start;
+            align-items: flex-start;
         }
         .cm-page-actions-desktop {
-            display: nãone !important;
+            display: none !important;
         }
         .cm-page-actions-mobile {
             display: block;
@@ -821,7 +821,7 @@
             padding: 9px 10px;
             margin-bottom: 8px;
         }
-        .cm-mêsg-head {
+        .cm-msg-head {
             gap: 6px;
         }
         .cm-audio-shell {
@@ -876,15 +876,15 @@
         }
     }
 
-    /* Responsividade para nãovos botões não header */
+    /* Responsividade para novos botões no header */
     #btnSyncInbound,
-    #btnNãovaConversa {
-        display: nãone !important;
+    #btnNovaConversa {
+        display: none !important;
     }
 
     @media (min-width: 768px) {
         #btnSyncInbound,
-        #btnNãovaConversa {
+        #btnNovaConversa {
             display: inline-flex !important;
         }
     }
@@ -895,7 +895,7 @@
         height: 32px;
         padding: 0;
         display: inline-flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: center;
     }
 
@@ -928,11 +928,11 @@
     }
     .cm-list-summary {
         display: flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: space-between;
         gap: .5rem;
         padding: .75rem .9rem;
-        border-bottom: 1px sãolid var(--bs-border-color-translucent);
+        border-bottom: 1px solid var(--bs-border-color-translucent);
         background: color-mix(in srgb, var(--bs-body-bg) 92%, transparent);
     }
     .cm-list-summary-label {
@@ -949,12 +949,12 @@
     }
     .cm-filter-btn {
         display: inline-flex;
-        align-itemês: center;
+        align-items: center;
         gap: .4rem;
     }
     .cm-filter-feedback {
         min-height: 24px;
-        border-bottom: 1px sãolid var(--bs-border-color-translucent);
+        border-bottom: 1px solid var(--bs-border-color-translucent);
     }
     .cm-empty-state {
         min-height: 140px;
@@ -963,7 +963,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        align-itemês: center;
+        align-items: center;
         gap: .6rem;
         color: var(--bs-secondary-color);
         background: color-mix(in srgb, var(--bs-tertiary-bg) 60%, transparent);
@@ -980,7 +980,7 @@
         font-size: .82rem;
     }
     .cm-conversa-item {
-        border: 1px sãolid var(--bs-border-color-translucent);
+        border: 1px solid var(--bs-border-color-translucent);
         border-radius: 14px;
         padding: .68rem .72rem;
         margin-bottom: .55rem;
@@ -1000,7 +1000,7 @@
     }
     .cm-conversa-head {
         display: flex;
-        align-itemês: flex-start;
+        align-items: flex-start;
         justify-content: space-between;
         gap: .5rem;
         min-width: 0;
@@ -1008,7 +1008,7 @@
     .cm-conversa-main {
         min-width: 0;
         display: flex;
-        align-itemês: flex-start;
+        align-items: flex-start;
         gap: .55rem;
     }
     .cm-conversa-avatar {
@@ -1019,7 +1019,7 @@
         background: linear-gradient(135deg, rgba(99,91,255,.16), rgba(59,130,246,.14));
         color: #3730a3;
         display: inline-flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: center;
         font-size: .75rem;
         font-weight: 700;
@@ -1031,14 +1031,14 @@
         font-weight: 700;
         color: var(--bs-emphasis-color);
         margin-bottom: .1rem;
-        white-space: nãowrap;
+        white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
     }
     .cm-conversa-subtitle {
         font-size: .73rem;
         color: var(--bs-secondary-color);
-        white-space: nãowrap;
+        white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
     }
@@ -1056,7 +1056,7 @@
     .cm-conversa-foot {
         margin-top: .45rem;
         display: flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: space-between;
         gap: .5rem;
         font-size: .72rem;
@@ -1076,7 +1076,7 @@
     }
     .cm-conversa-status {
         display: inline-flex;
-        align-itemês: center;
+        align-items: center;
         gap: .3rem;
         font-weight: 600;
     }
@@ -1093,13 +1093,13 @@
         min-width: 24px;
         height: 24px;
         display: inline-flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: center;
         font-size: .72rem;
     }
     .cm-thread-header {
         display: flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: space-between;
         gap: .6rem;
         padding: .62rem .72rem !important;
@@ -1108,9 +1108,9 @@
         width: 38px;
         height: 38px;
         border-radius: 50%;
-        border: 1px sãolid var(--bs-border-color-translucent);
+        border: 1px solid var(--bs-border-color-translucent);
         display: inline-flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: center;
         color: #64748b;
         background: color-mix(in srgb, var(--bs-tertiary-bg) 80%, transparent);
@@ -1131,7 +1131,7 @@
         font-size: .74rem;
         font-weight: 600;
         display: inline-flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: center;
         gap: .2rem;
     }
@@ -1144,8 +1144,8 @@
         letter-spacing: .02em;
         padding: .38rem .6rem;
     }
-    .cm-mêsg-wrap {
-        border: 1px sãolid var(--bs-border-color-translucent);
+    .cm-msg-wrap {
+        border: 1px solid var(--bs-border-color-translucent);
         border-radius: 14px;
         margin: .35rem;
         box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
@@ -1159,7 +1159,7 @@
     }
     .cm-day-separator span {
         display: inline-flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: center;
         border-radius: 999px;
         padding: .2rem .7rem;
@@ -1169,17 +1169,17 @@
         text-transform: uppercase;
         color: #475569;
         background: rgba(255, 255, 255, .82);
-        border: 1px sãolid rgba(148, 163, 184, .3);
+        border: 1px solid rgba(148, 163, 184, .3);
     }
     [data-bs-theme="dark"] .cm-day-separator span {
         color: #cbd5e1;
         background: rgba(15, 23, 42, .7);
         border-color: rgba(148, 163, 184, .35);
     }
-    .cm-mêsg-row-new .cm-bubble {
-        animation: cm-mêsg-pop .32s ease;
+    .cm-msg-row-new .cm-bubble {
+        animation: cm-msg-pop .32s ease;
     }
-    @keyframes cm-mêsg-pop {
+    @keyframes cm-msg-pop {
         from { transform: translateY(8px); opacity: .35; }
         to { transform: translateY(0); opacity: 1; }
     }
@@ -1187,25 +1187,25 @@
         border-radius: 14px;
         box-shadow: 0 2px 8px rgba(15, 23, 42, .08);
     }
-    .cm-mêsg-meta {
+    .cm-msg-meta {
         display: flex;
-        align-itemês: center;
+        align-items: center;
         justify-content: flex-end;
         gap: .32rem;
         line-height: 1;
     }
-    .cm-mêsg-status {
+    .cm-msg-status {
         display: inline-flex;
-        align-itemês: center;
+        align-items: center;
         gap: .2rem;
         font-size: .65rem;
         font-weight: 700;
         color: #64748b;
     }
-    .cm-mêsg-status.is-read {
+    .cm-msg-status.is-read {
         color: #0284c7;
     }
-    .cm-mêsg-status.is-failed {
+    .cm-msg-status.is-failed {
         color: #b91c1c;
     }
     .cm-messages-form {
@@ -1213,14 +1213,14 @@
     }
     .cm-compose-bar {
         background: color-mix(in srgb, var(--bs-tertiary-bg) 70%, transparent);
-        border: 1px sãolid var(--bs-border-color-translucent);
+        border: 1px solid var(--bs-border-color-translucent);
         border-radius: 14px;
         padding: .3rem .45rem;
         gap: .45rem;
     }
     .cm-compose-actions-left {
         display: inline-flex;
-        align-itemês: center;
+        align-items: center;
         gap: .15rem;
     }
     .cm-icon-btn {
@@ -1240,12 +1240,12 @@
         height: 40px;
     }
     .cm-emoji-menu {
-        position: absãolute;
+        position: absolute;
         bottom: calc(100% + 12px);
         left: 52px;
         z-index: 1061;
         background: var(--bg-glass, var(--bs-body-bg));
-        border: 1px sãolid var(--bs-border-color-translucent);
+        border: 1px solid var(--bs-border-color-translucent);
         border-radius: 12px;
         padding: .45rem;
         display: grid;
@@ -1271,7 +1271,7 @@
         font-weight: 700;
     }
     .cm-context-section {
-        border: 1px sãolid var(--bs-border-color-translucent);
+        border: 1px solid var(--bs-border-color-translucent);
         border-radius: 12px;
         padding: .62rem .68rem;
         margin-bottom: .55rem;
@@ -1305,7 +1305,7 @@
     }
     @media (max-width: 1399.98px) {
         .cm-thread-tools .btn span {
-            display: nãone !important;
+            display: none !important;
         }
         .cm-thread-tools .btn {
             width: 34px;
@@ -1322,13 +1322,13 @@
         .cm-thread-header {
             padding: .55rem .6rem !important;
         }
-        .cm-mêsg-wrap {
+        .cm-msg-wrap {
             margin: .2rem;
         }
     }
     @media (max-width: 767.98px) {
         .cm-page-subtitle {
-            display: nãone;
+            display: none;
         }
         .cm-thread-tools {
             gap: .32rem !important;
@@ -1340,7 +1340,7 @@
         }
         .cm-filter-select {
             min-width: calc(50% - .5rem);
-            max-width: nãone;
+            max-width: none;
             flex: 1 1 calc(50% - .5rem);
         }
         .cm-filter-btn {
@@ -1354,7 +1354,7 @@
 </style>
 
 <div class="page-header cm-page-header">
-    <div class="d-flex align-itemês-center gap-3 flex-wrap">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
         <div>
             <h2 class="mb-0"><i class="bi bi-whatsapp me-2"></i>Central de Mensagens</h2>
             <small class="cm-page-subtitle">Inbox operacional em tempo real para atendimento WhatsApp + ERP</small>
@@ -1368,11 +1368,11 @@
     </div>
 </div>
 
-<span id="gatewayAccountNumber" class="d-nãone"><?= esc($gatewayAccountNumber ?? '') ?></span>
+<span id="gatewayAccountNumber" class="d-none"><?= esc($gatewayAccountNumber ?? '') ?></span>
 
 <div class="central-mensagens-wrapper">
     <aside class="offcanvas-lg offcanvas-start cm-side-shell cm-col-left coluna-conversas" tabindex="-1" id="cmConversasCanvas" aria-labelledby="cmConversasCanvasLabel">
-        <div class="offcanvas-header d-lg-nãone border-bottom">
+        <div class="offcanvas-header d-lg-none border-bottom">
             <h5 class="offcanvas-title" id="cmConversasCanvasLabel">Conversas</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
         </div>
@@ -1406,7 +1406,7 @@
                             <select class="form-select form-select-sm" id="filtroConversaResponsavel">
                                 <option value="">Responsavel: todos</option>
                                 <?php foreach (($usuariosAtivos ?? []) as $u): ?>
-                                    <option value="<?= (int) $u['id'] ?>"><?= esc($u['nãome']) ?></option>
+                                    <option value="<?= (int) $u['id'] ?>"><?= esc($u['nome']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -1414,7 +1414,7 @@
                             <select class="form-select form-select-sm" id="filtroConversaTag">
                                 <option value="">Tag: todas</option>
                                 <?php foreach (($tagsAtivas ?? []) as $t): ?>
-                                    <option value="<?= (int) $t['id'] ?>"><?= esc($t['nãome']) ?></option>
+                                    <option value="<?= (int) $t['id'] ?>"><?= esc($t['nome']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -1428,8 +1428,8 @@
                                 <label class="form-check-label small" for="filtroConversaOsAberta">Com OS aberta</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="filtroConversaClientesNãovos">
-                                <label class="form-check-label small" for="filtroConversaClientesNãovos">Clientes nãovos</label>
+                                <input class="form-check-input" type="checkbox" id="filtroConversaClientesNovos">
+                                <label class="form-check-label small" for="filtroConversaClientesNovos">Clientes novos</label>
                             </div>
                         </div>
                         <div class="cm-filter-btn">
@@ -1454,41 +1454,41 @@
     <section class="cm-col-chat coluna-chat">
         <div class="card glass-card cm-panel">
             <div class="card-header cm-thread-header">
-                <div class="cm-thread-identity d-flex align-itemês-center gap-2 min-w-0">
-                    <button type="button" class="btn btn-sm btn-outline-secondary cm-mobile-list-trigger d-lg-nãone" data-bs-toggle="offcanvas" data-bs-target="#cmConversasCanvas" aria-controls="cmConversasCanvas">
+                <div class="cm-thread-identity d-flex align-items-center gap-2 min-w-0">
+                    <button type="button" class="btn btn-sm btn-outline-secondary cm-mobile-list-trigger d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#cmConversasCanvas" aria-controls="cmConversasCanvas">
                         <i class="bi bi-chat-left-text me-1"></i>Conversas
                     </button>
                     <div class="cm-thread-avatar">
-                        <i class="bi bi-persãon-circle"></i>
+                        <i class="bi bi-person-circle"></i>
                     </div>
                     <div class="min-w-0">
                         <div class="fw-semibold text-truncate" id="threadTitle">Selecione uma conversa</div>
                         <small class="text-muted text-truncate d-block" id="threadSubtitle">Sem conversa ativa</small>
                     </div>
                 </div>
-                <div class="cm-thread-tools d-flex align-itemês-center gap-2">
+                <div class="cm-thread-tools d-flex align-items-center gap-2">
                     <span class="badge cm-status-pill bg-secondary" id="threadStatusBadge">-</span>
                     <button class="btn btn-sm btn-outline-secondary" id="btnAtualizarConversa" title="Atualizar conversa">
                         <i class="bi bi-arrow-clockwise"></i>
                     </button>
                     <button class="btn btn-sm btn-outline-success" id="btnAssumirConversa" title="Assumir conversa">
-                        <i class="bi bi-persãon-check me-1"></i><span class="d-nãone d-lg-inline">Assumir</span>
+                        <i class="bi bi-person-check me-1"></i><span class="d-none d-lg-inline">Assumir</span>
                     </button>
                     <button class="btn btn-sm btn-outline-primary" id="btnAtribuirConversa" title="Atribuir responsavel">
-                        <i class="bi bi-diagram-3 me-1"></i><span class="d-nãone d-lg-inline">Atribuir</span>
+                        <i class="bi bi-diagram-3 me-1"></i><span class="d-none d-lg-inline">Atribuir</span>
                     </button>
                     <button class="btn btn-sm btn-outline-danger" id="btnEncerrarConversa" title="Encerrar conversa">
-                        <i class="bi bi-check2-circle me-1"></i><span class="d-nãone d-lg-inline">Encerrar</span>
+                        <i class="bi bi-check2-circle me-1"></i><span class="d-none d-lg-inline">Encerrar</span>
                     </button>
 
                     <button class="btn btn-sm btn-outline-secondary" id="btnSyncInbound" title="Sincronizar inbound">
                         <i class="bi bi-arrow-repeat"></i>
                     </button>
-                    <button class="btn btn-sm btn-primary" id="btnNãovaConversa" title="Nãova conversa">
+                    <button class="btn btn-sm btn-primary" id="btnNovaConversa" title="Nova conversa">
                         <i class="bi bi-plus-lg"></i>
                     </button>
 
-                    <div class="dropdown d-md-nãone">
+                    <div class="dropdown d-md-none">
                         <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown" aria-label="Mais acoes">
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
@@ -1499,8 +1499,8 @@
                                 </button>
                             </li>
                             <li>
-                                <button class="dropdown-item" type="button" id="btnNãovaConversaMobile">
-                                    <i class="bi bi-plus-lg me-1"></i>Nãova conversa
+                                <button class="dropdown-item" type="button" id="btnNovaConversaMobile">
+                                    <i class="bi bi-plus-lg me-1"></i>Nova conversa
                                 </button>
                             </li>
                         </ul>
@@ -1508,7 +1508,7 @@
 
                     <button
                         type="button"
-                        class="btn btn-sm btn-outline-secondary cm-mobile-context-trigger d-xl-nãone"
+                        class="btn btn-sm btn-outline-secondary cm-mobile-context-trigger d-xl-none"
                         data-bs-toggle="offcanvas"
                         data-bs-target="#cmContextoCanvas"
                         aria-controls="cmContextoCanvas"
@@ -1519,14 +1519,14 @@
                 </div>
             </div>
             <div class="card-body d-flex flex-column">
-                <div id="threadMessages" class="cm-mêsg-wrap mb-2">
+                <div id="threadMessages" class="cm-msg-wrap mb-2">
                     <div class="cm-empty-state">
                         <i class="bi bi-chat-dots"></i>
                         <p class="mb-0">Abra uma conversa para visualizar as mensagens.</p>
                     </div>
                 </div>
                 <!-- Botão Ir para o fim flutuante (estilo WhatsApp) -->
-                <button type="button" class="btn cm-jump-bottom d-nãone" id="cmJumpBottomBtn" title="Ir para mensagens mais recentes">
+                <button type="button" class="btn cm-jump-bottom d-none" id="cmJumpBottomBtn" title="Ir para mensagens mais recentes">
                     <i class="bi bi-chevron-double-down"></i>
                 </button>
                 <form id="formEnviarMensagem" class="mt-auto cm-messages-form">
@@ -1543,7 +1543,7 @@
                                 <i class="bi bi-emoji-smile"></i>
                             </button>
                             
-                            <div class="cm-attach-menu d-nãone" id="cmAttachMenu">
+                            <div class="cm-attach-menu d-none" id="cmAttachMenu">
                                 <button type="button" class="cm-attach-item" data-action="upload-file">
                                     <i class="bi bi-paperclip text-primary"></i>
                                     <span>Enviar arquivo</span>
@@ -1569,7 +1569,7 @@
                                     <span>Gravar vídeo agora</span>
                                 </button>
                             </div>
-                            <div class="cm-emoji-menu d-nãone" id="cmEmojiMenu">
+                            <div class="cm-emoji-menu d-none" id="cmEmojiMenu">
                                 <button type="button" class="cm-emoji-btn" data-emoji="?">?</button>
                                 <button type="button" class="cm-emoji-btn" data-emoji="?">?</button>
                                 <button type="button" class="cm-emoji-btn" data-emoji="?">?</button>
@@ -1580,21 +1580,21 @@
                                 <button type="button" class="cm-emoji-btn" data-emoji="?">?</button>
                             </div>
 
-                            <!-- Inputs ocultos preservados e nãovos para capturas -->
-                            <input type="file" id="cmAnexoInput" name="anexo" class="d-nãone"
+                            <!-- Inputs ocultos preservados e novos para capturas -->
+                            <input type="file" id="cmAnexoInput" name="anexo" class="d-none"
                                    accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv,.zip,.rar,application/pdf">
                             
-                            <input type="file" id="cmCameraPhotoInput" class="d-nãone" 
+                            <input type="file" id="cmCameraPhotoInput" class="d-none" 
                                    accept="image/*" capture="environment">
                             
-                            <input type="file" id="cmCameraVideoInput" class="d-nãone" 
+                            <input type="file" id="cmCameraVideoInput" class="d-none" 
                                    accept="video/*" capture="environment">
                         </div>
 
                         <!-- Centro: Campo de Mensagem e Painéis Flutuantes -->
                         <div class="cm-compose-center">
                             <!-- Painel de Meta (PDF/Tipo) - Acima da barra quando ativo -->
-                            <div class="cm-compose-meta-panel d-nãone" id="cmComposeMetaPanel">
+                            <div class="cm-compose-meta-panel d-none" id="cmComposeMetaPanel">
                                 <div class="cm-meta-group" id="cmPdfPickerWrap">
                                     <label class="form-label small mb-1">Selecionar PDF</label>
                                     <select class="form-select form-select-sm" id="cmDocumentoId" name="documento_id">
@@ -1612,7 +1612,7 @@
                                 </div>
                             </div>
 
-                            <div id="cmAnexoPreview" class="cm-anexo-preview d-nãone"></div>
+                            <div id="cmAnexoPreview" class="cm-anexo-preview d-none"></div>
 
                             <textarea
                                 class="form-control cm-compose-textarea"
@@ -1634,7 +1634,7 @@
 
                 </form>
                 <!-- Painel de Captura de Mídia (MediaRecorder) - Centralizado -->
-                <div id="cmCapturePanel" class="cm-capture-panel d-nãone"></div>
+                <div id="cmCapturePanel" class="cm-capture-panel d-none"></div>
             </div>
         </div>
     </section>
@@ -1652,7 +1652,7 @@
                     </div>
                     <div id="contextoConversa" class="cm-scroll cm-context-body small text-muted flex-grow-1 p-2">
                         <div class="cm-empty-state cm-empty-state-sm">
-                            <i class="bi bi-persãon-vcard"></i>
+                            <i class="bi bi-person-vcard"></i>
                             <p class="mb-0">Selecione uma conversa para ver dados do cliente, OS e documentos.</p>
                         </div>
                     </div>
@@ -1660,7 +1660,7 @@
                         <h6 class="mb-2">Respostas rapidas</h6>
                         <div class="d-flex flex-wrap gap-1" id="respostasRapidasWrap">
                             <?php foreach (($respostasRapidas ?? []) as $r): ?>
-                                <button type="button" class="btn btn-sm btn-outline-secondary btn-resposta-rapida" data-mêsg="<?= esc($r['mensagem']) ?>">
+                                <button type="button" class="btn btn-sm btn-outline-secondary btn-resposta-rapida" data-msg="<?= esc($r['mensagem']) ?>">
                                     <?= esc($r['titulo']) ?>
                                 </button>
                             <?php endforeach; ?>
@@ -1676,13 +1676,13 @@
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content bg-dark border-0">
             <div class="modal-body p-0 position-relative">
-                <button type="button" class="btn-close btn-close-white position-absãolute top-0 end-0 m-3 z-3"
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3"
                         data-bs-dismiss="modal" aria-label="Close"></button>
-                <button type="button" class="btn btn-dark position-absãolute top-50 start-0 translate-middle-y mês-2 z-3 d-nãone"
+                <button type="button" class="btn btn-dark position-absolute top-50 start-0 translate-middle-y ms-2 z-3 d-none"
                         id="cmImgPrevBtn" aria-label="Imagem anterior">
                     <i class="bi bi-chevron-left"></i>
                 </button>
-                <button type="button" class="btn btn-dark position-absãolute top-50 end-0 translate-middle-y me-2 z-3 d-nãone"
+                <button type="button" class="btn btn-dark position-absolute top-50 end-0 translate-middle-y me-2 z-3 d-none"
                         id="cmImgNextBtn" aria-label="Proxima imagem">
                     <i class="bi bi-chevron-right"></i>
                 </button>
@@ -1712,7 +1712,7 @@ window.CM_CFG = {
     endpointSyncInbound: '<?= parse_url(base_url('atendimento-whatsapp/sync-inbound'), PHP_URL_PATH) ?: '/atendimento-whatsapp/sync-inbound' ?>',
     urlClienteVisualizarPrefix: '<?= parse_url(base_url('clientes/visualizar'), PHP_URL_PATH) ?: '/clientes/visualizar' ?>',
     urlOsVisualizarPrefix: '<?= parse_url(base_url('os/visualizar'), PHP_URL_PATH) ?: '/os/visualizar' ?>',
-    urlOsNãova: '<?= parse_url(base_url('os/nãova'), PHP_URL_PATH) ?: '/os/nãova' ?>',
+    urlOsNova: '<?= parse_url(base_url('os/nova'), PHP_URL_PATH) ?: '/os/nova' ?>',
     gatewayAccountNumber: '<?= esc($gatewayAccountNumber ?? '') ?>',
     empresaEndereco: '<?= esc(get_config('empresa_endereco', '')) ?>',
     currentUserId: <?= (int) ($currentUserId ?? 0) ?>,
@@ -1736,7 +1736,7 @@ window.CM_CFG = {
     const filtroOsAberta = document.getElementById('filtroConversaOsAberta');
     const btnFiltrar = document.getElementById('btnFiltrarConversas');
     const btnSyncInbound = document.getElementById('btnSyncInbound');
-    const btnNãovaConversa = document.getElementById('btnNãovaConversa');
+    const btnNovaConversa = document.getElementById('btnNovaConversa');
 
     const threadTitle = document.getElementById('threadTitle');
     const threadSubtitle = document.getElementById('threadSubtitle');
@@ -1744,7 +1744,7 @@ window.CM_CFG = {
     const threadMessages = document.getElementById('threadMessages');
     const formEnviar = document.getElementById('formEnviarMensagem');
     const conversaIdInput = document.getElementById('cmConversaId');
-    const mêsgInput = document.getElementById('cmMensagem');
+    const msgInput = document.getElementById('cmMensagem');
     const tipoMensagemInput = document.getElementById('cmTipoMensagem');
     const documentoSelect = document.getElementById('cmDocumentoId');
     const contextoEl = document.getElementById('contextoConversa');
@@ -1752,12 +1752,12 @@ window.CM_CFG = {
     let currentConversaId = null;
     let activeConversationUnread = 0;
     let pollTimer = null;
-    const autoSyncIntervalMês = Math.max(5000, Number('<?= (int) ($autoSyncSeconds ?? 15) ?>') * 1000);
+    const autoSyncIntervalMs = Math.max(5000, Number('<?= (int) ($autoSyncSeconds ?? 15) ?>') * 1000);
     const slaPrimeiraRespostaMin = Math.max(1, Number('<?= (int) ($slaPrimeiraRespostaMin ?? 60) ?>'));
-    const swal = (opts) => (window.Swal ? window.Swal.fire(opts) : Promise.resãolve(alert(opts.text || opts.title || 'OK')));
-    const urlParamês = new URLSearchParamês(window.location.search);
-    const initialQ = (urlParamês.get('q') || '').trim();
-    const initialConversaId = Number(urlParamês.get('conversa_id') || 0);
+    const swal = (opts) => (window.Swal ? window.Swal.fire(opts) : Promise.resolve(alert(opts.text || opts.title || 'OK')));
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialQ = (urlParams.get('q') || '').trim();
+    const initialConversaId = Number(urlParams.get('conversa_id') || 0);
 
     if (initialQ) {
         filtroQ.value = initialQ;
@@ -1781,28 +1781,28 @@ window.CM_CFG = {
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
             body: fd
         });
-        const data = await res.jsãon().catch(() => ({}));
+        const data = await res.json().catch(() => ({}));
         if (!res.ok || !data.ok) {
             throw new Error(data.message || 'Falha na requisicao');
         }
         return data;
     };
 
-    const getJsãon = async (url) => {
+    const getJson = async (url) => {
         const res = await fetch(url, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            cache: 'não-store'
+            cache: 'no-store'
         });
-        const data = await res.jsãon().catch(() => ({}));
+        const data = await res.json().catch(() => ({}));
         if (!res.ok || !data.ok) {
             throw new Error(data.message || 'Falha na requisicao');
         }
         return data;
     };
 
-    const resãolveArquivoUrl = (arquivo) => {
+    const resolveArquivoUrl = (arquivo) => {
         const safe = encodeURIComponent(String(arquivo || '')).replace(/%2F/g, '/');
-        return `<?= base_url() ?>/${safe}?v=${Date.nãow()}`;
+        return `<?= base_url() ?>/${safe}?v=${Date.now()}`;
     };
 
     const renderArquivoHtml = (m) => {
@@ -1810,17 +1810,17 @@ window.CM_CFG = {
 
         const arquivo = String(m.arquivo || '');
         const mime = String(m.mime_type || '').toLowerCase();
-        const url = resãolveArquivoUrl(arquivo);
+        const url = resolveArquivoUrl(arquivo);
         const label = escapeHtml(arquivo.split('/').pop() || arquivo);
 
         const isImage = mime.startsWith('image/') || /\.(png|jpe?g|webp|gif)$/i.test(arquivo);
         if (isImage) {
             return `
                 <div class="mt-2">
-                    <a href="${url}" target="_blank" rel="nãoopener" class="d-inline-block text-decoration-nãone">
+                    <a href="${url}" target="_blank" rel="noopener" class="d-inline-block text-decoration-none">
                         <img src="${url}" alt="${label}" class="rounded border" style="max-width: 180px; max-height: 180px; object-fit: cover;">
                     </a>
-                    <div class="small mt-1"><a href="${url}" target="_blank" rel="nãoopener">Abrir imagem</a></div>
+                    <div class="small mt-1"><a href="${url}" target="_blank" rel="noopener">Abrir imagem</a></div>
                 </div>
             `;
         }
@@ -1828,7 +1828,7 @@ window.CM_CFG = {
         const isPdf = mime === 'application/pdf' || /\.pdf$/i.test(arquivo);
         return `
             <div class="mt-2">
-                <a href="${url}" target="_blank" rel="nãoopener" class="btn btn-sm btn-outline-secondary">
+                <a href="${url}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary">
                     <i class="bi ${isPdf ? 'bi-file-earmark-pdf' : 'bi-paperclip'} me-1"></i>${isPdf ? 'Abrir PDF' : 'Abrir anexo'}
                 </a>
                 <div class="small mt-1 text-muted">${label}</div>
@@ -1838,17 +1838,17 @@ window.CM_CFG = {
 
     const renderConversaItem = (item) => {
         const isActive = currentConversaId === Number(item.id);
-        const nãome = item.cliente_nãome || item.nãome_contato || item.telefone || 'Contato sem nãome';
+        const nome = item.cliente_nome || item.nome_contato || item.telefone || 'Contato sem nome';
         const unread = Number(item.nao_lidas || 0);
         const automacaoAtiva = Number(item.automacao_ativa ?? 1) === 1;
-        const aguardandoHumanão = Number(item.aguardando_humanão || 0) === 1;
-        const prioridade = String(item.prioridade || 'nãormal').toLowerCase();
+        const aguardandoHumano = Number(item.aguardando_humano || 0) === 1;
+        const prioridade = String(item.prioridade || 'normal').toLowerCase();
         const hasOs = !!item.numero_os;
         const ultimaMensagemAt = item.ultima_mensagem_em
             ? new Date(String(item.ultima_mensagem_em).replace(' ', 'T'))
             : null;
-        const diffMês = ultimaMensagemAt ? (Date.nãow() - ultimaMensagemAt.getTime()) : 0;
-        const slaEstourado = unread > 0 && diffMês > (slaPrimeiraRespostaMin * 60 * 1000);
+        const diffMs = ultimaMensagemAt ? (Date.now() - ultimaMensagemAt.getTime()) : 0;
+        const slaEstourado = unread > 0 && diffMs > (slaPrimeiraRespostaMin * 60 * 1000);
         const subtitle = [item.telefone, item.numero_os ? ('OS ' + item.numero_os) : null].filter(Boolean).join(' | ');
         const lastDirection = String(item.ultima_mensagem_direcao || '').toLowerCase();
         const lastBot = Number(item.ultima_mensagem_bot || 0) === 1;
@@ -1856,21 +1856,21 @@ window.CM_CFG = {
             ? '<span class="cm-preview-prefix inbound">Cliente:</span>'
             : (lastBot
                 ? '<span class="cm-preview-prefix bot">Bot:</span>'
-                : '<span class="cm-preview-prefix outbound">Vocêe:</span>');
+                : '<span class="cm-preview-prefix outbound">Voce:</span>');
         const ultimaMensagemBruta = item.ultima_mensagem_texto
             ? item.ultima_mensagem_texto
             : (item.ultima_mensagem_tipo && item.ultima_mensagem_tipo !== 'texto' ? `[${item.ultima_mensagem_tipo}]` : 'Sem mensagens');
         const ultimaMensagem = `<span class="cm-conversa-preview">${previewPrefix}${escapeHtml(ultimaMensagemBruta)}</span>`;
         const ultimaData = item.ultima_mensagem_em ? String(item.ultima_mensagem_em).replace('T', ' ').substring(0, 16) : '';
-        const responsavel = item.responsavel_nãome || 'Nao atribuido';
-        const prioridadeBadge = prioridade !== 'nãormal'
+        const responsavel = item.responsavel_nome || 'Nao atribuido';
+        const prioridadeBadge = prioridade !== 'normal'
             ? `<span class="badge text-bg-${prioridade === 'urgente' ? 'danger' : (prioridade === 'alta' ? 'warning text-dark' : 'secondary')}">${escapeHtml(prioridade)}</span>`
             : '';
         const flags = [
             automacaoAtiva
                 ? '<span class="badge text-bg-success-subtle text-success-emphasis border">Bot ativo</span>'
                 : '<span class="badge text-bg-secondary">Bot off</span>',
-            aguardandoHumanão ? '<span class="badge text-bg-warning text-dark">Aguard. humanão</span>' : '',
+            aguardandoHumano ? '<span class="badge text-bg-warning text-dark">Aguard. humano</span>' : '',
             hasOs ? '<span class="badge text-bg-primary">OS vinculada</span>' : '',
             slaEstourado ? '<span class="badge text-bg-danger">SLA estourado</span>' : '',
             prioridadeBadge,
@@ -1878,8 +1878,8 @@ window.CM_CFG = {
 
         return `
             <div class="border rounded p-2 mb-2 cm-conversa-item ${isActive ? 'active' : ''}" data-id="${item.id}">
-                <div class="d-flex justify-content-between align-itemês-start">
-                    <div class="fw-semibold">${escapeHtml(nãome)}</div>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="fw-semibold">${escapeHtml(nome)}</div>
                     ${unread > 0 ? `<span class="badge bg-danger">${unread}</span>` : ''}
                 </div>
                 <div class="small text-muted">${escapeHtml(subtitle)}</div>
@@ -1900,23 +1900,23 @@ window.CM_CFG = {
         const status = encodeURIComponent((filtroStatus.value || '').trim());
         const responsavelId = encodeURIComponent((filtroResponsavel?.value || '').trim());
         const tagId = encodeURIComponent((filtroTag?.value || '').trim());
-        const sãomenteNaoLidas = filtroNaoLidas?.checked ? '1' : '0';
+        const somenteNaoLidas = filtroNaoLidas?.checked ? '1' : '0';
         const comOsAberta = filtroOsAberta?.checked ? '1' : '0';
         try {
-            const data = await getJsãon(
-                `<?= base_url('atendimento-whatsapp/conversas') ?>?q=${q}&status=${status}&responsavel_id=${responsavelId}&tag_id=${tagId}&nao_lidas=${sãomenteNaoLidas}&com_os_aberta=${comOsAberta}`
+            const data = await getJson(
+                `<?= base_url('atendimento-whatsapp/conversas') ?>?q=${q}&status=${status}&responsavel_id=${responsavelId}&tag_id=${tagId}&nao_lidas=${somenteNaoLidas}&com_os_aberta=${comOsAberta}`
             );
-            const itemês = data.itemês || [];
-            if (!itemês.length) {
+            const items = data.items || [];
+            if (!items.length) {
                 listEl.innerHTML = '<div class="text-muted small p-2">Nenhuma conversa encontrada.</div>';
                 return [];
             }
 
-            listEl.innerHTML = itemês.map(renderConversaItem).join('');
+            listEl.innerHTML = items.map(renderConversaItem).join('');
             listEl.querySelectorAll('.cm-conversa-item').forEach((el) => {
                 el.addEventListener('click', () => openConversa(Number(el.dataset.id)));
             });
-            return itemês;
+            return items;
         } catch (error) {
             listEl.innerHTML = `<div class="text-danger small p-2">${escapeHtml(error.message || 'Erro ao carregar conversas')}</div>`;
             return [];
@@ -1933,7 +1933,7 @@ window.CM_CFG = {
             const outbound = (m.direcao || '').toLowerCase() === 'outbound';
             const enviadaPorBot = Number(m.enviada_por_bot || 0) === 1;
             const origemLabel = outbound ? (enviadaPorBot ? 'Bot' : 'Equipe') : 'Cliente';
-            const origemIcon = outbound ? (enviadaPorBot ? 'bi-robot' : 'bi-persãon-badge') : 'bi-persãon-circle';
+            const origemIcon = outbound ? (enviadaPorBot ? 'bi-robot' : 'bi-person-badge') : 'bi-person-circle';
             const body = m.mensagem
                 ? escapeHtml(m.mensagem).replace(/\n/g, '<br>')
                 : '<span class="text-muted">[mensagem sem texto]</span>';
@@ -1943,20 +1943,20 @@ window.CM_CFG = {
                 ? `<button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 cm-reply-btn" data-reply="${encodeURIComponent(String(m.mensagem || ''))}">Responder</button>`
                 : '';
             const unreadSeparator = (!outbound && activeConversationUnread > 0 && idx === Math.max(0, mensagens.length - activeConversationUnread))
-                ? '<div class="cm-mêsg-unread-sep"><span>Mensagens nao lidas</span></div>'
+                ? '<div class="cm-msg-unread-sep"><span>Mensagens nao lidas</span></div>'
                 : '';
 
             return `
                 ${unreadSeparator}
-                <div class="cm-mêsg-row ${outbound ? 'outbound' : 'inbound'}">
+                <div class="cm-msg-row ${outbound ? 'outbound' : 'inbound'}">
                     <div class="cm-bubble ${outbound ? 'outbound' : 'inbound'}">
-                        <div class="cm-mêsg-head">
-                            <span class="cm-mêsg-origin"><i class="bi ${origemIcon}"></i>${origemLabel}</span>
+                        <div class="cm-msg-head">
+                            <span class="cm-msg-origin"><i class="bi ${origemIcon}"></i>${origemLabel}</span>
                             ${replyAction}
                         </div>
                         <div>${body}</div>
                         ${arquivo}
-                        <div class="cm-mêsg-meta">${escapeHtml((when || '').replace('T', ' ').substring(0, 16))} ${outbound ? '| enviada' : '| recebida'}</div>
+                        <div class="cm-msg-meta">${escapeHtml((when || '').replace('T', ' ').substring(0, 16))} ${outbound ? '| enviada' : '| recebida'}</div>
                     </div>
                 </div>
             `;
@@ -1976,14 +1976,14 @@ window.CM_CFG = {
         const responsavelAtual = Number(meta.responsavel_id || 0);
         const statusOptions = Array.isArray(meta.status_options) && meta.status_options.length
             ? meta.status_options
-            : ['aberta', 'aguardando', 'resãolvida', 'arquivada'];
+            : ['aberta', 'aguardando', 'resolvida', 'arquivada'];
         const responsaveis = Array.isArray(meta.responsaveis) ? meta.responsaveis : [];
         const tagCatalogo = Array.isArray(meta.tag_catalogo) ? meta.tag_catalogo : [];
         const tagsSelecionadas = (Array.isArray(meta.tags) ? meta.tags : []).map((v) => Number(v));
 
         const clienteHtml = cliente ? `
             <div class="mb-2">
-                <div class="fw-semibold">${escapeHtml(cliente.nãome_razao || '')}</div>
+                <div class="fw-semibold">${escapeHtml(cliente.nome_razao || '')}</div>
                 <div>${escapeHtml(cliente.telefone1 || '')}</div>
                 <div>${escapeHtml(cliente.email || '')}</div>
             </div>
@@ -2018,13 +2018,13 @@ window.CM_CFG = {
             responsaveis.map((u) => {
                 const id = Number(u.id || 0);
                 const sel = id === responsavelAtual ? 'selected' : '';
-                return `<option value="${id}" ${sel}>${escapeHtml(u.nãome || ('Usuario #' + id))}</option>`;
+                return `<option value="${id}" ${sel}>${escapeHtml(u.nome || ('Usuario #' + id))}</option>`;
             })
         ).join('');
         const automacaoAtiva = Number(meta.automacao_ativa ?? 1) === 1;
-        const aguardandoHumanão = Number(meta.aguardando_humanão || 0) === 1;
-        const prioridadeAtual = String(meta.prioridade || 'nãormal').toLowerCase();
-        const prioridadeOptionsHtml = ['baixa', 'nãormal', 'alta', 'urgente']
+        const aguardandoHumano = Number(meta.aguardando_humano || 0) === 1;
+        const prioridadeAtual = String(meta.prioridade || 'normal').toLowerCase();
+        const prioridadeOptionsHtml = ['baixa', 'normal', 'alta', 'urgente']
             .map((p) => `<option value="${p}" ${p === prioridadeAtual ? 'selected' : ''}>${escapeHtml(p.charAt(0).toUpperCase() + p.slice(1))}</option>`)
             .join('');
         const tagsHtml = tagCatalogo.length
@@ -2035,7 +2035,7 @@ window.CM_CFG = {
                 return `
                     <label class="form-check form-check-inline border rounded px-2 py-1 me-1 mb-1 small" ${cor}>
                         <input class="form-check-input me-1 cm-tag-check" type="checkbox" value="${tagId}" ${checked}>
-                        <span class="form-check-label">${escapeHtml(t.nãome || 'Tag')}</span>
+                        <span class="form-check-label">${escapeHtml(t.nome || 'Tag')}</span>
                     </label>
                 `;
             }).join('')
@@ -2063,8 +2063,8 @@ window.CM_CFG = {
                         <label class="form-check-label small" for="contextAutomacaoAtiva">Bot ativo</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="contextAguardandoHumanão" ${aguardandoHumanão ? 'checked' : ''}>
-                        <label class="form-check-label small" for="contextAguardandoHumanão">Aguardando humanão</label>
+                        <input class="form-check-input" type="checkbox" id="contextAguardandoHumano" ${aguardandoHumano ? 'checked' : ''}>
+                        <label class="form-check-label small" for="contextAguardandoHumano">Aguardando humano</label>
                     </div>
                 </div>
                 <div class="mb-2">
@@ -2089,9 +2089,9 @@ window.CM_CFG = {
                 <ul class="mb-0 ps-3">${followupsHtml}</ul>
             </div>
             <div class="mt-3 d-grid gap-2">
-                ${clienteUrl ? `<a class="btn btn-sm btn-outline-primary" href="${clienteUrl}" target="_blank" rel="nãoopener">Abrir cliente</a>` : ''}
-                ${osUrl ? `<a class="btn btn-sm btn-outline-secondary" href="${osUrl}" target="_blank" rel="nãoopener">Abrir OS</a>` : ''}
-                <a class="btn btn-sm btn-outline-success" href="<?= base_url('os/nãova') ?>" target="_blank" rel="nãoopener">Nãova OS</a>
+                ${clienteUrl ? `<a class="btn btn-sm btn-outline-primary" href="${clienteUrl}" target="_blank" rel="noopener">Abrir cliente</a>` : ''}
+                ${osUrl ? `<a class="btn btn-sm btn-outline-secondary" href="${osUrl}" target="_blank" rel="noopener">Abrir OS</a>` : ''}
+                <a class="btn btn-sm btn-outline-success" href="<?= base_url('os/nova') ?>" target="_blank" rel="noopener">Nova OS</a>
             </div>
         `;
 
@@ -2107,7 +2107,7 @@ window.CM_CFG = {
                     conversa_id: currentConversaId,
                     os_id: osId
                 });
-                await swal({ icon: 'success', title: 'OS vinculada', text: 'Conversa vinculada com sucessão.' });
+                await swal({ icon: 'success', title: 'OS vinculada', text: 'Conversa vinculada com sucesso.' });
                 await openConversa(currentConversaId, false);
                 await loadConversas();
             } catch (error) {
@@ -2118,9 +2118,9 @@ window.CM_CFG = {
         document.getElementById('btnSalvarMetaConversa')?.addEventListener('click', async () => {
             const status = document.getElementById('contextStatusSelect')?.value || 'aberta';
             const responsavelId = Number(document.getElementById('contextResponsavelSelect')?.value || 0);
-            const prioridade = document.getElementById('contextPrioridadeSelect')?.value || 'nãormal';
+            const prioridade = document.getElementById('contextPrioridadeSelect')?.value || 'normal';
             const automacaoAtiva = document.getElementById('contextAutomacaoAtiva')?.checked ? 1 : 0;
-            const aguardandoHumanão = document.getElementById('contextAguardandoHumanão')?.checked ? 1 : 0;
+            const aguardandoHumano = document.getElementById('contextAguardandoHumano')?.checked ? 1 : 0;
             const tags = Array.from(document.querySelectorAll('#contextTagWrap .cm-tag-check:checked'))
                 .map((el) => Number(el.value || 0))
                 .filter((id) => id > 0);
@@ -2138,9 +2138,9 @@ window.CM_CFG = {
                     tag_ids: JSON.stringify(tags),
                     prioridade: prioridade,
                     automacao_ativa: automacaoAtiva,
-                    aguardando_humanão: aguardandoHumanão,
+                    aguardando_humano: aguardandoHumano,
                 });
-                await swal({ icon: 'success', title: 'Atualizado', text: 'Contexto da conversa atualizado com sucessão.' });
+                await swal({ icon: 'success', title: 'Atualizado', text: 'Contexto da conversa atualizado com sucesso.' });
                 await openConversa(currentConversaId, false);
                 await loadConversas();
             } catch (error) {
@@ -2150,13 +2150,13 @@ window.CM_CFG = {
 
         document.getElementById('contextAutomacaoAtiva')?.addEventListener('change', (e) => {
             const checked = !!e.target?.checked;
-            const human = document.getElementById('contextAguardandoHumanão');
+            const human = document.getElementById('contextAguardandoHumano');
             if (checked && human) {
                 human.checked = false;
             }
         });
 
-        document.getElementById('contextAguardandoHumanão')?.addEventListener('change', (e) => {
+        document.getElementById('contextAguardandoHumano')?.addEventListener('change', (e) => {
             const checked = !!e.target?.checked;
             const bot = document.getElementById('contextAutomacaoAtiva');
             if (checked && bot) {
@@ -2171,10 +2171,10 @@ window.CM_CFG = {
         threadMessages.innerHTML = '<div class="text-muted small">Carregando conversa...</div>';
 
         try {
-            const data = await getJsãon(`<?= base_url('atendimento-whatsapp/conversa') ?>/${id}`);
+            const data = await getJson(`<?= base_url('atendimento-whatsapp/conversa') ?>/${id}`);
             const conversa = data.conversa || {};
             activeConversationUnread = Number(data.unread_before || conversa.nao_lidas || 0);
-            threadTitle.textContent = conversa.nãome_contato || conversa.cliente_nãome || conversa.telefone || 'Conversa';
+            threadTitle.textContent = conversa.nome_contato || conversa.cliente_nome || conversa.telefone || 'Conversa';
             threadSubtitle.textContent = conversa.telefone || '';
             threadStatusBadge.textContent = conversa.status || 'aberta';
             renderMensagens(data.mensagens || []);
@@ -2199,7 +2199,7 @@ window.CM_CFG = {
 
         const payload = {
             conversa_id: currentConversaId,
-            mensagem: (mêsgInput.value || '').trim(),
+            mensagem: (msgInput.value || '').trim(),
             tipo_mensagem: tipoMensagemInput.value || 'manual',
             documento_id: documentoSelect.value || '',
         };
@@ -2211,16 +2211,16 @@ window.CM_CFG = {
 
         try {
             await postForm('<?= base_url('atendimento-whatsapp/enviar') ?>', payload);
-            mêsgInput.value = '';
+            msgInput.value = '';
             documentoSelect.value = '';
             await openConversa(currentConversaId, false);
             await loadConversas();
         } catch (error) {
-            await swal({ icon: 'error', title: 'Falha não envio', text: error.message || 'Nao foi possivel enviar.' });
+            await swal({ icon: 'error', title: 'Falha no envio', text: error.message || 'Nao foi possivel enviar.' });
         }
     });
 
-    mêsgInput?.addEventListener('keydown', (e) => {
+    msgInput?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             formEnviar?.requestSubmit();
@@ -2241,8 +2241,8 @@ window.CM_CFG = {
         }
         const trecho = texto.length > 160 ? (texto.substring(0, 160) + '...') : texto;
         const quote = `Respondendo cliente: "${trecho}"\n`;
-        mêsgInput.value = mêsgInput.value ? (mêsgInput.value + '\n' + quote) : quote;
-        mêsgInput.focus();
+        msgInput.value = msgInput.value ? (msgInput.value + '\n' + quote) : quote;
+        msgInput.focus();
     });
 
     btnSyncInbound?.addEventListener('click', async () => {
@@ -2268,13 +2268,13 @@ window.CM_CFG = {
         el?.addEventListener('change', loadConversas);
     });
 
-    btnNãovaConversa?.addEventListener('click', async () => {
+    btnNovaConversa?.addEventListener('click', async () => {
         if (!window.Swal) {
             return;
         }
 
         const { value: formValues } = await window.Swal.fire({
-            title: 'Nãova conversa',
+            title: 'Nova conversa',
             html: `
                 <input id="swTelefone" class="swal2-input" placeholder="Telefone (55...)">
                 <textarea id="swMensagem" class="swal2-textarea" placeholder="Mensagem inicial"></textarea>
@@ -2315,12 +2315,12 @@ window.CM_CFG = {
 
     document.querySelectorAll('.btn-resposta-rapida').forEach((btn) => {
         btn.addEventListener('click', () => {
-            const mêsg = btn.getAttribute('data-mêsg') || '';
-            if (!mêsg) {
+            const msg = btn.getAttribute('data-msg') || '';
+            if (!msg) {
                 return;
             }
-            mêsgInput.value = mêsgInput.value ? (mêsgInput.value + '\n' + mêsg) : mêsg;
-            mêsgInput.focus();
+            msgInput.value = msgInput.value ? (msgInput.value + '\n' + msg) : msg;
+            msgInput.focus();
         });
     });
 
@@ -2333,21 +2333,21 @@ window.CM_CFG = {
             if (currentConversaId) {
                 await openConversa(currentConversaId, false);
             }
-        }, autoSyncIntervalMês);
+        }, autoSyncIntervalMs);
     };
 
     const bootstrapCentral = async () => {
-        const itemês = await loadConversas();
+        const items = await loadConversas();
         if (initialConversaId > 0) {
             await openConversa(initialConversaId, false);
             return;
         }
-        if (initialQ && itemês.length > 0) {
-            await openConversa(Number(itemês[0].id), false);
+        if (initialQ && items.length > 0) {
+            await openConversa(Number(items[0].id), false);
             return;
         }
-        if (!currentConversaId && itemês.length > 0) {
-            await openConversa(Number(itemês[0].id), false);
+        if (!currentConversaId && items.length > 0) {
+            await openConversa(Number(items[0].id), false);
         }
     };
 

@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 <div class="page-header">
-    <div class="d-flex align-itemês-center gap-3">
+    <div class="d-flex align-items-center gap-3">
         <h2><i class="bi bi-megaphone me-2"></i>CRM - Campanhas</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('crm-campanhas')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -23,8 +23,8 @@
                     <div class="d-flex flex-column gap-2">
                         <?php foreach (($automacoes ?? []) as $auto): ?>
                             <div class="border rounded p-2">
-                                <div class="d-flex justify-content-between align-itemês-center gap-2">
-                                    <strong><?= esc($auto['nãome'] ?? '-') ?></strong>
+                                <div class="d-flex justify-content-between align-items-center gap-2">
+                                    <strong><?= esc($auto['nome'] ?? '-') ?></strong>
                                     <span class="badge <?= ((int) ($auto['ativo'] ?? 0) === 1) ? 'bg-success' : 'bg-secondary' ?>">
                                         <?= ((int) ($auto['ativo'] ?? 0) === 1) ? 'Ativa' : 'Inativa' ?>
                                     </span>
@@ -54,7 +54,7 @@
                         <table class="table table-sm align-middle">
                             <thead>
                                 <tr>
-                                    <th>Nãome</th>
+                                    <th>Nome</th>
                                     <th>Codigo</th>
                                     <th>Evento</th>
                                     <th>Status</th>
@@ -63,7 +63,7 @@
                             <tbody>
                                 <?php foreach (($templates ?? []) as $tpl): ?>
                                     <tr>
-                                        <td><?= esc($tpl['nãome'] ?? '-') ?></td>
+                                        <td><?= esc($tpl['nome'] ?? '-') ?></td>
                                         <td><code><?= esc($tpl['codigo'] ?? '-') ?></code></td>
                                         <td><?= esc($tpl['evento'] ?? '-') ?></td>
                                         <td>
@@ -91,9 +91,9 @@
                     <div class="d-flex flex-wrap gap-2">
                         <?php foreach (($tagStats ?? []) as $tag): ?>
                             <div class="border rounded px-3 py-2">
-                                <div class="d-flex align-itemês-center gap-2">
+                                <div class="d-flex align-items-center gap-2">
                                     <span class="rounded-circle border" style="width: 10px; height: 10px; background: <?= esc($tag['cor'] ?? '#6c757d') ?>;"></span>
-                                    <strong><?= esc($tag['nãome'] ?? '-') ?></strong>
+                                    <strong><?= esc($tag['nome'] ?? '-') ?></strong>
                                 </div>
                                 <div class="small text-muted mt-1"><?= (int) ($tag['total_clientes'] ?? 0) ?> cliente(s)</div>
                             </div>

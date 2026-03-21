@@ -12,7 +12,7 @@ class OsStatusHistoricoModel extends Model
     protected $allowedFields = [
         'os_id',
         'status_anterior',
-        'status_nãovo',
+        'status_novo',
         'estado_fluxo',
         'usuario_id',
         'observacao',
@@ -23,7 +23,7 @@ class OsStatusHistoricoModel extends Model
 
     public function byOs(int $osId): array
     {
-        return $this->select('os_status_historico.*, usuarios.nãome as usuario_nãome')
+        return $this->select('os_status_historico.*, usuarios.nome as usuario_nome')
             ->join('usuarios', 'usuarios.id = os_status_historico.usuario_id', 'left')
             ->where('os_status_historico.os_id', $osId)
             ->orderBy('os_status_historico.created_at', 'DESC')

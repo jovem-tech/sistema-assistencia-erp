@@ -8,7 +8,7 @@ $errorId = uniqid('error', true);
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="robots" content="nãoindex">
+    <meta name="robots" content="noindex">
 
     <title><?= esc($title) ?></title>
     <style>
@@ -34,17 +34,17 @@ $errorId = uniqid('error', true);
             <p>
                 <?= nl2br(esc($exception->getMessage())) ?>
                 <a href="https://www.duckduckgo.com/?q=<?= urlencode($title . ' ' . preg_replace('#\'.*\'|".*"#Us', '', $exception->getMessage())) ?>"
-                   rel="nãoreferrer" target="_blank">search &rarr;</a>
+                   rel="noreferrer" target="_blank">search &rarr;</a>
             </p>
         </div>
     </div>
 
-    <!-- Sãource -->
+    <!-- Source -->
     <div class="container">
         <p><b><?= esc(clean_path($file)) ?></b> at line <b><?= esc($line) ?></b></p>
 
         <?php if (is_file($file)) : ?>
-            <div class="sãource">
+            <div class="source">
                 <?= static::highlightFile($file, $line, 15); ?>
             </div>
         <?php endif; ?>
@@ -64,7 +64,7 @@ $errorId = uniqid('error', true);
 
     <?= nl2br(esc($prevException->getMessage())) ?>
     <a href="https://www.duckduckgo.com/?q=<?= urlencode($prevException::class . ' ' . preg_replace('#\'.*\'|".*"#Us', '', $prevException->getMessage())) ?>"
-       rel="nãoreferrer" target="_blank">search &rarr;</a>
+       rel="noreferrer" target="_blank">search &rarr;</a>
     <?= esc(clean_path($prevException->getFile()) . ':' . $prevException->getLine()) ?>
     </pre>
 
@@ -118,16 +118,16 @@ $errorId = uniqid('error', true);
                                         <table cellspacing="0">
 
                                         <?php
-                                        $paramês = null;
-                                        // Reflection by name is nãot available for closure function
+                                        $params = null;
+                                        // Reflection by name is not available for closure function
                                         if (! str_ends_with($row['function'], '}')) {
                                             $mirror = isset($row['class']) ? new ReflectionMethod($row['class'], $row['function']) : new ReflectionFunction($row['function']);
-                                            $paramês = $mirror->getParameters();
+                                            $params = $mirror->getParameters();
                                         }
 
                                         foreach ($row['args'] as $key => $value) : ?>
                                             <tr>
-                                                <td><code><?= esc(isset($paramês[$key]) ? '$' . $paramês[$key]->name : "#{$key}") ?></code></td>
+                                                <td><code><?= esc(isset($params[$key]) ? '$' . $params[$key]->name : "#{$key}") ?></code></td>
                                                 <td><pre><?= esc(print_r($value, true)) ?></pre></td>
                                             </tr>
                                         <?php endforeach ?>
@@ -144,9 +144,9 @@ $errorId = uniqid('error', true);
                             <?php endif; ?>
                         </p>
 
-                        <!-- Sãource? -->
+                        <!-- Source? -->
                         <?php if (isset($row['file']) && is_file($row['file']) && isset($row['class'])) : ?>
-                            <div class="sãource">
+                            <div class="source">
                                 <?= static::highlightFile($row['file'], $row['line']) ?>
                             </div>
                         <?php endif; ?>
@@ -242,15 +242,15 @@ $errorId = uniqid('error', true);
                         </tr>
                         <tr>
                             <td style="width: 10em">Is AJAX Request?</td>
-                            <td><?= $request->isAJAX() ? 'yes' : 'não' ?></td>
+                            <td><?= $request->isAJAX() ? 'yes' : 'no' ?></td>
                         </tr>
                         <tr>
                             <td>Is CLI Request?</td>
-                            <td><?= $request->isCLI() ? 'yes' : 'não' ?></td>
+                            <td><?= $request->isCLI() ? 'yes' : 'no' ?></td>
                         </tr>
                         <tr>
                             <td>Is Secure Request?</td>
-                            <td><?= $request->isSecure() ? 'yes' : 'não' ?></td>
+                            <td><?= $request->isSecure() ? 'yes' : 'no' ?></td>
                         </tr>
                         <tr>
                             <td>User Agent</td>
@@ -300,7 +300,7 @@ $errorId = uniqid('error', true);
                 <?php if ($empty) : ?>
 
                     <div class="alert">
-                        Não $_GET, $_POST, or $_COOKIE Information to show.
+                        No $_GET, $_POST, or $_COOKIE Information to show.
                     </div>
 
                 <?php endif; ?>
@@ -349,7 +349,7 @@ $errorId = uniqid('error', true);
                 <table>
                     <tr>
                         <td style="width: 15em">Response Status</td>
-                        <td><?= esc($response->getStatusCode() . ' - ' . $response->getReasãonPhrase()) ?></td>
+                        <td><?= esc($response->getStatusCode() . ' - ' . $response->getReasonPhrase()) ?></td>
                     </tr>
                 </table>
 
@@ -408,7 +408,7 @@ $errorId = uniqid('error', true);
                             <td><?= esc(static::describeMemory(memory_get_usage(true))) ?></td>
                         </tr>
                         <tr>
-                            <td style="width: 12em">Peçak Memory Usage:</td>
+                            <td style="width: 12em">Peak Memory Usage:</td>
                             <td><?= esc(static::describeMemory(memory_get_peak_usage(true))) ?></td>
                         </tr>
                         <tr>

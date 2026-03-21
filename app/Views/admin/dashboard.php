@@ -3,9 +3,9 @@
 <?= $this->section('content') ?>
 
 <div class="dashboard-page ds-dashboard-layout">
-<div class="page-header d-flex justify-content-between align-itemês-center mb-4">
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
-    <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('dashboard')" title="Ajuda sãobre o Dashboard">
+    <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('dashboard')" title="Ajuda sobre o Dashboard">
         <i class="bi bi-question-circle me-1"></i>Ajuda
     </button>
 </div>
@@ -159,11 +159,11 @@
     <!-- Recent OS -->
     <div class="col-xl-8">
         <div class="card glass-card h-100">
-            <div class="card-header d-flex justify-content-between align-itemês-center">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0"><i class="bi bi-clock-history me-2"></i>Últimas Ordens de Serviço</h5>
                 <?php if (can('os', 'criar')): ?>
-                <a href="<?= base_url('os/nãova') ?>" class="btn btn-glow btn-sm">
-                    <i class="bi bi-plus-lg me-1"></i>Nãova OS
+                <a href="<?= base_url('os/nova') ?>" class="btn btn-glow btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i>Nova OS
                 </a>
                 <?php endif; ?>
             </div>
@@ -192,7 +192,7 @@
                                 <?php foreach ($os_recentes as $os): ?>
                                 <tr>
                                     <td><strong><?= esc($os['numero_os']) ?></strong></td>
-                                    <td><?= esc($os['cliente_nãome']) ?></td>
+                                    <td><?= esc($os['cliente_nome']) ?></td>
                                     <td><?= esc($os['equip_marca'] . ' ' . $os['equip_modelo']) ?></td>
                                     <td><?= getStatusBadge($os['status']) ?></td>
                                     <td><?= date('d/m/Y', strtotime($os['created_at'])) ?></td>
@@ -238,7 +238,7 @@
                             <?php foreach ($estoque_baixo as $peca): ?>
                             <tr>
                                 <td><?= esc($peca['codigo']) ?></td>
-                                <td><?= esc($peca['nãome']) ?></td>
+                                <td><?= esc($peca['nome']) ?></td>
                                 <td><span class="badge bg-danger"><?= $peca['quantidade_atual'] ?></span></td>
                                 <td><?= $peca['estoque_minimo'] ?></td>
                                 <td>
@@ -268,7 +268,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Load chart data
     fetch('<?= base_url('admin/stats') ?>')
-        .then(res => res.jsãon())
+        .then(res => res.json())
         .then(data => {
             // Revenue Chart
             const ctxFat = document.getElementById('chartFaturamento').getContext('2d');
@@ -309,7 +309,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Macrofases da OS (Status operacional)
             const macroLabels = {
                 recepcao: 'Recepção',
-                diagnãostico: 'Diagnóstico',
+                diagnostico: 'Diagnóstico',
                 orcamento: 'Orçamento',
                 execucao: 'Execução',
                 interrupcao: 'Interrupção',
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         })
-        .catch(err => consãole.log('Erro ao carregar gráficos:', err));
+        .catch(err => console.log('Erro ao carregar gráficos:', err));
 });
 </script>
 <?= $this->endSection() ?>

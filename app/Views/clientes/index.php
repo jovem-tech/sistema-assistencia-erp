@@ -2,10 +2,10 @@
 
 <?= $this->section('content') ?>
 
-<div class="page-header d-flex justify-content-between align-itemês-center mb-4">
-    <div class="d-flex align-itemês-center gap-3">
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
         <h2 class="mb-0"><i class="bi bi-people-fill me-2"></i>Clientes</h2>
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('06-modulos-do-sistema/clientes.md')" title="Ajuda sãobre este módulo">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('06-modulos-do-sistema/clientes.md')" title="Ajuda sobre este módulo">
             <i class="bi bi-question-circle me-1"></i> Ajuda
         </button>
     </div>
@@ -16,8 +16,8 @@
         </button>
         <?php endif; ?>
         <?php if (can('clientes', 'criar')): ?>
-        <a href="<?= base_url('clientes/nãovo') ?>" class="btn btn-primary btn-glow">
-            <i class="bi bi-plus-lg me-1"></i>Nãovo Cliente
+        <a href="<?= base_url('clientes/novo') ?>" class="btn btn-primary btn-glow">
+            <i class="bi bi-plus-lg me-1"></i>Novo Cliente
         </a>
         <?php endif; ?>
     </div>
@@ -30,7 +30,7 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Nãome / Razão Sãocial</th>
+                        <th>Nome / Razão Social</th>
                         <th>CPF / CNPJ</th>
                         <th>Telefone</th>
                         <th>Email</th>
@@ -43,7 +43,7 @@
                         <?php foreach ($clientes as $c): ?>
                         <tr>
                             <td><?= $c['id'] ?></td>
-                            <td><strong><?= esc($c['nãome_razao']) ?></strong></td>
+                            <td><strong><?= esc($c['nome_razao']) ?></strong></td>
                             <td><?= esc($c['cpf_cnpj'] ?? '-') ?></td>
                             <td><?= esc($c['telefone1']) ?></td>
                             <td><?= esc($c['email'] ?? '-') ?></td>
@@ -59,7 +59,7 @@
                                     </a>
                                     <?php endif; ?>
                                     <?php if (can('clientes', 'excluir')): ?>
-                                    <a href="<?= base_url('clientes/excluir/' . $c['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nãome="<?= esc($c['nãome_razao']) ?>" title="Excluir">
+                                    <a href="<?= base_url('clientes/excluir/' . $c['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nome="<?= esc($c['nome_razao']) ?>" title="Excluir">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                     <?php endif; ?>
@@ -87,7 +87,7 @@
                 <div class="modal-body">
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle-fill me-2"></i>
-                        Para importar múltiplos clientes ao mesmo tempo, baixe o nãossão modelo em CSV e faça o upload através deste formulário.
+                        Para importar múltiplos clientes ao mesmo tempo, baixe o nosso modelo em CSV e faça o upload através deste formulário.
                     </div>
                     
                     <div class="text-center mb-4">

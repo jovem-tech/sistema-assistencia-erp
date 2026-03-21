@@ -7,23 +7,23 @@ $statusGrouped = $statusGrouped ?? [];
 $statusDefault = $statusDefault ?? ($isEdit ? (string)($os['status'] ?? 'triagem') : 'triagem');
 
 $statusFlat = [];
-foreach ($statusGrouped as $macro => $itemês) {
-    if (!is_array($itemês)) {
+foreach ($statusGrouped as $macro => $items) {
+    if (!is_array($items)) {
         continue;
     }
-    foreach ($itemês as $item) {
+    foreach ($items as $item) {
         $codigo = (string) ($item['codigo'] ?? '');
         if ($codigo === '') {
             continue;
         }
         $statusFlat[$codigo] = [
-            'nãome' => (string) ($item['nãome'] ?? $codigo),
+            'nome' => (string) ($item['nome'] ?? $codigo),
             'cor' => (string) ($item['cor'] ?? 'secondary'),
             'grupo' => (string) $macro,
         ];
     }
 }
-$statusDefaultLabel = (string) ($statusFlat[$statusDefault]['nãome'] ?? 'Triagem');
+$statusDefaultLabel = (string) ($statusFlat[$statusDefault]['nome'] ?? 'Triagem');
 
 $origemConversaId = (int) ($origemConversaId ?? 0);
 $origemContatoId = (int) ($origemContatoId ?? 0);
@@ -31,20 +31,20 @@ $origemConversa = (isset($origemConversa) && is_array($origemConversa)) ? $orige
 $origemContato = (isset($origemContato) && is_array($origemContato)) ? $origemContato : null;
 $clientePreSelecionado = (int) ($clientePreSelecionado ?? 0);
 
-$origemNãomeHint = trim((string) ($origemNãomeHint ?? ''));
-if ($origemNãomeHint === '') {
-    $origemNãomeHint = trim((string) ($origemContato['nãome'] ?? $origemContato['whatsapp_nãome_perfil'] ?? $origemConversa['nãome_contato'] ?? ''));
+$origemNomeHint = trim((string) ($origemNomeHint ?? ''));
+if ($origemNomeHint === '') {
+    $origemNomeHint = trim((string) ($origemContato['nome'] ?? $origemContato['whatsapp_nome_perfil'] ?? $origemConversa['nome_contato'] ?? ''));
 }
 
 $origemTelefoneHint = preg_replace('/\D+/', '', (string) ($origemTelefoneHint ?? '')) ?? '';
 if ($origemTelefoneHint === '') {
-    $origemTelefoneHint = preg_replace('/\D+/', '', (string) ($origemContato['telefone_nãormalizado'] ?? $origemContato['telefone'] ?? $origemConversa['telefone'] ?? '')) ?? '';
+    $origemTelefoneHint = preg_replace('/\D+/', '', (string) ($origemContato['telefone_normalizado'] ?? $origemContato['telefone'] ?? $origemConversa['telefone'] ?? '')) ?? '';
 }
 
 $isOrigemCentralWhatsapp = !$isEdit
-    && ($origemConversaId > 0 || $origemContatoId > 0 || $clientePreSelecionado > 0 || $origemTelefoneHint !== '' || $origemNãomeHint !== '');
+    && ($origemConversaId > 0 || $origemContatoId > 0 || $clientePreSelecionado > 0 || $origemTelefoneHint !== '' || $origemNomeHint !== '');
 
-$clienteSelecionadoNãoForm = $isEdit
+$clienteSelecionadoNoForm = $isEdit
     ? (int) ($os['cliente_id'] ?? 0)
     : ($clientePreSelecionado > 0 ? $clientePreSelecionado : 0);
 ?>
@@ -53,8 +53,8 @@ $clienteSelecionadoNãoForm = $isEdit
 
 <?= $this->section('content') ?>
 
-<div class="page-header d-flex justify-content-between align-itemês-center">
-    <div class="d-flex align-itemês-center gap-3">
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-3">
         <h2><i class="bi bi-<?= $isEdit ? 'pencil' : 'plus-lg' ?> me-2"></i><?= $title ?></h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')">Ajuda</button>
     </div>
@@ -77,15 +77,15 @@ $clienteSelecionadoNãoForm = $isEdit
                     </h6>
                     <!-- Foto Principal -->
                     <div id="fotoPrincipalWrap" class="mb-3 text-center">
-                        <div id="fotoMainBox" class="rounded overflow-hidden d-nãone"
-                             style="height: 200px; background: #111; border: 2px sãolid rgba(255,255,255,0.1); position:relative;">
-                            <a href="javascript:void(0)" id="fotoPrincipalLink" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="" class="d-block w-100 h-100" style="cursãor: zoom-in;">
+                        <div id="fotoMainBox" class="rounded overflow-hidden d-none"
+                             style="height: 200px; background: #111; border: 2px solid rgba(255,255,255,0.1); position:relative;">
+                            <a href="javascript:void(0)" id="fotoPrincipalLink" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="" class="d-block w-100 h-100" style="cursor: zoom-in;">
                                 <img id="fotoPrincipalImg" src="" alt="Foto do equipamento"
                                      class="w-100 h-100"
                                      style="object-fit: contain; transition: opacity 0.2s;">
                             </a>
                         </div>
-                        <div id="fotoPlaceholder" class="rounded align-itemês-center justify-content-center d-flex"
+                        <div id="fotoPlaceholder" class="rounded align-items-center justify-content-center d-flex"
                              style="height: 200px; background: rgba(255,255,255,0.04); border: 2px dashed rgba(255,255,255,0.1);">
                             <div class="text-center text-muted">
                                 <i class="bi bi-image" style="font-size: 2rem;"></i>
@@ -94,7 +94,7 @@ $clienteSelecionadoNãoForm = $isEdit
                         </div>
                     </div>
 
-                    <div id="equipColorInfo" class="d-flex align-itemês-center gap-2 small text-muted mb-2 d-nãone">
+                    <div id="equipColorInfo" class="d-flex align-items-center gap-2 small text-muted mb-2 d-none">
                         <span id="equipColorSwatch" class="d-inline-block rounded-circle border" style="width: 14px; height: 14px; background: #333;"></span>
                         <span id="equipColorName">Cor n�o informada</span>
                     </div>
@@ -103,12 +103,12 @@ $clienteSelecionadoNãoForm = $isEdit
                     <div id="fotosMiniaturas" class="d-flex flex-wrap gap-2 justify-content-center"></div>
 
                     <!-- Info do Equipamento -->
-                    <div id="equipInfoBox" class="mt-3 p-2 rounded" style="background: rgba(255,255,255,0.04); font-size: 0.78rem; display:nãone;">
+                    <div id="equipInfoBox" class="mt-3 p-2 rounded" style="background: rgba(255,255,255,0.04); font-size: 0.78rem; display:none;">
                         <div id="equipInfoContent" class="text-muted"></div>
                     </div>
                     <?php if (can('equipamentos', 'editar')): ?>
                     <div class="mt-2">
-                        <button class="btn btn-outline-primary btn-sm w-100 d-nãone" type="button" id="btnEditarEquipamento"
+                        <button class="btn btn-outline-primary btn-sm w-100 d-none" type="button" id="btnEditarEquipamento"
                                 title="Editar equipamento selecionado">
                             <i class="bi bi-pencil-square me-1"></i>Editar equipamento
                         </button>
@@ -123,93 +123,93 @@ $clienteSelecionadoNãoForm = $isEdit
                         <i class="bi bi-clipboard2-check me-1"></i>Resumo da OS
                     </h6>
                     <div class="d-flex flex-column gap-2 small">
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Cliente</span>
-                            <span class="d-flex align-itemês-center gap-2">
+                            <span class="d-flex align-items-center gap-2">
                                 <span id="resumoCliente" class="text-white-50">N�o selecionado</span>
                                 <span id="statusCliente" class="text-danger">?</span>
                             </span>
                         </div>
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Equipamento</span>
-                            <span class="d-flex align-itemês-center gap-2">
+                            <span class="d-flex align-items-center gap-2">
                                 <span id="resumoEquipamento" class="text-white-50">N�o selecionado</span>
                                 <span id="statusEquipamento" class="text-danger">?</span>
                             </span>
                         </div>
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">T�cnico</span>
-                            <span class="d-flex align-itemês-center gap-2">
+                            <span class="d-flex align-items-center gap-2">
                                 <span id="resumoTecnico" class="text-white-50">N�o atribu�do</span>
                                 <span id="statusTecnico" class="text-danger">?</span>
                             </span>
                         </div>
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Prioridade</span>
-                            <span class="d-flex align-itemês-center gap-2">
-                                <span id="resumoPrioridade" class="badge text-bg-secondary">Nãormal</span>
+                            <span class="d-flex align-items-center gap-2">
+                                <span id="resumoPrioridade" class="badge text-bg-secondary">Normal</span>
                                 <span id="statusPrioridade" class="text-success">??</span>
                             </span>
                         </div>
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Status</span>
-                            <span class="d-flex align-itemês-center gap-2">
+                            <span class="d-flex align-items-center gap-2">
                                 <span id="resumoStatus" class="badge text-bg-secondary"><?= esc($statusDefaultLabel) ?></span>
                                 <span id="statusStatus" class="text-success">??</span>
                             </span>
                         </div>
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Entrada</span>
-                            <span class="d-flex align-itemês-center gap-2">
+                            <span class="d-flex align-items-center gap-2">
                                 <span id="resumoEntrada" class="text-white-50">-</span>
                                 <span id="statusEntrada" class="text-danger">?</span>
                             </span>
                         </div>
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Previs�o</span>
-                            <span class="d-flex align-itemês-center gap-2">
+                            <span class="d-flex align-items-center gap-2">
                                 <span id="resumoPrevisao" class="text-white-50">-</span>
                                 <span id="statusPrevisao" class="text-danger">?</span>
                             </span>
                         </div>
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Relato</span>
-                            <span class="d-flex align-itemês-center gap-2">
+                            <span class="d-flex align-items-center gap-2">
                                 <span id="resumoRelato" class="text-white-50">Vazio</span>
                                 <span id="statusRelato" class="text-danger">?</span>
                             </span>
                         </div>
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Acess�rios</span>
-                            <span class="d-flex align-itemês-center gap-2">
-                                <span id="resumoAcessãorios" class="text-white-50">N�o informado</span>
-                                <span id="statusAcessãorios" class="text-danger">?</span>
+                            <span class="d-flex align-items-center gap-2">
+                                <span id="resumoAcessorios" class="text-white-50">N�o informado</span>
+                                <span id="statusAcessorios" class="text-danger">?</span>
                             </span>
                         </div>
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Estado f�sico</span>
-                            <span class="d-flex align-itemês-center gap-2">
+                            <span class="d-flex align-items-center gap-2">
                                 <span id="resumoEstadoFisico" class="text-white-50">N�o informado</span>
                                 <span id="statusEstadoFisico" class="text-danger">?</span>
                             </span>
                         </div>
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Fotos de entrada</span>
-                            <span class="d-flex align-itemês-center gap-2">
+                            <span class="d-flex align-items-center gap-2">
                                 <span id="resumoFotosEntrada" class="text-white-50">0</span>
                                 <span id="statusFotos" class="text-danger">?</span>
                             </span>
                         </div>
                         <?php if ($isEdit): ?>
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Defeitos marcados</span>
-                            <span class="d-flex align-itemês-center gap-2">
+                            <span class="d-flex align-items-center gap-2">
                                 <span id="resumoDefeitos" class="text-white-50">0</span>
                                 <span id="statusDefeitos" class="text-danger">?</span>
                             </span>
                         </div>
                         <?php endif; ?>
-                        <div class="d-flex justify-content-between align-itemês-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Rascunho</span>
                             <span id="resumoRascunho" class="text-white-50">N�o salvo</span>
                         </div>
@@ -224,22 +224,22 @@ $clienteSelecionadoNãoForm = $isEdit
         <div class="card glass-card">
             <div class="card-body">
                 <form action="<?= $isEdit ? base_url('os/atualizar/' . $os['id']) : base_url('os/salvar') ?>"
-                      method="POST" enctype="multipart/form-data" id="formOs" nãovalidate>
+                      method="POST" enctype="multipart/form-data" id="formOs" novalidate>
                     <?= csrf_field() ?>
                     <?php if (!$isEdit): ?>
                     <input type="hidden" name="origem_conversa_id" value="<?= $origemConversaId > 0 ? $origemConversaId : '' ?>">
                     <input type="hidden" name="origem_contato_id" value="<?= $origemContatoId > 0 ? $origemContatoId : '' ?>">
                     <?php if ($isOrigemCentralWhatsapp): ?>
-                    <div class="alert alert-primary d-flex flex-wrap justify-content-between align-itemês-center gap-2">
+                    <div class="alert alert-primary d-flex flex-wrap justify-content-between align-items-center gap-2">
                         <div class="small mb-0">
                             <i class="bi bi-whatsapp me-1"></i>
                             <strong>Origem Central WhatsApp:</strong>
-                            <?= esc($origemNãomeHint !== '' ? $origemNãomeHint : 'Contato sem nãome') ?>
+                            <?= esc($origemNomeHint !== '' ? $origemNomeHint : 'Contato sem nome') ?>
                             <?= $origemTelefoneHint !== '' ? ' (' . esc($origemTelefoneHint) . ')' : '' ?>
-                            <?php if ($clienteSelecionadoNãoForm > 0): ?>
-                                <span class="badge text-bg-success-subtle text-success-emphasis border mês-2">Cliente ERP pre-selecionado</span>
+                            <?php if ($clienteSelecionadoNoForm > 0): ?>
+                                <span class="badge text-bg-success-subtle text-success-emphasis border ms-2">Cliente ERP pre-selecionado</span>
                             <?php else: ?>
-                                <span class="badge text-bg-info text-dark mês-2">Contato ainda sem vinculo em clientes</span>
+                                <span class="badge text-bg-info text-dark ms-2">Contato ainda sem vinculo em clientes</span>
                             <?php endif; ?>
                         </div>
                         <a href="<?= base_url('atendimento-whatsapp') ?>" class="btn btn-sm btn-outline-primary">
@@ -247,7 +247,7 @@ $clienteSelecionadoNãoForm = $isEdit
                         </a>
                     </div>
                     <?php endif; ?>
-                    <div id="osDraftAlert" class="alert alert-info d-flex align-itemês-center justify-content-between gap-3 d-nãone">
+                    <div id="osDraftAlert" class="alert alert-info d-flex align-items-center justify-content-between gap-3 d-none">
                         <div class="small mb-0">
                             <i class="bi bi-clock-history me-1"></i>Encontramos um rascunho salvo automaticamente para esta OS.
                         </div>
@@ -284,12 +284,12 @@ $clienteSelecionadoNãoForm = $isEdit
                         </div>
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
-                            <label class="form-label d-flex align-itemês-center gap-2">
+                            <label class="form-label d-flex align-items-center gap-2">
                                 Cliente *
                                 <?php if (can('clientes', 'criar')): ?>
-                                <button class="btn btn-warning btn-sm py-0 px-2" type="button" id="btnNãovoCliente"
-                                        title="Cadastrar nãovo cliente" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
-                                    <i class="bi bi-plus-lg"></i> Nãovo
+                                <button class="btn btn-warning btn-sm py-0 px-2" type="button" id="btnNovoCliente"
+                                        title="Cadastrar novo cliente" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
+                                    <i class="bi bi-plus-lg"></i> Novo
                                 </button>
                                 <?php endif; ?>
                             </label>
@@ -297,24 +297,24 @@ $clienteSelecionadoNãoForm = $isEdit
                                 <option value="">Selecione o cliente...</option>
                                 <?php foreach ($clientes as $c): ?>
                                 <option value="<?= $c['id'] ?>"
-                                    <?= ($clienteSelecionadoNãoForm === (int) $c['id']) ? 'selected' : '' ?>>
-                                    <?= esc($c['nãome_razao']) ?>
+                                    <?= ($clienteSelecionadoNoForm === (int) $c['id']) ? 'selected' : '' ?>>
+                                    <?= esc($c['nome_razao']) ?>
                                 </option>
                                 <?php endforeach; ?>
                             </select>
-                            <?php if (!$isEdit && $isOrigemCentralWhatsapp && $clienteSelecionadoNãoForm <= 0): ?>
+                            <?php if (!$isEdit && $isOrigemCentralWhatsapp && $clienteSelecionadoNoForm <= 0): ?>
                             <div class="form-text text-warning">
                                 Este contato ainda nao esta vinculado ao cadastro de clientes. Selecione o cliente para abrir a OS.
                             </div>
                             <?php endif; ?>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label d-flex align-itemês-center gap-2">
+                            <label class="form-label d-flex align-items-center gap-2">
                                 Equipamento *
                                 <?php if (can('equipamentos', 'criar')): ?>
-                                <button class="btn btn-warning btn-sm py-0 px-2" type="button" id="btnNãovoEquipamento"
-                                        title="Cadastrar nãovo equipamento" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
-                                    <i class="bi bi-plus-lg"></i> Nãovo
+                                <button class="btn btn-warning btn-sm py-0 px-2" type="button" id="btnNovoEquipamento"
+                                        title="Cadastrar novo equipamento" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
+                                    <i class="bi bi-plus-lg"></i> Novo
                                 </button>
                                 <?php endif; ?>
                             </label>
@@ -323,20 +323,20 @@ $clienteSelecionadoNãoForm = $isEdit
                                 <?php if ($isEdit && !empty($equipamentos)): foreach ($equipamentos as $eq): ?>
                                 <option value="<?= $eq['id'] ?>"
                                     data-tipo="<?= $eq['tipo_id'] ?? '' ?>"
-                                    data-marca="<?= esc($eq['marca_nãome'] ?? $eq['marca'] ?? '') ?>"
-                                    data-modelo="<?= esc($eq['modelo_nãome'] ?? $eq['modelo'] ?? '') ?>"
+                                    data-marca="<?= esc($eq['marca_nome'] ?? $eq['marca'] ?? '') ?>"
+                                    data-modelo="<?= esc($eq['modelo_nome'] ?? $eq['modelo'] ?? '') ?>"
                                     data-serie="<?= esc($eq['numero_serie'] ?? '') ?>"
                                     data-cor="<?= esc($eq['cor'] ?? '') ?>"
                                     data-cor_hex="<?= esc($eq['cor_hex'] ?? '') ?>"
-                                    data-tipo_nãome="<?= esc($eq['tipo_nãome'] ?? $eq['tipo'] ?? '') ?>"
+                                    data-tipo_nome="<?= esc($eq['tipo_nome'] ?? $eq['tipo'] ?? '') ?>"
                                     data-marca_id="<?= esc($eq['marca_id'] ?? '') ?>"
                                     data-modelo_id="<?= esc($eq['modelo_id'] ?? '') ?>"
                                     data-cliente_id="<?= esc($eq['cliente_id'] ?? '') ?>"
-                                    data-senha_acessão="<?= esc($eq['senha_acessão'] ?? '') ?>"
+                                    data-senha_acesso="<?= esc($eq['senha_acesso'] ?? '') ?>"
                                     data-estado_fisico="<?= esc($eq['estado_fisico'] ?? '') ?>"
-                                    data-acessãorios="<?= esc($eq['acessãorios'] ?? '') ?>"
+                                    data-acessorios="<?= esc($eq['acessorios'] ?? '') ?>"
                                     <?= $os['equipamento_id'] == $eq['id'] ? 'selected' : '' ?>>
-                                    <?= esc(($eq['marca_nãome'] ?? $eq['marca'] ?? '') . ' ' . ($eq['modelo_nãome'] ?? $eq['modelo'] ?? '') . ' (' . ($eq['tipo_nãome'] ?? $eq['tipo'] ?? '') . ')') ?>
+                                    <?= esc(($eq['marca_nome'] ?? $eq['marca'] ?? '') . ' ' . ($eq['modelo_nome'] ?? $eq['modelo'] ?? '') . ' (' . ($eq['tipo_nome'] ?? $eq['tipo'] ?? '') . ')') ?>
                                 </option>
                                 <?php endforeach; endif; ?>
                             </select>
@@ -348,7 +348,7 @@ $clienteSelecionadoNãoForm = $isEdit
                                 <?php foreach ($tecnicos as $t): ?>
                                 <option value="<?= $t['id'] ?>"
                                     <?= ($isEdit && ($os['tecnico_id'] ?? '') == $t['id']) ? 'selected' : '' ?>>
-                                    <?= esc($t['nãome']) ?>
+                                    <?= esc($t['nome']) ?>
                                 </option>
                                 <?php endforeach; ?>
                             </select>
@@ -366,7 +366,7 @@ $clienteSelecionadoNãoForm = $isEdit
                             <label class="form-label">Prioridade</label>
                             <select name="prioridade" class="form-select">
                                 <option value="baixa"   <?= ($isEdit && $os['prioridade'] === 'baixa')   ? 'selected' : '' ?>>Baixa</option>
-                                <option value="nãormal"  <?= (!$isEdit || $os['prioridade'] === 'nãormal')  ? 'selected' : '' ?>>Nãormal</option>
+                                <option value="normal"  <?= (!$isEdit || $os['prioridade'] === 'normal')  ? 'selected' : '' ?>>Normal</option>
                                 <option value="alta"    <?= ($isEdit && $os['prioridade'] === 'alta')    ? 'selected' : '' ?>>Alta</option>
                                 <option value="urgente" <?= ($isEdit && $os['prioridade'] === 'urgente') ? 'selected' : '' ?>>Urgente</option>
                             </select>
@@ -392,14 +392,14 @@ $clienteSelecionadoNãoForm = $isEdit
                             <label class="form-label">Status</label>
                             <select name="status" class="form-select">
                                 <?php if (!empty($statusGrouped)): ?>
-                                    <?php foreach ($statusGrouped as $macro => $itemês): ?>
-                                        <?php if (empty($itemês) || !is_array($itemês)) continue; ?>
+                                    <?php foreach ($statusGrouped as $macro => $items): ?>
+                                        <?php if (empty($items) || !is_array($items)) continue; ?>
                                         <optgroup label="<?= esc(ucwords(str_replace('_', ' ', (string) $macro))) ?>">
-                                            <?php foreach ($itemês as $item): ?>
+                                            <?php foreach ($items as $item): ?>
                                                 <?php $codigo = (string) ($item['codigo'] ?? ''); ?>
                                                 <?php if ($codigo === '') continue; ?>
                                                 <option value="<?= esc($codigo) ?>" data-status-cor="<?= esc((string) ($item['cor'] ?? 'secondary')) ?>" <?= ((string) ($os['status'] ?? $statusDefault) === $codigo) ? 'selected' : '' ?>>
-                                                    <?= esc((string) ($item['nãome'] ?? $codigo)) ?>
+                                                    <?= esc((string) ($item['nome'] ?? $codigo)) ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </optgroup>
@@ -407,7 +407,7 @@ $clienteSelecionadoNãoForm = $isEdit
                                 <?php else: ?>
                                     <?php $currStatus = (string) ($os['status'] ?? $statusDefault); ?>
                                     <option value="triagem" <?= $currStatus === 'triagem' ? 'selected' : '' ?>>Triagem</option>
-                                    <option value="diagnãostico" <?= $currStatus === 'diagnãostico' ? 'selected' : '' ?>>Diagnãostico Tecnico</option>
+                                    <option value="diagnostico" <?= $currStatus === 'diagnostico' ? 'selected' : '' ?>>Diagnostico Tecnico</option>
                                     <option value="aguardando_orcamento" <?= $currStatus === 'aguardando_orcamento' ? 'selected' : '' ?>>Aguardando Orcamento</option>
                                     <option value="aguardando_autorizacao" <?= $currStatus === 'aguardando_autorizacao' ? 'selected' : '' ?>>Aguardando Autorizacao</option>
                                     <option value="reparo_execucao" <?= $currStatus === 'reparo_execucao' ? 'selected' : '' ?>>Em Execucao</option>
@@ -444,14 +444,14 @@ $clienteSelecionadoNãoForm = $isEdit
                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="vidro_traseiro_quebrado">+ Vidro traseiro quebrado</button>
                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="amassado">+ Amassado</button>
                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="botao_quebrado">+ Botao quebrado</button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="outro">+ Outro danão</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="outro">+ Outro dano</button>
                             </div>
                             <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="estadoFisicoSemAvarias" value="1">
                                 <label class="form-check-label" for="estadoFisicoSemAvarias">Sem avarias aparentes na entrada</label>
                             </div>
-                            <div id="estadoFisicoQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-nãone">
-                                <div class="d-flex justify-content-between align-itemês-center mb-2">
+                            <div id="estadoFisicoQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
                                     <strong id="estadoFisicoQuickTitle"></strong>
                                     <button type="button" class="btn-close" id="estadoFisicoQuickClose"></button>
                                 </div>
@@ -462,11 +462,11 @@ $clienteSelecionadoNãoForm = $isEdit
                                 </div>
                             </div>
                             <div id="estadoFisicoList" class="list-group"></div>
-                            <small class="form-text text-muted mt-3">Registre danãos observados na recepcao com foto para evidenciar o estado de entrada.</small>
-                            <textarea name="estado_fisico" id="estadoFisicoInput" class="d-nãone"><?= $isEdit ? esc($os['estado_fisico'] ?? '') : old('estado_fisico') ?></textarea>
+                            <small class="form-text text-muted mt-3">Registre danos observados na recepcao com foto para evidenciar o estado de entrada.</small>
+                            <textarea name="estado_fisico" id="estadoFisicoInput" class="d-none"><?= $isEdit ? esc($os['estado_fisico'] ?? '') : old('estado_fisico') ?></textarea>
                             <input type="hidden" name="estado_fisico_data" id="estadoFisicoDataInput">
-                            <input type="file" id="estadoFisicoPhotoInput" class="d-nãone" accept="image/jpeg,image/png,image/webp" multiple>
-                            <div id="estadoFisicoFilesInputs" class="d-nãone"></div>
+                            <input type="file" id="estadoFisicoPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
+                            <div id="estadoFisicoFilesInputs" class="d-none"></div>
                         </div>
                     </div>
 
@@ -476,36 +476,36 @@ $clienteSelecionadoNãoForm = $isEdit
                             </div>
                             <div class="border rounded-3 p-3 bg-white bg-opacity-10">
                                 <div class="d-flex flex-wrap gap-2 mb-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessãorio-key="chip">+ Chip</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessãorio-key="capinha">+ Capinha celular</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessãorio-key="capa">+ Capa</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessãorio-key="mochila">+ Mochila</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessãorio-key="bolsa">+ Bolsa nãotebook</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessãorio-key="cabo">+ Cabo</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessãorio-key="carregador">+ Carregador</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessãorio-key="outro">+ Outro acess�rio</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="chip">+ Chip</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="capinha">+ Capinha celular</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="capa">+ Capa</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="mochila">+ Mochila</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="bolsa">+ Bolsa notebook</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="cabo">+ Cabo</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="carregador">+ Carregador</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acess�rio</button>
                                 </div>
                                 <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" id="acessãoriosSemItens" name="acessãorios_sem_itens" value="1" <?= old('acessãorios_sem_itens') ? 'checked' : '' ?>>
-                                    <label class="form-check-label" for="acessãoriosSemItens">Equipamento recebido sem acess�rios</label>
+                                    <input class="form-check-input" type="checkbox" id="acessoriosSemItens" name="acessorios_sem_itens" value="1" <?= old('acessorios_sem_itens') ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="acessoriosSemItens">Equipamento recebido sem acess�rios</label>
                                 </div>
-                                <div id="acessãoriosQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-nãone">
-                                    <div class="d-flex justify-content-between align-itemês-center mb-2">
-                                        <strong id="acessãoriosQuickTitle"></strong>
-                                        <button type="button" class="btn-close" id="acessãoriosQuickClose"></button>
+                                <div id="acessoriosQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong id="acessoriosQuickTitle"></strong>
+                                        <button type="button" class="btn-close" id="acessoriosQuickClose"></button>
                                     </div>
-                                    <div id="acessãoriosQuickFields" class="row g-2"></div>
+                                    <div id="acessoriosQuickFields" class="row g-2"></div>
                                     <div class="mt-3">
-                                        <button type="button" class="btn btn-sm btn-primary" id="acessãoriosQuickSave">Salvar item</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="acessãoriosQuickCancel">Cancelar</button>
+                                        <button type="button" class="btn btn-sm btn-primary" id="acessoriosQuickSave">Salvar item</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="acessoriosQuickCancel">Cancelar</button>
                                     </div>
                                 </div>
-                                <div id="acessãoriosList" class="list-group"></div>
-                                <small class="form-text text-muted mt-3">Padrãonize rapidamente o registro de acess�rios comuns.</small>
-                                <textarea name="acessãorios" id="acessãoriosInput" class="d-nãone"><?= $isEdit ? esc($os['acessãorios'] ?? '') : old('acessãorios') ?></textarea>
-                                <input type="hidden" name="acessãorios_data" id="acessãoriosDataInput">
-                                <input type="file" id="acessãoriosPhotoInput" class="d-nãone" accept="image/jpeg,image/png,image/webp" multiple>
-                                <div id="acessãoriosFilesInputs" class="d-nãone"></div>
+                                <div id="acessoriosList" class="list-group"></div>
+                                <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acess�rios comuns.</small>
+                                <textarea name="acessorios" id="acessoriosInput" class="d-none"><?= $isEdit ? esc($os['acessorios'] ?? '') : old('acessorios') ?></textarea>
+                                <input type="hidden" name="acessorios_data" id="acessoriosDataInput">
+                                <input type="file" id="acessoriosPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
+                                <div id="acessoriosFilesInputs" class="d-none"></div>
                             </div>
                     </div>
 
@@ -541,23 +541,23 @@ $clienteSelecionadoNãoForm = $isEdit
                                         </span>
                                     <?php endif; ?>
                                 </div>
-                                <small class="text-muted d-block mt-2">Clique em uma op��o para inserir não relato.</small>
+                                <small class="text-muted d-block mt-2">Clique em uma op��o para inserir no relato.</small>
                             </div>
                             <?php endif; ?>
                             <textarea name="relato_cliente" id="relatoClienteInput" class="form-control" rows="6"><?= $isEdit ? esc($os['relato_cliente']) : old('relato_cliente') ?></textarea>
                             <?php if (!$isEdit): ?>
-                            <small class="text-muted d-block mt-2">Você� pode complementar manualmente o relato a qualquer momento.</small>
+                            <small class="text-muted d-block mt-2">Voc� pode complementar manualmente o relato a qualquer momento.</small>
                             <?php endif; ?>
                         </div>
                     </div>
 
                     <?php if ($isEdit): ?>
-                    <div class="row g-3 mb-4" id="defeitosSection" style="display:nãone;">
+                    <div class="row g-3 mb-4" id="defeitosSection" style="display:none;">
                         <div class="col-12">
-                            <div class="card" style="background: rgba(255,255,255,0.04); border: 1px sãolid rgba(255,255,255,0.1); border-radius: 10px;">
-                                <div class="card-header py-2" style="background: transparent; border-bottom: 1px sãolid rgba(255,255,255,0.1);">
+                            <div class="card" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;">
+                                <div class="card-header py-2" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.1);">
                                     <strong><i class="bi bi-bug me-2 text-warning"></i>Defeitos Comuns do Tipo de Equipamento</strong>
-                                    <small class="text-muted mês-2">(opcional ? selecione os que se aplicam)</small>
+                                    <small class="text-muted ms-2">(opcional ? selecione os que se aplicam)</small>
                                 </div>
                                 <div class="card-body" id="defeitosContainer">
                                     <span class="text-muted small">Selecione o equipamento para carregar os defeitos...</span>
@@ -572,14 +572,14 @@ $clienteSelecionadoNãoForm = $isEdit
                     <!-- FOTOS DE ENTRADA DO EQUIPAMENTO -->
                     <div class="row g-3 mb-4">
                         <div class="col-12">
-                    <div class="card" style="background: rgba(255,255,255,0.04); border: 1px sãolid rgba(255,255,255,0.1); border-radius: 16px;">
-                        <div class="card-header py-3 d-flex flex-column flex-md-row justify-content-between gap-2" style="background: transparent; border-bottom: 1px sãolid rgba(255,255,255,0.1);">
+                    <div class="card" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;">
+                        <div class="card-header py-3 d-flex flex-column flex-md-row justify-content-between gap-2" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.1);">
                             <div>
                                 <strong><i class="bi bi-camera me-2 text-info"></i>Fotos de Entrada do Equipamento</strong>
-                                <small class="text-muted mês-2">(opcional ? acess�rios, estado f�sico, placa interna, etc.)</small>
+                                <small class="text-muted ms-2">(opcional ? acess�rios, estado f�sico, placa interna, etc.)</small>
                             </div>
                             <div class="d-flex justify-content-center justify-content-md-end gap-2 flex-wrap">
-                                <button type="button" class="btn btn-outline-light btn-sm d-nãone" id="btnFotosEscolher">
+                                <button type="button" class="btn btn-outline-light btn-sm d-none" id="btnFotosEscolher">
                                     <i class="bi bi-folder2-open me-1"></i>Escolher Arquivos
                                 </button>
                                 <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" id="btnFotosEntradaCamera">
@@ -594,20 +594,20 @@ $clienteSelecionadoNãoForm = $isEdit
                             </div>
                         </div>
                         <div class="card-body">
-                            <input type="file" id="fotosEntradaGaleriaInput" accept="image/*" multiple class="d-nãone">
+                            <input type="file" id="fotosEntradaGaleriaInput" accept="image/*" multiple class="d-none">
                             <input type="file" name="fotos_entrada[]" id="fotosEntradaInput"
                                    accept="image/jpeg,image/png,image/webp"
-                                   multiple class="d-nãone">
-                            <div class="p-3 border rounded bg-light bg-opacity-10 mb-4 text-center py-4" id="fotosEntradaEmptyState" style="display:nãone;">
+                                   multiple class="d-none">
+                            <div class="p-3 border rounded bg-light bg-opacity-10 mb-4 text-center py-4" id="fotosEntradaEmptyState" style="display:none;">
                                 <i class="bi bi-cloud-upload display-5 text-muted opacity-25"></i>
                                 <h6 class="mt-3 text-muted mb-1">Nenhuma foto anexada</h6>
                                 <p class="text-muted small mb-0">Use Capturar Foto ou Abrir Galeria para adicionar as imagens da entrada.</p>
                             </div>
-                            <div class="alert alert-info border-0 shadow-sm d-flex align-itemês-center mb-3 mx-auto" style="max-width: 680px;">
+                            <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-3 mx-auto" style="max-width: 680px;">
                                 <i class="bi bi-info-circle-fill fs-5 me-2"></i>
                                 <div class="small">At&eacute; <strong>4 fotos</strong>, 2MB cada. O sistema abre o ajuste de corte antes de importar.</div>
                             </div>
-                            <div id="osFotosDropzone" class="border rounded-4 d-nãone align-itemês-center justify-content-center flex-column gap-2 text-center py-4 mb-3"
+                            <div id="osFotosDropzone" class="border rounded-4 d-none align-items-center justify-content-center flex-column gap-2 text-center py-4 mb-3"
                                  style="min-height: 180px; transition: background 0.2s;">
                                 <i class="bi bi-cloud-upload display-4 text-muted"></i>
                                 <p class="text-muted mb-0 fw-semibold">Clique para selecionar ou arraste arquivos aqui.</p>
@@ -625,8 +625,8 @@ $clienteSelecionadoNãoForm = $isEdit
                         <div class="tab-pane fade" id="tab-financeiro" role="tabpanel" aria-labelledby="tab-financeiro-btn" tabindex="0">
                     <div class="row g-3 mb-4">
                         <div class="col-12">
-                            <div class="card" style="background: rgba(255,255,255,0.04); border: 1px sãolid rgba(255,255,255,0.1); border-radius: 10px;">
-                                <div class="card-header py-2" style="background: transparent; border-bottom: 1px sãolid rgba(255,255,255,0.1);">
+                            <div class="card" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;">
+                                <div class="card-header py-2" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.1);">
                                     <strong><i class="bi bi-box-seam me-2 text-primary"></i>Pe�as e Servi�os</strong>
                                 </div>
                                 <div class="card-body">
@@ -662,11 +662,11 @@ $clienteSelecionadoNãoForm = $isEdit
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <label class="form-label">Diagn�stico T�cnico</label>
-                            <textarea name="diagnãostico_tecnico" class="form-control" rows="3"><?= esc($os['diagnãostico_tecnico'] ?? '') ?></textarea>
+                            <textarea name="diagnostico_tecnico" class="form-control" rows="3"><?= esc($os['diagnostico_tecnico'] ?? '') ?></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Sãolu��o Aplicada</label>
-                            <textarea name="sãolucao_aplicada" class="form-control" rows="3"><?= esc($os['sãolucao_aplicada'] ?? '') ?></textarea>
+                            <label class="form-label">Solu��o Aplicada</label>
+                            <textarea name="solucao_aplicada" class="form-control" rows="3"><?= esc($os['solucao_aplicada'] ?? '') ?></textarea>
                         </div>
                     </div>
 
@@ -725,22 +725,22 @@ $clienteSelecionadoNãoForm = $isEdit
 </div>
 
 <!-- ===== MODAL: CADASTRAR NOVO CLIENTE ===== -->
-<div class="modal fade" id="modalNãovoCliente" tabindex="-1">
+<div class="modal fade" id="modalNovoCliente" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content glass-card">
             <div class="modal-header border-bottom">
                 <h5 class="modal-title">
-                    <i class="bi bi-persãon-plus text-warning me-2"></i>Cadastro R�pido de Cliente
+                    <i class="bi bi-person-plus text-warning me-2"></i>Cadastro R�pido de Cliente
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="formNãovoClienteAjax">
+                <form id="formNovoClienteAjax">
                     <?= csrf_field() ?>
                     <div class="row g-3">
                         <div class="col-md-8">
-                            <label class="form-label">Nãome / Raz�o Sãocial *</label>
-                            <input type="text" name="nãome_razao" class="form-control" required>
+                            <label class="form-label">Nome / Raz�o Social *</label>
+                            <input type="text" name="nome_razao" class="form-control" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Telefone 1 *</label>
@@ -756,8 +756,8 @@ $clienteSelecionadoNãoForm = $isEdit
                         </div>
                         
                         <div class="col-md-6">
-                            <label class="form-label text-muted">Nãome Contato (Opcional)</label>
-                            <input type="text" name="nãome_contato" class="form-control" placeholder="Esposa, Fllho...">
+                            <label class="form-label text-muted">Nome Contato (Opcional)</label>
+                            <input type="text" name="nome_contato" class="form-control" placeholder="Esposa, Fllho...">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-muted">Telefone do Contato (Opcional)</label>
@@ -788,12 +788,12 @@ $clienteSelecionadoNãoForm = $isEdit
                             <input type="text" name="uf" class="form-control js-uf" maxlength="2">
                         </div>
                     </div>
-                    <div id="modalClienteErrors" class="alert alert-danger mt-3 d-nãone"></div>
+                    <div id="modalClienteErrors" class="alert alert-danger mt-3 d-none"></div>
                 </form>
             </div>
             <div class="modal-footer border-top">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-glow" id="btnSalvarNãovoCliente">
+                <button type="button" class="btn btn-glow" id="btnSalvarNovoCliente">
                     <i class="bi bi-check-lg me-1"></i>Cadastrar Cliente
                 </button>
             </div>
@@ -802,20 +802,20 @@ $clienteSelecionadoNãoForm = $isEdit
 </div>
 
 <!-- ===== MODAL: CADASTRAR NOVO EQUIPAMENTO ===== -->
-<div class="modal fade" id="modalNãovoEquipamento" tabindex="-1" aria-labelledby="labelModalNãovoEquip">
+<div class="modal fade" id="modalNovoEquipamento" tabindex="-1" aria-labelledby="labelModalNovoEquip">
     <div class="modal-dialog modal-lg">
         <div class="modal-content glass-card">
             <div class="modal-header border-bottom">
-                <h5 class="modal-title" id="labelModalNãovoEquip">
-                    <i class="bi bi-plus-circle text-warning me-2"></i>Cadastrar Nãovo Equipamento
+                <h5 class="modal-title" id="labelModalNovoEquip">
+                    <i class="bi bi-plus-circle text-warning me-2"></i>Cadastrar Novo Equipamento
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="formNãovoEquipAjax" enctype="multipart/form-data">
+                <form id="formNovoEquipAjax" enctype="multipart/form-data">
                     <?= csrf_field() ?>
                     
-                    <!-- Navega��o por Abas não Modal -->
+                    <!-- Navega��o por Abas no Modal -->
                     <ul class="nav nav-pills nav-fill mb-3 bg-light p-1 rounded-3" id="modalEquipTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active small py-1" id="m-info-tab" data-bs-toggle="tab" data-bs-target="#m-info-pane" type="button" role="tab"><i class="bi bi-info-circle me-1"></i>Info</button>
@@ -834,34 +834,34 @@ $clienteSelecionadoNãoForm = $isEdit
                             <div class="row g-2">
                                 <div class="col-md-6 text-start">
                                     <label class="form-label mb-1 small fw-bold">Tipo *</label>
-                                    <select name="tipo_id" id="nãovoEquipTipo" class="form-select form-select-sm" required>
+                                    <select name="tipo_id" id="novoEquipTipo" class="form-select form-select-sm" required>
                                         <option value="">Escolha...</option>
                                         <?php foreach ($tipos as $t): ?>
-                                        <option value="<?= $t['id'] ?>"><?= esc($t['nãome']) ?></option>
+                                        <option value="<?= $t['id'] ?>"><?= esc($t['nome']) ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <div class="col-md-6 text-start">
                                     <label class="form-label mb-1 small fw-bold">Marca *</label>
                                     <div class="input-group input-group-sm">
-                                        <select name="marca_id" id="nãovoEquipMarca" class="form-select select2-modal" required>
+                                        <select name="marca_id" id="novoEquipMarca" class="form-select select2-modal" required>
                                             <option value="">Marca...</option>
                                             <?php foreach ($marcas as $m): ?>
-                                            <option value="<?= $m['id'] ?>"><?= esc($m['nãome']) ?></option>
+                                            <option value="<?= $m['id'] ?>"><?= esc($m['nome']) ?></option>
                                             <?php endforeach; ?>
                                         </select>
-                                        <button class="btn btn-warning" type="button" id="btnNãovaMarcaOS"><i class="bi bi-plus"></i></button>
+                                        <button class="btn btn-warning" type="button" id="btnNovaMarcaOS"><i class="bi bi-plus"></i></button>
                                     </div>
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
                                     <label class="form-label mb-1 small fw-bold">Modelo *</label>
                                     <div class="input-group input-group-sm">
-                                        <select name="modelo_id" id="nãovoEquipModelo" class="form-select" required>
+                                        <select name="modelo_id" id="novoEquipModelo" class="form-select" required>
                                             <option value="">Modelo...</option>
                                         </select>
-                                        <button class="btn btn-warning" type="button" id="btnNãovoModeloOS"><i class="bi bi-plus"></i></button>
+                                        <button class="btn btn-warning" type="button" id="btnNovoModeloOS"><i class="bi bi-plus"></i></button>
                                     </div>
-                                    <input type="hidden" name="modelo_nãome_ext" id="nãovoEquipModeloNãomeExt">
+                                    <input type="hidden" name="modelo_nome_ext" id="novoEquipModeloNomeExt">
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
                                     <label class="form-label mb-1 small fw-bold">N� de S�rie</label>
@@ -869,13 +869,13 @@ $clienteSelecionadoNãoForm = $isEdit
                                 </div>
                                 <div class="col-12 text-start mt-2">
                                     <label class="form-label mb-1 small d-flex justify-content-between">
-                                        <span class="fw-bold">Senha de Acessão</span>
+                                        <span class="fw-bold">Senha de Acesso</span>
                                         <div class="btn-group btn-group-sm">
                                             <button type="button" class="btn btn-light border py-0 px-2 btn-senha-tipo-os" data-placeholder="Num�rico (PIN)" title="PIN/Desenho" style="font-size:0.65rem;">PIN</button>
                                             <button type="button" class="btn btn-light border py-0 px-2 btn-senha-tipo-os" data-placeholder="Alfanum�rico" title="Texto" style="font-size:0.65rem;">TEXTO</button>
                                         </div>
                                     </label>
-                                    <input type="text" name="senha_acessão" id="inputSenhaAcessãoOS" class="form-control form-control-sm" placeholder="Senha do aparelho">
+                                    <input type="text" name="senha_acesso" id="inputSenhaAcessoOS" class="form-control form-control-sm" placeholder="Senha do aparelho">
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
                                     <label class="form-label mb-1 small fw-bold text-muted">Estado F�sico</label>
@@ -886,13 +886,13 @@ $clienteSelecionadoNãoForm = $isEdit
                                         Acess�rios
                                         <span style="font-size:0.6rem;">+ R�pido</span>
                                     </label>
-                                    <textarea name="acessãorios" id="textareaAcessãoriosOS" class="form-control form-control-sm mb-1" rows="2" placeholder="Cabos, capas..."></textarea>
+                                    <textarea name="acessorios" id="textareaAcessoriosOS" class="form-control form-control-sm mb-1" rows="2" placeholder="Cabos, capas..."></textarea>
                                     <div class="d-flex flex-wrap gap-1">
-                                        <button type="button" class="badge btn btn-light border p-1 fw-nãormal btn-quick-acessãorio-os" style="font-size:0.6rem; color:#666;">+ Carregador</button>
-                                        <button type="button" class="badge btn btn-light border p-1 fw-nãormal btn-quick-acessãorio-os" style="font-size:0.6rem; color:#666;">+ Cabo</button>
-                                        <button type="button" class="badge btn btn-light border p-1 fw-nãormal btn-quick-acessãorio-os" style="font-size:0.6rem; color:#666;">+ Capa</button>
-                                        <button type="button" class="badge btn btn-light border p-1 fw-nãormal btn-quick-acessãorio-os" style="font-size:0.6rem; color:#666;">+ Chip</button>
-                                        <button type="button" class="badge btn btn-light border p-1 fw-nãormal btn-quick-acessãorio-os" style="font-size:0.6rem; color:#666;">+ Cart�o</button>
+                                        <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Carregador</button>
+                                        <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Cabo</button>
+                                        <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Capa</button>
+                                        <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Chip</button>
+                                        <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Cart�o</button>
                                     </div>
                                 </div>
                             </div>
@@ -903,15 +903,15 @@ $clienteSelecionadoNãoForm = $isEdit
                             <div class="p-2 border rounded bg-light bg-opacity-25">
                                 <input type="hidden" name="cor_hex" id="corHexRealOS" value="#1A1A1A">
                                 <input type="hidden" name="cor_rgb" id="corRgbRealOS" value="26,26,26">
-                                <input type="hidden" name="cor" id="corNãomeRealOS" value="Preto">
+                                <input type="hidden" name="cor" id="corNomeRealOS" value="Preto">
 
                                 <!-- Smart Detection -->
-                                <div class="p-2 mb-2 rounded border border-warning border-opacity-50 bg-warning bg-opacity-10 d-nãone" id="smartColorContainerOS">
-                                    <div class="d-flex justify-content-between align-itemês-center mb-1">
+                                <div class="p-2 mb-2 rounded border border-warning border-opacity-50 bg-warning bg-opacity-10 d-none" id="smartColorContainerOS">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
                                         <span style="font-size: 0.65rem;" class="text-warning fw-semibold"><i class="bi bi-magic me-1"></i>Sugerido da foto:</span>
-                                        <button type="button" class="btn btn-sm text-success p-0 border-0 fw-bold" id="btnAcceptColorOS" style="font-size: 0.7rem;">Aplicar <i class="bi bi-check2-circle mês-1"></i></button>
+                                        <button type="button" class="btn btn-sm text-success p-0 border-0 fw-bold" id="btnAcceptColorOS" style="font-size: 0.7rem;">Aplicar <i class="bi bi-check2-circle ms-1"></i></button>
                                     </div>
-                                    <div class="d-flex align-itemês-center gap-2">
+                                    <div class="d-flex align-items-center gap-2">
                                         <div id="smartColorSwatchOS" class="rounded-circle shadow border" style="width: 20px; height: 20px;"></div>
                                         <strong id="smartColorNameOS" style="font-size: 0.8rem;">Nenhuma</strong>
                                     </div>
@@ -919,13 +919,13 @@ $clienteSelecionadoNãoForm = $isEdit
 
                                 <div class="row g-2">
                                     <div class="col-md-5">
-                                        <div id="colorPreviewBoxOS" class="rounded-3 shadow-sm border mb-2 d-flex flex-column align-itemês-center justify-content-center" style="height: 80px; background: #1A1A1A; transition: background 0.3s ease;">
-                                            <span id="colorPreviewHexOS" class="fw-bold font-monãospace" style="font-size: 0.85rem; color: #fff;">#1A1A1A</span>
+                                        <div id="colorPreviewBoxOS" class="rounded-3 shadow-sm border mb-2 d-flex flex-column align-items-center justify-content-center" style="height: 80px; background: #1A1A1A; transition: background 0.3s ease;">
+                                            <span id="colorPreviewHexOS" class="fw-bold font-monospace" style="font-size: 0.85rem; color: #fff;">#1A1A1A</span>
                                             <span id="colorPreviewNameOS" class="mt-1" style="font-size: 0.7rem; color: rgba(255,255,255,0.8);">Preto</span>
                                         </div>
                                         <div class="d-flex gap-2 mb-2">
                                             <input type="color" id="corHexPickerOS" class="form-control form-control-color p-1" value="#1A1A1A" style="width: 40px; height: 32px;">
-                                            <input type="text" id="corNãomeInputOS" class="form-control form-control-sm" placeholder="Nãome" value="Preto">
+                                            <input type="text" id="corNomeInputOS" class="form-control form-control-sm" placeholder="Nome" value="Preto">
                                         </div>
                                         <div id="coresProximasGridOS" class="d-flex flex-wrap gap-1 mb-2"></div>
                                     </div>
@@ -945,30 +945,30 @@ $clienteSelecionadoNãoForm = $isEdit
                                 <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="btnAbrirGaleria">
                                     <i class="bi bi-images me-1"></i>Galeria
                                 </button>
-                                <input type="file" name="fotos[]" id="nãovoEquipFoto" class="d-nãone" accept="image/jpeg,image/png,image/webp" multiple>
+                                <input type="file" name="fotos[]" id="novoEquipFoto" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
                             </div>
 
-                            <div id="nãovoEquipFotoPreview" class="mt-2" style="display:nãone;">
-                                <div id="nãovoEquipFotosNãovasList" class="d-flex flex-wrap gap-2 justify-content-center"></div>
+                            <div id="novoEquipFotoPreview" class="mt-2" style="display:none;">
+                                <div id="novoEquipFotosNovasList" class="d-flex flex-wrap gap-2 justify-content-center"></div>
                                 <div class="mt-2 small text-muted">A foto de perfil ajuda na identifica��o visual r�pida.</div>
                             </div>
                             
                             <div id="fotoVaziaOS" class="py-4 text-muted opacity-50">
                                 <i class="bi bi-image fs-1 d-block"></i>
-                                <span class="small font-monãospace">Nenhuma imagem selecionada</span>
+                                <span class="small font-monospace">Nenhuma imagem selecionada</span>
                             </div>
 
-                            <div id="modalEquipFotosExistentesWrap" class="mt-3 d-nãone">
+                            <div id="modalEquipFotosExistentesWrap" class="mt-3 d-none">
                                 <div class="small text-muted mb-2">Fotos j� cadastradas neste equipamento</div>
                                 <div id="modalEquipFotosExistentes" class="d-flex flex-wrap gap-2 justify-content-center"></div>
                             </div>
                     </div>
-                    <div id="modalEquipErrors" class="alert alert-danger mt-3 d-nãone p-2 small"></div>
+                    <div id="modalEquipErrors" class="alert alert-danger mt-3 d-none p-2 small"></div>
                 </form>
             </div>
             <div class="modal-footer border-top">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-glow" id="btnSalvarNãovoEquip">
+                <button type="button" class="btn btn-glow" id="btnSalvarNovoEquip">
                     <i class="bi bi-check-lg me-1"></i>Cadastrar Equipamento
                 </button>
             </div>
@@ -977,16 +977,16 @@ $clienteSelecionadoNãoForm = $isEdit
 </div>
 
 <!-- ===== MODAL: NOVA MARCA (AUXILIAR) ===== -->
-<div class="modal fade" id="modalNãovaMarcaOS" tabindex="-1" style="z-index: 1070;">
+<div class="modal fade" id="modalNovaMarcaOS" tabindex="-1" style="z-index: 1070;">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content glass-card shadow-lg">
             <div class="modal-header border-bottom">
-                <h5 class="modal-title font-title"><i class="bi bi-tag text-warning me-2"></i>Nãova Marca</h5>
+                <h5 class="modal-title font-title"><i class="bi bi-tag text-warning me-2"></i>Nova Marca</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <input type="text" id="inputNãovaMarcaOS" class="form-control" placeholder="Ex: Samêsung, Apple...">
-                <div id="errorNãovaMarcaOS" class="text-danger small mt-2 d-nãone"></div>
+                <input type="text" id="inputNovaMarcaOS" class="form-control" placeholder="Ex: Samsung, Apple...">
+                <div id="errorNovaMarcaOS" class="text-danger small mt-2 d-none"></div>
             </div>
             <div class="modal-footer border-top">
                 <button type="button" class="btn btn-glow w-100" id="btnSalvarMarcaOS">Salvar Marca</button>
@@ -996,11 +996,11 @@ $clienteSelecionadoNãoForm = $isEdit
 </div>
 
 <!-- ===== MODAL: NOVO MODELO (AUXILIAR) ===== -->
-<div class="modal fade" id="modalNãovoModeloOS" tabindex="-1" style="z-index: 1070;">
+<div class="modal fade" id="modalNovoModeloOS" tabindex="-1" style="z-index: 1070;">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
         <div class="modal-content glass-card shadow-lg">
             <div class="modal-header border-bottom">
-                <h5 class="modal-title font-title"><i class="bi bi-cpu text-warning me-2"></i>Nãovo Modelo</h5>
+                <h5 class="modal-title font-title"><i class="bi bi-cpu text-warning me-2"></i>Novo Modelo</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -1009,24 +1009,24 @@ $clienteSelecionadoNãoForm = $isEdit
                     <input type="text" id="displayMarcaOS" class="form-control form-control-sm bg-transparent" readonly>
                 </div>
                 <div class="mb-2">
-                    <label class="form-label fw-bold mb-1">Nãome do Modelo *</label>
+                    <label class="form-label fw-bold mb-1">Nome do Modelo *</label>
                     <div class="position-relative">
-                        <input type="text" id="inputNãovoModeloOS" class="form-control"
+                        <input type="text" id="inputNovoModeloOS" class="form-control"
                                placeholder="Ex: Galaxy S24, iPhone 15, Moto G84..."
                                autocomplete="off">
-                        <div id="spinnerNãovoModeloOS" class="position-absãolute top-50 end-0 translate-middle-y me-2 d-nãone">
+                        <div id="spinnerNovoModeloOS" class="position-absolute top-50 end-0 translate-middle-y me-2 d-none">
                             <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                         </div>
                     </div>
                     <!-- Dropdown de sugest�es -->
-                    <div id="sugestoesNãovoModeloOS" class="list-group shadow-lg mt-1 d-nãone"
+                    <div id="sugestoesNovoModeloOS" class="list-group shadow-lg mt-1 d-none"
                          style="max-height: 220px; overflow-y: auto; border-radius: 8px; z-index: 9999; position: relative;"></div>
                     <div class="form-text mt-1">
                         <i class="bi bi-globe2 me-1 text-info"></i>
                         Digite 3+ caracteres para ver sugest�es da internet
                     </div>
                 </div>
-                <div id="errorNãovoModeloOS" class="text-danger small mt-2 d-nãone"></div>
+                <div id="errorNovoModeloOS" class="text-danger small mt-2 d-none"></div>
             </div>
             <div class="modal-footer border-top">
                 <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
@@ -1049,7 +1049,7 @@ $clienteSelecionadoNãoForm = $isEdit
             </div>
             <div class="modal-body text-center p-0 overflow-hidden bg-black" style="min-height: 300px;">
                 <video id="videoCamera" class="w-100 h-100" style="object-fit: cover;" autoplay playsinline></video>
-                <canvas id="canvasCamera" class="d-nãone"></canvas>
+                <canvas id="canvasCamera" class="d-none"></canvas>
             </div>
             <div class="modal-footer border-top border-light justify-content-center p-3">
                 <button type="button" class="btn btn-glow btn-lg rounded-pill px-5" id="btnCapturar">
@@ -1094,19 +1094,19 @@ $clienteSelecionadoNãoForm = $isEdit
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 <style>
     .custom-color-accordion .accordion-button { transition: all 0.2s ease; }
-    .custom-color-accordion .accordion-button:nãot(.collapsed) {
+    .custom-color-accordion .accordion-button:not(.collapsed) {
         color: var(--bs-primary) !important;
         background-color: rgba(var(--bs-primary-rgb), 0.05) !important;
     }
-    .custom-color-accordion .list-group-item { transition: all 0.15s ease; cursãor: pointer; }
+    .custom-color-accordion .list-group-item { transition: all 0.15s ease; cursor: pointer; }
     .custom-color-accordion .list-group-item:hover { background-color: rgba(0,0,0,0.03); transform: translateX(3px); }
-    .custom-color-accordion .list-group-item.active { border-left: 3px sãolid var(--bs-primary) !important; }
+    .custom-color-accordion .list-group-item.active { border-left: 3px solid var(--bs-primary) !important; }
     .relato-quick-grid .dropdown-menu {
         max-height: 280px;
         overflow-y: auto;
     }
     .os-data-section {
-        border: 1px sãolid rgba(99, 91, 255, 0.2);
+        border: 1px solid rgba(99, 91, 255, 0.2);
         border-radius: 12px;
         padding: 14px;
         background: rgba(255, 255, 255, 0.03);
@@ -1120,7 +1120,7 @@ $clienteSelecionadoNãoForm = $isEdit
         color: #5f6c86;
         margin-bottom: 0.75rem;
         display: flex;
-        align-itemês: center;
+        align-items: center;
     }
     .os-data-section + .os-data-section {
         margin-top: 0.2rem;
@@ -1132,7 +1132,7 @@ $clienteSelecionadoNãoForm = $isEdit
         flex: 0 0 auto;
     }
     .os-form-page #estadoFisicoList .list-group-item,
-    .os-form-page #acessãoriosList .list-group-item {
+    .os-form-page #acessoriosList .list-group-item {
         padding: 0.8rem;
     }
     @media (max-width: 1199.98px) {
@@ -1151,7 +1151,7 @@ $clienteSelecionadoNãoForm = $isEdit
         }
         .os-form-page .relato-quick-grid {
             overflow-x: auto;
-            flex-wrap: nãowrap !important;
+            flex-wrap: nowrap !important;
             padding-bottom: 4px;
         }
         .os-form-page .relato-quick-grid .btn-group {
@@ -1164,22 +1164,22 @@ $clienteSelecionadoNãoForm = $isEdit
 const BASE_URL = document.querySelector('meta[name="base-url"]').content;
 const isEdit   = <?= $isEdit ? 'true' : 'false' ?>;
 <?php if ($isEdit && !empty($defeitosSelected)): ?>
-var defeitosSelecionados = <?= jsãon_encode(array_column($defeitosSelected, 'defeito_id')) ?>;
+var defeitosSelecionados = <?= json_encode(array_column($defeitosSelected, 'defeito_id')) ?>;
 <?php else: ?>
 var defeitosSelecionados = [];
 <?php endif; ?>
 const existingFotosCount = <?= (int)(count($fotos_entrada ?? [])) ?>;
-const estadoFisicoEntriesServer = <?= jsãon_encode(array_map(static function ($entry) {
+const estadoFisicoEntriesServer = <?= json_encode(array_map(static function ($entry) {
     $values = [];
     if (!empty($entry['valores'])) {
-        $decoded = jsãon_decode((string) $entry['valores'], true);
+        $decoded = json_decode((string) $entry['valores'], true);
         if (is_array($decoded)) {
             $values = $decoded;
         }
     }
     return [
         'id' => 'est_srv_' . ($entry['id'] ?? uniqid()),
-        'text' => trim((string)($entry['descricao_danão'] ?? '')),
+        'text' => trim((string)($entry['descricao_dano'] ?? '')),
         'key' => $entry['tipo'] ?? 'outro',
         'values' => $values,
     ];
@@ -1190,15 +1190,15 @@ const DRAFT_KEY = 'osDraft_v1';
 const DRAFT_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 let draftSaveTimer = null;
 
-const statusMeta = <?= jsãon_encode($statusFlat, JSON_UNESCAPED_UNICODE) ?> || {};
+const statusMeta = <?= json_encode($statusFlat, JSON_UNESCAPED_UNICODE) ?> || {};
 const statusLabels = Object.keys(statusMeta).reduce((acc, key) => {
-    acc[key] = statusMeta[key]?.nãome || key;
+    acc[key] = statusMeta[key]?.nome || key;
     return acc;
 }, {});
 
 const statusBadgeClassMap = Object.keys(statusMeta).reduce((acc, key) => {
     const raw = String(statusMeta[key]?.cor || 'secondary').toLowerCase();
-    const nãormalized = ({
+    const normalized = ({
         indigo: 'primary',
         purple: 'primary',
         orange: 'warning',
@@ -1211,13 +1211,13 @@ const statusBadgeClassMap = Object.keys(statusMeta).reduce((acc, key) => {
         danger: 'danger',
         info: 'info'
     })[raw] || 'secondary';
-    acc[key] = 'text-bg-' + nãormalized;
+    acc[key] = 'text-bg-' + normalized;
     return acc;
 }, {});
 
 const prioridadeLabels = {
     baixa: 'Baixa',
-    nãormal: 'Nãormal',
+    normal: 'Normal',
     alta: 'Alta',
     urgente: 'Urgente'
 };
@@ -1231,25 +1231,25 @@ if (typeof $.fn.select2 !== 'undefined') {
         width: '100%'
     }).on('select2:open', function() {
         // Adiciona um listener para detectar quando o usu�rio pressiona Enter na busca vazia
-        // ou quando n�o h� resultados. Mas vamos focar não bot�o fixo.
+        // ou quando n�o h� resultados. Mas vamos focar no bot�o fixo.
     });
 
     // Se quiser bot�o de Add dentro do dropdown Select2, � complexo.
-    // O bot�o '+ Nãovo' j� resãolve bem.
+    // O bot�o '+ Novo' j� resolve bem.
 }
 
-// ??? Modal: Cadastrar Nãovo Cliente ??????????????????????????????????????????
-const btnNãovoCliente = document.getElementById('btnNãovoCliente');
-if (btnNãovoCliente) {
-    btnNãovoCliente.addEventListener('click', function() {
-        new bootstrap.Modal(document.getElementById('modalNãovoCliente')).show();
+// ??? Modal: Cadastrar Novo Cliente ??????????????????????????????????????????
+const btnNovoCliente = document.getElementById('btnNovoCliente');
+if (btnNovoCliente) {
+    btnNovoCliente.addEventListener('click', function() {
+        new bootstrap.Modal(document.getElementById('modalNovoCliente')).show();
     });
 }
 
-document.getElementById('btnSalvarNãovoCliente')?.addEventListener('click', function() {
-    const form = document.getElementById('formNãovoClienteAjax');
+document.getElementById('btnSalvarNovoCliente')?.addEventListener('click', function() {
+    const form = document.getElementById('formNovoClienteAjax');
     const errors = document.getElementById('modalClienteErrors');
-    errors.classList.add('d-nãone');
+    errors.classList.add('d-none');
 
     const formData = new FormData(form);
 
@@ -1258,29 +1258,29 @@ document.getElementById('btnSalvarNãovoCliente')?.addEventListener('click', fun
         body: formData,
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
-    .then(r => r.jsãon())
+    .then(r => r.json())
     .then(res => {
         if (!res.success) {
             errors.innerHTML = res.message || 'Erro ao cadastrar cliente.';
-            errors.classList.remove('d-nãone');
+            errors.classList.remove('d-none');
             return;
         }
 
         // Adiciona ao Select2
         const sel = $('#clienteOsSelect');
-        const opt = new Option(res.nãome, res.id, true, true);
+        const opt = new Option(res.nome, res.id, true, true);
         sel.append(opt).trigger('change');
 
         // Fecha modal
-        bootstrap.Modal.getInstance(document.getElementById('modalNãovoCliente'))?.hide();
+        bootstrap.Modal.getInstance(document.getElementById('modalNovoCliente'))?.hide();
         form.reset();
         
         // Dispara o change para carregar equipamentos (que vir�o vazios, claro, mas reseta o combo)
         _onClienteChange(res.id);
     })
     .catch(() => {
-        errors.innerHTML = 'Erro inesperado. Tente nãovamente.';
-        errors.classList.remove('d-nãone');
+        errors.innerHTML = 'Erro inesperado. Tente novamente.';
+        errors.classList.remove('d-none');
     });
 });
 
@@ -1299,17 +1299,17 @@ function hideSidebar() {
     const infoContent = document.getElementById('equipInfoContent');
     const colorInfo   = document.getElementById('equipColorInfo');
 
-    if (mainBox) mainBox.classList.add('d-nãone');
+    if (mainBox) mainBox.classList.add('d-none');
     if (placeholder) {
-        placeholder.classList.remove('d-nãone');
+        placeholder.classList.remove('d-none');
         placeholder.classList.add('d-flex');
         placeholder.style.background = 'rgba(255,255,255,0.04)';
         placeholder.style.color = '';
     }
     if (minis) minis.innerHTML = '';
-    if (infoBox) infoBox.style.display = 'nãone';
+    if (infoBox) infoBox.style.display = 'none';
     if (infoContent) infoContent.innerHTML = '';
-    if (colorInfo) colorInfo.classList.add('d-nãone');
+    if (colorInfo) colorInfo.classList.add('d-none');
     showSidebar();
 }
 
@@ -1356,17 +1356,17 @@ function updateResumo() {
     const entradaInp = document.querySelector('input[name="data_entrada"]');
     const previsaoInp = document.querySelector('input[name="data_previsao"]');
     const relatoInp  = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
-    const acessãoriosInp = document.querySelector('textarea[name="acessãorios"]');
+    const acessoriosInp = document.querySelector('textarea[name="acessorios"]');
     const estadoFisicoInp = document.getElementById('estadoFisicoInput');
     const estadoFisicoSemAvarias = document.getElementById('estadoFisicoSemAvarias');
 
     const clienteText = _getSelectedText(clienteSel, 'N�o selecionado');
     const equipText   = _getSelectedText(equipSel, 'N�o selecionado');
     const tecnicoText = _getSelectedText(tecnicoSel, 'N�o atribu�do');
-    const prioridadeVal = prioridadeSel?.value || 'nãormal';
+    const prioridadeVal = prioridadeSel?.value || 'normal';
     const statusVal = statusSel?.value || 'triagem';
     const relatoVal = relatoInp?.value?.trim() || '';
-    const acessãoriosVal = acessãoriosInp?.value?.trim() || '';
+    const acessoriosVal = acessoriosInp?.value?.trim() || '';
     const estadoFisicoVal = estadoFisicoInp?.value?.trim() || '';
 
     document.getElementById('resumoCliente').textContent = clienteText;
@@ -1374,19 +1374,19 @@ function updateResumo() {
     document.getElementById('resumoTecnico').textContent = tecnicoText;
     document.getElementById('resumoEntrada').textContent = _formatDateTime(entradaInp?.value);
     document.getElementById('resumoPrevisao').textContent = _formatDate(previsaoInp?.value);
-    const semAcessãorios = acessãoriosVal.toLowerCase() === 'sem acess�rios';
+    const semAcessorios = acessoriosVal.toLowerCase() === 'sem acess�rios';
     const semAvarias = Boolean(estadoFisicoSemAvarias?.checked) || estadoFisicoVal.toLowerCase() === 'sem avarias aparentes';
     document.getElementById('resumoRelato').textContent = relatoVal ? 'Preenchido' : 'Vazio';
-    document.getElementById('resumoAcessãorios').textContent = semAcessãorios ? 'Sem acess�rios' : (acessãoriosVal ? 'Informado' : 'N�o informado');
+    document.getElementById('resumoAcessorios').textContent = semAcessorios ? 'Sem acess�rios' : (acessoriosVal ? 'Informado' : 'N�o informado');
     document.getElementById('resumoEstadoFisico').textContent = semAvarias ? 'Sem avarias' : (estadoFisicoVal ? 'Informado' : 'N�o informado');
 
     const prioridadeBadgeClass = {
         baixa: 'text-bg-secondary',
-        nãormal: 'text-bg-primary',
+        normal: 'text-bg-primary',
         alta: 'text-bg-warning',
         urgente: 'text-bg-danger'
     }[prioridadeVal] || 'text-bg-secondary';
-    _setResumoBadge('resumoPrioridade', prioridadeLabels[prioridadeVal] || 'Nãormal', prioridadeBadgeClass);
+    _setResumoBadge('resumoPrioridade', prioridadeLabels[prioridadeVal] || 'Normal', prioridadeBadgeClass);
 
     const statusBadgeClass = statusBadgeClassMap[statusVal] || 'text-bg-secondary';
     _setResumoBadge('resumoStatus', statusLabels[statusVal] || statusVal || 'Triagem', statusBadgeClass);
@@ -1408,7 +1408,7 @@ function updateResumo() {
     _setFieldStatus('statusEntrada', Boolean(entradaInp?.value));
     _setFieldStatus('statusPrevisao', Boolean(previsaoInp?.value));
     _setFieldStatus('statusRelato', Boolean(relatoVal));
-    _setFieldStatus('statusAcessãorios', semAcessãorios || Boolean(acessãoriosVal));
+    _setFieldStatus('statusAcessorios', semAcessorios || Boolean(acessoriosVal));
     _setFieldStatus('statusEstadoFisico', semAvarias || Boolean(estadoFisicoVal));
     _setFieldStatus('statusFotos', totalFotos > 0);
     if (document.getElementById('statusDefeitos')) {
@@ -1419,7 +1419,7 @@ function updateResumo() {
 const relatoClienteInput = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
 const relatoQuickButtons = document.getElementById('relatoQuickButtons');
 
-function relatoNãormalizarTexto(texto) {
+function relatoNormalizarTexto(texto) {
     let valor = String(texto || '').trim();
     valor = valor.replace(/^Cliente relata:\s*/i, '');
     valor = valor.replace(/[.;:,\s]+$/g, '').trim();
@@ -1436,7 +1436,7 @@ function initRelatoRapidoModule() {
         relatoQuickButtons.addEventListener('click', event => {
             const btn = event.target.closest('.btn-relato-opcao');
             if (!btn) return;
-            const texto = relatoNãormalizarTexto(btn.dataset.relatoOpcao || '');
+            const texto = relatoNormalizarTexto(btn.dataset.relatoOpcao || '');
             if (!texto) return;
             const linha = /[.!?]$/.test(texto) ? texto : `${texto}.`;
             const atual = relatoClienteInput.value.trim();
@@ -1469,33 +1469,33 @@ const colorNameMap = COMMON_ACCESSORY_COLORS.reduce((acc, color) => {
     return acc;
 }, {});
 
-function nãormalizeHexColor(value) {
+function normalizeHexColor(value) {
     const raw = (value || '').trim();
     if (/^#[0-9a-fA-F]{6}$/.test(raw)) return raw.toUpperCase();
     if (/^[0-9a-fA-F]{6}$/.test(raw)) return `#${raw.toUpperCase()}`;
     return '';
 }
 
-function extractHexFromAccessãoryColor(value) {
+function extractHexFromAccessoryColor(value) {
     const raw = (value || '').trim();
-    const directHex = nãormalizeHexColor(raw);
+    const directHex = normalizeHexColor(raw);
     if (directHex) return directHex;
     const match = raw.match(/#([0-9a-fA-F]{6})/);
     return match ? `#${match[1].toUpperCase()}` : '';
 }
 
-function getAccessãoryNamedColors() {
+function getAccessoryNamedColors() {
     const list = [];
     Object.entries(colorNameMap).forEach(([hex, name]) => {
-        const nãormalizedHex = nãormalizeHexColor(hex);
-        if (nãormalizedHex) list.push({ hex: nãormalizedHex, name });
+        const normalizedHex = normalizeHexColor(hex);
+        if (normalizedHex) list.push({ hex: normalizedHex, name });
     });
 
     if (typeof PROFESSIONAL_COLORS_OS !== 'undefined' && Array.isArray(PROFESSIONAL_COLORS_OS)) {
         PROFESSIONAL_COLORS_OS.forEach(group => {
             (group.colors || []).forEach(color => {
-                const nãormalizedHex = nãormalizeHexColor(color.hex);
-                if (nãormalizedHex) list.push({ hex: nãormalizedHex, name: color.name || nãormalizedHex });
+                const normalizedHex = normalizeHexColor(color.hex);
+                if (normalizedHex) list.push({ hex: normalizedHex, name: color.name || normalizedHex });
             });
         });
     }
@@ -1507,55 +1507,55 @@ function getAccessãoryNamedColors() {
     return Array.from(unique.values());
 }
 
-function getAccessãoryHexByName(name) {
+function getAccessoryHexByName(name) {
     const needle = (name || '').trim().toLowerCase();
     if (!needle) return '';
-    const exact = getAccessãoryNamedColors().find(c => (c.name || '').trim().toLowerCase() === needle);
+    const exact = getAccessoryNamedColors().find(c => (c.name || '').trim().toLowerCase() === needle);
     return exact ? exact.hex : '';
 }
 
-function getClosestAccessãoryColorName(hex) {
-    const nãormalizedHex = nãormalizeHexColor(hex);
-    if (!nãormalizedHex) return '';
-    const colors = getAccessãoryNamedColors();
-    if (!colors.length) return nãormalizedHex;
+function getClosestAccessoryColorName(hex) {
+    const normalizedHex = normalizeHexColor(hex);
+    if (!normalizedHex) return '';
+    const colors = getAccessoryNamedColors();
+    if (!colors.length) return normalizedHex;
 
     let best = colors[0];
     let minDistance = Number.POSITIVE_INFINITY;
     colors.forEach(color => {
         const distance = (typeof colorDistanceOS === 'function')
-            ? colorDistanceOS(nãormalizedHex, color.hex)
-            : (color.hex === nãormalizedHex ? 0 : Number.POSITIVE_INFINITY);
+            ? colorDistanceOS(normalizedHex, color.hex)
+            : (color.hex === normalizedHex ? 0 : Number.POSITIVE_INFINITY);
         if (distance < minDistance) {
             minDistance = distance;
             best = color;
         }
     });
-    return best?.name || nãormalizedHex;
+    return best?.name || normalizedHex;
 }
 
-function formatAccessãoryColorValue(hex) {
-    const nãormalizedHex = nãormalizeHexColor(hex);
-    if (!nãormalizedHex) return '';
-    const name = getClosestAccessãoryColorName(nãormalizedHex);
+function formatAccessoryColorValue(hex) {
+    const normalizedHex = normalizeHexColor(hex);
+    if (!normalizedHex) return '';
+    const name = getClosestAccessoryColorName(normalizedHex);
     return name || '';
 }
 
-function composeAccessãoryText(base, detail = '') {
+function composeAccessoryText(base, detail = '') {
     const cleanDetail = (detail || '').trim();
     return cleanDetail ? `${base} ${cleanDetail}` : base;
 }
 
-const acessãoriosConfig = {
+const acessoriosConfig = {
     chip: {
         title: 'Chip',
         fields: [{ name: 'chip_digits', label: '�ltimos 6 d�gitos do chip', placeholder: '123456', max: 6 }],
-        format: values => composeAccessãoryText('Chip', values.chip_digits ? ('final ' + values.chip_digits) : '')
+        format: values => composeAccessoryText('Chip', values.chip_digits ? ('final ' + values.chip_digits) : '')
     },
     capinha: {
         title: 'Capinha celular',
         fields: [{ name: 'cor', label: 'Cor da capinha', placeholder: 'Preta', type: 'color_text' }],
-        format: values => composeAccessãoryText('Capinha celular', values.cor)
+        format: values => composeAccessoryText('Capinha celular', values.cor)
     },
     capa: {
         title: 'Capa',
@@ -1565,12 +1565,12 @@ const acessãoriosConfig = {
     mochila: {
         title: 'Mochila',
         fields: [{ name: 'cor', label: 'Cor da mochila', placeholder: 'Preta', type: 'color_text' }],
-        format: values => composeAccessãoryText('Mochila', values.cor)
+        format: values => composeAccessoryText('Mochila', values.cor)
     },
     bolsa: {
-        title: 'Bolsa nãotebook',
+        title: 'Bolsa notebook',
         fields: [{ name: 'cor', label: 'Cor da bolsa', placeholder: 'Cinza', type: 'color_text' }],
-        format: values => composeAccessãoryText('Bolsa nãotebook', values.cor)
+        format: values => composeAccessoryText('Bolsa notebook', values.cor)
     },
     cabo: {
         title: 'Cabo',
@@ -1590,7 +1590,7 @@ const acessãoriosConfig = {
                 { value: 'Outro', label: 'Outro' }
             ]
         }],
-        format: values => composeAccessãoryText('Cabo', values.tipo)
+        format: values => composeAccessoryText('Cabo', values.tipo)
     },
     carregador: {
         title: 'Carregador',
@@ -1601,12 +1601,12 @@ const acessãoriosConfig = {
             options: [
                 { value: '', label: 'Selecionar tipo (opcional)' },
                 { value: 'Celular', label: 'Celular' },
-                { value: 'Nãotebook', label: 'Nãotebook' },
+                { value: 'Notebook', label: 'Notebook' },
                 { value: 'Tablet', label: 'Tablet' },
                 { value: 'Outro', label: 'Outro' }
             ]
         }],
-        format: values => composeAccessãoryText('Carregador', values.tipo_equip)
+        format: values => composeAccessoryText('Carregador', values.tipo_equip)
     },
     outro: {
         title: 'Outro acess�rio',
@@ -1615,76 +1615,76 @@ const acessãoriosConfig = {
     }
 };
 
-const acessãoriosInput = document.getElementById('acessãoriosInput');
-const acessãoriosDataInput = document.getElementById('acessãoriosDataInput');
-const acessãoriosList = document.getElementById('acessãoriosList');
-const acessãoriosSemItensCheckbox = document.getElementById('acessãoriosSemItens');
-const acessãoriosQuickForm = document.getElementById('acessãoriosQuickForm');
-const acessãoriosQuickTitle = document.getElementById('acessãoriosQuickTitle');
-const acessãoriosQuickFields = document.getElementById('acessãoriosQuickFields');
-const acessãoriosQuickSave = document.getElementById('acessãoriosQuickSave');
-const acessãoriosQuickCancel = document.getElementById('acessãoriosQuickCancel');
-const acessãoriosQuickClose = document.getElementById('acessãoriosQuickClose');
-const acessãoriosPhotoInput = document.getElementById('acessãoriosPhotoInput');
-const acessãoriosFilesInputs = document.getElementById('acessãoriosFilesInputs');
-const acessãoriosPhotos = {};
-const acessãoriosFileInputs = {};
-let acessãoriosEntries = [];
-let acessãoriosEditing = null;
-let acessãoriosCurrentKey = null;
-let acessãoriosPhotoTarget = null;
-let acessãorioCropQueue = [];
-let acessãorioCropEntryId = null;
+const acessoriosInput = document.getElementById('acessoriosInput');
+const acessoriosDataInput = document.getElementById('acessoriosDataInput');
+const acessoriosList = document.getElementById('acessoriosList');
+const acessoriosSemItensCheckbox = document.getElementById('acessoriosSemItens');
+const acessoriosQuickForm = document.getElementById('acessoriosQuickForm');
+const acessoriosQuickTitle = document.getElementById('acessoriosQuickTitle');
+const acessoriosQuickFields = document.getElementById('acessoriosQuickFields');
+const acessoriosQuickSave = document.getElementById('acessoriosQuickSave');
+const acessoriosQuickCancel = document.getElementById('acessoriosQuickCancel');
+const acessoriosQuickClose = document.getElementById('acessoriosQuickClose');
+const acessoriosPhotoInput = document.getElementById('acessoriosPhotoInput');
+const acessoriosFilesInputs = document.getElementById('acessoriosFilesInputs');
+const acessoriosPhotos = {};
+const acessoriosFileInputs = {};
+let acessoriosEntries = [];
+let acessoriosEditing = null;
+let acessoriosCurrentKey = null;
+let acessoriosPhotoTarget = null;
+let acessorioCropQueue = [];
+let acessorioCropEntryId = null;
 const ACCESSORIOS_SEM_ITENS_TEXT = 'Sem acess�rios';
 
-const initialAcessãoriosText = acessãoriosInput?.value?.trim() || '';
-if (acessãoriosSemItensCheckbox && initialAcessãoriosText.toLowerCase() === ACCESSORIOS_SEM_ITENS_TEXT.toLowerCase()) {
-    acessãoriosSemItensCheckbox.checked = true;
+const initialAcessoriosText = acessoriosInput?.value?.trim() || '';
+if (acessoriosSemItensCheckbox && initialAcessoriosText.toLowerCase() === ACCESSORIOS_SEM_ITENS_TEXT.toLowerCase()) {
+    acessoriosSemItensCheckbox.checked = true;
 }
-if (initialAcessãoriosText && initialAcessãoriosText.toLowerCase() !== ACCESSORIOS_SEM_ITENS_TEXT.toLowerCase()) {
-    initialAcessãoriosText.split(/\r?\n/).filter(Boolean).forEach(text => {
-        acessãoriosEntries.push({ id: `acc_${Date.nãow()}_${Math.random().toString(36).slice(2)}`, text, key: 'outro' });
+if (initialAcessoriosText && initialAcessoriosText.toLowerCase() !== ACCESSORIOS_SEM_ITENS_TEXT.toLowerCase()) {
+    initialAcessoriosText.split(/\r?\n/).filter(Boolean).forEach(text => {
+        acessoriosEntries.push({ id: `acc_${Date.now()}_${Math.random().toString(36).slice(2)}`, text, key: 'outro' });
     });
 }
 
 function generateEntryId() {
-    return `acc_${Date.nãow()}_${Math.random().toString(36).substring(2, 8)}`;
+    return `acc_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 }
 
-function isAcessãoriosSemItensChecked() {
-    return Boolean(acessãoriosSemItensCheckbox?.checked);
+function isAcessoriosSemItensChecked() {
+    return Boolean(acessoriosSemItensCheckbox?.checked);
 }
 
-function clearAllAcessãorios() {
-    acessãoriosEntries.forEach(entry => removeAcessãorioFileInput(entry.id));
-    acessãoriosEntries = [];
+function clearAllAcessorios() {
+    acessoriosEntries.forEach(entry => removeAcessorioFileInput(entry.id));
+    acessoriosEntries = [];
 }
 
-function refreshAcessãoriosSemItensUi() {
-    const isSemItens = isAcessãoriosSemItensChecked();
-    document.querySelectorAll('[data-acessãorio-key]').forEach(btn => {
+function refreshAcessoriosSemItensUi() {
+    const isSemItens = isAcessoriosSemItensChecked();
+    document.querySelectorAll('[data-acessorio-key]').forEach(btn => {
         btn.disabled = isSemItens;
     });
     if (isSemItens) {
-        closeAcessãoriosForm();
+        closeAcessoriosForm();
     }
 }
 
-function syncAcessãoriosInput() {
-    if (!acessãoriosInput) return;
-    if (isAcessãoriosSemItensChecked()) {
-        acessãoriosInput.value = ACCESSORIOS_SEM_ITENS_TEXT;
-        if (acessãoriosDataInput) {
-            acessãoriosDataInput.value = JSON.stringify([]);
+function syncAcessoriosInput() {
+    if (!acessoriosInput) return;
+    if (isAcessoriosSemItensChecked()) {
+        acessoriosInput.value = ACCESSORIOS_SEM_ITENS_TEXT;
+        if (acessoriosDataInput) {
+            acessoriosDataInput.value = JSON.stringify([]);
         }
         updateResumo();
         scheduleDraftSave();
         return;
     }
 
-    acessãoriosInput.value = acessãoriosEntries.map(entry => entry.text).join('\n');
-    if (acessãoriosDataInput) {
-        acessãoriosDataInput.value = JSON.stringify(acessãoriosEntries.map(entry => ({
+    acessoriosInput.value = acessoriosEntries.map(entry => entry.text).join('\n');
+    if (acessoriosDataInput) {
+        acessoriosDataInput.value = JSON.stringify(acessoriosEntries.map(entry => ({
             id: entry.id,
             text: entry.text,
             key: entry.key || 'outro',
@@ -1695,39 +1695,39 @@ function syncAcessãoriosInput() {
     scheduleDraftSave();
 }
 
-function ensureAcessãorioFileInput(entryId) {
-    if (!acessãoriosFilesInputs) return null;
-    let input = acessãoriosFileInputs[entryId];
+function ensureAcessorioFileInput(entryId) {
+    if (!acessoriosFilesInputs) return null;
+    let input = acessoriosFileInputs[entryId];
     if (!input) {
         input = document.createElement('input');
         input.type = 'file';
         input.multiple = true;
-        input.name = `fotos_acessãorios[${entryId}][]`;
-        input.id = `acessãorio_files_${entryId}`;
-        input.className = 'd-nãone';
-        acessãoriosFilesInputs.appendChild(input);
-        acessãoriosFileInputs[entryId] = input;
+        input.name = `fotos_acessorios[${entryId}][]`;
+        input.id = `acessorio_files_${entryId}`;
+        input.className = 'd-none';
+        acessoriosFilesInputs.appendChild(input);
+        acessoriosFileInputs[entryId] = input;
     }
-    const dt = acessãoriosPhotos[entryId];
+    const dt = acessoriosPhotos[entryId];
     if (dt) {
         input.files = dt.files;
     }
     return input;
 }
 
-function removeAcessãorioFileInput(entryId) {
-    const input = acessãoriosFileInputs[entryId];
+function removeAcessorioFileInput(entryId) {
+    const input = acessoriosFileInputs[entryId];
     if (input) {
         input.remove();
-        delete acessãoriosFileInputs[entryId];
+        delete acessoriosFileInputs[entryId];
     }
-    delete acessãoriosPhotos[entryId];
+    delete acessoriosPhotos[entryId];
 }
 
-function renderAcessãoriosPhotos(entryId, container) {
+function renderAcessoriosPhotos(entryId, container) {
     if (!container) return;
     container.innerHTML = '';
-    const dt = acessãoriosPhotos[entryId];
+    const dt = acessoriosPhotos[entryId];
     if (!dt) return;
     Array.from(dt.files).forEach((file, index) => {
         const reader = new FileReader();
@@ -1738,7 +1738,7 @@ function renderAcessãoriosPhotos(entryId, container) {
 
             const preview = document.createElement('div');
             preview.className = 'w-100 h-100 overflow-hidden position-relative image-preview';
-            preview.style.cursãor = 'zoom-in';
+            preview.style.cursor = 'zoom-in';
             preview.setAttribute('data-bs-toggle', 'modal');
             preview.setAttribute('data-bs-target', '#imageModal');
             preview.setAttribute('data-img-src', e.target.result);
@@ -1748,7 +1748,7 @@ function renderAcessãoriosPhotos(entryId, container) {
 
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
-            removeBtn.className = 'btn btn-sm btn-outline-light position-absãolute top-0 end-0 m-1 btn-remove-foto-accessãorio';
+            removeBtn.className = 'btn btn-sm btn-outline-light position-absolute top-0 end-0 m-1 btn-remove-foto-accessorio';
             removeBtn.dataset.entry = entryId;
             removeBtn.dataset.index = index;
             removeBtn.innerHTML = '<i class="bi bi-x"></i>';
@@ -1761,18 +1761,18 @@ function renderAcessãoriosPhotos(entryId, container) {
     });
 }
 
-function renderAcessãoriosList() {
-    if (!acessãoriosList) return;
-    acessãoriosList.innerHTML = '';
-    if (isAcessãoriosSemItensChecked()) {
+function renderAcessoriosList() {
+    if (!acessoriosList) return;
+    acessoriosList.innerHTML = '';
+    if (isAcessoriosSemItensChecked()) {
         const item = document.createElement('div');
         item.className = 'list-group-item text-muted';
         item.textContent = 'Marcado como sem acess�rios.';
-        acessãoriosList.appendChild(item);
+        acessoriosList.appendChild(item);
         return;
     }
 
-    acessãoriosEntries.forEach((entry, index) => {
+    acessoriosEntries.forEach((entry, index) => {
         const cleanText = (entry.text || '').replace(/\s*\(#[0-9a-fA-F]{6}\)/g, '');
         if (cleanText !== entry.text) {
             entry.text = cleanText;
@@ -1780,37 +1780,37 @@ function renderAcessãoriosList() {
         const item = document.createElement('div');
         item.className = 'list-group-item';
         item.innerHTML = `
-            <div class="d-flex justify-content-between align-itemês-center">
+            <div class="d-flex justify-content-between align-items-center">
                 <span class="fw-semibold">${cleanText}</span>
                 <div class="d-flex gap-1">
                     <button type="button" class="btn btn-outline-info btn-sm btn-add-foto" data-entry="${entry.id}"><i class="bi bi-camera"></i> Adicionar foto</button>
                     <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-camera" data-entry="${entry.id}"><i class="bi bi-camera-video"></i> C�mera</button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm btn-edit-acessãorio" data-index="${index}"><i class="bi bi-pencil"></i></button>
-                    <button type="button" class="btn btn-outline-danger btn-sm btn-remove-acessãorio" data-index="${index}"><i class="bi bi-trash"></i></button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm btn-edit-acessorio" data-index="${index}"><i class="bi bi-pencil"></i></button>
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-remove-acessorio" data-index="${index}"><i class="bi bi-trash"></i></button>
                 </div>
             </div>
             <div class="d-flex gap-2 flex-wrap mt-2" data-photos-container="${entry.id}"></div>
         `;
-        acessãoriosList.appendChild(item);
+        acessoriosList.appendChild(item);
         const photosContainer = item.querySelector(`[data-photos-container="${entry.id}"]`);
-        ensureAcessãorioFileInput(entry.id);
-        renderAcessãoriosPhotos(entry.id, photosContainer);
+        ensureAcessorioFileInput(entry.id);
+        renderAcessoriosPhotos(entry.id, photosContainer);
     });
     updateResumo();
 }
 
-function closeAcessãoriosForm() {
-    acessãoriosQuickForm?.classList.add('d-nãone');
-    acessãoriosQuickFields.innerHTML = '';
-    acessãoriosEditing = null;
+function closeAcessoriosForm() {
+    acessoriosQuickForm?.classList.add('d-none');
+    acessoriosQuickFields.innerHTML = '';
+    acessoriosEditing = null;
 }
 
-function openAcessãoriosForm(key, index = null) {
-    const config = acessãoriosConfig[key];
+function openAcessoriosForm(key, index = null) {
+    const config = acessoriosConfig[key];
     if (!config) return;
-    acessãoriosCurrentKey = key;
-    acessãoriosQuickTitle.textContent = config.title;
-    acessãoriosQuickFields.innerHTML = '';
+    acessoriosCurrentKey = key;
+    acessoriosQuickTitle.textContent = config.title;
+    acessoriosQuickFields.innerHTML = '';
     config.fields.forEach(field => {
         const wrapper = document.createElement('div');
         wrapper.className = 'col-md-6';
@@ -1842,25 +1842,25 @@ function openAcessãoriosForm(key, index = null) {
             const otherName = field.otherName || `${field.name}_outro`;
             const otherInput = document.createElement('input');
             otherInput.type = 'text';
-            otherInput.className = 'form-control form-control-sm mt-2 d-nãone';
+            otherInput.className = 'form-control form-control-sm mt-2 d-none';
             otherInput.name = otherName;
             otherInput.placeholder = field.otherPlaceholder || 'Especifique';
 
             input.addEventListener('change', () => {
                 const isOther = input.value === 'Outro';
-                otherInput.classList.toggle('d-nãone', !isOther);
+                otherInput.classList.toggle('d-none', !isOther);
                 if (!isOther) otherInput.value = '';
             });
 
             wrapper.appendChild(label);
             wrapper.appendChild(input);
             wrapper.appendChild(otherInput);
-            acessãoriosQuickFields.appendChild(wrapper);
+            acessoriosQuickFields.appendChild(wrapper);
             return;
         } else if (field.type === 'color_text') {
             wrapper.className = 'col-12';
             const group = document.createElement('div');
-            group.className = 'd-flex gap-2 align-itemês-center';
+            group.className = 'd-flex gap-2 align-items-center';
 
             const colorInput = document.createElement('input');
             colorInput.type = 'color';
@@ -1876,17 +1876,17 @@ function openAcessãoriosForm(key, index = null) {
             input.name = field.name;
 
             colorInput.addEventListener('input', () => {
-                const selectedHex = nãormalizeHexColor(colorInput.value);
-                input.value = formatAccessãoryColorValue(selectedHex);
+                const selectedHex = normalizeHexColor(colorInput.value);
+                input.value = formatAccessoryColorValue(selectedHex);
             });
 
             input.addEventListener('blur', () => {
                 const rawValue = (input.value || '').trim();
                 if (!rawValue) return;
-                const hexFromText = extractHexFromAccessãoryColor(rawValue) || getAccessãoryHexByName(rawValue);
+                const hexFromText = extractHexFromAccessoryColor(rawValue) || getAccessoryHexByName(rawValue);
                 if (hexFromText) {
                     colorInput.value = hexFromText;
-                    input.value = formatAccessãoryColorValue(hexFromText);
+                    input.value = formatAccessoryColorValue(hexFromText);
                 }
             });
 
@@ -1901,11 +1901,11 @@ function openAcessãoriosForm(key, index = null) {
             };
 
             const quickColorsDesktop = document.createElement('div');
-            quickColorsDesktop.className = 'd-nãone d-md-flex flex-nãowrap gap-1 mt-2 w-100';
+            quickColorsDesktop.className = 'd-none d-md-flex flex-nowrap gap-1 mt-2 w-100';
             COMMON_ACCESSORY_COLORS.forEach(color => {
                 const quickBtn = document.createElement('button');
                 quickBtn.type = 'button';
-                quickBtn.className = 'btn btn-sm btn-outline-secondary d-inline-flex align-itemês-center gap-1 text-nãowrap px-2 py-1';
+                quickBtn.className = 'btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 text-nowrap px-2 py-1';
                 quickBtn.style.fontSize = '0.82rem';
                 quickBtn.innerHTML = `
                     <span class="rounded-circle border" style="width:12px;height:12px;background:${color.hex};"></span>
@@ -1917,8 +1917,8 @@ function openAcessãoriosForm(key, index = null) {
             wrapper.appendChild(quickColorsDesktop);
 
             const quickColorsMobile = document.createElement('div');
-            quickColorsMobile.className = 'dropdown d-md-nãone mt-2';
-            const dropdownId = `acessãorioColorQuick_${field.name}_${Date.nãow()}_${Math.random().toString(36).slice(2, 6)}`;
+            quickColorsMobile.className = 'dropdown d-md-none mt-2';
+            const dropdownId = `acessorioColorQuick_${field.name}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
             quickColorsMobile.innerHTML = `
                 <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" id="${dropdownId}" data-bs-toggle="dropdown" aria-expanded="false">
                     Cores r�pidas
@@ -1930,7 +1930,7 @@ function openAcessãoriosForm(key, index = null) {
                 const li = document.createElement('li');
                 const mobileBtn = document.createElement('button');
                 mobileBtn.type = 'button';
-                mobileBtn.className = 'dropdown-item d-flex align-itemês-center gap-2';
+                mobileBtn.className = 'dropdown-item d-flex align-items-center gap-2';
                 mobileBtn.innerHTML = `
                     <span class="rounded-circle border" style="width:12px;height:12px;background:${color.hex};"></span>
                     <span>${color.name}</span>
@@ -1941,7 +1941,7 @@ function openAcessãoriosForm(key, index = null) {
             });
             wrapper.appendChild(quickColorsMobile);
 
-            acessãoriosQuickFields.appendChild(wrapper);
+            acessoriosQuickFields.appendChild(wrapper);
             return;
         } else {
             input = document.createElement('input');
@@ -1953,22 +1953,22 @@ function openAcessãoriosForm(key, index = null) {
         input.name = field.name;
         wrapper.appendChild(label);
         wrapper.appendChild(input);
-        acessãoriosQuickFields.appendChild(wrapper);
+        acessoriosQuickFields.appendChild(wrapper);
     });
     if (index !== null) {
-        acessãoriosEditing = index;
-        const values = acessãoriosEntries[index].values || {};
+        acessoriosEditing = index;
+        const values = acessoriosEntries[index].values || {};
         config.fields.forEach(field => {
-            const el = acessãoriosQuickFields.querySelector(`[name="${field.name}"]`);
+            const el = acessoriosQuickFields.querySelector(`[name="${field.name}"]`);
             if (el) el.value = values[field.name] || '';
             if (field.type === 'select_with_other') {
                 const otherName = field.otherName || `${field.name}_outro`;
-                const otherEl = acessãoriosQuickFields.querySelector(`[name="${otherName}"]`);
+                const otherEl = acessoriosQuickFields.querySelector(`[name="${otherName}"]`);
                 const savedValue = (values[field.name] || '').trim();
-                const knãownOption = (field.options || []).sãome(opt => opt.value === savedValue && opt.value !== 'Outro');
+                const knownOption = (field.options || []).some(opt => opt.value === savedValue && opt.value !== 'Outro');
 
                 if (el) {
-                    if (!savedValue || knãownOption) {
+                    if (!savedValue || knownOption) {
                         el.value = savedValue;
                     } else {
                         el.value = 'Outro';
@@ -1977,46 +1977,46 @@ function openAcessãoriosForm(key, index = null) {
 
                 if (otherEl) {
                     const showOther = el && el.value === 'Outro';
-                    otherEl.classList.toggle('d-nãone', !showOther);
+                    otherEl.classList.toggle('d-none', !showOther);
                     if (showOther) {
-                        otherEl.value = values[otherName] || (!knãownOption ? savedValue : '');
+                        otherEl.value = values[otherName] || (!knownOption ? savedValue : '');
                     }
                 }
             }
             if (field.type === 'color_text') {
-                const picker = acessãoriosQuickFields.querySelector(`[data-color-picker-for="${field.name}"]`);
+                const picker = acessoriosQuickFields.querySelector(`[data-color-picker-for="${field.name}"]`);
                 const rawColor = values[field.name] || '';
-                const hex = extractHexFromAccessãoryColor(rawColor) || getAccessãoryHexByName(rawColor);
+                const hex = extractHexFromAccessoryColor(rawColor) || getAccessoryHexByName(rawColor);
                 if (picker && hex) picker.value = hex;
-                if (el && hex && !extractHexFromAccessãoryColor(rawColor)) {
-                    el.value = formatAccessãoryColorValue(hex);
+                if (el && hex && !extractHexFromAccessoryColor(rawColor)) {
+                    el.value = formatAccessoryColorValue(hex);
                 }
             }
         });
     }
-    acessãoriosQuickForm?.classList.remove('d-nãone');
+    acessoriosQuickForm?.classList.remove('d-none');
 }
 
-function handleAcessãoriosButtonClick(event) {
-    if (isAcessãoriosSemItensChecked()) return;
-    const key = event.currentTarget.dataset.acessãorioKey;
+function handleAcessoriosButtonClick(event) {
+    if (isAcessoriosSemItensChecked()) return;
+    const key = event.currentTarget.dataset.acessorioKey;
     if (!key) return;
-    openAcessãoriosForm(key);
+    openAcessoriosForm(key);
 }
 
 function collectFormValues() {
     const values = {};
-    acessãoriosQuickFields.querySelectorAll('input, select').forEach(input => {
+    acessoriosQuickFields.querySelectorAll('input, select').forEach(input => {
         if (!input.name) return;
         values[input.name] = input.value.trim();
     });
     return values;
 }
 
-function handleAcessãoriosSave() {
-    if (isAcessãoriosSemItensChecked()) return;
-    const key = acessãoriosCurrentKey;
-    const config = acessãoriosConfig[key];
+function handleAcessoriosSave() {
+    if (isAcessoriosSemItensChecked()) return;
+    const key = acessoriosCurrentKey;
+    const config = acessoriosConfig[key];
     if (!config) return;
     const values = collectFormValues();
     (config.fields || []).forEach(field => {
@@ -2032,77 +2032,77 @@ function handleAcessãoriosSave() {
         }
         if (field.type !== 'color_text') return;
         const rawColor = values[field.name] || '';
-        const hex = extractHexFromAccessãoryColor(rawColor) || getAccessãoryHexByName(rawColor);
-        if (hex) values[field.name] = formatAccessãoryColorValue(hex);
+        const hex = extractHexFromAccessoryColor(rawColor) || getAccessoryHexByName(rawColor);
+        if (hex) values[field.name] = formatAccessoryColorValue(hex);
     });
     const text = config.format(values);
-    if (acessãoriosEditing !== null) {
-        acessãoriosEntries[acessãoriosEditing] = { ...acessãoriosEntries[acessãoriosEditing], text, values, key };
+    if (acessoriosEditing !== null) {
+        acessoriosEntries[acessoriosEditing] = { ...acessoriosEntries[acessoriosEditing], text, values, key };
     } else {
-        acessãoriosEntries.push({ id: generateEntryId(), text, values, key });
+        acessoriosEntries.push({ id: generateEntryId(), text, values, key });
     }
-    renderAcessãoriosList();
-    syncAcessãoriosInput();
-    closeAcessãoriosForm();
+    renderAcessoriosList();
+    syncAcessoriosInput();
+    closeAcessoriosForm();
 }
 
-function handleAcessãoriosCancel() {
-    closeAcessãoriosForm();
+function handleAcessoriosCancel() {
+    closeAcessoriosForm();
 }
 
-function handleRemoveAcessãorio(event) {
+function handleRemoveAcessorio(event) {
     const index = parseInt(event.currentTarget.dataset.index, 10);
     if (Number.isNaN(index)) return;
-    const entry = acessãoriosEntries[index];
-    removeAcessãorioFileInput(entry.id);
-    acessãoriosEntries.splice(index, 1);
-    renderAcessãoriosList();
-    syncAcessãoriosInput();
+    const entry = acessoriosEntries[index];
+    removeAcessorioFileInput(entry.id);
+    acessoriosEntries.splice(index, 1);
+    renderAcessoriosList();
+    syncAcessoriosInput();
 }
 
-function handleEditAcessãorio(event) {
+function handleEditAcessorio(event) {
     const index = parseInt(event.currentTarget.dataset.index, 10);
-    const entry = acessãoriosEntries[index];
+    const entry = acessoriosEntries[index];
     if (!entry) return;
     const key = entry.key || 'outro';
-    openAcessãoriosForm(key, index);
+    openAcessoriosForm(key, index);
 }
 
-function openAcessãorioPhotoInput(entryId) {
+function openAcessorioPhotoInput(entryId) {
     closeImageModalIfOpen();
-    acessãoriosPhotoTarget = entryId;
-    acessãoriosPhotoInput.dataset.entryId = entryId;
-    acessãoriosPhotoInput?.click();
+    acessoriosPhotoTarget = entryId;
+    acessoriosPhotoInput.dataset.entryId = entryId;
+    acessoriosPhotoInput?.click();
 }
 
-function openAcessãorioCameraCapture(entryId) {
+function openAcessorioCameraCapture(entryId) {
     if (!entryId) return;
-    acessãorioCropEntryId = entryId;
-    acessãorioCropQueue = [];
-    openCameraCapture({ type: 'acessãorio', entryId });
+    acessorioCropEntryId = entryId;
+    acessorioCropQueue = [];
+    openCameraCapture({ type: 'acessorio', entryId });
 }
 
 function readFileAsDataUrl(file) {
-    return new Promise((resãolve, reject) => {
+    return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = e => resãolve(e.target.result);
+        reader.onload = e => resolve(e.target.result);
         reader.onerror = reject;
         reader.readAsDataURL(file);
     });
 }
 
-async function processNextAcessãorioCrop() {
-    if (!acessãorioCropEntryId) return;
-    if (!acessãorioCropQueue.length) {
+async function processNextAcessorioCrop() {
+    if (!acessorioCropEntryId) return;
+    if (!acessorioCropQueue.length) {
         hideModalSafe(modalCrop, '#modalCropEquip');
         return;
     }
-    const nextFile = acessãorioCropQueue.shift();
+    const nextFile = acessorioCropQueue.shift();
     try {
-        const sãource = await readFileAsDataUrl(nextFile);
-        openCropper(sãource, { type: 'acessãorio' });
+        const source = await readFileAsDataUrl(nextFile);
+        openCropper(source, { type: 'acessorio' });
     } catch (e) {
-        processNextAcessãorioCrop();
+        processNextAcessorioCrop();
     }
 }
 
@@ -2114,55 +2114,55 @@ function handlePhotoInputChange() {
         this.value = '';
         return;
     }
-    acessãorioCropEntryId = entryId;
-    acessãorioCropQueue = files.slice();
-    processNextAcessãorioCrop();
+    acessorioCropEntryId = entryId;
+    acessorioCropQueue = files.slice();
+    processNextAcessorioCrop();
     this.value = '';
 }
 
 function handleRemovePhoto(event) {
     const entryId = event.currentTarget.dataset.entry;
     const index = parseInt(event.currentTarget.dataset.index, 10);
-    const dt = acessãoriosPhotos[entryId];
+    const dt = acessoriosPhotos[entryId];
     if (!dt) return;
     const newDt = new DataTransfer();
     Array.from(dt.files).forEach((file, idx) => {
-        if (idx !== index) newDt.itemês.add(file);
+        if (idx !== index) newDt.items.add(file);
     });
     if (newDt.files.length === 0) {
-        delete acessãoriosPhotos[entryId];
-        removeAcessãorioFileInput(entryId);
+        delete acessoriosPhotos[entryId];
+        removeAcessorioFileInput(entryId);
     } else {
-        acessãoriosPhotos[entryId] = newDt;
-        ensureAcessãorioFileInput(entryId);
+        acessoriosPhotos[entryId] = newDt;
+        ensureAcessorioFileInput(entryId);
     }
-    renderAcessãoriosList();
+    renderAcessoriosList();
 }
 
-document.querySelectorAll('[data-acessãorio-key]').forEach(btn => {
-    btn.addEventListener('click', handleAcessãoriosButtonClick);
+document.querySelectorAll('[data-acessorio-key]').forEach(btn => {
+    btn.addEventListener('click', handleAcessoriosButtonClick);
 });
-acessãoriosSemItensCheckbox?.addEventListener('change', () => {
-    const enableSemItens = Boolean(acessãoriosSemItensCheckbox.checked);
+acessoriosSemItensCheckbox?.addEventListener('change', () => {
+    const enableSemItens = Boolean(acessoriosSemItensCheckbox.checked);
     if (!enableSemItens) {
-        refreshAcessãoriosSemItensUi();
-        renderAcessãoriosList();
-        syncAcessãoriosInput();
+        refreshAcessoriosSemItensUi();
+        renderAcessoriosList();
+        syncAcessoriosInput();
         return;
     }
 
-    if (!acessãoriosEntries.length) {
-        refreshAcessãoriosSemItensUi();
-        renderAcessãoriosList();
-        syncAcessãoriosInput();
+    if (!acessoriosEntries.length) {
+        refreshAcessoriosSemItensUi();
+        renderAcessoriosList();
+        syncAcessoriosInput();
         return;
     }
 
     const applySemItens = () => {
-        clearAllAcessãorios();
-        refreshAcessãoriosSemItensUi();
-        renderAcessãoriosList();
-        syncAcessãoriosInput();
+        clearAllAcessorios();
+        refreshAcessoriosSemItensUi();
+        renderAcessoriosList();
+        syncAcessoriosInput();
     };
 
     if (window.Swal && typeof window.Swal.fire === 'function') {
@@ -2180,8 +2180,8 @@ acessãoriosSemItensCheckbox?.addEventListener('change', () => {
                 applySemItens();
                 return;
             }
-            acessãoriosSemItensCheckbox.checked = false;
-            refreshAcessãoriosSemItensUi();
+            acessoriosSemItensCheckbox.checked = false;
+            refreshAcessoriosSemItensUi();
         });
         return;
     }
@@ -2191,22 +2191,22 @@ acessãoriosSemItensCheckbox?.addEventListener('change', () => {
         applySemItens();
         return;
     }
-    acessãoriosSemItensCheckbox.checked = false;
-    refreshAcessãoriosSemItensUi();
+    acessoriosSemItensCheckbox.checked = false;
+    refreshAcessoriosSemItensUi();
 });
-acessãoriosQuickSave?.addEventListener('click', handleAcessãoriosSave);
-acessãoriosQuickCancel?.addEventListener('click', handleAcessãoriosCancel);
-acessãoriosQuickClose?.addEventListener('click', handleAcessãoriosCancel);
+acessoriosQuickSave?.addEventListener('click', handleAcessoriosSave);
+acessoriosQuickCancel?.addEventListener('click', handleAcessoriosCancel);
+acessoriosQuickClose?.addEventListener('click', handleAcessoriosCancel);
 document.addEventListener('click', event => {
-    const removeBtn = event.target.closest('.btn-remove-acessãorio');
-    if (removeBtn) handleRemoveAcessãorio({ currentTarget: removeBtn });
-    const editBtn = event.target.closest('.btn-edit-acessãorio');
-    if (editBtn) handleEditAcessãorio({ currentTarget: editBtn });
+    const removeBtn = event.target.closest('.btn-remove-acessorio');
+    if (removeBtn) handleRemoveAcessorio({ currentTarget: removeBtn });
+    const editBtn = event.target.closest('.btn-edit-acessorio');
+    if (editBtn) handleEditAcessorio({ currentTarget: editBtn });
     const addPhotoBtn = event.target.closest('.btn-add-foto');
-    if (addPhotoBtn) openAcessãorioPhotoInput(addPhotoBtn.dataset.entry);
+    if (addPhotoBtn) openAcessorioPhotoInput(addPhotoBtn.dataset.entry);
     const addPhotoCameraBtn = event.target.closest('.btn-add-foto-camera');
-    if (addPhotoCameraBtn) openAcessãorioCameraCapture(addPhotoCameraBtn.dataset.entry);
-    const removePhotoBtn = event.target.closest('.btn-remove-foto-accessãorio');
+    if (addPhotoCameraBtn) openAcessorioCameraCapture(addPhotoCameraBtn.dataset.entry);
+    const removePhotoBtn = event.target.closest('.btn-remove-foto-accessorio');
     if (removePhotoBtn) handleRemovePhoto({ currentTarget: removePhotoBtn });
     const removeEstadoBtn = event.target.closest('.btn-remove-estado');
     if (removeEstadoBtn) handleRemoveEstadoFisico({ currentTarget: removeEstadoBtn });
@@ -2219,43 +2219,43 @@ document.addEventListener('click', event => {
     const removeEstadoPhotoBtn = event.target.closest('.btn-remove-foto-estado');
     if (removeEstadoPhotoBtn) handleRemoveEstadoFisicoPhoto({ currentTarget: removeEstadoPhotoBtn });
 });
-acessãoriosPhotoInput?.addEventListener('change', handlePhotoInputChange);
+acessoriosPhotoInput?.addEventListener('change', handlePhotoInputChange);
 
 const estadoFisicoConfig = {
     tela_trincada: {
         title: 'Tela trincada',
         fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: canto superior direito' }],
-        format: values => composeAccessãoryText('Tela trincada', values.detalhe)
+        format: values => composeAccessoryText('Tela trincada', values.detalhe)
     },
     arranhoes: {
         title: 'Arranhoes',
         fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: tampa e lateral' }],
-        format: values => composeAccessãoryText('Arranhoes', values.detalhe)
+        format: values => composeAccessoryText('Arranhoes', values.detalhe)
     },
     carcaca_quebrada: {
         title: 'Carcaca quebrada',
         fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: quina inferior' }],
-        format: values => composeAccessãoryText('Carcaca quebrada', values.detalhe)
+        format: values => composeAccessoryText('Carcaca quebrada', values.detalhe)
     },
     vidro_traseiro_quebrado: {
         title: 'Vidro traseiro quebrado',
         fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: fissura central' }],
-        format: values => composeAccessãoryText('Vidro traseiro quebrado', values.detalhe)
+        format: values => composeAccessoryText('Vidro traseiro quebrado', values.detalhe)
     },
     amassado: {
         title: 'Amassado',
         fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: lateral esquerda' }],
-        format: values => composeAccessãoryText('Amassado', values.detalhe)
+        format: values => composeAccessoryText('Amassado', values.detalhe)
     },
     botao_quebrado: {
         title: 'Botao quebrado',
         fields: [{ name: 'detalhe', label: 'Qual botao?', placeholder: 'Ex: power' }],
-        format: values => composeAccessãoryText('Botao quebrado', values.detalhe)
+        format: values => composeAccessoryText('Botao quebrado', values.detalhe)
     },
     outro: {
-        title: 'Outro danão',
+        title: 'Outro dano',
         fields: [{ name: 'descricao', label: 'Descricao', placeholder: 'Ex: camera traseira quebrada' }],
-        format: values => values.descricao || 'Outro danão'
+        format: values => values.descricao || 'Outro dano'
     }
 };
 
@@ -2296,12 +2296,12 @@ if (estadoFisicoSemAvariasCheckbox && initialEstadoFisicoText.toLowerCase() === 
 }
 if (!estadoFisicoEntries.length && initialEstadoFisicoText && initialEstadoFisicoText.toLowerCase() !== ESTADO_FISICO_SEM_AVARIAS_TEXT.toLowerCase()) {
     initialEstadoFisicoText.split(/\r?\n/).filter(Boolean).forEach(text => {
-        estadoFisicoEntries.push({ id: `est_${Date.nãow()}_${Math.random().toString(36).slice(2)}`, text, key: 'outro' });
+        estadoFisicoEntries.push({ id: `est_${Date.now()}_${Math.random().toString(36).slice(2)}`, text, key: 'outro' });
     });
 }
 
 function generateEstadoFisicoEntryId() {
-    return `est_${Date.nãow()}_${Math.random().toString(36).substring(2, 8)}`;
+    return `est_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 }
 
 function isEstadoFisicoSemAvariasChecked() {
@@ -2362,7 +2362,7 @@ function ensureEstadoFisicoFileInput(entryId) {
         input.multiple = true;
         input.name = `fotos_estado_fisico[${entryId}][]`;
         input.id = `estado_fisico_files_${entryId}`;
-        input.className = 'd-nãone';
+        input.className = 'd-none';
         estadoFisicoFilesInputs.appendChild(input);
         estadoFisicoFileInputs[entryId] = input;
     }
@@ -2397,7 +2397,7 @@ function renderEstadoFisicoPhotos(entryId, container) {
 
             const preview = document.createElement('div');
             preview.className = 'w-100 h-100 overflow-hidden position-relative image-preview';
-            preview.style.cursãor = 'zoom-in';
+            preview.style.cursor = 'zoom-in';
             preview.setAttribute('data-bs-toggle', 'modal');
             preview.setAttribute('data-bs-target', '#imageModal');
             preview.setAttribute('data-img-src', e.target.result);
@@ -2405,7 +2405,7 @@ function renderEstadoFisicoPhotos(entryId, container) {
 
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
-            removeBtn.className = 'btn btn-sm btn-outline-light position-absãolute top-0 end-0 m-1 btn-remove-foto-estado';
+            removeBtn.className = 'btn btn-sm btn-outline-light position-absolute top-0 end-0 m-1 btn-remove-foto-estado';
             removeBtn.dataset.entry = entryId;
             removeBtn.dataset.index = index;
             removeBtn.innerHTML = '<i class="bi bi-x"></i>';
@@ -2435,7 +2435,7 @@ function renderEstadoFisicoList() {
         const item = document.createElement('div');
         item.className = 'list-group-item';
         item.innerHTML = `
-            <div class="d-flex justify-content-between align-itemês-center">
+            <div class="d-flex justify-content-between align-items-center">
                 <span class="fw-semibold">${entry.text}</span>
                 <div class="d-flex gap-1">
                     <button type="button" class="btn btn-outline-info btn-sm btn-add-foto-estado" data-entry="${entry.id}"><i class="bi bi-camera"></i> Adicionar foto</button>
@@ -2455,7 +2455,7 @@ function renderEstadoFisicoList() {
 }
 
 function closeEstadoFisicoForm() {
-    estadoFisicoQuickForm?.classList.add('d-nãone');
+    estadoFisicoQuickForm?.classList.add('d-none');
     estadoFisicoQuickFields.innerHTML = '';
     estadoFisicoEditing = null;
 }
@@ -2492,7 +2492,7 @@ function openEstadoFisicoForm(key, index = null) {
         });
     }
 
-    estadoFisicoQuickForm?.classList.remove('d-nãone');
+    estadoFisicoQuickForm?.classList.remove('d-none');
 }
 
 function collectEstadoFisicoFormValues() {
@@ -2564,8 +2564,8 @@ async function processNextEstadoFisicoCrop() {
 
     const nextFile = estadoFisicoCropQueue.shift();
     try {
-        const sãource = await readFileAsDataUrl(nextFile);
-        openCropper(sãource, { type: 'estado_fisico' });
+        const source = await readFileAsDataUrl(nextFile);
+        openCropper(source, { type: 'estado_fisico' });
     } catch (e) {
         processNextEstadoFisicoCrop();
     }
@@ -2593,7 +2593,7 @@ function handleRemoveEstadoFisicoPhoto(event) {
 
     const newDt = new DataTransfer();
     Array.from(dt.files).forEach((file, idx) => {
-        if (idx !== index) newDt.itemês.add(file);
+        if (idx !== index) newDt.items.add(file);
     });
 
     if (!newDt.files.length) {
@@ -2677,12 +2677,12 @@ estadoFisicoPhotoInput?.addEventListener('change', handleEstadoFisicoPhotoInputC
 refreshEstadoFisicoSemAvariasUi();
 renderEstadoFisicoList();
 syncEstadoFisicoInput();
-refreshAcessãoriosSemItensUi();
-renderAcessãoriosList();
-syncAcessãoriosInput();
+refreshAcessoriosSemItensUi();
+renderAcessoriosList();
+syncAcessoriosInput();
 
-function getTotalAcessãoriosFotos() {
-    return Object.keys(acessãoriosPhotos).reduce((sum, id) => sum + (acessãoriosPhotos[id]?.files?.length || 0), 0);
+function getTotalAcessoriosFotos() {
+    return Object.keys(acessoriosPhotos).reduce((sum, id) => sum + (acessoriosPhotos[id]?.files?.length || 0), 0);
 }
 
 function getTotalEstadoFisicoFotos() {
@@ -2690,9 +2690,9 @@ function getTotalEstadoFisicoFotos() {
 }
 
 function getTotalFotosEntradaResumo() {
-    const fotosEntradaNãovas = document.getElementById('fotosEntradaInput')?.files?.length || 0;
+    const fotosEntradaNovas = document.getElementById('fotosEntradaInput')?.files?.length || 0;
     const fotosEntradaExistentes = existingFotosCount || 0;
-    return fotosEntradaNãovas + fotosEntradaExistentes + getTotalAcessãoriosFotos() + getTotalEstadoFisicoFotos();
+    return fotosEntradaNovas + fotosEntradaExistentes + getTotalAcessoriosFotos() + getTotalEstadoFisicoFotos();
 }
 
 function _setResumoRascunho(text) {
@@ -2709,7 +2709,7 @@ function _collectDraft() {
     const entradaInp = document.querySelector('input[name="data_entrada"]');
     const previsaoInp = document.querySelector('input[name="data_previsao"]');
     const relatoInp  = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
-    const acessãoriosInp = document.querySelector('textarea[name="acessãorios"]');
+    const acessoriosInp = document.querySelector('textarea[name="acessorios"]');
     const estadoFisicoInp = document.querySelector('textarea[name="estado_fisico"]');
     const formaPagamentoSel = document.querySelector('select[name="forma_pagamento"]');
 
@@ -2718,13 +2718,13 @@ function _collectDraft() {
         cliente_id: clienteSel?.value || '',
         equipamento_id: equipSel?.value || '',
         tecnico_id: tecnicoSel?.value || '',
-        prioridade: prioridadeSel?.value || 'nãormal',
+        prioridade: prioridadeSel?.value || 'normal',
         status: statusSel?.value || 'triagem',
         data_entrada: entradaInp?.value || '',
         data_previsao: previsaoInp?.value || '',
         relato_cliente: relatoInp?.value || '',
-        acessãorios: acessãoriosInp?.value || '',
-        acessãorios_sem_itens: acessãoriosSemItensCheckbox?.checked ? '1' : '0',
+        acessorios: acessoriosInp?.value || '',
+        acessorios_sem_itens: acessoriosSemItensCheckbox?.checked ? '1' : '0',
         estado_fisico: estadoFisicoInp?.value || '',
         estado_fisico_sem_avarias: estadoFisicoSemAvariasCheckbox?.checked ? '1' : '0',
         forma_pagamento: formaPagamentoSel?.value || '',
@@ -2740,8 +2740,8 @@ function _hasDraftData(data) {
         data.tecnico_id ||
         data.data_previsao ||
         data.relato_cliente?.trim() ||
-        data.acessãorios?.trim() ||
-        data.acessãorios_sem_itens === '1' ||
+        data.acessorios?.trim() ||
+        data.acessorios_sem_itens === '1' ||
         data.estado_fisico?.trim() ||
         data.estado_fisico_sem_avarias === '1' ||
         data.forma_pagamento?.trim() ||
@@ -2749,7 +2749,7 @@ function _hasDraftData(data) {
     );
 }
 
-function saveDraftNãow() {
+function saveDraftNow() {
     if (isEdit) return;
     const data = _collectDraft();
     if (!_hasDraftData(data)) {
@@ -2766,7 +2766,7 @@ function scheduleDraftSave() {
     if (isEdit) return;
     if (draftSaveTimer) clearTimeout(draftSaveTimer);
     draftSaveTimer = setTimeout(() => {
-        saveDraftNãow();
+        saveDraftNow();
     }, 800);
 }
 
@@ -2779,7 +2779,7 @@ function _loadDraft() {
         if (!data?.savedAt) return null;
         const savedAt = new Date(data.savedAt);
         if (Number.isNaN(savedAt.getTime())) return null;
-        if (Date.nãow() - savedAt.getTime() > DRAFT_TTL_MS) {
+        if (Date.now() - savedAt.getTime() > DRAFT_TTL_MS) {
             localStorage.removeItem(DRAFT_KEY);
             return null;
         }
@@ -2797,34 +2797,34 @@ function _applyDraft(data) {
     const entradaInp = document.querySelector('input[name="data_entrada"]');
     const previsaoInp = document.querySelector('input[name="data_previsao"]');
     const relatoInp  = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
-    const acessãoriosInp = document.querySelector('textarea[name="acessãorios"]');
+    const acessoriosInp = document.querySelector('textarea[name="acessorios"]');
     const estadoFisicoInp = document.querySelector('textarea[name="estado_fisico"]');
     const formaPagamentoSel = document.querySelector('select[name="forma_pagamento"]');
 
     if (tecnicoSel) tecnicoSel.value = data.tecnico_id || '';
-    if (prioridadeSel) prioridadeSel.value = data.prioridade || 'nãormal';
+    if (prioridadeSel) prioridadeSel.value = data.prioridade || 'normal';
     if (statusSel) statusSel.value = data.status || 'triagem';
     if (entradaInp && data.data_entrada) entradaInp.value = data.data_entrada;
     if (previsaoInp) previsaoInp.value = data.data_previsao || '';
     if (relatoInp) relatoInp.value = data.relato_cliente || '';
-    if (acessãoriosInp) acessãoriosInp.value = data.acessãorios || '';
+    if (acessoriosInp) acessoriosInp.value = data.acessorios || '';
     if (estadoFisicoInp) estadoFisicoInp.value = data.estado_fisico || '';
-    if (acessãoriosSemItensCheckbox) {
-        const semItens = String(data.acessãorios_sem_itens || '') === '1'
-            || String(data.acessãorios || '').trim().toLowerCase() === ACCESSORIOS_SEM_ITENS_TEXT.toLowerCase();
-        acessãoriosSemItensCheckbox.checked = semItens;
-        clearAllAcessãorios();
+    if (acessoriosSemItensCheckbox) {
+        const semItens = String(data.acessorios_sem_itens || '') === '1'
+            || String(data.acessorios || '').trim().toLowerCase() === ACCESSORIOS_SEM_ITENS_TEXT.toLowerCase();
+        acessoriosSemItensCheckbox.checked = semItens;
+        clearAllAcessorios();
         if (!semItens) {
-            const draftAcessãorios = String(data.acessãorios || '').trim();
-            if (draftAcessãorios) {
-                draftAcessãorios.split(/\r?\n/).filter(Boolean).forEach(text => {
-                    acessãoriosEntries.push({ id: generateEntryId(), text, key: 'outro' });
+            const draftAcessorios = String(data.acessorios || '').trim();
+            if (draftAcessorios) {
+                draftAcessorios.split(/\r?\n/).filter(Boolean).forEach(text => {
+                    acessoriosEntries.push({ id: generateEntryId(), text, key: 'outro' });
                 });
             }
         }
-        refreshAcessãoriosSemItensUi();
-        renderAcessãoriosList();
-        syncAcessãoriosInput();
+        refreshAcessoriosSemItensUi();
+        renderAcessoriosList();
+        syncAcessoriosInput();
     }
     if (estadoFisicoSemAvariasCheckbox) {
         const semAvarias = String(data.estado_fisico_sem_avarias || '') === '1'
@@ -2872,23 +2872,23 @@ function _applyPendingDefeitos() {
     pendingDefeitos = null;
 }
 
-// Rascunho autom�tico para nãova OS
+// Rascunho autom�tico para nova OS
 if (!isEdit) {
     const draftData = _loadDraft();
     const draftAlert = document.getElementById('osDraftAlert');
     if (draftData && draftAlert) {
-        draftAlert.classList.remove('d-nãone');
+        draftAlert.classList.remove('d-none');
         const savedAtLabel = new Date(draftData.savedAt).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
         _setResumoRascunho('Rascunho em ' + savedAtLabel);
         document.getElementById('btnRestaurarRascunho')?.addEventListener('click', () => {
-            draftAlert.classList.add('d-nãone');
+            draftAlert.classList.add('d-none');
             _applyDraft(draftData);
             updateResumo();
             scheduleDraftSave();
         });
         document.getElementById('btnDescartarRascunho')?.addEventListener('click', () => {
             localStorage.removeItem(DRAFT_KEY);
-            draftAlert.classList.add('d-nãone');
+            draftAlert.classList.add('d-none');
             _setResumoRascunho('N�o salvo');
         });
     } else {
@@ -2953,10 +2953,10 @@ if (formOs) {
         const optionalChecks = [
             { selector: 'input[name="data_previsao"]', label: 'Previsao de Entrega', tabBtnId: 'tab-dados-btn', isMissing: (el) => !el?.value },
             {
-                selector: '#acessãoriosSemItens',
-                label: 'Acessãorios/Componentes',
+                selector: '#acessoriosSemItens',
+                label: 'Acessorios/Componentes',
                 tabBtnId: 'tab-dados-btn',
-                isMissing: () => !isAcessãoriosSemItensChecked() && !((acessãoriosInput?.value || '').trim())
+                isMissing: () => !isAcessoriosSemItensChecked() && !((acessoriosInput?.value || '').trim())
             },
             {
                 selector: '#estadoFisicoSemAvarias',
@@ -3101,24 +3101,24 @@ function carregarFotosEquipamentoLegacy(equipId, equipData) {
             ${equipData.tipo  ? `<div class="mt-1"><i class="bi bi-cpu me-1"></i>${equipData.tipo}</div>` : ''}
         `;
         const corHex = equipData.cor_hex || '#2a2a2a';
-        const corNãome = equipData.cor || 'Cor n�o informada';
+        const corNome = equipData.cor || 'Cor n�o informada';
         if (colorSwatch) colorSwatch.style.background = corHex;
-        if (colorName) colorName.textContent = corNãome;
-        if (colorInfo) colorInfo.classList.remove('d-nãone');
+        if (colorName) colorName.textContent = corNome;
+        if (colorInfo) colorInfo.classList.remove('d-none');
     }
 
     // Busca fotos via AJAX
     fetch(`${BASE_URL}equipamentos/fotos/${equipId}`)
-    .then(r => r.jsãon())
+    .then(r => r.json())
     .then(fotos => {
         minis.innerHTML = '';
         if (fotos.length === 0) {
-            mainBox.classList.add('d-nãone');
-            placeholder.classList.remove('d-nãone');
+            mainBox.classList.add('d-none');
+            placeholder.classList.remove('d-none');
             placeholder.classList.add('d-flex');
             if (equipData?.cor_hex) {
                 placeholder.style.background = equipData.cor_hex;
-                placeholder.style.border = '2px sãolid rgba(0,0,0,0.2)';
+                placeholder.style.border = '2px solid rgba(0,0,0,0.2)';
                 placeholder.style.color = '#fff';
             }
             return;
@@ -3128,8 +3128,8 @@ function carregarFotosEquipamentoLegacy(equipId, equipData) {
         const principal = fotos.find(f => f.is_principal == 1) || fotos[0];
         img.src = principal.url;
         document.getElementById('fotoPrincipalLink').setAttribute('data-img-src', principal.url);
-        mainBox.classList.remove('d-nãone');
-        placeholder.classList.add('d-nãone');
+        mainBox.classList.remove('d-none');
+        placeholder.classList.add('d-none');
         placeholder.classList.remove('d-flex');
         placeholder.style.background = 'rgba(255,255,255,0.04)';
         placeholder.style.color = '';
@@ -3137,8 +3137,8 @@ function carregarFotosEquipamentoLegacy(equipId, equipData) {
         // Miniaturas
                 fotos.forEach((f, i) => {
                     const el = document.createElement('div');
-                    el.className = 'border rounded overflow-hidden shadow-sm hover-elevate cursãor-pointer';
-                    el.style.cssText = 'width: 45px; height: 45px; cursãor: pointer; transition: all 0.2s;';
+                    el.className = 'border rounded overflow-hidden shadow-sm hover-elevate cursor-pointer';
+                    el.style.cssText = 'width: 45px; height: 45px; cursor: pointer; transition: all 0.2s;';
                     el.innerHTML = `<img src="${f.url}" class="w-100 h-100 object-fit-cover">`;
             el.addEventListener('click', () => {
                 img.style.opacity = '0.4';
@@ -3157,9 +3157,9 @@ function carregarFotosEquipamentoLegacy(equipId, equipData) {
 
 // ??? Select de cliente ? carrega equipamentos ?????????????????????????????
 // Override com renderizacao reativa e anti-cache para fotos do equipamento.
-let equipamentoFotosVersion = Date.nãow();
+let equipamentoFotosVersion = Date.now();
 function bumpEquipamentoFotosVersion() {
-    equipamentoFotosVersion = Date.nãow();
+    equipamentoFotosVersion = Date.now();
 }
 
 function withFotoVersion(url, version = equipamentoFotosVersion) {
@@ -3190,21 +3190,21 @@ function renderFotosEquipamentoSidebar(fotos, equipData) {
             ${equipData.tipo  ? `<div class="mt-1"><i class="bi bi-cpu me-1"></i>${equipData.tipo}</div>` : ''}
         `;
         const corHex = equipData.cor_hex || '#2a2a2a';
-        const corNãome = equipData.cor || 'Cor nao informada';
+        const corNome = equipData.cor || 'Cor nao informada';
         if (colorSwatch) colorSwatch.style.background = corHex;
-        if (colorName) colorName.textContent = corNãome;
-        if (colorInfo) colorInfo.classList.remove('d-nãone');
+        if (colorName) colorName.textContent = corNome;
+        if (colorInfo) colorInfo.classList.remove('d-none');
     }
 
     minis.innerHTML = '';
     const lista = Array.isArray(fotos) ? fotos : [];
     if (!lista.length) {
-        mainBox.classList.add('d-nãone');
-        placeholder.classList.remove('d-nãone');
+        mainBox.classList.add('d-none');
+        placeholder.classList.remove('d-none');
         placeholder.classList.add('d-flex');
         if (equipData?.cor_hex) {
             placeholder.style.background = equipData.cor_hex;
-            placeholder.style.border = '2px sãolid rgba(0,0,0,0.2)';
+            placeholder.style.border = '2px solid rgba(0,0,0,0.2)';
             placeholder.style.color = '#fff';
         }
         return;
@@ -3214,8 +3214,8 @@ function renderFotosEquipamentoSidebar(fotos, equipData) {
     const principalUrl = withFotoVersion(principal.url);
     img.src = principalUrl;
     document.getElementById('fotoPrincipalLink')?.setAttribute('data-img-src', principalUrl);
-    mainBox.classList.remove('d-nãone');
-    placeholder.classList.add('d-nãone');
+    mainBox.classList.remove('d-none');
+    placeholder.classList.add('d-none');
     placeholder.classList.remove('d-flex');
     placeholder.style.background = 'rgba(255,255,255,0.04)';
     placeholder.style.color = '';
@@ -3224,8 +3224,8 @@ function renderFotosEquipamentoSidebar(fotos, equipData) {
         const thumbUrl = withFotoVersion(foto.url);
         const isPrincipal = Number(foto.is_principal) === 1;
         const el = document.createElement('div');
-        el.className = 'border rounded overflow-hidden shadow-sm hover-elevate cursãor-pointer';
-        el.style.cssText = `width:45px;height:45px;cursãor:pointer;transition:all 0.2s;border-color:${isPrincipal ? 'var(--primary)' : 'rgba(255,255,255,0.1)'};`;
+        el.className = 'border rounded overflow-hidden shadow-sm hover-elevate cursor-pointer';
+        el.style.cssText = `width:45px;height:45px;cursor:pointer;transition:all 0.2s;border-color:${isPrincipal ? 'var(--primary)' : 'rgba(255,255,255,0.1)'};`;
         el.innerHTML = `<img src="${thumbUrl}" class="w-100 h-100 object-fit-cover" alt="Miniatura do equipamento">`;
         el.addEventListener('click', () => {
             img.style.opacity = '0.4';
@@ -3247,8 +3247,8 @@ function carregarFotosEquipamento(equipId, equipData, fotosOverride = null) {
         renderFotosEquipamentoSidebar(fotosOverride, equipData);
         return;
     }
-    fetch(`${BASE_URL}equipamentos/fotos/${equipId}?v=${Date.nãow()}`)
-        .then(r => r.jsãon())
+    fetch(`${BASE_URL}equipamentos/fotos/${equipId}?v=${Date.now()}`)
+        .then(r => r.json())
         .then(fotos => {
             bumpEquipamentoFotosVersion();
             renderFotosEquipamentoSidebar(fotos, equipData);
@@ -3281,14 +3281,14 @@ function _onClienteChange(clienteId) {
     }
 
     // Atualiza cliente_id para o modal
-    const hiddenCli = document.getElementById('nãovoEquipClienteId');
+    const hiddenCli = document.getElementById('novoEquipClienteId');
     if (hiddenCli) hiddenCli.value = clienteId;
     window._osClienteId = clienteId;
 
     fetch(`${BASE_URL}equipamentos/por-cliente/${clienteId}`, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
-    .then(r => r.jsãon())
+    .then(r => r.json())
     .then(equipamentos => {
         if (window._osEquipamentosCache) {
             Object.keys(window._osEquipamentosCache).forEach(key => delete window._osEquipamentosCache[key]);
@@ -3302,26 +3302,26 @@ function _onClienteChange(clienteId) {
                 if (window._osEquipamentosCache) {
                     window._osEquipamentosCache[String(eq.id)] = eq;
                 }
-                const nãome = (eq.marca_nãome || '') + ' ' + (eq.modelo_nãome || '') + ' (' + (eq.tipo_nãome || eq.tipo || '') + ')';
-                const opt  = new Option(nãome, eq.id);
+                const nome = (eq.marca_nome || '') + ' ' + (eq.modelo_nome || '') + ' (' + (eq.tipo_nome || eq.tipo || '') + ')';
+                const opt  = new Option(nome, eq.id);
                 opt.dataset.tipo      = eq.tipo_id || '';
-                opt.dataset.marca     = eq.marca_nãome || '';
-                opt.dataset.modelo    = eq.modelo_nãome || '';
+                opt.dataset.marca     = eq.marca_nome || '';
+                opt.dataset.modelo    = eq.modelo_nome || '';
                 opt.dataset.serie     = eq.numero_serie || '';
                 opt.dataset.cor       = eq.cor || '';
                 opt.dataset.cor_hex   = eq.cor_hex || '';
-                opt.dataset.tipo_nãome = eq.tipo_nãome || '';
+                opt.dataset.tipo_nome = eq.tipo_nome || '';
                 opt.dataset.marca_id  = eq.marca_id || '';
                 opt.dataset.modelo_id = eq.modelo_id || '';
                 opt.dataset.cliente_id = eq.cliente_id || '';
-                opt.dataset.senha_acessão = eq.senha_acessão || '';
+                opt.dataset.senha_acesso = eq.senha_acesso || '';
                 opt.dataset.estado_fisico = eq.estado_fisico || '';
-                opt.dataset.acessãorios = eq.acessãorios || '';
+                opt.dataset.acessorios = eq.acessorios || '';
                 equipamentoSelect.appendChild(opt);
             });
         }
         equipamentoSelect.disabled = false;
-        // Re-inicializa Select2 não equipamento
+        // Re-inicializa Select2 no equipamento
         if (typeof $.fn.select2 !== 'undefined') {
             $('#equipamentoSelect').select2({
                 theme: 'bootstrap-5',
@@ -3375,7 +3375,7 @@ function _onEquipamentoChange(id, opt) {
             marca:  opt?.dataset?.marca,
             modelo: opt?.dataset?.modelo,
             serie:  opt?.dataset?.serie,
-            tipo:   opt?.dataset?.tipo_nãome,
+            tipo:   opt?.dataset?.tipo_nome,
             cor:    opt?.dataset?.cor,
             cor_hex: opt?.dataset?.cor_hex
         });
@@ -3407,7 +3407,7 @@ if (equipSelect) {
                 marca:  opt?.dataset.marca,
                 modelo: opt?.dataset.modelo,
                 serie:  opt?.dataset.serie,
-                tipo:   opt?.dataset.tipo_nãome,
+                tipo:   opt?.dataset.tipo_nome,
                 cor:    opt?.dataset.cor,
                 cor_hex: opt?.dataset.cor_hex
             });
@@ -3415,9 +3415,9 @@ if (equipSelect) {
     }
 }
 
-// Atualiza resumo e rascunho conforme altera��es não formul�rio
+// Atualiza resumo e rascunho conforme altera��es no formul�rio
 ['input', 'change'].forEach(evt => {
-    document.querySelector('textarea[name="acessãorios"]')?.addEventListener(evt, () => {
+    document.querySelector('textarea[name="acessorios"]')?.addEventListener(evt, () => {
         updateResumo();
         scheduleDraftSave();
     });
@@ -3451,7 +3451,7 @@ if (equipSelect) {
 });
 
 // ??? Preview fotos de entrada ?????????????????????????????????????????????
-const osFotosExistingData = <?= jsãon_encode(array_map(fn($f) => ['url' => $f['url']], $fotos_entrada ?? [])) ?>;
+const osFotosExistingData = <?= json_encode(array_map(fn($f) => ['url' => $f['url']], $fotos_entrada ?? [])) ?>;
 const osFotosMaxFiles = 4;
 const osFotoMaxSizeMb = 2;
 const fotosEntradaInput = document.getElementById('fotosEntradaInput');
@@ -3476,7 +3476,7 @@ function syncFotosEntradaInput() {
 function toggleFotosEntradaEmptyState() {
     if (!fotosEntradaEmptyState) return;
     const totalPhotos = osFotosExistingData.length + osDataTransfer.files.length;
-    fotosEntradaEmptyState.style.display = totalPhotos > 0 ? 'nãone' : 'block';
+    fotosEntradaEmptyState.style.display = totalPhotos > 0 ? 'none' : 'block';
 }
 
 function queueFotosEntradaFromFiles(files) {
@@ -3485,13 +3485,13 @@ function queueFotosEntradaFromFiles(files) {
 
     const disponivel = osFotosMaxFiles - osDataTransfer.files.length;
     if (disponivel <= 0) {
-        showWarningDialog(`Vocêe pode enviar ate ${osFotosMaxFiles} fotos não total.`);
+        showWarningDialog(`Voce pode enviar ate ${osFotosMaxFiles} fotos no total.`);
         return;
     }
 
     fotosEntradaCropQueue = incoming.slice(0, disponivel);
     if (incoming.length > disponivel) {
-        showWarningDialog(`Sãomente ${disponivel} foto(s) cabem agora (limite de ${osFotosMaxFiles}).`);
+        showWarningDialog(`Somente ${disponivel} foto(s) cabem agora (limite de ${osFotosMaxFiles}).`);
     }
     processNextFotoEntradaCrop();
 }
@@ -3503,7 +3503,7 @@ function processNextFotoEntradaCrop() {
     }
     const nextFile = fotosEntradaCropQueue.shift();
     if (nextFile.size > (osFotoMaxSizeMb * 1024 * 1024)) {
-        showWarningDialog(`Cada foto deve ter não maximo ${osFotoMaxSizeMb}MB.`);
+        showWarningDialog(`Cada foto deve ter no maximo ${osFotoMaxSizeMb}MB.`);
         processNextFotoEntradaCrop();
         return;
     }
@@ -3517,7 +3517,7 @@ function renderExistingFotos() {
     osFotosExisting.innerHTML = '';
     osFotosExistingData.forEach((foto, idx) => {
         const thumb = document.createElement('div');
-        thumb.className = 'position-relative border rounded overflow-hidden cursãor-pointer';
+        thumb.className = 'position-relative border rounded overflow-hidden cursor-pointer';
         thumb.style.cssText = 'width:90px; height:90px;';
         thumb.innerHTML = `
             <img src="${foto.url}" class="w-100 h-100 object-fit-cover">
@@ -3540,7 +3540,7 @@ function renderNewFotos() {
             thumb.style.cssText = 'width:110px; height:110px;';
             thumb.innerHTML = `
                 <img src="${e.target.result}" class="w-100 h-100 object-fit-cover">
-                <button type="button" class="btn btn-sm btn-outline-danger position-absãolute top-0 end-0 m-1 btn-remover-foto-nãova" data-index="${index}">
+                <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-1 btn-remover-foto-nova" data-index="${index}">
                     <i class="bi bi-x"></i>
                 </button>
             `;
@@ -3559,7 +3559,7 @@ function updatePhotoState() {
 }
 
 function clearNewFotos() {
-    osDataTransfer.itemês.clear();
+    osDataTransfer.items.clear();
     fotosEntradaCropQueue = [];
     if (fotosEntradaInput) fotosEntradaInput.value = '';
     if (fotosEntradaGaleriaInput) fotosEntradaGaleriaInput.value = '';
@@ -3591,15 +3591,15 @@ fotosEntradaGaleriaInput?.addEventListener('change', function() {
     this.value = '';
 });
 osFotosPreview?.addEventListener('click', function(event) {
-    const remover = event.target.closest('.btn-remover-foto-nãova');
+    const remover = event.target.closest('.btn-remover-foto-nova');
     if (!remover) return;
     const index = parseInt(remover.dataset.index, 10);
     const dt = new DataTransfer();
     Array.from(osDataTransfer.files).forEach((file, idx) => {
-        if (idx !== index) dt.itemês.add(file);
+        if (idx !== index) dt.items.add(file);
     });
-    osDataTransfer.itemês.clear();
-    Array.from(dt.files).forEach(f => osDataTransfer.itemês.add(f));
+    osDataTransfer.items.clear();
+    Array.from(dt.files).forEach(f => osDataTransfer.items.add(f));
     syncFotosEntradaInput();
     renderNewFotos();
     updatePhotoState();
@@ -3609,28 +3609,28 @@ renderExistingFotos();
 renderNewFotos();
 updatePhotoState();
 
-// ??? Modal: Cadastrar Nãovo Equipamento ?????????????????????????????????????
+// ??? Modal: Cadastrar Novo Equipamento ?????????????????????????????????????
 const osEquipamentosCache = window._osEquipamentosCache || (window._osEquipamentosCache = {});
-const btnNãovoEquip = document.getElementById('btnNãovoEquipamento');
+const btnNovoEquip = document.getElementById('btnNovoEquipamento');
 const btnEditarEquip = document.getElementById('btnEditarEquipamento');
-const modalNãovoEquipamentoEl = document.getElementById('modalNãovoEquipamento');
-const modalNãovoEquipamento = modalNãovoEquipamentoEl ? new bootstrap.Modal(modalNãovoEquipamentoEl) : null;
-const formNãovoEquipAjax = document.getElementById('formNãovoEquipAjax');
-const labelModalNãovoEquip = document.getElementById('labelModalNãovoEquip');
-const btnSalvarNãovoEquip = document.getElementById('btnSalvarNãovoEquip');
+const modalNovoEquipamentoEl = document.getElementById('modalNovoEquipamento');
+const modalNovoEquipamento = modalNovoEquipamentoEl ? new bootstrap.Modal(modalNovoEquipamentoEl) : null;
+const formNovoEquipAjax = document.getElementById('formNovoEquipAjax');
+const labelModalNovoEquip = document.getElementById('labelModalNovoEquip');
+const btnSalvarNovoEquip = document.getElementById('btnSalvarNovoEquip');
 const modalEquipFotosExistentesWrap = document.getElementById('modalEquipFotosExistentesWrap');
 const modalEquipFotosExistentes = document.getElementById('modalEquipFotosExistentes');
-const nãovoEquipFotosNãovasList = document.getElementById('nãovoEquipFotosNãovasList');
+const novoEquipFotosNovasList = document.getElementById('novoEquipFotosNovasList');
 let equipamentoModalMode = 'create';
 let equipamentoEditId = null;
 let modalEquipExistingFotos = [];
-let modalEquipFotosVersion = Date.nãow();
-const nãovoEquipFotosMaxFiles = 4;
-const nãovoEquipFotosDataTransfer = new DataTransfer();
-let nãovoEquipFotoCropQueue = [];
+let modalEquipFotosVersion = Date.now();
+const novoEquipFotosMaxFiles = 4;
+const novoEquipFotosDataTransfer = new DataTransfer();
+let novoEquipFotoCropQueue = [];
 
 function bumpModalEquipFotosVersion() {
-    modalEquipFotosVersion = Date.nãow();
+    modalEquipFotosVersion = Date.now();
 }
 
 function showWarningDialog(message, title = 'Aten��o') {
@@ -3650,21 +3650,21 @@ function showWarningDialog(message, title = 'Aten��o') {
 function ensureModalEquipSelect2() {
     $('.select2-modal').select2({
         theme: 'bootstrap-5',
-        dropdownParent: $('#modalNãovoEquipamento'),
+        dropdownParent: $('#modalNovoEquipamento'),
         width: '100%',
         placeholder: 'Escolha...'
     });
 }
 
-function ensureNãovoEquipClienteInput(clienteId) {
-    if (!formNãovoEquipAjax) return;
-    let hiddenInput = document.getElementById('nãovoEquipClienteId');
+function ensureNovoEquipClienteInput(clienteId) {
+    if (!formNovoEquipAjax) return;
+    let hiddenInput = document.getElementById('novoEquipClienteId');
     if (!hiddenInput) {
         hiddenInput = document.createElement('input');
         hiddenInput.type = 'hidden';
         hiddenInput.name = 'cliente_id';
-        hiddenInput.id = 'nãovoEquipClienteId';
-        formNãovoEquipAjax.appendChild(hiddenInput);
+        hiddenInput.id = 'novoEquipClienteId';
+        formNovoEquipAjax.appendChild(hiddenInput);
     }
     hiddenInput.value = clienteId || '';
 }
@@ -3673,93 +3673,93 @@ function setEquipamentoEditButtonState() {
     if (!btnEditarEquip) return;
     const equipId = document.getElementById('equipamentoSelect')?.value || '';
     const hasEquipamento = Boolean(String(equipId).trim());
-    btnEditarEquip.classList.toggle('d-nãone', !hasEquipamento);
+    btnEditarEquip.classList.toggle('d-none', !hasEquipamento);
 }
 
-function syncNãovoEquipFotosInput() {
-    if (!nãovoEquipFoto) return;
-    nãovoEquipFoto.files = nãovoEquipFotosDataTransfer.files;
+function syncNovoEquipFotosInput() {
+    if (!novoEquipFoto) return;
+    novoEquipFoto.files = novoEquipFotosDataTransfer.files;
 }
 
-function resetNãovoEquipPreview() {
-    nãovoEquipFotosDataTransfer.itemês.clear();
-    nãovoEquipFotoCropQueue = [];
-    if (nãovoEquipFoto) {
-        nãovoEquipFoto.value = '';
-        syncNãovoEquipFotosInput();
+function resetNovoEquipPreview() {
+    novoEquipFotosDataTransfer.items.clear();
+    novoEquipFotoCropQueue = [];
+    if (novoEquipFoto) {
+        novoEquipFoto.value = '';
+        syncNovoEquipFotosInput();
     }
-    renderNãovoEquipFotosNãovas();
+    renderNovoEquipFotosNovas();
     const fotoVazia = document.getElementById('fotoVaziaOS');
-    if (fotoVazia) fotoVazia.style.display = (modalEquipExistingFotos.length || nãovoEquipFotosDataTransfer.files.length) ? 'nãone' : 'block';
+    if (fotoVazia) fotoVazia.style.display = (modalEquipExistingFotos.length || novoEquipFotosDataTransfer.files.length) ? 'none' : 'block';
 }
 
 function getTotalModalEquipFotos() {
-    return (modalEquipExistingFotos?.length || 0) + (nãovoEquipFotosDataTransfer?.files?.length || 0);
+    return (modalEquipExistingFotos?.length || 0) + (novoEquipFotosDataTransfer?.files?.length || 0);
 }
 
-function renderNãovoEquipFotosNãovas() {
-    if (!previewDiv || !nãovoEquipFotosNãovasList) return;
-    const files = Array.from(nãovoEquipFotosDataTransfer.files || []);
-    nãovoEquipFotosNãovasList.innerHTML = '';
+function renderNovoEquipFotosNovas() {
+    if (!previewDiv || !novoEquipFotosNovasList) return;
+    const files = Array.from(novoEquipFotosDataTransfer.files || []);
+    novoEquipFotosNovasList.innerHTML = '';
 
     if (!files.length) {
-        previewDiv.style.display = 'nãone';
+        previewDiv.style.display = 'none';
         const fotoVazia = document.getElementById('fotoVaziaOS');
-        if (fotoVazia) fotoVazia.style.display = modalEquipExistingFotos.length ? 'nãone' : 'block';
+        if (fotoVazia) fotoVazia.style.display = modalEquipExistingFotos.length ? 'none' : 'block';
         return;
     }
 
     previewDiv.style.display = 'block';
     const fotoVazia = document.getElementById('fotoVaziaOS');
-    if (fotoVazia) fotoVazia.style.display = 'nãone';
+    if (fotoVazia) fotoVazia.style.display = 'none';
 
     files.forEach((file, index) => {
         const objectUrl = URL.createObjectURL(file);
-        const isPrincipal = index === 0 && !modalEquipExistingFotos.sãome(f => Number(f.is_principal) === 1);
+        const isPrincipal = index === 0 && !modalEquipExistingFotos.some(f => Number(f.is_principal) === 1);
         const thumb = document.createElement('div');
         thumb.className = 'position-relative d-inline-block shadow rounded border p-1 bg-white';
         thumb.style.cssText = `width:96px;height:96px;border-color:${isPrincipal ? 'var(--primary)' : 'rgba(0,0,0,.1)'};`;
         thumb.innerHTML = `
-            <img src="${objectUrl}" class="w-100 h-100" style="object-fit:cover; border-radius:4px;" alt="Nãova foto do equipamento">
-            ${isPrincipal ? '<span class="badge text-bg-primary position-absãolute top-0 start-0 m-1" style="font-size:0.55rem;">Principal</span>' : ''}
-            <button type="button" class="btn btn-danger btn-sm position-absãolute top-0 end-0 m-1 p-1 py-0 shadow btn-remover-foto-nãova-equip" data-index="${index}" style="border-radius:50%;">
+            <img src="${objectUrl}" class="w-100 h-100" style="object-fit:cover; border-radius:4px;" alt="Nova foto do equipamento">
+            ${isPrincipal ? '<span class="badge text-bg-primary position-absolute top-0 start-0 m-1" style="font-size:0.55rem;">Principal</span>' : ''}
+            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 p-1 py-0 shadow btn-remover-foto-nova-equip" data-index="${index}" style="border-radius:50%;">
                 <i class="bi bi-x"></i>
             </button>
         `;
         const img = thumb.querySelector('img');
         img?.addEventListener('load', () => URL.revokeObjectURL(objectUrl), { once: true });
-        nãovoEquipFotosNãovasList.appendChild(thumb);
+        novoEquipFotosNovasList.appendChild(thumb);
     });
 }
 
-function processNextNãovoEquipCrop() {
-    if (!nãovoEquipFotoCropQueue.length) {
+function processNextNovoEquipCrop() {
+    if (!novoEquipFotoCropQueue.length) {
         hideModalSafe(modalCrop, '#modalCropEquip');
         return;
     }
-    const nextFile = nãovoEquipFotoCropQueue.shift();
+    const nextFile = novoEquipFotoCropQueue.shift();
     const reader = new FileReader();
     reader.onload = e => openCropper(e.target.result, { type: 'equipamento' });
-    reader.onerror = () => processNextNãovoEquipCrop();
+    reader.onerror = () => processNextNovoEquipCrop();
     reader.readAsDataURL(nextFile);
 }
 
-function queueNãovoEquipFotosFromFiles(files) {
+function queueNovoEquipFotosFromFiles(files) {
     const incoming = Array.from(files || []).filter(file => (file.type || '').startsWith('image/'));
     if (!incoming.length) return;
 
-    const available = nãovoEquipFotosMaxFiles - getTotalModalEquipFotos();
+    const available = novoEquipFotosMaxFiles - getTotalModalEquipFotos();
     if (available <= 0) {
-        showWarningDialog(`Vocêe pode manter ate ${nãovoEquipFotosMaxFiles} fotos por equipamento.`);
+        showWarningDialog(`Voce pode manter ate ${novoEquipFotosMaxFiles} fotos por equipamento.`);
         return;
     }
 
-    nãovoEquipFotoCropQueue = incoming.slice(0, available);
+    novoEquipFotoCropQueue = incoming.slice(0, available);
     if (incoming.length > available) {
-        showWarningDialog(`Sãomente ${available} foto(s) cabem agora (limite de ${nãovoEquipFotosMaxFiles} por equipamento).`);
+        showWarningDialog(`Somente ${available} foto(s) cabem agora (limite de ${novoEquipFotosMaxFiles} por equipamento).`);
     }
 
-    processNextNãovoEquipCrop();
+    processNextNovoEquipCrop();
 }
 
 function renderModalEquipFotosExistentes(fotos = []) {
@@ -3769,11 +3769,11 @@ function renderModalEquipFotosExistentes(fotos = []) {
     const lista = Array.isArray(fotos) ? fotos : [];
     modalEquipExistingFotos = lista;
     if (equipamentoModalMode !== 'edit' || !lista.length) {
-        modalEquipFotosExistentesWrap.classList.add('d-nãone');
+        modalEquipFotosExistentesWrap.classList.add('d-none');
         return;
     }
 
-    modalEquipFotosExistentesWrap.classList.remove('d-nãone');
+    modalEquipFotosExistentesWrap.classList.remove('d-none');
     lista.forEach((foto, index) => {
         const fotoUrl = withFotoVersion(foto.url || '', modalEquipFotosVersion);
         const isPrincipal = Number(foto.is_principal) === 1 || index === 0;
@@ -3784,14 +3784,14 @@ function renderModalEquipFotosExistentes(fotos = []) {
         const thumb = document.createElement('a');
         thumb.href = 'javascript:void(0)';
         thumb.className = 'd-block w-100 h-100';
-        thumb.style.cssText = 'cursãor:zoom-in;';
+        thumb.style.cssText = 'cursor:zoom-in;';
         thumb.setAttribute('data-bs-toggle', 'modal');
         thumb.setAttribute('data-bs-target', '#imageModal');
         thumb.setAttribute('data-img-src', fotoUrl);
 
         thumb.innerHTML = `
             <img src="${fotoUrl}" class="w-100 h-100 object-fit-cover" alt="Foto do equipamento">
-            ${isPrincipal ? '<span class="badge text-bg-primary position-absãolute top-0 start-0 m-1" style="font-size:0.55rem;">Principal</span>' : ''}
+            ${isPrincipal ? '<span class="badge text-bg-primary position-absolute top-0 start-0 m-1" style="font-size:0.55rem;">Principal</span>' : ''}
         `;
 
         wrapper.appendChild(thumb);
@@ -3801,7 +3801,7 @@ function renderModalEquipFotosExistentes(fotos = []) {
             if (!isPrincipal) {
                 const btnPrincipal = document.createElement('button');
                 btnPrincipal.type = 'button';
-                btnPrincipal.className = 'btn btn-sm btn-primary position-absãolute bottom-0 end-0 m-1 py-0 px-1 btn-definir-principal-foto-existente-equip';
+                btnPrincipal.className = 'btn btn-sm btn-primary position-absolute bottom-0 end-0 m-1 py-0 px-1 btn-definir-principal-foto-existente-equip';
                 btnPrincipal.dataset.fotoId = String(fotoId);
                 btnPrincipal.title = 'Definir como principal';
                 btnPrincipal.innerHTML = '<i class="bi bi-star"></i>';
@@ -3810,7 +3810,7 @@ function renderModalEquipFotosExistentes(fotos = []) {
 
             const btnDelete = document.createElement('button');
             btnDelete.type = 'button';
-            btnDelete.className = 'btn btn-sm btn-danger position-absãolute top-0 end-0 m-1 py-0 px-1 btn-remover-foto-existente-equip';
+            btnDelete.className = 'btn btn-sm btn-danger position-absolute top-0 end-0 m-1 py-0 px-1 btn-remover-foto-existente-equip';
             btnDelete.dataset.fotoId = String(fotoId);
             btnDelete.title = 'Excluir foto';
             btnDelete.innerHTML = '<i class="bi bi-trash"></i>';
@@ -3824,22 +3824,22 @@ function renderModalEquipFotosExistentes(fotos = []) {
 async function reloadModalEquipFotosExistentes() {
     if (!equipamentoEditId) return;
     try {
-        const response = await fetch(`${BASE_URL}equipamentos/fotos/${equipamentoEditId}?v=${Date.nãow()}`, {
+        const response = await fetch(`${BASE_URL}equipamentos/fotos/${equipamentoEditId}?v=${Date.now()}`, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
-        const fotos = await response.jsãon();
+        const fotos = await response.json();
         bumpModalEquipFotosVersion();
         bumpEquipamentoFotosVersion();
         renderModalEquipFotosExistentes(fotos);
-        renderNãovoEquipFotosNãovas();
+        renderNovoEquipFotosNovas();
 
         const selectedEq = getSelectedEquipamentoData();
         if (selectedEq && String(selectedEq.id || '') === String(equipamentoEditId)) {
             carregarFotosEquipamento(equipamentoEditId, {
-                marca: selectedEq.marca_nãome || selectedEq.marca || '',
-                modelo: selectedEq.modelo_nãome || selectedEq.modelo || '',
+                marca: selectedEq.marca_nome || selectedEq.marca || '',
+                modelo: selectedEq.modelo_nome || selectedEq.modelo || '',
                 serie: selectedEq.numero_serie || selectedEq.serie || '',
-                tipo: selectedEq.tipo_nãome || selectedEq.tipo || '',
+                tipo: selectedEq.tipo_nome || selectedEq.tipo || '',
                 cor: selectedEq.cor || '',
                 cor_hex: selectedEq.cor_hex || ''
             }, fotos);
@@ -3849,98 +3849,98 @@ async function reloadModalEquipFotosExistentes() {
     }
 }
 
-function setNãovoEquipModalMode(mode) {
+function setNovoEquipModalMode(mode) {
     equipamentoModalMode = mode === 'edit' ? 'edit' : 'create';
     if (equipamentoModalMode === 'edit') {
-        if (labelModalNãovoEquip) {
-            labelModalNãovoEquip.innerHTML = '<i class="bi bi-pencil-square text-primary me-2"></i>Editar Equipamento';
+        if (labelModalNovoEquip) {
+            labelModalNovoEquip.innerHTML = '<i class="bi bi-pencil-square text-primary me-2"></i>Editar Equipamento';
         }
-        if (btnSalvarNãovoEquip) {
-            btnSalvarNãovoEquip.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Salvar Altera��es';
+        if (btnSalvarNovoEquip) {
+            btnSalvarNovoEquip.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Salvar Altera��es';
         }
         return;
     }
     equipamentoEditId = null;
-    if (labelModalNãovoEquip) {
-        labelModalNãovoEquip.innerHTML = '<i class="bi bi-plus-circle text-warning me-2"></i>Cadastrar Nãovo Equipamento';
+    if (labelModalNovoEquip) {
+        labelModalNovoEquip.innerHTML = '<i class="bi bi-plus-circle text-warning me-2"></i>Cadastrar Novo Equipamento';
     }
-    if (btnSalvarNãovoEquip) {
-        btnSalvarNãovoEquip.innerHTML = '<i class="bi bi-check-lg me-1"></i>Cadastrar Equipamento';
+    if (btnSalvarNovoEquip) {
+        btnSalvarNovoEquip.innerHTML = '<i class="bi bi-check-lg me-1"></i>Cadastrar Equipamento';
     }
     renderModalEquipFotosExistentes([]);
 }
 setEquipamentoEditButtonState();
 
-function resetNãovoEquipModalForm() {
-    if (!formNãovoEquipAjax) return;
-    formNãovoEquipAjax.reset();
-    $('#nãovoEquipModeloNãomeExt').val('');
-    $('#nãovoEquipModelo').html('<option value="">Modelo...</option>');
-    $('#nãovoEquipMarca').val('').trigger('change');
-    $('#nãovoEquipTipo').val('');
+function resetNovoEquipModalForm() {
+    if (!formNovoEquipAjax) return;
+    formNovoEquipAjax.reset();
+    $('#novoEquipModeloNomeExt').val('');
+    $('#novoEquipModelo').html('<option value="">Modelo...</option>');
+    $('#novoEquipMarca').val('').trigger('change');
+    $('#novoEquipTipo').val('');
     updateColorUIOS('#1A1A1A', 'Preto');
-    resetNãovoEquipPreview();
+    resetNovoEquipPreview();
     renderModalEquipFotosExistentes([]);
     const errors = document.getElementById('modalEquipErrors');
     if (errors) {
-        errors.classList.add('d-nãone');
+        errors.classList.add('d-none');
         errors.innerHTML = '';
     }
 }
 
-function fillNãovoEquipModalFromData(eq) {
-    if (!eq || !formNãovoEquipAjax) return;
+function fillNovoEquipModalFromData(eq) {
+    if (!eq || !formNovoEquipAjax) return;
     const clienteAtual = document.getElementById('clienteOsSelect')?.value || '';
-    ensureNãovoEquipClienteInput(eq.cliente_id || clienteAtual);
+    ensureNovoEquipClienteInput(eq.cliente_id || clienteAtual);
 
-    $('#nãovoEquipTipo').val(eq.tipo_id ? String(eq.tipo_id) : '');
-    $('#nãovoEquipMarca').val(eq.marca_id ? String(eq.marca_id) : '').trigger('change');
+    $('#novoEquipTipo').val(eq.tipo_id ? String(eq.tipo_id) : '');
+    $('#novoEquipMarca').val(eq.marca_id ? String(eq.marca_id) : '').trigger('change');
     initModeloSelect2();
 
     setTimeout(() => {
-        const modeloSelect = $('#nãovoEquipModelo');
+        const modeloSelect = $('#novoEquipModelo');
         const modeloId = eq.modelo_id ? String(eq.modelo_id) : '';
-        const modeloNãome = eq.modelo_nãome || eq.modelo || '';
+        const modeloNome = eq.modelo_nome || eq.modelo || '';
         if (modeloId) {
             if (!modeloSelect.find(`option[value="${modeloId}"]`).length) {
-                modeloSelect.append(new Option(modeloNãome || 'Modelo', modeloId, false, false));
+                modeloSelect.append(new Option(modeloNome || 'Modelo', modeloId, false, false));
             }
             modeloSelect.val(modeloId).trigger('change');
-        } else if (modeloNãome) {
-            modeloSelect.val(modeloNãome).trigger('change');
+        } else if (modeloNome) {
+            modeloSelect.val(modeloNome).trigger('change');
         }
     }, 120);
 
-    const numeroSerie = formNãovoEquipAjax.querySelector('input[name="numero_serie"]');
-    const senhaAcessão = formNãovoEquipAjax.querySelector('input[name="senha_acessão"]');
-    const estadoFisico = formNãovoEquipAjax.querySelector('textarea[name="estado_fisico"]');
-    const acessãoriosEquip = formNãovoEquipAjax.querySelector('textarea[name="acessãorios"]');
+    const numeroSerie = formNovoEquipAjax.querySelector('input[name="numero_serie"]');
+    const senhaAcesso = formNovoEquipAjax.querySelector('input[name="senha_acesso"]');
+    const estadoFisico = formNovoEquipAjax.querySelector('textarea[name="estado_fisico"]');
+    const acessoriosEquip = formNovoEquipAjax.querySelector('textarea[name="acessorios"]');
 
     if (numeroSerie) numeroSerie.value = eq.numero_serie || '';
-    if (senhaAcessão) senhaAcessão.value = eq.senha_acessão || '';
+    if (senhaAcesso) senhaAcesso.value = eq.senha_acesso || '';
     if (estadoFisico) estadoFisico.value = eq.estado_fisico || '';
-    if (acessãoriosEquip) acessãoriosEquip.value = eq.acessãorios || '';
+    if (acessoriosEquip) acessoriosEquip.value = eq.acessorios || '';
 
     updateColorUIOS(eq.cor_hex || '#1A1A1A', eq.cor || 'Preto');
-    resetNãovoEquipPreview();
+    resetNovoEquipPreview();
 
-    fetch(`${BASE_URL}equipamentos/fotos/${eq.id}?v=${Date.nãow()}`, {
+    fetch(`${BASE_URL}equipamentos/fotos/${eq.id}?v=${Date.now()}`, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
-    .then(r => r.jsãon())
+    .then(r => r.json())
     .then(fotos => {
         bumpModalEquipFotosVersion();
         renderModalEquipFotosExistentes(fotos);
-        renderNãovoEquipFotosNãovas();
+        renderNovoEquipFotosNovas();
         if (!Array.isArray(fotos) || !fotos.length) return;
         const principal = fotos.find(f => Number(f.is_principal) === 1) || fotos[0];
         if (!principal?.url) return;
         const fotoVazia = document.getElementById('fotoVaziaOS');
-        if (fotoVazia) fotoVazia.style.display = 'nãone';
+        if (fotoVazia) fotoVazia.style.display = 'none';
     })
     .catch(() => {
         renderModalEquipFotosExistentes([]);
-        renderNãovoEquipFotosNãovas();
+        renderNovoEquipFotosNovas();
     });
 }
 
@@ -3961,30 +3961,30 @@ function getSelectedEquipamentoData() {
         tipo_id: opt.dataset.tipo || '',
         marca_id: opt.dataset.marca_id || '',
         modelo_id: opt.dataset.modelo_id || '',
-        marca_nãome: opt.dataset.marca || '',
-        modelo_nãome: opt.dataset.modelo || '',
-        tipo_nãome: opt.dataset.tipo_nãome || '',
+        marca_nome: opt.dataset.marca || '',
+        modelo_nome: opt.dataset.modelo || '',
+        tipo_nome: opt.dataset.tipo_nome || '',
         numero_serie: opt.dataset.serie || '',
         cor: opt.dataset.cor || '',
         cor_hex: opt.dataset.cor_hex || '',
-        senha_acessão: opt.dataset.senha_acessão || '',
+        senha_acesso: opt.dataset.senha_acesso || '',
         estado_fisico: opt.dataset.estado_fisico || '',
-        acessãorios: opt.dataset.acessãorios || ''
+        acessorios: opt.dataset.acessorios || ''
     };
 }
 
-function openNãovoEquipamentoModal() {
+function openNovoEquipamentoModal() {
     const clienteId = document.getElementById('clienteOsSelect')?.value || '';
     if (!clienteId) {
         showWarningDialog('Selecione um cliente primeiro para cadastrar o equipamento.');
         return;
     }
-    setNãovoEquipModalMode('create');
-    resetNãovoEquipModalForm();
-    ensureNãovoEquipClienteInput(clienteId);
+    setNovoEquipModalMode('create');
+    resetNovoEquipModalForm();
+    ensureNovoEquipClienteInput(clienteId);
     ensureModalEquipSelect2();
     initModeloSelect2();
-    modalNãovoEquipamento?.show();
+    modalNovoEquipamento?.show();
 }
 
 function openEditarEquipamentoModal() {
@@ -3994,99 +3994,99 @@ function openEditarEquipamentoModal() {
         return;
     }
     equipamentoEditId = selectedEq.id;
-    setNãovoEquipModalMode('edit');
-    resetNãovoEquipModalForm();
+    setNovoEquipModalMode('edit');
+    resetNovoEquipModalForm();
     ensureModalEquipSelect2();
     initModeloSelect2();
-    fillNãovoEquipModalFromData(selectedEq);
-    modalNãovoEquipamento?.show();
+    fillNovoEquipModalFromData(selectedEq);
+    modalNovoEquipamento?.show();
 }
 
-btnNãovoEquip?.addEventListener('click', openNãovoEquipamentoModal);
+btnNovoEquip?.addEventListener('click', openNovoEquipamentoModal);
 btnEditarEquip?.addEventListener('click', openEditarEquipamentoModal);
-modalNãovoEquipamentoEl?.addEventListener('hidden.bs.modal', () => {
-    setNãovoEquipModalMode('create');
-    resetNãovoEquipModalForm();
+modalNovoEquipamentoEl?.addEventListener('hidden.bs.modal', () => {
+    setNovoEquipModalMode('create');
+    resetNovoEquipModalForm();
 });
 
 // ??? Cadastro R�pido de Marcas e Modelos (Dentro da OS) ????????????????????
-const modalNãovaMarca = new bootstrap.Modal(document.getElementById('modalNãovaMarcaOS'));
-const modalNãovoModelo = new bootstrap.Modal(document.getElementById('modalNãovoModeloOS'));
+const modalNovaMarca = new bootstrap.Modal(document.getElementById('modalNovaMarcaOS'));
+const modalNovoModelo = new bootstrap.Modal(document.getElementById('modalNovoModeloOS'));
 
-document.getElementById('btnNãovaMarcaOS')?.addEventListener('click', () => modalNãovaMarca.show());
-document.getElementById('btnNãovoModeloOS')?.addEventListener('click', () => {
-    const marcaId = $('#nãovoEquipMarca').val();
+document.getElementById('btnNovaMarcaOS')?.addEventListener('click', () => modalNovaMarca.show());
+document.getElementById('btnNovoModeloOS')?.addEventListener('click', () => {
+    const marcaId = $('#novoEquipMarca').val();
     if (!marcaId) { showWarningDialog('Selecione uma marca primeiro!'); return; }
     
-    // Mostra o nãome da marca não modal para confer�ncia
-    const marcaNãome = $('#nãovoEquipMarca option:selected').text();
-    document.getElementById('displayMarcaOS').value = marcaNãome;
+    // Mostra o nome da marca no modal para confer�ncia
+    const marcaNome = $('#novoEquipMarca option:selected').text();
+    document.getElementById('displayMarcaOS').value = marcaNome;
     
-    modalNãovoModelo.show();
+    modalNovoModelo.show();
 });
 
 document.getElementById('btnSalvarMarcaOS')?.addEventListener('click', function() {
-    const nãome = document.getElementById('inputNãovaMarcaOS').value.trim();
-    if (!nãome) return;
+    const nome = document.getElementById('inputNovaMarcaOS').value.trim();
+    if (!nome) return;
 
     this.disabled = true;
     const fd = new FormData();
-    fd.append('nãome', nãome);
+    fd.append('nome', nome);
     fd.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
 
     fetch(`${BASE_URL}equipamentosmarcas/salvar_ajax`, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-    .then(r => r.jsãon())
+    .then(r => r.json())
     .then(res => {
         if (res.success) {
-            const opt = new Option(res.nãome, res.id, true, true);
-            $('#nãovoEquipMarca').append(opt).trigger('change');
-            modalNãovaMarca.hide();
-            document.getElementById('inputNãovaMarcaOS').value = '';
+            const opt = new Option(res.nome, res.id, true, true);
+            $('#novoEquipMarca').append(opt).trigger('change');
+            modalNovaMarca.hide();
+            document.getElementById('inputNovaMarcaOS').value = '';
         } else {
-            const err = document.getElementById('errorNãovaMarcaOS');
+            const err = document.getElementById('errorNovaMarcaOS');
             err.innerText = res.message;
-            err.classList.remove('d-nãone');
+            err.classList.remove('d-none');
         }
     })
     .finally(() => this.disabled = false);
 });
 
 document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function() {
-    const nãome = document.getElementById('inputNãovoModeloOS').value.trim();
-    const marcaId = $('#nãovoEquipMarca').val();
-    if (!nãome || !marcaId) return;
+    const nome = document.getElementById('inputNovoModeloOS').value.trim();
+    const marcaId = $('#novoEquipMarca').val();
+    if (!nome || !marcaId) return;
 
     this.disabled = true;
     const fd = new FormData();
-    fd.append('nãome', nãome);
+    fd.append('nome', nome);
     fd.append('marca_id', marcaId);
     fd.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
 
     fetch(`${BASE_URL}equipamentosmodelos/salvar_ajax`, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-    .then(r => r.jsãon())
+    .then(r => r.json())
     .then(res => {
         if (res.success) {
-            const opt = new Option(res.nãome, res.id, true, true);
-            $('#nãovoEquipModelo').append(opt).trigger('change');
-            modalNãovoModelo.hide();
-            document.getElementById('inputNãovoModeloOS').value = '';
-            document.getElementById('sugestoesNãovoModeloOS').classList.add('d-nãone');
+            const opt = new Option(res.nome, res.id, true, true);
+            $('#novoEquipModelo').append(opt).trigger('change');
+            modalNovoModelo.hide();
+            document.getElementById('inputNovoModeloOS').value = '';
+            document.getElementById('sugestoesNovoModeloOS').classList.add('d-none');
         } else {
-            const err = document.getElementById('errorNãovoModeloOS');
+            const err = document.getElementById('errorNovoModeloOS');
             err.innerText = res.message;
-            err.classList.remove('d-nãone');
+            err.classList.remove('d-none');
         }
     })
     .finally(() => this.disabled = false);
 });
 
-// ??? Autocomplete inteligente não modal "Nãovo Modelo" ?????????????????????????
+// ??? Autocomplete inteligente no modal "Novo Modelo" ?????????????????????????
 (function() {
     let debounceTimerModelo = null;
-    const inputModelo    = document.getElementById('inputNãovoModeloOS');
-    const sugestoesBox   = document.getElementById('sugestoesNãovoModeloOS');
-    const spinnerModelo  = document.getElementById('spinnerNãovoModeloOS');
-    const errorModelo    = document.getElementById('errorNãovoModeloOS');
+    const inputModelo    = document.getElementById('inputNovoModeloOS');
+    const sugestoesBox   = document.getElementById('sugestoesNovoModeloOS');
+    const spinnerModelo  = document.getElementById('spinnerNovoModeloOS');
+    const errorModelo    = document.getElementById('errorNovoModeloOS');
 
     if (!inputModelo) return;
 
@@ -4100,7 +4100,7 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
             // Cabe�alho do grupo
             const header = document.createElement('div');
             header.className = 'list-group-item list-group-item-secondary py-1 px-3';
-            header.style.cssText = 'font-size:0.7rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; pointer-events:nãone;';
+            header.style.cssText = 'font-size:0.7rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; pointer-events:none;';
             const icon = group.text.includes('Cadastrados') ? '?' : '?';
             header.textContent = icon + ' ' + group.text.replace(/^[??] /, '');
             sugestoesBox.appendChild(header);
@@ -4114,7 +4114,7 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
 
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'list-group-item list-group-item-action py-2 px-3 d-flex align-itemês-start gap-2';
+                btn.className = 'list-group-item list-group-item-action py-2 px-3 d-flex align-items-start gap-2';
                 btn.style.fontSize = '0.88rem';
                 btn.innerHTML = `
                     <div class="mt-1"><i class="bi bi-${group.text.includes('Cadastrados') ? 'check-circle text-success' : 'globe2 text-info'}" style="font-size:0.8rem;"></i></div>
@@ -4125,7 +4125,7 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
                 `;
                 btn.addEventListener('click', () => {
                     inputModelo.value = item.text;
-                    sugestoesBox.classList.add('d-nãone');
+                    sugestoesBox.classList.add('d-none');
                     inputModelo.focus();
                     el.setAttribute('data-bs-toggle', 'modal');
                     el.setAttribute('data-bs-target', '#imageModal');
@@ -4142,72 +4142,72 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
         });
 
         if (total > 0) {
-            sugestoesBox.classList.remove('d-nãone');
+            sugestoesBox.classList.remove('d-none');
         } else {
             sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugest�o. Digite e salve manualmente.</div>';
-            sugestoesBox.classList.remove('d-nãone');
+            sugestoesBox.classList.remove('d-none');
         }
     }
 
     inputModelo.addEventListener('input', function() {
         const q = this.value.trim();
         clearTimeout(debounceTimerModelo);
-        errorModelo.classList.add('d-nãone');
+        errorModelo.classList.add('d-none');
 
         if (q.length < 3) {
-            sugestoesBox.classList.add('d-nãone');
-            spinnerModelo.classList.add('d-nãone');
+            sugestoesBox.classList.add('d-none');
+            spinnerModelo.classList.add('d-none');
             return;
         }
 
-        spinnerModelo.classList.remove('d-nãone');
-        sugestoesBox.classList.add('d-nãone');
+        spinnerModelo.classList.remove('d-none');
+        sugestoesBox.classList.add('d-none');
 
         debounceTimerModelo = setTimeout(() => {
-            const marcaId   = $('#nãovoEquipMarca').val();
-            const marcaNãome = $('#nãovoEquipMarca option:selected').text().trim();
-            const tipoNãome  = $('#nãovoEquipTipo option:selected').text().trim();
+            const marcaId   = $('#novoEquipMarca').val();
+            const marcaNome = $('#novoEquipMarca option:selected').text().trim();
+            const tipoNome  = $('#novoEquipTipo option:selected').text().trim();
 
-            const paramês = new URLSearchParamês({
+            const params = new URLSearchParams({
                 q:        q,
                 marca_id: marcaId || '',
-                marca:    marcaNãome || '',
-                tipo:     tipoNãome !== 'Selecione o Tipo...' ? tipoNãome : ''
+                marca:    marcaNome || '',
+                tipo:     tipoNome !== 'Selecione o Tipo...' ? tipoNome : ''
             });
 
-            fetch(`${BASE_URL}api/modelos/buscar?${paramês}`, {
+            fetch(`${BASE_URL}api/modelos/buscar?${params}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
-            .then(r => r.jsãon())
+            .then(r => r.json())
             .then(data => {
-                spinnerModelo.classList.add('d-nãone');
+                spinnerModelo.classList.add('d-none');
                 if (data.results && data.results.length > 0) {
                     renderSugestoes(data.results);
                 } else {
-                    sugestoesBox.classList.add('d-nãone');
+                    sugestoesBox.classList.add('d-none');
                 }
             })
-            .catch(() => spinnerModelo.classList.add('d-nãone'));
+            .catch(() => spinnerModelo.classList.add('d-none'));
         }, 400);
     });
 
     // Fecha dropdown ao clicar fora
     document.addEventListener('click', e => {
         if (!inputModelo.contains(e.target) && !sugestoesBox.contains(e.target)) {
-            sugestoesBox.classList.add('d-nãone');
+            sugestoesBox.classList.add('d-none');
         }
     });
 
     // Limpa ao fechar o modal
-    document.getElementById('modalNãovoModeloOS')?.addEventListener('hidden.bs.modal', () => {
+    document.getElementById('modalNovoModeloOS')?.addEventListener('hidden.bs.modal', () => {
         inputModelo.value = '';
-        sugestoesBox.classList.add('d-nãone');
-        errorModelo.classList.add('d-nãone');
+        sugestoesBox.classList.add('d-none');
+        errorModelo.classList.add('d-none');
     });
 })();
 
 
-// L�gica de Cores não Modal (Igual ao cadastro de equipamentos)
+// L�gica de Cores no Modal (Igual ao cadastro de equipamentos)
 // ???????????????????????????????????????????????????????????
 // SELETOR DE COR PROFISSIONAL (OS Modal)
 // ???????????????????????????????????????????????????????????
@@ -4219,7 +4219,7 @@ const PROFESSIONAL_COLORS_OS = [
         { hex: '#FFFFFF', name: 'Branco' }, { hex: '#F8F8FF', name: 'Branco Gelo' }, { hex: '#FFFFF0', name: 'Marfim' },
     ]},
     { category: 'Azuis e Marinhos', colors: [
-        { hex: '#191970', name: 'Azul Meia-Nãoite' }, { hex: '#000080', name: 'Azul Marinho' }, { hex: '#0000FF', name: 'Azul Puro' },
+        { hex: '#191970', name: 'Azul Meia-Noite' }, { hex: '#000080', name: 'Azul Marinho' }, { hex: '#0000FF', name: 'Azul Puro' },
         { hex: '#4169E1', name: 'Azul Real' }, { hex: '#1E90FF', name: 'Azul C�u' }, { hex: '#87CEEB', name: 'Azul Celeste' },
         { hex: '#5F9EA0', name: 'Azul Petr�leo' },
     ]},
@@ -4266,10 +4266,10 @@ window.updateColorUIOS = function(hex, name) {
 
     $('#corHexRealOS').val(hex);
     $('#corRgbRealOS').val(rgbStr);
-    $('#corNãomeRealOS').val(name);
+    $('#corNomeRealOS').val(name);
 
     $('#corHexPickerOS').val(hex);
-    $('#corNãomeInputOS').val(name);
+    $('#corNomeInputOS').val(name);
 
     const preview = document.getElementById('colorPreviewBoxOS');
     if (preview) {
@@ -4283,7 +4283,7 @@ window.updateColorUIOS = function(hex, name) {
     // Similar colors
     let all = [];
     PROFESSIONAL_COLORS_OS.forEach(cat => cat.colors.forEach(c => all.push({ ...c, d: colorDistanceOS(hex, c.hex) })));
-    const nearest = all.sãort((a,b) => a.d - b.d).slice(0, 6);
+    const nearest = all.sort((a,b) => a.d - b.d).slice(0, 6);
     
     const grid = document.getElementById('coresProximasGridOS');
     if (grid) {
@@ -4291,7 +4291,7 @@ window.updateColorUIOS = function(hex, name) {
         nearest.forEach(c => {
             const b = document.createElement('button');
             b.type = 'button'; b.className = 'rounded-circle border';
-            b.style.cssText = `width:24px;height:24px;background:${c.hex};cursãor:pointer;`;
+            b.style.cssText = `width:24px;height:24px;background:${c.hex};cursor:pointer;`;
             b.onclick = () => updateColorUIOS(c.hex, c.name);
             grid.appendChild(b);
         });
@@ -4320,7 +4320,7 @@ window.buildCatalogOS = function() {
 
         accordionItem.innerHTML = `
             <h2 class="accordion-header" id="${headerId}">
-                <button class="accordion-button collapsed py-2 px-1 bg-transparent shadow-nãone fw-bold text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#${itemId}" aria-expanded="false" aria-controls="${itemId}" style="font-size: 0.8rem;">
+                <button class="accordion-button collapsed py-2 px-1 bg-transparent shadow-none fw-bold text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#${itemId}" aria-expanded="false" aria-controls="${itemId}" style="font-size: 0.8rem;">
                     <i class="bi bi-circle-fill me-2" style="color: ${cat.colors[0].hex}; font-size: 0.8rem;"></i>
                     ${cat.category}
                 </button>
@@ -4331,12 +4331,12 @@ window.buildCatalogOS = function() {
                         ${cat.colors.map(c => {
                             const isSelected = $('#corHexRealOS').val().toUpperCase() === c.hex.toUpperCase();
                             return `
-                                <button type="button" class="list-group-item list-group-item-action py-2 px-3 d-flex align-itemês-center gap-3 border-0 ${isSelected ? 'active bg-primary bg-opacity-10 text-primary fw-bold' : ''}" 
+                                <button type="button" class="list-group-item list-group-item-action py-2 px-3 d-flex align-items-center gap-3 border-0 ${isSelected ? 'active bg-primary bg-opacity-10 text-primary fw-bold' : ''}" 
                                         onclick="updateColorUIOS('${c.hex}', '${c.name}')" style="font-size: 0.82rem;">
                                     <div class="rounded-circle shadow-sm border border-light" 
                                          style="width: 24px; height: 24px; background: ${c.hex}; flex-shrink: 0;"></div>
                                     <span class="flex-grow-1 text-start">${c.name}</span>
-                                    <small class="text-muted font-monãospace opacity-50" style="font-size: 0.7rem;">${c.hex}</small>
+                                    <small class="text-muted font-monospace opacity-50" style="font-size: 0.7rem;">${c.hex}</small>
                                 </button>
                             `;
                         }).join('')}
@@ -4360,8 +4360,8 @@ $('#corHexPickerOS').on('input', function() {
     updateColorUIOS(hex, best ? best.name : hex);
 });
 
-$('#corNãomeInputOS').on('input', function() {
-    $('#corNãomeRealOS').val(this.value);
+$('#corNomeInputOS').on('input', function() {
+    $('#corNomeRealOS').val(this.value);
 });
 
 // Init OS Color
@@ -4394,11 +4394,11 @@ function rgbToHexStrOS(r, g, b) {
     return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1).toUpperCase();
 }
 
-function detectDominantColorOS(sãourceCanvas) {
+function detectDominantColorOS(sourceCanvas) {
     try {
-        const ctx = sãourceCanvas.getContext('2d', { willReadFrequently: true });
-        const w = sãourceCanvas.width;
-        const h = sãourceCanvas.height;
+        const ctx = sourceCanvas.getContext('2d', { willReadFrequently: true });
+        const w = sourceCanvas.width;
+        const h = sourceCanvas.height;
         const startX = Math.floor(w * 0.3);
         const startY = Math.floor(h * 0.3);
         const width = Math.floor(w * 0.4);
@@ -4439,7 +4439,7 @@ function detectDominantColorOS(sãourceCanvas) {
         const dominantRgb = hexToRgbOS(dominantHex);
         if (!dominantRgb) return;
 
-        let bestMatch = { hex: dominantHex, name: 'Persãonalizada' };
+        let bestMatch = { hex: dominantHex, name: 'Personalizada' };
         let minDistance = Infinity;
         
         PROFESSIONAL_COLORS_OS.forEach(cat => cat.colors.forEach(c => {
@@ -4453,24 +4453,24 @@ function detectDominantColorOS(sãourceCanvas) {
         $('#smartColorSwatchOS').css('background-color', dominantHex);
         $('#smartColorNameOS').text(bestMatch.name);
         $('#btnAcceptColorOS').data('hex', bestMatch.hex).data('name', bestMatch.name);
-        $('#smartColorContainerOS').removeClass('d-nãone');
+        $('#smartColorContainerOS').removeClass('d-none');
 
     } catch (e) {
-        consãole.warn('Erro na detec��o de cor: ', e);
+        console.warn('Erro na detec��o de cor: ', e);
     }
 }
 
 // ??? L�GICA DE SENHA E ACESS�RIOS (MODAL OS) ???????????????????????
 $(document).on('click', '.btn-senha-tipo-os', function() {
     const placeholder = $(this).data('placeholder');
-    $('#inputSenhaAcessãoOS').attr('placeholder', placeholder).focus();
+    $('#inputSenhaAcessoOS').attr('placeholder', placeholder).focus();
     $('.btn-senha-tipo-os').removeClass('btn-secondary text-white').addClass('btn-light border');
     $(this).removeClass('btn-light border').addClass('btn-secondary text-white');
 });
 
-$(document).on('click', '.btn-quick-acessãorio-os', function() {
+$(document).on('click', '.btn-quick-acessorio-os', function() {
     const value = $(this).text().replace('+ ', '').trim();
-    const textarea = $('#textareaAcessãoriosOS');
+    const textarea = $('#textareaAcessoriosOS');
     const current = textarea.val().trim();
     if (current.includes(value)) return;
     textarea.val(current === '' ? value : current + ', ' + value).focus();
@@ -4520,8 +4520,8 @@ const modalCropTitle = document.getElementById('modalCropTitle');
 const videoCamera    = document.getElementById('videoCamera');
 const canvasCamera   = document.getElementById('canvasCamera');
 const btnCapturar     = document.getElementById('btnCapturar');
-const nãovoEquipFoto  = document.getElementById('nãovoEquipFoto');
-const previewDiv     = document.getElementById('nãovoEquipFotoPreview');
+const novoEquipFoto  = document.getElementById('novoEquipFoto');
+const previewDiv     = document.getElementById('novoEquipFotoPreview');
 const imgToCrop      = document.getElementById('imgToCrop');
 let streamCamera     = null;
 let cropper          = null;
@@ -4553,10 +4553,10 @@ function scheduleModalCleanup() {
     window.setTimeout(cleanupStuckModalArtifacts, 140);
 }
 
-function resetModalNãodeState(modalEl) {
+function resetModalNodeState(modalEl) {
     if (!modalEl) return;
     modalEl.classList.remove('show');
-    modalEl.style.display = 'nãone';
+    modalEl.style.display = 'none';
     modalEl.setAttribute('aria-hidden', 'true');
     modalEl.removeAttribute('aria-modal');
 }
@@ -4591,11 +4591,11 @@ function closeImageModalIfOpen() {
         const imageModalInstance = bootstrap.Modal.getInstance(imageModalEl);
         imageModalInstance?.hide();
     } catch (err) {
-        consãole.error('[OS Nãova] falha ao ocultar imageModal', err);
+        console.error('[OS Nova] falha ao ocultar imageModal', err);
     }
 
     imageModalEl.classList.remove('show');
-    imageModalEl.style.display = 'nãone';
+    imageModalEl.style.display = 'none';
     imageModalEl.setAttribute('aria-hidden', 'true');
     imageModalEl.removeAttribute('aria-modal');
     document.body.classList.remove('modal-open');
@@ -4607,15 +4607,15 @@ function closeImageModalIfOpen() {
 
 document.addEventListener('hidden.bs.modal', scheduleModalCleanup);
 
-document.getElementById('btnAbrirGaleria')?.addEventListener('click', () => nãovoEquipFoto.click());
+document.getElementById('btnAbrirGaleria')?.addEventListener('click', () => novoEquipFoto.click());
 
 async function openCameraCapture(context = { type: 'equipamento', entryId: null }) {
     closeImageModalIfOpen();
     cameraCaptureContext = context;
     try {
         if (!navigator.mediaDevices?.getUserMedia) {
-            consãole.error('[OS Nãova] navigator.mediaDevices.getUserMedia indisponivel');
-            showWarningDialog('Este dispositivo ou navegador nao permite acessão a camera.', 'Camera indisponivel');
+            console.error('[OS Nova] navigator.mediaDevices.getUserMedia indisponivel');
+            showWarningDialog('Este dispositivo ou navegador nao permite acesso a camera.', 'Camera indisponivel');
             return;
         }
 
@@ -4629,15 +4629,15 @@ async function openCameraCapture(context = { type: 'equipamento', entryId: null 
             videoCamera.srcObject = streamCamera;
             const playPromise = videoCamera.play?.();
             if (playPromise && typeof playPromise.catch === 'function') {
-                playPromise.catch(err => consãole.error('[OS Nãova] falha ao iniciar preview da camera', err));
+                playPromise.catch(err => console.error('[OS Nova] falha ao iniciar preview da camera', err));
             }
         }
 
-        resetModalNãodeState(modalCameraEl);
+        resetModalNodeState(modalCameraEl);
         try {
             bootstrap.Modal.getInstance(modalCameraEl)?.dispose();
         } catch (error) {
-            consãole.error('[OS Nãova] falha ao descartar instancia anterior do modal da camera', error);
+            console.error('[OS Nova] falha ao descartar instancia anterior do modal da camera', error);
         }
 
         const cameraModalInstance = modalCameraEl ? new bootstrap.Modal(modalCameraEl) : null;
@@ -4645,10 +4645,10 @@ async function openCameraCapture(context = { type: 'equipamento', entryId: null 
 
         window.setTimeout(() => {
             if (!modalCameraEl) return;
-            if (modalCameraEl.classList.contains('show') && window.getComputedStyle(modalCameraEl).display !== 'nãone') {
+            if (modalCameraEl.classList.contains('show') && window.getComputedStyle(modalCameraEl).display !== 'none') {
                 return;
             }
-            consãole.error('[OS Nãova] modal da camera nao abriu corretamente', {
+            console.error('[OS Nova] modal da camera nao abriu corretamente', {
                 context,
                 display: modalCameraEl.style.display,
                 computedDisplay: window.getComputedStyle(modalCameraEl).display,
@@ -4657,7 +4657,7 @@ async function openCameraCapture(context = { type: 'equipamento', entryId: null 
             showWarningDialog('Nao foi possivel abrir a interface da camera. Tente pela galeria enquanto ajustamos este fluxo.', 'Falha ao abrir camera');
         }, 1000);
     } catch (err) {
-        consãole.error('[OS Nãova] falha ao acessar camera', err);
+        console.error('[OS Nova] falha ao acessar camera', err);
         showWarningDialog('Nao foi possivel acessar a camera: ' + err.message, 'Camera indisponivel');
     }
 }
@@ -4667,7 +4667,7 @@ document.getElementById('btnAbrirCamera')?.addEventListener('click', async () =>
 });
 
 modalCameraEl?.addEventListener('shown.bs.modal', () => {
-    consãole.info('[OS Nãova] modal da camera exibido com sucessão');
+    console.info('[OS Nova] modal da camera exibido com sucesso');
 });
 
 modalCameraEl?.addEventListener('hidden.bs.modal', () => {
@@ -4678,9 +4678,9 @@ modalCameraEl?.addEventListener('hidden.bs.modal', () => {
     if (videoCamera) {
         videoCamera.srcObject = null;
     }
-    if (cameraCaptureContext.type === 'acessãorio' && cropContext.type !== 'acessãorio') {
-        acessãorioCropEntryId = null;
-        acessãorioCropQueue = [];
+    if (cameraCaptureContext.type === 'acessorio' && cropContext.type !== 'acessorio') {
+        acessorioCropEntryId = null;
+        acessorioCropQueue = [];
     }
     if (cameraCaptureContext.type === 'estado_fisico' && cropContext.type !== 'estado_fisico') {
         estadoFisicoCropEntryId = null;
@@ -4696,8 +4696,8 @@ modalCameraEl?.addEventListener('hidden.bs.modal', () => {
 function setCropContext(context = { type: 'equipamento' }) {
     cropContext = context || { type: 'equipamento' };
     if (modalCropTitle) {
-        if (cropContext.type === 'acessãorio') {
-            modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto do Acessãorio';
+        if (cropContext.type === 'acessorio') {
+            modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto do Acessorio';
         } else if (cropContext.type === 'estado_fisico') {
             modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto do Estado Fisico';
         } else if (cropContext.type === 'entrada') {
@@ -4737,26 +4737,26 @@ function isCropModalVisible() {
 
 function appendBlobToCurrentPhotoContext(blob, canvas) {
     if (!blob) {
-        consãole.error('[OS Nãova] blob vazio ao anexar foto', cropContext);
+        console.error('[OS Nova] blob vazio ao anexar foto', cropContext);
         showWarningDialog('Nao foi possivel gerar a imagem selecionada.');
         return;
     }
 
-    if (cropContext.type === 'acessãorio' && acessãorioCropEntryId) {
-        const entryId = acessãorioCropEntryId;
-        const dt = acessãoriosPhotos[entryId] || new DataTransfer();
-        const fileName = `acessãorio_${Date.nãow()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+    if (cropContext.type === 'acessorio' && acessorioCropEntryId) {
+        const entryId = acessorioCropEntryId;
+        const dt = acessoriosPhotos[entryId] || new DataTransfer();
+        const fileName = `acessorio_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
         const file = new File([blob], fileName, { type: 'image/jpeg' });
-        dt.itemês.add(file);
-        acessãoriosPhotos[entryId] = dt;
-        ensureAcessãorioFileInput(entryId);
-        renderAcessãoriosList();
+        dt.items.add(file);
+        acessoriosPhotos[entryId] = dt;
+        ensureAcessorioFileInput(entryId);
+        renderAcessoriosList();
         scheduleDraftSave();
 
-        if (acessãorioCropQueue.length > 0) {
-            processNextAcessãorioCrop();
+        if (acessorioCropQueue.length > 0) {
+            processNextAcessorioCrop();
         } else {
-            acessãorioCropEntryId = null;
+            acessorioCropEntryId = null;
             hideModalSafe(modalCrop, '#modalCropEquip');
         }
         return;
@@ -4765,9 +4765,9 @@ function appendBlobToCurrentPhotoContext(blob, canvas) {
     if (cropContext.type === 'estado_fisico' && estadoFisicoCropEntryId) {
         const entryId = estadoFisicoCropEntryId;
         const dt = estadoFisicoPhotos[entryId] || new DataTransfer();
-        const fileName = `estado_fisico_${Date.nãow()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+        const fileName = `estado_fisico_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
         const file = new File([blob], fileName, { type: 'image/jpeg' });
-        dt.itemês.add(file);
+        dt.items.add(file);
         estadoFisicoPhotos[entryId] = dt;
         ensureEstadoFisicoFileInput(entryId);
         renderEstadoFisicoList();
@@ -4785,14 +4785,14 @@ function appendBlobToCurrentPhotoContext(blob, canvas) {
 
     if (cropContext.type === 'entrada') {
         if (osDataTransfer.files.length >= osFotosMaxFiles) {
-            showWarningDialog(`Vocêe pode enviar ate ${osFotosMaxFiles} fotos não total.`);
+            showWarningDialog(`Voce pode enviar ate ${osFotosMaxFiles} fotos no total.`);
             hideModalSafe(modalCrop, '#modalCropEquip');
             return;
         }
 
-        const fileName = `entrada_${Date.nãow()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+        const fileName = `entrada_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
         const file = new File([blob], fileName, { type: 'image/jpeg' });
-        osDataTransfer.itemês.add(file);
+        osDataTransfer.items.add(file);
         syncFotosEntradaInput();
         renderNewFotos();
         updatePhotoState();
@@ -4806,28 +4806,28 @@ function appendBlobToCurrentPhotoContext(blob, canvas) {
         return;
     }
 
-    if (getTotalModalEquipFotos() >= nãovoEquipFotosMaxFiles) {
-        showWarningDialog(`Vocêe pode manter ate ${nãovoEquipFotosMaxFiles} fotos por equipamento.`);
+    if (getTotalModalEquipFotos() >= novoEquipFotosMaxFiles) {
+        showWarningDialog(`Voce pode manter ate ${novoEquipFotosMaxFiles} fotos por equipamento.`);
         hideModalSafe(modalCrop, '#modalCropEquip');
         return;
     }
 
-    const fileName = `equipamento_${Date.nãow()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+    const fileName = `equipamento_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
     const file = new File([blob], fileName, { type: 'image/jpeg' });
-    nãovoEquipFotosDataTransfer.itemês.add(file);
-    syncNãovoEquipFotosInput();
+    novoEquipFotosDataTransfer.items.add(file);
+    syncNovoEquipFotosInput();
     detectDominantColorOS(canvas);
-    renderNãovoEquipFotosNãovas();
+    renderNovoEquipFotosNovas();
 
-    if (nãovoEquipFotoCropQueue.length > 0) {
-        processNextNãovoEquipCrop();
+    if (novoEquipFotoCropQueue.length > 0) {
+        processNextNovoEquipCrop();
         return;
     }
 
     hideModalSafe(modalCrop, '#modalCropEquip');
 }
 
-function fallbackCropperFromSãource(sãource, context, warnMessage = null) {
+function fallbackCropperFromSource(source, context, warnMessage = null) {
     setCropContext(context);
 
     if (warnMessage && !cropModalFailureWarned) {
@@ -4842,7 +4842,7 @@ function fallbackCropperFromSãource(sãource, context, warnMessage = null) {
         canvas.height = img.naturalHeight || img.height || 1024;
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-            consãole.error('[OS Nãova] Canvas nao disponivel não fallback de imagem', context);
+            console.error('[OS Nova] Canvas nao disponivel no fallback de imagem', context);
             showWarningDialog('Nao foi possivel processar a imagem selecionada.');
             hideModalSafe(modalCrop, '#modalCropEquip');
             return;
@@ -4852,32 +4852,32 @@ function fallbackCropperFromSãource(sãource, context, warnMessage = null) {
         canvas.toBlob((blob) => appendBlobToCurrentPhotoContext(blob, canvas), 'image/jpeg', 0.9);
     };
     img.onerror = () => {
-        consãole.error('[OS Nãova] erro ao carregar imagem não fallback visual', context);
+        console.error('[OS Nova] erro ao carregar imagem no fallback visual', context);
         showWarningDialog('Nao foi possivel carregar a imagem para envio.');
         hideModalSafe(modalCrop, '#modalCropEquip');
     };
-    img.src = sãource;
+    img.src = source;
 }
 
-function openCropper(sãource, context = { type: 'equipamento' }) {
+function openCropper(source, context = { type: 'equipamento' }) {
     closeImageModalIfOpen();
     const cropToken = ++activeCropToken;
-    if (!sãource) {
-        consãole.error('[OS Nãova] openCropper chamado sem sãource', context);
+    if (!source) {
+        console.error('[OS Nova] openCropper chamado sem source', context);
         return;
     }
     if (!imgToCrop || !modalCropEl) {
-        consãole.error('[OS Nãova] elementos do editor de corte indisponiveis', { hasImage: Boolean(imgToCrop), hasModal: Boolean(modalCropEl), context });
-        fallbackCropperFromSãource(sãource, context, 'Editor visual indisponivel não momento. A foto sera adicionada sem corte.');
+        console.error('[OS Nova] elementos do editor de corte indisponiveis', { hasImage: Boolean(imgToCrop), hasModal: Boolean(modalCropEl), context });
+        fallbackCropperFromSource(source, context, 'Editor visual indisponivel no momento. A foto sera adicionada sem corte.');
         return;
     }
     if (typeof window.Cropper === 'undefined') {
-        consãole.error('[OS Nãova] Cropper nao disponivel, ativando fallback');
+        console.error('[OS Nova] Cropper nao disponivel, ativando fallback');
         if (!cropperUnavailableWarned) {
             cropperUnavailableWarned = true;
             showWarningDialog('Editor de corte indisponivel. A foto sera adicionada sem corte.');
         }
-        fallbackCropperFromSãource(sãource, context);
+        fallbackCropperFromSource(source, context);
         return;
     }
 
@@ -4885,12 +4885,12 @@ function openCropper(sãource, context = { type: 'equipamento' }) {
     try {
         cropper?.destroy();
     } catch (error) {
-        consãole.error('[OS Nãova] falha ao destruir cropper anterior', error);
+        console.error('[OS Nova] falha ao destruir cropper anterior', error);
     }
     cropper = null;
     imgToCrop.onload = null;
     imgToCrop.onerror = null;
-    imgToCrop.src = sãource;
+    imgToCrop.src = source;
     imgToCrop.dataset.cropToken = String(cropToken);
 
     const cropModalInstance = bootstrap.Modal.getOrCreateInstance(modalCropEl);
@@ -4899,14 +4899,14 @@ function openCropper(sãource, context = { type: 'equipamento' }) {
     window.setTimeout(() => {
         if (cropToken !== activeCropToken) return;
         if (cropper || isCropModalVisible()) return;
-        consãole.error('[OS Nãova] modal de crop nao abriu corretamente, ativando fallback', {
+        console.error('[OS Nova] modal de crop nao abriu corretamente, ativando fallback', {
             context,
             display: modalCropEl.style.display,
             computedDisplay: window.getComputedStyle(modalCropEl).display,
             classes: modalCropEl.className
         });
         hideModalSafe(cropModalInstance, '#modalCropEquip');
-        fallbackCropperFromSãource(sãource, context, 'Editor visual indisponivel não momento. A foto sera adicionada sem corte.');
+        fallbackCropperFromSource(source, context, 'Editor visual indisponivel no momento. A foto sera adicionada sem corte.');
     }, 1200);
 }
 
@@ -4919,9 +4919,9 @@ document.getElementById('modalCropEquip').addEventListener('shown.bs.modal', () 
         try {
             createCropperInstance();
         } catch (error) {
-            consãole.error('[OS Nãova] falha ao inicializar cropper não modal visivel', error);
+            console.error('[OS Nova] falha ao inicializar cropper no modal visivel', error);
             hideModalSafe(bootstrap.Modal.getOrCreateInstance(modalCropEl), '#modalCropEquip');
-            fallbackCropperFromSãource(imgToCrop?.src || '', cropContext, 'Falha não editor visual. A foto sera adicionada sem corte.');
+            fallbackCropperFromSource(imgToCrop?.src || '', cropContext, 'Falha no editor visual. A foto sera adicionada sem corte.');
         }
     };
 
@@ -4936,9 +4936,9 @@ document.getElementById('modalCropEquip').addEventListener('shown.bs.modal', () 
     };
     imgToCrop.onerror = (error) => {
         imgToCrop.onerror = null;
-        consãole.error('[OS Nãova] falha ao carregar imagem para o cropper', error);
+        console.error('[OS Nova] falha ao carregar imagem para o cropper', error);
         hideModalSafe(bootstrap.Modal.getOrCreateInstance(modalCropEl), '#modalCropEquip');
-        fallbackCropperFromSãource(imgToCrop?.src || '', cropContext, 'Falha ao carregar a imagem para corte. A foto sera adicionada sem corte.');
+        fallbackCropperFromSource(imgToCrop?.src || '', cropContext, 'Falha ao carregar a imagem para corte. A foto sera adicionada sem corte.');
     };
 });
 
@@ -4947,9 +4947,9 @@ document.getElementById('modalCropEquip').addEventListener('hidden.bs.modal', ()
         cropper.destroy();
         cropper = null;
     }
-    if (cropContext.type === 'acessãorio') {
-        acessãorioCropQueue = [];
-        acessãorioCropEntryId = null;
+    if (cropContext.type === 'acessorio') {
+        acessorioCropQueue = [];
+        acessorioCropEntryId = null;
     }
     if (cropContext.type === 'estado_fisico') {
         estadoFisicoCropQueue = [];
@@ -4959,7 +4959,7 @@ document.getElementById('modalCropEquip').addEventListener('hidden.bs.modal', ()
         fotosEntradaCropQueue = [];
     }
     if (cropContext.type === 'equipamento') {
-        nãovoEquipFotoCropQueue = [];
+        novoEquipFotoCropQueue = [];
     }
     setCropContext({ type: 'equipamento' });
     scheduleModalCleanup();
@@ -4979,7 +4979,7 @@ document.getElementById('btnRotateRight')?.addEventListener('click', () => {
 btnCapturar?.addEventListener('click', () => {
     const context = canvasCamera.getContext('2d');
     if (!context || !videoCamera) {
-        consãole.error('[OS Nãova] camera indisponivel para captura');
+        console.error('[OS Nova] camera indisponivel para captura');
         showWarningDialog('Nao foi possivel capturar a foto pela camera.', 'Camera indisponivel');
         return;
     }
@@ -4989,10 +4989,10 @@ btnCapturar?.addEventListener('click', () => {
     
     const dataUrl = canvasCamera.toDataURL('image/jpeg');
     hideModalSafe(bootstrap.Modal.getOrCreateInstance(modalCameraEl), '#modalCamera');
-    if (cameraCaptureContext.type === 'acessãorio' && cameraCaptureContext.entryId) {
-        acessãorioCropEntryId = cameraCaptureContext.entryId;
-        acessãorioCropQueue = [];
-        openCropper(dataUrl, { type: 'acessãorio' });
+    if (cameraCaptureContext.type === 'acessorio' && cameraCaptureContext.entryId) {
+        acessorioCropEntryId = cameraCaptureContext.entryId;
+        acessorioCropQueue = [];
+        openCropper(dataUrl, { type: 'acessorio' });
         return;
     }
     if (cameraCaptureContext.type === 'estado_fisico' && cameraCaptureContext.entryId) {
@@ -5011,7 +5011,7 @@ btnCapturar?.addEventListener('click', () => {
 document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
     if (!cropper) return;
     const canvas = cropper.getCroppedCanvas({
-        width: 1024, // Limita o tamanho para n�o sãobrecarregar
+        width: 1024, // Limita o tamanho para n�o sobrecarregar
         height: 1024,
         imageSmoothingEnabled: true,
         imageSmoothingQuality: 'high',
@@ -5019,21 +5019,21 @@ document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
 
     canvas.toBlob((blob) => {
         if (!blob) return;
-        if (cropContext.type === 'acessãorio' && acessãorioCropEntryId) {
-            const entryId = acessãorioCropEntryId;
-            const dt = acessãoriosPhotos[entryId] || new DataTransfer();
-            const fileName = `acessãorio_${Date.nãow()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+        if (cropContext.type === 'acessorio' && acessorioCropEntryId) {
+            const entryId = acessorioCropEntryId;
+            const dt = acessoriosPhotos[entryId] || new DataTransfer();
+            const fileName = `acessorio_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
             const file = new File([blob], fileName, { type: 'image/jpeg' });
-            dt.itemês.add(file);
-            acessãoriosPhotos[entryId] = dt;
-            ensureAcessãorioFileInput(entryId);
-            renderAcessãoriosList();
+            dt.items.add(file);
+            acessoriosPhotos[entryId] = dt;
+            ensureAcessorioFileInput(entryId);
+            renderAcessoriosList();
             scheduleDraftSave();
 
-            if (acessãorioCropQueue.length > 0) {
-                processNextAcessãorioCrop();
+            if (acessorioCropQueue.length > 0) {
+                processNextAcessorioCrop();
             } else {
-                acessãorioCropEntryId = null;
+                acessorioCropEntryId = null;
                 hideModalSafe(modalCrop, '#modalCropEquip');
             }
             return;
@@ -5042,9 +5042,9 @@ document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
         if (cropContext.type === 'estado_fisico' && estadoFisicoCropEntryId) {
             const entryId = estadoFisicoCropEntryId;
             const dt = estadoFisicoPhotos[entryId] || new DataTransfer();
-            const fileName = `estado_fisico_${Date.nãow()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+            const fileName = `estado_fisico_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
             const file = new File([blob], fileName, { type: 'image/jpeg' });
-            dt.itemês.add(file);
+            dt.items.add(file);
             estadoFisicoPhotos[entryId] = dt;
             ensureEstadoFisicoFileInput(entryId);
             renderEstadoFisicoList();
@@ -5062,14 +5062,14 @@ document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
 
     if (cropContext.type === 'entrada') {
         if (osDataTransfer.files.length >= osFotosMaxFiles) {
-            showWarningDialog(`Vocêe pode enviar ate ${osFotosMaxFiles} fotos não total.`);
+            showWarningDialog(`Voce pode enviar ate ${osFotosMaxFiles} fotos no total.`);
             hideModalSafe(modalCrop, '#modalCropEquip');
             return;
         }
 
-            const fileName = `entrada_${Date.nãow()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+            const fileName = `entrada_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
             const file = new File([blob], fileName, { type: 'image/jpeg' });
-            osDataTransfer.itemês.add(file);
+            osDataTransfer.items.add(file);
             syncFotosEntradaInput();
             renderNewFotos();
             updatePhotoState();
@@ -5083,24 +5083,24 @@ document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
             return;
         }
 
-        if (getTotalModalEquipFotos() >= nãovoEquipFotosMaxFiles) {
-            showWarningDialog(`Vocêe pode manter ate ${nãovoEquipFotosMaxFiles} fotos por equipamento.`);
+        if (getTotalModalEquipFotos() >= novoEquipFotosMaxFiles) {
+            showWarningDialog(`Voce pode manter ate ${novoEquipFotosMaxFiles} fotos por equipamento.`);
             hideModalSafe(modalCrop, '#modalCropEquip');
             return;
         }
 
-        const fileName = `equipamento_${Date.nãow()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+        const fileName = `equipamento_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
         const file = new File([blob], fileName, { type: 'image/jpeg' });
-        nãovoEquipFotosDataTransfer.itemês.add(file);
-        syncNãovoEquipFotosInput();
+        novoEquipFotosDataTransfer.items.add(file);
+        syncNovoEquipFotosInput();
         
         detectDominantColorOS(canvas); // <--- Inicia a detec��o de cor autom�tica na OS
 
         // Preview Final
-        renderNãovoEquipFotosNãovas();
+        renderNovoEquipFotosNovas();
 
-        if (nãovoEquipFotoCropQueue.length > 0) {
-            processNextNãovoEquipCrop();
+        if (novoEquipFotoCropQueue.length > 0) {
+            processNextNovoEquipCrop();
             return;
         }
         hideModalSafe(modalCrop, '#modalCropEquip');
@@ -5108,9 +5108,9 @@ document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
 });
 
 const btnConfirmCropOriginal = document.getElementById('btnConfirmCrop');
-if (btnConfirmCropOriginal && btnConfirmCropOriginal.parentNãode) {
-    const btnConfirmCropSafe = btnConfirmCropOriginal.cloneNãode(true);
-    btnConfirmCropOriginal.parentNãode.replaceChild(btnConfirmCropSafe, btnConfirmCropOriginal);
+if (btnConfirmCropOriginal && btnConfirmCropOriginal.parentNode) {
+    const btnConfirmCropSafe = btnConfirmCropOriginal.cloneNode(true);
+    btnConfirmCropOriginal.parentNode.replaceChild(btnConfirmCropSafe, btnConfirmCropOriginal);
     btnConfirmCropSafe.addEventListener('click', () => {
         if (!cropper) return;
         const canvas = cropper.getCroppedCanvas({
@@ -5121,7 +5121,7 @@ if (btnConfirmCropOriginal && btnConfirmCropOriginal.parentNãode) {
         });
 
         if (!canvas) {
-            consãole.error('[OS Nãova] getCroppedCanvas retornãou vazio', cropContext);
+            console.error('[OS Nova] getCroppedCanvas retornou vazio', cropContext);
             showWarningDialog('Nao foi possivel preparar a imagem selecionada.');
             return;
         }
@@ -5132,8 +5132,8 @@ if (btnConfirmCropOriginal && btnConfirmCropOriginal.parentNãode) {
     });
 }
 
-nãovoEquipFoto?.addEventListener('change', function() {
-    queueNãovoEquipFotosFromFiles(this.files);
+novoEquipFoto?.addEventListener('change', function() {
+    queueNovoEquipFotosFromFiles(this.files);
     this.value = '';
 });
 
@@ -5161,12 +5161,12 @@ async function deleteModalEquipFotoExistente(fotoId) {
 
     const previousFotos = Array.isArray(modalEquipExistingFotos) ? [...modalEquipExistingFotos] : [];
     const semFoto = previousFotos.filter(f => Number(f.id || 0) !== Number(fotoId));
-    if (semFoto.length && !semFoto.sãome(f => Number(f.is_principal) === 1)) {
+    if (semFoto.length && !semFoto.some(f => Number(f.is_principal) === 1)) {
         semFoto[0] = { ...semFoto[0], is_principal: 1 };
     }
     bumpModalEquipFotosVersion();
     renderModalEquipFotosExistentes(semFoto);
-    renderNãovoEquipFotosNãovas();
+    renderNovoEquipFotosNovas();
     syncSidebarFotosFromModal(semFoto);
 
     const fd = new FormData();
@@ -5178,7 +5178,7 @@ async function deleteModalEquipFotoExistente(fotoId) {
             body: fd,
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
-        const res = await response.jsãon();
+        const res = await response.json();
         if (!res || res.success !== true) {
             throw new Error(res?.message || 'Nao foi possivel excluir a foto.');
         }
@@ -5187,7 +5187,7 @@ async function deleteModalEquipFotoExistente(fotoId) {
             bumpModalEquipFotosVersion();
             bumpEquipamentoFotosVersion();
             renderModalEquipFotosExistentes(res.fotos);
-            renderNãovoEquipFotosNãovas();
+            renderNovoEquipFotosNovas();
             syncSidebarFotosFromModal(res.fotos);
         } else {
             await reloadModalEquipFotosExistentes();
@@ -5204,7 +5204,7 @@ async function deleteModalEquipFotoExistente(fotoId) {
     } catch (error) {
         bumpModalEquipFotosVersion();
         renderModalEquipFotosExistentes(previousFotos);
-        renderNãovoEquipFotosNãovas();
+        renderNovoEquipFotosNovas();
         syncSidebarFotosFromModal(previousFotos);
         showWarningDialog(error?.message || 'Nao foi possivel excluir a foto.', 'Falha na exclusao');
     }
@@ -5217,10 +5217,10 @@ function syncSidebarFotosFromModal(fotos) {
 
     bumpEquipamentoFotosVersion();
     carregarFotosEquipamento(selectedEq.id, {
-        marca: selectedEq.marca_nãome || selectedEq.marca || '',
-        modelo: selectedEq.modelo_nãome || selectedEq.modelo || '',
+        marca: selectedEq.marca_nome || selectedEq.marca || '',
+        modelo: selectedEq.modelo_nome || selectedEq.modelo || '',
         serie: selectedEq.numero_serie || selectedEq.serie || '',
-        tipo: selectedEq.tipo_nãome || selectedEq.tipo || '',
+        tipo: selectedEq.tipo_nome || selectedEq.tipo || '',
         cor: selectedEq.cor || '',
         cor_hex: selectedEq.cor_hex || ''
     }, fotos);
@@ -5237,7 +5237,7 @@ async function definirModalEquipFotoPrincipal(fotoId) {
             body: fd,
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
-        const res = await response.jsãon();
+        const res = await response.json();
         if (!res || res.success !== true) {
             throw new Error(res?.message || 'Nao foi possivel definir a foto principal.');
         }
@@ -5246,7 +5246,7 @@ async function definirModalEquipFotoPrincipal(fotoId) {
         bumpModalEquipFotosVersion();
         bumpEquipamentoFotosVersion();
         renderModalEquipFotosExistentes(fotos);
-        renderNãovoEquipFotosNãovas();
+        renderNovoEquipFotosNovas();
         syncSidebarFotosFromModal(fotos);
     } catch (error) {
         showWarningDialog(error?.message || 'Nao foi possivel definir a foto principal.', 'Falha ao atualizar');
@@ -5276,26 +5276,26 @@ document.addEventListener('click', async function(event) {
         return;
     }
 
-    const removeNãovoEquipFotoBtn = event.target.closest('.btn-remover-foto-nãova-equip');
-    if (!removeNãovoEquipFotoBtn) return;
+    const removeNovoEquipFotoBtn = event.target.closest('.btn-remover-foto-nova-equip');
+    if (!removeNovoEquipFotoBtn) return;
 
-    const index = parseInt(removeNãovoEquipFotoBtn.dataset.index, 10);
+    const index = parseInt(removeNovoEquipFotoBtn.dataset.index, 10);
     if (Number.isNaN(index)) return;
 
     const nextDt = new DataTransfer();
-    Array.from(nãovoEquipFotosDataTransfer.files).forEach((file, fileIndex) => {
-        if (fileIndex !== index) nextDt.itemês.add(file);
+    Array.from(novoEquipFotosDataTransfer.files).forEach((file, fileIndex) => {
+        if (fileIndex !== index) nextDt.items.add(file);
     });
 
-    nãovoEquipFotosDataTransfer.itemês.clear();
-    Array.from(nextDt.files).forEach(file => nãovoEquipFotosDataTransfer.itemês.add(file));
-    syncNãovoEquipFotosInput();
-    renderNãovoEquipFotosNãovas();
+    novoEquipFotosDataTransfer.items.clear();
+    Array.from(nextDt.files).forEach(file => novoEquipFotosDataTransfer.items.add(file));
+    syncNovoEquipFotosInput();
+    renderNovoEquipFotosNovas();
 });
 
 // ??? Select2 H�brido: Modelos via API ??????????????????????????????????????
 function initModeloSelect2() {
-    var modeloSel = $('#nãovoEquipModelo');
+    var modeloSel = $('#novoEquipModelo');
 
     if (modeloSel.hasClass("select2-hidden-accessible")) {
         modeloSel.select2('destroy').off('change');
@@ -5306,10 +5306,10 @@ function initModeloSelect2() {
         width: '100%',
         placeholder: 'Busque ou selecione o modelo...',
         allowClear: true,
-        dropdownParent: $('#modalNãovoEquipamento'),
+        dropdownParent: $('#modalNovoEquipamento'),
         tags: true, // HABILITA EDI��O E NOVAS TAGS LIVRES
-        createTag: function(paramês) {
-            var term = $.trim(paramês.term);
+        createTag: function(params) {
+            var term = $.trim(params.term);
             if (term === '') return null;
             return {
                 id: term,
@@ -5319,15 +5319,15 @@ function initModeloSelect2() {
         },
         ajax: {
             url: BASE_URL + 'api/modelos/buscar',
-            dataType: 'jsãon',
+            dataType: 'json',
             delay: 250,
-            data: function (paramês) {
-                var tipoNãome = $('#nãovoEquipTipo option:selected').text().trim();
+            data: function (params) {
+                var tipoNome = $('#novoEquipTipo option:selected').text().trim();
                 return {
-                    q:        paramês.term || '',
-                    marca_id: $('#nãovoEquipMarca').val(),
-                    marca:    $('#nãovoEquipMarca option:selected').text().trim(),
-                    tipo:     tipoNãome !== 'Selecione o Tipo...' ? tipoNãome : ''
+                    q:        params.term || '',
+                    marca_id: $('#novoEquipMarca').val(),
+                    marca:    $('#novoEquipMarca option:selected').text().trim(),
+                    tipo:     tipoNome !== 'Selecione o Tipo...' ? tipoNome : ''
                 };
             },
             processResults: function (data) {
@@ -5342,7 +5342,7 @@ function initModeloSelect2() {
                 return `Digite mais ${restante} caractere(s) para buscar...`;
             },
             searching: function() { return '<i class="bi bi-search me-1"></i> Buscando modelos...'; },
-            nãoResults: function()  { return 'Nenhuma sugest�o encontrada. Use o bot�o <strong>+ Nãovo</strong> para cadastrar manualmente.'; },
+            noResults: function()  { return 'Nenhuma sugest�o encontrada. Use o bot�o <strong>+ Novo</strong> para cadastrar manualmente.'; },
             errorLoading: function() { return 'Erro ao consultar. Verifique sua conex�o.'; }
         },
         templateResult: function (data) {
@@ -5353,7 +5353,7 @@ function initModeloSelect2() {
                 return $(`
                 <div>
                     <strong class="d-block text-primary"><i class="bi bi-pencil-square me-1"></i> "${data.text}"</strong>
-                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nãome (edi��o manual)</small>
+                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (edi��o manual)</small>
                 </div>`);
             }
 
@@ -5369,16 +5369,16 @@ function initModeloSelect2() {
             return data.text;
         }
     }).on('select2:select', function (e) {
-        var data = e.paramês.data;
-        // Armazena o nãome real do modelo externão para auto-cadastro não backend
+        var data = e.params.data;
+        // Armazena o nome real do modelo externo para auto-cadastro no backend
         // Se for newTag, j� vai salvar pelo pr�prio texto sendo o ID
         if (data.id && String(data.id).indexOf('EXT|') === 0) {
-            $('#nãovoEquipModeloNãomeExt').val(data.text);
+            $('#novoEquipModeloNomeExt').val(data.text);
         } else {
-            $('#nãovoEquipModeloNãomeExt').val('');
+            $('#novoEquipModeloNomeExt').val('');
         }
     }).on('select2:open', function () {
-        // Ação abrir, preenche a barra de pesquisa com o modelo atualmente selecionado
+        // Ao abrir, preenche a barra de pesquisa com o modelo atualmente selecionado
         var selecionado = $(this).select2('data')[0];
         if (selecionado && selecionado.id && selecionado.id !== '') {
             var searchField = document.querySelector('.select2-search__field');
@@ -5390,29 +5390,29 @@ function initModeloSelect2() {
 }
 
 // Reinicializa ao trocar marca
-$('#nãovoEquipMarca').on('change', function() {
+$('#novoEquipMarca').on('change', function() {
     var marcaId = $(this).val();
     if (marcaId) {
         initModeloSelect2();
     } else {
-        if ($('#nãovoEquipModelo').hasClass("select2-hidden-accessible")) {
-            $('#nãovoEquipModelo').select2('destroy').html('<option value="">Selecione a marca primeiro...</option>');
+        if ($('#novoEquipModelo').hasClass("select2-hidden-accessible")) {
+            $('#novoEquipModelo').select2('destroy').html('<option value="">Selecione a marca primeiro...</option>');
         }
     }
 });
 
 // Salvar equipamento via AJAX
-document.getElementById('btnSalvarNãovoEquip')?.addEventListener('click', function() {
-    const form = document.getElementById('formNãovoEquipAjax');
+document.getElementById('btnSalvarNovoEquip')?.addEventListener('click', function() {
+    const form = document.getElementById('formNovoEquipAjax');
     const errors = document.getElementById('modalEquipErrors');
     if (!form || !errors) return;
-    errors.classList.add('d-nãone');
+    errors.classList.add('d-none');
 
     const formData = new FormData(form);
 
-    const modeloId = $('#nãovoEquipModelo').val();
+    const modeloId = $('#novoEquipModelo').val();
     if (modeloId && String(modeloId).startsWith('EXT|')) {
-        formData.append('modelo_nãome_ext', $('#nãovoEquipModelo option:selected').text());
+        formData.append('modelo_nome_ext', $('#novoEquipModelo option:selected').text());
     }
 
     const isEditMode = equipamentoModalMode === 'edit' && !!equipamentoEditId;
@@ -5425,11 +5425,11 @@ document.getElementById('btnSalvarNãovoEquip')?.addEventListener('click', funct
         body: formData,
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
-    .then(r => r.jsãon())
+    .then(r => r.json())
     .then(res => {
         if (res.status !== 'success') {
             errors.innerHTML = Object.values(res.errors || {}).join('<br>') || (res.message || 'Erro ao salvar equipamento.');
-            errors.classList.remove('d-nãone');
+            errors.classList.remove('d-none');
             return;
         }
 
@@ -5439,30 +5439,30 @@ document.getElementById('btnSalvarNãovoEquip')?.addEventListener('click', funct
             throw new Error('Resposta sem identificador do equipamento.');
         }
 
-        const nãome = `${eq.marca_nãome || ''} ${eq.modelo_nãome || ''} (${eq.tipo_nãome || ''})`.trim();
+        const nome = `${eq.marca_nome || ''} ${eq.modelo_nome || ''} (${eq.tipo_nome || ''})`.trim();
         const sel = document.getElementById('equipamentoSelect');
         if (!sel) return;
 
         let opt = Array.from(sel.options).find(o => String(o.value) === eqId);
         if (!opt) {
-            opt = new Option(nãome, eqId, true, true);
+            opt = new Option(nome, eqId, true, true);
             sel.appendChild(opt);
         }
-        opt.text = nãome;
+        opt.text = nome;
         opt.value = eqId;
         opt.dataset.tipo = eq.tipo_id || '';
-        opt.dataset.marca = eq.marca_nãome || '';
-        opt.dataset.modelo = eq.modelo_nãome || '';
+        opt.dataset.marca = eq.marca_nome || '';
+        opt.dataset.modelo = eq.modelo_nome || '';
         opt.dataset.serie = eq.numero_serie || '';
         opt.dataset.cor = eq.cor || '';
         opt.dataset.cor_hex = eq.cor_hex || '';
-        opt.dataset.tipo_nãome = eq.tipo_nãome || '';
+        opt.dataset.tipo_nome = eq.tipo_nome || '';
         opt.dataset.marca_id = eq.marca_id || '';
         opt.dataset.modelo_id = eq.modelo_id || '';
         opt.dataset.cliente_id = eq.cliente_id || '';
-        opt.dataset.senha_acessão = eq.senha_acessão || '';
+        opt.dataset.senha_acesso = eq.senha_acesso || '';
         opt.dataset.estado_fisico = eq.estado_fisico || '';
-        opt.dataset.acessãorios = eq.acessãorios || '';
+        opt.dataset.acessorios = eq.acessorios || '';
 
         osEquipamentosCache[eqId] = eq;
         const fotosAtualizadas = Array.isArray(res.fotos) ? res.fotos : null;
@@ -5478,20 +5478,20 @@ document.getElementById('btnSalvarNãovoEquip')?.addEventListener('click', funct
             bumpModalEquipFotosVersion();
             bumpEquipamentoFotosVersion();
             renderModalEquipFotosExistentes(fotosAtualizadas);
-            renderNãovoEquipFotosNãovas();
+            renderNovoEquipFotosNovas();
         }
 
         carregarFotosEquipamento(eqId, {
-            marca: eq.marca_nãome,
-            modelo: eq.modelo_nãome,
-            tipo: eq.tipo_nãome,
+            marca: eq.marca_nome,
+            modelo: eq.modelo_nome,
+            tipo: eq.tipo_nome,
             cor: eq.cor,
             cor_hex: eq.cor_hex
         }, fotosAtualizadas);
 
         if (eq.tipo_id) carregarDefeitos(eq.tipo_id);
 
-        bootstrap.Modal.getInstance(document.getElementById('modalNãovoEquipamento'))?.hide();
+        bootstrap.Modal.getInstance(document.getElementById('modalNovoEquipamento'))?.hide();
 
         if (window.Swal && typeof window.Swal.fire === 'function') {
             const hasWarning = Boolean(res.warning);
@@ -5506,8 +5506,8 @@ document.getElementById('btnSalvarNãovoEquip')?.addEventListener('click', funct
         }
     })
     .catch(() => {
-        errors.innerHTML = 'Erro inesperado. Tente nãovamente.';
-        errors.classList.remove('d-nãone');
+        errors.innerHTML = 'Erro inesperado. Tente novamente.';
+        errors.classList.remove('d-none');
     });
 });
 
@@ -5516,7 +5516,7 @@ function carregarDefeitos(tipoId) {
     const section   = document.getElementById('defeitosSection');
     const container = document.getElementById('defeitosContainer');
     if (!section || !container) return;
-    if (!tipoId) { section.style.display = 'nãone'; return; }
+    if (!tipoId) { section.style.display = 'none'; return; }
 
     container.innerHTML = '<div class="text-muted small"><i class="bi bi-hourglass-split me-1"></i>Carregando defeitos...</div>';
     section.style.display = '';
@@ -5526,14 +5526,14 @@ function carregarDefeitos(tipoId) {
     fd.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
 
     fetch(BASE_URL + 'equipamentosdefeitos/por-tipo', { method: 'POST', body: fd })
-    .then(r => r.jsãon())
+    .then(r => r.json())
     .then(defeitos => {
         if (defeitos.length === 0) {
             container.innerHTML = `<span class="text-muted small"><i class="bi bi-info-circle me-1"></i>Nenhum defeito comum cadastrado para este tipo. <a href="${BASE_URL}equipamentosdefeitos" target="_blank">Cadastrar defeitos</a></span>`;
             return;
         }
         const hw = defeitos.filter(d => d.classificacao === 'hardware');
-        const sw = defeitos.filter(d => d.classificacao === 'sãoftware');
+        const sw = defeitos.filter(d => d.classificacao === 'software');
         let html = '<div class="row g-2">';
 
         [{ list: hw, cls: 'text-danger', icon: 'bi-cpu', label: 'HARDWARE' },
@@ -5545,15 +5545,15 @@ function carregarDefeitos(tipoId) {
                 html += `<div class="form-check mb-1">
                     <input class="form-check-input chk-defeito-comum" type="checkbox" name="defeitos[]"
                            value="${d.id}" id="def_${d.id}" ${chk}
-                           data-nãome="${d.nãome.replace(/"/g,'&quot;')}"
+                           data-nome="${d.nome.replace(/"/g,'&quot;')}"
                            data-desc="${(d.descricao||'').replace(/"/g,'&quot;')}">
-                    <label class="form-check-label d-flex align-itemês-center" for="def_${d.id}">
+                    <label class="form-check-label d-flex align-items-center" for="def_${d.id}">
                         <div class="flex-grow-1">
-                            <strong style="font-size:0.85rem;">${d.nãome}</strong>
+                            <strong style="font-size:0.85rem;">${d.nome}</strong>
                             ${d.descricao ? `<br><small class="text-muted">${d.descricao}</small>` : ''}
                         </div>
-                        <button type="button" class="btn btn-sm btn-link p-0 text-warning mês-2 btn-ver-procedimentos-os"
-                                data-id="${d.id}" data-nãome="${d.nãome.replace(/"/g,'&quot;')}" title="Ver Procedimentos">
+                        <button type="button" class="btn btn-sm btn-link p-0 text-warning ms-2 btn-ver-procedimentos-os"
+                                data-id="${d.id}" data-nome="${d.nome.replace(/"/g,'&quot;')}" title="Ver Procedimentos">
                             <i class="bi bi-info-circle"></i>
                         </button>
                     </label>
@@ -5569,9 +5569,9 @@ function carregarDefeitos(tipoId) {
             chk.addEventListener('change', function() {
                 const relato = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
                 if (!relato) return;
-                const nãome   = this.getAttribute('data-nãome');
+                const nome   = this.getAttribute('data-nome');
                 const desc   = this.getAttribute('data-desc');
-                const tag    = `[DEFEITO: ${nãome}]${desc ? ' - ' + desc : ''}`;
+                const tag    = `[DEFEITO: ${nome}]${desc ? ' - ' + desc : ''}`;
                 if (this.checked) {
                     if (relato.value.trim()) relato.value += '\n';
                     relato.value += tag;
@@ -5587,7 +5587,7 @@ function carregarDefeitos(tipoId) {
         container.querySelectorAll('.btn-ver-procedimentos-os').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                abrirProcedimentosViewOnly(this.dataset.id, this.dataset.nãome);
+                abrirProcedimentosViewOnly(this.dataset.id, this.dataset.nome);
             });
         });
         _applyPendingDefeitos();
@@ -5598,13 +5598,13 @@ function carregarDefeitos(tipoId) {
 }
 
 // ??? Modal de visualiza��o de procedimentos ???????????????????????????????
-function abrirProcedimentosViewOnly(defeitoId, nãome) {
+function abrirProcedimentosViewOnly(defeitoId, nome) {
     const modalHtml = `
     <div class="modal fade" id="modalViewProcedimentos" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content glass-card">
                 <div class="modal-header border-bottom">
-                    <h5 class="modal-title"><i class="bi bi-journal-text text-warning me-2"></i>Procedimentos: ${nãome}</h5>
+                    <h5 class="modal-title"><i class="bi bi-journal-text text-warning me-2"></i>Procedimentos: ${nome}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -5621,7 +5621,7 @@ function abrirProcedimentosViewOnly(defeitoId, nãome) {
         document.body.insertAdjacentHTML('beforeend', modalHtml);
         modalEl = document.getElementById('modalViewProcedimentos');
     } else {
-        modalEl.querySelector('.modal-title').innerHTML = `<i class="bi bi-journal-text text-warning me-2"></i>Procedimentos: ${nãome}`;
+        modalEl.querySelector('.modal-title').innerHTML = `<i class="bi bi-journal-text text-warning me-2"></i>Procedimentos: ${nome}`;
     }
 
     const listDiv = modalEl.querySelector('#listProcOS');
@@ -5630,7 +5630,7 @@ function abrirProcedimentosViewOnly(defeitoId, nãome) {
     new bootstrap.Modal(modalEl).show();
 
     fetch(BASE_URL + 'equipamentosdefeitos/procedimentos/' + defeitoId)
-    .then(r => r.jsãon())
+    .then(r => r.json())
     .then(procs => {
         if (!procs.length) {
             listDiv.innerHTML = '<p class="text-muted small text-center my-3">Nenhum procedimento cadastrado.</p>';
@@ -5638,7 +5638,7 @@ function abrirProcedimentosViewOnly(defeitoId, nãome) {
             listDiv.innerHTML = '';
             procs.forEach((p, i) => {
                 listDiv.innerHTML += `
-                    <div class="p-2 rounded" style="background:rgba(255,255,255,0.03);border:1px sãolid rgba(255,255,255,0.05);">
+                    <div class="p-2 rounded" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);">
                         <span class="badge text-bg-warning rounded-pill me-2">${i+1}</span>
                         <span class="small">${p.descricao}</span>
                     </div>`;
@@ -5655,7 +5655,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="modal-content bg-transparent border-0">
                 <div class="modal-body text-center p-0 position-relative">
                     <div class="d-inline-block position-relative">
-                        <button type="button" class="btn-close position-absãolute" data-bs-dismiss="modal" aria-label="Close" style="top: 10px; right: 10px; z-index: 2055; filter: invert(1); opacity: 1; background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5);"></button>
+                        <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" aria-label="Close" style="top: 10px; right: 10px; z-index: 2055; filter: invert(1); opacity: 1; background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5);"></button>
                         <img src="" id="modalImagePreview" class="img-fluid rounded shadow-lg" style="max-height: 85vh; object-fit: contain; background: rgba(0,0,0,0.9);">
                     </div>
                 </div>
@@ -5687,7 +5687,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const button = event.relatedTarget;
         const imgSrc = button?.getAttribute('data-img-src') || '';
         if (!imgSrc) {
-            consãole.error('[OS Nãova] tentativa de abrir lightbox sem data-img-src');
+            console.error('[OS Nova] tentativa de abrir lightbox sem data-img-src');
             event.preventDefault();
             scheduleModalCleanup();
             return;

@@ -10,7 +10,7 @@ class OsItemModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSãoftDeletes = false;
+    protected $useSoftDeletes = false;
     protected $allowedFields = [
         'os_id', 'tipo', 'descricao', 'quantidade', 'valor_unitario', 'valor_total', 'peca_id'
     ];
@@ -19,7 +19,7 @@ class OsItemModel extends Model
 
     public function getByOs($osId)
     {
-        return $this->select('os_itens.*, pecas.nãome as peca_nãome')
+        return $this->select('os_itens.*, pecas.nome as peca_nome')
                     ->join('pecas', 'pecas.id = os_itens.peca_id', 'left')
                     ->where('os_id', $osId)
                     ->findAll();

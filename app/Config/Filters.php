@@ -42,10 +42,10 @@ class Filters extends BaseFilters
      * List of special required filters.
      *
      * The filters listed here are special. They are applied before and after
-     * other kinds of filters, and always applied even if a route does nãot exist.
+     * other kinds of filters, and always applied even if a route does not exist.
      *
      * Filters set by default provide framework functionality. If removed,
-     * those functions will não longer work.
+     * those functions will no longer work.
      *
      * @see https://codeigniter.com/user_guide/incoming/filters.html#provided-filters
      *

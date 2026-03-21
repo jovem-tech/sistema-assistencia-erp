@@ -19,7 +19,7 @@ class Grupos extends BaseController
     public function index()
     {
         $data = [
-            'title'  => 'Grupos de Acessão',
+            'title'  => 'Grupos de Acesso',
             'grupos' => $this->model->findAll(),
         ];
         return view('grupos/index', $data);
@@ -28,7 +28,7 @@ class Grupos extends BaseController
     public function create()
     {
         requirePermission('grupos', 'criar');
-        return view('grupos/form', ['title' => 'Nãovo Grupo']);
+        return view('grupos/form', ['title' => 'Novo Grupo']);
     }
 
     public function store()
@@ -36,55 +36,55 @@ class Grupos extends BaseController
         requirePermission('grupos', 'criar');
 
         $rules = [
-            'nãome' => 'required|min_length[3]|max_length[80]',
+            'nome' => 'required|min_length[3]|max_length[80]',
         ];
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $this->model->insert($this->request->getPost(['nãome', 'descricao']));
-        LogModel::registrar('grupo_criado', 'Grupo criado: ' . $this->request->getPost('nãome'));
+        $this->model->insert($this->request->getPost(['nome', 'descricao']));
+        LogModel::registrar('grupo_criado', 'Grupo criado: ' . $this->request->getPost('nome'));
 
         return redirect()->to('/grupos')->with('success', 'Grupo criado! Configure as permissões abaixo.');
     }
 
-    public function permissãoes(int $id)
+    public function permissoes(int $id)
     {
         requirePermission('grupos', 'editar');
 
         $grupo = $this->model->find($id);
         if (!$grupo) return redirect()->to('/grupos')->with('error', 'Grupo não encontrado.');
 
-        $matrix = $this->model->getComPermissãoes($id);
+        $matrix = $this->model->getComPermissoes($id);
 
-        return view('grupos/permissãoes', [
-            'title'   => 'Permissões — ' . $grupo['nãome'],
+        return view('grupos/permissoes', [
+            'title'   => 'Permissões — ' . $grupo['nome'],
             'grupo'   => $grupo,
             'modulos'    => $matrix['modulos'],
-            'permissãoes' => $matrix['permissãoes'],
+            'permissoes' => $matrix['permissoes'],
             'granted'    => $matrix['granted'],
         ]);
     }
 
-    public function salvarPermissãoes(int $id)
+    public function salvarPermissoes(int $id)
     {
         requirePermission('grupos', 'editar');
 
         $grupo = $this->model->find($id);
         if (!$grupo) return redirect()->to('/grupos')->with('error', 'Grupo não encontrado.');
 
-        $permissãoes = $this->request->getPost('permissãoes') ?? [];
-        $this->model->salvarPermissãoes($id, $permissãoes);
+        $permissoes = $this->request->getPost('permissoes') ?? [];
+        $this->model->salvarPermissoes($id, $permissoes);
 
         // Se o usuário logado pertence a esse grupo, invalida cache
         if (session()->get('user_grupo_id') == $id) {
             refreshPermissions();
         }
 
-        LogModel::registrar('grupo_permissãoes', "Permissões do grupo '{$grupo['nãome']}' atualizadas.");
+        LogModel::registrar('grupo_permissoes', "Permissões do grupo '{$grupo['nome']}' atualizadas.");
 
-        return redirect()->to('/grupos/' . $id . '/permissãoes')
-            ->with('success', 'Permissões salvas com sucessão!');
+        return redirect()->to('/grupos/' . $id . '/permissoes')
+            ->with('success', 'Permissões salvas com sucesso!');
     }
 
     public function edit(int $id)
@@ -99,7 +99,7 @@ class Grupos extends BaseController
     public function update(int $id)
     {
         requirePermission('grupos', 'editar');
-        $this->model->update($id, $this->request->getPost(['nãome', 'descricao']));
+        $this->model->update($id, $this->request->getPost(['nome', 'descricao']));
         LogModel::registrar('grupo_editado', 'Grupo editado ID: ' . $id);
         return redirect()->to('/grupos')->with('success', 'Grupo atualizado!');
     }

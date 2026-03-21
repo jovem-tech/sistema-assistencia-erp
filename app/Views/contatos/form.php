@@ -4,7 +4,7 @@
 <?php $isEdit = !empty($contato); ?>
 <?php
 $statusRel = (string) ($contato['status_relacionamento'] ?? '');
-$statusLabel = 'Lead nãovo';
+$statusLabel = 'Lead novo';
 $statusClass = 'text-bg-info text-dark';
 if ($statusRel === 'lead_qualificado') {
     $statusLabel = 'Lead qualificado';
@@ -25,12 +25,12 @@ if ($engajamentoStatus === 'em_risco') {
 }
 ?>
 
-<div class="page-header d-flex justify-content-between align-itemês-center mb-4">
-    <div class="d-flex align-itemês-center gap-3">
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
         <h2 class="mb-0">
-            <i class="bi bi-persãon-lines-fill me-2"></i><?= $isEdit ? 'Editar Contato' : 'Nãovo Contato' ?>
+            <i class="bi bi-person-lines-fill me-2"></i><?= $isEdit ? 'Editar Contato' : 'Novo Contato' ?>
         </h2>
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('contatos')" title="Ajuda sãobre Contatos">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('contatos')" title="Ajuda sobre Contatos">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
     </div>
@@ -46,14 +46,14 @@ if ($engajamentoStatus === 'em_risco') {
 
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label class="form-label">Nãome</label>
+                    <label class="form-label">Nome</label>
                     <input
                         type="text"
-                        name="nãome"
+                        name="nome"
                         class="form-control"
                         maxlength="150"
-                        value="<?= esc(old('nãome', (string) ($contato['nãome'] ?? ''))) ?>"
-                        placeholder="Nãome completo do contato"
+                        value="<?= esc(old('nome', (string) ($contato['nome'] ?? ''))) ?>"
+                        placeholder="Nome completo do contato"
                     >
                 </div>
 
@@ -78,7 +78,7 @@ if ($engajamentoStatus === 'em_risco') {
                         class="form-control"
                         maxlength="120"
                         value="<?= esc(old('email', (string) ($contato['email'] ?? ''))) ?>"
-                        placeholder="nãome@dominio.com"
+                        placeholder="nome@dominio.com"
                     >
                 </div>
 
@@ -95,14 +95,14 @@ if ($engajamentoStatus === 'em_risco') {
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label">Nãome de perfil não WhatsApp</label>
+                    <label class="form-label">Nome de perfil no WhatsApp</label>
                     <input
                         type="text"
-                        name="whatsapp_nãome_perfil"
+                        name="whatsapp_nome_perfil"
                         class="form-control"
                         maxlength="140"
-                        value="<?= esc(old('whatsapp_nãome_perfil', (string) ($contato['whatsapp_nãome_perfil'] ?? ''))) ?>"
-                        placeholder="Nãome exibido não perfil do WhatsApp"
+                        value="<?= esc(old('whatsapp_nome_perfil', (string) ($contato['whatsapp_nome_perfil'] ?? ''))) ?>"
+                        placeholder="Nome exibido no perfil do WhatsApp"
                     >
                 </div>
 
@@ -130,7 +130,7 @@ if ($engajamentoStatus === 'em_risco') {
             <?php endif; ?>
             <?php if ($isEdit && !empty($supportsLifecycle)): ?>
                 <div class="alert alert-light border mt-3 mb-0">
-                    <div class="d-flex flex-wrap gap-2 align-itemês-center">
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
                         <span class="small text-muted">Etapa atual:</span>
                         <span class="badge <?= esc($statusClass) ?>"><?= esc($statusLabel) ?></span>
                         <?php if (!empty($contato['qualificado_em'])): ?>

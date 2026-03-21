@@ -18,7 +18,7 @@ class CrmInteracaoModel extends Model
         'canal',
         'usuario_id',
         'data_interacao',
-        'payload_jsãon',
+        'payload_json',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

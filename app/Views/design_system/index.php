@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<div class="page-header d-flex justify-content-between align-itemês-center mb-4">
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0"><i class="bi bi-palette2 me-2"></i>Design System</h2>
     <div class="d-flex gap-2">
         <button type="button" class="btn btn-outline-info btn-sm rounded-pill" onclick="window.openDocPage('design-system')">
@@ -15,7 +15,7 @@
 
 <div class="card glass-card mb-4">
     <div class="card-body">
-        <div class="d-flex flex-wrap gap-2 align-itemês-center">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
             <span class="badge text-bg-primary">tokens</span>
             <span class="badge text-bg-secondary">componentes base</span>
             <span class="badge text-bg-info">componentes compostos</span>
@@ -23,7 +23,7 @@
             <span class="badge text-bg-warning">patterns</span>
         </div>
         <p class="mb-0 mt-3 text-muted">
-            Esta pagina consãolida os padroes visuais e comportamentais para usão em todos os modulos:
+            Esta pagina consolida os padroes visuais e comportamentais para uso em todos os modulos:
             OS, Equipamentos, Servicos, Estoque, Financeiro, Relatorios, Documentacao e Configuracoes.
         </p>
     </div>
@@ -192,7 +192,7 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="ds-tab-fotos">
-                        <p class="mb-0 text-muted">Use a galeria padrao para fotos de equipamento, OS e acessãorios.</p>
+                        <p class="mb-0 text-muted">Use a galeria padrao para fotos de equipamento, OS e acessorios.</p>
                     </div>
                     <div class="tab-pane fade" id="ds-tab-valores">
                         <p class="mb-0 text-muted">Campos monetarios e resumo de valores seguem o mesmo padrao visual.</p>
@@ -214,7 +214,7 @@
                     <div class="ds-gallery-thumb"><div class="ds-gallery-fake ds-gallery-fake-c"></div></div>
                     <div class="ds-gallery-thumb"><div class="ds-gallery-fake ds-gallery-fake-d"></div></div>
                 </div>
-                <div class="alert alert-success mb-2"><i class="bi bi-check-circle me-2"></i>Acao salva com sucessão.</div>
+                <div class="alert alert-success mb-2"><i class="bi bi-check-circle me-2"></i>Acao salva com sucesso.</div>
                 <div class="alert alert-warning mb-2"><i class="bi bi-exclamation-triangle me-2"></i>Itens opcionais pendentes.</div>
                 <div class="alert alert-danger mb-0"><i class="bi bi-x-circle me-2"></i>Campo obrigatorio nao preenchido.</div>
             </div>

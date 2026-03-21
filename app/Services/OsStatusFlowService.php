@@ -59,14 +59,14 @@ class OsStatusFlowService
 
         $count = $this->transicaoModel
             ->where('status_origem_id', $from['id'])
-            ->where('status_destinão_id', $to['id'])
+            ->where('status_destino_id', $to['id'])
             ->where('ativo', 1)
             ->countAllResults();
 
         return $count > 0;
     }
 
-    public function resãolveEstadoFluxo(string $statusCode): string
+    public function resolveEstadoFluxo(string $statusCode): string
     {
         $status = $this->getStatusByCode($statusCode);
         if (!empty($status['estado_fluxo_padrao'])) {
@@ -83,7 +83,7 @@ class OsStatusFlowService
         };
     }
 
-    public function applyStatus(int $osId, string $nãovoStatus, ?int $usuarioId = null, ?string $observacao = null): array
+    public function applyStatus(int $osId, string $novoStatus, ?int $usuarioId = null, ?string $observacao = null): array
     {
         $os = $this->osModel->find($osId);
         if (!$os) {
@@ -91,26 +91,26 @@ class OsStatusFlowService
         }
 
         $statusAtual = (string)($os['status'] ?? '');
-        if (!$this->isTransitionAllowed($statusAtual, $nãovoStatus)) {
+        if (!$this->isTransitionAllowed($statusAtual, $novoStatus)) {
             return [
                 'ok' => false,
-                'message' => "Transicao invalida: {$statusAtual} -> {$nãovoStatus}.",
+                'message' => "Transicao invalida: {$statusAtual} -> {$novoStatus}.",
             ];
         }
 
-        $estadoFluxo = $this->resãolveEstadoFluxo($nãovoStatus);
+        $estadoFluxo = $this->resolveEstadoFluxo($novoStatus);
         $updateData = [
-            'status' => $nãovoStatus,
+            'status' => $novoStatus,
             'estado_fluxo' => $estadoFluxo,
             'status_atualizado_em' => date('Y-m-d H:i:s'),
         ];
 
-        if (in_array($nãovoStatus, ['reparo_concluido', 'reparado_disponivel_loja', 'garantia_concluida'], true)) {
+        if (in_array($novoStatus, ['reparo_concluido', 'reparado_disponivel_loja', 'garantia_concluida'], true)) {
             $updateData['data_conclusao'] = date('Y-m-d H:i:s');
             $updateData['garantia_validade'] = date('Y-m-d', strtotime('+' . ($os['garantia_dias'] ?? 90) . ' days'));
         }
 
-        if (in_array($nãovoStatus, ['entregue_reparado', 'devolvido_sem_reparo'], true)) {
+        if (in_array($novoStatus, ['entregue_reparado', 'devolvido_sem_reparo'], true)) {
             $updateData['data_entrega'] = date('Y-m-d H:i:s');
         }
 
@@ -120,7 +120,7 @@ class OsStatusFlowService
             $this->historicoModel->insert([
                 'os_id' => $osId,
                 'status_anterior' => $statusAtual ?: null,
-                'status_nãovo' => $nãovoStatus,
+                'status_novo' => $novoStatus,
                 'estado_fluxo' => $estadoFluxo,
                 'usuario_id' => $usuarioId,
                 'observacao' => $observacao,
@@ -132,7 +132,7 @@ class OsStatusFlowService
             'ok' => true,
             'os' => $this->osModel->find($osId),
             'status_anterior' => $statusAtual,
-            'status_nãovo' => $nãovoStatus,
+            'status_novo' => $novoStatus,
             'estado_fluxo' => $estadoFluxo,
         ];
     }
@@ -141,8 +141,8 @@ class OsStatusFlowService
     {
         $grouped = $this->getStatusGrouped();
         $flat = [];
-        foreach ($grouped as $itemês) {
-            foreach ($itemês as $s) {
+        foreach ($grouped as $items) {
+            foreach ($items as $s) {
                 $flat[] = $s;
             }
         }
@@ -159,22 +159,22 @@ class OsStatusFlowService
     private function legacyStatusGrouped(): array
     {
         return [
-            'diagnãostico' => [
-                ['codigo' => 'aguardando_analise', 'nãome' => 'Aguardando Analise', 'grupo_macro' => 'diagnãostico', 'cor' => 'secondary'],
+            'diagnostico' => [
+                ['codigo' => 'aguardando_analise', 'nome' => 'Aguardando Analise', 'grupo_macro' => 'diagnostico', 'cor' => 'secondary'],
             ],
             'orcamento' => [
-                ['codigo' => 'aguardando_orcamento', 'nãome' => 'Aguardando Orcamento', 'grupo_macro' => 'orcamento', 'cor' => 'info'],
-                ['codigo' => 'aguardando_aprovacao', 'nãome' => 'Aguardando Aprovacao', 'grupo_macro' => 'orcamento', 'cor' => 'purple'],
+                ['codigo' => 'aguardando_orcamento', 'nome' => 'Aguardando Orcamento', 'grupo_macro' => 'orcamento', 'cor' => 'info'],
+                ['codigo' => 'aguardando_aprovacao', 'nome' => 'Aguardando Aprovacao', 'grupo_macro' => 'orcamento', 'cor' => 'purple'],
             ],
             'execucao' => [
-                ['codigo' => 'aprovado', 'nãome' => 'Aprovado', 'grupo_macro' => 'execucao', 'cor' => 'primary'],
-                ['codigo' => 'em_reparo', 'nãome' => 'Em Reparo', 'grupo_macro' => 'execucao', 'cor' => 'warning'],
-                ['codigo' => 'aguardando_peca', 'nãome' => 'Aguardando Peca', 'grupo_macro' => 'interrupcao', 'cor' => 'orange'],
+                ['codigo' => 'aprovado', 'nome' => 'Aprovado', 'grupo_macro' => 'execucao', 'cor' => 'primary'],
+                ['codigo' => 'em_reparo', 'nome' => 'Em Reparo', 'grupo_macro' => 'execucao', 'cor' => 'warning'],
+                ['codigo' => 'aguardando_peca', 'nome' => 'Aguardando Peca', 'grupo_macro' => 'interrupcao', 'cor' => 'orange'],
             ],
             'concluido' => [
-                ['codigo' => 'pronto', 'nãome' => 'Pronto', 'grupo_macro' => 'concluido', 'cor' => 'success'],
-                ['codigo' => 'entregue', 'nãome' => 'Entregue', 'grupo_macro' => 'encerrado', 'cor' => 'dark'],
-                ['codigo' => 'cancelado', 'nãome' => 'Cancelado', 'grupo_macro' => 'cancelado', 'cor' => 'secondary'],
+                ['codigo' => 'pronto', 'nome' => 'Pronto', 'grupo_macro' => 'concluido', 'cor' => 'success'],
+                ['codigo' => 'entregue', 'nome' => 'Entregue', 'grupo_macro' => 'encerrado', 'cor' => 'dark'],
+                ['codigo' => 'cancelado', 'nome' => 'Cancelado', 'grupo_macro' => 'cancelado', 'cor' => 'secondary'],
             ],
         ];
     }

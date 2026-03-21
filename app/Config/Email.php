@@ -85,7 +85,7 @@ class Email extends BaseConfig
     public string $mailType = 'text';
 
     /**
-     * Character set (utf-8, isão-8859-1, etc.)
+     * Character set (utf-8, iso-8859-1, etc.)
      */
     public string $charset = 'UTF-8';
 
@@ -95,7 +95,7 @@ class Email extends BaseConfig
     public bool $validate = false;
 
     /**
-     * Email Priority. 1 = highest. 5 = lowest. 3 = nãormal
+     * Email Priority. 1 = highest. 5 = lowest. 3 = normal
      */
     public int $priority = 3;
 
@@ -120,7 +120,7 @@ class Email extends BaseConfig
     public int $BCCBatchSize = 200;
 
     /**
-     * Enable nãotify message from server
+     * Enable notify message from server
      */
     public bool $DSN = false;
 }

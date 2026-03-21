@@ -3,15 +3,15 @@
 <?= $this->section('content') ?>
 <div class="row mb-4">
     <div class="col-12">
-        <div class="d-flex justify-content-between align-itemês-center">
+        <div class="d-flex justify-content-between align-items-center">
             <h1 class="h3 mb-0">Funcionários</h1>
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('funcionarios')" title="Ajuda sãobre Funcionários">
+                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('funcionarios')" title="Ajuda sobre Funcionários">
                     <i class="bi bi-question-circle me-1"></i>Ajuda
                 </button>
             <?php if (can('funcionarios', 'criar')): ?>
-            <a href="<?= base_url('funcionarios/nãovo') ?>" class="btn btn-primary btn-glow">
-                <i class="bi bi-persãon-plus-fill me-2"></i>Nãovo Funcionário
+            <a href="<?= base_url('funcionarios/novo') ?>" class="btn btn-primary btn-glow">
+                <i class="bi bi-person-plus-fill me-2"></i>Novo Funcionário
             </a>
             <?php endif; ?>
             </div>
@@ -26,7 +26,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Nãome Completo</th>
+                        <th>Nome Completo</th>
                         <th>CPF</th>
                         <th>Cargo</th>
                         <th>Telefone / Email</th>
@@ -39,7 +39,7 @@
                         <tr>
                             <td><?= esc($func['id']) ?></td>
                             <td>
-                                <div class="font-weight-bold"><?= esc($func['nãome']) ?></div>
+                                <div class="font-weight-bold"><?= esc($func['nome']) ?></div>
                             </td>
                             <td><?= esc($func['cpf']) ?></td>
                             <td><?= esc($func['cargo'] ?? '-') ?></td>

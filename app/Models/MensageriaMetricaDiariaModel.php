@@ -19,8 +19,8 @@ class MensageriaMetricaDiariaModel extends Model
         'conversas_finalizadas',
         'tempo_medio_primeira_resposta',
         'tempo_medio_resposta_total',
-        'taxa_resãolucao_automatica',
-        'taxa_escalonamento_humanão',
+        'taxa_resolucao_automatica',
+        'taxa_escalonamento_humano',
     ];
 
     protected $useTimestamps = true;

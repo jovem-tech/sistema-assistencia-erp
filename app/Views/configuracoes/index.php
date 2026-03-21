@@ -4,7 +4,7 @@
 <?php
 $enabled = (string) ($configs['whatsapp_enabled'] ?? '0') === '1';
 $directProvider = (string) ($configs['whatsapp_direct_provider'] ?? 'menuia');
-if ($directProvider === 'local_nãode') {
+if ($directProvider === 'local_node') {
     $directProvider = 'api_whats_local';
 }
 if (!in_array($directProvider, ['menuia', 'api_whats_local', 'api_whats_linux', 'webhook'], true)) {
@@ -14,25 +14,25 @@ if (!in_array($directProvider, ['menuia', 'api_whats_local', 'api_whats_linux', 
 $menuiaUrl = trim((string) ($configs['whatsapp_menuia_url'] ?? 'https://api.menuia.com/api'));
 $menuiaAuth = trim((string) ($configs['whatsapp_menuia_authkey'] ?? ''));
 $menuiaApp = trim((string) ($configs['whatsapp_menuia_appkey'] ?? ''));
-$localNãodeUrl = trim((string) ($configs['whatsapp_local_nãode_url'] ?? 'http://127.0.0.1:3001'));
-$localNãodeToken = trim((string) ($configs['whatsapp_local_nãode_token'] ?? ''));
-$linuxNãodeUrl = trim((string) ($configs['whatsapp_linux_nãode_url'] ?? 'http://127.0.0.1:3001'));
-$linuxNãodeToken = trim((string) ($configs['whatsapp_linux_nãode_token'] ?? ''));
+$localNodeUrl = trim((string) ($configs['whatsapp_local_node_url'] ?? 'http://127.0.0.1:3001'));
+$localNodeToken = trim((string) ($configs['whatsapp_local_node_token'] ?? ''));
+$linuxNodeUrl = trim((string) ($configs['whatsapp_linux_node_url'] ?? 'http://127.0.0.1:3001'));
+$linuxNodeToken = trim((string) ($configs['whatsapp_linux_node_token'] ?? ''));
 
 $statusOk = false;
 if ($enabled && $directProvider === 'menuia') {
     $statusOk = $menuiaAuth !== '' && $menuiaApp !== '';
 }
 if ($enabled && $directProvider === 'api_whats_local') {
-    $statusOk = $localNãodeUrl !== '' && $localNãodeToken !== '';
+    $statusOk = $localNodeUrl !== '' && $localNodeToken !== '';
 }
 if ($enabled && $directProvider === 'api_whats_linux') {
-    $statusOk = $linuxNãodeUrl !== '' && $linuxNãodeToken !== '';
+    $statusOk = $linuxNodeUrl !== '' && $linuxNodeToken !== '';
 }
 ?>
 
 <div class="row mb-4">
-    <div class="col-12 d-flex justify-content-between align-itemês-center">
+    <div class="col-12 d-flex justify-content-between align-items-center">
         <h1 class="h3 mb-0">Configuracoes</h1>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('configuracoes')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -57,9 +57,9 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link d-flex align-itemês-center" id="integracoes-tab" data-bs-toggle="tab" data-bs-target="#tab-integracoes" type="button" role="tab">
+                    <button class="nav-link d-flex align-items-center" id="integracoes-tab" data-bs-toggle="tab" data-bs-target="#tab-integracoes" type="button" role="tab">
                         <i class="bi bi-whatsapp me-2"></i>Integrações
-                        <span id="tabBadgeStatus" class="mês-2 badge bg-secondary" style="font-size: 0.65rem;">...</span>
+                        <span id="tabBadgeStatus" class="ms-2 badge bg-secondary" style="font-size: 0.65rem;">...</span>
                     </button>
                 </li>
             </ul>
@@ -77,8 +77,8 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Nãome do Sistema na Tela de Login / Menu</label>
-                            <input type="text" class="form-control" name="sistema_nãome" value="<?= esc($configs['sistema_nãome'] ?? 'AssistTech') ?>">
+                            <label class="form-label text-muted">Nome do Sistema na Tela de Login / Menu</label>
+                            <input type="text" class="form-control" name="sistema_nome" value="<?= esc($configs['sistema_nome'] ?? 'AssistTech') ?>">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-muted">Logo do Sistema (Login/Menu)</label>
@@ -102,8 +102,8 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                     <h5 class="mb-3 border-bottom pb-2">Informações Jurídicas e Contato</h5>
                     <div class="row mb-4">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Nãome da Empresa</label>
-                            <input type="text" class="form-control" name="empresa_nãome" value="<?= esc($configs['empresa_nãome'] ?? '') ?>">
+                            <label class="form-label text-muted">Nome da Empresa</label>
+                            <input type="text" class="form-control" name="empresa_nome" value="<?= esc($configs['empresa_nome'] ?? '') ?>">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-muted">CNPJ</label>
@@ -126,10 +126,10 @@ if ($enabled && $directProvider === 'api_whats_linux') {
 
                 <!-- Aba Integracoes -->
                 <div class="tab-pane fade" id="tab-integracoes" role="tabpanel">
-                    <h5 class="mb-3 border-bottom pb-2 d-flex justify-content-between align-itemês-center flex-wrap gap-2">
+                    <h5 class="mb-3 border-bottom pb-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <span>Configurações WhatsApp</span>
-                        <div class="d-flex gap-2 align-itemês-center">
-                            <span id="whatsRealtimeStatus" class="badge bg-secondary" style="cursãor: pointer;" title="Clique para gerenciar">Verificando gateway...</span>
+                        <div class="d-flex gap-2 align-items-center">
+                            <span id="whatsRealtimeStatus" class="badge bg-secondary" style="cursor: pointer;" title="Clique para gerenciar">Verificando gateway...</span>
                             <span class="badge <?= $statusOk ? 'bg-success' : 'bg-danger' ?>" id="whatsConfigBadge">
                                 <?= $statusOk ? 'Configuracao OK' : 'Incompleto' ?>
                             </span>
@@ -181,59 +181,59 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                             <input type="password" class="form-control" name="whatsapp_menuia_authkey" id="whatsapp_menuia_authkey" value="<?= esc($menuiaAuth) ?>">
                         </div>
 
-                        <div class="col-12 mb-3 config-api_whats_local d-nãone">
+                        <div class="col-12 mb-3 config-api_whats_local d-none">
                             <div class="row g-2">
                                 <div class="col-md-5">
                                     <label class="form-label text-muted">URL API Local</label>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" name="whatsapp_local_nãode_url" id="whatsapp_local_nãode_url" value="<?= esc($configs['whatsapp_local_nãode_url'] ?? 'http://127.0.0.1:3001') ?>">
+                                        <input type="text" class="form-control" name="whatsapp_local_node_url" id="whatsapp_local_node_url" value="<?= esc($configs['whatsapp_local_node_url'] ?? 'http://127.0.0.1:3001') ?>">
                                         <button class="btn btn-outline-primary btn-gerenciar-gateway" type="button" data-provider="api_whats_local">Gerenciar</button>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label text-muted">Token API</label>
-                                    <input type="password" class="form-control" name="whatsapp_local_nãode_token" id="whatsapp_local_nãode_token" value="<?= esc($configs['whatsapp_local_nãode_token'] ?? '') ?>">
+                                    <input type="password" class="form-control" name="whatsapp_local_node_token" id="whatsapp_local_node_token" value="<?= esc($configs['whatsapp_local_node_token'] ?? '') ?>">
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label text-muted">Origem ERP</label>
-                                    <input type="text" class="form-control" name="whatsapp_local_nãode_origin" id="whatsapp_local_nãode_origin" value="<?= esc($configs['whatsapp_local_nãode_origin'] ?? base_url('/')) ?>">
+                                    <input type="text" class="form-control" name="whatsapp_local_node_origin" id="whatsapp_local_node_origin" value="<?= esc($configs['whatsapp_local_node_origin'] ?? base_url('/')) ?>">
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label text-muted">Timeout (s)</label>
-                                    <input type="number" min="5" max="90" class="form-control" name="whatsapp_local_nãode_timeout" id="whatsapp_local_nãode_timeout" value="<?= esc($configs['whatsapp_local_nãode_timeout'] ?? '20') ?>">
+                                    <input type="number" min="5" max="90" class="form-control" name="whatsapp_local_node_timeout" id="whatsapp_local_node_timeout" value="<?= esc($configs['whatsapp_local_node_timeout'] ?? '20') ?>">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-12 mb-3 config-api_whats_linux d-nãone">
+                        <div class="col-12 mb-3 config-api_whats_linux d-none">
                             <div class="row g-2">
                                 <div class="col-md-5">
                                     <label class="form-label text-muted">URL API Linux</label>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" name="whatsapp_linux_nãode_url" id="whatsapp_linux_nãode_url" value="<?= esc($configs['whatsapp_linux_nãode_url'] ?? 'http://127.0.0.1:3001') ?>">
+                                        <input type="text" class="form-control" name="whatsapp_linux_node_url" id="whatsapp_linux_node_url" value="<?= esc($configs['whatsapp_linux_node_url'] ?? 'http://127.0.0.1:3001') ?>">
                                         <button class="btn btn-outline-primary btn-gerenciar-gateway" type="button" data-provider="api_whats_linux">Gerenciar</button>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label text-muted">Token API</label>
-                                    <input type="password" class="form-control" name="whatsapp_linux_nãode_token" id="whatsapp_linux_nãode_token" value="<?= esc($configs['whatsapp_linux_nãode_token'] ?? '') ?>">
+                                    <input type="password" class="form-control" name="whatsapp_linux_node_token" id="whatsapp_linux_node_token" value="<?= esc($configs['whatsapp_linux_node_token'] ?? '') ?>">
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label text-muted">Origem ERP</label>
-                                    <input type="text" class="form-control" name="whatsapp_linux_nãode_origin" id="whatsapp_linux_nãode_origin" value="<?= esc($configs['whatsapp_linux_nãode_origin'] ?? base_url('/')) ?>">
+                                    <input type="text" class="form-control" name="whatsapp_linux_node_origin" id="whatsapp_linux_node_origin" value="<?= esc($configs['whatsapp_linux_node_origin'] ?? base_url('/')) ?>">
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label text-muted">Timeout (s)</label>
-                                    <input type="number" min="5" max="90" class="form-control" name="whatsapp_linux_nãode_timeout" id="whatsapp_linux_nãode_timeout" value="<?= esc($configs['whatsapp_linux_nãode_timeout'] ?? '20') ?>">
+                                    <input type="number" min="5" max="90" class="form-control" name="whatsapp_linux_node_timeout" id="whatsapp_linux_node_timeout" value="<?= esc($configs['whatsapp_linux_node_timeout'] ?? '20') ?>">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-md-8 mb-3 config-webhook d-nãone">
+                        <div class="col-md-8 mb-3 config-webhook d-none">
                             <label class="form-label text-muted">URL Webhook</label>
                             <input type="text" class="form-control" name="whatsapp_webhook_url" id="whatsapp_webhook_url" value="<?= esc($configs['whatsapp_webhook_url'] ?? '') ?>">
                         </div>
-                        <div class="col-md-4 mb-3 config-webhook d-nãone">
+                        <div class="col-md-4 mb-3 config-webhook d-none">
                             <label class="form-label text-muted">Metodo</label>
                             <select class="form-select" name="whatsapp_webhook_method" id="whatsapp_webhook_method">
                                 <option value="POST" <?= ($configs['whatsapp_webhook_method'] ?? 'POST') === 'POST' ? 'selected' : '' ?>>POST</option>
@@ -241,11 +241,11 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                                 <option value="PUT" <?= ($configs['whatsapp_webhook_method'] ?? 'POST') === 'PUT' ? 'selected' : '' ?>>PUT</option>
                             </select>
                         </div>
-                        <div class="col-md-6 mb-3 config-webhook d-nãone">
+                        <div class="col-md-6 mb-3 config-webhook d-none">
                             <label class="form-label text-muted">Headers (JSON)</label>
                             <textarea class="form-control" name="whatsapp_webhook_headers" id="whatsapp_webhook_headers" rows="2"><?= esc($configs['whatsapp_webhook_headers'] ?? '{}') ?></textarea>
                         </div>
-                        <div class="col-md-6 mb-3 config-webhook d-nãone">
+                        <div class="col-md-6 mb-3 config-webhook d-none">
                             <label class="form-label text-muted">Payload Template (JSON)</label>
                             <textarea class="form-control" name="whatsapp_webhook_payload" id="whatsapp_webhook_payload" rows="2"><?= esc($configs['whatsapp_webhook_payload'] ?? '{"to":"{{phone}}","message":"{{message}}"}') ?></textarea>
                         </div>
@@ -258,7 +258,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                         <div class="col-12">
                             <small class="text-muted d-block mt-1">
                                 <i class="bi bi-info-circle me-1"></i>
-                                O self-check inbound testa automaticamente a rota de entrada do WhatsApp (gateway -> webhook ERP), token e host/origem, sem usar consãole.
+                                O self-check inbound testa automaticamente a rota de entrada do WhatsApp (gateway -> webhook ERP), token e host/origem, sem usar console.
                             </small>
                         </div>
                     </div>
@@ -277,7 +277,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-dark text-white border-0">
-                <h5 class="modal-title d-flex align-itemês-center gap-2">
+                <h5 class="modal-title d-flex align-items-center gap-2">
                     <i class="bi bi-whatsapp"></i>
                     Gerenciar Gateway
                     <span id="gatewayProviderBadge" class="badge text-bg-secondary">API Local (Windows)</span>
@@ -290,23 +290,23 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                     <p class="mt-3 text-muted mb-0">Consultando status do gateway...</p>
                 </div>
 
-                <div id="localGatewayPanel" class="d-nãone">
-                    <div class="d-flex flex-wrap justify-content-between align-itemês-center mb-3 gap-2">
-                        <div class="d-flex align-itemês-center gap-2">
+                <div id="localGatewayPanel" class="d-none">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                        <div class="d-flex align-items-center gap-2">
                             <span class="small text-muted">Status:</span>
                             <span id="gatewayStatusBadge" class="badge text-bg-secondary">-</span>
                         </div>
                         <small class="text-muted">Ultima verificacao: <span id="gatewayLastCheck">-</span></small>
                     </div>
 
-                    <div class="row g-3 align-itemês-start">
+                    <div class="row g-3 align-items-start">
                         <div class="col-lg-5 text-center">
                             <p class="small text-muted mb-2">QR Code para autenticacao</p>
-                            <div class="bg-light p-3 rounded border mx-auto" style="width:256px;height:256px;display:flex;align-itemês:center;justify-content:center;">
-                                <img id="localQrImage" src="" alt="QR" class="img-fluid d-nãone">
+                            <div class="bg-light p-3 rounded border mx-auto" style="width:256px;height:256px;display:flex;align-items:center;justify-content:center;">
+                                <img id="localQrImage" src="" alt="QR" class="img-fluid d-none">
                                 <div id="localQrPlaceholder" class="text-muted small px-2">Aguardando QR Code...</div>
                             </div>
-                            <small id="gatewayQrHint" class="text-muted d-block mt-2">Escaneie o QR não WhatsApp para manter sessao ativa.</small>
+                            <small id="gatewayQrHint" class="text-muted d-block mt-2">Escaneie o QR no WhatsApp para manter sessao ativa.</small>
                         </div>
                         <div class="col-lg-7">
                             <div class="border rounded p-3 bg-light-subtle small">
@@ -336,7 +336,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                                     <span id="gatewaySessionPath">-</span>
                                 </div>
                             </div>
-                            <div id="localGatewayErrorDetails" class="alert alert-danger mt-3 py-2 px-3 d-nãone mb-0 small"></div>
+                            <div id="localGatewayErrorDetails" class="alert alert-danger mt-3 py-2 px-3 d-none mb-0 small"></div>
                         </div>
                     </div>
                 </div>
@@ -345,10 +345,10 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                 <button type="button" class="btn btn-outline-primary" id="btnRefreshLocal">
                     <i class="bi bi-arrow-repeat me-1"></i>Atualizar status
                 </button>
-                <button type="button" class="btn btn-outline-danger d-nãone" id="btnLogoutLocal">
-                    <i class="bi bi-persãon-x me-1"></i>Desconectar / Trocar Numero
+                <button type="button" class="btn btn-outline-danger d-none" id="btnLogoutLocal">
+                    <i class="bi bi-person-x me-1"></i>Desconectar / Trocar Numero
                 </button>
-                <button type="button" class="btn btn-success d-nãone" id="btnStartLocal">
+                <button type="button" class="btn btn-success d-none" id="btnStartLocal">
                     <i class="bi bi-play-fill me-1"></i>Iniciar Servidor
                 </button>
                 <button type="button" class="btn btn-outline-warning" id="btnRestartLocal">
@@ -379,7 +379,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
     let pollInterval = null;
     let modalRef = null;
 
-    const fireSwal = (opts) => (window.Swal && typeof window.Swal.fire === 'function') ? window.Swal.fire(opts) : Promise.resãolve(alert(opts?.text || opts?.title || 'Acao concluida.'));
+    const fireSwal = (opts) => (window.Swal && typeof window.Swal.fire === 'function') ? window.Swal.fire(opts) : Promise.resolve(alert(opts?.text || opts?.title || 'Acao concluida.'));
     const getCsrf = () => ({ name: 'csrf_test_name', value: (document.cookie.match(/(?:^|;\s*)csrf_cookie_name=([^;]+)/)?.[1] || '') });
     const byId = (id) => document.getElementById(id);
 
@@ -414,10 +414,10 @@ if ($enabled && $directProvider === 'api_whats_linux') {
 
     const toggleProviders = () => {
         const provider = selectProvider?.value || 'menuia';
-        document.querySelectorAll('.config-menuia').forEach((el) => el.classList.toggle('d-nãone', provider !== 'menuia'));
-        document.querySelectorAll('.config-webhook').forEach((el) => el.classList.toggle('d-nãone', provider !== 'webhook'));
-        document.querySelectorAll('.config-api_whats_local').forEach((el) => el.classList.toggle('d-nãone', provider !== 'api_whats_local'));
-        document.querySelectorAll('.config-api_whats_linux').forEach((el) => el.classList.toggle('d-nãone', provider !== 'api_whats_linux'));
+        document.querySelectorAll('.config-menuia').forEach((el) => el.classList.toggle('d-none', provider !== 'menuia'));
+        document.querySelectorAll('.config-webhook').forEach((el) => el.classList.toggle('d-none', provider !== 'webhook'));
+        document.querySelectorAll('.config-api_whats_local').forEach((el) => el.classList.toggle('d-none', provider !== 'api_whats_local'));
+        document.querySelectorAll('.config-api_whats_linux').forEach((el) => el.classList.toggle('d-none', provider !== 'api_whats_linux'));
     };
     selectProvider?.addEventListener('change', toggleProviders);
     toggleProviders();
@@ -432,23 +432,23 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         webhook_method: document.getElementById('whatsapp_webhook_method')?.value || 'POST',
         webhook_headers: document.getElementById('whatsapp_webhook_headers')?.value || '',
         webhook_payload: document.getElementById('whatsapp_webhook_payload')?.value || '',
-        local_url: document.getElementById('whatsapp_local_nãode_url')?.value || '',
-        local_token: document.getElementById('whatsapp_local_nãode_token')?.value || '',
-        local_origin: document.getElementById('whatsapp_local_nãode_origin')?.value || '',
-        local_timeout: document.getElementById('whatsapp_local_nãode_timeout')?.value || '',
-        linux_url: document.getElementById('whatsapp_linux_nãode_url')?.value || '',
-        linux_token: document.getElementById('whatsapp_linux_nãode_token')?.value || '',
-        linux_origin: document.getElementById('whatsapp_linux_nãode_origin')?.value || '',
-        linux_timeout: document.getElementById('whatsapp_linux_nãode_timeout')?.value || '',
+        local_url: document.getElementById('whatsapp_local_node_url')?.value || '',
+        local_token: document.getElementById('whatsapp_local_node_token')?.value || '',
+        local_origin: document.getElementById('whatsapp_local_node_origin')?.value || '',
+        local_timeout: document.getElementById('whatsapp_local_node_timeout')?.value || '',
+        linux_url: document.getElementById('whatsapp_linux_node_url')?.value || '',
+        linux_token: document.getElementById('whatsapp_linux_node_token')?.value || '',
+        linux_origin: document.getElementById('whatsapp_linux_node_origin')?.value || '',
+        linux_timeout: document.getElementById('whatsapp_linux_node_timeout')?.value || '',
     });
 
-    const postJsãon = async (url, payload) => {
+    const postJson = async (url, payload) => {
         const fd = new FormData();
         Object.entries(payload).forEach(([k, v]) => fd.append(k, v ?? ''));
         const csrf = getCsrf();
         if (csrf.value) fd.append(csrf.name, decodeURIComponent(csrf.value));
         const res = await fetch(url, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' }, body: fd });
-        const data = await res.jsãon().catch(() => ({}));
+        const data = await res.json().catch(() => ({}));
         if (!res.ok || !(data.ok || data.success)) {
             const err = new Error(data.message || 'Falha na requisicao');
             err.payload = data;
@@ -462,7 +462,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         try {
             btnTestConn.disabled = true;
             btnTestConn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Validando...';
-            const data = await postJsãon('<?= base_url('configuracoes/whatsapp/testar-conexao') ?>', providerPayload());
+            const data = await postJson('<?= base_url('configuracoes/whatsapp/testar-conexao') ?>', providerPayload());
             await fireSwal({ icon: 'success', title: 'Conexao validada', text: data.message || 'OK' });
         } catch (error) {
             await fireSwal({ icon: 'error', title: 'Falha na conexao', text: error.message || 'Erro' });
@@ -488,10 +488,10 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         try {
             btnSendTest.disabled = true;
             btnSendTest.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando...';
-            const data = await postJsãon('<?= base_url('configuracoes/whatsapp/enviar-teste') ?>', { ...providerPayload(), telefone: phone, mensagem: dataPrompt.value || '' });
+            const data = await postJson('<?= base_url('configuracoes/whatsapp/enviar-teste') ?>', { ...providerPayload(), telefone: phone, mensagem: dataPrompt.value || '' });
             await fireSwal({ icon: 'success', title: 'Mensagem enviada', text: data.message || 'OK' });
         } catch (error) {
-            await fireSwal({ icon: 'error', title: 'Falha não envio', text: error.message || 'Erro' });
+            await fireSwal({ icon: 'error', title: 'Falha no envio', text: error.message || 'Erro' });
         } finally {
             btnSendTest.disabled = false;
             btnSendTest.innerHTML = originalHtml;
@@ -514,24 +514,24 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             btnSelfCheckInbound.disabled = true;
             btnSelfCheckInbound.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Validando inbound...';
 
-            const data = await postJsãon('<?= base_url('configuracoes/whatsapp/self-check-inbound') ?>', providerPayload());
+            const data = await postJson('<?= base_url('configuracoes/whatsapp/self-check-inbound') ?>', providerPayload());
             const checks = data?.checks || {};
             const checkLine = (label, check) => {
                 const ok = !!check?.ok;
                 const icon = ok ? '✅' : '❌';
-                const mêsg = check?.message || '';
+                const msg = check?.message || '';
                 const detail = check?.detail || '';
                 const targetUrl = check?.target_url || check?.url || '';
                 const detailHtml = detail ? `<div class="text-muted" style="font-size:0.78rem;">Detalhe: ${detail}</div>` : '';
                 const targetHtml = targetUrl ? `<div class="text-muted" style="font-size:0.78rem;">URL: ${targetUrl}</div>` : '';
-                return `<div class="mb-1">${icon} <strong>${label}</strong>${mêsg ? ` - ${mêsg}` : ''}${targetHtml}${detailHtml}</div>`;
+                return `<div class="mb-1">${icon} <strong>${label}</strong>${msg ? ` - ${msg}` : ''}${targetHtml}${detailHtml}</div>`;
             };
 
             const html = `
                 <div class="text-start small">
                     ${checkLine('Gateway /status', checks.gateway_status)}
                     ${checkLine('Gateway -> ERP (/self-check-inbound)', checks.gateway_forward)}
-                    ${checkLine('Webhook direto não ERP', checks.webhook_direct)}
+                    ${checkLine('Webhook direto no ERP', checks.webhook_direct)}
                     ${checkLine('Alinhamento de origem (ERP_ORIGIN)', checks.origin_alignment)}
                 </div>
             `;
@@ -548,18 +548,18 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                 const checkLine = (label, check) => {
                     const ok = !!check?.ok;
                     const icon = ok ? '✅' : '❌';
-                    const mêsg = check?.message || '';
+                    const msg = check?.message || '';
                     const detail = check?.detail || '';
                     const targetUrl = check?.target_url || check?.url || '';
                     const detailHtml = detail ? `<div class="text-muted" style="font-size:0.78rem;">Detalhe: ${detail}</div>` : '';
                     const targetHtml = targetUrl ? `<div class="text-muted" style="font-size:0.78rem;">URL: ${targetUrl}</div>` : '';
-                    return `<div class="mb-1">${icon} <strong>${label}</strong>${mêsg ? ` - ${mêsg}` : ''}${targetHtml}${detailHtml}</div>`;
+                    return `<div class="mb-1">${icon} <strong>${label}</strong>${msg ? ` - ${msg}` : ''}${targetHtml}${detailHtml}</div>`;
                 };
                 detailsHtml = `
                     <div class="text-start small mt-2">
                         ${checkLine('Gateway /status', checks.gateway_status)}
                         ${checkLine('Gateway -> ERP (/self-check-inbound)', checks.gateway_forward)}
-                        ${checkLine('Webhook direto não ERP', checks.webhook_direct)}
+                        ${checkLine('Webhook direto no ERP', checks.webhook_direct)}
                         ${checkLine('Alinhamento de origem (ERP_ORIGIN)', checks.origin_alignment)}
                     </div>
                 `;
@@ -579,12 +579,12 @@ if ($enabled && $directProvider === 'api_whats_linux') {
     const setGatewayError = (message = '', isCritical = true) => {
         if (!localGatewayErrorDetails) return;
         if (!message) {
-            localGatewayErrorDetails.classList.add('d-nãone');
+            localGatewayErrorDetails.classList.add('d-none');
             localGatewayErrorDetails.textContent = '';
             return;
         }
         localGatewayErrorDetails.textContent = message;
-        localGatewayErrorDetails.classList.remove('d-nãone');
+        localGatewayErrorDetails.classList.remove('d-none');
         localGatewayErrorDetails.className = 'alert mt-3 py-2 px-3 mb-0 small ' + (isCritical ? 'alert-danger' : 'alert-info');
     };
 
@@ -593,7 +593,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         const navTabBadge = document.getElementById('tabBadgeStatus');
         if (!target) return;
         
-        const key = String(status || 'unknãown').toLowerCase();
+        const key = String(status || 'unknown').toLowerCase();
         const map = {
             connected: { cls: 'text-bg-success', label: 'Conectado', icon: 'bi-check-circle-fill' },
             awaiting_qr: { cls: 'text-bg-warning', label: 'Aguardando QR', icon: 'bi-qr-code' },
@@ -610,7 +610,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         if (isGlobal) {
             target.className = 'badge ' + (cfg.cls.replace('text-bg-', 'bg-'));
             if (navTabBadge) {
-                navTabBadge.className = 'mês-2 badge ' + (cfg.cls.replace('text-bg-', 'bg-'));
+                navTabBadge.className = 'ms-2 badge ' + (cfg.cls.replace('text-bg-', 'bg-'));
                 navTabBadge.textContent = cfg.label;
             }
         } else {
@@ -620,28 +620,28 @@ if ($enabled && $directProvider === 'api_whats_linux') {
     };
 
     const setLoadingState = () => {
-        localGatewayLoading?.classList.remove('d-nãone');
-        localGatewayPanel?.classList.add('d-nãone');
+        localGatewayLoading?.classList.remove('d-none');
+        localGatewayPanel?.classList.add('d-none');
     };
 
     const setPanelState = () => {
-        localGatewayLoading?.classList.add('d-nãone');
-        localGatewayPanel?.classList.remove('d-nãone');
+        localGatewayLoading?.classList.add('d-none');
+        localGatewayPanel?.classList.remove('d-none');
     };
 
     const clearQr = (placeholderText) => {
         if (localQrImage) {
             localQrImage.src = '';
-            localQrImage.classList.add('d-nãone');
+            localQrImage.classList.add('d-none');
         }
         if (localQrPlaceholder) {
             localQrPlaceholder.textContent = placeholderText || 'Aguardando QR Code...';
-            localQrPlaceholder.classList.remove('d-nãone');
+            localQrPlaceholder.classList.remove('d-none');
         }
     };
 
     const applyGatewayData = (statusPayload, qrData = null) => {
-        const status = statusPayload?.status || 'unknãown';
+        const status = statusPayload?.status || 'unknown';
         const data = statusPayload?.data || {};
         const account = data?.account || {};
         const success = !!statusPayload?.success;
@@ -650,11 +650,11 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         setGatewayStatusBadge(status);
         
         // Só mostramos erro se houver uma mensagem de erro real ou se a query falhou
-        let errorMêsg = data?.last_error_message || '';
-        if (!errorMêsg && !success) {
-            errorMêsg = statusPayload?.message || 'Gateway inacessivel';
+        let errorMsg = data?.last_error_message || '';
+        if (!errorMsg && !success) {
+            errorMsg = statusPayload?.message || 'Gateway inacessivel';
         }
-        setGatewayError(errorMêsg, !success || !!data?.last_error_message);
+        setGatewayError(errorMsg, !success || !!data?.last_error_message);
 
         if (gatewayLastCheck) gatewayLastCheck.textContent = new Date().toLocaleString('pt-BR');
         if (gatewayAccountName) gatewayAccountName.textContent = account.pushname || '-';
@@ -670,29 +670,29 @@ if ($enabled && $directProvider === 'api_whats_linux') {
 
     const updateButtons = (status, hasQr = false, finalQr = '') => {
         if (status === 'gateway_unreachable') {
-            btnStart?.classList.remove('d-nãone');
+            btnStart?.classList.remove('d-none');
         } else {
-            btnStart?.classList.add('d-nãone');
+            btnStart?.classList.add('d-none');
         }
 
         if (status === 'connected') {
-            btnLogout?.classList.remove('d-nãone');
+            btnLogout?.classList.remove('d-none');
             clearQr('Conectado. QR nao necessario.');
             if (localQrImage) {
                 localQrImage.src = '<?= base_url('assets/img/sistema/whatsapp_connected_success.png') ?>';
-                localQrImage.classList.remove('d-nãone');
+                localQrImage.classList.remove('d-none');
             }
-            if (localQrPlaceholder) localQrPlaceholder.classList.add('d-nãone');
+            if (localQrPlaceholder) localQrPlaceholder.classList.add('d-none');
             if (gatewayQrHint) gatewayQrHint.textContent = 'Sessao ativa e pronta para envio.';
         } else {
-            btnLogout?.classList.add('d-nãone');
+            btnLogout?.classList.add('d-none');
             if (hasQr && localQrImage && localQrPlaceholder) {
                 localQrImage.src = finalQr;
-                localQrImage.classList.remove('d-nãone');
-                localQrPlaceholder.classList.add('d-nãone');
+                localQrImage.classList.remove('d-none');
+                localQrPlaceholder.classList.add('d-none');
                 if (gatewayQrHint) gatewayQrHint.textContent = 'Escaneie o QR Code para autenticar o WhatsApp.';
             } else {
-                clearQr('QR indisponivel não momento. Aguarde ou reinicie.');
+                clearQr('QR indisponivel no momento. Aguarde ou reinicie.');
                 if (gatewayQrHint) gatewayQrHint.textContent = 'Se o QR demorar, use Reiniciar Inicializacao.';
             }
         }
@@ -706,7 +706,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             }
             if (btnLogout && btnLogout.disabled) {
                 btnLogout.disabled = false;
-                btnLogout.innerHTML = '<i class="bi bi-persãon-x me-1"></i>Desconectar / Trocar Numero';
+                btnLogout.innerHTML = '<i class="bi bi-person-x me-1"></i>Desconectar / Trocar Numero';
             }
             if (btnStart && btnStart.disabled) {
                 btnStart.disabled = false;
@@ -720,8 +720,8 @@ if ($enabled && $directProvider === 'api_whats_linux') {
 
     const fetchStatus = async () => {
         try {
-            const res = await fetch(statusUrl(), { cache: 'não-store' });
-            const statusPayload = await res.jsãon().catch(() => ({}));
+            const res = await fetch(statusUrl(), { cache: 'no-store' });
+            const statusPayload = await res.json().catch(() => ({}));
             if (!res.ok || !statusPayload?.success) {
                 setPanelState();
                 setGatewayStatusBadge(statusPayload?.status || 'gateway_unreachable');
@@ -734,8 +734,8 @@ if ($enabled && $directProvider === 'api_whats_linux') {
 
             let qrPayload = null;
             if (!statusPayload?.data?.qr && !statusPayload?.data?.ready) {
-                const q = await fetch(qrUrl(), { cache: 'não-store' });
-                qrPayload = await q.jsãon().catch(() => null);
+                const q = await fetch(qrUrl(), { cache: 'no-store' });
+                qrPayload = await q.json().catch(() => null);
                 if (q.ok && qrPayload?.success) {
                     setGatewayError('');
                 } else if (statusPayload?.status === 'awaiting_qr') {
@@ -748,7 +748,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             setGatewayStatusBadge('gateway_unreachable');
             setGatewayError(e?.message || 'Servidor do gateway inacessivel.');
             clearQr('Servidor inacessivel.');
-            if (gatewayQrHint) gatewayQrHint.textContent = 'Confirme processão Nãode em execucao e token correto.';
+            if (gatewayQrHint) gatewayQrHint.textContent = 'Confirme processo Node em execucao e token correto.';
             updateButtons('gateway_unreachable');
             setGatewayStatusBadge('gateway_unreachable', true);
         }
@@ -760,7 +760,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             const btn = document.querySelector(`.btn-gerenciar-gateway[data-provider="${provider}"]`);
             if (btn) btn.click();
         } else {
-            fireSwal({ icon: 'info', title: 'Avisão', text: 'Selecione um provider local para gerenciar.' });
+            fireSwal({ icon: 'info', title: 'Aviso', text: 'Selecione um provider local para gerenciar.' });
         }
     });
 
@@ -770,7 +770,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
     } else {
         if (whatsRealtimeStatus) {
             whatsRealtimeStatus.className = 'badge bg-dark';
-            whatsRealtimeStatus.innerHTML = '<i class="bi bi-info-circle me-1"></i>Provider Externão';
+            whatsRealtimeStatus.innerHTML = '<i class="bi bi-info-circle me-1"></i>Provider Externo';
         }
     }
 
@@ -808,7 +808,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
     btnRestart?.addEventListener('click', async () => {
         const conf = await fireSwal({
             title: 'Reiniciar Gateway?',
-            text: 'Deseja apenas reiniciar o processão ou tambem zerar os arquivos de sessao (limpeza profunda)? Zerar a sessao exigira uma nãova leitura de QR Code.',
+            text: 'Deseja apenas reiniciar o processo ou tambem zerar os arquivos de sessao (limpeza profunda)? Zerar a sessao exigira uma nova leitura de QR Code.',
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Limpeza Profunda (Zerar)',
@@ -819,10 +819,10 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             cancelButtonColor: '#6c757d'   // cinza para apenas reiniciar
         });
 
-        if (conf.isDenied) return; // Clicou não Cancelar (denyButton)
+        if (conf.isDenied) return; // Clicou no Cancelar (denyButton)
 
         const isClean = conf.isConfirmed; // isConfirmed = Limpeza profunda
-        // Nãote: Swal fire results: isConfirmed (confirmButton), isDenied (denyButton), isDismissed (cancelButton)
+        // Note: Swal fire results: isConfirmed (confirmButton), isDenied (denyButton), isDismissed (cancelButton)
         // Wait, default Swal logic: isConfirmed=true (confirm), isDismissed=true e dismiss='cancel' (cancel), isDenied=true (deny)
         // Re-adjusting for clarity:
         
@@ -835,31 +835,31 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         try {
             btnRestart.disabled = true;
             btnRestart.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> ' + (cleanParam ? 'Limpando...' : 'Reiniciando...');
-            await postJsãon('<?= base_url('configuracoes/whatsapp/local-restart') ?>', { provider: currentGatewayProvider, clean: cleanParam ? 'true' : 'false' });
+            await postJson('<?= base_url('configuracoes/whatsapp/local-restart') ?>', { provider: currentGatewayProvider, clean: cleanParam ? 'true' : 'false' });
             setLoadingState();
             setGatewayError('');
             setTimeout(fetchStatus, 3000);
         } catch (error) {
-            await fireSwal({ icon: 'error', title: 'Falha não reinicio', text: error.message || 'Erro ao reiniciar' });
+            await fireSwal({ icon: 'error', title: 'Falha no reinicio', text: error.message || 'Erro ao reiniciar' });
             btnRestart.disabled = false;
             btnRestart.innerHTML = originalHtml;
         }
     });
 
     btnLogout?.addEventListener('click', async () => {
-        const conf = await fireSwal({ title: 'Desconectar WhatsApp?', text: 'Issão ira encerrar a sessao atual e gerar um nãovo QR Code para vincular outro numero. Tem certeza?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim, desconectar', cancelButtonText: 'Nao' });
+        const conf = await fireSwal({ title: 'Desconectar WhatsApp?', text: 'Isso ira encerrar a sessao atual e gerar um novo QR Code para vincular outro numero. Tem certeza?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim, desconectar', cancelButtonText: 'Nao' });
         if (!conf.isConfirmed) return;
         
         const originalHtml = btnLogout.innerHTML;
         try {
             btnLogout.disabled = true;
             btnLogout.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Desconectando...';
-            await postJsãon('<?= base_url('configuracoes/whatsapp/local-logout') ?>', { provider: currentGatewayProvider });
+            await postJson('<?= base_url('configuracoes/whatsapp/local-logout') ?>', { provider: currentGatewayProvider });
             setLoadingState();
             setGatewayError('');
             setTimeout(fetchStatus, 3000);
         } catch (error) {
-            await fireSwal({ icon: 'error', title: 'Falha não logout', text: error.message || 'Erro ao deslogar' });
+            await fireSwal({ icon: 'error', title: 'Falha no logout', text: error.message || 'Erro ao deslogar' });
             btnLogout.disabled = false;
             btnLogout.innerHTML = originalHtml;
         }
@@ -870,7 +870,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         try {
             btnStart.disabled = true;
             btnStart.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Iniciando...';
-            const data = await postJsãon('<?= base_url('configuracoes/whatsapp/local-start') ?>', { provider: currentGatewayProvider });
+            const data = await postJson('<?= base_url('configuracoes/whatsapp/local-start') ?>', { provider: currentGatewayProvider });
             fireSwal({ icon: 'info', title: 'Comando enviado', text: data.message || 'Aguarde o servidor subir.' });
             setLoadingState();
             setTimeout(fetchStatus, 5000);

@@ -8,7 +8,7 @@
         h1 { text-align: center; font-size: 18px; }
         p { text-align: center; font-size: 14px; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px sãolid #ccc; padding: 6px; text-align: left; }
+        th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
         th { background-color: #f0f0f0; }
         .text-right { text-align: right; }
         .footer { margin-top: 30px; text-align: right; font-size: 10px; }
@@ -38,7 +38,7 @@
                 <?php foreach ($ordens as $os): ?>
                 <tr>
                     <td><?= $os['id'] ?></td>
-                    <td><?= esc($os['cliente_nãome']) ?></td>
+                    <td><?= esc($os['cliente_nome']) ?></td>
                     <td><?= esc($os['equip_marca'] . ' ' . $os['equip_modelo']) ?></td>
                     <td><?= ucwords(str_replace('_', ' ', $os['status'])) ?></td>
                     <td><?= date('d/m/Y', strtotime($os['created_at'])) ?></td>
@@ -61,7 +61,7 @@
     </table>
 
     <div class="footer">
-        Impressão em: <?= date('d/m/Y H:i:s') ?>
+        Impresso em: <?= date('d/m/Y H:i:s') ?>
     </div>
 </body>
 </html>

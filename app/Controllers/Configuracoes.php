@@ -79,7 +79,7 @@ class Configuracoes extends BaseController
 
         LogModel::registrar('configuracao', 'Configuracoes do sistema atualizadas');
 
-        return redirect()->to('/configuracoes')->with('success', 'Configuracoes salvas com sucessão.');
+        return redirect()->to('/configuracoes')->with('success', 'Configuracoes salvas com sucesso.');
     }
 
     public function testWhatsAppConnection()
@@ -105,7 +105,7 @@ class Configuracoes extends BaseController
         if (!empty($result['ok'])) {
             return $this->response->setJSON([
                 'ok' => true,
-                'message' => $result['message'] ?? 'Conexao validada com sucessão.',
+                'message' => $result['message'] ?? 'Conexao validada com sucesso.',
                 'response' => $result['response'] ?? null,
             ]);
         }
@@ -153,7 +153,7 @@ class Configuracoes extends BaseController
             LogModel::registrar('whatsapp_teste', 'Mensagem de teste WhatsApp enviada para ' . $telefone);
             return $this->response->setJSON([
                 'ok' => true,
-                'message' => 'Mensagem de teste enviada com sucessão.',
+                'message' => 'Mensagem de teste enviada com sucesso.',
                 'result' => $result,
             ]);
         }
@@ -172,7 +172,7 @@ class Configuracoes extends BaseController
         if ($provider === '') {
             $provider = trim((string) get_config('whatsapp_direct_provider', 'api_whats_local'));
         }
-        if ($provider === 'local_nãode') {
+        if ($provider === 'local_node') {
             $provider = 'api_whats_local';
         }
 
@@ -187,11 +187,11 @@ class Configuracoes extends BaseController
         if ($webhookToken === '') {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'Webhook Token (inbound) nao configurado não ERP.',
+                'message' => 'Webhook Token (inbound) nao configurado no ERP.',
             ]);
         }
 
-        $gatewayConfig = $this->resãolveGatewayConfig($provider);
+        $gatewayConfig = $this->resolveGatewayConfig($provider);
         $baseOrigin = rtrim((string) base_url('/'), '/');
         $originConfigured = rtrim((string) ($gatewayConfig['origin'] ?? ''), '/');
         $originAligned = $originConfigured !== '' && strcasecmp($originConfigured, $baseOrigin) === 0;
@@ -200,7 +200,7 @@ class Configuracoes extends BaseController
         $statusOk = !empty($statusCheck['success']);
 
         $gatewayForwardCheck = $this->callGateway('POST', '/self-check-inbound', [
-            'sãource' => 'erp_configuracoes',
+            'source' => 'erp_configuracoes',
             'provider' => $provider,
         ], 12, $provider);
         $gatewayForwardOk = !empty($gatewayForwardCheck['success']);
@@ -213,18 +213,18 @@ class Configuracoes extends BaseController
         $response = [
             'ok' => $allOk,
             'message' => $allOk
-                ? 'Self-check inbound validado com sucessão.'
+                ? 'Self-check inbound validado com sucesso.'
                 : 'Self-check inbound encontrou pendencias de configuracao ou comunicacao.',
             'checks' => [
                 'gateway_status' => [
                     'ok' => $statusOk,
                     'status' => $statusCheck['status'] ?? null,
-                    'message' => $statusCheck['message'] ?? 'Falha ao consultar /status não gateway.',
+                    'message' => $statusCheck['message'] ?? 'Falha ao consultar /status no gateway.',
                 ],
                 'gateway_forward' => [
                     'ok' => $gatewayForwardOk,
                     'status' => $gatewayForwardCheck['status'] ?? null,
-                    'message' => $gatewayForwardCheck['message'] ?? 'Falha ao executar /self-check-inbound não gateway.',
+                    'message' => $gatewayForwardCheck['message'] ?? 'Falha ao executar /self-check-inbound no gateway.',
                     'webhook_url' => $gatewayForwardCheck['data']['webhook_url'] ?? null,
                     'target_url' => $gatewayForwardCheck['data']['target_url'] ?? ($gatewayForwardCheck['error']['target_url'] ?? null),
                     'attempts' => $gatewayForwardCheck['data']['attempts'] ?? ($gatewayForwardCheck['error']['attempts'] ?? []),
@@ -233,7 +233,7 @@ class Configuracoes extends BaseController
                 ],
                 'webhook_direct' => [
                     'ok' => $directWebhookOk,
-                    'message' => $directWebhookCheck['message'] ?? 'Falha não POST direto para /webhooks/whatsapp.',
+                    'message' => $directWebhookCheck['message'] ?? 'Falha no POST direto para /webhooks/whatsapp.',
                     'url' => $directWebhookCheck['url'] ?? null,
                     'status_code' => $directWebhookCheck['status_code'] ?? null,
                     'attempts' => $directWebhookCheck['attempts'] ?? [],
@@ -294,14 +294,14 @@ class Configuracoes extends BaseController
 
         $isWindows = stripos(PHP_OS, 'WIN') === 0;
         if ($provider === 'api_whats_linux') {
-            // Não Linux usamos PM2. Tentamos dar um restart não processão pelo nãome padrao.
+            // No Linux usamos PM2. Tentamos dar um restart no processo pelo nome padrao.
             $output = [];
             $retval = null;
             exec('pm2 restart whatsapp-gateway 2>&1', $output, $retval);
             
             return $this->response->setJSON([
                 'success' => $retval === 0,
-                'message' => $retval === 0 ? 'Comando PM2 executado com sucessão.' : 'Falha ao executar PM2.',
+                'message' => $retval === 0 ? 'Comando PM2 executado com sucesso.' : 'Falha ao executar PM2.',
                 'output' => $output
             ]);
         }
@@ -315,7 +315,7 @@ class Configuracoes extends BaseController
         if ($isWindows) {
             // Comando para Windows: inicia oculto em background
             // Usamos 'start /B' para nao abrir janela de terminal e direcionamos logs
-            $cmd = "cd /d " . escapeshellarg($apiPath) . " && start /B nãode server.js > boot.out.log 2> boot.err.log";
+            $cmd = "cd /d " . escapeshellarg($apiPath) . " && start /B node server.js > boot.out.log 2> boot.err.log";
             pclose(popen($cmd, "r"));
             
             return $this->response->setJSON([
@@ -333,14 +333,14 @@ class Configuracoes extends BaseController
             'whatsapp_menuia_url' => trim((string) $this->request->getPost('url')),
             'whatsapp_menuia_authkey' => trim((string) $this->request->getPost('authkey')),
             'whatsapp_menuia_appkey' => trim((string) $this->request->getPost('appkey')),
-            'whatsapp_local_nãode_url' => trim((string) ($this->request->getPost('local_url') ?: get_config('whatsapp_local_nãode_url', 'http://127.0.0.1:3001'))),
-            'whatsapp_local_nãode_token' => trim((string) ($this->request->getPost('local_token') ?: get_config('whatsapp_local_nãode_token', ''))),
-            'whatsapp_local_nãode_origin' => trim((string) ($this->request->getPost('local_origin') ?: get_config('whatsapp_local_nãode_origin', base_url('/')))),
-            'whatsapp_local_nãode_timeout' => (int) ($this->request->getPost('local_timeout') ?: get_config('whatsapp_local_nãode_timeout', 20)),
-            'whatsapp_linux_nãode_url' => trim((string) ($this->request->getPost('linux_url') ?: get_config('whatsapp_linux_nãode_url', 'http://127.0.0.1:3001'))),
-            'whatsapp_linux_nãode_token' => trim((string) ($this->request->getPost('linux_token') ?: get_config('whatsapp_linux_nãode_token', ''))),
-            'whatsapp_linux_nãode_origin' => trim((string) ($this->request->getPost('linux_origin') ?: get_config('whatsapp_linux_nãode_origin', base_url('/')))),
-            'whatsapp_linux_nãode_timeout' => (int) ($this->request->getPost('linux_timeout') ?: get_config('whatsapp_linux_nãode_timeout', 20)),
+            'whatsapp_local_node_url' => trim((string) ($this->request->getPost('local_url') ?: get_config('whatsapp_local_node_url', 'http://127.0.0.1:3001'))),
+            'whatsapp_local_node_token' => trim((string) ($this->request->getPost('local_token') ?: get_config('whatsapp_local_node_token', ''))),
+            'whatsapp_local_node_origin' => trim((string) ($this->request->getPost('local_origin') ?: get_config('whatsapp_local_node_origin', base_url('/')))),
+            'whatsapp_local_node_timeout' => (int) ($this->request->getPost('local_timeout') ?: get_config('whatsapp_local_node_timeout', 20)),
+            'whatsapp_linux_node_url' => trim((string) ($this->request->getPost('linux_url') ?: get_config('whatsapp_linux_node_url', 'http://127.0.0.1:3001'))),
+            'whatsapp_linux_node_token' => trim((string) ($this->request->getPost('linux_token') ?: get_config('whatsapp_linux_node_token', ''))),
+            'whatsapp_linux_node_origin' => trim((string) ($this->request->getPost('linux_origin') ?: get_config('whatsapp_linux_node_origin', base_url('/')))),
+            'whatsapp_linux_node_timeout' => (int) ($this->request->getPost('linux_timeout') ?: get_config('whatsapp_linux_node_timeout', 20)),
             'whatsapp_webhook_url' => trim((string) $this->request->getPost('webhook_url')),
             'whatsapp_webhook_method' => trim((string) $this->request->getPost('webhook_method')),
             'whatsapp_webhook_headers' => (string) $this->request->getPost('webhook_headers'),
@@ -348,13 +348,13 @@ class Configuracoes extends BaseController
         ];
     }
 
-    private function callGateway(string $method, string $path, ?array $jsãonBody = null, ?int $timeout = null, string $provider = ''): array
+    private function callGateway(string $method, string $path, ?array $jsonBody = null, ?int $timeout = null, string $provider = ''): array
     {
-        $gateway = $this->resãolveGatewayConfig($provider);
+        $gateway = $this->resolveGatewayConfig($provider);
         $requestTimeout = $timeout ?: $gateway['timeout'];
 
         $headers = [
-            'Accept' => 'application/jsãon',
+            'Accept' => 'application/json',
         ];
         if ($gateway['token'] !== '') {
             $headers['X-Api-Token'] = $gateway['token'];
@@ -372,15 +372,15 @@ class Configuracoes extends BaseController
                 'http_errors' => false,
                 'headers' => $headers,
             ];
-            if ($jsãonBody !== null) {
-                $opts['jsãon'] = $jsãonBody;
+            if ($jsonBody !== null) {
+                $opts['json'] = $jsonBody;
             }
 
             $response = strtoupper($method) === 'POST'
                 ? $client->post($gateway['url'] . $path, $opts)
                 : $client->get($gateway['url'] . $path, $opts);
 
-            $decoded = jsãon_decode((string) $response->getBody(), true);
+            $decoded = json_decode((string) $response->getBody(), true);
             if (is_array($decoded)) {
                 return $decoded;
             }
@@ -412,7 +412,7 @@ class Configuracoes extends BaseController
         $webhookUrl = (string) base_url('webhooks/whatsapp');
         $payload = [
             'self_check' => true,
-            'sãource' => 'erp_direct_self_check',
+            'source' => 'erp_direct_self_check',
             'timestamp' => gmdate('c'),
         ];
 
@@ -425,16 +425,16 @@ class Configuracoes extends BaseController
                     'timeout' => 10,
                     'http_errors' => false,
                     'headers' => [
-                        'Accept' => 'application/jsãon',
-                        'Content-Type' => 'application/jsãon',
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
                         'X-Webhook-Token' => $token,
                         'X-Webhook-Self-Check' => '1',
                     ],
-                    'jsãon' => $payload,
+                    'json' => $payload,
                 ]);
 
                 $statusCode = (int) $response->getStatusCode();
-                $decoded = jsãon_decode((string) $response->getBody(), true);
+                $decoded = json_decode((string) $response->getBody(), true);
                 $ok = $statusCode >= 200 && $statusCode < 300 && is_array($decoded) && !empty($decoded['ok']);
 
                 $attemptInfo = [
@@ -470,7 +470,7 @@ class Configuracoes extends BaseController
             'ok' => false,
             'url' => (string) ($last['url'] ?? $webhookUrl),
             'status_code' => (int) ($last['status_code'] ?? 0),
-            'message' => 'Falha ao executar POST direto não webhook.',
+            'message' => 'Falha ao executar POST direto no webhook.',
             'error' => (string) ($last['message'] ?? 'Falha desconhecida.'),
             'attempts' => $attempts,
         ];
@@ -533,14 +533,14 @@ class Configuracoes extends BaseController
         return $result;
     }
 
-    private function resãolveGatewayConfig(string $provider = ''): array
+    private function resolveGatewayConfig(string $provider = ''): array
     {
         $selected = strtolower(trim($provider));
         if ($selected === '') {
             $selected = strtolower((string) get_config('whatsapp_direct_provider', 'api_whats_local'));
         }
 
-        if ($selected === 'local_nãode') {
+        if ($selected === 'local_node') {
             $selected = 'api_whats_local';
         }
         if (!in_array($selected, ['api_whats_local', 'api_whats_linux', 'menuia', 'webhook'], true)) {
@@ -550,19 +550,19 @@ class Configuracoes extends BaseController
         if ($selected === 'api_whats_linux') {
             return [
                 'provider' => 'api_whats_linux',
-                'url' => rtrim((string) get_config('whatsapp_linux_nãode_url', 'http://127.0.0.1:3001'), '/'),
-                'token' => trim((string) get_config('whatsapp_linux_nãode_token', '')),
-                'origin' => trim((string) get_config('whatsapp_linux_nãode_origin', base_url('/'))),
-                'timeout' => (int) get_config('whatsapp_linux_nãode_timeout', 20),
+                'url' => rtrim((string) get_config('whatsapp_linux_node_url', 'http://127.0.0.1:3001'), '/'),
+                'token' => trim((string) get_config('whatsapp_linux_node_token', '')),
+                'origin' => trim((string) get_config('whatsapp_linux_node_origin', base_url('/'))),
+                'timeout' => (int) get_config('whatsapp_linux_node_timeout', 20),
             ];
         }
 
         return [
             'provider' => 'api_whats_local',
-            'url' => rtrim((string) get_config('whatsapp_local_nãode_url', 'http://127.0.0.1:3001'), '/'),
-            'token' => trim((string) get_config('whatsapp_local_nãode_token', '')),
-            'origin' => trim((string) get_config('whatsapp_local_nãode_origin', base_url('/'))),
-            'timeout' => (int) get_config('whatsapp_local_nãode_timeout', 20),
+            'url' => rtrim((string) get_config('whatsapp_local_node_url', 'http://127.0.0.1:3001'), '/'),
+            'token' => trim((string) get_config('whatsapp_local_node_token', '')),
+            'origin' => trim((string) get_config('whatsapp_local_node_origin', base_url('/'))),
+            'timeout' => (int) get_config('whatsapp_local_node_timeout', 20),
         ];
     }
 }

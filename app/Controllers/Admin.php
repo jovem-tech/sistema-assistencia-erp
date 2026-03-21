@@ -45,21 +45,21 @@ class Admin extends BaseController
         $statusBuilder = $db->table('os')->select('os.status, COUNT(*) as total');
         if ($hasStatusTable) {
             $statusBuilder
-                ->select('COALESCE(os_status.nãome, os.status) as status_nãome')
+                ->select('COALESCE(os_status.nome, os.status) as status_nome')
                 ->select('COALESCE(os_status.grupo_macro, "outros") as macrofase')
                 ->join('os_status', 'os_status.codigo = os.status', 'left')
-                ->groupBy('os_status.nãome')
+                ->groupBy('os_status.nome')
                 ->groupBy('os_status.grupo_macro');
         } else {
             $statusBuilder
-                ->select('os.status as status_nãome')
+                ->select('os.status as status_nome')
                 ->select('"outros" as macrofase', false);
         }
 
         if ($hasEstadoFluxo) {
-            $statusBuilder->whereNãotIn('os.estado_fluxo', ['encerrado', 'cancelado']);
+            $statusBuilder->whereNotIn('os.estado_fluxo', ['encerrado', 'cancelado']);
         } else {
-            $statusBuilder->whereNãotIn('os.status', ['entregue', 'cancelado']);
+            $statusBuilder->whereNotIn('os.status', ['entregue', 'cancelado']);
         }
 
         $statusBuilder->groupBy('os.status');
@@ -77,9 +77,9 @@ class Admin extends BaseController
                 ->groupBy('macrofase');
         }
         if ($hasEstadoFluxo) {
-            $macroBuilder->whereNãotIn('os.estado_fluxo', ['encerrado', 'cancelado']);
+            $macroBuilder->whereNotIn('os.estado_fluxo', ['encerrado', 'cancelado']);
         } else {
-            $macroBuilder->whereNãotIn('os.status', ['entregue', 'cancelado']);
+            $macroBuilder->whereNotIn('os.status', ['entregue', 'cancelado']);
         }
         $macroCount = $macroBuilder->get()->getResultArray();
 
@@ -87,14 +87,14 @@ class Admin extends BaseController
         $faturamento = [];
         for ($i = 5; $i >= 0; $i--) {
             $mes = date('m', strtotime("-$i months"));
-            $anão = date('Y', strtotime("-$i months"));
+            $ano = date('Y', strtotime("-$i months"));
             $label = date('M/Y', strtotime("-$i months"));
 
             $total = $db->table('os')
                 ->selectSum('valor_final')
                 ->whereIn('status', ['entregue_reparado', 'entregue_pagamento_pendente', 'entregue'])
                 ->where('MONTH(data_entrega)', $mes)
-                ->where('YEAR(data_entrega)', $anão)
+                ->where('YEAR(data_entrega)', $ano)
                 ->get()->getRow()->valor_final ?? 0;
 
             $faturamento[] = [

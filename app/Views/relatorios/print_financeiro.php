@@ -8,12 +8,12 @@
         h1 { text-align: center; font-size: 18px; }
         p { text-align: center; font-size: 14px; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px sãolid #ccc; padding: 6px; text-align: left; }
+        th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
         th { background-color: #f0f0f0; }
         .text-right { text-align: right; }
         .footer { margin-top: 30px; text-align: right; font-size: 10px; }
         .resumo { display: flex; justify-content: space-around; margin-bottom: 20px; text-align: center; }
-        .resumo-item { border: 1px sãolid #ccc; padding: 10px; width: 30%; font-weight: bold; }
+        .resumo-item { border: 1px solid #ccc; padding: 10px; width: 30%; font-weight: bold; }
         .text-success { color: green; }
         .text-danger { color: red; }
     </style>
@@ -21,7 +21,7 @@
 <body onload="window.print()">
     <h1>Relatório Financeiro</h1>
     <p>
-        <strong>Mês/Anão Ref:</strong> <?= empty($filtro_mes) ? 'Todos' : date('m/Y', strtotime($filtro_mes . '-01')) ?>
+        <strong>Mês/Ano Ref:</strong> <?= empty($filtro_mes) ? 'Todos' : date('m/Y', strtotime($filtro_mes . '-01')) ?>
     </p>
 
     <div class="resumo">
@@ -62,14 +62,14 @@
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="5" style="text-align: center;">Nenhum lançamento não período</td>
+                    <td colspan="5" style="text-align: center;">Nenhum lançamento no período</td>
                 </tr>
             <?php endif; ?>
         </tbody>
     </table>
 
     <div class="footer">
-        Impressão em: <?= date('d/m/Y H:i:s') ?>
+        Impresso em: <?= date('d/m/Y H:i:s') ?>
     </div>
 </body>
 </html>

@@ -78,14 +78,14 @@ class WhatsAppService
         ?int $userId = null,
         array $options = []
     ): array {
-        $provider = $this->resãolveDirectProvider();
+        $provider = $this->resolveDirectProvider();
         $providerName = (string) get_config('whatsapp_direct_provider', get_config('whatsapp_provider', 'menuia'));
         $filePath = trim((string)($options['arquivo_path'] ?? ''));
         $fileRelative = trim((string)($options['arquivo'] ?? ''));
         $templateCode = trim((string)($options['template_codigo'] ?? ''));
         $mimeFromOption = strtolower(trim((string)($options['mime_type'] ?? '')));
         $tipoConteudoOption = strtolower(trim((string)($options['tipo_conteudo'] ?? '')));
-        $arquivoNãomeOption = trim((string)($options['arquivo_nãome'] ?? ''));
+        $arquivoNomeOption = trim((string)($options['arquivo_nome'] ?? ''));
         $arquivoTamanhoOption = (int) ($options['arquivo_tamanho'] ?? 0);
         $conversaId = (int)($options['conversa_id'] ?? 0);
         $enviadaPorBot = !empty($options['enviada_por_bot']);
@@ -97,7 +97,7 @@ class WhatsAppService
         $tipoConteudo = 'texto';
         $mimeOutbound = '';
         if ($hasFile) {
-            $mimeOutbound = $mimeFromOption !== '' ? $mimeFromOption : $this->resãolveMimeByPath($filePath);
+            $mimeOutbound = $mimeFromOption !== '' ? $mimeFromOption : $this->resolveMimeByPath($filePath);
             if ($tipoConteudoOption !== '') {
                 $tipoConteudo = $tipoConteudoOption;
             } else {
@@ -113,7 +113,7 @@ class WhatsAppService
             $conversa = (new \App\Models\ConversaWhatsappModel())->find($conversaId);
         }
         if (!$conversa) {
-            $conversa = $this->centralMensagensService->resãolveConversationForOutgoing(
+            $conversa = $this->centralMensagensService->resolveConversationForOutgoing(
                 $telefone,
                 $clienteId > 0 ? $clienteId : null,
                 $osId > 0 ? $osId : null,
@@ -157,10 +157,10 @@ class WhatsAppService
                 'arquivo' => $fileRelative !== '' ? $fileRelative : null,
                 'anexo_path' => $fileRelative !== '' ? $fileRelative : null,
                 'status' => 'pendente',
-                'payload' => jsãon_encode([
+                'payload' => json_encode([
                     'tipo_conteudo' => $tipoConteudo,
                     'template_codigo' => $templateCode !== '' ? $templateCode : null,
-                    'file_name' => $arquivoNãomeOption !== '' ? $arquivoNãomeOption : null,
+                    'file_name' => $arquivoNomeOption !== '' ? $arquivoNomeOption : null,
                     'file_size' => $arquivoTamanhoOption > 0 ? $arquivoTamanhoOption : null,
                 ], JSON_UNESCAPED_UNICODE),
                 'usuario_id' => $userId,
@@ -207,7 +207,7 @@ class WhatsAppService
         if ($envioId) {
             $this->envioModel->update($envioId, [
                 'status' => !empty($result['ok']) ? 'enviado' : 'erro',
-                'resposta_api' => isset($result['response']) ? jsãon_encode($result['response'], JSON_UNESCAPED_UNICODE) : null,
+                'resposta_api' => isset($result['response']) ? json_encode($result['response'], JSON_UNESCAPED_UNICODE) : null,
             ]);
         }
 
@@ -215,8 +215,8 @@ class WhatsAppService
             $this->mensagensWhatsappModel->update($mensagemWhatsappId, [
                 'status' => !empty($result['ok']) ? 'enviado' : 'erro',
                 'provider_message_id' => $result['message_id'] ?? null,
-                'resposta_api' => isset($result['response']) ? jsãon_encode($result['response'], JSON_UNESCAPED_UNICODE) : null,
-                'erro' => !empty($result['ok']) ? null : ($result['message'] ?? 'Falha não envio'),
+                'resposta_api' => isset($result['response']) ? json_encode($result['response'], JSON_UNESCAPED_UNICODE) : null,
+                'erro' => !empty($result['ok']) ? null : ($result['message'] ?? 'Falha no envio'),
                 'enviada_em' => !empty($result['ok']) ? date('Y-m-d H:i:s') : null,
             ]);
         }
@@ -225,8 +225,8 @@ class WhatsAppService
             $this->mensagemModel->update($legacyId, [
                 'status_envio' => !empty($result['ok']) ? 'enviado' : 'erro',
                 'api_message_id' => $result['message_id'] ?? null,
-                'api_response' => isset($result['response']) ? jsãon_encode($result['response'], JSON_UNESCAPED_UNICODE) : null,
-                'erro_detalhe' => !empty($result['ok']) ? null : ($result['message'] ?? 'Falha não envio'),
+                'api_response' => isset($result['response']) ? json_encode($result['response'], JSON_UNESCAPED_UNICODE) : null,
+                'erro_detalhe' => !empty($result['ok']) ? null : ($result['message'] ?? 'Falha no envio'),
             ]);
         }
 
@@ -249,7 +249,7 @@ class WhatsAppService
                 'template_codigo' => $templateCode !== '' ? $templateCode : null,
                 'mime_type' => $mimeOutbound !== '' ? $mimeOutbound : null,
                 'arquivo' => $fileRelative !== '' ? $fileRelative : null,
-                'arquivo_nãome' => $arquivoNãomeOption !== '' ? $arquivoNãomeOption : null,
+                'arquivo_nome' => $arquivoNomeOption !== '' ? $arquivoNomeOption : null,
                 'arquivo_tamanho' => $arquivoTamanhoOption > 0 ? $arquivoTamanhoOption : null,
                 'enviada_por_bot' => $enviadaPorBot ? 1 : 0,
                 'enviada_por_usuario_id' => $enviadaPorUsuarioId > 0 ? $enviadaPorUsuarioId : null,
@@ -277,7 +277,7 @@ class WhatsAppService
         );
     }
 
-    public function resãolveBulkProvider(): BulkMessageProviderInterface
+    public function resolveBulkProvider(): BulkMessageProviderInterface
     {
         $provider = (string) get_config('whatsapp_bulk_provider', 'meta_oficial');
         if ($provider === 'meta_oficial') {
@@ -286,9 +286,9 @@ class WhatsAppService
         return new NullBulkProvider();
     }
 
-    private function resãolveDirectProvider(): WhatsAppProviderInterface
+    private function resolveDirectProvider(): WhatsAppProviderInterface
     {
-        return $this->mensageriaService->resãolveDirectProvider();
+        return $this->mensageriaService->resolveDirectProvider();
     }
 
     private function renderTemplate(string $template, array $os, array $extra = []): string
@@ -297,7 +297,7 @@ class WhatsAppService
             'numero_os' => $os['numero_os'] ?? '',
             'data_abertura' => !empty($os['data_abertura']) ? date('d/m/Y H:i', strtotime($os['data_abertura'])) : '',
             'equipamento' => trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? '')),
-            'cliente' => $os['cliente_nãome'] ?? '',
+            'cliente' => $os['cliente_nome'] ?? '',
             'valor_final' => isset($os['valor_final']) ? formatMoney((float)$os['valor_final']) : 'R$ 0,00',
             'status' => $os['status'] ?? '',
         ];
@@ -319,7 +319,7 @@ class WhatsAppService
         return $message;
     }
 
-    private function resãolveMimeByPath(string $filePath): string
+    private function resolveMimeByPath(string $filePath): string
     {
         $path = trim($filePath);
         if ($path === '' || !is_file($path)) {

@@ -10,11 +10,11 @@ class FuncionarioModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $useSãoftDeletes   = false;
+    protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     
     protected $allowedFields    = [
-        'nãome', 'cpf', 'rg', 'data_nascimento', 'cargo', 'salario',
+        'nome', 'cpf', 'rg', 'data_nascimento', 'cargo', 'salario',
         'data_admissao', 'data_demissao', 'email', 'telefone',
         'cep', 'endereco', 'numero', 'complemento', 'bairro',
         'cidade', 'uf', 'observacoes', 'ativo'
@@ -25,7 +25,7 @@ class FuncionarioModel extends Model
     protected $updatedField  = 'updated_at';
 
     protected $validationRules      = [
-        'nãome'     => 'required|min_length[3]|max_length[100]',
+        'nome'     => 'required|min_length[3]|max_length[100]',
         'cpf'      => 'required|max_length[20]',
         'telefone' => 'required|max_length[20]',
     ];
@@ -34,7 +34,7 @@ class FuncionarioModel extends Model
     {
         return $this->where('ativo', 1)
                     ->where('LOWER(cargo)', 'técnico')
-                    ->orderBy('nãome', 'ASC')
+                    ->orderBy('nome', 'ASC')
                     ->findAll();
     }
 }

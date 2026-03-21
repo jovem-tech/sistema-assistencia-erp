@@ -1,16 +1,16 @@
 ?<?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
-<div class="row align-itemês-center mb-4">
+<div class="row align-items-center mb-4">
     <div class="col-md">
-        <div class="d-flex align-itemês-center gap-3">
+        <div class="d-flex align-items-center gap-3">
             <div class="bg-primary bg-opacity-10 p-2 rounded-3">
                 <i class="bi bi-graph-up text-primary fs-4"></i>
             </div>
             <div>
                 <h2 class="h4 mb-1">Métricas da Central</h2>
                 <p class="text-muted small mb-0">
-                    Acompanhe o desempenho operacional da central com indicadores, produtividade e automação não período selecionado.
+                    Acompanhe o desempenho operacional da central com indicadores, produtividade e automação no período selecionado.
                 </p>
             </div>
         </div>
@@ -27,9 +27,9 @@
 <!-- Painel de Filtros -->
 <div class="card glass-card border-0 mb-4 shadow-sm">
     <div class="card-body p-3">
-        <div class="row g-3 align-itemês-end">
+        <div class="row g-3 align-items-end">
             <div class="col-12 col-md-auto">
-                <form class="row g-2 align-itemês-end" method="get" action="<?= base_url('atendimento-whatsapp/metricas') ?>">
+                <form class="row g-2 align-items-end" method="get" action="<?= base_url('atendimento-whatsapp/metricas') ?>">
                     <div class="col-6 col-sm-auto" style="min-width: 160px;">
                         <label class="form-label small fw-semibold text-muted mb-1">Início</label>
                         <input type="date" class="form-control form-control-sm border-0 bg-light" name="inicio" value="<?= esc((string) ($inicio ?? date('Y-m-d', strtotime('-7 day')))) ?>">
@@ -49,11 +49,11 @@
                 </form>
             </div>
             <div class="col-12 col-md d-flex justify-content-md-end">
-                <form method="post" action="<?= base_url('atendimento-whatsapp/metricas/consãolidar-diario') ?>">
+                <form method="post" action="<?= base_url('atendimento-whatsapp/metricas/consolidar-diario') ?>">
                     <?= csrf_field() ?>
                     <input type="hidden" name="data_referencia" value="<?= esc((string) ($fim ?? date('Y-m-d'))) ?>">
                     <button type="submit" class="btn btn-sm btn-outline-primary border-dashed px-3">
-                        <i class="bi bi-arrow-repeat me-1"></i>Consãolidar dia final
+                        <i class="bi bi-arrow-repeat me-1"></i>Consolidar dia final
                     </button>
                 </form>
             </div>
@@ -68,7 +68,7 @@
             <div class="card glass-card border-0 h-100 shadow-sm border-start border-4 border-<?= esc($kpi['status']) ?>" 
                  title="<?= esc($kpi['tooltip']) ?>" data-bs-toggle="tooltip">
                 <div class="card-body p-3">
-                    <div class="d-flex align-itemês-center justify-content-between mb-1">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
                         <div class="text-uppercase text-muted fw-bold extra-small"><?= esc($kpi['titulo']) ?></div>
                         <i class="bi <?= esc($kpi['icone']) ?> text-<?= esc($kpi['status']) ?> opacity-75"></i>
                     </div>
@@ -83,14 +83,14 @@
 </div>
 
 <!-- Área de Gráficos (Reservada) -->
-<div class="row g-4 mb-4 d-nãone">
+<div class="row g-4 mb-4 d-none">
     <div class="col-12 col-xl-8">
         <div class="card glass-card border-0 shadow-sm h-100">
             <div class="card-header bg-transparent border-0 pt-3 px-3">
                 <h5 class="card-title h6 mb-0 fw-bold">Evolução Diária</h5>
                 <p class="text-muted extra-small mb-0">Total de mensagens por tipo ao longo do tempo.</p>
             </div>
-            <div class="card-body d-flex align-itemês-center justify-content-center" style="min-height: 300px;">
+            <div class="card-body d-flex align-items-center justify-content-center" style="min-height: 300px;">
                 <div class="text-center">
                     <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
                     <div class="text-muted small">Processando dados gráficos...</div>
@@ -103,7 +103,7 @@
             <div class="card-header bg-transparent border-0 pt-3 px-3">
                 <h5 class="card-title h6 mb-0 fw-bold">Distribuição de Intenções</h5>
             </div>
-            <div class="card-body d-flex align-itemês-center justify-content-center" style="min-height: 300px;">
+            <div class="card-body d-flex align-items-center justify-content-center" style="min-height: 300px;">
                 <div class="text-muted small">Aguardando dados...</div>
             </div>
         </div>
@@ -115,7 +115,7 @@
     <div class="col-12 col-xl-7">
         <div class="card glass-card border-0 shadow-sm">
             <div class="card-header bg-transparent py-3 px-4">
-                <div class="d-flex align-itemês-center justify-content-between">
+                <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <h5 class="card-title h6 mb-1 fw-bold">Volume por Dia</h5>
                         <p class="text-muted extra-small mb-0">Distribuição quantitativa de mensagens registradas.</p>
@@ -137,9 +137,9 @@
                             <?php foreach (($resumo['por_dia'] ?? []) as $d): ?>
                                 <tr>
                                     <td class="ps-4 fw-medium"><?= esc(date('d/m/Y', strtotime((string) $d['dia']))) ?></td>
-                                    <td><span class="badge bg-light text-dark fw-nãormal px-2"><?= (int) $d['recebidas'] ?></span></td>
-                                    <td><span class="badge bg-light text-dark fw-nãormal px-2"><?= (int) $d['enviadas'] ?></span></td>
-                                    <td class="text-end pe-4"><span class="badge bg-primary bg-opacity-10 text-primary fw-nãormal px-2"><?= (int) $d['automaticas'] ?></span></td>
+                                    <td><span class="badge bg-light text-dark fw-normal px-2"><?= (int) $d['recebidas'] ?></span></td>
+                                    <td><span class="badge bg-light text-dark fw-normal px-2"><?= (int) $d['enviadas'] ?></span></td>
+                                    <td class="text-end pe-4"><span class="badge bg-primary bg-opacity-10 text-primary fw-normal px-2"><?= (int) $d['automaticas'] ?></span></td>
                                 </tr>
                             <?php endforeach; ?>
                             <?php if (empty($resumo['por_dia'])): ?>
@@ -171,11 +171,11 @@
                             <?php foreach (($resumo['por_atendente'] ?? []) as $a): ?>
                                 <tr>
                                     <td class="ps-4">
-                                        <div class="d-flex align-itemês-center gap-2">
+                                        <div class="d-flex align-items-center gap-2">
                                             <div class="avatar-xxs rounded-circle bg-secondary bg-opacity-10 text-secondary text-center" style="width: 24px; height: 24px; line-height: 24px;">
-                                                <i class="bi bi-persãon fs-6"></i>
+                                                <i class="bi bi-person fs-6"></i>
                                             </div>
-                                            <?= esc((string) ($a['usuario_nãome'] ?: 'Não identificado')) ?>
+                                            <?= esc((string) ($a['usuario_nome'] ?: 'Não identificado')) ?>
                                         </div>
                                     </td>
                                     <td class="text-end pe-4 fw-bold text-primary"><?= (int) ($a['total'] ?? 0) ?></td>
@@ -231,7 +231,7 @@
     
     .nav-pills .nav-link { 
         color: var(--bs-secondary); 
-        border: 1px sãolid transparent;
+        border: 1px solid transparent;
         transition: all 0.3s ease;
     }
     .nav-pills .nav-link.active { 
@@ -239,11 +239,11 @@
         color: white !important; 
         font-weight: 500;
     }
-    .nav-pills .nav-link:hover:nãot(.active) {
+    .nav-pills .nav-link:hover:not(.active) {
         background: rgba(0,0,0,0.05);
     }
     
-    [data-bs-theme="dark"] .nav-pills .nav-link:hover:nãot(.active) {
+    [data-bs-theme="dark"] .nav-pills .nav-link:hover:not(.active) {
         background: rgba(255,255,255,0.05);
     }
 </style>

@@ -5,7 +5,7 @@
 <div class="page-header">
     <h2><i class="bi bi-tools me-2"></i><?= esc($title) ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sãobre Relatórios">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sobre Relatórios">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('relatorios') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('relatorios') ?>">
@@ -39,7 +39,7 @@
                     <option value="cancelado" <?= $filtro_status === 'cancelado' ? 'selected' : '' ?>>Cancelado / Sem Conserto</option>
                 </select>
             </div>
-            <div class="col-md-3 d-flex align-itemês-end gap-2">
+            <div class="col-md-3 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-primary w-100">
                     <i class="bi bi-filter me-1"></i>Filtrar
                 </button>
@@ -71,7 +71,7 @@
                         <?php foreach ($ordens as $os): ?>
                         <tr>
                             <td><?= $os['id'] ?></td>
-                            <td><?= esc($os['cliente_nãome']) ?></td>
+                            <td><?= esc($os['cliente_nome']) ?></td>
                             <td><?= esc($os['equip_marca'] . ' ' . $os['equip_modelo']) ?></td>
                             <td>
                                 <span class="badge bg-secondary"><?= esc(ucwords(str_replace('_', ' ', $os['status']))) ?></span>

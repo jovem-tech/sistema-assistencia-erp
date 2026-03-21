@@ -43,7 +43,7 @@ class Financeiro extends BaseController
     public function create()
     {
         $data = [
-            'title' => 'Nãovo Lançamento',
+            'title' => 'Novo Lançamento',
         ];
         return view('financeiro/form', $data);
     }
@@ -55,7 +55,7 @@ class Financeiro extends BaseController
         LogModel::registrar('financeiro_criado', 'Lançamento criado: ' . $dados['descricao']);
 
         return redirect()->to('/financeiro')
-            ->with('success', 'Lançamento criado com sucessão!');
+            ->with('success', 'Lançamento criado com sucesso!');
     }
 
     public function edit($id)
@@ -80,7 +80,7 @@ class Financeiro extends BaseController
         LogModel::registrar('financeiro_atualizado', 'Lançamento atualizado ID: ' . $id);
 
         return redirect()->to('/financeiro')
-            ->with('success', 'Lançamento atualizado com sucessão!');
+            ->with('success', 'Lançamento atualizado com sucesso!');
     }
 
     public function delete($id)
@@ -89,7 +89,7 @@ class Financeiro extends BaseController
         LogModel::registrar('financeiro_excluido', 'Lançamento excluído ID: ' . $id);
 
         return redirect()->to('/financeiro')
-            ->with('success', 'Lançamento excluído com sucessão!');
+            ->with('success', 'Lançamento excluído com sucesso!');
     }
 
     public function pay($id)
@@ -101,9 +101,9 @@ class Financeiro extends BaseController
             'forma_pagamento' => $dados['forma_pagamento'] ?? null,
         ]);
 
-        LogModel::registrar('financeiro_baixa', 'Baixa não lançamento ID: ' . $id);
+        LogModel::registrar('financeiro_baixa', 'Baixa no lançamento ID: ' . $id);
 
         return redirect()->to('/financeiro')
-            ->with('success', 'Pagamento registrado com sucessão!');
+            ->with('success', 'Pagamento registrado com sucesso!');
     }
 }

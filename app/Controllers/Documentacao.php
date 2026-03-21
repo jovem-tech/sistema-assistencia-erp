@@ -17,7 +17,7 @@ class Documentacao extends BaseController
         // Aceita qualquer grupo com visualizar em configuracoes ou grupo_id == 1
         $grupoId = session()->get('user_grupo_id');
         if ($grupoId != 1 && !can('configuracoes', 'visualizar')) {
-            redirect()->to('/dashboard')->with('error', 'Acessão restrito a administradores.')->send();
+            redirect()->to('/dashboard')->with('error', 'Acesso restrito a administradores.')->send();
             exit;
         }
 
@@ -110,12 +110,12 @@ class Documentacao extends BaseController
      */
     private function buildTree(string $path, string $base = ''): array
     {
-        $itemês = [];
+        $items = [];
 
-        if (!is_dir($path)) return $itemês;
+        if (!is_dir($path)) return $items;
 
         $entries = scandir($path);
-        sãort($entries); // ordem alfabética
+        sort($entries); // ordem alfabética
 
         // Pastas primeiro
         foreach ($entries as $entry) {
@@ -124,7 +124,7 @@ class Documentacao extends BaseController
             $relPath  = $base ? $base . '/' . $entry : $entry;
 
             if (is_dir($fullPath)) {
-                $itemês[] = [
+                $items[] = [
                     'type'     => 'folder',
                     'name'     => $this->formatName($entry),
                     'raw_name' => $entry,
@@ -143,7 +143,7 @@ class Documentacao extends BaseController
             $ext      = strtolower(pathinfo($entry, PATHINFO_EXTENSION));
 
             if (is_file($fullPath) && in_array($ext, $validExt)) {
-                $itemês[] = [
+                $items[] = [
                     'type'     => 'file',
                     'name'     => $this->formatName(pathinfo($entry, PATHINFO_FILENAME)),
                     'raw_name' => $entry,
@@ -154,11 +154,11 @@ class Documentacao extends BaseController
             }
         }
 
-        return $itemês;
+        return $items;
     }
 
     /**
-     * Converte nãome de arquivo/pasta em nãome legível.
+     * Converte nome de arquivo/pasta em nome legível.
      * Ex: "01-manual-do-usuario" → "Manual do Usuário"
      * Ex: "ordens-de-servico.md" → "Ordens de Serviço"
      */
@@ -177,13 +177,13 @@ class Documentacao extends BaseController
         // Corrige acentuação comum
         $replacements = [
             'Opcoes' => 'Opções', 'Configuracao' => 'Configuração',
-            'Configuracoes' => 'Configurações', 'Permissãoes' => 'Permissões',
+            'Configuracoes' => 'Configurações', 'Permissoes' => 'Permissões',
             'Informacoes' => 'Informações', 'Autenticacao' => 'Autenticação',
             'Implementacoes' => 'Implementações', 'Correcoes' => 'Correções',
             'Integracoes' => 'Integrações', 'Migracoes' => 'Migrações',
             'Banco De Dados' => 'Banco de Dados',
             'Visao Geral' => 'Visão Geral',
-            'Nãovas Implementacoes' => 'Nãovas Implementações',
+            'Novas Implementacoes' => 'Novas Implementações',
         ];
         $name = strtr($name, $replacements);
 
@@ -220,7 +220,7 @@ class Documentacao extends BaseController
             $titleLow   = mb_strtolower($this->formatName(pathinfo($entry, PATHINFO_FILENAME)));
 
             if (str_contains($contentLow, $queryLow) || str_contains($titleLow, $queryLow)) {
-                // Extrai snippet em tornão da palavra encontrada
+                // Extrai snippet em torno da palavra encontrada
                 $pos     = strpos($contentLow, $queryLow);
                 $snippet = '';
                 if ($pos !== false) {

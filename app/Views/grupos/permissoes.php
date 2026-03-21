@@ -1,20 +1,20 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<div class="page-header d-flex justify-content-between align-item√™s-center mb-4">
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
     <div>
         <h2 class="mb-0"><i class="bi bi-grid-3x3-gap me-2"></i><?= esc($title) ?></h2>
         <small class="text-muted">Marque as permissıes que este grupo dever· ter por mÛdulo</small>
     </div>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('grupos')" title="Ajuda s√£obre Grupos e Permiss√µes">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('grupos')" title="Ajuda sobre Grupos e Permiss√µes">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('grupos') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('grupos') ?>"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
     </div>
 </div>
 
-<form action="<?= base_url('grupos/' . $grupo['id'] . '/permiss√£oes/salvar') ?>" method="POST">
+<form action="<?= base_url('grupos/' . $grupo['id'] . '/permissoes/salvar') ?>" method="POST">
     <?= csrf_field() ?>
     <div class="card glass-card">
         <div class="card-body p-0">
@@ -25,10 +25,10 @@
                             <th class="ps-4 py-3" style="min-width:200px; background:rgba(0,0,0,.2);">
                                 <i class="bi bi-layers me-1 text-info"></i>MÛdulo
                             </th>
-                            <?php foreach ($permiss√£oes as $p): ?>
+                            <?php foreach ($permissoes as $p): ?>
                             <th class="text-center py-3" style="background:rgba(0,0,0,.2); min-width: 110px;">
                                 <small class="fw-bold text-uppercase" style="letter-spacing:.06em;">
-                                    <?= esc($p['n√£ome']) ?>
+                                    <?= esc($p['nome']) ?>
                                 </small>
                             </th>
                             <?php endforeach; ?>
@@ -45,9 +45,9 @@
                         <tr style="<?= $zebraStyle ?>">
                             <td class="ps-4 fw-semibold align-middle" style="font-size:.9rem;">
                                 <i class="bi <?= esc($m['icone'] ?? 'bi-app') ?> me-2 text-muted"></i>
-                                <?= esc($m['n√£ome']) ?>
+                                <?= esc($m['nome']) ?>
                             </td>
-                            <?php foreach ($permiss√£oes as $p): ?>
+                            <?php foreach ($permissoes as $p): ?>
                             <?php 
                                 $checked = !empty($granted[$m['id']][$p['id']]) ? 'checked' : '';
                                 $isDisabled = ($m['slug'] === 'clientes' && $p['slug'] === 'encerrar');
@@ -58,13 +58,13 @@
                                         <i class="bi bi-dash-circle text-muted" title="N„o aplic·vel a Clientes"></i>
                                     <?php else: ?>
                                         <input class="form-check-input perm-check" type="checkbox"
-                                               name="permiss√£oes[]"
+                                               name="permissoes[]"
                                                value="<?= $m['id'] ?>:<?= $p['id'] ?>"
                                                id="perm_<?= $m['id'] ?>_<?= $p['id'] ?>"
                                                data-modulo="<?= $m['id'] ?>"
                                                data-perm="<?= $p['slug'] ?>"
                                                <?= $checked ?>
-                                               style="width:18px; height:18px; curs√£or:pointer;">
+                                               style="width:18px; height:18px; cursor:pointer;">
                                     <?php endif; ?>
                                 </div>
                             </td>
@@ -74,15 +74,15 @@
                                 <div class="form-check d-flex justify-content-center">
                                     <?php
                                     $allChecked = true;
-                                    foreach ($permiss√£oes as $p) {
+                                    foreach ($permissoes as $p) {
                                         if (empty($granted[$m['id']][$p['id']])) { $allChecked = false; break; }
                                     }
                                     ?>
                                     <input class="form-check-input check-all-row" type="checkbox"
                                            data-modulo="<?= $m['id'] ?>"
                                            <?= $allChecked ? 'checked' : '' ?>
-                                           style="width:18px; height:18px; curs√£or:pointer; opacity:.7;"
-                                           title="Marcar/desmarcar todas as permissıes de <?= esc($m['n√£ome']) ?>">
+                                           style="width:18px; height:18px; cursor:pointer; opacity:.7;"
+                                           title="Marcar/desmarcar todas as permissıes de <?= esc($m['nome']) ?>">
                                 </div>
                             </td>
                         </tr>
@@ -91,12 +91,12 @@
                     <tfoot>
                         <tr style="background:rgba(0,0,0,.15);">
                             <td class="ps-4 text-muted small py-3">Marcar coluna completa:</td>
-                            <?php foreach ($permiss√£oes as $p): ?>
+                            <?php foreach ($permissoes as $p): ?>
                             <td class="text-center align-middle">
                                 <input class="form-check-input check-all-col" type="checkbox"
                                        data-permissao="<?= $p['slug'] ?>"
-                                       style="width:18px; height:18px; curs√£or:pointer; opacity:.7;"
-                                       title="Marcar '<?= esc($p['n√£ome']) ?>'' para todos os mÛdulos">
+                                       style="width:18px; height:18px; cursor:pointer; opacity:.7;"
+                                       title="Marcar '<?= esc($p['nome']) ?>'' para todos os mÛdulos">
                             </td>
                             <?php endforeach; ?>
                             <td></td>
@@ -146,7 +146,7 @@ function syncRowCheckboxes() {
         const moduloId = rowChk.dataset.modulo;
         const cbs = document.querySelectorAll(`.perm-check[data-modulo="${moduloId}"]`);
         rowChk.checked = Array.from(cbs).every(c => c.checked);
-        rowChk.indeterminate = !rowChk.checked && Array.from(cbs).s√£ome(c => c.checked);
+        rowChk.indeterminate = !rowChk.checked && Array.from(cbs).some(c => c.checked);
     });
 }
 

@@ -37,19 +37,19 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('perfil',          'Perfil::index');
     $routes->post('perfil/salvar',  'Perfil::salvar');
 
-    // ── Grupos de Acessão ──────────────────────────────────────────────────
+    // ── Grupos de Acesso ──────────────────────────────────────────────────
     $routes->get('grupos',                             'Grupos::index',            ['filter' => 'permission:grupos:visualizar']);
-    $routes->get('grupos/nãovo',                        'Grupos::create',           ['filter' => 'permission:grupos:criar']);
+    $routes->get('grupos/novo',                        'Grupos::create',           ['filter' => 'permission:grupos:criar']);
     $routes->post('grupos/salvar',                     'Grupos::store',            ['filter' => 'permission:grupos:criar']);
     $routes->get('grupos/editar/(:num)',               'Grupos::edit/$1',          ['filter' => 'permission:grupos:editar']);
     $routes->post('grupos/atualizar/(:num)',            'Grupos::update/$1',        ['filter' => 'permission:grupos:editar']);
     $routes->get('grupos/excluir/(:num)',               'Grupos::delete/$1',        ['filter' => 'permission:grupos:excluir']);
-    $routes->get('grupos/(:num)/permissãoes',           'Grupos::permissãoes/$1',    ['filter' => 'permission:grupos:editar']);
-    $routes->post('grupos/(:num)/permissãoes/salvar',   'Grupos::salvarPermissãoes/$1', ['filter' => 'permission:grupos:editar']);
+    $routes->get('grupos/(:num)/permissoes',           'Grupos::permissoes/$1',    ['filter' => 'permission:grupos:editar']);
+    $routes->post('grupos/(:num)/permissoes/salvar',   'Grupos::salvarPermissoes/$1', ['filter' => 'permission:grupos:editar']);
 
     // â”€â”€ Clientes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     $routes->get('clientes',                  'Clientes::index',            ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('clientes/nãovo',             'Clientes::create',           ['filter' => 'permission:clientes:criar']);
+    $routes->get('clientes/novo',             'Clientes::create',           ['filter' => 'permission:clientes:criar']);
     $routes->post('clientes/salvar',          'Clientes::store',            ['filter' => 'permission:clientes:criar']);
     $routes->post('clientes/salvar_ajax',     'Clientes::salvar_ajax',      ['filter' => 'permission:clientes:criar']);
     $routes->get('clientes/editar/(:num)',    'Clientes::edit/$1',          ['filter' => 'permission:clientes:editar']);
@@ -57,13 +57,13 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('clientes/excluir/(:num)',   'Clientes::delete/$1',        ['filter' => 'permission:clientes:excluir']);
     $routes->get('clientes/visualizar/(:num)','Clientes::show/$1',          ['filter' => 'permission:clientes:visualizar']);
     $routes->get('clientes/buscar',           'Clientes::search',           ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('clientes/jsãon/(:num)',      'Clientes::getJsãon/$1',       ['filter' => 'permission:clientes:visualizar']);
+    $routes->get('clientes/json/(:num)',      'Clientes::getJson/$1',       ['filter' => 'permission:clientes:visualizar']);
     $routes->post('clientes/importar',        'Clientes::importCsv',        ['filter' => 'permission:clientes:importar']);
     $routes->get('clientes/modelo-csv',       'Clientes::downloadCsvTemplate', ['filter' => 'permission:clientes:importar']);
 
     // Contatos (agenda telefonica / pre-cliente)
     $routes->get('contatos',                  'Contatos::index',            ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('contatos/nãovo',             'Contatos::create',           ['filter' => 'permission:clientes:criar']);
+    $routes->get('contatos/novo',             'Contatos::create',           ['filter' => 'permission:clientes:criar']);
     $routes->post('contatos/salvar',          'Contatos::store',            ['filter' => 'permission:clientes:criar']);
     $routes->get('contatos/editar/(:num)',    'Contatos::edit/$1',          ['filter' => 'permission:clientes:editar']);
     $routes->post('contatos/atualizar/(:num)','Contatos::update/$1',        ['filter' => 'permission:clientes:editar']);
@@ -71,7 +71,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
     // â”€â”€ Fornecedores â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     $routes->get('fornecedores',                  'Fornecedores::index',      ['filter' => 'permission:fornecedores:visualizar']);
-    $routes->get('fornecedores/nãovo',             'Fornecedores::create',     ['filter' => 'permission:fornecedores:criar']);
+    $routes->get('fornecedores/novo',             'Fornecedores::create',     ['filter' => 'permission:fornecedores:criar']);
     $routes->post('fornecedores/salvar',          'Fornecedores::store',      ['filter' => 'permission:fornecedores:criar']);
     $routes->get('fornecedores/editar/(:num)',    'Fornecedores::edit/$1',    ['filter' => 'permission:fornecedores:editar']);
     $routes->post('fornecedores/atualizar/(:num)','Fornecedores::update/$1',  ['filter' => 'permission:fornecedores:editar']);
@@ -79,7 +79,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
     // â”€â”€ FuncionÃ¡rios â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     $routes->get('funcionarios',                  'Funcionarios::index',      ['filter' => 'permission:funcionarios:visualizar']);
-    $routes->get('funcionarios/nãovo',             'Funcionarios::create',     ['filter' => 'permission:funcionarios:criar']);
+    $routes->get('funcionarios/novo',             'Funcionarios::create',     ['filter' => 'permission:funcionarios:criar']);
     $routes->post('funcionarios/salvar',          'Funcionarios::store',      ['filter' => 'permission:funcionarios:criar']);
     $routes->get('funcionarios/editar/(:num)',    'Funcionarios::edit/$1',    ['filter' => 'permission:funcionarios:editar']);
     $routes->post('funcionarios/atualizar/(:num)','Funcionarios::update/$1',  ['filter' => 'permission:funcionarios:editar']);
@@ -87,7 +87,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
     // â”€â”€ Equipamentos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     $routes->get('equipamentos',                  'Equipamentos::index',      ['filter' => 'permission:equipamentos:visualizar']);
-    $routes->get('equipamentos/nãovo',             'Equipamentos::create',     ['filter' => 'permission:equipamentos:criar']);
+    $routes->get('equipamentos/novo',             'Equipamentos::create',     ['filter' => 'permission:equipamentos:criar']);
     $routes->post('equipamentos/salvar',          'Equipamentos::store',      ['filter' => 'permission:equipamentos:criar']);
     $routes->get('equipamentos/editar/(:num)',    'Equipamentos::edit/$1',    ['filter' => 'permission:equipamentos:editar']);
     $routes->post('equipamentos/atualizar/(:num)','Equipamentos::update/$1',  ['filter' => 'permission:equipamentos:editar']);
@@ -140,7 +140,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
     // Defeitos Relatados (base de relatos do cliente)
     $routes->get('defeitosrelatados',                   'DefeitosRelatados::index',            ['filter' => 'permission:defeitos:visualizar']);
-    $routes->get('defeitosrelatados/nãovo',              'DefeitosRelatados::create',           ['filter' => 'permission:defeitos:criar']);
+    $routes->get('defeitosrelatados/novo',              'DefeitosRelatados::create',           ['filter' => 'permission:defeitos:criar']);
     $routes->post('defeitosrelatados/salvar',           'DefeitosRelatados::store',            ['filter' => 'permission:defeitos:criar']);
     $routes->get('defeitosrelatados/editar/(:num)',     'DefeitosRelatados::edit/$1',          ['filter' => 'permission:defeitos:editar']);
     $routes->post('defeitosrelatados/atualizar/(:num)', 'DefeitosRelatados::update/$1',        ['filter' => 'permission:defeitos:editar']);
@@ -162,11 +162,11 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('crm/metricas-marketing',       'Crm::metricasMarketing',      ['filter' => 'permission:clientes:visualizar']);
     $routes->post('crm/metricas-marketing/engajamento', 'Crm::salvarEngajamentoPeriodos', ['filter' => 'permission:clientes:editar']);
 
-    // Central de Atendimento WhatsApp (rota canãonica + alias legado)
+    // Central de Atendimento WhatsApp (rota canonica + alias legado)
     $routes->get('atendimento-whatsapp',                    'CentralMensagens::index',                       ['filter' => 'permission:clientes:visualizar']);
     $routes->get('atendimento-whatsapp/conversas',          'CentralMensagens::conversas',                   ['filter' => 'permission:clientes:visualizar']);
     $routes->get('atendimento-whatsapp/conversa/(:num)',    'CentralMensagens::conversa/$1',                 ['filter' => 'permission:clientes:visualizar']);
-$routes->get('atendimento-whatsapp/conversa/(:num)/nãovas', 'CentralMensagens::conversaNãovas/$1',         ['filter' => 'permission:clientes:visualizar']);
+$routes->get('atendimento-whatsapp/conversa/(:num)/novas', 'CentralMensagens::conversaNovas/$1',         ['filter' => 'permission:clientes:visualizar']);
 $routes->get('atendimento-whatsapp/conversa/(:num)/stream', 'CentralMensagens::conversaStream/$1',       ['filter' => 'permission:clientes:visualizar']);
 $routes->post('atendimento-whatsapp/conversa/(:num)/cadastrar-contato', 'CentralMensagens::cadastrarContatoConversa/$1', ['filter' => 'permission:clientes:visualizar']);
 $routes->post('atendimento-whatsapp/conversa/(:num)/cadastrar-cliente', 'CentralMensagens::cadastrarContatoConversa/$1', ['filter' => 'permission:clientes:visualizar']);
@@ -193,7 +193,7 @@ $routes->post('atendimento-whatsapp/sync-inbound',      'CentralMensagens::syncI
     $routes->get('atendimento-whatsapp/filas',              'CentralMensagens::filas',                       ['filter' => 'permission:clientes:visualizar']);
     $routes->post('atendimento-whatsapp/filas/atualizar',   'CentralMensagens::atualizarFila',               ['filter' => 'permission:clientes:editar']);
     $routes->get('atendimento-whatsapp/metricas',           'CentralMensagens::metricas',                    ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('atendimento-whatsapp/metricas/consãolidar-diario', 'CentralMensagens::consãolidarMetricasDiarias', ['filter' => 'permission:clientes:visualizar']);
+    $routes->post('atendimento-whatsapp/metricas/consolidar-diario', 'CentralMensagens::consolidarMetricasDiarias', ['filter' => 'permission:clientes:visualizar']);
     $routes->get('atendimento-whatsapp/configuracoes',      'CentralMensagens::configuracoes',               ['filter' => 'permission:clientes:visualizar']);
     $routes->post('atendimento-whatsapp/configuracoes/salvar', 'CentralMensagens::salvarConfiguracoes',      ['filter' => 'permission:clientes:editar']);
 
@@ -201,7 +201,7 @@ $routes->post('atendimento-whatsapp/sync-inbound',      'CentralMensagens::syncI
     $routes->get('central-mensagens',                       'CentralMensagens::index',                       ['filter' => 'permission:clientes:visualizar']);
     $routes->get('central-mensagens/conversas',             'CentralMensagens::conversas',                   ['filter' => 'permission:clientes:visualizar']);
     $routes->get('central-mensagens/conversa/(:num)',       'CentralMensagens::conversa/$1',                 ['filter' => 'permission:clientes:visualizar']);
-$routes->get('central-mensagens/conversa/(:num)/nãovas', 'CentralMensagens::conversaNãovas/$1',            ['filter' => 'permission:clientes:visualizar']);
+$routes->get('central-mensagens/conversa/(:num)/novas', 'CentralMensagens::conversaNovas/$1',            ['filter' => 'permission:clientes:visualizar']);
 $routes->get('central-mensagens/conversa/(:num)/stream', 'CentralMensagens::conversaStream/$1',          ['filter' => 'permission:clientes:visualizar']);
 $routes->post('central-mensagens/conversa/(:num)/cadastrar-contato', 'CentralMensagens::cadastrarContatoConversa/$1', ['filter' => 'permission:clientes:visualizar']);
 $routes->post('central-mensagens/conversa/(:num)/cadastrar-cliente', 'CentralMensagens::cadastrarContatoConversa/$1', ['filter' => 'permission:clientes:visualizar']);
@@ -228,14 +228,14 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->get('central-mensagens/filas',                 'CentralMensagens::filas',                       ['filter' => 'permission:clientes:visualizar']);
     $routes->post('central-mensagens/filas/atualizar',      'CentralMensagens::atualizarFila',               ['filter' => 'permission:clientes:editar']);
     $routes->get('central-mensagens/metricas',              'CentralMensagens::metricas',                    ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('central-mensagens/metricas/consãolidar-diario', 'CentralMensagens::consãolidarMetricasDiarias', ['filter' => 'permission:clientes:visualizar']);
+    $routes->post('central-mensagens/metricas/consolidar-diario', 'CentralMensagens::consolidarMetricasDiarias', ['filter' => 'permission:clientes:visualizar']);
     $routes->get('central-mensagens/configuracoes',         'CentralMensagens::configuracoes',               ['filter' => 'permission:clientes:visualizar']);
     $routes->post('central-mensagens/configuracoes/salvar', 'CentralMensagens::salvarConfiguracoes',         ['filter' => 'permission:clientes:editar']);
 
     // â”€â”€ Ordens de ServiÃ§o â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     $routes->get('os',                    'Os::index',              ['filter' => 'permission:os:visualizar']);
     $routes->post('os/datatable',         'Os::datatable',          ['filter' => 'permission:os:visualizar']);
-    $routes->get('os/nãova',              'Os::create',             ['filter' => 'permission:os:criar']);
+    $routes->get('os/nova',              'Os::create',             ['filter' => 'permission:os:criar']);
     $routes->post('os/salvar',            'Os::store',              ['filter' => 'permission:os:criar']);
     $routes->get('os/editar/(:num)',      'Os::edit/$1',            ['filter' => 'permission:os:editar']);
     $routes->post('os/atualizar/(:num)',  'Os::update/$1',          ['filter' => 'permission:os:editar']);
@@ -249,7 +249,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
 
     // â”€â”€ ServiÃ§os â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     $routes->get('servicos',                  'Servicos::index',            ['filter' => 'permission:servicos:visualizar']);
-    $routes->get('servicos/nãovo',             'Servicos::create',           ['filter' => 'permission:servicos:criar']);
+    $routes->get('servicos/novo',             'Servicos::create',           ['filter' => 'permission:servicos:criar']);
     $routes->post('servicos/salvar',          'Servicos::store',            ['filter' => 'permission:servicos:criar']);
     $routes->get('servicos/editar/(:num)',    'Servicos::edit/$1',          ['filter' => 'permission:servicos:editar']);
     $routes->post('servicos/atualizar/(:num)','Servicos::update/$1',        ['filter' => 'permission:servicos:editar']);
@@ -264,7 +264,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
 
     // â”€â”€ Estoque â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     $routes->get('estoque',                    'Estoque::index',      ['filter' => 'permission:estoque:visualizar']);
-    $routes->get('estoque/nãovo',              'Estoque::create',     ['filter' => 'permission:estoque:criar']);
+    $routes->get('estoque/novo',              'Estoque::create',     ['filter' => 'permission:estoque:criar']);
     $routes->post('estoque/salvar',            'Estoque::store',      ['filter' => 'permission:estoque:criar']);
     $routes->get('estoque/editar/(:num)',      'Estoque::edit/$1',    ['filter' => 'permission:estoque:editar']);
     $routes->post('estoque/atualizar/(:num)',  'Estoque::update/$1',  ['filter' => 'permission:estoque:editar']);
@@ -278,7 +278,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
 
     // â”€â”€ Financeiro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     $routes->get('financeiro',                  'Financeiro::index',    ['filter' => 'permission:financeiro:visualizar']);
-    $routes->get('financeiro/nãovo',            'Financeiro::create',   ['filter' => 'permission:financeiro:criar']);
+    $routes->get('financeiro/novo',            'Financeiro::create',   ['filter' => 'permission:financeiro:criar']);
     $routes->post('financeiro/salvar',          'Financeiro::store',    ['filter' => 'permission:financeiro:criar']);
     $routes->get('financeiro/editar/(:num)',    'Financeiro::edit/$1',  ['filter' => 'permission:financeiro:editar']);
     $routes->post('financeiro/atualizar/(:num)','Financeiro::update/$1',['filter' => 'permission:financeiro:editar']);
@@ -307,7 +307,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     // â”€â”€ UsuÃ¡rios â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     $routes->get('usuarios',                  'Usuarios::index',    ['filter' => 'permission:usuarios:visualizar']);
     $routes->post('usuarios/datatable',       'Usuarios::datatable',['filter' => 'permission:usuarios:visualizar']);
-    $routes->get('usuarios/nãovo',             'Usuarios::create',   ['filter' => 'permission:usuarios:criar']);
+    $routes->get('usuarios/novo',             'Usuarios::create',   ['filter' => 'permission:usuarios:criar']);
     $routes->post('usuarios/salvar',          'Usuarios::store',    ['filter' => 'permission:usuarios:criar']);
     $routes->get('usuarios/editar/(:num)',    'Usuarios::edit/$1',  ['filter' => 'permission:usuarios:editar']);
     $routes->post('usuarios/atualizar/(:num)','Usuarios::update/$1',['filter' => 'permission:usuarios:editar']);

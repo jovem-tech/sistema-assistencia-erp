@@ -1,10 +1,10 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<div class="page-header d-flex justify-content-between align-itemês-center mb-4">
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0"><i class="bi bi-box-seam-fill me-2"></i>Estoque de Peças</h2>
     <div>
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('estoque')" title="Ajuda sãobre Estoque">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('estoque')" title="Ajuda sobre Estoque">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <?php if (can('estoque', 'exportar')): ?>
@@ -18,8 +18,8 @@
         </button>
         <?php endif; ?>
         <?php if (can('estoque', 'criar')): ?>
-        <a href="<?= base_url('estoque/nãovo') ?>" class="btn btn-primary btn-glow">
-            <i class="bi bi-plus-lg me-1"></i>Nãova Peça
+        <a href="<?= base_url('estoque/novo') ?>" class="btn btn-primary btn-glow">
+            <i class="bi bi-plus-lg me-1"></i>Nova Peça
         </a>
         <?php endif; ?>
     </div>
@@ -32,7 +32,7 @@
                 <thead>
                     <tr>
                         <th>Código</th>
-                        <th>Nãome</th>
+                        <th>Nome</th>
                         <th>Categoria</th>
                         <th>Custo</th>
                         <th>Venda</th>
@@ -45,7 +45,7 @@
                     <?php if (!empty($pecas)): foreach ($pecas as $p): ?>
                     <tr>
                         <td><code><?= esc($p['codigo'] ?? '-') ?></code></td>
-                        <td><strong><?= esc($p['nãome']) ?></strong></td>
+                        <td><strong><?= esc($p['nome']) ?></strong></td>
                         <td><?= esc($p['categoria'] ?? '-') ?></td>
                         <td><?= formatMoney($p['preco_custo']) ?></td>
                         <td><?= formatMoney($p['preco_venda']) ?></td>
@@ -62,12 +62,12 @@
                                 <a href="<?= base_url('estoque/editar/' . $p['id']) ?>" class="btn btn-sm btn-outline-secondary" title="Editar"><i class="bi bi-pencil"></i></a>
                                 <?php endif; ?>
                                 <?php if (can('estoque', 'encerrar') && $p['ativo']): ?>
-                                <button type="button" class="btn btn-sm btn-outline-warning" title="Encerrar" onclick="confirmarEncerramento('estoque/excluir/<?= $p['id'] ?>', '<?= esc($p['nãome']) ?>')">
+                                <button type="button" class="btn btn-sm btn-outline-warning" title="Encerrar" onclick="confirmarEncerramento('estoque/excluir/<?= $p['id'] ?>', '<?= esc($p['nome']) ?>')">
                                     <i class="bi bi-archive"></i>
                                 </button>
                                 <?php endif; ?>
                                 <?php if (can('estoque', 'excluir')): ?>
-                                <a href="<?= base_url('estoque/excluir/' . $p['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nãome="<?= esc($p['nãome']) ?>"><i class="bi bi-trash"></i></a>
+                                <a href="<?= base_url('estoque/excluir/' . $p['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nome="<?= esc($p['nome']) ?>"><i class="bi bi-trash"></i></a>
                                 <?php endif; ?>
                             </div>
                         </td>

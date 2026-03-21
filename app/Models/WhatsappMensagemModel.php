@@ -30,7 +30,7 @@ class WhatsappMensagemModel extends Model
 
     public function byOs(int $osId, int $limit = 30): array
     {
-        return $this->select('whatsapp_mensagens.*, usuarios.nãome as enviado_por_nãome, whatsapp_templates.nãome as template_nãome')
+        return $this->select('whatsapp_mensagens.*, usuarios.nome as enviado_por_nome, whatsapp_templates.nome as template_nome')
             ->join('usuarios', 'usuarios.id = whatsapp_mensagens.enviado_por', 'left')
             ->join('whatsapp_templates', 'whatsapp_templates.id = whatsapp_mensagens.template_id', 'left')
             ->where('whatsapp_mensagens.os_id', $osId)

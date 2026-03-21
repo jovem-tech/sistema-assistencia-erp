@@ -24,7 +24,7 @@
                         <i class="bi bi-shield-lock"></i>
                     </div>
                     <h1 class="login-title">Redefinir Senha</h1>
-                    <p class="login-subtitle">Crie uma nãova senha para sua conta</p>
+                    <p class="login-subtitle">Crie uma nova senha para sua conta</p>
                 </div>
                 
                 <?php if (session()->getFlashdata('error')): ?>
@@ -35,17 +35,17 @@
                     <div class="form-floating-custom mb-3">
                         <div class="input-icon-wrapper">
                             <i class="bi bi-key input-icon"></i>
-                            <input type="password" class="form-control" name="senha" placeholder="Nãova Senha" minlength="6" required autofocus>
+                            <input type="password" class="form-control" name="senha" placeholder="Nova Senha" minlength="6" required autofocus>
                         </div>
                     </div>
                     <div class="form-floating-custom">
                         <div class="input-icon-wrapper">
                             <i class="bi bi-check2-circle input-icon"></i>
-                            <input type="password" class="form-control" name="senha_confirmar" placeholder="Confirme a Nãova Senha" minlength="6" required>
+                            <input type="password" class="form-control" name="senha_confirmar" placeholder="Confirme a Nova Senha" minlength="6" required>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-glow btn-login w-100 mb-3">
-                        <i class="bi bi-check2-all me-2"></i>Salvar Nãova Senha
+                        <i class="bi bi-check2-all me-2"></i>Salvar Nova Senha
                     </button>
                     <div class="text-center">
                         <a href="<?= base_url('login') ?>" class="forgot-link"><i class="bi bi-arrow-left me-1"></i>Voltar ao login</a>

@@ -19,9 +19,9 @@ class GlobalSearchService
     private $modules = [
         ['name' => 'Dashboard', 'url' => 'dashboard', 'icon' => 'bi-speedometer2', 'category' => 'Módulo', 'permission' => 'dashboard:visualizar'],
         ['name' => 'Ordens de Serviço', 'url' => 'os', 'icon' => 'bi-file-earmark-text', 'category' => 'Módulo', 'permission' => 'os:visualizar'],
-        ['name' => 'Nãova Ordem de Serviço (OS)', 'url' => 'os/nãova', 'icon' => 'bi-plus-circle', 'category' => 'Ação', 'permission' => 'os:criar'],
+        ['name' => 'Nova Ordem de Serviço (OS)', 'url' => 'os/nova', 'icon' => 'bi-plus-circle', 'category' => 'Ação', 'permission' => 'os:criar'],
         ['name' => 'Clientes', 'url' => 'clientes', 'icon' => 'bi-people', 'category' => 'Módulo', 'permission' => 'clientes:visualizar'],
-        ['name' => 'Nãovo Cliente', 'url' => 'clientes/nãovo', 'icon' => 'bi-persãon-plus', 'category' => 'Ação', 'permission' => 'clientes:criar'],
+        ['name' => 'Novo Cliente', 'url' => 'clientes/novo', 'icon' => 'bi-person-plus', 'category' => 'Ação', 'permission' => 'clientes:criar'],
         ['name' => 'Serviços', 'url' => 'servicos', 'icon' => 'bi-tools', 'category' => 'Módulo', 'permission' => 'servicos:visualizar'],
         ['name' => 'Estoque / Peças', 'url' => 'estoque', 'icon' => 'bi-box-seam', 'category' => 'Módulo', 'permission' => 'estoque:visualizar'],
         ['name' => 'Equipamentos / Aparelhos', 'url' => 'equipamentos', 'icon' => 'bi-laptop', 'category' => 'Módulo', 'permission' => 'equipamentos:visualizar'],
@@ -147,7 +147,7 @@ class GlobalSearchService
         $model = new OsModel();
         $termClean = str_replace(['OS', 'os'], '', $term);
 
-        $query = $model->select('os.*, clientes.nãome_razao as cliente_nãome, et.nãome as equip_tipo, em.nãome as equip_marca, emod.nãome as equip_modelo')
+        $query = $model->select('os.*, clientes.nome_razao as cliente_nome, et.nome as equip_tipo, em.nome as equip_marca, emod.nome as equip_modelo')
             ->join('clientes', 'clientes.id = os.cliente_id')
             ->join('equipamentos', 'equipamentos.id = os.equipamento_id')
             ->join('equipamentos_tipos et', 'et.id = equipamentos.tipo_id', 'left')
@@ -156,10 +156,10 @@ class GlobalSearchService
             ->groupStart()
                 ->like('os.numero_os', $term)
                 ->orLike('os.numero_os', $termClean)
-                ->orLike('clientes.nãome_razao', $term)
+                ->orLike('clientes.nome_razao', $term)
                 ->orLike('os.relato_cliente', $term)
                 ->orLike('equipamentos.numero_serie', $term)
-                ->orLike('emod.nãome', $term)
+                ->orLike('emod.nome', $term)
             ->groupEnd()
             ->limit(10)
             ->find();
@@ -168,7 +168,7 @@ class GlobalSearchService
         foreach ($query as $row) {
             $found[] = [
                 'title' => $row['numero_os'],
-                'subtitle' => $row['cliente_nãome'] . ' - ' . ($row['equip_modelo'] ?? $row['equip_tipo']),
+                'subtitle' => $row['cliente_nome'] . ' - ' . ($row['equip_modelo'] ?? $row['equip_tipo']),
                 'url' => base_url('os/visualizar/' . $row['id']),
                 'icon' => 'bi-file-earmark-text',
                 'badge' => $row['status']
@@ -181,7 +181,7 @@ class GlobalSearchService
     {
         $model = new ClienteModel();
         $query = $model->groupStart()
-                ->like('nãome_razao', $term)
+                ->like('nome_razao', $term)
                 ->orLike('cpf_cnpj', $term)
                 ->orLike('telefone1', $term)
                 ->orLike('email', $term)
@@ -192,10 +192,10 @@ class GlobalSearchService
         $found = [];
         foreach ($query as $row) {
             $found[] = [
-                'title' => $row['nãome_razao'],
+                'title' => $row['nome_razao'],
                 'subtitle' => ($row['cpf_cnpj'] ?? $row['email'] ?? $row['telefone1']),
                 'url' => base_url('clientes/visualizar/' . $row['id']),
-                'icon' => 'bi-persãon',
+                'icon' => 'bi-person',
                 'badge' => 'Cliente'
             ];
         }
@@ -205,7 +205,7 @@ class GlobalSearchService
     private function searchEquipamentos(string $term): array
     {
         $model = new EquipamentoModel();
-        $query = $model->select('equipamentos.*, tipos.nãome as tipo_nãome, marcas.nãome as marca_nãome, modelos.nãome as modelo_nãome, clientes.nãome_razao as cliente_nãome')
+        $query = $model->select('equipamentos.*, tipos.nome as tipo_nome, marcas.nome as marca_nome, modelos.nome as modelo_nome, clientes.nome_razao as cliente_nome')
             ->join('clientes', 'clientes.id = equipamentos.cliente_id', 'left')
             ->join('equipamentos_tipos tipos', 'tipos.id = equipamentos.tipo_id', 'left')
             ->join('equipamentos_marcas marcas', 'marcas.id = equipamentos.marca_id', 'left')
@@ -213,8 +213,8 @@ class GlobalSearchService
             ->groupStart()
                 ->like('equipamentos.numero_serie', $term)
                 ->orLike('equipamentos.imei', $term)
-                ->orLike('modelos.nãome', $term)
-                ->orLike('clientes.nãome_razao', $term)
+                ->orLike('modelos.nome', $term)
+                ->orLike('clientes.nome_razao', $term)
             ->groupEnd()
             ->limit(10)
             ->find();
@@ -222,11 +222,11 @@ class GlobalSearchService
         $found = [];
         foreach ($query as $row) {
             $found[] = [
-                'title' => ($row['marca_nãome'] . ' ' . $row['modelo_nãome']),
-                'subtitle' => 'S/N: ' . ($row['numero_serie'] ?? 'N/I') . ' - Cli: ' . $row['cliente_nãome'],
+                'title' => ($row['marca_nome'] . ' ' . $row['modelo_nome']),
+                'subtitle' => 'S/N: ' . ($row['numero_serie'] ?? 'N/I') . ' - Cli: ' . $row['cliente_nome'],
                 'url' => base_url('equipamentos/visualizar/' . $row['id']),
                 'icon' => 'bi-laptop',
-                'badge' => $row['tipo_nãome']
+                'badge' => $row['tipo_nome']
             ];
         }
         return $found;
@@ -235,7 +235,7 @@ class GlobalSearchService
     private function searchWhatsapp(string $term): array
     {
         $model = new MensagemWhatsappModel();
-        $query = $model->select('mensagens_whatsapp.*, clientes.nãome_razao as cliente_nãome')
+        $query = $model->select('mensagens_whatsapp.*, clientes.nome_razao as cliente_nome')
             ->join('clientes', 'clientes.id = mensagens_whatsapp.cliente_id', 'left')
             ->like('mensagens_whatsapp.mensagem', $term)
             ->orLike('mensagens_whatsapp.telefone', $term)
@@ -247,7 +247,7 @@ class GlobalSearchService
         foreach ($query as $row) {
             $found[] = [
                 'title' => mb_strimwidth($row['mensagem'], 0, 50, '...'),
-                'subtitle' => ($row['cliente_nãome'] ?? $row['telefone']) . ' - ' . date('d/m/Y H:i', strtotime($row['created_at'])),
+                'subtitle' => ($row['cliente_nome'] ?? $row['telefone']) . ' - ' . date('d/m/Y H:i', strtotime($row['created_at'])),
                 'url' => base_url('atendimento-whatsapp/conversa/' . $row['conversa_id']),
                 'icon' => 'bi-whatsapp',
                 'badge' => 'Mensagem'
@@ -259,7 +259,7 @@ class GlobalSearchService
     private function searchServicos(string $term): array
     {
         $model = new ServicoModel();
-        $query = $model->like('nãome', $term)
+        $query = $model->like('nome', $term)
             ->orLike('descricao', $term)
             ->limit(5)
             ->find();
@@ -267,7 +267,7 @@ class GlobalSearchService
         $found = [];
         foreach ($query as $row) {
             $found[] = [
-                'title' => $row['nãome'],
+                'title' => $row['nome'],
                 'subtitle' => 'Valor: R$ ' . number_format($row['valor'], 2, ',', '.'),
                 'url' => base_url('servicos/editar/' . $row['id']),
                 'icon' => 'bi-tools',
@@ -280,7 +280,7 @@ class GlobalSearchService
     private function searchPecas(string $term): array
     {
         $model = new PecaModel();
-        $query = $model->like('nãome', $term)
+        $query = $model->like('nome', $term)
             ->orLike('codigo', $term)
             ->orLike('modelos_compativeis', $term)
             ->limit(10)
@@ -289,7 +289,7 @@ class GlobalSearchService
         $found = [];
         foreach ($query as $row) {
             $found[] = [
-                'title' => $row['nãome'],
+                'title' => $row['nome'],
                 'subtitle' => 'Estoque: ' . $row['quantidade_atual'] . ' - Preço Venda: R$ ' . number_format($row['preco_venda'], 2, ',', '.'),
                 'url' => base_url('estoque/editar/' . $row['id']),
                 'icon' => 'bi-box-seam',

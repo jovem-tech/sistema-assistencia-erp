@@ -11,20 +11,20 @@ class IntencaoService
      */
     public function detectar(string $mensagem, array $intencoes = [], array $faqs = []): array
     {
-        $texto = $this->nãormalizar($mensagem);
+        $texto = $this->normalizar($mensagem);
         if ($texto === '') {
             return [
                 'intent' => null,
                 'faq' => null,
                 'score' => 0.0,
-                'origem' => 'nãone',
+                'origem' => 'none',
             ];
         }
 
         $bestIntent = null;
         $bestIntentScore = 0.0;
         foreach ($intencoes as $intencao) {
-            $gatilhos = $this->decodeArray($intencao['gatilhos_jsãon'] ?? null);
+            $gatilhos = $this->decodeArray($intencao['gatilhos_json'] ?? null);
             if (empty($gatilhos)) {
                 continue;
             }
@@ -38,9 +38,9 @@ class IntencaoService
         $bestFaq = null;
         $bestFaqScore = 0.0;
         foreach ($faqs as $faq) {
-            $palavras = $this->decodeArray($faq['palavras_chave_jsãon'] ?? null);
+            $palavras = $this->decodeArray($faq['palavras_chave_json'] ?? null);
             if (empty($palavras)) {
-                $palavras = preg_split('/\s+/', $this->nãormalizar((string) ($faq['pergunta'] ?? ''))) ?: [];
+                $palavras = preg_split('/\s+/', $this->normalizar((string) ($faq['pergunta'] ?? ''))) ?: [];
             }
             $score = $this->calcularScore($texto, $palavras);
             if ($score > $bestFaqScore) {
@@ -54,7 +54,7 @@ class IntencaoService
                 'intent' => $bestIntent,
                 'faq' => null,
                 'score' => $bestIntentScore,
-                'origem' => $bestIntent ? 'intent' : 'nãone',
+                'origem' => $bestIntent ? 'intent' : 'none',
             ];
         }
 
@@ -62,7 +62,7 @@ class IntencaoService
             'intent' => null,
             'faq' => $bestFaq,
             'score' => $bestFaqScore,
-            'origem' => $bestFaq ? 'faq' : 'nãone',
+            'origem' => $bestFaq ? 'faq' : 'none',
         ];
     }
 
@@ -78,14 +78,14 @@ class IntencaoService
         $pontos = 0.0;
         $maxPontos = 0.0;
         foreach ($gatilhos as $gatilho) {
-            $g = $this->nãormalizar((string) $gatilho);
+            $g = $this->normalizar((string) $gatilho);
             if ($g === '') {
                 continue;
             }
-            $pesão = str_contains($g, ' ') ? 2.0 : 1.0;
-            $maxPontos += $pesão;
+            $peso = str_contains($g, ' ') ? 2.0 : 1.0;
+            $maxPontos += $peso;
             if (str_contains($texto, $g)) {
-                $pontos += $pesão;
+                $pontos += $peso;
             }
         }
 
@@ -108,14 +108,14 @@ class IntencaoService
         if (!is_string($raw) || trim($raw) === '') {
             return [];
         }
-        $decoded = jsãon_decode($raw, true);
+        $decoded = json_decode($raw, true);
         if (!is_array($decoded)) {
             return [];
         }
         return array_values(array_filter(array_map('strval', $decoded)));
     }
 
-    private function nãormalizar(string $texto): string
+    private function normalizar(string $texto): string
     {
         $texto = mb_strtolower(trim($texto), 'UTF-8');
         if ($texto === '') {

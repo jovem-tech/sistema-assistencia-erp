@@ -25,7 +25,7 @@ class Clientes extends BaseController
     {
         $data = [
             'title'    => 'Clientes',
-            'clientes' => $this->model->orderBy('nãome_razao', 'ASC')->findAll(),
+            'clientes' => $this->model->orderBy('nome_razao', 'ASC')->findAll(),
         ];
         return view('clientes/index', $data);
     }
@@ -33,7 +33,7 @@ class Clientes extends BaseController
     public function create()
     {
         $data = [
-            'title' => 'Nãovo Cliente',
+            'title' => 'Novo Cliente',
         ];
         return view('clientes/form', $data);
     }
@@ -41,7 +41,7 @@ class Clientes extends BaseController
     public function store()
     {
         $rules = [
-            'nãome_razao' => 'required|min_length[3]',
+            'nome_razao' => 'required|min_length[3]',
             'telefone1'  => 'required',
         ];
 
@@ -52,10 +52,10 @@ class Clientes extends BaseController
         $dados = $this->request->getPost();
         $this->model->insert($dados);
 
-        LogModel::registrar('cliente_criado', 'Cliente cadastrado: ' . $dados['nãome_razao']);
+        LogModel::registrar('cliente_criado', 'Cliente cadastrado: ' . $dados['nome_razao']);
 
         return redirect()->to('/clientes')
-            ->with('success', 'Cliente cadastrado com sucessão!');
+            ->with('success', 'Cliente cadastrado com sucesso!');
     }
 
     public function edit($id)
@@ -76,7 +76,7 @@ class Clientes extends BaseController
     public function update($id)
     {
         $rules = [
-            'nãome_razao' => 'required|min_length[3]',
+            'nome_razao' => 'required|min_length[3]',
             'telefone1'  => 'required',
         ];
 
@@ -90,7 +90,7 @@ class Clientes extends BaseController
         LogModel::registrar('cliente_atualizado', 'Cliente atualizado ID: ' . $id);
 
         return redirect()->to('/clientes')
-            ->with('success', 'Cliente atualizado com sucessão!');
+            ->with('success', 'Cliente atualizado com sucesso!');
     }
 
     public function delete($id)
@@ -98,11 +98,11 @@ class Clientes extends BaseController
         $cliente = $this->model->find($id);
         if ($cliente) {
             $this->model->delete($id);
-            LogModel::registrar('cliente_excluido', 'Cliente excluído: ' . $cliente['nãome_razao']);
+            LogModel::registrar('cliente_excluido', 'Cliente excluído: ' . $cliente['nome_razao']);
         }
 
         return redirect()->to('/clientes')
-            ->with('success', 'Cliente excluído com sucessão!');
+            ->with('success', 'Cliente excluído com sucesso!');
     }
 
     public function show($id)
@@ -178,7 +178,7 @@ class Clientes extends BaseController
                 ->findAll(20);
         }
 
-        usãort($crmTimeline, static function (array $a, array $b): int {
+        usort($crmTimeline, static function (array $a, array $b): int {
             return strtotime((string) ($b['data'] ?? '1970-01-01')) <=> strtotime((string) ($a['data'] ?? '1970-01-01'));
         });
         $crmTimeline = array_slice($crmTimeline, 0, 150);
@@ -187,7 +187,7 @@ class Clientes extends BaseController
             'title'        => 'Detalhes do Cliente',
             'cliente'      => $cliente,
             'equipamentos' => $equipamentoModel->getByCliente($id),
-            'ordens'       => $osModel->select('os.*, equipamentos_marcas.nãome as equip_marca, equipamentos_modelos.nãome as equip_modelo')
+            'ordens'       => $osModel->select('os.*, equipamentos_marcas.nome as equip_marca, equipamentos_modelos.nome as equip_modelo')
                                      ->join('equipamentos', 'equipamentos.id = os.equipamento_id', 'left')
                                      ->join('equipamentos_marcas', 'equipamentos_marcas.id = equipamentos.marca_id', 'left')
                                      ->join('equipamentos_modelos', 'equipamentos_modelos.id = equipamentos.modelo_id', 'left')
@@ -208,7 +208,7 @@ class Clientes extends BaseController
         return $this->response->setJSON($results);
     }
 
-    public function getJsãon($id)
+    public function getJson($id)
     {
         $cliente = $this->model->find($id);
         if (!$cliente) {
@@ -220,14 +220,14 @@ class Clientes extends BaseController
     public function salvar_ajax()
     {
         $rules = [
-            'nãome_razao' => 'required|min_length[3]',
+            'nome_razao' => 'required|min_length[3]',
             'telefone1'  => 'required',
         ];
 
         if (!$this->validate($rules)) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Verifique se os campos obrigatórios (Nãome e Telefone) foram preenchidos corretamente.'
+                'message' => 'Verifique se os campos obrigatórios (Nome e Telefone) foram preenchidos corretamente.'
             ]);
         }
 
@@ -237,12 +237,12 @@ class Clientes extends BaseController
             $this->model->insert($dados);
             $insertId = $this->model->getInsertID();
 
-            LogModel::registrar('cliente_criado_ajax', 'Cliente cadastrado via Ajax: ' . $dados['nãome_razao']);
+            LogModel::registrar('cliente_criado_ajax', 'Cliente cadastrado via Ajax: ' . $dados['nome_razao']);
 
             return $this->response->setJSON([
                 'success' => true,
                 'id'      => $insertId,
-                'nãome'    => $dados['nãome_razao']
+                'nome'    => $dados['nome_razao']
             ]);
             
         } catch (\Exception $e) {
@@ -266,7 +266,7 @@ class Clientes extends BaseController
         fputs($f, "\xEF\xBB\xBF");
         
         $fields = [
-            'tipo_pessãoa', 'nãome_razao', 'cpf_cnpj', 'rg_ie', 'email', 
+            'tipo_pessoa', 'nome_razao', 'cpf_cnpj', 'rg_ie', 'email', 
             'telefone1', 'telefone2', 'cep', 'endereco', 'numero', 
             'complemento', 'bairro', 'cidade', 'uf', 'observacoes'
         ];
@@ -309,7 +309,7 @@ class Clientes extends BaseController
         $delimiter = strpos($headerLine, ';') !== false ? ';' : ',';
         rewind($fileStream); // Volta para ler com o fputcsv agora sabendo o delimitador
         if ($bom === "\xEF\xBB\xBF") {
-            fread($fileStream, 3); // Pula o BOM nãovamente
+            fread($fileStream, 3); // Pula o BOM novamente
         }
 
         $headers = fgetcsv($fileStream, 1000, $delimiter);
@@ -318,7 +318,7 @@ class Clientes extends BaseController
         }
         
         $expectedHeaders = [
-            'tipo_pessãoa', 'nãome_razao', 'cpf_cnpj', 'rg_ie', 'email', 
+            'tipo_pessoa', 'nome_razao', 'cpf_cnpj', 'rg_ie', 'email', 
             'telefone1', 'telefone2', 'cep', 'endereco', 'numero', 
             'complemento', 'bairro', 'cidade', 'uf', 'observacoes'
         ];
@@ -331,7 +331,7 @@ class Clientes extends BaseController
 
         while (($row = fgetcsv($fileStream, 1000, $delimiter)) !== false) {
             if (count($row) < 2 || empty(trim($row[1]))) {
-                continue; // Pula linhas em branco ou onde o nãome não foi preenchido
+                continue; // Pula linhas em branco ou onde o nome não foi preenchido
             }
 
             $clienteData = [];
@@ -341,18 +341,18 @@ class Clientes extends BaseController
                 }
             }
 
-            // Nãormaliza dados de tipo_pessãoa
-            if (!empty($clienteData['tipo_pessãoa'])) {
-                $clienteData['tipo_pessãoa'] = strtolower($clienteData['tipo_pessãoa']);
-                if (!in_array($clienteData['tipo_pessãoa'], ['fisica', 'juridica'])) {
-                    $clienteData['tipo_pessãoa'] = 'fisica';
+            // Normaliza dados de tipo_pessoa
+            if (!empty($clienteData['tipo_pessoa'])) {
+                $clienteData['tipo_pessoa'] = strtolower($clienteData['tipo_pessoa']);
+                if (!in_array($clienteData['tipo_pessoa'], ['fisica', 'juridica'])) {
+                    $clienteData['tipo_pessoa'] = 'fisica';
                 }
             } else {
-                $clienteData['tipo_pessãoa'] = 'fisica';
+                $clienteData['tipo_pessoa'] = 'fisica';
             }
 
             // Validação mínima via código antes do insert
-            if (empty($clienteData['nãome_razao']) || empty($clienteData['telefone1'])) {
+            if (empty($clienteData['nome_razao']) || empty($clienteData['telefone1'])) {
                 $errorCount++;
                 continue;
             }
@@ -366,14 +366,14 @@ class Clientes extends BaseController
         }
         fclose($fileStream);
 
-        LogModel::registrar('cliente_importacao', "Importação CSV realizada: $importedCount sucessãos, $errorCount falhas.");
+        LogModel::registrar('cliente_importacao', "Importação CSV realizada: $importedCount sucessos, $errorCount falhas.");
 
-        $mêsg = "Importação concluída. $importedCount clientes cadastrados.";
+        $msg = "Importação concluída. $importedCount clientes cadastrados.";
         if ($errorCount > 0) {
-            $mêsg .= " $errorCount registros não puderam ser importados (verifique preenchimento do Nãome e Telefone1 e se os documentos não são duplicados não sistema).";
-            return redirect()->to('/clientes')->with('success', $mêsg)->with('warning', true);
+            $msg .= " $errorCount registros não puderam ser importados (verifique preenchimento do Nome e Telefone1 e se os documentos não são duplicados no sistema).";
+            return redirect()->to('/clientes')->with('success', $msg)->with('warning', true);
         }
 
-        return redirect()->to('/clientes')->with('success', $mêsg);
+        return redirect()->to('/clientes')->with('success', $msg);
     }
 }

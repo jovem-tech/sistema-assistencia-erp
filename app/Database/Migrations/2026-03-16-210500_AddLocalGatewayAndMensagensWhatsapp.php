@@ -95,10 +95,10 @@ class AddLocalGatewayAndMensagensWhatsapp extends Migration
         if ($this->db->tableExists('configuracoes')) {
             $table = $this->db->table('configuracoes');
             $defaults = [
-                'whatsapp_local_nãode_url' => 'http://127.0.0.1:3001',
-                'whatsapp_local_nãode_token' => '',
-                'whatsapp_local_nãode_origin' => 'http://localhost:8081',
-                'whatsapp_local_nãode_timeout' => '20',
+                'whatsapp_local_node_url' => 'http://127.0.0.1:3001',
+                'whatsapp_local_node_token' => '',
+                'whatsapp_local_node_origin' => 'http://localhost:8081',
+                'whatsapp_local_node_timeout' => '20',
             ];
 
             foreach ($defaults as $chave => $valor) {
@@ -124,10 +124,10 @@ class AddLocalGatewayAndMensagensWhatsapp extends Migration
         if ($this->db->tableExists('configuracoes')) {
             $this->db->table('configuracoes')
                 ->whereIn('chave', [
-                    'whatsapp_local_nãode_url',
-                    'whatsapp_local_nãode_token',
-                    'whatsapp_local_nãode_origin',
-                    'whatsapp_local_nãode_timeout',
+                    'whatsapp_local_node_url',
+                    'whatsapp_local_node_token',
+                    'whatsapp_local_node_origin',
+                    'whatsapp_local_node_timeout',
                 ])->delete();
         }
     }

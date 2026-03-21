@@ -1,13 +1,13 @@
 <!-- Sidebar -->
 <nav class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-brand d-flex align-itemês-center">
+        <div class="sidebar-brand d-flex align-items-center">
             <?php $logo = get_config('sistema_logo'); if($logo && file_exists('uploads/sistema/'.$logo)): ?>
                 <img src="<?= base_url('uploads/sistema/'.$logo) ?>" alt="Logo" style="max-height: 32px; margin-right: 8px;">
             <?php else: ?>
                 <i class="bi bi-tools brand-icon"></i>
             <?php endif; ?>
-            <span class="brand-text text-truncate"><?= esc(get_config('sistema_nãome', 'AssistTech')) ?></span>
+            <span class="brand-text text-truncate"><?= esc(get_config('sistema_nome', 'AssistTech')) ?></span>
         </div>
         <button class="sidebar-toggle" id="sidebarToggle" title="Recolher menu">
             <i class="bi bi-chevron-left"></i>
@@ -72,9 +72,9 @@
             <li class="nav-item">
                 <a class="nav-link <?= $isEquipMenuGlobalActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#equipamentosSubmenu" role="button">
                     <i class="bi bi-laptop"></i>
-                    <span class="d-flex justify-content-between w-100 align-itemês-center">
+                    <span class="d-flex justify-content-between w-100 align-items-center">
                         Aparelhos / Equip.
-                        <i class="bi bi-chevron-down mês-1" style="font-size: 0.75rem;"></i>
+                        <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
                     </span>
                 </a>
                 <div class="collapse <?= $isEquipMenuGlobalActive ? 'show' : '' ?>" id="equipamentosSubmenu">
@@ -100,9 +100,9 @@
             <li class="nav-item">
                 <a class="nav-link <?= $isConhecimentoActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#conhecimentoSubmenu" role="button">
                     <i class="bi bi-journal-bookmark-fill"></i>
-                    <span class="d-flex justify-content-between w-100 align-itemês-center">
+                    <span class="d-flex justify-content-between w-100 align-items-center">
                         Gest�o de Conhecimento
-                        <i class="bi bi-chevron-down mês-1" style="font-size: 0.75rem;"></i>
+                        <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
                     </span>
                 </a>
                 <div class="collapse <?= $isConhecimentoActive ? 'show' : '' ?>" id="conhecimentoSubmenu">
@@ -130,31 +130,31 @@
             <?php if ($showComercial): ?>
             <li class="nav-section">COMERCIAL</li>
             
-            <!-- Submenu Pessãoas -->
+            <!-- Submenu Pessoas -->
             <?php if (canModule('clientes') || canModule('fornecedores') || canModule('funcionarios')): ?>
             <?php 
-            $isPessãoasActive = str_starts_with(uri_string(), 'clientes') 
+            $isPessoasActive = str_starts_with(uri_string(), 'clientes') 
                 || str_starts_with(uri_string(), 'contatos')
                 || str_starts_with(uri_string(), 'fornecedores') 
                 || str_starts_with(uri_string(), 'funcionarios'); 
             ?>
             <li class="nav-item">
-                <a class="nav-link <?= $isPessãoasActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#pessãoasSubmenu" role="button">
+                <a class="nav-link <?= $isPessoasActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#pessoasSubmenu" role="button">
                     <i class="bi bi-people-fill"></i>
-                    <span class="d-flex justify-content-between w-100 align-itemês-center">
-                        Pessãoas
+                    <span class="d-flex justify-content-between w-100 align-items-center">
+                        Pessoas
                         <i class="bi bi-chevron-down" style="font-size: 0.75rem;"></i>
                     </span>
                 </a>
-                <div class="collapse <?= $isPessãoasActive ? 'show' : '' ?>" id="pessãoasSubmenu">
+                <div class="collapse <?= $isPessoasActive ? 'show' : '' ?>" id="pessoasSubmenu">
                     <ul class="nav flex-column">
                         <?php if (canModule('clientes')): ?>
-                        <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'clientes') ? 'active' : '' ?>" href="<?= base_url('clientes') ?>"><i class="bi bi-persãon-badge"></i><span>Clientes</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'clientes') ? 'active' : '' ?>" href="<?= base_url('clientes') ?>"><i class="bi bi-person-badge"></i><span>Clientes</span></a></li>
                         <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'contatos') ? 'active' : '' ?>" href="<?= base_url('contatos') ?>"><i class="bi bi-journal-bookmark"></i><span>Contatos</span></a></li>
                         <?php endif; ?>
                         
                         <?php if (canModule('funcionarios')): ?>
-                        <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'funcionarios') ? 'active' : '' ?>" href="<?= base_url('funcionarios') ?>"><i class="bi bi-persãon-workspace"></i><span>Equipe T�cnico</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'funcionarios') ? 'active' : '' ?>" href="<?= base_url('funcionarios') ?>"><i class="bi bi-person-workspace"></i><span>Equipe T�cnico</span></a></li>
                         <?php endif; ?>
                         <?php if (canModule('fornecedores')): ?>
                         <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'fornecedores') ? 'active' : '' ?>" href="<?= base_url('fornecedores') ?>"><i class="bi bi-truck"></i><span>Fornecedores</span></a></li>
@@ -171,9 +171,9 @@
             <li class="nav-item">
                 <a class="nav-link <?= $isCrmActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#crmSubmenu" role="button">
                     <i class="bi bi-diagram-3-fill"></i>
-                    <span class="d-flex justify-content-between w-100 align-itemês-center">
+                    <span class="d-flex justify-content-between w-100 align-items-center">
                         CRM
-                        <i class="bi bi-chevron-down mês-1" style="font-size: 0.75rem;"></i>
+                        <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
                     </span>
                 </a>
                 <div class="collapse <?= $isCrmActive ? 'show' : '' ?>" id="crmSubmenu">
@@ -215,7 +215,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link <?= uri_string() === 'crm/clientes-inativos' ? 'active' : '' ?>" href="<?= base_url('crm/clientes-inativos') ?>">
-                                <i class="bi bi-persãon-x"></i><span>Clientes Inativos</span>
+                                <i class="bi bi-person-x"></i><span>Clientes Inativos</span>
                             </a>
                         </li>
                     </ul>
@@ -229,9 +229,9 @@
             <li class="nav-item">
                 <a class="nav-link <?= $isCentralMensagensActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#centralMensagensSubmenu" role="button">
                     <i class="bi bi-whatsapp"></i>
-                    <span class="d-flex justify-content-between w-100 align-itemês-center">
+                    <span class="d-flex justify-content-between w-100 align-items-center">
                         Atendimento WhatsApp
-                        <i class="bi bi-chevron-down mês-1" style="font-size: 0.75rem;"></i>
+                        <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
                     </span>
                 </a>
                 <div class="collapse <?= $isCentralMensagensActive ? 'show' : '' ?>" id="centralMensagensSubmenu">
@@ -300,9 +300,9 @@
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-toggle="collapse" href="#menuSeguranca" role="button">
                     <i class="bi bi-shield-lock-fill"></i>
-                    <span class="d-flex justify-content-between w-100 align-itemês-center">
+                    <span class="d-flex justify-content-between w-100 align-items-center">
                         Seguran�a
-                        <i class="bi bi-chevron-down mês-1" style="font-size: 0.75rem;"></i>
+                        <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
                     </span>
                 </a>
                 <div class="collapse" id="menuSeguranca">
@@ -314,7 +314,7 @@
                         <?php endif; ?>
                         <?php if (canModule('grupos')): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('grupos') ?>">N�veis de Acessão</a>
+                            <a class="nav-link" href="<?= base_url('grupos') ?>">N�veis de Acesso</a>
                         </li>
                         <?php endif; ?>
                     </ul>
@@ -341,7 +341,7 @@
     </div>
 
     <div class="sidebar-footer">
-        <a href="<?= base_url('logout') ?>" class="btn btn-outline-danger w-100 d-flex align-itemês-center justify-content-center gap-2 py-2 logout-btn" title="Sair do Sistema">
+        <a href="<?= base_url('logout') ?>" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 py-2 logout-btn" title="Sair do Sistema">
             <i class="bi bi-box-arrow-left fs-5"></i>
             <span class="logout-text">Sair do Sistema</span>
         </a>

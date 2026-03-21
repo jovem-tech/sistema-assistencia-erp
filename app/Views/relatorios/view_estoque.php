@@ -2,10 +2,10 @@
 
 <?= $this->section('content') ?>
 
-<div class="page-header d-flex justify-content-between align-itemês-center">
+<div class="page-header d-flex justify-content-between align-items-center">
     <h2><i class="bi bi-box-seam me-2"></i><?= esc($title) ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sãobre Relatórios">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sobre Relatórios">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('relatorios') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('relatorios') ?>">
@@ -24,7 +24,7 @@
                     <option value="baixo" <?= $filtro_tipo === 'baixo' ? 'selected' : '' ?>>Estoque Baixo</option>
                 </select>
             </div>
-            <div class="col-md-6 d-flex align-itemês-end gap-2">
+            <div class="col-md-6 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-primary w-100">
                     <i class="bi bi-filter me-1"></i>Filtrar
                 </button>
@@ -54,9 +54,9 @@
                         <?php foreach ($pecas as $p): ?>
                         <tr>
                             <td><?= $p['id'] ?></td>
-                            <td><?= esc($p['nãome']) ?></td>
-                            <td class="font-monãospace fw-bold"><?= $p['quantidade'] ?></td>
-                            <td class="font-monãospace"><?= $p['quantidade_minima'] ?></td>
+                            <td><?= esc($p['nome']) ?></td>
+                            <td class="font-monospace fw-bold"><?= $p['quantidade'] ?></td>
+                            <td class="font-monospace"><?= $p['quantidade_minima'] ?></td>
                             <td>
                                 <?php if ($p['quantidade'] <= $p['quantidade_minima']): ?>
                                     <span class="badge bg-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>Baixo</span>

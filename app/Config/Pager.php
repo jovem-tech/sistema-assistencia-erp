@@ -28,7 +28,7 @@ class Pager extends BaseConfig
 
     /**
      * --------------------------------------------------------------------------
-     * Itemês Per Page
+     * Items Per Page
      * --------------------------------------------------------------------------
      *
      * The default number of results shown in a single page.

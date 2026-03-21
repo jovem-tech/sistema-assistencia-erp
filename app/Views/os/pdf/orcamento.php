@@ -12,12 +12,12 @@
 </div>
 
 <table class="grid">
-    <tr><td class="label">Cliente</td><td><?= esc($os['cliente_nãome']) ?></td><td class="label">Telefone</td><td><?= esc($os['cliente_telefone'] ?? '-') ?></td></tr>
+    <tr><td class="label">Cliente</td><td><?= esc($os['cliente_nome']) ?></td><td class="label">Telefone</td><td><?= esc($os['cliente_telefone'] ?? '-') ?></td></tr>
     <tr><td class="label">Equipamento</td><td><?= esc(trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))) ?></td><td class="label">Numero OS</td><td><?= esc($os['numero_os']) ?></td></tr>
 </table>
 
-<div class="section-title">Diagnãostico tecnico</div>
-<div><?= nl2br(esc($os['diagnãostico_tecnico'] ?? 'Diagnãostico nao informado.')) ?></div>
+<div class="section-title">Diagnostico tecnico</div>
+<div><?= nl2br(esc($os['diagnostico_tecnico'] ?? 'Diagnostico nao informado.')) ?></div>
 
 <div class="section-title">Itens de servico e pecas</div>
 <table class="table">

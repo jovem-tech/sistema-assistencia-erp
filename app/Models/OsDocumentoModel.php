@@ -24,7 +24,7 @@ class OsDocumentoModel extends Model
 
     public function byOs(int $osId): array
     {
-        return $this->select('os_documentos.*, usuarios.nãome as gerado_por_nãome')
+        return $this->select('os_documentos.*, usuarios.nome as gerado_por_nome')
             ->join('usuarios', 'usuarios.id = os_documentos.gerado_por', 'left')
             ->where('os_documentos.os_id', $osId)
             ->orderBy('os_documentos.created_at', 'DESC')

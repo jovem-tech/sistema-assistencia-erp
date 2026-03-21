@@ -6,7 +6,7 @@
 <div class="page-header">
     <h2><i class="bi bi-<?= $isEdit ? 'pencil' : 'plus-lg' ?> me-2"></i><?= $title ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('financeiro')" title="Ajuda sãobre Financeiro">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('financeiro')" title="Ajuda sobre Financeiro">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('financeiro') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('financeiro') ?>"><i class="bi bi-arrow-left me-1"></i>Voltar</a>

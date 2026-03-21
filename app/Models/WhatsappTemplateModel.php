@@ -11,7 +11,7 @@ class WhatsappTemplateModel extends Model
     protected $returnType = 'array';
     protected $allowedFields = [
         'codigo',
-        'nãome',
+        'nome',
         'evento',
         'conteudo',
         'ativo',
@@ -23,7 +23,7 @@ class WhatsappTemplateModel extends Model
 
     public function getActive(): array
     {
-        return $this->where('ativo', 1)->orderBy('nãome', 'ASC')->findAll();
+        return $this->where('ativo', 1)->orderBy('nome', 'ASC')->findAll();
     }
 
     public function byCode(string $codigo): ?array

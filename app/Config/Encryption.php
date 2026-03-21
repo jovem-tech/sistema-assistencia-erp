@@ -18,7 +18,7 @@ class Encryption extends BaseConfig
      * --------------------------------------------------------------------------
      *
      * If you use the Encryption class you must set an encryption key (seed).
-     * You need to ensure it is long enãough for the cipher and mode you plan to use.
+     * You need to ensure it is long enough for the cipher and mode you plan to use.
      * See the user guide for more info.
      */
     public string $key = '';
@@ -49,13 +49,13 @@ class Encryption extends BaseConfig
      *
      * Available drivers:
      * - OpenSSL
-     * - Sãodium
+     * - Sodium
      */
     public string $driver = 'OpenSSL';
 
     /**
      * --------------------------------------------------------------------------
-     * SãodiumHandler's Padding Length in Bytes
+     * SodiumHandler's Padding Length in Bytes
      * --------------------------------------------------------------------------
      *
      * This is the number of bytes that will be padded to the plaintext message

@@ -13,20 +13,20 @@ class FixCentralRegraTemplateProntoRetirada extends Migration
         }
 
         $rows = $this->db->table('chatbot_regras_erp')
-            ->select('id, acao_jsãon, condicao_jsãon')
+            ->select('id, acao_json, condicao_json')
             ->where('evento_origem', 'os_status_alterado')
             ->get()
             ->getResultArray();
 
-        $nãow = date('Y-m-d H:i:s');
+        $now = date('Y-m-d H:i:s');
         foreach ($rows as $row) {
-            $acao = jsãon_decode((string) ($row['acao_jsãon'] ?? ''), true);
+            $acao = json_decode((string) ($row['acao_json'] ?? ''), true);
             if (!is_array($acao)) {
                 continue;
             }
 
             $template = strtolower(trim((string) ($acao['template'] ?? '')));
-            $cond = jsãon_decode((string) ($row['condicao_jsãon'] ?? ''), true);
+            $cond = json_decode((string) ($row['condicao_json'] ?? ''), true);
             $statusCond = strtolower(trim((string) ($cond['status'] ?? '')));
             if ($template !== 'equipamento_pronto' && $statusCond !== 'reparado_disponivel_loja') {
                 continue;
@@ -42,8 +42,8 @@ class FixCentralRegraTemplateProntoRetirada extends Migration
             $this->db->table('chatbot_regras_erp')
                 ->where('id', (int) $row['id'])
                 ->update([
-                    'acao_jsãon' => jsãon_encode($acao, JSON_UNESCAPED_UNICODE),
-                    'updated_at' => $nãow,
+                    'acao_json' => json_encode($acao, JSON_UNESCAPED_UNICODE),
+                    'updated_at' => $now,
                 ]);
         }
     }
@@ -55,14 +55,14 @@ class FixCentralRegraTemplateProntoRetirada extends Migration
         }
 
         $rows = $this->db->table('chatbot_regras_erp')
-            ->select('id, acao_jsãon')
+            ->select('id, acao_json')
             ->where('evento_origem', 'os_status_alterado')
             ->get()
             ->getResultArray();
 
-        $nãow = date('Y-m-d H:i:s');
+        $now = date('Y-m-d H:i:s');
         foreach ($rows as $row) {
-            $acao = jsãon_decode((string) ($row['acao_jsãon'] ?? ''), true);
+            $acao = json_decode((string) ($row['acao_json'] ?? ''), true);
             if (!is_array($acao)) {
                 continue;
             }
@@ -77,8 +77,8 @@ class FixCentralRegraTemplateProntoRetirada extends Migration
             $this->db->table('chatbot_regras_erp')
                 ->where('id', (int) $row['id'])
                 ->update([
-                    'acao_jsãon' => jsãon_encode($acao, JSON_UNESCAPED_UNICODE),
-                    'updated_at' => $nãow,
+                    'acao_json' => json_encode($acao, JSON_UNESCAPED_UNICODE),
+                    'updated_at' => $now,
                 ]);
         }
     }

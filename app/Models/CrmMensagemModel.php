@@ -20,7 +20,7 @@ class CrmMensagemModel extends Model
         'conteudo',
         'arquivo',
         'status',
-        'payload_jsãon',
+        'payload_json',
         'usuario_id',
         'data_mensagem',
     ];

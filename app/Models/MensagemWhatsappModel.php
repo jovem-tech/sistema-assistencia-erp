@@ -41,7 +41,7 @@ class MensagemWhatsappModel extends Model
 
     public function byOs(int $osId, int $limit = 100): array
     {
-        $rows = $this->select('mensagens_whatsapp.*, usuarios.nãome as usuario_nãome')
+        $rows = $this->select('mensagens_whatsapp.*, usuarios.nome as usuario_nome')
             ->join(
                 'usuarios',
                 'usuarios.id = COALESCE(mensagens_whatsapp.enviada_por_usuario_id, mensagens_whatsapp.usuario_id)',
@@ -57,7 +57,7 @@ class MensagemWhatsappModel extends Model
 
     public function byConversa(int $conversaId, int $limit = 300): array
     {
-        $rows = $this->select('mensagens_whatsapp.*, usuarios.nãome as usuario_nãome')
+        $rows = $this->select('mensagens_whatsapp.*, usuarios.nome as usuario_nome')
             ->join(
                 'usuarios',
                 'usuarios.id = COALESCE(mensagens_whatsapp.enviada_por_usuario_id, mensagens_whatsapp.usuario_id)',
@@ -65,7 +65,7 @@ class MensagemWhatsappModel extends Model
                 false
             )
             ->where('mensagens_whatsapp.conversa_id', $conversaId)
-            // Carrega a janela mais recente para evitar esconder mensagens nãovas
+            // Carrega a janela mais recente para evitar esconder mensagens novas
             // em conversas longas (ex.: respostas externas via WhatsApp celular).
             ->orderBy('mensagens_whatsapp.id', 'DESC')
             ->findAll($limit);
@@ -75,7 +75,7 @@ class MensagemWhatsappModel extends Model
 
     public function afterId(int $conversaId, int $afterId, int $limit = 120): array
     {
-        $rows = $this->select('mensagens_whatsapp.*, usuarios.nãome as usuario_nãome')
+        $rows = $this->select('mensagens_whatsapp.*, usuarios.nome as usuario_nome')
             ->join(
                 'usuarios',
                 'usuarios.id = COALESCE(mensagens_whatsapp.enviada_por_usuario_id, mensagens_whatsapp.usuario_id)',
@@ -96,17 +96,17 @@ class MensagemWhatsappModel extends Model
             if (!is_array($row)) {
                 continue;
             }
-            $row['origem'] = $this->resãolveOrigem($row);
+            $row['origem'] = $this->resolveOrigem($row);
         }
         unset($row);
 
         return $rows;
     }
 
-    private function resãolveOrigem(array $row): string
+    private function resolveOrigem(array $row): string
     {
         $existing = strtolower(trim((string) ($row['origem'] ?? '')));
-        if (in_array($existing, ['sistema', 'externão', 'chatbot'], true)) {
+        if (in_array($existing, ['sistema', 'externo', 'chatbot'], true)) {
             return $existing;
         }
 
@@ -123,13 +123,13 @@ class MensagemWhatsappModel extends Model
         }
 
         if ($direcao === 'outbound') {
-            if ($tipoMensagem === 'outbound_externão' || str_contains($tipoMensagem, 'externão')) {
-                return 'externão';
+            if ($tipoMensagem === 'outbound_externo' || str_contains($tipoMensagem, 'externo')) {
+                return 'externo';
             }
             return 'sistema';
         }
 
-        return 'externão';
+        return 'externo';
     }
 
 }

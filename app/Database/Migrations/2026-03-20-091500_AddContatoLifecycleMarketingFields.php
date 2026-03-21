@@ -13,7 +13,7 @@ class AddContatoLifecycleMarketingFields extends Migration
         }
 
         if (!$this->db->fieldExists('status_relacionamento', 'contatos')) {
-            $this->db->query("ALTER TABLE contatos ADD COLUMN status_relacionamento VARCHAR(30) NOT NULL DEFAULT 'lead_nãovo' AFTER origem");
+            $this->db->query("ALTER TABLE contatos ADD COLUMN status_relacionamento VARCHAR(30) NOT NULL DEFAULT 'lead_novo' AFTER origem");
         }
 
         if (!$this->db->fieldExists('qualificado_em', 'contatos')) {
@@ -30,14 +30,14 @@ class AddContatoLifecycleMarketingFields extends Migration
                SET status_relacionamento = CASE
                     WHEN cliente_id IS NOT NULL AND cliente_id > 0 THEN 'cliente_convertido'
                     WHEN (
-                        (nãome IS NOT NULL AND TRIM(nãome) <> '' AND LOCATE(' ', TRIM(nãome)) > 0)
-                        OR (whatsapp_nãome_perfil IS NOT NULL AND TRIM(whatsapp_nãome_perfil) <> '' AND LOCATE(' ', TRIM(whatsapp_nãome_perfil)) > 0)
+                        (nome IS NOT NULL AND TRIM(nome) <> '' AND LOCATE(' ', TRIM(nome)) > 0)
+                        OR (whatsapp_nome_perfil IS NOT NULL AND TRIM(whatsapp_nome_perfil) <> '' AND LOCATE(' ', TRIM(whatsapp_nome_perfil)) > 0)
                     ) THEN 'lead_qualificado'
-                    ELSE 'lead_nãovo'
+                    ELSE 'lead_novo'
                 END
              WHERE status_relacionamento IS NULL
                 OR TRIM(status_relacionamento) = ''
-                OR status_relacionamento NOT IN ('lead_nãovo', 'lead_qualificado', 'cliente_convertido')
+                OR status_relacionamento NOT IN ('lead_novo', 'lead_qualificado', 'cliente_convertido')
         ");
 
         $this->db->query("

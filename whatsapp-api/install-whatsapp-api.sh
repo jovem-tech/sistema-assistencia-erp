@@ -10,12 +10,15 @@ sudo apt-get update -y
 echo "[2/7] Instalando dependencias do Chromium/Puppeteer..."
 sudo apt-get install -y \
   ca-certificates curl gnupg lsb-release \
-  libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 \
+  libatk1.0-0 libatk-bridge2.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 \
   libfontconfig1 libgcc1 libgdk-pixbuf2.0-0 libglib2.0-0 \
   libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 libpangocairo-1.0-0 \
   libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 \
-  libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxtst6 \
-  xdg-utils fonts-liberation libgbm-dev
+  libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
+  xdg-utils fonts-liberation libgbm1 libgbm-dev
+
+echo "[2.1/7] Instalando libs de audio (fallback automatico)..."
+sudo apt-get install -y libasound2t64 || sudo apt-get install -y libasound2 || true
 
 if ! command -v node >/dev/null 2>&1; then
   echo "[3/7] Instalando Node.js 20.x..."

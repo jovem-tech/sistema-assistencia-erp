@@ -175,6 +175,20 @@ QR nao aparece:
 - reiniciar inicializacao pelo modal (botao reiniciar)
 - validar escrita em `.wwebjs_auth` e `logs/`
 
+`Erro nao tratado no gateway. {"detail":"Origin not allowed by ERP_ORIGIN."}`
+- Ocorre quando a origem configurada no painel (**Origem ERP**) Nao bate com o arquivo `.env`.
+- Verifique se ha barras sobressalentes. `http://meu-vps.com` (Certo) vs `http://meu-vps.com/` (Errado).
+
+`Error while loading shared libraries: libatk-1.0.so.0... no such file or directory` (ou `libasound.so.2`)
+- Faltam dependencias graficas do Puppeteer no seu Linux (geralmente Ubuntu 24.04+).
+- Em paineis limpos, instale o conjunto compelto:
+  `apt-get install -y libgbm1 libatk1.0-0 libatk-bridge2.0-0 libnss3 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 libpango-1.0-0 libpangocairo-1.0-0 libgtk-3-0 libcairo2 libcups2 fonts-liberation`
+- Para pacotes de som problematicos como ALSA no Ubuntu 24.04+, verifique o novo nome da dependencia:
+  `apt-get install -y libasound2t64 || apt-get install -y libasound2`
+
+`Falha ao executar PM2` (Alertas na interface Web)
+- O botao de **Iniciar Servidor** no painel Administrativo (Web) chama processos via terminal. No Linux VPS, ele sera bloquedo por causa de permissoes restritas (usuario `www-data`). Esteja ciente de que **sempre** precisara iniciar ou reiniciar o servico como ROOT pelo terminal: `pm2 restart whatsapp-gateway`.
+
 ## 10. Compatibilidade local x producao
 
 Desenvolvimento local:

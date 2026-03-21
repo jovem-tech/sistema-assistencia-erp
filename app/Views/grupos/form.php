@@ -24,7 +24,7 @@
                        placeholder="Ex: Vendedor, Supervisor, Caixa...">
             </div>
             <div class="mb-4">
-                <label class="form-label fw-bold">Descrição <small class="text-muted">(opcional)</small></label>
+                <label class="form-label fw-bold">Descri??o <small class="text-muted">(opcional)</small></label>
                 <textarea name="descricao" class="form-control" rows="2" maxlength="200"
                           placeholder="Descreva brevemente as responsabilidades deste grupo..."><?= esc($grupo['descricao'] ?? old('descricao')) ?></textarea>
             </div>

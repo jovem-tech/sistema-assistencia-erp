@@ -86,11 +86,11 @@
     </style>
     <input type="hidden" name="modelo_nome_ext" id="modelo_nome_ext">
 
-            <!-- NavegaÁ„o por Abas -->
+            <!-- Navega??o por Abas -->
             <ul class="nav nav-tabs nav-fill ds-tabs-scroll mb-4" id="equipamentoTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active fw-bold" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab" aria-controls="info-pane" aria-selected="true">
-                        <i class="bi bi-info-circle me-2"></i>InformaÁıes
+                        <i class="bi bi-info-circle me-2"></i>Informa??es
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -107,7 +107,7 @@
 
             <div class="tab-content" id="equipamentoTabsContent">
                 
-                <!-- ABA 1: INFORMA«’ES -->
+                <!-- ABA 1: INFORMA??ES -->
                 <div class="tab-pane fade show active" id="info-pane" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
@@ -175,15 +175,15 @@
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">N∫ SÈrie</label>
-                            <input type="text" name="numero_serie" class="form-control" placeholder="IMEI ou SÈrie" value="<?= $isEdit ? esc($equipamento['numero_serie'] ?? '') : '' ?>">
+                            <label class="form-label">N? S√©rie</label>
+                            <input type="text" name="numero_serie" class="form-control" placeholder="IMEI ou S√©rie" value="<?= $isEdit ? esc($equipamento['numero_serie'] ?? '') : '' ?>">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label d-flex justify-content-between align-items-center">
                                 Senha de Acesso
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <button type="button" class="btn btn-outline-secondary py-0 px-2 btn-senha-tipo" data-placeholder="NumÈrico (PIN)" title="PIN/Desenho"><i class="bi bi-grip-vertical"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary py-0 px-2 btn-senha-tipo" data-placeholder="AlfanumÈrico" title="Texto"><i class="bi bi-fonts"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary py-0 px-2 btn-senha-tipo" data-placeholder="Num√©rico (PIN)" title="PIN/Desenho"><i class="bi bi-grip-vertical"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary py-0 px-2 btn-senha-tipo" data-placeholder="Alfanum√©rico" title="Texto"><i class="bi bi-fonts"></i></button>
                                 </div>
                             </label>
                             <input type="text" name="senha_acesso" id="inputSenhaAcesso" class="form-control" placeholder="PIN ou senha" value="<?= $isEdit ? esc($equipamento['senha_acesso'] ?? '') : '' ?>">
@@ -192,12 +192,12 @@
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">Estado FÌsico</label>
-                            <textarea name="estado_fisico" class="form-control" rows="3" placeholder="Arranhıes, tela trincada..."><?= $isEdit ? esc($equipamento['estado_fisico'] ?? '') : '' ?></textarea>
+                            <label class="form-label">Estado F√≠sico</label>
+                            <textarea name="estado_fisico" class="form-control" rows="3" placeholder="Arranh√µes, tela trincada..."><?= $isEdit ? esc($equipamento['estado_fisico'] ?? '') : '' ?></textarea>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label d-flex justify-content-between">
-                                AcessÛrios
+                                Acess√≥rios
                                 <small class="text-muted">Clique para adicionar</small>
                             </label>
                             <textarea name="acessorios" id="textareaAcessorios" class="form-control mb-2" rows="3" placeholder="O que o cliente enviou?"><?= $isEdit ? esc($equipamento['acessorios'] ?? '') : '' ?></textarea>
@@ -206,14 +206,14 @@
                                 <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Cabo USB</button>
                                 <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Capa</button>
                                 <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Chip</button>
-                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Cart„o MemÛria</button>
+                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Cart√£o Mem√≥ria</button>
                             </div>
                         </div>
                     </div>
 
                     <div class="row g-3 mb-4">
                         <div class="col-12">
-                            <label class="form-label text-muted">ObservaÁıes Internas (Opcional)</label>
+                            <label class="form-label text-muted">Observa??es Internas (Opcional)</label>
                             <textarea name="observacoes" class="form-control" rows="2"><?= $isEdit ? esc($equipamento['observacoes'] ?? '') : '' ?></textarea>
                         </div>
                     </div>
@@ -232,7 +232,7 @@
                         <div class="row g-3">
                             <!-- Coluna Esquerda: Preview + Picker -->
                             <div class="col-md-5">
-                                <!-- DetecÁ„o por foto (smart) -->
+                                <!-- Detec??o por foto (smart) -->
                                 <div class="p-2 mb-3 rounded border border-warning border-opacity-50 bg-warning bg-opacity-10 d-none" id="smartColorContainer">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                         <span style="font-size: 0.72rem;" class="text-warning fw-semibold"><i class="bi bi-magic me-1"></i>Detectado na foto:</span>
@@ -267,15 +267,15 @@
                                 </div>
 
                                 <div id="coresProximasBox">
-                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Sugestıes Semelhantes</label>
+                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Sugest√µes Semelhantes</label>
                                     <div id="coresProximasGrid" class="d-flex flex-wrap gap-2"></div>
                                 </div>
                             </div>
 
-                            <!-- Coluna Direita: Cat·logo -->
+                            <!-- Coluna Direita: Cat√°logo -->
                             <div class="col-md-7">
                                 <div class="bg-white bg-opacity-50 p-3 rounded shadow-sm h-100 border">
-                                    <label class="form-label small text-muted fw-bold text-uppercase mb-3" style="letter-spacing: 0.5px;"><i class="bi bi-grid-3x3-gap me-1"></i> Cat·logo Profissional</label>
+                                    <label class="form-label small text-muted fw-bold text-uppercase mb-3" style="letter-spacing: 0.5px;"><i class="bi bi-grid-3x3-gap me-1"></i> Cat√°logo Profissional</label>
                                     <div id="colorCatalog" class="pe-2 custom-scrollbar" style="max-height: 480px; overflow-y: auto;"></div>
                                 </div>
                             </div>
@@ -305,7 +305,7 @@
                     <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4 mx-auto" style="max-width: 600px;">
                         <i class="bi bi-info-circle-fill fs-4 me-3"></i>
                         <div class="small">
-                            Envie atÈ <strong>4 fotos</strong> (M·ximo 2MB cada). A primeira foto ser· usada como imagem principal do perfil do equipamento.
+                            Envie at√© <strong>4 fotos</strong> (M√°ximo 2MB cada). A primeira foto ser√° usada como imagem principal do perfil do equipamento.
                         </div>
                     </div>
                     
@@ -328,14 +328,14 @@
                             <?php endforeach; ?>
                         <?php endif; ?>
 
-                        <!-- Container para Previews din‚micos de Novas -->
+                        <!-- Container para Previews din√¢micos de Novas -->
                         <div id="fotoPreviewNovas" class="d-flex flex-wrap gap-4"></div>
                     </div>
                 </div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
-                <a href="<?= base_url('equipamentos') ?>" class="btn btn-link text-secondary text-decoration-none"><i class="bi bi-x-lg me-1"></i> Descartar AlteraÁıes</a>
+                <a href="<?= base_url('equipamentos') ?>" class="btn btn-link text-secondary text-decoration-none"><i class="bi bi-x-lg me-1"></i> Descartar Altera??es</a>
                 <button type="submit" class="btn btn-glow btn-lg px-5 shadow"><i class="bi bi-save me-2 text-warning"></i><?= $isEdit ? 'Atualizar Equipamento' : 'Finalizar Cadastro' ?></button>
             </div>
         </form>
@@ -343,14 +343,14 @@
 </div>
 </div>
 
-<!-- ================= MODAIS DE CADASTRO R¡PIDO ================= -->
+<!-- ================= MODAIS DE CADASTRO R√ÅPIDO ================= -->
 
 <!-- Modal Novo Cliente -->
 <div class="modal fade" id="modalNovoCliente" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content glass-card">
             <div class="modal-header border-bottom border-light">
-                <h5 class="modal-title">Novo Cliente R·pido</h5>
+                <h5 class="modal-title">Novo Cliente R√°pido</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -411,7 +411,7 @@
                 <div class="mb-3">
                     <label>Marca Vinculada</label>
                     <select id="modMarcaId" class="form-select" disabled>
-                        <option value="">Selecione a marca no formul·rio antes...</option>
+                        <option value="">Selecione a marca no formul√°rio antes...</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -422,12 +422,12 @@
                             <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                         </div>
                     </div>
-                    <!-- Dropdown de sugestıes -->
+                    <!-- Dropdown de sugest√µes -->
                     <div id="sugestoesNovoModeloForm" class="list-group shadow-lg mt-1 d-none"
                          style="max-height: 220px; overflow-y: auto; border-radius: 8px; z-index: 9999; position: relative;"></div>
                     <div class="form-text mt-1">
                         <i class="bi bi-globe2 me-1 text-info"></i>
-                        Digite 3+ caracteres para ver sugestıes da internet
+                        Digite 3+ caracteres para ver sugest√µes da internet
                     </div>
                 </div>
             </div>
@@ -438,7 +438,7 @@
     </div>
 </div>
 
-<!-- ===== MODAL: C¬MERA (AUXILIAR) ===== -->
+<!-- ===== MODAL: C√ÇMERA (AUXILIAR) ===== -->
 <div class="modal fade" id="modalCamera" tabindex="-1" style="z-index: 2000;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-card border-0 shadow-lg">
@@ -510,12 +510,12 @@ $(document).ready(function() {
         width: '100%',
         placeholder: "Selecione a Marca..."
     }).on('change', function() {
-        // Quando a marca muda, destruÌmos e recriamos o select2 de modelos
+        // Quando a marca muda, destru√≠mos e recriamos o select2 de modelos
         // ou pelo menos limpamos o valor dele.
         $('#modeloSelect').val(null).trigger('change');
     });
 
-    // Select2 HÌbrido: Modelos via API
+    // Select2 H√≠brido: Modelos via API
     $('#modeloSelect').select2({
         theme: 'bootstrap-5',
         width: '100%',
@@ -557,8 +557,8 @@ $(document).ready(function() {
                 return `Digite mais ${restante} caractere(s) para buscar...`;
             },
             searching:    function() { return '<i class="bi bi-globe2 me-1"></i> Buscando modelos na internet...'; },
-            noResults:    function() { return 'Nenhuma sugest„o encontrada. Use o bot„o <strong>+ Novo</strong> para cadastrar manualmente.'; },
-            errorLoading: function() { return 'Erro ao consultar. Verifique sua conex„o.'; }
+            noResults:    function() { return 'Nenhuma sugest√£o encontrada. Use o bot√£o <strong>+ Novo</strong> para cadastrar manualmente.'; },
+            errorLoading: function() { return 'Erro ao consultar. Verifique sua conex√£o.'; }
         },
         templateResult: function (data) {
             if (data.loading) return data.text;
@@ -568,7 +568,7 @@ $(document).ready(function() {
                 return $(`
                 <div>
                     <strong class="d-block text-primary"><i class="bi bi-pencil-square me-1"></i> "${data.text}"</strong>
-                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (ediÁ„o manual)</small>
+                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (edi??o manual)</small>
                 </div>`);
             }
 
@@ -601,9 +601,9 @@ $(document).ready(function() {
     });
 
 
-    // ???????????????????????????????????????????????????????????
+    // ===========================================================
     // SELETOR DE COR PROFISSIONAL
-    // ???????????????????????????????????????????????????????????
+    // ===========================================================
 
     const PROFESSIONAL_COLORS = [
         { category: 'Neutras (Preto, Branco, Cinza)', colors: [
@@ -613,12 +613,12 @@ $(document).ready(function() {
             { hex: '#41464D', name: 'Graphite' },
             { hex: '#5C5B57', name: 'Titanium' },
             { hex: '#696969', name: 'Cinza Escuro' },
-            { hex: '#708090', name: 'Cinza ArdÛsia' },
+            { hex: '#708090', name: 'Cinza Ard√≥sia' },
             { hex: '#BEBEBE', name: 'Cinza' },
             { hex: '#D3D3D3', name: 'Cinza Claro' },
             { hex: '#FFFFFF', name: 'Branco' },
             { hex: '#F8F8FF', name: 'Branco Gelo' },
-            { hex: '#F5F5F5', name: 'Branco FumaÁa' },
+            { hex: '#F5F5F5', name: 'Branco Fuma√ßa' },
             { hex: '#FFFFF0', name: 'Marfim' },
         ]},
         { category: 'Azuis e Marinhos', colors: [
@@ -627,10 +627,10 @@ $(document).ready(function() {
             { hex: '#00008B', name: 'Azul Escuro' },
             { hex: '#0000FF', name: 'Azul Puro' },
             { hex: '#4169E1', name: 'Azul Real' },
-            { hex: '#1E90FF', name: 'Azul CÈu' },
+            { hex: '#1E90FF', name: 'Azul C√©u' },
             { hex: '#87CEEB', name: 'Azul Celeste' },
-            { hex: '#ADD8E6', name: 'Azul BebÍ' },
-            { hex: '#5F9EA0', name: 'Azul PetrÛleo' },
+            { hex: '#ADD8E6', name: 'Azul Beb?' },
+            { hex: '#5F9EA0', name: 'Azul Petr√≥leo' },
         ]},
         { category: 'Verdes e Mentas', colors: [
             { hex: '#006400', name: 'Verde Escuro' },
@@ -650,11 +650,11 @@ $(document).ready(function() {
             { hex: '#FF6347', name: 'Tomate' },
             { hex: '#FFA500', name: 'Laranja' },
             { hex: '#FF7F50', name: 'Coral' },
-            { hex: '#FA8072', name: 'Salm„o' },
+            { hex: '#FA8072', name: 'Salm√£o' },
         ]},
         { category: 'Amarelos e Dourados', colors: [
             { hex: '#B8860B', name: 'Dourado Escuro' },
-            { hex: '#DAA520', name: 'Dourado MÈdio' },
+            { hex: '#DAA520', name: 'Dourado M√©dio' },
             { hex: '#D4AF37', name: 'Dourado' },
             { hex: '#FFD700', name: 'Dourado Vivo' },
             { hex: '#FFFF00', name: 'Amarelo' },
@@ -669,12 +669,12 @@ $(document).ready(function() {
             { hex: '#D2691E', name: 'Chocolate' },
             { hex: '#F4A460', name: 'Areia' },
         ]},
-        { category: 'Roxos, Pinks e Lil·s', colors: [
-            { hex: '#4B0082', name: 'Õndigo' },
+        { category: 'Roxos, Pinks e Lil√°s', colors: [
+            { hex: '#4B0082', name: '√çndigo' },
             { hex: '#2D1B69', name: 'Violeta Escuro' },
             { hex: '#800080', name: 'Roxo Puro' },
-            { hex: '#9370DB', name: 'Roxo MÈdio' },
-            { hex: '#DA70D6', name: 'Lil·s' },
+            { hex: '#9370DB', name: 'Roxo M√©dio' },
+            { hex: '#DA70D6', name: 'Lil√°s' },
             { hex: '#FF00FF', name: 'Magenta' },
             { hex: '#FF1493', name: 'Rosa Pink' },
             { hex: '#FFC0CB', name: 'Rosa' },
@@ -838,7 +838,7 @@ $(document).ready(function() {
         }
     });
 
-    // Nome edit·vel manual
+    // Nome edit√°vel manual
     $('#corNomeInput').on('input', function() {
         $('#corNomeReal').val(this.value);
     });
@@ -849,7 +849,7 @@ $(document).ready(function() {
     const initClosest = findClosestColor(initHex);
     updateColorUI(initHex, initClosest ? initClosest.name : ($('#corNomeReal').val() || 'Preto'));
 
-    // ??? L”GICA DE DETEC«√O DE COR INTELIGENTE NA IMAGEM ??????????????????
+    // --- L√ìGICA DE DETEC√á√ÉO DE COR INTELIGENTE NA IMAGEM ---
 // (smartColorMap removido, usando PROFESSIONAL_COLORS)
 
     function rgbToHexStr(r, g, b) {
@@ -866,7 +866,7 @@ $(document).ready(function() {
         try {
             const ctx = sourceCanvas.getContext('2d', { willReadFrequently: true });
             
-            // Foca nos 40% centrais da imagem para evitar fundos brancos/pretos de est˙dio
+            // Foca nos 40% centrais da imagem para evitar fundos brancos/pretos de est√∫dio
             const w = sourceCanvas.width;
             const h = sourceCanvas.height;
             const startX = Math.floor(w * 0.3);
@@ -882,7 +882,7 @@ $(document).ready(function() {
             
             // Amostragem (step = 4px)
             for (let i = 0; i < data.length; i += 16) {
-                const r = Math.round(data[i] / 20) * 20; // QuantizaÁ„o grossa
+                const r = Math.round(data[i] / 20) * 20; // Quantiza√ß√£o grossa
                 const g = Math.round(data[i+1] / 20) * 20;
                 const b = Math.round(data[i+2] / 20) * 20;
                 const a = data[i+3];
@@ -925,7 +925,7 @@ $(document).ready(function() {
             $('#smartColorContainer').removeClass('d-none');
 
         } catch (e) {
-            console.warn('Erro na detecÁ„o de cor: ', e);
+            console.warn('Erro na detec√ß√£o de cor: ', e);
         }
     }
 
@@ -936,17 +936,17 @@ $(document).ready(function() {
         const marcaId = $(this).val();
         const marcaNome = $(this).find('option:selected').text();
 
-        // Atualiza a opÁ„o no modal de Novo Modelo
+        // Atualiza a op√ß√£o no modal de Novo Modelo
         if(marcaId) {
             $('#modMarcaId').html(`<option value="${marcaId}">${marcaNome}</option>`);
             $('#modMarcaId').prop('disabled', false);
         } else {
-            $('#modMarcaId').html('<option value="">Selecione a marca no formul·rio antes...</option>');
+            $('#modMarcaId').html('<option value="">Selecione a marca no formul√°rio antes...</option>');
             $('#modMarcaId').prop('disabled', true);
         }
     });
 
-    // ??? L”GICA DE SENHA E ACESS”RIOS (NOVAS ABAS) ??????????????????????
+    // --- L√ìGICA DE SENHA E ACESS√ìRIOS (NOVAS ABAS) ---
     $(document).on('click', '.btn-senha-tipo', function() {
         const placeholder = $(this).data('placeholder');
         $('#inputSenhaAcesso').attr('placeholder', placeholder).focus();
@@ -978,7 +978,7 @@ $(document).ready(function() {
         }
     }
 
-    // Chamar no init e apÛs mudar fotos
+    // Chamar no init e ap√≥s mudar fotos
     setTimeout(checkPhotosEmptyState, 500);
 
     // Reaproveitar o renderNewPreviews para checar vazio
@@ -990,7 +990,7 @@ $(document).ready(function() {
         };
     }
 
-    // ??? L”GICA DE C¬MERA, GALERIA E CROPPER (FOTOS) ?????????????????????
+    // --- L√ìGICA DE C√ÇMERA, GALERIA E CROPPER (FOTOS) ---
     const modalCameraEl  = document.getElementById('modalCamera');
     const modalCropEl    = document.getElementById('modalCropEquip');
     const modalCamera    = modalCameraEl ? new bootstrap.Modal(modalCameraEl) : null;
@@ -1421,13 +1421,13 @@ $(document).ready(function() {
         });
     });
 
-    // ================= AJAX SALVAMENTO R¡PIDO ================= //
+    // ================= AJAX SALVAMENTO R√ÅPIDO ================= //
 
     // Salvar Cliente
     $('#btnSalvarCliente').click(function() {
         const btn = $(this);
         const nome = $('#cNome').val();
-        if(!nome) { alert('Nome È obrigatÛrio'); return; }
+        if(!nome) { alert('Nome ? obrigat√©rio'); return; }
         
         btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
         
@@ -1450,7 +1450,7 @@ $(document).ready(function() {
                 alert(data.message || 'Erro ao salvar cliente');
             }
         })
-        .catch(err => alert('Erro na comunicaÁ„o'))
+        .catch(err => alert('Erro na comunica??o'))
         .finally(() => btn.prop('disabled', false).html('Salvar Cliente'));
     });
 
@@ -1507,7 +1507,7 @@ $(document).ready(function() {
     // Masks para Modal Cliente
     $('#cTelefone').mask('(00) 00000-0000');
 
-    // ??? Autocomplete Inteligente (Modal Novo Modelo) ?????????????????
+    // --- Autocomplete Inteligente (Modal Novo Modelo) ---
     (function () {
         const inputModelo = document.getElementById('modNome');
         const sugestoesBox = document.getElementById('sugestoesNovoModeloForm');
@@ -1561,7 +1561,7 @@ $(document).ready(function() {
             if (total > 0) {
                 sugestoesBox.classList.remove('d-none');
             } else {
-                sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugest„o encontrada. Salve manualmente.</div>';
+                sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugest√£o encontrada. Salve manualmente.</div>';
                 sugestoesBox.classList.remove('d-none');
             }
         }

@@ -25,7 +25,7 @@ $routes->post('orcamento/recusar/(:any)', 'Orcamento::recusar/$1');
 $routes->post('webhooks/whatsapp', 'WhatsAppWebhook::receive');
 
 // =====================================================
-// ROTAS PROTEGIDAS (requer autenticaÃ§Ã£o + permissÃ£o RBAC)
+// ROTAS PROTEGIDAS (requer autenticação + permissão RBAC)
 // =====================================================
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 
@@ -47,7 +47,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('grupos/(:num)/permissoes',           'Grupos::permissoes/$1',    ['filter' => 'permission:grupos:editar']);
     $routes->post('grupos/(:num)/permissoes/salvar',   'Grupos::salvarPermissoes/$1', ['filter' => 'permission:grupos:editar']);
 
-    // â”€â”€ Clientes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Clientes ----------------------------------------------------------
     $routes->get('clientes',                  'Clientes::index',            ['filter' => 'permission:clientes:visualizar']);
     $routes->get('clientes/novo',             'Clientes::create',           ['filter' => 'permission:clientes:criar']);
     $routes->post('clientes/salvar',          'Clientes::store',            ['filter' => 'permission:clientes:criar']);
@@ -69,7 +69,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('contatos/atualizar/(:num)','Contatos::update/$1',        ['filter' => 'permission:clientes:editar']);
     $routes->get('contatos/excluir/(:num)',   'Contatos::delete/$1',        ['filter' => 'permission:clientes:excluir']);
 
-    // â”€â”€ Fornecedores â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Fornecedores ------------------------------------------------------
     $routes->get('fornecedores',                  'Fornecedores::index',      ['filter' => 'permission:fornecedores:visualizar']);
     $routes->get('fornecedores/novo',             'Fornecedores::create',     ['filter' => 'permission:fornecedores:criar']);
     $routes->post('fornecedores/salvar',          'Fornecedores::store',      ['filter' => 'permission:fornecedores:criar']);
@@ -77,7 +77,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('fornecedores/atualizar/(:num)','Fornecedores::update/$1',  ['filter' => 'permission:fornecedores:editar']);
     $routes->get('fornecedores/excluir/(:num)',   'Fornecedores::delete/$1',  ['filter' => 'permission:fornecedores:excluir']);
 
-    // â”€â”€ FuncionÃ¡rios â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Funcionários ------------------------------------------------------
     $routes->get('funcionarios',                  'Funcionarios::index',      ['filter' => 'permission:funcionarios:visualizar']);
     $routes->get('funcionarios/novo',             'Funcionarios::create',     ['filter' => 'permission:funcionarios:criar']);
     $routes->post('funcionarios/salvar',          'Funcionarios::store',      ['filter' => 'permission:funcionarios:criar']);
@@ -85,7 +85,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('funcionarios/atualizar/(:num)','Funcionarios::update/$1',  ['filter' => 'permission:funcionarios:editar']);
     $routes->get('funcionarios/excluir/(:num)',   'Funcionarios::delete/$1',  ['filter' => 'permission:funcionarios:excluir']);
 
-    // â”€â”€ Equipamentos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Equipamentos ------------------------------------------------------
     $routes->get('equipamentos',                  'Equipamentos::index',      ['filter' => 'permission:equipamentos:visualizar']);
     $routes->get('equipamentos/novo',             'Equipamentos::create',     ['filter' => 'permission:equipamentos:criar']);
     $routes->post('equipamentos/salvar',          'Equipamentos::store',      ['filter' => 'permission:equipamentos:criar']);
@@ -102,19 +102,19 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('equipamentos/salvar-ajax','Equipamentos::storeAjax',['filter' => 'permission:equipamentos:criar']);
     $routes->post('equipamentos/atualizar-ajax/(:num)','Equipamentos::updateAjax/$1',['filter' => 'permission:equipamentos:editar']);
 
-    // â”€â”€ Equipamentos Tipos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Equipamentos Tipos ------------------------------------------------
     $routes->get('equipamentostipos',              'EquipamentosTipos::index',  ['filter' => 'permission:equipamentos:visualizar']);
     $routes->post('equipamentostipos/salvar',      'EquipamentosTipos::store',  ['filter' => 'permission:equipamentos:criar']);
     $routes->get('equipamentostipos/excluir/(:num)','EquipamentosTipos::delete/$1',['filter' => 'permission:equipamentos:excluir']);
 
-    // â”€â”€ Equipamentos Marcas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Equipamentos Marcas -----------------------------------------------
     $routes->get('equipamentosmarcas',              'EquipamentosMarcas::index',  ['filter' => 'permission:equipamentos:visualizar']);
     $routes->post('equipamentosmarcas/salvar',      'EquipamentosMarcas::store',  ['filter' => 'permission:equipamentos:criar']);
     $routes->post('equipamentosmarcas/salvar_ajax', 'EquipamentosMarcas::salvar_ajax',  ['filter' => 'permission:equipamentos:criar']);
     $routes->get('equipamentosmarcas/excluir/(:num)','EquipamentosMarcas::delete/$1',['filter' => 'permission:equipamentos:excluir']);
     $routes->post('equipamentosmarcas/importar',    'EquipamentosMarcas::importCsv',['filter' => 'permission:equipamentos:importar']);
 
-    // â”€â”€ Equipamentos Modelos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Equipamentos Modelos ----------------------------------------------
     $routes->get('equipamentosmodelos',              'EquipamentosModelos::index',  ['filter' => 'permission:equipamentos:visualizar']);
     $routes->post('equipamentosmodelos/salvar',      'EquipamentosModelos::store',  ['filter' => 'permission:equipamentos:criar']);
     $routes->post('equipamentosmodelos/salvar_ajax', 'EquipamentosModelos::salvar_ajax',  ['filter' => 'permission:equipamentos:criar']);
@@ -123,7 +123,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('equipamentosmodelos/por-marca',   'EquipamentosModelos::porMarca', ['filter' => 'permission:equipamentos:visualizar']);
     $routes->get('api/modelos/buscar',               'ModeloBridge::buscar', ['filter' => 'permission:equipamentos:visualizar']);
 
-    // â”€â”€ Defeitos Comuns â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Defeitos Comuns ---------------------------------------------------
     $routes->get('equipamentosdefeitos',                  'EquipamentosDefeitos::index',         ['filter' => 'permission:equipamentos:visualizar']);
     $routes->post('equipamentosdefeitos/salvar',          'EquipamentosDefeitos::store',         ['filter' => 'permission:equipamentos:criar']);
     $routes->get('equipamentosdefeitos/editar/(:num)',    'EquipamentosDefeitos::edit/$1',       ['filter' => 'permission:equipamentos:editar']);
@@ -133,7 +133,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('equipamentosdefeitos/importar',        'EquipamentosDefeitos::importCsv',     ['filter' => 'permission:equipamentos:importar']);
     $routes->get('equipamentosdefeitos/modelo-csv',       'EquipamentosDefeitos::downloadTemplate',['filter' => 'permission:equipamentos:visualizar']);
 
-    // â”€â”€ Procedimentos de Defeitos (Base de Conhecimento) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Procedimentos de Defeitos (Base de Conhecimento) ------------------
     $routes->get('equipamentosdefeitos/procedimentos/(:num)', 'EquipamentosDefeitos::getProcedimentos/$1', ['filter' => 'permission:equipamentos:visualizar']);
     $routes->post('equipamentosdefeitos/procedimentos/salvar', 'EquipamentosDefeitos::salvarProcedimento', ['filter' => 'permission:equipamentos:editar']);
     $routes->post('equipamentosdefeitos/procedimentos/excluir/(:num)', 'EquipamentosDefeitos::excluirProcedimento/$1', ['filter' => 'permission:equipamentos:editar']);
@@ -232,7 +232,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->get('central-mensagens/configuracoes',         'CentralMensagens::configuracoes',               ['filter' => 'permission:clientes:visualizar']);
     $routes->post('central-mensagens/configuracoes/salvar', 'CentralMensagens::salvarConfiguracoes',         ['filter' => 'permission:clientes:editar']);
 
-    // â”€â”€ Ordens de ServiÃ§o â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Ordens de Serviço -------------------------------------------------
     $routes->get('os',                    'Os::index',              ['filter' => 'permission:os:visualizar']);
     $routes->post('os/datatable',         'Os::datatable',          ['filter' => 'permission:os:visualizar']);
     $routes->get('os/nova',              'Os::create',             ['filter' => 'permission:os:criar']);
@@ -247,7 +247,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->post('os/item/salvar',       'Os::addItem',            ['filter' => 'permission:os:editar']);
     $routes->get('os/item/excluir/(:num)','Os::removeItem/$1',     ['filter' => 'permission:os:editar']);
 
-    // â”€â”€ ServiÃ§os â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Serviços ----------------------------------------------------------
     $routes->get('servicos',                  'Servicos::index',            ['filter' => 'permission:servicos:visualizar']);
     $routes->get('servicos/novo',             'Servicos::create',           ['filter' => 'permission:servicos:criar']);
     $routes->post('servicos/salvar',          'Servicos::store',            ['filter' => 'permission:servicos:criar']);
@@ -259,10 +259,10 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->get('servicos/modelo-csv',       'Servicos::downloadCsvTemplate',['filter' => 'permission:servicos:importar']);
     $routes->post('servicos/importar',        'Servicos::importCsv',        ['filter' => 'permission:servicos:importar']);
 
-    // â”€â”€ Vendas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Vendas ------------------------------------------------------------
     $routes->get('vendas',                    'Vendas::index',              ['filter' => 'permission:vendas:visualizar']);
 
-    // â”€â”€ Estoque â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Estoque -----------------------------------------------------------
     $routes->get('estoque',                    'Estoque::index',      ['filter' => 'permission:estoque:visualizar']);
     $routes->get('estoque/novo',              'Estoque::create',     ['filter' => 'permission:estoque:criar']);
     $routes->post('estoque/salvar',            'Estoque::store',      ['filter' => 'permission:estoque:criar']);
@@ -276,7 +276,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->get('estoque/movimentacoes/(:num)','Estoque::movements/$1',['filter' => 'permission:estoque:visualizar']);
     $routes->get('estoque/buscar',             'Estoque::search',     ['filter' => 'permission:estoque:visualizar']);
 
-    // â”€â”€ Financeiro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Financeiro --------------------------------------------------------
     $routes->get('financeiro',                  'Financeiro::index',    ['filter' => 'permission:financeiro:visualizar']);
     $routes->get('financeiro/novo',            'Financeiro::create',   ['filter' => 'permission:financeiro:criar']);
     $routes->post('financeiro/salvar',          'Financeiro::store',    ['filter' => 'permission:financeiro:criar']);
@@ -285,14 +285,14 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->get('financeiro/excluir/(:num)',   'Financeiro::delete/$1',['filter' => 'permission:financeiro:excluir']);
     $routes->post('financeiro/baixar/(:num)',   'Financeiro::pay/$1',   ['filter' => 'permission:financeiro:editar']);
 
-    // â”€â”€ RelatÃ³rios â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Relatórios --------------------------------------------------------
     $routes->get('relatorios',             'Relatorios::index',      ['filter' => 'permission:relatorios:visualizar']);
     $routes->get('relatorios/os',          'Relatorios::osByPeriod', ['filter' => 'permission:relatorios:visualizar']);
     $routes->get('relatorios/financeiro',  'Relatorios::financial',  ['filter' => 'permission:relatorios:visualizar']);
     $routes->get('relatorios/estoque',     'Relatorios::stock',      ['filter' => 'permission:relatorios:visualizar']);
     $routes->get('relatorios/clientes',    'Relatorios::clients',    ['filter' => 'permission:relatorios:visualizar']);
 
-    // â”€â”€ ConfiguraÃ§Ãµes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Configurações -----------------------------------------------------
     $routes->get('configuracoes',          'Configuracoes::index',   ['filter' => 'permission:configuracoes:visualizar']);
     $routes->post('configuracoes/salvar',  'Configuracoes::save',    ['filter' => 'permission:configuracoes:editar']);
     $routes->post('configuracoes/whatsapp/testar-conexao', 'Configuracoes::testWhatsAppConnection', ['filter' => 'permission:configuracoes:editar']);
@@ -304,7 +304,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->post('configuracoes/whatsapp/local-start', 'Configuracoes::whatsappLocalStart', ['filter' => 'permission:configuracoes:editar']);
     $routes->post('configuracoes/whatsapp/self-check-inbound', 'Configuracoes::whatsappInboundSelfCheck', ['filter' => 'permission:configuracoes:editar']);
 
-    // â”€â”€ UsuÃ¡rios â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Usuários ----------------------------------------------------------
     $routes->get('usuarios',                  'Usuarios::index',    ['filter' => 'permission:usuarios:visualizar']);
     $routes->post('usuarios/datatable',       'Usuarios::datatable',['filter' => 'permission:usuarios:visualizar']);
     $routes->get('usuarios/novo',             'Usuarios::create',   ['filter' => 'permission:usuarios:criar']);
@@ -313,14 +313,14 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->post('usuarios/atualizar/(:num)','Usuarios::update/$1',['filter' => 'permission:usuarios:editar']);
     $routes->get('usuarios/excluir/(:num)',   'Usuarios::delete/$1',['filter' => 'permission:usuarios:excluir']);
 
-    // â”€â”€ DocumentaÃ§Ã£o (Central de Conhecimento / Wiki) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Documentação (Central de Conhecimento / Wiki) ---------------------
     $routes->get('design-system',         'DesignSystem::index', ['filter' => 'permission:configuracoes:visualizar']);
     $routes->get('documentacao',          'Documentacao::index');
     $routes->get('documentacao/arquivo',  'Documentacao::arquivo');
     $routes->get('documentacao/buscar',   'Documentacao::buscar');
     $routes->get('documentacao/arvore',   'Documentacao::arvore');
 
-    // â”€â”€ Upload (apenas usuÃ¡rios autenticados) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Upload (apenas usuários autenticados) -----------------------------
     $routes->post('upload/imagem',         'Upload::image');
     // ── Busca Global ─────────────────────────────────────────────────────
     $routes->get('api/busca-global', 'GlobalSearch::index');

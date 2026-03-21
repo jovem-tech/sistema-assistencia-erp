@@ -32,11 +32,11 @@
                         <?php endif; ?>
                     </div>
                 </div>
-                <p class="text-muted small flex-grow-1"><?= esc($g['descricao'] ?: 'Sem descrição.') ?></p>
+                <p class="text-muted small flex-grow-1"><?= esc($g['descricao'] ?: 'Sem descri??o.') ?></p>
                 <div class="d-flex gap-2 mt-2">
                     <?php if (can('grupos', 'editar')): ?>
                     <a href="<?= base_url('grupos/' . $g['id'] . '/permissoes') ?>" class="btn btn-sm btn-glow flex-grow-1">
-                        <i class="bi bi-grid-3x3-gap me-1"></i>Permissões
+                        <i class="bi bi-grid-3x3-gap me-1"></i>PermissÃµes
                     </a>
                     <a href="<?= base_url('grupos/editar/' . $g['id']) ?>" class="btn btn-sm btn-outline-secondary" title="Editar nome">
                         <i class="bi bi-pencil"></i>

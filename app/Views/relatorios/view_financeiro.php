@@ -18,7 +18,7 @@
     <div class="card-body">
         <form method="GET" action="<?= base_url('relatorios/financial') ?>" class="row g-3">
             <div class="col-md-5">
-                <label for="mes" class="form-label">Mês/Ano</label>
+                <label for="mes" class="form-label">MÃªs/Ano</label>
                 <input type="month" class="form-control" id="mes" name="mes" value="<?= esc($filtro_mes) ?>">
             </div>
             <div class="col-md-7 d-flex align-items-end gap-2">
@@ -53,7 +53,7 @@
     <div class="col-md-4">
         <div class="card glass-card <?= $resumo['lucro'] >= 0 ? 'border-primary' : 'border-warning' ?>">
             <div class="card-body text-center">
-                <h6 class="<?= $resumo['lucro'] >= 0 ? 'text-primary' : 'text-warning' ?> mb-2 uppercase tracking-wider">Resultado Mês</h6>
+                <h6 class="<?= $resumo['lucro'] >= 0 ? 'text-primary' : 'text-warning' ?> mb-2 uppercase tracking-wider">Resultado MÃªs</h6>
                 <h3 class="text-body m-0">R$ <?= number_format($resumo['lucro'], 2, ',', '.') ?></h3>
             </div>
         </div>
@@ -66,7 +66,7 @@
             <table class="table table-hover datatable">
                 <thead>
                     <tr>
-                        <th>Descrição</th>
+                        <th>Descri??o</th>
                         <th>Tipo</th>
                         <th>Data Venc.</th>
                         <th>Valor</th>

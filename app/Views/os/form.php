@@ -63,7 +63,7 @@ $clienteSelecionadoNoForm = $isEdit
     </a>
 </div>
 
-<!-- LAYOUT PRINCIPAL: SIDEBAR (foto) + CONTE⁄DO -->
+<!-- LAYOUT PRINCIPAL: SIDEBAR (foto) + CONTE√öDO -->
 <div class="os-form-page">
 <div class="row g-4 ds-split-layout">
 
@@ -96,7 +96,7 @@ $clienteSelecionadoNoForm = $isEdit
 
                     <div id="equipColorInfo" class="d-flex align-items-center gap-2 small text-muted mb-2 d-none">
                         <span id="equipColorSwatch" class="d-inline-block rounded-circle border" style="width: 14px; height: 14px; background: #333;"></span>
-                        <span id="equipColorName">Cor n„o informada</span>
+                        <span id="equipColorName">Cor n√£o informada</span>
                     </div>
 
                     <!-- Miniaturas -->
@@ -126,21 +126,21 @@ $clienteSelecionadoNoForm = $isEdit
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Cliente</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoCliente" class="text-white-50">N„o selecionado</span>
+                                <span id="resumoCliente" class="text-white-50">N√£o selecionado</span>
                                 <span id="statusCliente" class="text-danger">?</span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Equipamento</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoEquipamento" class="text-white-50">N„o selecionado</span>
+                                <span id="resumoEquipamento" class="text-white-50">N√£o selecionado</span>
                                 <span id="statusEquipamento" class="text-danger">?</span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">TÈcnico</span>
+                            <span class="text-muted">T√©cnico</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoTecnico" class="text-white-50">N„o atribuÌdo</span>
+                                <span id="resumoTecnico" class="text-white-50">N√£o atribu√≠do</span>
                                 <span id="statusTecnico" class="text-danger">?</span>
                             </span>
                         </div>
@@ -166,7 +166,7 @@ $clienteSelecionadoNoForm = $isEdit
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Previs„o</span>
+                            <span class="text-muted">Previs√£o</span>
                             <span class="d-flex align-items-center gap-2">
                                 <span id="resumoPrevisao" class="text-white-50">-</span>
                                 <span id="statusPrevisao" class="text-danger">?</span>
@@ -180,16 +180,16 @@ $clienteSelecionadoNoForm = $isEdit
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">AcessÛrios</span>
+                            <span class="text-muted">Acess√≥rios</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoAcessorios" class="text-white-50">N„o informado</span>
+                                <span id="resumoAcessorios" class="text-white-50">N√£o informado</span>
                                 <span id="statusAcessorios" class="text-danger">?</span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Estado fÌsico</span>
+                            <span class="text-muted">Estado f√≠sico</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoEstadoFisico" class="text-white-50">N„o informado</span>
+                                <span id="resumoEstadoFisico" class="text-white-50">N√£o informado</span>
                                 <span id="statusEstadoFisico" class="text-danger">?</span>
                             </span>
                         </div>
@@ -211,7 +211,7 @@ $clienteSelecionadoNoForm = $isEdit
                         <?php endif; ?>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Rascunho</span>
-                            <span id="resumoRascunho" class="text-white-50">N„o salvo</span>
+                            <span id="resumoRascunho" class="text-white-50">N√£o salvo</span>
                         </div>
                     </div>
                 </div>
@@ -219,7 +219,7 @@ $clienteSelecionadoNoForm = $isEdit
         </div>
     </div>
 
-    <!-- ¡REA PRINCIPAL DO FORMUL¡RIO -->
+    <!-- √ÅREA PRINCIPAL DO FORMUL√ÅRIO -->
     <div class="col-12 col-xl-8 col-xxl-9 ds-split-main" id="formCol">
         <div class="card glass-card">
             <div class="card-body">
@@ -270,7 +270,7 @@ $clienteSelecionadoNoForm = $isEdit
                         </li>
                         <?php if ($isEdit): ?>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold" id="tab-financeiro-btn" data-bs-toggle="tab" data-bs-target="#tab-financeiro" type="button" role="tab" aria-controls="tab-financeiro" aria-selected="false">PeÁas e OrÁamento</button>
+                            <button class="nav-link fw-bold" id="tab-financeiro-btn" data-bs-toggle="tab" data-bs-target="#tab-financeiro" type="button" role="tab" aria-controls="tab-financeiro" aria-selected="false">Pe√ßas e Or√ßamento</button>
                         </li>
                         <?php endif; ?>
                     </ul>
@@ -280,7 +280,7 @@ $clienteSelecionadoNoForm = $isEdit
 
                     <div class="os-data-section mb-4">
                         <div class="os-data-section-title">
-                            <i class="bi bi-people me-1"></i>Cliente, Equipamento e TÈcnico Respons·vel
+                            <i class="bi bi-people me-1"></i>Cliente, Equipamento e T√©cnico Respons√°vel
                         </div>
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
@@ -342,9 +342,9 @@ $clienteSelecionadoNoForm = $isEdit
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">TÈcnico Respons·vel</label>
+                            <label class="form-label">T√©cnico Respons√°vel</label>
                             <select name="tecnico_id" class="form-select">
-                                <option value="">N„o atribuÌdo</option>
+                                <option value="">N√£o atribu√≠do</option>
                                 <?php foreach ($tecnicos as $t): ?>
                                 <option value="<?= $t['id'] ?>"
                                     <?= ($isEdit && ($os['tecnico_id'] ?? '') == $t['id']) ? 'selected' : '' ?>>
@@ -359,7 +359,7 @@ $clienteSelecionadoNoForm = $isEdit
 
                     <div class="os-data-section mb-4">
                         <div class="os-data-section-title">
-                            <i class="bi bi-calendar-check me-1"></i>Prioridade, Entrada, Previs„o e Status
+                            <i class="bi bi-calendar-check me-1"></i>Prioridade, Entrada, Previs√£o e Status
                         </div>
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
@@ -377,7 +377,7 @@ $clienteSelecionadoNoForm = $isEdit
                                    value="<?= $isEdit ? ($os['data_entrada'] ?? date('Y-m-d\TH:i')) : date('Y-m-d\TH:i') ?>" required>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Previs„o de Entrega</label>
+                            <label class="form-label">Previs√£o de Entrega</label>
                             <select id="prazoEntregaSelect" class="form-select mb-2">
                                 <option value="">Prazo (dias)</option>
                                 <option value="1">1 dia</option>
@@ -421,7 +421,7 @@ $clienteSelecionadoNoForm = $isEdit
 
                     </div>
 
-                    <!-- LINHA EXTRA (ediÁ„o): Garantia -->
+                    <!-- LINHA EXTRA (edi??o): Garantia -->
                     <?php if ($isEdit): ?>
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
@@ -472,7 +472,7 @@ $clienteSelecionadoNoForm = $isEdit
 
                     <div class="os-data-section mb-4">
                             <div class="os-data-section-title">
-                                <i class="bi bi-box-seam me-1"></i>AcessÛrios e Componentes (na entrada)
+                                <i class="bi bi-box-seam me-1"></i>Acess√≥rios e Componentes (na entrada)
                             </div>
                             <div class="border rounded-3 p-3 bg-white bg-opacity-10">
                                 <div class="d-flex flex-wrap gap-2 mb-2">
@@ -483,11 +483,11 @@ $clienteSelecionadoNoForm = $isEdit
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="bolsa">+ Bolsa notebook</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="cabo">+ Cabo</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="carregador">+ Carregador</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acessÛrio</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acess√≥rio</button>
                                 </div>
                                 <div class="form-check form-switch mb-3">
                                     <input class="form-check-input" type="checkbox" id="acessoriosSemItens" name="acessorios_sem_itens" value="1" <?= old('acessorios_sem_itens') ? 'checked' : '' ?>>
-                                    <label class="form-check-label" for="acessoriosSemItens">Equipamento recebido sem acessÛrios</label>
+                                    <label class="form-check-label" for="acessoriosSemItens">Equipamento recebido sem acess√≥rios</label>
                                 </div>
                                 <div id="acessoriosQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -501,7 +501,7 @@ $clienteSelecionadoNoForm = $isEdit
                                     </div>
                                 </div>
                                 <div id="acessoriosList" class="list-group"></div>
-                                <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acessÛrios comuns.</small>
+                                <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acess√≥rios comuns.</small>
                                 <textarea name="acessorios" id="acessoriosInput" class="d-none"><?= $isEdit ? esc($os['acessorios'] ?? '') : old('acessorios') ?></textarea>
                                 <input type="hidden" name="acessorios_data" id="acessoriosDataInput">
                                 <input type="file" id="acessoriosPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
@@ -536,17 +536,17 @@ $clienteSelecionadoNoForm = $isEdit
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <span class="text-muted small">
-                                            Nenhum relato r·pido ativo. Cadastre em
+                                            Nenhum relato r√°pido ativo. Cadastre em
                                             <a href="<?= base_url('defeitosrelatados') ?>">Defeitos Relatados</a>.
                                         </span>
                                     <?php endif; ?>
                                 </div>
-                                <small class="text-muted d-block mt-2">Clique em uma opÁ„o para inserir no relato.</small>
+                                <small class="text-muted d-block mt-2">Clique em uma op??o para inserir no relato.</small>
                             </div>
                             <?php endif; ?>
                             <textarea name="relato_cliente" id="relatoClienteInput" class="form-control" rows="6"><?= $isEdit ? esc($os['relato_cliente']) : old('relato_cliente') ?></textarea>
                             <?php if (!$isEdit): ?>
-                            <small class="text-muted d-block mt-2">VocÍ pode complementar manualmente o relato a qualquer momento.</small>
+                            <small class="text-muted d-block mt-2">Voc? pode complementar manualmente o relato a qualquer momento.</small>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -576,7 +576,7 @@ $clienteSelecionadoNoForm = $isEdit
                         <div class="card-header py-3 d-flex flex-column flex-md-row justify-content-between gap-2" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.1);">
                             <div>
                                 <strong><i class="bi bi-camera me-2 text-info"></i>Fotos de Entrada do Equipamento</strong>
-                                <small class="text-muted ms-2">(opcional ? acessÛrios, estado fÌsico, placa interna, etc.)</small>
+                                <small class="text-muted ms-2">(opcional: acess√≥rios, estado f√≠sico, placa interna, etc.)</small>
                             </div>
                             <div class="d-flex justify-content-center justify-content-md-end gap-2 flex-wrap">
                                 <button type="button" class="btn btn-outline-light btn-sm d-none" id="btnFotosEscolher">
@@ -611,7 +611,7 @@ $clienteSelecionadoNoForm = $isEdit
                                  style="min-height: 180px; transition: background 0.2s;">
                                 <i class="bi bi-cloud-upload display-4 text-muted"></i>
                                 <p class="text-muted mb-0 fw-semibold">Clique para selecionar ou arraste arquivos aqui.</p>
-                                <small class="text-muted">AtÈ 4 fotos, 2MB cada.</small>
+                                <small class="text-muted">At? 4 fotos, 2MB cada.</small>
                             </div>
                             <div id="osFotosPreview" class="d-flex flex-wrap justify-content-center gap-3"></div>
                             <div id="osFotosExisting" class="d-flex flex-wrap justify-content-center gap-3 mt-3"></div>
@@ -627,11 +627,11 @@ $clienteSelecionadoNoForm = $isEdit
                         <div class="col-12">
                             <div class="card" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;">
                                 <div class="card-header py-2" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                    <strong><i class="bi bi-box-seam me-2 text-primary"></i>PeÁas e ServiÁos</strong>
+                                    <strong><i class="bi bi-box-seam me-2 text-primary"></i>Pe√ßas e Servi√ßos</strong>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted small mb-2">Adicione peÁas e serviÁos na tela de visualizaÁ„o da OS.</p>
-                                    <a href="<?= base_url('os/visualizar/' . $os['id']) ?>" class="btn btn-sm btn-outline-info">Abrir OS e lanÁar itens</a>
+                                    <p class="text-muted small mb-2">Adicione pe√ßas e servi√ßos na tela de visualiza√ß√£o da OS.</p>
+                                    <a href="<?= base_url('os/visualizar/' . $os['id']) ?>" class="btn btn-sm btn-outline-info">Abrir OS e lan√ßar itens</a>
                                 </div>
                             </div>
                         </div>
@@ -643,12 +643,12 @@ $clienteSelecionadoNoForm = $isEdit
                             <select name="forma_pagamento" class="form-select">
                                 <?php
                                 $formas = [
-                                    '' => 'N„o definido',
+                                    '' => 'N√£o definido',
                                     'dinheiro' => 'Dinheiro',
                                     'pix' => 'Pix',
-                                    'cartao_credito' => 'Cart„o de CrÈdito',
-                                    'cartao_debito' => 'Cart„o de DÈbito',
-                                    'transferencia' => 'TransferÍncia',
+                                    'cartao_credito' => 'Cart√£o de Cr√©dito',
+                                    'cartao_debito' => 'Cart√£o de D√©bito',
+                                    'transferencia' => 'Transfer√™ncia',
                                     'boleto' => 'Boleto',
                                 ];
                                 foreach ($formas as $val => $label): ?>
@@ -658,14 +658,14 @@ $clienteSelecionadoNoForm = $isEdit
                         </div>
                     </div>
 
-                    <!-- DiagnÛstico -->
+                    <!-- Diagn√≥stico -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">DiagnÛstico TÈcnico</label>
+                            <label class="form-label">Diagn√≥stico T√©cnico</label>
                             <textarea name="diagnostico_tecnico" class="form-control" rows="3"><?= esc($os['diagnostico_tecnico'] ?? '') ?></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">SoluÁ„o Aplicada</label>
+                            <label class="form-label">Solu??o Aplicada</label>
                             <textarea name="solucao_aplicada" class="form-control" rows="3"><?= esc($os['solucao_aplicada'] ?? '') ?></textarea>
                         </div>
                     </div>
@@ -674,11 +674,11 @@ $clienteSelecionadoNoForm = $isEdit
                     <h6 class="text-uppercase text-muted mb-3"><i class="bi bi-currency-dollar me-1"></i>Valores</h6>
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
-                            <label class="form-label">M„o de Obra (R$)</label>
+                            <label class="form-label">M√£o de Obra (R$)</label>
                             <input type="number" step="0.01" name="valor_mao_obra" class="form-control" value="<?= $os['valor_mao_obra'] ?? 0 ?>">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">PeÁas (R$)</label>
+                            <label class="form-label">Pe√ßas (R$)</label>
                             <input type="number" step="0.01" name="valor_pecas" class="form-control" readonly value="<?= $os['valor_pecas'] ?? 0 ?>">
                         </div>
                         <div class="col-md-3">
@@ -691,14 +691,14 @@ $clienteSelecionadoNoForm = $isEdit
                         </div>
                     </div>
 
-                    <!-- ObservaÁıes -->
+                    <!-- Observa??es -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">ObservaÁıes Internas</label>
+                            <label class="form-label">Observa??es Internas</label>
                             <textarea name="observacoes_internas" class="form-control" rows="2"><?= esc($os['observacoes_internas'] ?? '') ?></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">ObservaÁıes para o Cliente</label>
+                            <label class="form-label">Observa??es para o Cliente</label>
                             <textarea name="observacoes_cliente" class="form-control" rows="2"><?= esc($os['observacoes_cliente'] ?? '') ?></textarea>
                         </div>
                     </div>
@@ -730,7 +730,7 @@ $clienteSelecionadoNoForm = $isEdit
         <div class="modal-content glass-card">
             <div class="modal-header border-bottom">
                 <h5 class="modal-title">
-                    <i class="bi bi-person-plus text-warning me-2"></i>Cadastro R·pido de Cliente
+                    <i class="bi bi-person-plus text-warning me-2"></i>Cadastro R√°pido de Cliente
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -739,7 +739,7 @@ $clienteSelecionadoNoForm = $isEdit
                     <?= csrf_field() ?>
                     <div class="row g-3">
                         <div class="col-md-8">
-                            <label class="form-label">Nome / Raz„o Social *</label>
+                            <label class="form-label">Nome / Raz√£o Social *</label>
                             <input type="text" name="nome_razao" class="form-control" required>
                         </div>
                         <div class="col-md-4">
@@ -768,11 +768,11 @@ $clienteSelecionadoNoForm = $isEdit
                             <input type="text" name="cep" class="form-control mask-cep">
                         </div>
                         <div class="col-md-7">
-                            <label class="form-label text-muted">EndereÁo</label>
+                            <label class="form-label text-muted">Endere√ßo</label>
                             <input type="text" name="endereco" class="form-control js-logradouro">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label text-muted">N∫</label>
+                            <label class="form-label text-muted">N?</label>
                             <input type="text" name="numero" class="form-control js-numero">
                         </div>
                         <div class="col-md-5">
@@ -815,7 +815,7 @@ $clienteSelecionadoNoForm = $isEdit
                 <form id="formNovoEquipAjax" enctype="multipart/form-data">
                     <?= csrf_field() ?>
                     
-                    <!-- NavegaÁ„o por Abas no Modal -->
+                    <!-- Navega??o por Abas no Modal -->
                     <ul class="nav nav-pills nav-fill mb-3 bg-light p-1 rounded-3" id="modalEquipTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active small py-1" id="m-info-tab" data-bs-toggle="tab" data-bs-target="#m-info-pane" type="button" role="tab"><i class="bi bi-info-circle me-1"></i>Info</button>
@@ -864,27 +864,27 @@ $clienteSelecionadoNoForm = $isEdit
                                     <input type="hidden" name="modelo_nome_ext" id="novoEquipModeloNomeExt">
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
-                                    <label class="form-label mb-1 small fw-bold">N∫ de SÈrie</label>
-                                    <input type="text" name="numero_serie" class="form-control form-control-sm" placeholder="IMEI ou SÈrie">
+                                    <label class="form-label mb-1 small fw-bold">N? de S√©rie</label>
+                                    <input type="text" name="numero_serie" class="form-control form-control-sm" placeholder="IMEI ou S√©rie">
                                 </div>
                                 <div class="col-12 text-start mt-2">
                                     <label class="form-label mb-1 small d-flex justify-content-between">
                                         <span class="fw-bold">Senha de Acesso</span>
                                         <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-light border py-0 px-2 btn-senha-tipo-os" data-placeholder="NumÈrico (PIN)" title="PIN/Desenho" style="font-size:0.65rem;">PIN</button>
-                                            <button type="button" class="btn btn-light border py-0 px-2 btn-senha-tipo-os" data-placeholder="AlfanumÈrico" title="Texto" style="font-size:0.65rem;">TEXTO</button>
+                                            <button type="button" class="btn btn-light border py-0 px-2 btn-senha-tipo-os" data-placeholder="Num√©rico (PIN)" title="PIN/Desenho" style="font-size:0.65rem;">PIN</button>
+                                            <button type="button" class="btn btn-light border py-0 px-2 btn-senha-tipo-os" data-placeholder="Alfanum√©rico" title="Texto" style="font-size:0.65rem;">TEXTO</button>
                                         </div>
                                     </label>
                                     <input type="text" name="senha_acesso" id="inputSenhaAcessoOS" class="form-control form-control-sm" placeholder="Senha do aparelho">
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
-                                    <label class="form-label mb-1 small fw-bold text-muted">Estado FÌsico</label>
+                                    <label class="form-label mb-1 small fw-bold text-muted">Estado F√≠sico</label>
                                     <textarea name="estado_fisico" class="form-control form-control-sm" rows="2" placeholder="Ex: Tela riscada..."></textarea>
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
                                     <label class="form-label mb-1 small fw-bold text-muted d-flex justify-content-between">
-                                        AcessÛrios
-                                        <span style="font-size:0.6rem;">+ R·pido</span>
+                                        Acess√≥rios
+                                        <span style="font-size:0.6rem;">+ R√°pido</span>
                                     </label>
                                     <textarea name="acessorios" id="textareaAcessoriosOS" class="form-control form-control-sm mb-1" rows="2" placeholder="Cabos, capas..."></textarea>
                                     <div class="d-flex flex-wrap gap-1">
@@ -892,7 +892,7 @@ $clienteSelecionadoNoForm = $isEdit
                                         <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Cabo</button>
                                         <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Capa</button>
                                         <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Chip</button>
-                                        <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Cart„o</button>
+                                        <button type="button" class="badge btn btn-light border p-1 fw-normal btn-quick-acessorio-os" style="font-size:0.6rem; color:#666;">+ Cart√£o</button>
                                     </div>
                                 </div>
                             </div>
@@ -950,7 +950,7 @@ $clienteSelecionadoNoForm = $isEdit
 
                             <div id="novoEquipFotoPreview" class="mt-2" style="display:none;">
                                 <div id="novoEquipFotosNovasList" class="d-flex flex-wrap gap-2 justify-content-center"></div>
-                                <div class="mt-2 small text-muted">A foto de perfil ajuda na identificaÁ„o visual r·pida.</div>
+                                <div class="mt-2 small text-muted">A foto de perfil ajuda na identifica√ß√£o visual r√°pida.</div>
                             </div>
                             
                             <div id="fotoVaziaOS" class="py-4 text-muted opacity-50">
@@ -959,7 +959,7 @@ $clienteSelecionadoNoForm = $isEdit
                             </div>
 
                             <div id="modalEquipFotosExistentesWrap" class="mt-3 d-none">
-                                <div class="small text-muted mb-2">Fotos j· cadastradas neste equipamento</div>
+                                <div class="small text-muted mb-2">Fotos j√° cadastradas neste equipamento</div>
                                 <div id="modalEquipFotosExistentes" class="d-flex flex-wrap gap-2 justify-content-center"></div>
                             </div>
                     </div>
@@ -1018,12 +1018,12 @@ $clienteSelecionadoNoForm = $isEdit
                             <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                         </div>
                     </div>
-                    <!-- Dropdown de sugestıes -->
+                    <!-- Dropdown de sugest√µes -->
                     <div id="sugestoesNovoModeloOS" class="list-group shadow-lg mt-1 d-none"
                          style="max-height: 220px; overflow-y: auto; border-radius: 8px; z-index: 9999; position: relative;"></div>
                     <div class="form-text mt-1">
                         <i class="bi bi-globe2 me-1 text-info"></i>
-                        Digite 3+ caracteres para ver sugestıes da internet
+                        Digite 3+ caracteres para ver sugest√µes da internet
                     </div>
                 </div>
                 <div id="errorNovoModeloOS" class="text-danger small mt-2 d-none"></div>
@@ -1039,7 +1039,7 @@ $clienteSelecionadoNoForm = $isEdit
 </div>
 
 
-<!-- ===== MODAL: C¬MERA (AUXILIAR) ===== -->
+<!-- ===== MODAL: C√ÇMERA (AUXILIAR) ===== -->
 <div class="modal fade" id="modalCamera" tabindex="-1" style="z-index: 2000;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-card border-0 shadow-lg">
@@ -1222,7 +1222,7 @@ const prioridadeLabels = {
     urgente: 'Urgente'
 };
 
-// ??? Select2 ????????????????????????????????????????????????????????????????
+// --- Select2 ---
 if (typeof $.fn.select2 !== 'undefined') {
     $('#clienteOsSelect').select2({
         theme: 'bootstrap-5',
@@ -1230,15 +1230,15 @@ if (typeof $.fn.select2 !== 'undefined') {
         allowClear: true,
         width: '100%'
     }).on('select2:open', function() {
-        // Adiciona um listener para detectar quando o usu·rio pressiona Enter na busca vazia
-        // ou quando n„o h· resultados. Mas vamos focar no bot„o fixo.
+        // Adiciona um listener para detectar quando o usu√°rio pressiona Enter na busca vazia
+        // ou quando n√£o h√° resultados. Mas vamos focar no bot√£o fixo.
     });
 
-    // Se quiser bot„o de Add dentro do dropdown Select2, È complexo.
-    // O bot„o '+ Novo' j· resolve bem.
+    // Se quiser bot√£o de Add dentro do dropdown Select2, √© complexo.
+    // O bot√£o '+ Novo' j√° resolve bem.
 }
 
-// ??? Modal: Cadastrar Novo Cliente ??????????????????????????????????????????
+// --- Modal: Cadastrar Novo Cliente ---
 const btnNovoCliente = document.getElementById('btnNovoCliente');
 if (btnNovoCliente) {
     btnNovoCliente.addEventListener('click', function() {
@@ -1275,7 +1275,7 @@ document.getElementById('btnSalvarNovoCliente')?.addEventListener('click', funct
         bootstrap.Modal.getInstance(document.getElementById('modalNovoCliente'))?.hide();
         form.reset();
         
-        // Dispara o change para carregar equipamentos (que vir„o vazios, claro, mas reseta o combo)
+        // Dispara o change para carregar equipamentos (que vir√£o vazios, claro, mas reseta o combo)
         _onClienteChange(res.id);
     })
     .catch(() => {
@@ -1284,7 +1284,7 @@ document.getElementById('btnSalvarNovoCliente')?.addEventListener('click', funct
     });
 });
 
-// ??? Sidebar layout toggling ???????????????????????????????????????????????
+// --- Sidebar layout toggling ---
 function showSidebar() {
     const sidebar = document.getElementById('sidebarEquipamento');
     const formCol = document.getElementById('formCol');
@@ -1360,9 +1360,9 @@ function updateResumo() {
     const estadoFisicoInp = document.getElementById('estadoFisicoInput');
     const estadoFisicoSemAvarias = document.getElementById('estadoFisicoSemAvarias');
 
-    const clienteText = _getSelectedText(clienteSel, 'N„o selecionado');
-    const equipText   = _getSelectedText(equipSel, 'N„o selecionado');
-    const tecnicoText = _getSelectedText(tecnicoSel, 'N„o atribuÌdo');
+    const clienteText = _getSelectedText(clienteSel, 'N√£o selecionado');
+    const equipText   = _getSelectedText(equipSel, 'N√£o selecionado');
+    const tecnicoText = _getSelectedText(tecnicoSel, 'N√£o atribu√≠do');
     const prioridadeVal = prioridadeSel?.value || 'normal';
     const statusVal = statusSel?.value || 'triagem';
     const relatoVal = relatoInp?.value?.trim() || '';
@@ -1374,11 +1374,11 @@ function updateResumo() {
     document.getElementById('resumoTecnico').textContent = tecnicoText;
     document.getElementById('resumoEntrada').textContent = _formatDateTime(entradaInp?.value);
     document.getElementById('resumoPrevisao').textContent = _formatDate(previsaoInp?.value);
-    const semAcessorios = acessoriosVal.toLowerCase() === 'sem acessÛrios';
+    const semAcessorios = acessoriosVal.toLowerCase() === 'sem acess√≥rios';
     const semAvarias = Boolean(estadoFisicoSemAvarias?.checked) || estadoFisicoVal.toLowerCase() === 'sem avarias aparentes';
     document.getElementById('resumoRelato').textContent = relatoVal ? 'Preenchido' : 'Vazio';
-    document.getElementById('resumoAcessorios').textContent = semAcessorios ? 'Sem acessÛrios' : (acessoriosVal ? 'Informado' : 'N„o informado');
-    document.getElementById('resumoEstadoFisico').textContent = semAvarias ? 'Sem avarias' : (estadoFisicoVal ? 'Informado' : 'N„o informado');
+    document.getElementById('resumoAcessorios').textContent = semAcessorios ? 'Sem acess√≥rios' : (acessoriosVal ? 'Informado' : 'N√£o informado');
+    document.getElementById('resumoEstadoFisico').textContent = semAvarias ? 'Sem avarias' : (estadoFisicoVal ? 'Informado' : 'N√£o informado');
 
     const prioridadeBadgeClass = {
         baixa: 'text-bg-secondary',
@@ -1549,7 +1549,7 @@ function composeAccessoryText(base, detail = '') {
 const acessoriosConfig = {
     chip: {
         title: 'Chip',
-        fields: [{ name: 'chip_digits', label: '⁄ltimos 6 dÌgitos do chip', placeholder: '123456', max: 6 }],
+        fields: [{ name: 'chip_digits', label: '√öltimos 6 d√≠gitos do chip', placeholder: '123456', max: 6 }],
         format: values => composeAccessoryText('Chip', values.chip_digits ? ('final ' + values.chip_digits) : '')
     },
     capinha: {
@@ -1586,7 +1586,7 @@ const acessoriosConfig = {
                 { value: 'Micro USB', label: 'Micro USB' },
                 { value: 'Lightning', label: 'Lightning' },
                 { value: 'HDMI', label: 'HDMI' },
-                { value: 'Cabo de forÁa', label: 'Cabo de forÁa' },
+                { value: 'Cabo de for√ßa', label: 'Cabo de for√ßa' },
                 { value: 'Outro', label: 'Outro' }
             ]
         }],
@@ -1609,9 +1609,9 @@ const acessoriosConfig = {
         format: values => composeAccessoryText('Carregador', values.tipo_equip)
     },
     outro: {
-        title: 'Outro acessÛrio',
-        fields: [{ name: 'descricao', label: 'DescriÁ„o', placeholder: 'Ex: cabo adaptador' }],
-        format: values => `${values.descricao || 'Outro acessÛrio'}`
+        title: 'Outro acess√≥rio',
+        fields: [{ name: 'descricao', label: 'Descri??o', placeholder: 'Ex: cabo adaptador' }],
+        format: values => `${values.descricao || 'Outro acess√≥rio'}`
     }
 };
 
@@ -1635,7 +1635,7 @@ let acessoriosCurrentKey = null;
 let acessoriosPhotoTarget = null;
 let acessorioCropQueue = [];
 let acessorioCropEntryId = null;
-const ACCESSORIOS_SEM_ITENS_TEXT = 'Sem acessÛrios';
+const ACCESSORIOS_SEM_ITENS_TEXT = 'Sem acess√≥rios';
 
 const initialAcessoriosText = acessoriosInput?.value?.trim() || '';
 if (acessoriosSemItensCheckbox && initialAcessoriosText.toLowerCase() === ACCESSORIOS_SEM_ITENS_TEXT.toLowerCase()) {
@@ -1767,7 +1767,7 @@ function renderAcessoriosList() {
     if (isAcessoriosSemItensChecked()) {
         const item = document.createElement('div');
         item.className = 'list-group-item text-muted';
-        item.textContent = 'Marcado como sem acessÛrios.';
+        item.textContent = 'Marcado como sem acess√≥rios.';
         acessoriosList.appendChild(item);
         return;
     }
@@ -1784,7 +1784,7 @@ function renderAcessoriosList() {
                 <span class="fw-semibold">${cleanText}</span>
                 <div class="d-flex gap-1">
                     <button type="button" class="btn btn-outline-info btn-sm btn-add-foto" data-entry="${entry.id}"><i class="bi bi-camera"></i> Adicionar foto</button>
-                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-camera" data-entry="${entry.id}"><i class="bi bi-camera-video"></i> C‚mera</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-camera" data-entry="${entry.id}"><i class="bi bi-camera-video"></i> C√¢mera</button>
                     <button type="button" class="btn btn-outline-secondary btn-sm btn-edit-acessorio" data-index="${index}"><i class="bi bi-pencil"></i></button>
                     <button type="button" class="btn btn-outline-danger btn-sm btn-remove-acessorio" data-index="${index}"><i class="bi bi-trash"></i></button>
                 </div>
@@ -1921,7 +1921,7 @@ function openAcessoriosForm(key, index = null) {
             const dropdownId = `acessorioColorQuick_${field.name}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
             quickColorsMobile.innerHTML = `
                 <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" id="${dropdownId}" data-bs-toggle="dropdown" aria-expanded="false">
-                    Cores r·pidas
+                    Cores r√°pidas
                 </button>
                 <ul class="dropdown-menu w-100" aria-labelledby="${dropdownId}"></ul>
             `;
@@ -2168,8 +2168,8 @@ acessoriosSemItensCheckbox?.addEventListener('change', () => {
     if (window.Swal && typeof window.Swal.fire === 'function') {
         Swal.fire({
             icon: 'warning',
-            title: 'Marcar como sem acessÛrios?',
-            text: 'Os acessÛrios j· adicionados ser„o removidos.',
+            title: 'Marcar como sem acess√≥rios?',
+            text: 'Os acess√≥rios j√° adicionados ser√°o removidos.',
             showCancelButton: true,
             confirmButtonText: 'Sim, marcar',
             cancelButtonText: 'Cancelar',
@@ -2186,7 +2186,7 @@ acessoriosSemItensCheckbox?.addEventListener('change', () => {
         return;
     }
 
-    const confirmed = confirm('Marcar como sem acessÛrios vai remover os acessÛrios j· adicionados. Deseja continuar?');
+    const confirmed = confirm('Marcar como sem acess√≥rios vai remover os acess√≥rios j√° adicionados. Deseja continuar?');
     if (confirmed) {
         applySemItens();
         return;
@@ -2439,7 +2439,7 @@ function renderEstadoFisicoList() {
                 <span class="fw-semibold">${entry.text}</span>
                 <div class="d-flex gap-1">
                     <button type="button" class="btn btn-outline-info btn-sm btn-add-foto-estado" data-entry="${entry.id}"><i class="bi bi-camera"></i> Adicionar foto</button>
-                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-camera-estado" data-entry="${entry.id}"><i class="bi bi-camera-video"></i> C‚mera</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-camera-estado" data-entry="${entry.id}"><i class="bi bi-camera-video"></i> C√¢mera</button>
                     <button type="button" class="btn btn-outline-secondary btn-sm btn-edit-estado" data-index="${index}"><i class="bi bi-pencil"></i></button>
                     <button type="button" class="btn btn-outline-danger btn-sm btn-remove-estado" data-index="${index}"><i class="bi bi-trash"></i></button>
                 </div>
@@ -2754,7 +2754,7 @@ function saveDraftNow() {
     const data = _collectDraft();
     if (!_hasDraftData(data)) {
         localStorage.removeItem(DRAFT_KEY);
-        _setResumoRascunho('N„o salvo');
+        _setResumoRascunho('N√£o salvo');
         return;
     }
     localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
@@ -2872,7 +2872,7 @@ function _applyPendingDefeitos() {
     pendingDefeitos = null;
 }
 
-// Rascunho autom·tico para nova OS
+// Rascunho autom√°tico para nova OS
 if (!isEdit) {
     const draftData = _loadDraft();
     const draftAlert = document.getElementById('osDraftAlert');
@@ -2889,15 +2889,15 @@ if (!isEdit) {
         document.getElementById('btnDescartarRascunho')?.addEventListener('click', () => {
             localStorage.removeItem(DRAFT_KEY);
             draftAlert.classList.add('d-none');
-            _setResumoRascunho('N„o salvo');
+            _setResumoRascunho('N√£o salvo');
         });
     } else {
-        _setResumoRascunho('N„o salvo');
+        _setResumoRascunho('N√£o salvo');
     }
 
     document.getElementById('btnLimparRascunho')?.addEventListener('click', () => {
         localStorage.removeItem(DRAFT_KEY);
-        _setResumoRascunho('N„o salvo');
+        _setResumoRascunho('N√£o salvo');
     });
 }
 
@@ -3077,7 +3077,7 @@ prazoEntregaSelect?.addEventListener('change', function() {
     }
 });
 
-// ??? Carrega fotos do equipamento ??????????????????????????????????????????
+// --- Carrega fotos do equipamento ---
 function carregarFotosEquipamentoLegacy(equipId, equipData) {
     const mainBox     = document.getElementById('fotoMainBox');
     const img         = document.getElementById('fotoPrincipalImg');
@@ -3101,7 +3101,7 @@ function carregarFotosEquipamentoLegacy(equipId, equipData) {
             ${equipData.tipo  ? `<div class="mt-1"><i class="bi bi-cpu me-1"></i>${equipData.tipo}</div>` : ''}
         `;
         const corHex = equipData.cor_hex || '#2a2a2a';
-        const corNome = equipData.cor || 'Cor n„o informada';
+        const corNome = equipData.cor || 'Cor n√£o informada';
         if (colorSwatch) colorSwatch.style.background = corHex;
         if (colorName) colorName.textContent = corNome;
         if (colorInfo) colorInfo.classList.remove('d-none');
@@ -3155,7 +3155,7 @@ function carregarFotosEquipamentoLegacy(equipId, equipData) {
     });
 }
 
-// ??? Select de cliente ? carrega equipamentos ?????????????????????????????
+// --- Select de cliente: carrega equipamentos ---
 // Override com renderizacao reativa e anti-cache para fotos do equipamento.
 let equipamentoFotosVersion = Date.now();
 function bumpEquipamentoFotosVersion() {
@@ -3366,7 +3366,7 @@ if (typeof $.fn.select2 !== 'undefined') {
     });
 }
 
-// ??? Handler de mudanÁa de equipamento ??????????????????????????????????
+// --- Handler de mudan√ßa de equipamento ---
 function _onEquipamentoChange(id, opt) {
     const tipoId = opt ? opt.getAttribute('data-tipo') : null;
     carregarDefeitos(tipoId);
@@ -3387,17 +3387,17 @@ function _onEquipamentoChange(id, opt) {
     scheduleDraftSave();
 }
 
-// ??? Listener vanilla do equipamentoSelect (usado quando Select2 ainda n„o foi inicializado) ???
+// --- Listener vanilla do equipamentoSelect (usado quando Select2 ainda n√£o foi inicializado) ---
 const equipSelect = document.getElementById('equipamentoSelect');
 if (equipSelect) {
     equipSelect.addEventListener('change', function() {
-        // Apenas disparado quando Select2 n„o est· ativo
+        // Apenas disparado quando Select2 n√£o est√° ativo
         if (!$(this).data('select2')) {
             _onEquipamentoChange(this.value, this.options[this.selectedIndex]);
         }
     });
 
-    // Na ediÁ„o, carrega automaticamente
+    // Na edi??o, carrega automaticamente
     if (isEdit && equipSelect.value) {
         const opt = equipSelect.options[equipSelect.selectedIndex];
         const tipoId = opt ? opt.getAttribute('data-tipo') : null;
@@ -3415,7 +3415,7 @@ if (equipSelect) {
     }
 }
 
-// Atualiza resumo e rascunho conforme alteraÁıes no formul·rio
+// Atualiza resumo e rascunho conforme altera√ß√µes no formul√°rio
 ['input', 'change'].forEach(evt => {
     document.querySelector('textarea[name="acessorios"]')?.addEventListener(evt, () => {
         updateResumo();
@@ -3450,7 +3450,7 @@ if (equipSelect) {
     });
 });
 
-// ??? Preview fotos de entrada ?????????????????????????????????????????????
+// --- Preview fotos de entrada ---
 const osFotosExistingData = <?= json_encode(array_map(fn($f) => ['url' => $f['url']], $fotos_entrada ?? [])) ?>;
 const osFotosMaxFiles = 4;
 const osFotoMaxSizeMb = 2;
@@ -3609,7 +3609,7 @@ renderExistingFotos();
 renderNewFotos();
 updatePhotoState();
 
-// ??? Modal: Cadastrar Novo Equipamento ?????????????????????????????????????
+// --- Modal: Cadastrar Novo Equipamento ---
 const osEquipamentosCache = window._osEquipamentosCache || (window._osEquipamentosCache = {});
 const btnNovoEquip = document.getElementById('btnNovoEquipamento');
 const btnEditarEquip = document.getElementById('btnEditarEquipamento');
@@ -3633,7 +3633,7 @@ function bumpModalEquipFotosVersion() {
     modalEquipFotosVersion = Date.now();
 }
 
-function showWarningDialog(message, title = 'AtenÁ„o') {
+function showWarningDialog(message, title = 'Aten??o') {
     if (window.Swal && typeof window.Swal.fire === 'function') {
         Swal.fire({
             icon: 'warning',
@@ -3856,7 +3856,7 @@ function setNovoEquipModalMode(mode) {
             labelModalNovoEquip.innerHTML = '<i class="bi bi-pencil-square text-primary me-2"></i>Editar Equipamento';
         }
         if (btnSalvarNovoEquip) {
-            btnSalvarNovoEquip.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Salvar AlteraÁıes';
+            btnSalvarNovoEquip.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Salvar Altera??es';
         }
         return;
     }
@@ -4009,7 +4009,7 @@ modalNovoEquipamentoEl?.addEventListener('hidden.bs.modal', () => {
     resetNovoEquipModalForm();
 });
 
-// ??? Cadastro R·pido de Marcas e Modelos (Dentro da OS) ????????????????????
+// --- Cadastro R√°pido de Marcas e Modelos (Dentro da OS) ---
 const modalNovaMarca = new bootstrap.Modal(document.getElementById('modalNovaMarcaOS'));
 const modalNovoModelo = new bootstrap.Modal(document.getElementById('modalNovoModeloOS'));
 
@@ -4018,7 +4018,7 @@ document.getElementById('btnNovoModeloOS')?.addEventListener('click', () => {
     const marcaId = $('#novoEquipMarca').val();
     if (!marcaId) { showWarningDialog('Selecione uma marca primeiro!'); return; }
     
-    // Mostra o nome da marca no modal para conferÍncia
+    // Mostra o nome da marca no modal para confer√™ncia
     const marcaNome = $('#novoEquipMarca option:selected').text();
     document.getElementById('displayMarcaOS').value = marcaNome;
     
@@ -4080,7 +4080,7 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
     .finally(() => this.disabled = false);
 });
 
-// ??? Autocomplete inteligente no modal "Novo Modelo" ?????????????????????????
+// --- Autocomplete inteligente no modal "Novo Modelo" ---
 (function() {
     let debounceTimerModelo = null;
     const inputModelo    = document.getElementById('inputNovoModeloOS');
@@ -4097,7 +4097,7 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
         groups.forEach(group => {
             if (!group.children || group.children.length === 0) return;
 
-            // CabeÁalho do grupo
+            // Cabe√ßalho do grupo
             const header = document.createElement('div');
             header.className = 'list-group-item list-group-item-secondary py-1 px-3';
             header.style.cssText = 'font-size:0.7rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; pointer-events:none;';
@@ -4144,7 +4144,7 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
         if (total > 0) {
             sugestoesBox.classList.remove('d-none');
         } else {
-            sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugest„o. Digite e salve manualmente.</div>';
+            sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugest√£o. Digite e salve manualmente.</div>';
             sugestoesBox.classList.remove('d-none');
         }
     }
@@ -4207,10 +4207,10 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
 })();
 
 
-// LÛgica de Cores no Modal (Igual ao cadastro de equipamentos)
-// ???????????????????????????????????????????????????????????
+// L√≥gica de Cores no Modal (Igual ao cadastro de equipamentos)
+// ===========================================================
 // SELETOR DE COR PROFISSIONAL (OS Modal)
-// ???????????????????????????????????????????????????????????
+// ===========================================================
 
 const PROFESSIONAL_COLORS_OS = [
     { category: 'Neutras (Preto, Branco, Cinza)', colors: [
@@ -4220,8 +4220,8 @@ const PROFESSIONAL_COLORS_OS = [
     ]},
     { category: 'Azuis e Marinhos', colors: [
         { hex: '#191970', name: 'Azul Meia-Noite' }, { hex: '#000080', name: 'Azul Marinho' }, { hex: '#0000FF', name: 'Azul Puro' },
-        { hex: '#4169E1', name: 'Azul Real' }, { hex: '#1E90FF', name: 'Azul CÈu' }, { hex: '#87CEEB', name: 'Azul Celeste' },
-        { hex: '#5F9EA0', name: 'Azul PetrÛleo' },
+        { hex: '#4169E1', name: 'Azul Real' }, { hex: '#1E90FF', name: 'Azul C√©u' }, { hex: '#87CEEB', name: 'Azul Celeste' },
+        { hex: '#5F9EA0', name: 'Azul Petr√≥leo' },
     ]},
     { category: 'Verdes e Mentas', colors: [
         { hex: '#006400', name: 'Verde Escuro' }, { hex: '#2E8B57', name: 'Verde Floresta' }, { hex: '#008000', name: 'Verde Puro' },
@@ -4235,9 +4235,9 @@ const PROFESSIONAL_COLORS_OS = [
         { hex: '#DAA520', name: 'Dourado' }, { hex: '#FFD700', name: 'Dourado Vivo' }, { hex: '#FFFF00', name: 'Amarelo' },
         { hex: '#F5F5DC', name: 'Bege' }, { hex: '#FFF8DC', name: 'Marfim' },
     ]},
-    { category: 'Roxos, Pinks e Lil·s', colors: [
-        { hex: '#4B0082', name: 'Õndigo' }, { hex: '#2D1B69', name: 'Violeta' }, { hex: '#800080', name: 'Roxo Puro' },
-        { hex: '#DA70D6', name: 'Lil·s' }, { hex: '#FF1493', name: 'Pink' }, { hex: '#AA336A', name: 'Rose Gold' },
+    { category: 'Roxos, Pinks e Lil√°s', colors: [
+        { hex: '#4B0082', name: '?ndigo' }, { hex: '#2D1B69', name: 'Violeta' }, { hex: '#800080', name: 'Roxo Puro' },
+        { hex: '#DA70D6', name: 'Lil√°s' }, { hex: '#FF1493', name: 'Pink' }, { hex: '#AA336A', name: 'Rose Gold' },
     ]},
 ];
 
@@ -4368,7 +4368,7 @@ $('#corNomeInputOS').on('input', function() {
 buildCatalogOS();
 updateColorUIOS('#1A1A1A', 'Preto');
 
-// ??? L”GICA DE DETEC«√O DE COR INTELIGENTE NA IMAGEM (OS Modal) ???????????????
+// --- L√ìGICA DE DETEC√á√ÉO DE COR INTELIGENTE NA IMAGEM (OS Modal) ---
 const smartColorMapOS = {
     '#1C1C1E': 'Midnight',
     '#F2F2F4': 'Starlight',
@@ -4456,11 +4456,11 @@ function detectDominantColorOS(sourceCanvas) {
         $('#smartColorContainerOS').removeClass('d-none');
 
     } catch (e) {
-        console.warn('Erro na detecÁ„o de cor: ', e);
+        console.warn('Erro na detec√ß√£o de cor: ', e);
     }
 }
 
-// ??? L”GICA DE SENHA E ACESS”RIOS (MODAL OS) ???????????????????????
+// --- L√ìGICA DE SENHA E ACESS√ìRIOS (MODAL OS) ---
 $(document).on('click', '.btn-senha-tipo-os', function() {
     const placeholder = $(this).data('placeholder');
     $('#inputSenhaAcessoOS').attr('placeholder', placeholder).focus();
@@ -4496,7 +4496,7 @@ $('#btnAcceptColorOS').click(function() {
     }, 1500);
 });
 
-// ??? LÛgica de C‚mera, Galeria e Cropper ?????????????????????????????
+// --- L√≥gica de C√¢mera, Galeria e Cropper ---
 const modalCameraEl  = document.getElementById('modalCamera');
 const modalCropEl    = document.getElementById('modalCropEquip');
 
@@ -5011,7 +5011,7 @@ btnCapturar?.addEventListener('click', () => {
 document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
     if (!cropper) return;
     const canvas = cropper.getCroppedCanvas({
-        width: 1024, // Limita o tamanho para n„o sobrecarregar
+        width: 1024, // Limita o tamanho para n√£o sobrecarregar
         height: 1024,
         imageSmoothingEnabled: true,
         imageSmoothingQuality: 'high',
@@ -5094,7 +5094,7 @@ document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
         novoEquipFotosDataTransfer.items.add(file);
         syncNovoEquipFotosInput();
         
-        detectDominantColorOS(canvas); // <--- Inicia a detecÁ„o de cor autom·tica na OS
+        detectDominantColorOS(canvas); // <--- Inicia a detec√ß√£o de cor autom√°tica na OS
 
         // Preview Final
         renderNovoEquipFotosNovas();
@@ -5293,7 +5293,7 @@ document.addEventListener('click', async function(event) {
     renderNovoEquipFotosNovas();
 });
 
-// ??? Select2 HÌbrido: Modelos via API ??????????????????????????????????????
+// --- Select2 H√≠brido: Modelos via API ---
 function initModeloSelect2() {
     var modeloSel = $('#novoEquipModelo');
 
@@ -5307,7 +5307,7 @@ function initModeloSelect2() {
         placeholder: 'Busque ou selecione o modelo...',
         allowClear: true,
         dropdownParent: $('#modalNovoEquipamento'),
-        tags: true, // HABILITA EDI«√O E NOVAS TAGS LIVRES
+        tags: true, // HABILITA EDI??O E NOVAS TAGS LIVRES
         createTag: function(params) {
             var term = $.trim(params.term);
             if (term === '') return null;
@@ -5342,8 +5342,8 @@ function initModeloSelect2() {
                 return `Digite mais ${restante} caractere(s) para buscar...`;
             },
             searching: function() { return '<i class="bi bi-search me-1"></i> Buscando modelos...'; },
-            noResults: function()  { return 'Nenhuma sugest„o encontrada. Use o bot„o <strong>+ Novo</strong> para cadastrar manualmente.'; },
-            errorLoading: function() { return 'Erro ao consultar. Verifique sua conex„o.'; }
+            noResults: function()  { return 'Nenhuma sugest√£o encontrada. Use o bot√£o <strong>+ Novo</strong> para cadastrar manualmente.'; },
+            errorLoading: function() { return 'Erro ao consultar. Verifique sua conex√£o.'; }
         },
         templateResult: function (data) {
             if (data.loading) return data.text;
@@ -5353,7 +5353,7 @@ function initModeloSelect2() {
                 return $(`
                 <div>
                     <strong class="d-block text-primary"><i class="bi bi-pencil-square me-1"></i> "${data.text}"</strong>
-                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (ediÁ„o manual)</small>
+                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (edi??o manual)</small>
                 </div>`);
             }
 
@@ -5371,7 +5371,7 @@ function initModeloSelect2() {
     }).on('select2:select', function (e) {
         var data = e.params.data;
         // Armazena o nome real do modelo externo para auto-cadastro no backend
-        // Se for newTag, j· vai salvar pelo prÛprio texto sendo o ID
+        // Se for newTag, j√° vai salvar pelo pr√≥prio texto sendo o ID
         if (data.id && String(data.id).indexOf('EXT|') === 0) {
             $('#novoEquipModeloNomeExt').val(data.text);
         } else {
@@ -5511,7 +5511,7 @@ document.getElementById('btnSalvarNovoEquip')?.addEventListener('click', functio
     });
 });
 
-// ??? carregarDefeitos ??????????????????????????????????????????????????????
+// --- carregarDefeitos ---
 function carregarDefeitos(tipoId) {
     const section   = document.getElementById('defeitosSection');
     const container = document.getElementById('defeitosContainer');
@@ -5583,7 +5583,7 @@ function carregarDefeitos(tipoId) {
             });
         });
 
-        // Bot„o de procedimentos
+        // Bot√£o de procedimentos
         container.querySelectorAll('.btn-ver-procedimentos-os').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -5597,7 +5597,7 @@ function carregarDefeitos(tipoId) {
     .catch(() => { container.innerHTML = '<span class="text-danger small">Erro ao carregar defeitos.</span>'; });
 }
 
-// ??? Modal de visualizaÁ„o de procedimentos ???????????????????????????????
+// --- Modal de visualiza√ß√£o de procedimentos ---
 function abrirProcedimentosViewOnly(defeitoId, nome) {
     const modalHtml = `
     <div class="modal fade" id="modalViewProcedimentos" tabindex="-1">
@@ -5647,7 +5647,7 @@ function abrirProcedimentosViewOnly(defeitoId, nome) {
     });
 }
 
-// ??? Modal de VisualizaÁ„o de Imagem (Lightbox) ???????????????????????????
+// --- Modal de Visualiza√ß√£o de Imagem (Lightbox) ---
 updateResumo();
 document.addEventListener('DOMContentLoaded', function() {
     const modalInnerHtml = `

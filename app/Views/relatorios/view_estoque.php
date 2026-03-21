@@ -20,7 +20,7 @@
             <div class="col-md-6">
                 <label for="tipo" class="form-label">Filtro de Estoque</label>
                 <select class="form-select" id="tipo" name="tipo">
-                    <option value="todos" <?= $filtro_tipo === 'todos' ? 'selected' : '' ?>>Todas as Peças</option>
+                    <option value="todos" <?= $filtro_tipo === 'todos' ? 'selected' : '' ?>>Todas as PeÃ§as</option>
                     <option value="baixo" <?= $filtro_tipo === 'baixo' ? 'selected' : '' ?>>Estoque Baixo</option>
                 </select>
             </div>
@@ -42,10 +42,10 @@
             <table class="table table-hover datatable">
                 <thead>
                     <tr>
-                        <th>Cód/ID</th>
-                        <th>Peça/Produto</th>
+                        <th>CÃ³d/ID</th>
+                        <th>PeÃ§a/Produto</th>
                         <th>Qtd. Atual</th>
-                        <th>Qtd. Mínima</th>
+                        <th>Qtd. MÃ­nima</th>
                         <th>Status</th>
                     </tr>
                 </thead>

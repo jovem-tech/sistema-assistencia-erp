@@ -17,9 +17,9 @@
     <div class="sidebar-menu">
         <ul class="nav flex-column">
 
-            <!-- ?? VIS√O GERAL ?????????????????????????? -->
+            <!-- VIS√ÉO GERAL -->
             <?php if (canModule('dashboard')): ?>
-            <li class="nav-section">VIS√O GERAL</li>
+            <li class="nav-section">VIS√ÉO GERAL</li>
             <li class="nav-item">
                 <a class="nav-link <?= uri_string() === 'dashboard' ? 'active' : '' ?>" href="<?= base_url('dashboard') ?>">
                     <i class="bi bi-grid-1x2-fill"></i>
@@ -28,7 +28,7 @@
             </li>
             <?php endif; ?>
 
-            <!-- ?? OPERACIONAL ?????????????????????????? -->
+            <!-- OPERACIONAL -->
             <?php 
             $showOperacional = canModule('os') || canModule('servicos') || canModule('estoque') || canModule('equipamentos') || canModule('defeitos');
             ?>
@@ -39,7 +39,7 @@
             <li class="nav-item">
                 <a class="nav-link <?= str_starts_with(uri_string(), 'os') ? 'active' : '' ?>" href="<?= base_url('os') ?>">
                     <i class="bi bi-clipboard-check-fill"></i>
-                    <span>Ordens de ServiÁo</span>
+                    <span>Ordens de Servi√ßo</span>
                 </a>
             </li>
             <?php endif; ?>
@@ -48,7 +48,7 @@
             <li class="nav-item">
                 <a class="nav-link <?= str_starts_with(uri_string(), 'servicos') ? 'active' : '' ?>" href="<?= base_url('servicos') ?>">
                     <i class="bi bi-gear-wide-connected"></i>
-                    <span>ServiÁos</span>
+                    <span>Servi√ßos</span>
                 </a>
             </li>
             <?php endif; ?>
@@ -57,7 +57,7 @@
             <li class="nav-item">
                 <a class="nav-link <?= str_starts_with(uri_string(), 'estoque') ? 'active' : '' ?>" href="<?= base_url('estoque') ?>">
                     <i class="bi bi-box-seam-fill"></i>
-                    <span>Estoque de PeÁas</span>
+                    <span>Estoque de Pe√ßas</span>
                 </a>
             </li>
             <?php endif; ?>
@@ -101,7 +101,7 @@
                 <a class="nav-link <?= $isConhecimentoActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#conhecimentoSubmenu" role="button">
                     <i class="bi bi-journal-bookmark-fill"></i>
                     <span class="d-flex justify-content-between w-100 align-items-center">
-                        Gest„o de Conhecimento
+                        Gest√£o de Conhecimento
                         <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
                     </span>
                 </a>
@@ -123,7 +123,7 @@
             <?php endif; ?>
             <?php endif; ?>
 
-            <!-- ?? COMERCIAL ???????????????????????????? -->
+            <!-- COMERCIAL -->
             <?php 
             $showComercial = canModule('clientes') || canModule('fornecedores') || canModule('funcionarios') || canModule('vendas');
             ?>
@@ -154,7 +154,7 @@
                         <?php endif; ?>
                         
                         <?php if (canModule('funcionarios')): ?>
-                        <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'funcionarios') ? 'active' : '' ?>" href="<?= base_url('funcionarios') ?>"><i class="bi bi-person-workspace"></i><span>Equipe TÈcnico</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'funcionarios') ? 'active' : '' ?>" href="<?= base_url('funcionarios') ?>"><i class="bi bi-person-workspace"></i><span>Equipe T√©cnico</span></a></li>
                         <?php endif; ?>
                         <?php if (canModule('fornecedores')): ?>
                         <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'fornecedores') ? 'active' : '' ?>" href="<?= base_url('fornecedores') ?>"><i class="bi bi-truck"></i><span>Fornecedores</span></a></li>
@@ -260,9 +260,9 @@
             <?php endif; ?>
 
 
-            <!-- ?? GEST√O & RESULTADOS ???????????????????? -->
+            <!-- GEST√ÉO & RESULTADOS -->
             <?php if (canModule('financeiro') || canModule('relatorios')): ?>
-            <li class="nav-section">GEST√O & RESULTADOS</li>
+            <li class="nav-section">GEST√ÉO & RESULTADOS</li>
             
             <?php if (canModule('financeiro')): ?>
             <li class="nav-item">
@@ -277,15 +277,15 @@
             <li class="nav-item">
                 <a class="nav-link <?= uri_string() === 'relatorios' ? 'active' : '' ?>" href="<?= base_url('relatorios') ?>">
                     <i class="bi bi-graph-up-arrow"></i>
-                    <span>RelatÛrios</span>
+                    <span>Relat√≥rios</span>
                 </a>
             </li>
             <?php endif; ?>
             <?php endif; ?>
 
-            <!-- ?? CONFIGURA«’ES ???????????????????????? -->
+            <!-- CONFIGURA√á√ïES -->
             <?php if (canModule('configuracoes') || canModule('usuarios') || canModule('grupos')): ?>
-            <li class="nav-section">CONFIGURA«’ES</li>
+            <li class="nav-section">CONFIGURA√á√ïES</li>
 
             <?php if (canModule('configuracoes')): ?>
             <li class="nav-item">
@@ -301,7 +301,7 @@
                 <a class="nav-link collapsed" data-bs-toggle="collapse" href="#menuSeguranca" role="button">
                     <i class="bi bi-shield-lock-fill"></i>
                     <span class="d-flex justify-content-between w-100 align-items-center">
-                        SeguranÁa
+                        Seguran√ßa
                         <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
                     </span>
                 </a>
@@ -309,12 +309,12 @@
                     <ul class="nav flex-column">
                         <?php if (canModule('usuarios')): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('usuarios') ?>">Usu·rios</a>
+                            <a class="nav-link" href="<?= base_url('usuarios') ?>">Usu√°rios</a>
                         </li>
                         <?php endif; ?>
                         <?php if (canModule('grupos')): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('grupos') ?>">NÌveis de Acesso</a>
+                            <a class="nav-link" href="<?= base_url('grupos') ?>">N√≠veis de Acesso</a>
                         </li>
                         <?php endif; ?>
                     </ul>
@@ -332,7 +332,7 @@
             <li class="nav-item">
                 <a class="nav-link <?= uri_string() === 'documentacao' ? 'active' : '' ?>" href="<?= base_url('documentacao') ?>">
                     <i class="bi bi-journal-richtext"></i>
-                    <span>DocumentaÁ„o</span>
+                    <span>Documenta√ß√£o</span>
                 </a>
             </li>
             <?php endif; ?>

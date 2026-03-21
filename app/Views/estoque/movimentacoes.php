@@ -57,7 +57,7 @@
                         <th>Quantidade</th>
                         <th>Motivo</th>
                         <th>OS</th>
-                        <th>Respons·vel</th>
+                        <th>Respons√°vel</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -68,7 +68,7 @@
                             <?php if ($m['tipo'] === 'entrada'): ?>
                                 <span class="badge bg-success">Entrada</span>
                             <?php elseif ($m['tipo'] === 'saida'): ?>
-                                <span class="badge bg-danger">SaÌda</span>
+                                <span class="badge bg-danger">Sa√≠da</span>
                             <?php else: ?>
                                 <span class="badge bg-warning text-dark">Ajuste</span>
                             <?php endif; ?>

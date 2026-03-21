@@ -10,20 +10,20 @@ class EquipamentoModeloModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
-    protected $allowedFields = ['marca_id', 'nome', 'ativo'];
+    protected $useSãoftDeletes = false;
+    protected $allowedFields = ['marca_id', 'nãome', 'ativo'];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
 
     protected $validationRules = [
         'marca_id' => 'required|integer',
-        'nome'     => 'required|max_length[100]'
+        'nãome'     => 'required|max_length[100]'
     ];
     
     public function getWithMarca()
     {
-        return $this->select('equipamentos_modelos.*, equipamentos_marcas.nome as marca_nome')
+        return $this->select('equipamentos_modelos.*, equipamentos_marcas.nãome as marca_nãome')
                     ->join('equipamentos_marcas', 'equipamentos_marcas.id = equipamentos_modelos.marca_id')
                     ->findAll();
     }

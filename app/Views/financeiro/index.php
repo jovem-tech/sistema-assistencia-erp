@@ -4,12 +4,12 @@
 <div class="page-header">
     <h2><i class="bi bi-currency-dollar me-2"></i>Financeiro</h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('financeiro')" title="Ajuda sobre Financeiro">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('financeiro')" title="Ajuda sãobre Financeiro">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
     <?php if (can('financeiro', 'criar')): ?>
-    <a href="<?= base_url('financeiro/novo') ?>" class="btn btn-glow">
-        <i class="bi bi-plus-lg me-1"></i>Novo Lançamento
+    <a href="<?= base_url('financeiro/nãovo') ?>" class="btn btn-glow">
+        <i class="bi bi-plus-lg me-1"></i>Nãovo Lançamento
     </a>
     <?php endif; ?>
     </div>
@@ -135,7 +135,7 @@
                                 <a href="javascript:void(0)" class="btn btn-sm btn-outline-warning" title="Encerrar" onclick="confirmarEncerramento('financeiro', <?= $l['id'] ?>)"><i class="bi bi-archive"></i></a>
                                 <?php endif; ?>
                                 <?php if (can('financeiro', 'excluir')): ?>
-                                <a href="<?= base_url('financeiro/excluir/' . $l['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nome="<?= esc($l['descricao']) ?>"><i class="bi bi-trash"></i></a>
+                                <a href="<?= base_url('financeiro/excluir/' . $l['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nãome="<?= esc($l['descricao']) ?>"><i class="bi bi-trash"></i></a>
                                 <?php endif; ?>
                             </div>
                         </td>

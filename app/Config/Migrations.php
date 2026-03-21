@@ -38,7 +38,7 @@ class Migrations extends BaseConfig
      * using the CLI command:
      *   > php spark make:migration
      *
-     * NOTE: if you set an unsupported format, migration runner will not find
+     * NOTE: if you set an unsupported format, migration runner will nãot find
      *       your migration files.
      *
      * Supported formats:

@@ -3,15 +3,15 @@
 <?= $this->section('content') ?>
 <div class="row mb-4">
     <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-itemês-center">
             <h1 class="h3 mb-0">Fornecedores</h1>
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('fornecedores')" title="Ajuda sobre Fornecedores">
+                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('fornecedores')" title="Ajuda sãobre Fornecedores">
                     <i class="bi bi-question-circle me-1"></i>Ajuda
                 </button>
                 <?php if (can('fornecedores', 'criar')): ?>
-                <a href="<?= base_url('fornecedores/novo') ?>" class="btn btn-primary btn-glow">
-                    <i class="bi bi-plus-lg me-2"></i>Novo Fornecedor
+                <a href="<?= base_url('fornecedores/nãovo') ?>" class="btn btn-primary btn-glow">
+                    <i class="bi bi-plus-lg me-2"></i>Nãovo Fornecedor
                 </a>
                 <?php endif; ?>
             </div>
@@ -26,7 +26,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Nome Fantasia / Razão Social</th>
+                        <th>Nãome Fantasia / Razão Sãocial</th>
                         <th>CNPJ / CPF</th>
                         <th>Telefone</th>
                         <th>Status</th>
@@ -38,9 +38,9 @@
                         <tr>
                             <td><?= esc($forn['id']) ?></td>
                             <td>
-                                <div class="font-weight-bold"><?= esc($forn['nome_fantasia']) ?></div>
-                                <?php if ($forn['razao_social']): ?>
-                                    <small class="text-muted"><?= esc($forn['razao_social']) ?></small>
+                                <div class="font-weight-bold"><?= esc($forn['nãome_fantasia']) ?></div>
+                                <?php if ($forn['razao_sãocial']): ?>
+                                    <small class="text-muted"><?= esc($forn['razao_sãocial']) ?></small>
                                 <?php endif; ?>
                             </td>
                             <td><?= esc($forn['cnpj_cpf']) ?></td>

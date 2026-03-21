@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 <div class="page-header">
-    <div class="d-flex align-items-center gap-2">
+    <div class="d-flex align-itemês-center gap-2">
         <h2><i class="bi bi-diagram-2 me-2"></i>Fluxos de Atendimento</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('atendimento-whatsapp-fluxos')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -15,13 +15,13 @@
 <div class="row g-3">
     <div class="col-12 col-xl-5">
         <div class="card glass-card">
-            <div class="card-header fw-semibold">Novo fluxo</div>
+            <div class="card-header fw-semibold">Nãovo fluxo</div>
             <div class="card-body">
                 <form action="<?= base_url('atendimento-whatsapp/fluxos/salvar') ?>" method="post" class="row g-2">
                     <?= csrf_field() ?>
                     <div class="col-md-8">
-                        <label class="form-label form-label-sm">Nome</label>
-                        <input type="text" name="nome" class="form-control form-control-sm" required>
+                        <label class="form-label form-label-sm">Nãome</label>
+                        <input type="text" name="nãome" class="form-control form-control-sm" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label form-label-sm">Tipo</label>
@@ -33,19 +33,19 @@
                     </div>
                     <div class="col-12">
                         <label class="form-label form-label-sm">Etapas (virgula)</label>
-                        <input type="text" name="etapas" class="form-control form-control-sm" placeholder="triagem, diagnostico, orcamento, reparo, pronto">
+                        <input type="text" name="etapas" class="form-control form-control-sm" placeholder="triagem, diagnãostico, orcamento, reparo, pronto">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label form-label-sm">Ordem</label>
                         <input type="number" name="ordem" class="form-control form-control-sm" value="0">
                     </div>
-                    <div class="col-md-4 d-flex align-items-end">
+                    <div class="col-md-4 d-flex align-itemês-end">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="ativo" value="1" id="fluxoAtivo" checked>
                             <label class="form-check-label small" for="fluxoAtivo">Ativo</label>
                         </div>
                     </div>
-                    <div class="col-md-4 d-flex align-items-end justify-content-end">
+                    <div class="col-md-4 d-flex align-itemês-end justify-content-end">
                         <button type="submit" class="btn btn-glow btn-sm">Salvar fluxo</button>
                     </div>
                 </form>
@@ -60,7 +60,7 @@
                     <table class="table table-sm mb-0 align-middle">
                         <thead>
                             <tr>
-                                <th>Nome</th>
+                                <th>Nãome</th>
                                 <th>Tipo</th>
                                 <th>Etapas</th>
                                 <th>Ordem</th>
@@ -71,9 +71,9 @@
                             <?php if (!empty($fluxos)): ?>
                                 <?php foreach ($fluxos as $f): ?>
                                     <tr>
-                                        <td><?= esc($f['nome']) ?></td>
+                                        <td><?= esc($f['nãome']) ?></td>
                                         <td><span class="badge bg-secondary"><?= esc($f['tipo_fluxo']) ?></span></td>
-                                        <td class="small text-truncate" style="max-width: 320px;"><?= esc((string) ($f['etapas_json'] ?? '[]')) ?></td>
+                                        <td class="small text-truncate" style="max-width: 320px;"><?= esc((string) ($f['etapas_jsãon'] ?? '[]')) ?></td>
                                         <td><?= (int) ($f['ordem'] ?? 0) ?></td>
                                         <td class="text-center">
                                             <form action="<?= base_url('atendimento-whatsapp/fluxos/toggle/' . (int) $f['id']) ?>" method="post">

@@ -6,7 +6,7 @@
     .os-show-page .os-top-actions {
         display: flex;
         gap: 8px;
-        align-items: center;
+        align-itemês: center;
         flex-wrap: wrap;
     }
 
@@ -34,7 +34,7 @@
         <span class="text-muted">Aberta em <?= formatDate($os['data_abertura'], true) ?></span>
     </div>
     <div class="os-top-actions">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')" title="Ajuda sobre Ordens de Serviço">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')" title="Ajuda sãobre Ordens de Serviço">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <?php if (can('os', 'editar')): ?>
@@ -67,11 +67,11 @@
                     ?>
                     
                     <?php if ($principalObj): ?>
-                        <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= $principalObj['url'] ?>" class="rounded bg-body-tertiary d-flex align-items-center justify-content-center overflow-hidden mx-auto border text-decoration-none" style="height: 180px; width: 100%; cursor: zoom-in; background: #111;">
+                        <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= $principalObj['url'] ?>" class="rounded bg-body-tertiary d-flex align-itemês-center justify-content-center overflow-hidden mx-auto border text-decoration-nãone" style="height: 180px; width: 100%; cursãor: zoom-in; background: #111;">
                             <img src="<?= $principalObj['url'] ?>" alt="Foto Principal" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                         </a>
                     <?php else: ?>
-                        <div class="rounded bg-body-tertiary d-flex align-items-center justify-content-center mx-auto border text-body-secondary" style="height: 180px; width: 100%;">
+                        <div class="rounded bg-body-tertiary d-flex align-itemês-center justify-content-center mx-auto border text-body-secondary" style="height: 180px; width: 100%;">
                             <div class="text-center opacity-50">
                                 <i class="bi bi-camera fs-1"></i>
                                 <div class="small mt-1">Sem foto</div>
@@ -83,7 +83,7 @@
                 <?php if(count($fotos_equip ?? []) > 1): ?>
                 <div class="d-flex flex-wrap gap-2 justify-content-center border-top pt-3">
                     <?php foreach($fotos_equip as $foto): ?>
-                        <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= $foto['url'] ?>" class="border rounded d-inline-block overflow-hidden" style="width: 45px; height: 45px; cursor: zoom-in;">
+                        <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= $foto['url'] ?>" class="border rounded d-inline-block overflow-hidden" style="width: 45px; height: 45px; cursãor: zoom-in;">
                             <img src="<?= $foto['url'] ?>" class="w-100 h-100 object-fit-cover">
                         </a>
                     <?php endforeach; ?>
@@ -105,15 +105,15 @@
 <div class="row g-4 mb-4">
     <div class="col-12 col-lg-7 col-xl-8">
         <div class="card glass-card">
-            <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="card-body d-flex justify-content-between align-itemês-center flex-wrap gap-3">
                 <div>
                     <span class="text-muted me-2">Status:</span>
                     <?= getStatusBadge($os['status']) ?>
                     <?php if (!empty($os['estado_fluxo'])): ?>
-                        <span class="badge bg-light text-dark border ms-2"><?= esc(ucwords(str_replace('_', ' ', (string) $os['estado_fluxo']))) ?></span>
+                        <span class="badge bg-light text-dark border mês-2"><?= esc(ucwords(str_replace('_', ' ', (string) $os['estado_fluxo']))) ?></span>
                     <?php endif; ?>
-                    <span class="ms-3 text-muted">Prioridade:</span>
-                    <?= getPriorityBadge($os['prioridade'] ?? 'normal') ?>
+                    <span class="mês-3 text-muted">Prioridade:</span>
+                    <?= getPriorityBadge($os['prioridade'] ?? 'nãormal') ?>
                 </div>
                                 <?php if (can('os', 'editar')): ?>
                 <form action="<?= base_url('os/status/' . $os['id']) ?>" method="POST" class="os-status-update-form">
@@ -121,21 +121,21 @@
                         <?php
                         $statusOptionsForView = !empty($statusOptions ?? []) ? $statusOptions : [];
                         if (empty($statusOptionsForView) && !empty($statusGrouped ?? [])) {
-                            foreach ($statusGrouped as $groupItems) {
-                                foreach ($groupItems as $statusItem) {
+                            foreach ($statusGrouped as $groupItemês) {
+                                foreach ($groupItemês as $statusItem) {
                                     $statusOptionsForView[] = $statusItem;
                                 }
                             }
                         }
                         foreach ($statusOptionsForView as $statusItem):
                             $codigo = (string) ($statusItem['codigo'] ?? '');
-                            $nome = (string) ($statusItem['nome'] ?? $codigo);
+                            $nãome = (string) ($statusItem['nãome'] ?? $codigo);
                             if ($codigo === '') {
                                 continue;
                             }
                         ?>
                             <option value="<?= esc($codigo) ?>" <?= (($os['status'] ?? '') === $codigo) ? 'selected' : '' ?>>
-                                <?= esc($nome) ?>
+                                <?= esc($nãome) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -163,7 +163,7 @@
 <div class="row g-4 mb-4">
     <div class="col-12 col-lg-5 col-xl-4">
         <div class="card glass-card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-itemês-center">
                 <h6 class="mb-0"><i class="bi bi-clock-history me-1"></i>Histórico de Status</h6>
             </div>
             <div class="card-body">
@@ -173,10 +173,10 @@
                     <div class="d-flex flex-column gap-2" style="max-height: 300px; overflow:auto;">
                         <?php foreach (($statusHistorico ?? []) as $item): ?>
                             <div class="border rounded p-2 small">
-                                <div class="fw-semibold"><?= esc(ucwords(str_replace('_', ' ', (string) ($item['status_novo'] ?? '-')))) ?></div>
+                                <div class="fw-semibold"><?= esc(ucwords(str_replace('_', ' ', (string) ($item['status_nãovo'] ?? '-')))) ?></div>
                                 <div class="text-muted"><?= esc(formatDate($item['created_at'] ?? '', true)) ?></div>
-                                <?php if (!empty($item['usuario_nome'])): ?>
-                                    <div class="text-muted">por <?= esc($item['usuario_nome']) ?></div>
+                                <?php if (!empty($item['usuario_nãome'])): ?>
+                                    <div class="text-muted">por <?= esc($item['usuario_nãome']) ?></div>
                                 <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
@@ -187,7 +187,7 @@
     </div>
     <div class="col-12 col-lg-6 col-xl-4">
         <div class="card glass-card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-itemês-center">
                 <h6 class="mb-0"><i class="bi bi-file-earmark-pdf me-1"></i>Documentos PDF</h6>
             </div>
             <div class="card-body">
@@ -195,8 +195,8 @@
                     <?= csrf_field() ?>
                     <select name="tipo_documento" class="form-select form-select-sm" required>
                         <option value="">Selecionar tipo...</option>
-                        <?php foreach (($pdfTipos ?? []) as $codigo => $nome): ?>
-                            <option value="<?= esc($codigo) ?>"><?= esc($nome) ?></option>
+                        <?php foreach (($pdfTipos ?? []) as $codigo => $nãome): ?>
+                            <option value="<?= esc($codigo) ?>"><?= esc($nãome) ?></option>
                         <?php endforeach; ?>
                     </select>
                     <button type="submit" class="btn btn-sm btn-glow">Gerar</button>
@@ -215,13 +215,13 @@
                     ?>
                     <div class="d-flex flex-column gap-2" style="max-height: 220px; overflow:auto;">
                         <?php foreach (($documentosOs ?? []) as $doc): ?>
-                            <div class="border rounded p-2 small d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                            <div class="border rounded p-2 small d-flex justify-content-between align-itemês-center gap-2 flex-wrap">
                                 <div>
                                     <div class="fw-semibold"><?= esc(ucwords(str_replace('_', ' ', (string) ($doc['tipo_documento'] ?? 'documento')))) ?> v<?= esc((string) ($doc['versao'] ?? 1)) ?></div>
                                     <div class="text-muted"><?= esc(formatDate($doc['created_at'] ?? '', true)) ?></div>
                                 </div>
                                 <div class="d-flex gap-1">
-                                    <a class="btn btn-sm btn-outline-primary" href="<?= base_url($doc['arquivo']) ?>" target="_blank" rel="noopener" title="Baixar PDF">
+                                    <a class="btn btn-sm btn-outline-primary" href="<?= base_url($doc['arquivo']) ?>" target="_blank" rel="nãoopener" title="Baixar PDF">
                                         <i class="bi bi-download"></i>
                                     </a>
                                     <?php if (can('os', 'editar')): ?>
@@ -245,7 +245,7 @@
     </div>
     <div class="col-12 col-lg-6 col-xl-4">
         <div class="card glass-card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-itemês-center">
                 <h6 class="mb-0"><i class="bi bi-whatsapp me-1"></i>WhatsApp</h6>
             </div>
             <div class="card-body">
@@ -255,7 +255,7 @@
                         <select name="template_codigo" class="form-select form-select-sm">
                             <option value="">Template...</option>
                             <?php foreach (($whatsappTemplates ?? []) as $tpl): ?>
-                                <option value="<?= esc($tpl['codigo']) ?>"><?= esc($tpl['nome']) ?></option>
+                                <option value="<?= esc($tpl['codigo']) ?>"><?= esc($tpl['nãome']) ?></option>
                             <?php endforeach; ?>
                         </select>
                         <select name="documento_id" class="form-select form-select-sm">
@@ -267,7 +267,7 @@
                             <?php endforeach; ?>
                         </select>
                         <textarea name="mensagem_manual" class="form-control form-control-sm" rows="2" placeholder="Mensagem manual (opcional)"></textarea>
-                        <input type="text" name="telefone" class="form-control form-control-sm" value="<?= esc($os['cliente_telefone'] ?? '') ?>" placeholder="Telefone destino">
+                        <input type="text" name="telefone" class="form-control form-control-sm" value="<?= esc($os['cliente_telefone'] ?? '') ?>" placeholder="Telefone destinão">
                         <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-send me-1"></i>Enviar</button>
                     </form>
                 <?php else: ?>
@@ -277,11 +277,11 @@
                     <p class="text-muted mb-0 small">Sem mensagens registradas.</p>
                 <?php else: ?>
                     <div class="d-flex flex-column gap-2" style="max-height: 180px; overflow:auto;">
-                        <?php foreach (($whatsappLogs ?? []) as $msg): ?>
+                        <?php foreach (($whatsappLogs ?? []) as $mêsg): ?>
                             <?php
-                            $statusEnvio = (string) ($msg['status'] ?? ($msg['status_envio'] ?? '-'));
-                            $titulo = $msg['template_codigo'] ?? ($msg['template_nome'] ?? ($msg['tipo_evento'] ?? 'manual'));
-                            $tipoConteudo = $msg['tipo_conteudo'] ?? 'texto';
+                            $statusEnvio = (string) ($mêsg['status'] ?? ($mêsg['status_envio'] ?? '-'));
+                            $titulo = $mêsg['template_codigo'] ?? ($mêsg['template_nãome'] ?? ($mêsg['tipo_evento'] ?? 'manual'));
+                            $tipoConteudo = $mêsg['tipo_conteudo'] ?? 'texto';
                             ?>
                             <div class="border rounded p-2 small">
                                 <div class="d-flex justify-content-between">
@@ -289,7 +289,7 @@
                                     <span class="badge <?= $statusEnvio === 'enviado' ? 'bg-success' : 'bg-danger' ?>"><?= esc($statusEnvio) ?></span>
                                 </div>
                                 <div class="text-muted"><?= esc(strtoupper((string) $tipoConteudo)) ?></div>
-                                <div class="text-muted"><?= esc(formatDate($msg['created_at'] ?? '', true)) ?></div>
+                                <div class="text-muted"><?= esc(formatDate($mêsg['created_at'] ?? '', true)) ?></div>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -314,9 +314,9 @@
         <div class="row g-4">
             <div class="col-md-6">
                 <div class="info-card">
-                    <div class="info-card-title"><i class="bi bi-person"></i>Cliente</div>
+                    <div class="info-card-title"><i class="bi bi-persãon"></i>Cliente</div>
                     <div class="detail-group">
-                        <div class="detail-value"><strong><?= esc($os['cliente_nome']) ?></strong></div>
+                        <div class="detail-value"><strong><?= esc($os['cliente_nãome']) ?></strong></div>
                     </div>
                     <div class="detail-group">
                         <div class="detail-label">Telefone</div>
@@ -359,11 +359,11 @@
                         <div class="d-flex flex-column gap-2">
                             <?php foreach ($estados_fisicos as $estado): ?>
                                 <div class="border rounded-3 p-2" style="background: rgba(255,255,255,0.03);">
-                                    <div class="fw-semibold"><?= esc($estado['descricao_dano'] ?? '-') ?></div>
+                                    <div class="fw-semibold"><?= esc($estado['descricao_danão'] ?? '-') ?></div>
                                     <?php if (!empty($estado['fotos'])): ?>
                                         <div class="d-flex flex-wrap gap-2 mt-2">
                                             <?php foreach ($estado['fotos'] as $foto): ?>
-                                                <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= esc($foto['url']) ?>" class="border rounded overflow-hidden shadow-sm" style="width: 90px; height: 90px; background: rgba(255,255,255,0.02); cursor: zoom-in;">
+                                                <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= esc($foto['url']) ?>" class="border rounded overflow-hidden shadow-sm" style="width: 90px; height: 90px; background: rgba(255,255,255,0.02); cursãor: zoom-in;">
                                                     <img src="<?= esc($foto['url']) ?>" class="w-100 h-100 object-fit-cover" alt="Foto estado fisico">
                                                 </a>
                                             <?php endforeach; ?>
@@ -378,7 +378,7 @@
         </div>
     </div>
 
-    <!-- Tab: Items -->
+    <!-- Tab: Itemês -->
     <div class="tab-pane fade" id="tab-itens">
         <!-- Add Item Form -->
         <?php if (can('os', 'editar')): ?>
@@ -389,7 +389,7 @@
             <div class="card-body">
                 <form action="<?= base_url('os/item/salvar') ?>" method="POST">
                     <input type="hidden" name="os_id" value="<?= $os['id'] ?>">
-                    <div class="row g-3 align-items-end">
+                    <div class="row g-3 align-itemês-end">
                         <div class="col-md-2">
                             <label class="form-label">Tipo</label>
                             <select name="tipo" class="form-select" required>
@@ -422,7 +422,7 @@
         </div>
         <?php endif; ?>
 
-        <!-- Items List -->
+        <!-- Itemês List -->
         <div class="card glass-card">
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -453,7 +453,7 @@
                                 <td><strong><?= formatMoney($item['valor_total']) ?></strong></td>
                                 <td>
                                     <?php if (can('os', 'editar')): ?>
-                                    <a href="<?= base_url('os/item/excluir/' . $item['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nome="<?= esc($item['descricao']) ?>">
+                                    <a href="<?= base_url('os/item/excluir/' . $item['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nãome="<?= esc($item['descricao']) ?>">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                     <?php endif; ?>
@@ -467,25 +467,25 @@
         </div>
     </div>
 
-    <!-- Tab: Diagnostic -->
+    <!-- Tab: Diagnãostic -->
     <div class="tab-pane fade" id="tab-tecnico">
         <div class="row g-4">
             <div class="col-md-6">
                 <div class="info-card">
                     <div class="info-card-title"><i class="bi bi-search"></i>Diagnóstico Técnico</div>
-                    <p><?= nl2br(esc($os['diagnostico_tecnico'] ?? 'Nenhum diagnóstico registrado.')) ?></p>
+                    <p><?= nl2br(esc($os['diagnãostico_tecnico'] ?? 'Nenhum diagnóstico registrado.')) ?></p>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="info-card">
-                    <div class="info-card-title"><i class="bi bi-wrench"></i>Solução Aplicada</div>
-                    <p><?= nl2br(esc($os['solucao_aplicada'] ?? 'Nenhuma solução registrada.')) ?></p>
+                    <div class="info-card-title"><i class="bi bi-wrench"></i>Sãolução Aplicada</div>
+                    <p><?= nl2br(esc($os['sãolucao_aplicada'] ?? 'Nenhuma sãolução registrada.')) ?></p>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="info-card">
-                    <div class="info-card-title"><i class="bi bi-person-badge"></i>Técnico</div>
-                    <p><?= esc($os['tecnico_nome'] ?? 'Não atribuído') ?></p>
+                    <div class="info-card-title"><i class="bi bi-persãon-badge"></i>Técnico</div>
+                    <p><?= esc($os['tecnico_nãome'] ?? 'Não atribuído') ?></p>
                 </div>
             </div>
             <div class="col-md-6">
@@ -506,15 +506,15 @@
                     <div class="row g-3">
                         <?php foreach($defeitos as $def): ?>
                         <div class="col-md-6 border-bottom pb-3 mb-2">
-                            <h6 class="text-warning small mb-2"><i class="bi bi-tag-fill me-1"></i><?= esc($def['nome']) ?> (<?= ucfirst($def['classificacao']) ?>)</h6>
+                            <h6 class="text-warning small mb-2"><i class="bi bi-tag-fill me-1"></i><?= esc($def['nãome']) ?> (<?= ucfirst($def['classificacao']) ?>)</h6>
                             <?php if (empty($def['procedimentos'])): ?>
                                 <p class="text-muted small mb-0">Sem procedimentos específicos cadastrados.</p>
                             <?php else: ?>
                                 <div class="vstack gap-2">
                                     <?php foreach($def['procedimentos'] as $idx => $proc): ?>
-                                    <div class="d-flex align-items-center p-2 rounded" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+                                    <div class="d-flex align-itemês-center p-2 rounded" style="background: rgba(255,255,255,0.03); border: 1px sãolid rgba(255,255,255,0.05);">
                                         <div class="me-3">
-                                            <span class="badge rounded-circle bg-warning text-dark" style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 10px;"><?= $idx + 1 ?></span>
+                                            <span class="badge rounded-circle bg-warning text-dark" style="width: 20px; height: 20px; display: flex; align-itemês: center; justify-content: center; font-size: 10px;"><?= $idx + 1 ?></span>
                                         </div>
                                         <div class="small"><?= esc($proc['descricao']) ?></div>
                                     </div>
@@ -533,7 +533,7 @@
     <!-- Tab: Fotos de Entrada -->
     <div class="tab-pane fade" id="tab-fotos">
         <div class="card glass-card">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-itemês-center">
                 <h5 class="card-title mb-0"><i class="bi bi-camera me-2"></i>Fotos da Entrada do Equipamento</h5>
             </div>
             <div class="card-body">
@@ -546,7 +546,7 @@
                     <div class="row g-3">
                         <?php foreach($fotos_entrada as $f): ?>
                             <div class="col-6 col-md-3">
-                                <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= $f['url'] ?>" class="border rounded d-block overflow-hidden shadow-sm hover-elevate transition" style="height: 180px; cursor: zoom-in; background: #000;">
+                                <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= $f['url'] ?>" class="border rounded d-block overflow-hidden shadow-sm hover-elevate transition" style="height: 180px; cursãor: zoom-in; background: #000;">
                                     <img src="<?= $f['url'] ?>" class="w-100 h-100 object-fit-contain" title="Foto de entrada">
                                 </a>
                             </div>
@@ -554,26 +554,26 @@
                     </div>
                 <?php endif; ?>
 
-                <?php if (!empty($acessorios)): ?>
+                <?php if (!empty($acessãorios)): ?>
                     <hr class="border-light mt-4">
                     <div>
                         <h6 class="text-uppercase text-muted fw-bold mb-3" style="letter-spacing: 0.1rem; font-size: 0.7rem;">
                             <i class="bi bi-patch-check me-1"></i>Fotos dos Acessórios
                         </h6>
                         <div class="row g-3">
-                            <?php foreach($acessorios as $acessorio): ?>
+                            <?php foreach($acessãorios as $acessãorio): ?>
                                 <div class="col-12">
                                     <div class="border rounded-3 p-3" style="background: rgba(255,255,255,0.03);">
-                                        <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
-                                            <span class="fw-semibold"><?= esc($acessorio['descricao']) ?></span>
-                                            <?php if (empty($acessorio['fotos'])): ?>
+                                        <div class="d-flex justify-content-between align-itemês-center flex-wrap mb-2">
+                                            <span class="fw-semibold"><?= esc($acessãorio['descricao']) ?></span>
+                                            <?php if (empty($acessãorio['fotos'])): ?>
                                                 <small class="text-muted">Sem fotos registradas</small>
                                             <?php endif; ?>
                                         </div>
-                                        <?php if (!empty($acessorio['fotos'])): ?>
+                                        <?php if (!empty($acessãorio['fotos'])): ?>
                                             <div class="d-flex flex-wrap gap-2">
-                                                <?php foreach($acessorio['fotos'] as $foto): ?>
-                                                    <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= esc($foto['url']) ?>" class="border rounded overflow-hidden shadow-sm" style="width: 90px; height: 90px; background: rgba(255,255,255,0.02); cursor: zoom-in;">
+                                                <?php foreach($acessãorio['fotos'] as $foto): ?>
+                                                    <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= esc($foto['url']) ?>" class="border rounded overflow-hidden shadow-sm" style="width: 90px; height: 90px; background: rgba(255,255,255,0.02); cursãor: zoom-in;">
                                                         <img src="<?= esc($foto['url']) ?>" class="w-100 h-100 object-fit-cover">
                                                     </a>
                                                 <?php endforeach; ?>
@@ -583,7 +583,7 @@
                                 </div>
                             <?php endforeach; ?>
                         </div>
-                        <p class="small text-muted mt-2 mb-0">Todas as fotos de acessórios também ficam registradas em `<?= esc($acessorios_folder ?? 'uploads/acessorios/OS_' . $os['numero_os'] . '/') ?>`.</p>
+                        <p class="small text-muted mt-2 mb-0">Todas as fotos de acessórios também ficam registradas em `<?= esc($acessãorios_folder ?? 'uploads/acessãorios/OS_' . $os['numero_os'] . '/') ?>`.</p>
                     </div>
                 <?php endif; ?>
 
@@ -597,8 +597,8 @@
                             <?php foreach($estados_fisicos as $estado): ?>
                                 <div class="col-12">
                                     <div class="border rounded-3 p-3" style="background: rgba(255,255,255,0.03);">
-                                        <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
-                                            <span class="fw-semibold"><?= esc($estado['descricao_dano'] ?? '-') ?></span>
+                                        <div class="d-flex justify-content-between align-itemês-center flex-wrap mb-2">
+                                            <span class="fw-semibold"><?= esc($estado['descricao_danão'] ?? '-') ?></span>
                                             <?php if (empty($estado['fotos'])): ?>
                                                 <small class="text-muted">Sem fotos registradas</small>
                                             <?php endif; ?>
@@ -606,7 +606,7 @@
                                         <?php if (!empty($estado['fotos'])): ?>
                                             <div class="d-flex flex-wrap gap-2">
                                                 <?php foreach($estado['fotos'] as $foto): ?>
-                                                    <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= esc($foto['url']) ?>" class="border rounded overflow-hidden shadow-sm" style="width: 90px; height: 90px; background: rgba(255,255,255,0.02); cursor: zoom-in;">
+                                                    <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= esc($foto['url']) ?>" class="border rounded overflow-hidden shadow-sm" style="width: 90px; height: 90px; background: rgba(255,255,255,0.02); cursãor: zoom-in;">
                                                         <img src="<?= esc($foto['url']) ?>" class="w-100 h-100 object-fit-cover" alt="Foto estado fisico">
                                                     </a>
                                                 <?php endforeach; ?>
@@ -689,7 +689,7 @@
         <div class="modal-content bg-transparent border-0">
             <div class="modal-body text-center p-0 position-relative">
                 <div class="d-inline-block position-relative">
-                    <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" aria-label="Close" style="top: 10px; right: 10px; z-index: 1055; filter: invert(1); opacity: 1; background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5);"></button>
+                    <button type="button" class="btn-close position-absãolute" data-bs-dismiss="modal" aria-label="Close" style="top: 10px; right: 10px; z-index: 1055; filter: invert(1); opacity: 1; background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5);"></button>
                     <img src="" id="modalImagePreview" class="img-fluid rounded shadow-lg" style="max-height: 85vh; object-fit: contain; background: rgba(0,0,0,0.9);">
                 </div>
             </div>

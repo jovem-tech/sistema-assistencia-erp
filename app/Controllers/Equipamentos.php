@@ -39,10 +39,10 @@ class Equipamentos extends BaseController
         $tipoModel = new EquipamentoTipoModel();
         $marcaModel = new EquipamentoMarcaModel();
         $data = [
-            'title'    => 'Novo Equipamento',
-            'clientes' => $clienteModel->orderBy('nome_razao', 'ASC')->findAll(),
-            'tipos'    => $tipoModel->orderBy('nome', 'ASC')->findAll(),
-            'marcas'   => $marcaModel->orderBy('nome', 'ASC')->findAll()
+            'title'    => 'Nãovo Equipamento',
+            'clientes' => $clienteModel->orderBy('nãome_razao', 'ASC')->findAll(),
+            'tipos'    => $tipoModel->orderBy('nãome', 'ASC')->findAll(),
+            'marcas'   => $marcaModel->orderBy('nãome', 'ASC')->findAll()
         ];
         return view('equipamentos/form', $data);
     }
@@ -75,12 +75,12 @@ class Equipamentos extends BaseController
         if (false && ($imagefile = $this->request->getFiles())) {
             $fotoModel = new EquipamentoFotoModel();
             
-            // Buscar dados para nomeação
+            // Buscar dados para nãomeação
             $marcaModel = new EquipamentoMarcaModel();
             $modeloModel = new EquipamentoModeloModel();
             
-            $marca  = $marcaModel->find($dados['marca_id'])['nome'] ?? 'marca';
-            $modelo = $modeloModel->find($dados['modelo_id'])['nome'] ?? 'modelo';
+            $marca  = $marcaModel->find($dados['marca_id'])['nãome'] ?? 'marca';
+            $modelo = $modeloModel->find($dados['modelo_id'])['nãome'] ?? 'modelo';
             $slug   = strtolower(url_title($marca . '_' . $modelo, '_', true));
 
             $is_principal = 1;
@@ -116,7 +116,7 @@ class Equipamentos extends BaseController
         }
 
         $redirect = redirect()->to('/equipamentos')
-            ->with('success', 'Equipamento cadastrado com sucesso!');
+            ->with('success', 'Equipamento cadastrado com sucessão!');
         if ($warning) {
             $redirect = $redirect->with('warning', $warning);
         }
@@ -137,16 +137,16 @@ class Equipamentos extends BaseController
         $modeloModel  = new EquipamentoModeloModel();
 
         $fotoModel    = new EquipamentoFotoModel();
-        $this->normalizeEquipamentoFotosStorage((int) $id);
+        $this->nãormalizeEquipamentoFotosStorage((int) $id);
 
         $fotos = $fotoModel->where('equipamento_id', $id)->findAll();
         $data = [
             'title'        => 'Editar Equipamento',
             'equipamento'  => $equipamento,
-            'clientes'     => $clienteModel->orderBy('nome_razao', 'ASC')->findAll(),
-            'tipos'        => $tipoModel->orderBy('nome', 'ASC')->findAll(),
-            'marcas'       => $marcaModel->orderBy('nome', 'ASC')->findAll(),
-            'modelos'      => $modeloModel->where('marca_id', $equipamento['marca_id'])->orderBy('nome', 'ASC')->findAll(),
+            'clientes'     => $clienteModel->orderBy('nãome_razao', 'ASC')->findAll(),
+            'tipos'        => $tipoModel->orderBy('nãome', 'ASC')->findAll(),
+            'marcas'       => $marcaModel->orderBy('nãome', 'ASC')->findAll(),
+            'modelos'      => $modeloModel->where('marca_id', $equipamento['marca_id'])->orderBy('nãome', 'ASC')->findAll(),
             'fotos'        => $this->hydrateFotosUrls($fotos)
         ];
         return view('equipamentos/form', $data);
@@ -158,7 +158,7 @@ class Equipamentos extends BaseController
         $dados = $this->processarMarcaModelo($dados);
         
         $this->model->update($id, $dados);
-        $this->normalizeEquipamentoFotosStorage((int) $id);
+        $this->nãormalizeEquipamentoFotosStorage((int) $id);
         $uploadResult = $this->appendEquipamentoFotos(
             (int) $id,
             $this->collectAjaxUploadedFotos(),
@@ -169,12 +169,12 @@ class Equipamentos extends BaseController
         if (false && ($imagefile = $this->request->getFiles())) {
             $fotoModel = new EquipamentoFotoModel();
             
-            // Buscar dados para nomeação
+            // Buscar dados para nãomeação
             $equip = $this->model->find($id);
             $marcaModel  = new EquipamentoMarcaModel();
             $modeloModel = new EquipamentoModeloModel();
-            $marca  = $marcaModel->find($equip['marca_id'])['nome'] ?? 'marca';
-            $modelo = $modeloModel->find($equip['modelo_id'])['nome'] ?? 'modelo';
+            $marca  = $marcaModel->find($equip['marca_id'])['nãome'] ?? 'marca';
+            $modelo = $modeloModel->find($equip['modelo_id'])['nãome'] ?? 'modelo';
             $slug   = strtolower(url_title($marca . '_' . $modelo, '_', true));
 
             // Verifica se já existe uma foto principal para este equipamento
@@ -203,7 +203,7 @@ class Equipamentos extends BaseController
         LogModel::registrar('equipamento_atualizado', 'Equipamento atualizado ID: ' . $id);
 
         $redirect = redirect()->to('/equipamentos')
-            ->with('success', 'Equipamento atualizado com sucesso!');
+            ->with('success', 'Equipamento atualizado com sucessão!');
         $warning = $uploadResult['warning'] ?? null;
         if ($warning) {
             $redirect = $redirect->with('warning', $warning);
@@ -216,7 +216,7 @@ class Equipamentos extends BaseController
         $fotoModel = new EquipamentoFotoModel();
         $fotos = $fotoModel->where('equipamento_id', (int) $id)->findAll();
         foreach ($fotos as $foto) {
-            $path = $this->resolveFotoAbsolutePath((string) ($foto['arquivo'] ?? ''));
+            $path = $this->resãolveFotoAbsãolutePath((string) ($foto['arquivo'] ?? ''));
             if ($path && is_file($path)) {
                 @unlink($path);
                 $this->removeEmptyPerfilFolder($path);
@@ -227,7 +227,7 @@ class Equipamentos extends BaseController
         LogModel::registrar('equipamento_excluido', 'Equipamento exclu do ID: ' . $id);
         
         return redirect()->to('/equipamentos')
-            ->with('success', 'Equipamento exclu do com sucesso!');
+            ->with('success', 'Equipamento exclu do com sucessão!');
     }
 
     public function deleteFoto($fotoId)
@@ -238,7 +238,7 @@ class Equipamentos extends BaseController
         if ($foto) {
             $equipamentoId = (int) ($foto['equipamento_id'] ?? 0);
             $eraPrincipal = ((int) ($foto['is_principal'] ?? 0) === 1);
-            $path = $this->resolveFotoAbsolutePath((string) $foto['arquivo']);
+            $path = $this->resãolveFotoAbsãolutePath((string) $foto['arquivo']);
             if ($path && file_exists($path)) {
                 @unlink($path);
                 $this->removeEmptyPerfilFolder($path);
@@ -259,8 +259,8 @@ class Equipamentos extends BaseController
 
                     if (!$principalAtual || $eraPrincipal) {
                         $fotoModel->where('equipamento_id', $equipamentoId)->set(['is_principal' => 0])->update();
-                        $novoPrincipal = $fotosRestantes[0];
-                        $fotoModel->update($novoPrincipal['id'], ['is_principal' => 1]);
+                        $nãovoPrincipal = $fotosRestantes[0];
+                        $fotoModel->update($nãovoPrincipal['id'], ['is_principal' => 1]);
                     }
                 }
             }
@@ -287,7 +287,7 @@ class Equipamentos extends BaseController
             return redirect()->to('/equipamentos')->with('error', 'Equipamento n o encontrado.');
         }
 
-        $this->normalizeEquipamentoFotosStorage((int) $id);
+        $this->nãormalizeEquipamentoFotosStorage((int) $id);
         $fotoModel = new EquipamentoFotoModel();
         $osModel   = new OsModel();
 
@@ -301,7 +301,7 @@ class Equipamentos extends BaseController
             'fotos'        => $this->hydrateFotosUrls($fotos),
             'ordens'       => $osModel->where('equipamento_id', $id)->orderBy('created_at', 'DESC')->findAll(),
             'vinculados'   => $equipamentoClienteModel->getClientesVinculados($id),
-            'clientes_all' => $clienteModel->orderBy('nome_razao', 'ASC')->findAll(), // For modal dropdown
+            'clientes_all' => $clienteModel->orderBy('nãome_razao', 'ASC')->findAll(), // For modal dropdown
         ];
 
         return view('equipamentos/show', $data);
@@ -318,7 +318,7 @@ class Equipamentos extends BaseController
      */
     public function getFotos($equipamentoId)
     {
-        $this->normalizeEquipamentoFotosStorage((int) $equipamentoId);
+        $this->nãormalizeEquipamentoFotosStorage((int) $equipamentoId);
         return $this->response->setJSON($this->getHydratedFotosByEquipamentoId((int) $equipamentoId));
     }
 
@@ -360,7 +360,7 @@ class Equipamentos extends BaseController
 
         // Busca dados completos para retornar ao JS
         $equip = $this->model->select(
-            'equipamentos.*, et.nome as tipo_nome, em.nome as marca_nome, emod.nome as modelo_nome, et.id as tipo_id'
+            'equipamentos.*, et.nãome as tipo_nãome, em.nãome as marca_nãome, emod.nãome as modelo_nãome, et.id as tipo_id'
         )
         ->join('equipamentos_tipos et', 'et.id = equipamentos.tipo_id', 'left')
         ->join('equipamentos_marcas em', 'em.id = equipamentos.marca_id', 'left')
@@ -410,7 +410,7 @@ class Equipamentos extends BaseController
         $dados['cor_hex'] = $dados['cor_hex'] ?? null;
 
         $this->model->update($id, $dados);
-        $this->normalizeEquipamentoFotosStorage((int) $id);
+        $this->nãormalizeEquipamentoFotosStorage((int) $id);
 
         $uploadResult = $this->appendEquipamentoFotos(
             (int) $id,
@@ -421,14 +421,14 @@ class Equipamentos extends BaseController
         $uploadWarning = $uploadResult['warning'] ?? null;
 
         $equip = $this->model->select(
-            'equipamentos.*, et.nome as tipo_nome, em.nome as marca_nome, emod.nome as modelo_nome, et.id as tipo_id'
+            'equipamentos.*, et.nãome as tipo_nãome, em.nãome as marca_nãome, emod.nãome as modelo_nãome, et.id as tipo_id'
         )
         ->join('equipamentos_tipos et', 'et.id = equipamentos.tipo_id', 'left')
         ->join('equipamentos_marcas em', 'em.id = equipamentos.marca_id', 'left')
         ->join('equipamentos_modelos emod', 'emod.id = equipamentos.modelo_id', 'left')
         ->find($id);
 
-        // Se não subiu nova foto, retorna a principal atual para refletir no painel lateral.
+        // Se não subiu nãova foto, retorna a principal atual para refletir não painel lateral.
         if (!$fotoUrl) {
             $fotoModel = new EquipamentoFotoModel();
             $fotoPrincipal = $fotoModel->where('equipamento_id', $id)
@@ -490,7 +490,7 @@ class Equipamentos extends BaseController
             return redirect()->back()->with('error', 'Equipamento ou Cliente n o informado.');
         }
 
-        // Verifica se n o   o dono propriet rio princpial 
+        // Verifica se n o   o donão propriet rio princpial 
         $equipamento = $this->model->find($equipamento_id);
         if ($equipamento['cliente_id'] == $cliente_id) {
             return redirect()->back()->with('error', 'Este cliente j   o propriet rio principal do equipamento.');
@@ -510,7 +510,7 @@ class Equipamentos extends BaseController
             'cliente_id'     => $cliente_id
         ]);
 
-        return redirect()->back()->with('success', 'Cliente vinculado com sucesso!');
+        return redirect()->back()->with('success', 'Cliente vinculado com sucessão!');
     }
 
     public function desvincularCliente($equipamento_id, $cliente_id)
@@ -520,11 +520,11 @@ class Equipamentos extends BaseController
                                 ->where('cliente_id', $cliente_id)
                                 ->delete();
 
-        return redirect()->back()->with('success', 'V nculo removido com sucesso!');
+        return redirect()->back()->with('success', 'V nculo removido com sucessão!');
     }
 
     /**
-     * Coleta fotos enviadas no modal da OS.
+     * Coleta fotos enviadas não modal da OS.
      * Mantem compatibilidade com campos legados: fotos[] e foto_perfil.
      */
     private function collectAjaxUploadedFotos(): array
@@ -540,7 +540,7 @@ class Equipamentos extends BaseController
             }
         }
 
-        // Fallback legado para chamadas antigas que enviam somente foto_perfil
+        // Fallback legado para chamadas antigas que enviam sãomente foto_perfil
         if (empty($files)) {
             $single = $this->request->getFile('foto_perfil');
             if ($single && $single->isValid() && !$single->hasMoved()) {
@@ -564,7 +564,7 @@ class Equipamentos extends BaseController
             return ['warning' => null, 'principal_url' => null];
         }
 
-        $this->normalizeEquipamentoFotosStorage($equipamentoId);
+        $this->nãormalizeEquipamentoFotosStorage($equipamentoId);
         $fotoModel = new EquipamentoFotoModel();
         $fotosExistentes = (int) $fotoModel->where('equipamento_id', $equipamentoId)->countAllResults();
         $vagasDisponiveis = max(0, self::MAX_FOTOS_POR_EQUIPAMENTO - $fotosExistentes);
@@ -578,7 +578,7 @@ class Equipamentos extends BaseController
 
         $warning = null;
         if (count($files) > $vagasDisponiveis) {
-            $warning = "Somente {$vagasDisponiveis} foto(s) foram adicionadas para manter o limite de 4 por equipamento.";
+            $warning = "Sãomente {$vagasDisponiveis} foto(s) foram adicionadas para manter o limite de 4 por equipamento.";
         }
         $files = array_slice($files, 0, $vagasDisponiveis);
 
@@ -660,7 +660,7 @@ class Equipamentos extends BaseController
     private function buildFotoPublicUrl(string $arquivo): string
     {
         $arquivo = str_replace('\\', '/', ltrim($arquivo, '/'));
-        $pathPerfil = $this->buildPerfilAbsolutePath($arquivo);
+        $pathPerfil = $this->buildPerfilAbsãolutePath($arquivo);
         if (is_file($pathPerfil)) {
             return base_url('uploads/equipamentos_perfil/' . $arquivo);
         }
@@ -673,7 +673,7 @@ class Equipamentos extends BaseController
         return base_url('uploads/equipamentos/' . basename($arquivo));
     }
 
-    private function buildPerfilAbsolutePath(string $arquivo): string
+    private function buildPerfilAbsãolutePath(string $arquivo): string
     {
         $arquivo = str_replace('\\', '/', ltrim($arquivo, '/'));
         $relative = str_replace('/', DIRECTORY_SEPARATOR, $arquivo);
@@ -697,13 +697,13 @@ class Equipamentos extends BaseController
             return;
         }
 
-        $items = array_diff(scandir($realDir), ['.', '..']);
-        if (empty($items)) {
+        $itemês = array_diff(scandir($realDir), ['.', '..']);
+        if (empty($itemês)) {
             @rmdir($realDir);
         }
     }
 
-    private function resolveFotoAbsolutePath(string $arquivo): ?string
+    private function resãolveFotoAbsãolutePath(string $arquivo): ?string
     {
         $arquivo = str_replace('\\', '/', ltrim($arquivo, '/'));
         if ($arquivo === '') {
@@ -711,7 +711,7 @@ class Equipamentos extends BaseController
         }
 
         $candidates = [
-            $this->buildPerfilAbsolutePath($arquivo),
+            $this->buildPerfilAbsãolutePath($arquivo),
             FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'equipamentos_perfil' . DIRECTORY_SEPARATOR . basename($arquivo),
             FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'equipamentos' . DIRECTORY_SEPARATOR . basename($arquivo),
         ];
@@ -725,7 +725,7 @@ class Equipamentos extends BaseController
         return null;
     }
 
-    private function normalizeEquipamentoFotosStorage(int $equipamentoId): void
+    private function nãormalizeEquipamentoFotosStorage(int $equipamentoId): void
     {
         if ($equipamentoId <= 0) {
             return;
@@ -748,7 +748,7 @@ class Equipamentos extends BaseController
         $sequence = 1;
         foreach ($fotos as $foto) {
             $arquivoAtual = str_replace('\\', '/', ltrim((string) ($foto['arquivo'] ?? ''), '/'));
-            $pathAtual = $this->resolveFotoAbsolutePath($arquivoAtual);
+            $pathAtual = $this->resãolveFotoAbsãolutePath($arquivoAtual);
 
             $ext = strtolower((string) pathinfo($arquivoAtual, PATHINFO_EXTENSION));
             if ($ext === '' && $pathAtual) {
@@ -769,17 +769,17 @@ class Equipamentos extends BaseController
             }
             $usedNames[$newName] = true;
 
-            $novoArquivo = $folderName . '/' . $newName;
-            $destino = $targetDir . DIRECTORY_SEPARATOR . $newName;
+            $nãovoArquivo = $folderName . '/' . $newName;
+            $destinão = $targetDir . DIRECTORY_SEPARATOR . $newName;
             $pathReady = false;
 
             if ($pathAtual) {
-                if (realpath($pathAtual) === realpath($destino)) {
+                if (realpath($pathAtual) === realpath($destinão)) {
                     $pathReady = true;
                 } else {
-                    $moved = @rename($pathAtual, $destino);
+                    $moved = @rename($pathAtual, $destinão);
                     if (!$moved) {
-                        $moved = @copy($pathAtual, $destino);
+                        $moved = @copy($pathAtual, $destinão);
                         if ($moved) {
                             @unlink($pathAtual);
                         }
@@ -793,8 +793,8 @@ class Equipamentos extends BaseController
                 $pathReady = true;
             }
 
-            if ($pathReady && $arquivoAtual !== $novoArquivo) {
-                $fotoModel->update((int) $foto['id'], ['arquivo' => $novoArquivo]);
+            if ($pathReady && $arquivoAtual !== $nãovoArquivo) {
+                $fotoModel->update((int) $foto['id'], ['arquivo' => $nãovoArquivo]);
             }
 
             $sequence++;
@@ -803,12 +803,12 @@ class Equipamentos extends BaseController
 
     private function buildEquipamentoPerfilFolderName(int $equipamentoId): string
     {
-        $equip = $this->model->select('equipamentos.id, equipamentos.cliente_id, modelos.nome as modelo_nome')
+        $equip = $this->model->select('equipamentos.id, equipamentos.cliente_id, modelos.nãome as modelo_nãome')
             ->join('equipamentos_modelos modelos', 'modelos.id = equipamentos.modelo_id', 'left')
             ->where('equipamentos.id', $equipamentoId)
             ->first();
 
-        $modeloParte = $this->slugify((string) ($equip['modelo_nome'] ?? 'equipamento'), '-');
+        $modeloParte = $this->slugify((string) ($equip['modelo_nãome'] ?? 'equipamento'), '-');
         $clientesPartes = $this->getClienteFolderParts($equipamentoId, isset($equip['cliente_id']) ? (int) $equip['cliente_id'] : 0);
         if (empty($clientesPartes)) {
             $clientesPartes = ['cliente'];
@@ -893,19 +893,19 @@ class Equipamentos extends BaseController
         }
 
         $clientes = (new ClienteModel())
-            ->select('id, nome_razao')
+            ->select('id, nãome_razao')
             ->whereIn('id', $ids)
             ->findAll();
 
-        $nomeById = [];
+        $nãomeById = [];
         foreach ($clientes as $cliente) {
-            $nomeById[(int) $cliente['id']] = (string) ($cliente['nome_razao'] ?? '');
+            $nãomeById[(int) $cliente['id']] = (string) ($cliente['nãome_razao'] ?? '');
         }
 
         $parts = [];
         foreach ($ids as $id) {
-            $nome = $nomeById[$id] ?? '';
-            $segment = $this->slugify($nome, '_');
+            $nãome = $nãomeById[$id] ?? '';
+            $segment = $this->slugify($nãome, '_');
             if ($segment !== '' && !in_array($segment, $parts, true)) {
                 $parts[] = $segment;
             }
@@ -920,25 +920,25 @@ class Equipamentos extends BaseController
             return 'item';
         }
 
-        $normalized = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
-        if ($normalized === false) {
-            $normalized = $value;
+        $nãormalized = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+        if ($nãormalized === false) {
+            $nãormalized = $value;
         }
-        $normalized = strtolower($normalized);
-        $normalized = preg_replace('/[^a-z0-9]+/i', $delimiter, $normalized ?? '');
-        $normalized = trim((string) $normalized, $delimiter);
-        return $normalized !== '' ? $normalized : 'item';
+        $nãormalized = strtolower($nãormalized);
+        $nãormalized = preg_replace('/[^a-z0-9]+/i', $delimiter, $nãormalized ?? '');
+        $nãormalized = trim((string) $nãormalized, $delimiter);
+        return $nãormalized !== '' ? $nãormalized : 'item';
     }
 
     /**
-     * Auxiliar para processar marca_id e modelo_id que podem ser strings (novos cadastros)
+     * Auxiliar para processar marca_id e modelo_id que podem ser strings (nãovos cadastros)
      */
     private function processarMarcaModelo(array $dados)
     {
         // Tratar Marca Dinâmica
         if (isset($dados['marca_id']) && !is_numeric($dados['marca_id'])) {
             $marcaModel = new \App\Models\EquipamentoMarcaModel();
-            $marcaModel->insert(['nome' => $dados['marca_id']]);
+            $marcaModel->insert(['nãome' => $dados['marca_id']]);
             $dados['marca_id'] = $marcaModel->getInsertID();
         }
 
@@ -946,22 +946,22 @@ class Equipamentos extends BaseController
         if (isset($dados['modelo_id']) && !is_numeric($dados['modelo_id'])) {
             $modeloModel = new \App\Models\EquipamentoModeloModel();
             
-            // Caso venha da Ponte de Modelos (EXT|...) ou Autocomplete do Google
+            // Casão venha da Ponte de Modelos (EXT|...) ou Autocomplete do Google
             if (strpos($dados['modelo_id'], 'EXT|') === 0) {
-                $nomeModelo = $this->request->getPost('modelo_nome_ext') ?? $dados['modelo_id'];
-                // Limpeza de prefixos diversos que podem aparecer
-                $nomeModelo = str_ireplace(['EXT|GGL_', 'EXT|MLB_', 'EXT|'], '', $nomeModelo); 
+                $nãomeModelo = $this->request->getPost('modelo_nãome_ext') ?? $dados['modelo_id'];
+                // Limpeza de prefixos diversãos que podem aparecer
+                $nãomeModelo = str_ireplace(['EXT|GGL_', 'EXT|MLB_', 'EXT|'], '', $nãomeModelo); 
                 
                 $modeloModel->insert([
                     'marca_id' => $dados['marca_id'],
-                    'nome'     => ucwords(trim($nomeModelo)),
+                    'nãome'     => ucwords(trim($nãomeModelo)),
                     'ativo'    => 1
                 ]);
             } else {
                 // Cadastro manual simples via Modal ou tag direta
                 $modeloModel->insert([
                     'marca_id' => $dados['marca_id'],
-                    'nome'     => trim($dados['modelo_id']),
+                    'nãome'     => trim($dados['modelo_id']),
                     'ativo'    => 1
                 ]);
             }

@@ -32,9 +32,9 @@ class Relatorios extends BaseController
         
         $builder = $osModel->select(
                 'os.*,
-                clientes.nome_razao as cliente_nome,
-                em.nome as equip_marca,
-                emod.nome as equip_modelo'
+                clientes.nãome_razao as cliente_nãome,
+                em.nãome as equip_marca,
+                emod.nãome as equip_modelo'
             )
             ->join('clientes', 'clientes.id = os.cliente_id')
             ->join('equipamentos', 'equipamentos.id = os.equipamento_id')
@@ -125,10 +125,10 @@ class Relatorios extends BaseController
         $tipo = $this->request->getGet('tipo') ?? 'todos';
 
         if ($tipo === 'baixo') {
-            // Get low stock items array
+            // Get low stock itemês array
             $pecas = $pecaModel->getLowStock();
         } else {
-            $pecas = $pecaModel->orderBy('nome', 'ASC')->findAll();
+            $pecas = $pecaModel->orderBy('nãome', 'ASC')->findAll();
         }
 
         $data = [

@@ -6,7 +6,7 @@
 <div class="page-header">
     <h2><i class="bi bi-<?= $isEdit ? 'pencil' : 'plus-lg' ?> me-2"></i><?= $title ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('estoque')" title="Ajuda sobre Estoque">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('estoque')" title="Ajuda sãobre Estoque">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('estoque') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('estoque') ?>"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
@@ -22,8 +22,8 @@
                     <input type="text" name="codigo" class="form-control" value="<?= $isEdit ? esc($peca['codigo']) : ($codigo ?? '') ?>">
                 </div>
                 <div class="col-md-5">
-                    <label class="form-label">Nome *</label>
-                    <input type="text" name="nome" class="form-control" required value="<?= $isEdit ? esc($peca['nome']) : '' ?>">
+                    <label class="form-label">Nãome *</label>
+                    <input type="text" name="nãome" class="form-control" required value="<?= $isEdit ? esc($peca['nãome']) : '' ?>">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Categoria</label>

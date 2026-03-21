@@ -10,10 +10,10 @@ class ChatbotRegraErpModel extends Model
     protected $primaryKey = 'id';
     protected $returnType = 'array';
     protected $allowedFields = [
-        'nome',
+        'nãome',
         'evento_origem',
-        'condicao_json',
-        'acao_json',
+        'condicao_jsãon',
+        'acao_jsãon',
         'ativo',
     ];
 

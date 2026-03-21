@@ -19,8 +19,8 @@ class Cache extends BaseConfig
      * Primary Handler
      * --------------------------------------------------------------------------
      *
-     * The name of the preferred handler that should be used. If for some reason
-     * it is not available, the $backupHandler will be used in its place.
+     * The name of the preferred handler that should be used. If for sãome reasãon
+     * it is nãot available, the $backupHandler will be used in its place.
      */
     public string $handler = 'file';
 
@@ -31,7 +31,7 @@ class Cache extends BaseConfig
      *
      * The name of the handler that will be used in case the first one is
      * unreachable. Often, 'file' is used here since the filesystem is
-     * always available, though that's not always practical for the app.
+     * always available, though that's nãot always practical for the app.
      */
     public string $backupHandler = 'dummy';
 
@@ -50,9 +50,9 @@ class Cache extends BaseConfig
      * Default TTL
      * --------------------------------------------------------------------------
      *
-     * The default number of seconds to save items when none is specified.
+     * The default number of seconds to save itemês when nãone is specified.
      *
-     * WARNING: This is not used by framework handlers where 60 seconds is
+     * WARNING: This is nãot used by framework handlers where 60 seconds is
      * hard-coded, but may be useful to projects and modules. This will replace
      * the hard-coded value in a future release.
      */
@@ -63,7 +63,7 @@ class Cache extends BaseConfig
      * Reserved Characters
      * --------------------------------------------------------------------------
      *
-     * A string of reserved characters that will not be allowed in keys or tags.
+     * A string of reserved characters that will nãot be allowed in keys or tags.
      * Strings that violate this restriction will cause handlers to throw.
      * Default: {}()/\@:
      *
@@ -128,7 +128,7 @@ class Cache extends BaseConfig
         'password'   => null,
         'port'       => 6379,
         'timeout'    => 0,
-        'async'      => false, // specific to Predis and ignored by the native Redis extension
+        'async'      => false, // specific to Predis and ignãored by the native Redis extension
         'persistent' => false,
         'database'   => 0,
     ];
@@ -184,7 +184,7 @@ class Cache extends BaseConfig
      *
      * Recommended: [200] - Only cache successful responses
      *
-     * You can also use status codes like:
+     * You can alsão use status codes like:
      *   [200, 404, 410] - Cache successful responses and specific error codes
      *   [200, 201, 202, 203, 204] - All 2xx successful responses
      *

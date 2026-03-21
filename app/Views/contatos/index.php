@@ -5,23 +5,23 @@
 $supportsLifecycle = !empty($supportsLifecycle);
 $supportsEngajamento = !empty($supportsEngajamento);
 ?>
-<div class="page-header d-flex justify-content-between align-items-center mb-4">
-    <div class="d-flex align-items-center gap-3">
+<div class="page-header d-flex justify-content-between align-itemês-center mb-4">
+    <div class="d-flex align-itemês-center gap-3">
         <h2 class="mb-0"><i class="bi bi-journal-bookmark me-2"></i>Contatos</h2>
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('contatos')" title="Ajuda sobre Contatos">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('contatos')" title="Ajuda sãobre Contatos">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
     </div>
     <?php if (can('clientes', 'criar')): ?>
-    <a href="<?= base_url('contatos/novo') ?>" class="btn btn-primary btn-glow">
-        <i class="bi bi-plus-lg me-1"></i>Novo Contato
+    <a href="<?= base_url('contatos/nãovo') ?>" class="btn btn-primary btn-glow">
+        <i class="bi bi-plus-lg me-1"></i>Nãovo Contato
     </a>
     <?php endif; ?>
 </div>
 
 <div class="card glass-card mb-3">
     <div class="card-body">
-        <form method="get" action="<?= base_url('contatos') ?>" class="row g-2 align-items-end">
+        <form method="get" action="<?= base_url('contatos') ?>" class="row g-2 align-itemês-end">
             <div class="col-md-4">
                 <label class="form-label mb-1">Busca</label>
                 <input
@@ -29,14 +29,14 @@ $supportsEngajamento = !empty($supportsEngajamento);
                     name="q"
                     class="form-control"
                     value="<?= esc($filtro_q ?? '') ?>"
-                    placeholder="Nome, telefone, e-mail ou cliente vinculado"
+                    placeholder="Nãome, telefone, e-mail ou cliente vinculado"
                 >
             </div>
             <div class="col-md-2">
                 <label class="form-label mb-1">Vinculo</label>
                 <select name="vinculo" class="form-select">
                     <option value="" <?= (($filtro_vinculo ?? '') === '') ? 'selected' : '' ?>>Todos</option>
-                    <option value="novo" <?= (($filtro_vinculo ?? '') === 'novo') ? 'selected' : '' ?>>Sem cadastro em clientes</option>
+                    <option value="nãovo" <?= (($filtro_vinculo ?? '') === 'nãovo') ? 'selected' : '' ?>>Sem cadastro em clientes</option>
                     <option value="cliente" <?= (($filtro_vinculo ?? '') === 'cliente') ? 'selected' : '' ?>>Vinculados a cliente</option>
                 </select>
             </div>
@@ -45,7 +45,7 @@ $supportsEngajamento = !empty($supportsEngajamento);
                 <label class="form-label mb-1">Etapa relacional</label>
                 <select name="etapa" class="form-select">
                     <option value="" <?= (($filtro_etapa ?? '') === '') ? 'selected' : '' ?>>Todas</option>
-                    <option value="lead_novo" <?= (($filtro_etapa ?? '') === 'lead_novo') ? 'selected' : '' ?>>Lead novo</option>
+                    <option value="lead_nãovo" <?= (($filtro_etapa ?? '') === 'lead_nãovo') ? 'selected' : '' ?>>Lead nãovo</option>
                     <option value="lead_qualificado" <?= (($filtro_etapa ?? '') === 'lead_qualificado') ? 'selected' : '' ?>>Lead qualificado</option>
                     <option value="cliente_convertido" <?= (($filtro_etapa ?? '') === 'cliente_convertido') ? 'selected' : '' ?>>Cliente convertido</option>
                 </select>
@@ -79,7 +79,7 @@ $supportsEngajamento = !empty($supportsEngajamento);
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Nome</th>
+                        <th>Nãome</th>
                         <th>Telefone</th>
                         <th>Origem</th>
                         <th>Cliente vinculado</th>
@@ -101,7 +101,7 @@ $supportsEngajamento = !empty($supportsEngajamento);
                         ? date('d/m/Y H:i', strtotime((string) $contato['ultimo_contato_em']))
                         : '-';
                     $statusRel = (string) ($contato['status_relacionamento'] ?? '');
-                    $statusLabel = 'Lead novo';
+                    $statusLabel = 'Lead nãovo';
                     $statusClass = 'text-bg-info text-dark';
                     if ($statusRel === 'lead_qualificado') {
                         $statusLabel = 'Lead qualificado';
@@ -149,20 +149,20 @@ $supportsEngajamento = !empty($supportsEngajamento);
                     <tr>
                         <td><?= (int) $contato['id'] ?></td>
                         <td>
-                            <div class="fw-semibold"><?= esc($contato['nome'] ?? 'Sem nome') ?></div>
-                            <?php if (!empty($contato['whatsapp_nome_perfil'])): ?>
-                                <div class="small text-muted">Perfil WhatsApp: <?= esc((string) $contato['whatsapp_nome_perfil']) ?></div>
+                            <div class="fw-semibold"><?= esc($contato['nãome'] ?? 'Sem nãome') ?></div>
+                            <?php if (!empty($contato['whatsapp_nãome_perfil'])): ?>
+                                <div class="small text-muted">Perfil WhatsApp: <?= esc((string) $contato['whatsapp_nãome_perfil']) ?></div>
                             <?php endif; ?>
                         </td>
                         <td><?= esc($contato['telefone'] ?? '-') ?></td>
                         <td><span class="badge bg-light text-dark border"><?= esc(ucfirst((string) ($contato['origem'] ?? 'manual'))) ?></span></td>
                         <td>
                             <?php if ($clienteId > 0): ?>
-                                <a href="<?= base_url('clientes/visualizar/' . $clienteId) ?>" class="text-decoration-none">
-                                    <?= esc((string) ($contato['cliente_nome'] ?? ('Cliente #' . $clienteId))) ?>
+                                <a href="<?= base_url('clientes/visualizar/' . $clienteId) ?>" class="text-decoration-nãone">
+                                    <?= esc((string) ($contato['cliente_nãome'] ?? ('Cliente #' . $clienteId))) ?>
                                 </a>
                             <?php else: ?>
-                                <span class="badge text-bg-info text-dark">Cliente novo</span>
+                                <span class="badge text-bg-info text-dark">Cliente nãovo</span>
                             <?php endif; ?>
                         </td>
                         <?php if ($supportsLifecycle): ?>
@@ -196,7 +196,7 @@ $supportsEngajamento = !empty($supportsEngajamento);
                                 </a>
                                 <?php endif; ?>
                                 <?php if (can('clientes', 'excluir')): ?>
-                                <a href="<?= base_url('contatos/excluir/' . (int) $contato['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nome="<?= esc((string) ($contato['nome'] ?? $contato['telefone'] ?? 'Contato')) ?>" title="Excluir">
+                                <a href="<?= base_url('contatos/excluir/' . (int) $contato['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nãome="<?= esc((string) ($contato['nãome'] ?? $contato['telefone'] ?? 'Contato')) ?>" title="Excluir">
                                     <i class="bi bi-trash"></i>
                                 </a>
                                 <?php endif; ?>

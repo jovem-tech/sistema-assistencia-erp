@@ -4,7 +4,7 @@
 <div class="page-header">
     <h2><i class="bi bi-arrow-left-right me-2"></i><?= $title ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('estoque-movimentacoes')" title="Ajuda sobre Movimentações">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('estoque-movimentacoes')" title="Ajuda sãobre Movimentações">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('estoque') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('estoque') ?>"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
@@ -76,7 +76,7 @@
                         <td><strong><?= $m['quantidade'] ?></strong></td>
                         <td><?= esc($m['motivo'] ?? '-') ?></td>
                         <td><?= esc($m['numero_os'] ?? '-') ?></td>
-                        <td><?= esc($m['responsavel_nome'] ?? '-') ?></td>
+                        <td><?= esc($m['responsavel_nãome'] ?? '-') ?></td>
                     </tr>
                     <?php endforeach; endif; ?>
                 </tbody>

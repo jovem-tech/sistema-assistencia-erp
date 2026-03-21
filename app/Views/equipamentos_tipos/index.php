@@ -2,15 +2,15 @@
 
 <?= $this->section('content') ?>
 
-<div class="page-header d-flex justify-content-between align-items-center mb-4">
+<div class="page-header d-flex justify-content-between align-itemês-center mb-4">
     <h2 class="mb-0"><i class="bi bi-tag me-2"></i>Tipos de Equipamento</h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('equipamentos-tipos')" title="Ajuda sobre Tipos">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('equipamentos-tipos')" title="Ajuda sãobre Tipos">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <?php if (can('equipamentos', 'criar')): ?>
-        <button type="button" class="btn btn-primary btn-glow" data-bs-toggle="modal" data-bs-target="#novoTipoModal">
-            <i class="bi bi-plus-lg me-1"></i>Novo Tipo
+        <button type="button" class="btn btn-primary btn-glow" data-bs-toggle="modal" data-bs-target="#nãovoTipoModal">
+            <i class="bi bi-plus-lg me-1"></i>Nãovo Tipo
         </button>
         <?php endif; ?>
     </div>
@@ -23,7 +23,7 @@
                 <thead>
                     <tr>
                         <th width="10%">#</th>
-                        <th>Nome do Tipo</th>
+                        <th>Nãome do Tipo</th>
                         <th width="15%">Ações</th>
                     </tr>
                 </thead>
@@ -32,10 +32,10 @@
                         <?php foreach ($tipos as $t): ?>
                         <tr>
                             <td><?= $t['id'] ?></td>
-                            <td><strong><?= esc($t['nome']) ?></strong></td>
+                            <td><strong><?= esc($t['nãome']) ?></strong></td>
                             <td>
                                 <?php if (can('equipamentos', 'excluir')): ?>
-                                <a href="<?= base_url('equipamentostipos/excluir/' . $t['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nome="<?= esc($t['nome']) ?>" title="Excluir">
+                                <a href="<?= base_url('equipamentostipos/excluir/' . $t['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nãome="<?= esc($t['nãome']) ?>" title="Excluir">
                                     <i class="bi bi-trash"></i> Excluir
                                 </a>
                                 <?php endif; ?>
@@ -49,8 +49,8 @@
     </div>
 </div>
 
-<!-- Modal Novo Tipo -->
-<div class="modal fade" id="novoTipoModal" tabindex="-1">
+<!-- Modal Nãovo Tipo -->
+<div class="modal fade" id="nãovoTipoModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content card-custom">
             <div class="modal-header border-bottom">
@@ -61,8 +61,8 @@
                 <?= csrf_field() ?>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Nome do Tipo (Ex: Notebook, Celular, Fonte) *</label>
-                        <input type="text" class="form-control" name="nome" required maxlength="100">
+                        <label class="form-label fw-bold">Nãome do Tipo (Ex: Nãotebook, Celular, Fonte) *</label>
+                        <input type="text" class="form-control" name="nãome" required maxlength="100">
                     </div>
                 </div>
                 <div class="modal-footer border-top">

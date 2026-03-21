@@ -2,9 +2,9 @@
 
 <?= $this->section('content') ?>
 <div class="row mb-4">
-    <div class="col-12 d-flex justify-content-between align-items-center">
+    <div class="col-12 d-flex justify-content-between align-itemês-center">
         <h1 class="h3 mb-0">Meu Perfil</h1>
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('perfil')" title="Ajuda sobre Perfil">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('perfil')" title="Ajuda sãobre Perfil">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
     </div>
@@ -18,12 +18,12 @@
                     <?php if (!empty($usuario['foto']) && file_exists('uploads/usuarios/' . $usuario['foto'])): ?>
                         <img src="<?= base_url('uploads/usuarios/' . $usuario['foto']) ?>" alt="Foto de Perfil" class="img-thumbnail rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
                     <?php else: ?>
-                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 150px; height: 150px;">
-                            <i class="bi bi-person text-secondary" style="font-size: 5rem;"></i>
+                        <div class="bg-light rounded-circle d-flex align-itemês-center justify-content-center mx-auto" style="width: 150px; height: 150px;">
+                            <i class="bi bi-persãon text-secondary" style="font-size: 5rem;"></i>
                         </div>
                     <?php endif; ?>
                 </div>
-                <h4 class="mb-1"><?= esc($usuario['nome']) ?></h4>
+                <h4 class="mb-1"><?= esc($usuario['nãome']) ?></h4>
                 <p class="text-muted mb-0"><?= esc($usuario['email']) ?></p>
                 <div class="mt-3">
                     <span class="badge bg-primary px-3 py-2 text-uppercase"><?= esc($usuario['perfil']) ?></span>
@@ -38,7 +38,7 @@
                 <form action="<?= base_url('perfil/salvar') ?>" method="POST" enctype="multipart/form-data">
                     <?= csrf_field() ?>
                     
-                    <h5 class="mb-4 pb-2 border-bottom">Dados Pessoais</h5>
+                    <h5 class="mb-4 pb-2 border-bottom">Dados Pessãoais</h5>
                     
                     <div class="row mb-3">
                         <div class="col-md-12 mb-3">
@@ -50,8 +50,8 @@
 
                     <div class="row mb-4">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Nome Completo <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nome" value="<?= esc(old('nome', $usuario['nome'])) ?>" required>
+                            <label class="form-label text-muted">Nãome Completo <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="nãome" value="<?= esc(old('nãome', $usuario['nãome'])) ?>" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-muted">Email <span class="text-danger">*</span></label>
@@ -63,19 +63,19 @@
                         </div>
                     </div>
                     
-                    <h5 class="mb-4 pb-2 border-bottom">Alterar Senha <small class="text-muted fs-6 fw-normal">(opcional)</small></h5>
+                    <h5 class="mb-4 pb-2 border-bottom">Alterar Senha <small class="text-muted fs-6 fw-nãormal">(opcional)</small></h5>
                     <div class="row mb-4">
                         <div class="col-md-12 mb-3">
                             <label class="form-label text-muted">Senha Atual</label>
                             <input type="password" class="form-control" name="senha_atual" placeholder="Sua senha atual">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Nova Senha</label>
-                            <input type="password" class="form-control" name="nova_senha" placeholder="A partir de 6 caracteres">
+                            <label class="form-label text-muted">Nãova Senha</label>
+                            <input type="password" class="form-control" name="nãova_senha" placeholder="A partir de 6 caracteres">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Confirmar Nova Senha</label>
-                            <input type="password" class="form-control" name="confirma_senha" placeholder="Repita a nova senha">
+                            <label class="form-label text-muted">Confirmar Nãova Senha</label>
+                            <input type="password" class="form-control" name="confirma_senha" placeholder="Repita a nãova senha">
                         </div>
                     </div>
                     

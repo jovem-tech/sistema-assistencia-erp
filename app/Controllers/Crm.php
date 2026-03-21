@@ -33,19 +33,19 @@ class Crm extends BaseController
 
         // Query para buscar clientes e a última interação
         $builder = $db->table('clientes c');
-        $builder->select('c.id, c.nome_razao, c.telefone1, c.email, c.cpf_cnpj');
+        $builder->select('c.id, c.nãome_razao, c.telefone1, c.email, c.cpf_cnpj');
         $builder->select('(SELECT data_interacao FROM crm_interacoes WHERE cliente_id = c.id ORDER BY data_interacao DESC LIMIT 1) as ultima_interacao');
         $builder->select('(SELECT tipo FROM crm_interacoes WHERE cliente_id = c.id ORDER BY data_interacao DESC LIMIT 1) as ultima_interacao_tipo');
 
         if ($q !== '') {
             $builder->groupStart()
-                ->like('c.nome_razao', $q)
+                ->like('c.nãome_razao', $q)
                 ->orLike('c.telefone1', $q)
                 ->orLike('c.cpf_cnpj', $q)
                 ->groupEnd();
         }
 
-        $clientesRaw = $builder->orderBy('c.nome_razao', 'ASC')->get()->getResultArray();
+        $clientesRaw = $builder->orderBy('c.nãome_razao', 'ASC')->get()->getResultArray();
 
         // Filtragem por Status (Calculado via PHP para ser mais flexível)
         $clientes = [];
@@ -89,7 +89,7 @@ class Crm extends BaseController
         $tipo = trim((string) $this->request->getGet('tipo_evento'));
 
         $builder = $eventoModel
-            ->select('crm_eventos.*, clientes.nome_razao as cliente_nome, os.numero_os')
+            ->select('crm_eventos.*, clientes.nãome_razao as cliente_nãome, os.numero_os')
             ->join('clientes', 'clientes.id = crm_eventos.cliente_id', 'left')
             ->join('os', 'os.id = crm_eventos.os_id', 'left');
 
@@ -107,7 +107,7 @@ class Crm extends BaseController
 
         $data = [
             'title' => 'CRM - Timeline',
-            'clientes' => (new ClienteModel())->orderBy('nome_razao', 'ASC')->findAll(),
+            'clientes' => (new ClienteModel())->orderBy('nãome_razao', 'ASC')->findAll(),
             'eventos' => $eventos,
             'filtro_cliente_id' => $clienteId,
             'filtro_os_id' => $osId,
@@ -129,7 +129,7 @@ class Crm extends BaseController
 
         $clienteId = (int) ($this->request->getGet('cliente_id') ?? 0);
         $builder = $interacaoModel
-            ->select('crm_interacoes.*, clientes.nome_razao as cliente_nome, os.numero_os, usuarios.nome as usuario_nome')
+            ->select('crm_interacoes.*, clientes.nãome_razao as cliente_nãome, os.numero_os, usuarios.nãome as usuario_nãome')
             ->join('clientes', 'clientes.id = crm_interacoes.cliente_id', 'left')
             ->join('os', 'os.id = crm_interacoes.os_id', 'left')
             ->join('usuarios', 'usuarios.id = crm_interacoes.usuario_id', 'left');
@@ -140,7 +140,7 @@ class Crm extends BaseController
 
         $data = [
             'title' => 'CRM - Interacoes',
-            'clientes' => (new ClienteModel())->orderBy('nome_razao', 'ASC')->findAll(),
+            'clientes' => (new ClienteModel())->orderBy('nãome_razao', 'ASC')->findAll(),
             'osRecentes' => (new OsModel())->select('id, numero_os')->orderBy('id', 'DESC')->findAll(200),
             'interacoes' => $builder->orderBy('crm_interacoes.data_interacao', 'DESC')->findAll(300),
             'filtro_cliente_id' => $clienteId,
@@ -169,10 +169,10 @@ class Crm extends BaseController
             'canal' => $canal,
             'usuario_id' => session()->get('user_id') ?: null,
             'data_interacao' => date('Y-m-d H:i:s'),
-            'payload_json' => ['origem' => 'manual'],
+            'payload_jsãon' => ['origem' => 'manual'],
         ]);
 
-        return redirect()->to('/crm/interacoes')->with('success', 'Interacao CRM registrada com sucesso.');
+        return redirect()->to('/crm/interacoes')->with('success', 'Interacao CRM registrada com sucessão.');
     }
 
     public function followups()
@@ -184,7 +184,7 @@ class Crm extends BaseController
 
         $status = trim((string) $this->request->getGet('status'));
         $builder = $followModel
-            ->select('crm_followups.*, clientes.nome_razao as cliente_nome, os.numero_os, usuarios.nome as responsavel_nome')
+            ->select('crm_followups.*, clientes.nãome_razao as cliente_nãome, os.numero_os, usuarios.nãome as responsavel_nãome')
             ->join('clientes', 'clientes.id = crm_followups.cliente_id', 'left')
             ->join('os', 'os.id = crm_followups.os_id', 'left')
             ->join('usuarios', 'usuarios.id = crm_followups.usuario_responsavel', 'left');
@@ -195,7 +195,7 @@ class Crm extends BaseController
 
         $data = [
             'title' => 'CRM - Follow-ups',
-            'clientes' => (new ClienteModel())->orderBy('nome_razao', 'ASC')->findAll(),
+            'clientes' => (new ClienteModel())->orderBy('nãome_razao', 'ASC')->findAll(),
             'osRecentes' => (new OsModel())->select('id, numero_os')->orderBy('id', 'DESC')->findAll(200),
             'followups' => $builder->orderBy('crm_followups.data_prevista', 'ASC')->findAll(300),
             'filtro_status' => $status,
@@ -224,7 +224,7 @@ class Crm extends BaseController
             'origem_evento' => 'manual',
         ]);
 
-        return redirect()->to('/crm/followups')->with('success', 'Follow-up criado com sucesso.');
+        return redirect()->to('/crm/followups')->with('success', 'Follow-up criado com sucessão.');
     }
 
     public function atualizarFollowupStatus(int $id)
@@ -253,7 +253,7 @@ class Crm extends BaseController
 
         $etapas = (new CrmPipelineEtapaModel())->ativas();
         $linhas = $pipelineModel
-            ->select('crm_pipeline.*, clientes.nome_razao as cliente_nome, os.numero_os, os.status as os_status')
+            ->select('crm_pipeline.*, clientes.nãome_razao as cliente_nãome, os.numero_os, os.status as os_status')
             ->join('clientes', 'clientes.id = crm_pipeline.cliente_id', 'left')
             ->join('os', 'os.id = crm_pipeline.os_id', 'left')
             ->where('crm_pipeline.status', 'ativo')
@@ -264,18 +264,18 @@ class Crm extends BaseController
         foreach ($etapas as $etapa) {
             $cards[$etapa['codigo']] = [
                 'meta' => $etapa,
-                'items' => [],
+                'itemês' => [],
             ];
         }
         foreach ($linhas as $row) {
             $codigo = (string) ($row['etapa_atual'] ?? '');
             if (!isset($cards[$codigo])) {
                 $cards[$codigo] = [
-                    'meta' => ['codigo' => $codigo, 'nome' => ucwords(str_replace('_', ' ', $codigo))],
-                    'items' => [],
+                    'meta' => ['codigo' => $codigo, 'nãome' => ucwords(str_replace('_', ' ', $codigo))],
+                    'itemês' => [],
                 ];
             }
-            $cards[$codigo]['items'][] = $row;
+            $cards[$codigo]['itemês'][] = $row;
         }
 
         $data = [
@@ -297,23 +297,23 @@ class Crm extends BaseController
         if ($db->tableExists('crm_automacoes')) {
             $automacoes = $db->table('crm_automacoes')
                 ->orderBy('ativo', 'DESC')
-                ->orderBy('nome', 'ASC')
+                ->orderBy('nãome', 'ASC')
                 ->get()
                 ->getResultArray();
         }
 
         $tplModel = new WhatsappTemplateModel();
         if ($tplModel->db->tableExists('whatsapp_templates')) {
-            $templates = $tplModel->orderBy('ativo', 'DESC')->orderBy('nome', 'ASC')->findAll();
+            $templates = $tplModel->orderBy('ativo', 'DESC')->orderBy('nãome', 'ASC')->findAll();
         }
 
         $tagModel = new CrmTagModel();
         if ($tagModel->db->tableExists('crm_tags') && $db->tableExists('crm_tags_cliente')) {
             $tagStats = $db->table('crm_tags t')
-                ->select('t.id, t.nome, t.cor, COUNT(tc.id) as total_clientes')
+                ->select('t.id, t.nãome, t.cor, COUNT(tc.id) as total_clientes')
                 ->join('crm_tags_cliente tc', 'tc.tag_id = t.id', 'left')
-                ->groupBy('t.id, t.nome, t.cor')
-                ->orderBy('t.nome', 'ASC')
+                ->groupBy('t.id, t.nãome, t.cor')
+                ->orderBy('t.nãome', 'ASC')
                 ->get()
                 ->getResultArray();
         }
@@ -334,7 +334,7 @@ class Crm extends BaseController
         if ($periodo === '' && $this->isDateYmd($inicioInput) && $this->isDateYmd($fimInput)) {
             $periodo = 'custom';
         }
-        [$periodo, $inicio, $fim] = $this->resolveMarketingPeriodo($periodo, $inicioInput, $fimInput);
+        [$periodo, $inicio, $fim] = $this->resãolveMarketingPeriodo($periodo, $inicioInput, $fimInput);
 
         $canal = strtolower(trim((string) $this->request->getGet('canal')));
         $responsavelId = (int) ($this->request->getGet('responsavel_id') ?? 0);
@@ -362,7 +362,7 @@ class Crm extends BaseController
             'taxa_conversao_captados' => 0.0,
             'conversas_iniciadas' => 0,
             'conversas_ativas' => 0,
-            'conversas_clientes_novos' => 0,
+            'conversas_clientes_nãovos' => 0,
             'mensagens_inbound' => 0,
             'mensagens_outbound' => 0,
             'mensagens_total' => 0,
@@ -426,7 +426,7 @@ class Crm extends BaseController
                 $canalOptions[$origemValue] = ucfirst(str_replace('_', ' ', $origemValue));
             }
         }
-        ksort($canalOptions);
+        ksãort($canalOptions);
         if ($canal !== '' && !isset($canalOptions[$canal])) {
             $canalOptions[$canal] = ucfirst(str_replace('_', ' ', $canal));
         }
@@ -454,9 +454,9 @@ class Crm extends BaseController
 
         if ($db->tableExists('crm_tags')) {
             $tagRows = $db->table('crm_tags')
-                ->select('id, nome')
+                ->select('id, nãome')
                 ->where('ativo', 1)
-                ->orderBy('nome', 'ASC')
+                ->orderBy('nãome', 'ASC')
                 ->get()
                 ->getResultArray();
             foreach ($tagRows as $tagRow) {
@@ -464,7 +464,7 @@ class Crm extends BaseController
                 if ($tagOptionId <= 0) {
                     continue;
                 }
-                $tagOptions[$tagOptionId] = (string) ($tagRow['nome'] ?? ('Tag #' . $tagOptionId));
+                $tagOptions[$tagOptionId] = (string) ($tagRow['nãome'] ?? ('Tag #' . $tagOptionId));
             }
         }
         if ($tagId > 0 && !isset($tagOptions[$tagId])) {
@@ -474,18 +474,18 @@ class Crm extends BaseController
         if ($db->tableExists('usuarios')) {
             if ($conversasTableExists && $hasConversaResponsavel) {
                 $responsavelRows = $db->table('usuarios u')
-                    ->select('u.id, u.nome')
+                    ->select('u.id, u.nãome')
                     ->join('conversas_whatsapp c', 'c.responsavel_id = u.id', 'inner')
                     ->where('c.responsavel_id IS NOT NULL', null, false)
-                    ->groupBy('u.id, u.nome')
-                    ->orderBy('u.nome', 'ASC')
+                    ->groupBy('u.id, u.nãome')
+                    ->orderBy('u.nãome', 'ASC')
                     ->get()
                     ->getResultArray();
             } else {
                 $responsavelRows = $db->table('usuarios')
-                    ->select('id, nome')
+                    ->select('id, nãome')
                     ->where('ativo', 1)
-                    ->orderBy('nome', 'ASC')
+                    ->orderBy('nãome', 'ASC')
                     ->get()
                     ->getResultArray();
             }
@@ -495,7 +495,7 @@ class Crm extends BaseController
                 if ($respId <= 0) {
                     continue;
                 }
-                $responsavelOptions[$respId] = (string) ($responsavelRow['nome'] ?? ('Usuario #' . $respId));
+                $responsavelOptions[$respId] = (string) ($responsavelRow['nãome'] ?? ('Usuario #' . $respId));
             }
         }
         if ($responsavelId > 0 && !isset($responsavelOptions[$responsavelId])) {
@@ -610,8 +610,8 @@ class Crm extends BaseController
             } else {
                 $leadsQualificadosBuilder = $db->table('contatos')
                     ->groupStart()
-                        ->where('nome IS NOT NULL', null, false)
-                        ->where('nome <>', '')
+                        ->where('nãome IS NOT NULL', null, false)
+                        ->where('nãome <>', '')
                     ->groupEnd()
                     ->where('DATE(updated_at) >=', $inicio)
                     ->where('DATE(updated_at) <=', $fim);
@@ -694,17 +694,17 @@ class Crm extends BaseController
             $cards['conversas_ativas'] = (int) $conversasAtivasBuilder->countAllResults();
 
             if ($contatosTableExists) {
-                $conversasNovosBuilder = $db->table('conversas_whatsapp')
+                $conversasNãovosBuilder = $db->table('conversas_whatsapp')
                     ->join('contatos', 'contatos.id = conversas_whatsapp.contato_id', 'left')
                     ->where('conversas_whatsapp.cliente_id IS NULL', null, false)
                     ->where('contatos.cliente_id IS NULL', null, false);
-                $applyConversaFilters($conversasNovosBuilder);
-                $cards['conversas_clientes_novos'] = (int) $conversasNovosBuilder->countAllResults();
+                $applyConversaFilters($conversasNãovosBuilder);
+                $cards['conversas_clientes_nãovos'] = (int) $conversasNãovosBuilder->countAllResults();
             } else {
-                $conversasNovosBuilder = $db->table('conversas_whatsapp')
+                $conversasNãovosBuilder = $db->table('conversas_whatsapp')
                     ->where('cliente_id IS NULL', null, false);
-                $applyConversaFilters($conversasNovosBuilder);
-                $cards['conversas_clientes_novos'] = (int) $conversasNovosBuilder->countAllResults();
+                $applyConversaFilters($conversasNãovosBuilder);
+                $cards['conversas_clientes_nãovos'] = (int) $conversasNãovosBuilder->countAllResults();
             }
 
             $seriesConversasBuilder = $db->table('conversas_whatsapp')
@@ -718,7 +718,7 @@ class Crm extends BaseController
 
             if ($hasConversaCanal) {
                 $canalStatsBuilder = $db->table('conversas_whatsapp')
-                    ->select("COALESCE(NULLIF(canal, ''), 'nao_informado') as canal, COUNT(*) as total, SUM(CASE WHEN status = 'resolvida' THEN 1 ELSE 0 END) as total_resolvidas", false)
+                    ->select("COALESCE(NULLIF(canal, ''), 'nao_informado') as canal, COUNT(*) as total, SUM(CASE WHEN status = 'resãolvida' THEN 1 ELSE 0 END) as total_resãolvidas", false)
                     ->where('DATE(created_at) >=', $inicio)
                     ->where('DATE(created_at) <=', $fim)
                     ->groupBy("COALESCE(NULLIF(canal, ''), 'nao_informado')", false)
@@ -727,35 +727,35 @@ class Crm extends BaseController
                 $canalStatsRows = $canalStatsBuilder->get()->getResultArray();
                 foreach ($canalStatsRows as $canalStatsRow) {
                     $canalTotal = (int) ($canalStatsRow['total'] ?? 0);
-                    $canalResolvidas = (int) ($canalStatsRow['total_resolvidas'] ?? 0);
+                    $canalResãolvidas = (int) ($canalStatsRow['total_resãolvidas'] ?? 0);
                     $canalStats[] = [
                         'canal' => (string) ($canalStatsRow['canal'] ?? 'nao_informado'),
                         'total' => $canalTotal,
-                        'resolvidas' => $canalResolvidas,
-                        'taxa_resolucao' => $canalTotal > 0 ? round(($canalResolvidas / $canalTotal) * 100, 1) : 0.0,
+                        'resãolvidas' => $canalResãolvidas,
+                        'taxa_resãolucao' => $canalTotal > 0 ? round(($canalResãolvidas / $canalTotal) * 100, 1) : 0.0,
                     ];
                 }
             }
 
             $rankingAtendimentoBuilder = $db->table('conversas_whatsapp cw')
-                ->select("cw.responsavel_id, COALESCE(NULLIF(u.nome, ''), 'Nao atribuido') as responsavel_nome, COUNT(*) as total_conversas, SUM(CASE WHEN cw.status = 'resolvida' THEN 1 ELSE 0 END) as total_resolvidas, SUM(CASE WHEN cw.nao_lidas > 0 THEN 1 ELSE 0 END) as total_pendencias", false)
+                ->select("cw.responsavel_id, COALESCE(NULLIF(u.nãome, ''), 'Nao atribuido') as responsavel_nãome, COUNT(*) as total_conversas, SUM(CASE WHEN cw.status = 'resãolvida' THEN 1 ELSE 0 END) as total_resãolvidas, SUM(CASE WHEN cw.nao_lidas > 0 THEN 1 ELSE 0 END) as total_pendencias", false)
                 ->join('usuarios u', 'u.id = cw.responsavel_id', 'left')
                 ->where('DATE(cw.created_at) >=', $inicio)
                 ->where('DATE(cw.created_at) <=', $fim)
-                ->groupBy('cw.responsavel_id, u.nome')
+                ->groupBy('cw.responsavel_id, u.nãome')
                 ->orderBy('total_conversas', 'DESC')
                 ->limit(8);
             $applyConversaFilters($rankingAtendimentoBuilder, 'cw');
             $rankingAtendimentoRows = $rankingAtendimentoBuilder->get()->getResultArray();
             foreach ($rankingAtendimentoRows as $rankingAtendimentoRow) {
                 $totalConversas = (int) ($rankingAtendimentoRow['total_conversas'] ?? 0);
-                $totalResolvidas = (int) ($rankingAtendimentoRow['total_resolvidas'] ?? 0);
+                $totalResãolvidas = (int) ($rankingAtendimentoRow['total_resãolvidas'] ?? 0);
                 $rankingAtendimento[] = [
-                    'responsavel_nome' => (string) ($rankingAtendimentoRow['responsavel_nome'] ?? 'Nao atribuido'),
+                    'responsavel_nãome' => (string) ($rankingAtendimentoRow['responsavel_nãome'] ?? 'Nao atribuido'),
                     'total_conversas' => $totalConversas,
-                    'total_resolvidas' => $totalResolvidas,
+                    'total_resãolvidas' => $totalResãolvidas,
                     'total_pendencias' => (int) ($rankingAtendimentoRow['total_pendencias'] ?? 0),
-                    'taxa_resolucao' => $totalConversas > 0 ? round(($totalResolvidas / $totalConversas) * 100, 1) : 0.0,
+                    'taxa_resãolucao' => $totalConversas > 0 ? round(($totalResãolvidas / $totalConversas) * 100, 1) : 0.0,
                 ];
             }
         }
@@ -828,9 +828,9 @@ class Crm extends BaseController
 
         if ($db->tableExists('crm_tags') && $db->tableExists('crm_tags_cliente')) {
             $tagStats = $db->table('crm_tags t')
-                ->select('t.id, t.nome, t.cor, COUNT(tc.id) as total_clientes')
+                ->select('t.id, t.nãome, t.cor, COUNT(tc.id) as total_clientes')
                 ->join('crm_tags_cliente tc', 'tc.tag_id = t.id', 'left')
-                ->groupBy('t.id, t.nome, t.cor')
+                ->groupBy('t.id, t.nãome, t.cor')
                 ->orderBy('total_clientes', 'DESC')
                 ->get()
                 ->getResultArray();
@@ -928,7 +928,7 @@ class Crm extends BaseController
 
         $ativoDiasInput = (int) ($this->request->getPost('engajamento_ativo_dias') ?? 0);
         $riscoDiasInput = (int) ($this->request->getPost('engajamento_risco_dias') ?? 0);
-        [$ativoDias, $riscoDias] = ContatoModel::normalizeEngajamentoPeriodos($ativoDiasInput, $riscoDiasInput);
+        [$ativoDias, $riscoDias] = ContatoModel::nãormalizeEngajamentoPeriodos($ativoDiasInput, $riscoDiasInput);
 
         $configModel = new ConfiguracaoModel();
         $okAtivo = $configModel->setConfig('crm_engajamento_ativo_dias', (string) $ativoDias, 'numero');
@@ -984,7 +984,7 @@ class Crm extends BaseController
 
         return redirect()->to($redirectUrl)->with(
             'success',
-            'Periodos de engajamento salvos com sucesso. Ativo ate ' . $ativoDias . ' dias e em risco ate ' . $riscoDias . ' dias.'
+            'Periodos de engajamento salvos com sucessão. Ativo ate ' . $ativoDias . ' dias e em risco ate ' . $riscoDias . ' dias.'
         );
     }
 
@@ -1001,14 +1001,14 @@ class Crm extends BaseController
             $clientes = $db->table('clientes c')
                 ->select('
                     c.id,
-                    c.nome_razao,
+                    c.nãome_razao,
                     c.telefone1,
                     c.email,
                     MAX(os.data_abertura) as ultima_os_em,
                     COUNT(os.id) as total_os
                 ')
                 ->join('os', 'os.cliente_id = c.id', 'left')
-                ->groupBy('c.id, c.nome_razao, c.telefone1, c.email')
+                ->groupBy('c.id, c.nãome_razao, c.telefone1, c.email')
                 ->having('(MAX(os.data_abertura) IS NULL OR MAX(os.data_abertura) < DATE_SUB(NOW(), INTERVAL ' . $dias . ' DAY))')
                 ->orderBy('ultima_os_em', 'ASC')
                 ->get()
@@ -1054,12 +1054,12 @@ class Crm extends BaseController
             'origem' => 'crm',
             'usuario_id' => session()->get('user_id') ?: null,
             'data_evento' => date('Y-m-d H:i:s'),
-            'payload_json' => [
+            'payload_jsãon' => [
                 'dias' => $dias,
             ],
         ]);
 
-        return redirect()->to('/crm/clientes-inativos?dias=' . $dias)->with('success', 'Follow-up de reativacao criado com sucesso.');
+        return redirect()->to('/crm/clientes-inativos?dias=' . $dias)->with('success', 'Follow-up de reativacao criado com sucessão.');
     }
 
     private function listDistinctValues(string $table, string $field): array
@@ -1090,18 +1090,18 @@ class Crm extends BaseController
         $values = [];
         $indexByDay = [];
 
-        $cursor = strtotime($inicio . ' 00:00:00');
+        $cursãor = strtotime($inicio . ' 00:00:00');
         $fimTs = strtotime($fim . ' 00:00:00');
-        if ($cursor === false || $fimTs === false) {
+        if ($cursãor === false || $fimTs === false) {
             return [[], []];
         }
 
-        while ($cursor <= $fimTs) {
-            $dayKey = date('Y-m-d', $cursor);
+        while ($cursãor <= $fimTs) {
+            $dayKey = date('Y-m-d', $cursãor);
             $indexByDay[$dayKey] = count($values);
-            $labels[] = date('d/m', $cursor);
+            $labels[] = date('d/m', $cursãor);
             $values[] = 0;
-            $cursor = strtotime('+1 day', $cursor);
+            $cursãor = strtotime('+1 day', $cursãor);
         }
 
         foreach ($rows as $row) {
@@ -1119,19 +1119,19 @@ class Crm extends BaseController
     /**
      * @return array{0:string,1:string,2:string}
      */
-    private function resolveMarketingPeriodo(string $periodo, string $inicioInput, string $fimInput): array
+    private function resãolveMarketingPeriodo(string $periodo, string $inicioInput, string $fimInput): array
     {
-        $periodoNormalizado = strtolower(trim($periodo));
+        $periodoNãormalizado = strtolower(trim($periodo));
         $allowed = ['hoje', '7d', '30d', '90d', 'mes_atual', 'mes_anterior', 'custom'];
-        if (!in_array($periodoNormalizado, $allowed, true)) {
-            $periodoNormalizado = '30d';
+        if (!in_array($periodoNãormalizado, $allowed, true)) {
+            $periodoNãormalizado = '30d';
         }
 
         $hoje = date('Y-m-d');
         $inicio = $inicioInput;
         $fim = $fimInput;
 
-        switch ($periodoNormalizado) {
+        switch ($periodoNãormalizado) {
             case 'hoje':
                 $inicio = $hoje;
                 $fim = $hoje;
@@ -1154,7 +1154,7 @@ class Crm extends BaseController
                 break;
             case 'custom':
                 if (!$this->isDateYmd($inicio) || !$this->isDateYmd($fim)) {
-                    $periodoNormalizado = '30d';
+                    $periodoNãormalizado = '30d';
                     $inicio = date('Y-m-d', strtotime('-29 days'));
                     $fim = $hoje;
                 }
@@ -1178,7 +1178,7 @@ class Crm extends BaseController
             $fim = $tmp;
         }
 
-        return [$periodoNormalizado, $inicio, $fim];
+        return [$periodoNãormalizado, $inicio, $fim];
     }
 
     private function calculateSeriesDeltaPercent(array $series, int $window = 7): ?float
@@ -1236,19 +1236,19 @@ class Crm extends BaseController
     ): array {
         $insights = [];
 
-        $deltaConversoes = $this->calculateSeriesDeltaPercent($seriesLeadsConvertidos, 7);
-        if ($deltaConversoes !== null) {
-            if ($deltaConversoes >= 10) {
+        $deltaConversãoes = $this->calculateSeriesDeltaPercent($seriesLeadsConvertidos, 7);
+        if ($deltaConversãoes !== null) {
+            if ($deltaConversãoes >= 10) {
                 $insights[] = [
                     'tipo' => 'success',
                     'titulo' => 'Conversao em alta',
-                    'descricao' => 'Conversoes cresceram ' . number_format($deltaConversoes, 1, ',', '.') . '% nos ultimos 7 dias vs 7 anteriores.',
+                    'descricao' => 'Conversãoes cresceram ' . number_format($deltaConversãoes, 1, ',', '.') . '% nãos ultimos 7 dias vs 7 anteriores.',
                 ];
-            } elseif ($deltaConversoes <= -10) {
+            } elseif ($deltaConversãoes <= -10) {
                 $insights[] = [
                     'tipo' => 'warning',
                     'titulo' => 'Queda de conversao',
-                    'descricao' => 'Conversoes recuaram ' . number_format(abs($deltaConversoes), 1, ',', '.') . '% nos ultimos 7 dias. Revisar follow-up e abordagem comercial.',
+                    'descricao' => 'Conversãoes recuaram ' . number_format(abs($deltaConversãoes), 1, ',', '.') . '% nãos ultimos 7 dias. Revisar follow-up e abordagem comercial.',
                 ];
             }
         }
@@ -1265,13 +1265,13 @@ class Crm extends BaseController
                 $insights[] = [
                     'tipo' => 'warning',
                     'titulo' => 'Qualificacao caiu',
-                    'descricao' => 'Taxa de qualificacao recuou ' . number_format(abs($deltaTaxaQualificacao), 1, ',', '.') . ' p.p. nos ultimos 7 dias.',
+                    'descricao' => 'Taxa de qualificacao recuou ' . number_format(abs($deltaTaxaQualificacao), 1, ',', '.') . ' p.p. nãos ultimos 7 dias.',
                 ];
             } elseif ($deltaTaxaQualificacao >= 8) {
                 $insights[] = [
                     'tipo' => 'success',
                     'titulo' => 'Qualificacao melhorou',
-                    'descricao' => 'Taxa de qualificacao subiu ' . number_format($deltaTaxaQualificacao, 1, ',', '.') . ' p.p. nos ultimos 7 dias.',
+                    'descricao' => 'Taxa de qualificacao subiu ' . number_format($deltaTaxaQualificacao, 1, ',', '.') . ' p.p. nãos ultimos 7 dias.',
                 ];
             }
         }
@@ -1294,13 +1294,13 @@ class Crm extends BaseController
             $topCanal = $canalStats[0];
             $insights[] = [
                 'tipo' => 'info',
-                'titulo' => 'Canal lider no periodo',
+                'titulo' => 'Canal lider não periodo',
                 'descricao' => $this->formatCanalLabel((string) ($topCanal['canal'] ?? 'nao_informado'))
                     . ' concentrou '
                     . (int) ($topCanal['total'] ?? 0)
                     . ' conversas e '
-                    . number_format((float) ($topCanal['taxa_resolucao'] ?? 0), 1, ',', '.')
-                    . '% de resolucao.',
+                    . number_format((float) ($topCanal['taxa_resãolucao'] ?? 0), 1, ',', '.')
+                    . '% de resãolucao.',
             ];
         } elseif (!empty($origens)) {
             $topOrigem = $origens[0];
@@ -1366,6 +1366,6 @@ class Crm extends BaseController
         $configModel = new ConfiguracaoModel();
         $ativoDias = (int) $configModel->get('crm_engajamento_ativo_dias', '30');
         $riscoDias = (int) $configModel->get('crm_engajamento_risco_dias', '90');
-        return ContatoModel::normalizeEngajamentoPeriodos($ativoDias, $riscoDias);
+        return ContatoModel::nãormalizeEngajamentoPeriodos($ativoDias, $riscoDias);
     }
 }

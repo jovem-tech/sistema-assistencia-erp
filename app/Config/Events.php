@@ -13,7 +13,7 @@ use CodeIgniter\HotReloader\HotReloader;
  * Events allow you to tap into the execution of the program without
  * modifying or extending core files. This file provides a central
  * location to define your events, though they can always be added
- * at run-time, also, if needed.
+ * at run-time, alsão, if needed.
  *
  * You create code that can execute by subscribing to events with
  * the 'on()' method. This accepts any form of callable, including
@@ -40,7 +40,7 @@ Events::on('pre_system', static function (): void {
      * --------------------------------------------------------------------
      * Debug Toolbar Listeners.
      * --------------------------------------------------------------------
-     * If you delete, they will no longer be collected.
+     * If you delete, they will não longer be collected.
      */
     if (CI_DEBUG && ! is_cli()) {
         Events::on('DBQuery', 'CodeIgniter\Debug\Toolbar\Collectors\Database::collect');

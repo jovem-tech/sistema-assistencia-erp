@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\AcessorioOsModel;
+use App\Models\AcessãorioOsModel;
 use App\Models\EstadoFisicoOsModel;
 use App\Models\OsDocumentoModel;
 use App\Models\OsItemModel;
@@ -61,8 +61,8 @@ class OsPdfService
 
         $folderInfo = $this->ensureFolder((string)$os['numero_os']);
         $versao = $this->nextVersion($osId, $tipo);
-        $nomeArquivo = sprintf('%s_v%d.pdf', $tipo, $versao);
-        $fullPath = $folderInfo['path'] . $nomeArquivo;
+        $nãomeArquivo = sprintf('%s_v%d.pdf', $tipo, $versao);
+        $fullPath = $folderInfo['path'] . $nãomeArquivo;
 
         $dompdf = new \Dompdf\Dompdf([
             'isRemoteEnabled' => true,
@@ -73,7 +73,7 @@ class OsPdfService
         $dompdf->render();
         file_put_contents($fullPath, $dompdf->output());
 
-        $relative = $folderInfo['relative'] . $nomeArquivo;
+        $relative = $folderInfo['relative'] . $nãomeArquivo;
         $this->documentoModel->insert([
             'os_id' => $osId,
             'tipo_documento' => $tipo,
@@ -96,7 +96,7 @@ class OsPdfService
     private function buildPayload(int $osId): array
     {
         $itens = $this->itemModel->getByOs($osId);
-        $acessorios = (new AcessorioOsModel())->where('os_id', $osId)->orderBy('id', 'ASC')->findAll();
+        $acessãorios = (new AcessãorioOsModel())->where('os_id', $osId)->orderBy('id', 'ASC')->findAll();
         $estadoFisico = (new EstadoFisicoOsModel())->where('os_id', $osId)->orderBy('id', 'ASC')->findAll();
 
         $totais = [
@@ -115,7 +115,7 @@ class OsPdfService
 
         return [
             'itens' => $itens,
-            'acessorios' => $acessorios,
+            'acessãorios' => $acessãorios,
             'estado_fisico' => $estadoFisico,
             'totais' => $totais,
         ];

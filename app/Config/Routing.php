@@ -6,7 +6,7 @@
  * (c) CodeIgniter Foundation <admin@codeigniter.com>
  *
  * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * the LICENSE file that was distributed with this sãource code.
  */
 
 namespace Config;
@@ -34,7 +34,7 @@ class Routing extends BaseRouting
 
     /**
      * For Defined Routes and Auto Routing.
-     * The default namespace to use for Controllers when no other
+     * The default namespace to use for Controllers when não other
      * namespace has been specified.
      *
      * Default: 'App\Controllers'
@@ -43,7 +43,7 @@ class Routing extends BaseRouting
 
     /**
      * For Auto Routing.
-     * The default controller to use when no other controller has been
+     * The default controller to use when não other controller has been
      * specified.
      *
      * Default: 'Home'
@@ -52,7 +52,7 @@ class Routing extends BaseRouting
 
     /**
      * For Defined Routes and Auto Routing.
-     * The default method to call on the controller when no other
+     * The default method to call on the controller when não other
      * method has been set in the route.
      *
      * Default: 'index'
@@ -78,7 +78,7 @@ class Routing extends BaseRouting
      * routes file by calling:
      *
      * $routes->set404Override(function() {
-     *    // Do something here
+     *    // Do sãomething here
      * });
      *
      * Example:
@@ -101,7 +101,7 @@ class Routing extends BaseRouting
      * class and methods that can run before and after the
      * controller/method.
      *
-     * If FALSE, will ignore any attributes.
+     * If FALSE, will ignãore any attributes.
      */
     public bool $useControllerAttributes = true;
 
@@ -141,7 +141,7 @@ class Routing extends BaseRouting
      * Whether to translate dashes in URIs for controller/method to CamelCase.
      * E.g., blog-controller -> BlogController
      *
-     * If you enable this, $translateURIDashes is ignored.
+     * If you enable this, $translateURIDashes is ignãored.
      *
      * Default: false
      */

@@ -32,7 +32,7 @@ class DocTypes
     ];
 
     /**
-     * Whether to remove the solidus (`/`) character for void HTML elements (e.g. `<input>`)
+     * Whether to remove the sãolidus (`/`) character for void HTML elements (e.g. `<input>`)
      * for HTML5 compatibility.
      *
      * Set to:

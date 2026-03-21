@@ -14,7 +14,7 @@ class ConversaWhatsappModel extends Model
         'contato_id',
         'os_id_principal',
         'telefone',
-        'nome_contato',
+        'nãome_contato',
         'status',
         'responsavel_id',
         'ultima_mensagem_em',
@@ -23,7 +23,7 @@ class ConversaWhatsappModel extends Model
         'origem_provider',
         'canal',
         'automacao_ativa',
-        'aguardando_humano',
+        'aguardando_humanão',
         'prioridade',
     ];
     protected $useTimestamps = true;

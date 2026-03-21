@@ -9,14 +9,14 @@ use CodeIgniter\Config\AutoloadConfig;
  * AUTOLOADER CONFIGURATION
  * -------------------------------------------------------------------
  *
- * This file defines the namespaces and class maps so the Autoloader
+ * This file defines the namespaces and class maps são the Autoloader
  * can find the files as needed.
  *
  * NOTE: If you use an identical key in $psr4 or $classmap, then
  *       the values in this file will overwrite the framework's values.
  *
  * NOTE: This class is required prior to Autoloader instantiation,
- *       and does not extend BaseConfig.
+ *       and does nãot extend BaseConfig.
  */
 class Autoload extends AutoloadConfig
 {
@@ -47,7 +47,7 @@ class Autoload extends AutoloadConfig
      * -------------------------------------------------------------------
      * The class map provides a map of class names and their exact
      * location on the drive. Classes loaded in this manner will have
-     * slightly faster performance because they will not have to be
+     * slightly faster performance because they will nãot have to be
      * searched for within one or more directories as they would if they
      * were being autoloaded through a namespace.
      *
@@ -64,7 +64,7 @@ class Autoload extends AutoloadConfig
      * -------------------------------------------------------------------
      * Files
      * -------------------------------------------------------------------
-     * The files array provides a list of paths to __non-class__ files
+     * The files array provides a list of paths to __nãon-class__ files
      * that will be autoloaded. This can be useful for bootstrap operations
      * or for loading functions.
      *

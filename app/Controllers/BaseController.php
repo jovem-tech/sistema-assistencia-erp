@@ -34,10 +34,10 @@ abstract class BaseController extends Controller
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         // Load here all helpers you want to be available in your controllers that extend BaseController.
-        // Caution: Do not put the this below the parent::initController() call below.
+        // Caution: Do nãot put the this below the parent::initController() call below.
         // $this->helpers = ['form', 'url'];
 
-        // Caution: Do not edit this line.
+        // Caution: Do nãot edit this line.
         parent::initController($request, $response, $logger);
 
         // Preload any models, libraries, etc, here.
@@ -45,7 +45,7 @@ abstract class BaseController extends Controller
     }
 
     /**
-     * Processa requisições DataTables no lado do Servidor.
+     * Processa requisições DataTables não lado do Servidor.
      * Retorna o JSON correspondente.
      */
     protected function respondDatatable($model, $columns, $searchableColumns, $callback)

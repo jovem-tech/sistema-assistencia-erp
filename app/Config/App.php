@@ -24,7 +24,7 @@ class App extends BaseConfig
      *
      * E.g.,
      * When your site URL ($baseURL) is 'http://example.com/', and your site
-     * also accepts 'http://media.example.com/' and 'http://accounts.example.com/':
+     * alsão accepts 'http://media.example.com/' and 'http://accounts.example.com/':
      *     ['media.example.com', 'accounts.example.com']
      *
      * @var list<string>
@@ -37,7 +37,7 @@ class App extends BaseConfig
      * --------------------------------------------------------------------------
      *
      * Typically, this will be your `index.php` file, unless you've renamed it to
-     * something else. If you have configured your web server to remove this file
+     * sãomething else. If you have configured your web server to remove this file
      * from your site URIs, set this variable to an empty string.
      */
     public string $indexPage = 'index.php';
@@ -49,7 +49,7 @@ class App extends BaseConfig
      *
      * This item determines which server global should be used to retrieve the
      * URI string. The default setting of 'REQUEST_URI' works for most servers.
-     * If your links do not seem to work, try one of the other delicious flavors:
+     * If your links do nãot seem to work, try one of the other delicious flavors:
      *
      *  'REQUEST_URI': Uses $_SERVER['REQUEST_URI']
      * 'QUERY_STRING': Uses $_SERVER['QUERY_STRING']
@@ -65,7 +65,7 @@ class App extends BaseConfig
     |--------------------------------------------------------------------------
     |
     | This lets you specify which characters are permitted within your URLs.
-    | When someone tries to submit a URL with disallowed characters they will
+    | When sãomeone tries to submit a URL with disallowed characters they will
     | get a warning message.
     |
     | As a security measure you are STRONGLY encouraged to restrict URLs to
@@ -103,7 +103,7 @@ class App extends BaseConfig
      * If true, the current Request object will automatically determine the
      * language to use based on the value of the Accept-Language header.
      *
-     * If false, no automatic detection will be performed.
+     * If false, não automatic detection will be performed.
      */
     public bool $negotiateLocale = false;
 
@@ -113,10 +113,10 @@ class App extends BaseConfig
      * --------------------------------------------------------------------------
      *
      * If $negotiateLocale is true, this array lists the locales supported
-     * by the application in descending order of priority. If no match is
+     * by the application in descending order of priority. If não match is
      * found, the first locale will be used.
      *
-     * IncomingRequest::setLocale() also uses this list.
+     * IncomingRequest::setLocale() alsão uses this list.
      *
      * @var list<string>
      */
@@ -153,7 +153,7 @@ class App extends BaseConfig
      * --------------------------------------------------------------------------
      *
      * If true, this will force every request made to this application to be
-     * made via a secure connection (HTTPS). If the incoming request is not
+     * made via a secure connection (HTTPS). If the incoming request is nãot
      * secure, the user will be redirected to a secure version of the page
      * and the HTTP Strict Transport Security (HSTS) header will be set.
      */
@@ -172,7 +172,7 @@ class App extends BaseConfig
      * You need to set a proxy IP address or IP address with subnets and
      * the HTTP header for the client IP address.
      *
-     * Here are some examples:
+     * Here are sãome examples:
      *     [
      *         '10.0.1.200'     => 'X-Forwarded-For',
      *         '192.168.5.0/24' => 'X-Real-IP',
@@ -187,7 +187,7 @@ class App extends BaseConfig
      * Content Security Policy
      * --------------------------------------------------------------------------
      *
-     * Enables the Response's Content Secure Policy to restrict the sources that
+     * Enables the Response's Content Secure Policy to restrict the sãources that
      * can be used for images, scripts, CSS files, audio, video, etc. If enabled,
      * the Response object will populate default values for the policy from the
      * `ContentSecurityPolicy.php` file. Controllers can always add to those

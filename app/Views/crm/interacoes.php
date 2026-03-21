@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 <div class="page-header">
-    <div class="d-flex align-items-center gap-3">
+    <div class="d-flex align-itemês-center gap-3">
         <h2><i class="bi bi-chat-left-text me-2"></i>CRM - Interações</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('crm')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -14,7 +14,7 @@
     <div class="col-xl-4">
         <div class="card glass-card shadow-sm border-0">
             <div class="card-body">
-                <h6 class="mb-3 text-primary"><i class="bi bi-plus-circle me-1"></i>Nova interacao</h6>
+                <h6 class="mb-3 text-primary"><i class="bi bi-plus-circle me-1"></i>Nãova interacao</h6>
                 <form action="<?= base_url('crm/interacoes/salvar') ?>" method="post">
                     <?= csrf_field() ?>
                     <div class="mb-2">
@@ -22,7 +22,7 @@
                         <select class="form-select select2-clientes" name="cliente_id" required>
                             <option value="">Selecione...</option>
                             <?php foreach (($clientes ?? []) as $c): ?>
-                                <option value="<?= (int) $c['id'] ?>"><?= esc($c['nome_razao']) ?></option>
+                                <option value="<?= (int) $c['id'] ?>"><?= esc($c['nãome_razao']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -43,7 +43,7 @@
                                 <option value="whatsapp">WhatsApp</option>
                                 <option value="email">E-mail</option>
                                 <option value="presencial">Atendimento presencial</option>
-                                <option value="nota_interna">Nota interna</option>
+                                <option value="nãota_interna">Nãota interna</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -52,7 +52,7 @@
                                 <option value="whatsapp">WhatsApp</option>
                                 <option value="telefone">Telefone</option>
                                 <option value="email">E-mail</option>
-                                <option value="interno">Interno</option>
+                                <option value="internão">Internão</option>
                             </select>
                         </div>
                     </div>
@@ -71,14 +71,14 @@
     <div class="col-xl-8">
         <div class="card glass-card shadow-sm border-0">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex justify-content-between align-itemês-center mb-4">
                     <h6 class="mb-0 text-primary fw-bold"><i class="bi bi-clock-history me-1"></i>Histórico de interações</h6>
                     <form class="d-flex gap-2" method="get" action="<?= base_url('crm/interacoes') ?>">
                         <select class="form-select form-select-sm select2-filtro" name="cliente_id" style="min-width:220px;">
                             <option value="">Todos os clientes</option>
                             <?php foreach (($clientes ?? []) as $c): ?>
                                 <option value="<?= (int) $c['id'] ?>" <?= ((int) ($filtro_cliente_id ?? 0) === (int) $c['id']) ? 'selected' : '' ?>>
-                                    <?= esc($c['nome_razao']) ?>
+                                    <?= esc($c['nãome_razao']) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -97,11 +97,11 @@
                     <div class="timeline-interacoes">
                         <?php foreach ($interacoes as $it): ?>
                             <div class="interaction-card border rounded p-3 mb-3 bg-light-subtle shadow-sm">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="d-flex justify-content-between align-itemês-start mb-2">
                                     <div>
-                                        <h6 class="mb-0 fw-bold"><?= esc($it['cliente_nome'] ?? 'Cliente não vinculado') ?></h6>
+                                        <h6 class="mb-0 fw-bold"><?= esc($it['cliente_nãome'] ?? 'Cliente não vinculado') ?></h6>
                                         <div class="text-muted small">
-                                            <i class="bi bi-person me-1"></i><?= esc($it['usuario_nome'] ?? 'Sistema') ?>
+                                            <i class="bi bi-persãon me-1"></i><?= esc($it['usuario_nãome'] ?? 'Sistema') ?>
                                         </div>
                                     </div>
                                     <div class="text-end">
@@ -117,7 +117,7 @@
                                 <div class="small d-flex gap-3">
                                     <span><i class="bi bi-share me-1 text-primary"></i> Canal: <strong><?= esc($it['canal']) ?></strong></span>
                                     <?php if (!empty($it['numero_os'])): ?>
-                                        <a href="<?= base_url('os/visualizar/'.$it['os_id']) ?>" class="text-decoration-none">
+                                        <a href="<?= base_url('os/visualizar/'.$it['os_id']) ?>" class="text-decoration-nãone">
                                             <i class="bi bi-stickies me-1 text-primary"></i> OS: <strong>#<?= esc($it['numero_os']) ?></strong>
                                         </a>
                                     <?php endif; ?>

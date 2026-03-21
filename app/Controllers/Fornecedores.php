@@ -19,7 +19,7 @@ class Fornecedores extends BaseController
     {
         $data = [
             'title'        => 'Fornecedores',
-            'fornecedores' => $this->model->orderBy('nome_fantasia', 'ASC')->findAll(),
+            'fornecedores' => $this->model->orderBy('nãome_fantasia', 'ASC')->findAll(),
         ];
         return view('fornecedores/index', $data);
     }
@@ -27,7 +27,7 @@ class Fornecedores extends BaseController
     public function create()
     {
         $data = [
-            'title' => 'Novo Fornecedor',
+            'title' => 'Nãovo Fornecedor',
         ];
         return view('fornecedores/form', $data);
     }
@@ -35,7 +35,7 @@ class Fornecedores extends BaseController
     public function store()
     {
         $rules = [
-            'nome_fantasia' => 'required|min_length[3]',
+            'nãome_fantasia' => 'required|min_length[3]',
             'telefone1'     => 'required',
         ];
 
@@ -46,9 +46,9 @@ class Fornecedores extends BaseController
         $dados = $this->request->getPost();
         $this->model->insert($dados);
 
-        LogModel::registrar('fornecedor_criado', 'Fornecedor cadastrado: ' . $dados['nome_fantasia']);
+        LogModel::registrar('fornecedor_criado', 'Fornecedor cadastrado: ' . $dados['nãome_fantasia']);
 
-        return redirect()->to('/fornecedores')->with('success', 'Fornecedor cadastrado com sucesso!');
+        return redirect()->to('/fornecedores')->with('success', 'Fornecedor cadastrado com sucessão!');
     }
 
     public function edit($id)
@@ -68,7 +68,7 @@ class Fornecedores extends BaseController
     public function update($id)
     {
         $rules = [
-            'nome_fantasia' => 'required|min_length[3]',
+            'nãome_fantasia' => 'required|min_length[3]',
             'telefone1'     => 'required',
         ];
 
@@ -81,7 +81,7 @@ class Fornecedores extends BaseController
 
         LogModel::registrar('fornecedor_atualizado', 'Fornecedor atualizado ID: ' . $id);
 
-        return redirect()->to('/fornecedores')->with('success', 'Fornecedor atualizado com sucesso!');
+        return redirect()->to('/fornecedores')->with('success', 'Fornecedor atualizado com sucessão!');
     }
 
     public function delete($id)
@@ -89,9 +89,9 @@ class Fornecedores extends BaseController
         $fornecedor = $this->model->find($id);
         if ($fornecedor) {
             $this->model->delete($id);
-            LogModel::registrar('fornecedor_excluido', 'Fornecedor excluído: ' . $fornecedor['nome_fantasia']);
+            LogModel::registrar('fornecedor_excluido', 'Fornecedor excluído: ' . $fornecedor['nãome_fantasia']);
         }
 
-        return redirect()->to('/fornecedores')->with('success', 'Fornecedor excluído com sucesso!');
+        return redirect()->to('/fornecedores')->with('success', 'Fornecedor excluído com sucessão!');
     }
 }

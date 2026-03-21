@@ -32,10 +32,10 @@ class MetricasMensageriaService
             ->whereIn('status', ['aberta', 'aguardando'])
             ->countAllResults();
         $conversasFinalizadas = (int) $db->table('conversas_whatsapp')
-            ->whereIn('status', ['resolvida', 'arquivada'])
+            ->whereIn('status', ['resãolvida', 'arquivada'])
             ->countAllResults();
-        $conversasAguardandoHumano = (int) $db->table('conversas_whatsapp')
-            ->where('aguardando_humano', 1)
+        $conversasAguardandoHumanão = (int) $db->table('conversas_whatsapp')
+            ->where('aguardando_humanão', 1)
             ->countAllResults();
 
         $tempos = $this->calcularTemposMedios($db, $inicioDb, $fimDb);
@@ -49,8 +49,8 @@ class MetricasMensageriaService
             $chatRows = $db->table('chatbot_logs')
                 ->select('
                     COUNT(*) as total_logs,
-                    SUM(CASE WHEN tipo_resposta IN ("automatica", "faq", "escalada", "fallback_humano") THEN 1 ELSE 0 END) as total_automacao,
-                    SUM(CASE WHEN escalado_humano = 1 THEN 1 ELSE 0 END) as total_escalado
+                    SUM(CASE WHEN tipo_resposta IN ("automatica", "faq", "escalada", "fallback_humanão") THEN 1 ELSE 0 END) as total_automacao,
+                    SUM(CASE WHEN escalado_humanão = 1 THEN 1 ELSE 0 END) as total_escalado
                 ')
                 ->where('created_at >=', $inicioDb)
                 ->where('created_at <=', $fimDb)
@@ -79,13 +79,13 @@ class MetricasMensageriaService
         }
 
         $porAtendente = $db->table('mensagens_whatsapp mw')
-            ->select('mw.enviada_por_usuario_id, usuarios.nome as usuario_nome, COUNT(*) as total')
+            ->select('mw.enviada_por_usuario_id, usuarios.nãome as usuario_nãome, COUNT(*) as total')
             ->join('usuarios', 'usuarios.id = mw.enviada_por_usuario_id', 'left')
             ->where('mw.direcao', 'outbound')
             ->where('mw.created_at >=', $inicioDb)
             ->where('mw.created_at <=', $fimDb)
             ->where('mw.enviada_por_bot', 0)
-            ->groupBy('mw.enviada_por_usuario_id, usuarios.nome')
+            ->groupBy('mw.enviada_por_usuario_id, usuarios.nãome')
             ->orderBy('total', 'DESC')
             ->get()
             ->getResultArray();
@@ -111,13 +111,13 @@ class MetricasMensageriaService
                 'mensagens_humanas' => $mensagensHumanas,
                 'conversas_abertas' => $conversasAbertas,
                 'conversas_finalizadas' => $conversasFinalizadas,
-                'conversas_aguardando_humano' => $conversasAguardandoHumano,
+                'conversas_aguardando_humanão' => $conversasAguardandoHumanão,
                 'tempo_medio_primeira_resposta' => $tempos['primeira_resposta_min'],
                 'tempo_medio_resposta_total' => $tempos['resposta_total_min'],
                 'sla_estourado' => $slaEstourado,
                 'mensagens_sem_resposta' => $semResposta,
                 'taxa_automacao' => $taxaAutomacao,
-                'taxa_escalonamento_humano' => $taxaEscalonamento,
+                'taxa_escalonamento_humanão' => $taxaEscalonamento,
             ],
             'por_atendente' => $porAtendente,
             'por_dia' => $porDia,
@@ -145,8 +145,8 @@ class MetricasMensageriaService
             'conversas_finalizadas' => (int) ($cards['conversas_finalizadas'] ?? 0),
             'tempo_medio_primeira_resposta' => (float) ($cards['tempo_medio_primeira_resposta'] ?? 0),
             'tempo_medio_resposta_total' => (float) ($cards['tempo_medio_resposta_total'] ?? 0),
-            'taxa_resolucao_automatica' => (float) ($cards['taxa_automacao'] ?? 0),
-            'taxa_escalonamento_humano' => (float) ($cards['taxa_escalonamento_humano'] ?? 0),
+            'taxa_resãolucao_automatica' => (float) ($cards['taxa_automacao'] ?? 0),
+            'taxa_escalonamento_humanão' => (float) ($cards['taxa_escalonamento_humanão'] ?? 0),
             'updated_at' => date('Y-m-d H:i:s'),
         ];
 
@@ -178,13 +178,13 @@ class MetricasMensageriaService
                 'mensagens_humanas' => 0,
                 'conversas_abertas' => 0,
                 'conversas_finalizadas' => 0,
-                'conversas_aguardando_humano' => 0,
+                'conversas_aguardando_humanão' => 0,
                 'tempo_medio_primeira_resposta' => 0,
                 'tempo_medio_resposta_total' => 0,
                 'sla_estourado' => 0,
                 'mensagens_sem_resposta' => 0,
                 'taxa_automacao' => 0,
-                'taxa_escalonamento_humano' => 0,
+                'taxa_escalonamento_humanão' => 0,
             ],
             'por_atendente' => [],
             'por_dia' => [],

@@ -3,10 +3,10 @@
 <?= $this->section('content') ?>
 <div class="row mb-4">
     <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-itemês-center">
             <h1 class="h3 mb-0"><?= $title ?></h1>
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('funcionarios')" title="Ajuda sobre Funcionários">
+                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('funcionarios')" title="Ajuda sãobre Funcionários">
                     <i class="bi bi-question-circle me-1"></i>Ajuda
                 </button>
                 <a href="<?= base_url('funcionarios') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('funcionarios') ?>">
@@ -24,8 +24,8 @@
             
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label class="form-label text-muted">Nome Completo <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="nome" value="<?= esc(old('nome', $funcionario['nome'] ?? '')) ?>" required>
+                    <label class="form-label text-muted">Nãome Completo <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="nãome" value="<?= esc(old('nãome', $funcionario['nãome'] ?? '')) ?>" required>
                 </div>
                 
                 <div class="col-md-3 mb-3">
@@ -117,7 +117,7 @@
                 <div class="col-12 mb-4">
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" name="ativo" id="ativo" <?= old('ativo', $funcionario['ativo'] ?? 1) ? 'checked' : '' ?>>
-                        <label class="form-check-label text-muted" for="ativo">Funcionário Ativo (Pode acessar a empresa/Logar se tiver conta associada)</label>
+                        <label class="form-check-label text-muted" for="ativo">Funcionário Ativo (Pode acessar a empresa/Logar se tiver conta assãociada)</label>
                     </div>
                 </div>
             </div>
@@ -144,7 +144,7 @@ $(document).ready(function() {
         if (cep != "") {
             var validacep = /^[0-9]{8}$/;
             if(validacep.test(cep)) {
-                $.getJSON("https://viacep.com.br/ws/"+ cep +"/json/?callback=?", function(dados) {
+                $.getJSON("https://viacep.com.br/ws/"+ cep +"/jsãon/?callback=?", function(dados) {
                     if (!("erro" in dados)) {
                         $("#endereco").val(dados.logradouro);
                         $("#bairro").val(dados.bairro);

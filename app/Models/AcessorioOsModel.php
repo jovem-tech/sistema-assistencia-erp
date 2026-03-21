@@ -4,12 +4,12 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AcessorioOsModel extends Model
+class AcessãorioOsModel extends Model
 {
-    protected $table = 'acessorios_os';
+    protected $table = 'acessãorios_os';
     protected $primaryKey = 'id';
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
+    protected $useSãoftDeletes = false;
     protected $protectFields = true;
     protected $allowedFields = ['os_id', 'descricao', 'tipo', 'valores', 'created_at', 'updated_at'];
     protected $useTimestamps = true;

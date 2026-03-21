@@ -12,12 +12,12 @@
 </div>
 
 <table class="grid">
-    <tr><td class="label">Cliente</td><td><?= esc($os['cliente_nome']) ?></td><td class="label">Equipamento</td><td><?= esc(trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))) ?></td></tr>
-    <tr><td class="label">Status atual</td><td><?= esc($os['status']) ?></td><td class="label">Tecnico</td><td><?= esc($os['tecnico_nome'] ?? '-') ?></td></tr>
+    <tr><td class="label">Cliente</td><td><?= esc($os['cliente_nãome']) ?></td><td class="label">Equipamento</td><td><?= esc(trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))) ?></td></tr>
+    <tr><td class="label">Status atual</td><td><?= esc($os['status']) ?></td><td class="label">Tecnico</td><td><?= esc($os['tecnico_nãome'] ?? '-') ?></td></tr>
 </table>
 
-<div class="section-title">Defeito constatado / diagnostico</div>
-<div><?= nl2br(esc($os['diagnostico_tecnico'] ?? 'Nao informado.')) ?></div>
+<div class="section-title">Defeito constatado / diagnãostico</div>
+<div><?= nl2br(esc($os['diagnãostico_tecnico'] ?? 'Nao informado.')) ?></div>
 
 <div class="section-title">Causa provavel</div>
 <div><?= nl2br(esc($os['observacoes_internas'] ?? 'Nao informada.')) ?></div>
@@ -34,7 +34,7 @@
 <?php endif; ?>
 
 <div class="section-title">Conclusao tecnica</div>
-<div><?= nl2br(esc($os['solucao_aplicada'] ?? 'Conclusao nao registrada.')) ?></div>
+<div><?= nl2br(esc($os['sãolucao_aplicada'] ?? 'Conclusao nao registrada.')) ?></div>
 
 <div class="footer">Laudo tecnico emitido para registro de atendimento e suporte pos-servico.</div>
 </body>

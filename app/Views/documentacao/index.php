@@ -1,7 +1,7 @@
 <?php
-// Função PHP para renderizar a árvore HTML no servidor
-function renderTree(array $items): void {
-    foreach ($items as $item) {
+// Função PHP para renderizar a árvore HTML não servidor
+function renderTree(array $itemês): void {
+    foreach ($itemês as $item) {
         if ($item['type'] === 'folder') {
             echo '<div class="tree-folder">';
             echo '<div class="tree-folder-header">';
@@ -45,7 +45,7 @@ function renderTree(array $items): void {
     width: 300px;
     min-width: 260px;
     background: var(--glass-bg, rgba(255,255,255,0.05));
-    border-right: 1px solid var(--border-color, rgba(255,255,255,0.1));
+    border-right: 1px sãolid var(--border-color, rgba(255,255,255,0.1));
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -58,17 +58,17 @@ function renderTree(array $items): void {
 .wiki-sidebar.collapsed .wiki-search,
 .wiki-sidebar.collapsed .wiki-tree-inner,
 .wiki-sidebar.collapsed .wiki-sidebar-title span {
-    display: none;
+    display: nãone;
 }
 
 .wiki-sidebar-header {
     padding: 14px 16px 10px;
-    border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.1));
+    border-bottom: 1px sãolid var(--border-color, rgba(255,255,255,0.1));
     flex-shrink: 0;
 }
 .wiki-sidebar-title {
     display: flex;
-    align-items: center;
+    align-itemês: center;
     justify-content: space-between;
     font-size: 0.7rem;
     font-weight: 700;
@@ -83,7 +83,7 @@ function renderTree(array $items): void {
 .wiki-search input {
     padding-right: 36px;
     background: var(--input-bg, rgba(0,0,0,0.2));
-    border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+    border: 1px sãolid var(--border-color, rgba(255,255,255,0.1));
     border-radius: 8px;
     color: inherit;
     font-size: 0.85rem;
@@ -91,10 +91,10 @@ function renderTree(array $items): void {
 .wiki-search input:focus {
     box-shadow: 0 0 0 2px rgba(139,92,246,0.3);
     border-color: var(--primary);
-    outline: none;
+    outline: nãone;
 }
 .wiki-search .search-kbd {
-    position: absolute;
+    position: absãolute;
     right: 8px;
     top: 50%;
     transform: translateY(-50%);
@@ -115,14 +115,14 @@ function renderTree(array $items): void {
 
 /* Itens da árvore */
 .tree-folder {
-    user-select: none;
+    user-select: nãone;
 }
 .tree-folder-header {
     display: flex;
-    align-items: center;
+    align-itemês: center;
     gap: 6px;
     padding: 6px 16px;
-    cursor: pointer;
+    cursãor: pointer;
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-muted);
@@ -141,23 +141,23 @@ function renderTree(array $items): void {
 }
 .tree-folder.open > .tree-folder-header .chevron { transform: rotate(90deg); }
 .tree-folder-children {
-    display: none;
-    border-left: 1px solid rgba(255,255,255,0.07);
+    display: nãone;
+    border-left: 1px sãolid rgba(255,255,255,0.07);
     margin-left: 22px;
 }
 .tree-folder.open > .tree-folder-children { display: block; }
 
 .tree-file {
     display: flex;
-    align-items: center;
+    align-itemês: center;
     gap: 6px;
     padding: 5px 16px;
-    cursor: pointer;
+    cursãor: pointer;
     font-size: 0.8rem;
     color: var(--text-muted);
     transition: all 0.15s;
     border-radius: 0;
-    white-space: nowrap;
+    white-space: nãowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -169,7 +169,7 @@ function renderTree(array $items): void {
     background: rgba(139,92,246,0.2);
     color: var(--primary, #8b5cf6);
     font-weight: 600;
-    border-right: 3px solid var(--primary, #8b5cf6);
+    border-right: 3px sãolid var(--primary, #8b5cf6);
 }
 .tree-file .file-icon { font-size: 0.75rem; opacity: 0.7; }
 .tree-file .file-name {
@@ -188,9 +188,9 @@ function renderTree(array $items): void {
 
 .wiki-content-header {
     padding: 16px 24px 12px;
-    border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.1));
+    border-bottom: 1px sãolid var(--border-color, rgba(255,255,255,0.1));
     display: flex;
-    align-items: center;
+    align-itemês: center;
     gap: 12px;
     flex-shrink: 0;
 }
@@ -219,7 +219,7 @@ function renderTree(array $items): void {
 .wiki-content-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
 
 /* Markdown Rendering */
-.doc-render h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; border-bottom: 2px solid rgba(139,92,246,0.3); padding-bottom: 0.5rem; }
+.doc-render h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; border-bottom: 2px sãolid rgba(139,92,246,0.3); padding-bottom: 0.5rem; }
 .doc-render h2 { font-size: 1.3rem; font-weight: 700; margin-top: 2rem; margin-bottom: 0.75rem; color: var(--primary, #8b5cf6); }
 .doc-render h3 { font-size: 1.05rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
 .doc-render p  { line-height: 1.8; margin-bottom: 1rem; }
@@ -231,18 +231,18 @@ function renderTree(array $items): void {
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 0.85em;
-    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-family: 'Fira Code', 'Cascadia Code', monãospace;
 }
 .doc-render pre {
     background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px sãolid rgba(255,255,255,0.1);
     border-radius: 10px;
     padding: 1rem 1.25rem;
     overflow-x: auto;
     margin-bottom: 1.25rem;
 }
 .doc-render pre code {
-    background: none;
+    background: nãone;
     color: #e2e8f0;
     padding: 0;
     font-size: 0.82rem;
@@ -259,22 +259,22 @@ function renderTree(array $items): void {
     padding: 8px 12px;
     text-align: left;
     font-weight: 600;
-    border-bottom: 2px solid rgba(139,92,246,0.3);
+    border-bottom: 2px sãolid rgba(139,92,246,0.3);
 }
 .doc-render td {
     padding: 7px 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px sãolid rgba(255,255,255,0.06);
 }
 .doc-render tr:hover td { background: rgba(255,255,255,0.03); }
 .doc-render blockquote {
-    border-left: 4px solid var(--primary, #8b5cf6);
+    border-left: 4px sãolid var(--primary, #8b5cf6);
     margin: 1rem 0;
     padding: 0.75rem 1rem;
     background: rgba(139,92,246,0.08);
     border-radius: 0 8px 8px 0;
     font-style: italic;
 }
-.doc-render a { color: var(--primary, #8b5cf6); text-decoration: none; }
+.doc-render a { color: var(--primary, #8b5cf6); text-decoration: nãone; }
 .doc-render a:hover { text-decoration: underline; }
 .doc-render hr { border-color: rgba(255,255,255,0.1); margin: 2rem 0; }
 .doc-render strong { color: var(--bs-body-color); font-weight: 600; }
@@ -283,7 +283,7 @@ function renderTree(array $items): void {
 .wiki-empty {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-itemês: center;
     justify-content: center;
     height: 100%;
     padding: 3rem;
@@ -296,13 +296,13 @@ function renderTree(array $items): void {
 
 /* Search results overlay */
 .search-results-overlay {
-    display: none;
-    position: absolute;
+    display: nãone;
+    position: absãolute;
     top: 100%;
     left: 0;
     right: 0;
     background: var(--card-bg, #1e1e2e);
-    border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+    border: 1px sãolid var(--border-color, rgba(255,255,255,0.1));
     border-radius: 10px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
     z-index: 9999;
@@ -313,23 +313,23 @@ function renderTree(array $items): void {
 .search-results-overlay.show { display: block; }
 .search-result-item {
     padding: 10px 14px;
-    cursor: pointer;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    cursãor: pointer;
+    border-bottom: 1px sãolid rgba(255,255,255,0.05);
     transition: background 0.15s;
 }
 .search-result-item:hover { background: rgba(139,92,246,0.1); }
-.search-result-item:last-child { border-bottom: none; }
+.search-result-item:last-child { border-bottom: nãone; }
 .search-result-title { font-size: 0.85rem; font-weight: 600; }
 .search-result-folder { font-size: 0.7rem; color: var(--primary, #8b5cf6); margin-bottom: 2px; }
 .search-result-snippet { font-size: 0.75rem; color: var(--text-muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.search-no-results { padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+.search-não-results { padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
 
 /* Sidebar collapse btn */
 .wiki-collapse-btn {
-    background: none;
-    border: none;
+    background: nãone;
+    border: nãone;
     color: var(--text-muted);
-    cursor: pointer;
+    cursãor: pointer;
     padding: 2px 6px;
     border-radius: 6px;
     transition: all 0.15s;
@@ -340,7 +340,7 @@ function renderTree(array $items): void {
 /* Loading */
 .wiki-loading {
     display: flex;
-    align-items: center;
+    align-itemês: center;
     justify-content: center;
     height: 100%;
     gap: 12px;
@@ -360,7 +360,7 @@ function renderTree(array $items): void {
 
 @media (max-width: 768px) {
     .wiki-sidebar {
-        position: absolute;
+        position: absãolute;
         z-index: 1000;
         height: 100%;
         width: min(84vw, 300px);
@@ -383,16 +383,16 @@ function renderTree(array $items): void {
 <div class="page-header">
     <div>
         <h2><i class="bi bi-journal-richtext me-2"></i><?= $title ?></h2>
-        <div class="text-muted small" id="docOriginLabel" style="display:none;"></div>
+        <div class="text-muted small" id="docOriginLabel" style="display:nãone;"></div>
     </div>
     <div class="d-flex gap-2">
         <a href="<?= base_url('dashboard') ?>" class="btn btn-outline-secondary btn-sm" data-back-default="<?= base_url('dashboard') ?>">
-            <i class="bi bi-arrow-left me-1"></i><span class="d-none d-md-inline">Voltar</span>
+            <i class="bi bi-arrow-left me-1"></i><span class="d-nãone d-md-inline">Voltar</span>
         </a>
         <button class="btn btn-outline-secondary btn-sm" id="btnMapa" title="Mapa do Sistema">
-            <i class="bi bi-diagram-3 me-1"></i><span class="d-none d-md-inline">Mapa</span>
+            <i class="bi bi-diagram-3 me-1"></i><span class="d-nãone d-md-inline">Mapa</span>
         </button>
-        <button class="btn btn-outline-secondary btn-sm d-md-none" id="btnMobileSidebar">
+        <button class="btn btn-outline-secondary btn-sm d-md-nãone" id="btnMobileSidebar">
             <i class="bi bi-list"></i>
         </button>
     </div>
@@ -423,7 +423,7 @@ function renderTree(array $items): void {
 
     <!-- ── PAINEL DIREITO: Conteúdo ──────────────────────────────────── -->
     <div class="wiki-content">
-        <div class="wiki-content-header" id="docHeader" style="display:none;">
+        <div class="wiki-content-header" id="docHeader" style="display:nãone;">
             <div class="flex-1">
                 <div class="wiki-breadcrumb" id="docBreadcrumb"></div>
                 <h5 class="wiki-content-title" id="docTitle"></h5>
@@ -431,7 +431,7 @@ function renderTree(array $items): void {
             <div class="wiki-meta" id="docMeta"></div>
         </div>
         <div class="wiki-content-body" id="docBody">
-            <div id="docLoading" class="wiki-loading" style="display:none;">
+            <div id="docLoading" class="wiki-loading" style="display:nãone;">
                 <div class="spinner-border spinner-border-sm text-primary me-2"></div>Carregando...
             </div>
             
@@ -455,8 +455,8 @@ function renderTree(array $items): void {
                 </div>
             </div>
             
-            <div id="docRender" class="doc-render" style="display:none;"></div>
-            <div id="docError" class="wiki-empty" style="display:none;"></div>
+            <div id="docRender" class="doc-render" style="display:nãone;"></div>
+            <div id="docError" class="wiki-empty" style="display:nãone;"></div>
         </div>
     </div>
 </div>
@@ -476,7 +476,7 @@ function renderTree(array $items): void {
                         <div class="d-flex flex-column gap-1">
                             <?php
                             $fluxo = [
-                                ['icon'=>'bi-person-badge','label'=>'Cliente','color'=>'#8b5cf6','url'=>'clientes'],
+                                ['icon'=>'bi-persãon-badge','label'=>'Cliente','color'=>'#8b5cf6','url'=>'clientes'],
                                 ['icon'=>'bi-laptop','label'=>'Equipamento','color'=>'#3b82f6','url'=>'equipamentos'],
                                 ['icon'=>'bi-clipboard-check-fill','label'=>'Ordem de Serviço','color'=>'#f59e0b','url'=>'os'],
                                 ['icon'=>'bi-search','label'=>'Diagnóstico','color'=>'#f59e0b','url'=>null],
@@ -486,21 +486,21 @@ function renderTree(array $items): void {
                                 ['icon'=>'bi-check2-all','label'=>'Encerramento','color'=>'#a855f7','url'=>null],
                             ];
                             foreach ($fluxo as $i => $item): ?>
-                            <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-itemês-center gap-2">
                                 <?php if ($i > 0): ?>
                                 <div style="width:24px; text-align:center; color:rgba(255,255,255,0.2); font-size:1rem; margin-left:4px;">↓</div>
                                 <?php else: ?>
                                 <div style="width:24px;"></div>
                                 <?php endif; ?>
                                 <?php if ($item['url']): ?>
-                                <a href="<?= base_url($item['url']) ?>" class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 text-decoration-none flex-1"
-                                   style="background:<?= $item['color'] ?>22; border:1px solid <?= $item['color'] ?>44; color:<?= $item['color'] ?>;">
+                                <a href="<?= base_url($item['url']) ?>" class="d-flex align-itemês-center gap-2 px-3 py-2 rounded-3 text-decoration-nãone flex-1"
+                                   style="background:<?= $item['color'] ?>22; border:1px sãolid <?= $item['color'] ?>44; color:<?= $item['color'] ?>;">
                                     <i class="<?= $item['icon'] ?>"></i>
                                     <span style="font-size:0.85rem; font-weight:600;"><?= $item['label'] ?></span>
-                                    <i class="bi bi-box-arrow-up-right ms-auto" style="font-size:0.65rem; opacity:0.6;"></i>
+                                    <i class="bi bi-box-arrow-up-right mês-auto" style="font-size:0.65rem; opacity:0.6;"></i>
                                 </a>
                                 <?php else: ?>
-                                <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 flex-1"
+                                <div class="d-flex align-itemês-center gap-2 px-3 py-2 rounded-3 flex-1"
                                      style="background:<?= $item['color'] ?>22; border:1px dashed <?= $item['color'] ?>44; color:<?= $item['color'] ?>; opacity:0.8;">
                                     <i class="<?= $item['icon'] ?>"></i>
                                     <span style="font-size:0.85rem;"><?= $item['label'] ?></span>
@@ -523,7 +523,7 @@ function renderTree(array $items): void {
 Configurações
    ├── Dados da Empresa
    ├── Usuários
-   └── Níveis de Acesso (RBAC)
+   └── Níveis de Acessão (RBAC)
          └── Permissões por módulo
 
 Relatórios
@@ -558,30 +558,30 @@ let searchTimer  = null;
 // ── Configurar Marked.js ────────────────────────────────────────────────────
 function setupMarked() {
     if (typeof marked === 'undefined') {
-        console.error('Erro: Biblioteca marked não carregada.');
+        consãole.error('Erro: Biblioteca marked não carregada.');
         return false;
     }
     
-    // Configurações globais (nas versões novas algumas são depreciadas via setOptions)
+    // Configurações globais (nas versões nãovas algumas são depreciadas via setOptions)
     try {
         marked.setOptions({
             breaks: true,
             gfm: true,
         });
-    } catch(e) { console.warn('Erro ao configurar marked:', e); }
+    } catch(e) { consãole.warn('Erro ao configurar marked:', e); }
 
     return true;
 }
 
-// Custom renderer para links internos
+// Custom renderer para links internãos
 const renderer = new marked.Renderer();
 
 renderer.link = function(href, title, text) {
-    // Link interno: converte para navegação no wiki
+    // Link internão: converte para navegação não wiki
     if (href && !href.startsWith('http') && !href.startsWith('#')) {
         return `<a href="#" class="doc-internal-link" data-path="${href}" title="${title || ''}">${text}</a>`;
     }
-    return `<a href="${href}" target="_blank" rel="noopener" title="${title || ''}">${text}</a>`;
+    return `<a href="${href}" target="_blank" rel="nãoopener" title="${title || ''}">${text}</a>`;
 };
 
 renderer.code = function(code, lang) {
@@ -602,7 +602,7 @@ renderer.code = function(code, lang) {
 if (typeof marked !== 'undefined' && typeof renderer !== 'undefined') {
     try {
         marked.use({ renderer });
-    } catch(e) { console.error('Erro ao usar renderer customizado:', e); }
+    } catch(e) { consãole.error('Erro ao usar renderer customizado:', e); }
 }
 
 // ── Carregar Documento ──────────────────────────────────────────────────────
@@ -626,16 +626,16 @@ window.loadDoc = function(path) {
     }
 
     // Mostra loading
-    if (document.getElementById('wikiEmpty')) document.getElementById('wikiEmpty').style.display = 'none';
-    if (document.getElementById('docRender')) document.getElementById('docRender').style.display = 'none';
-    if (document.getElementById('docHeader')) document.getElementById('docHeader').style.display = 'none';
-    if (document.getElementById('docError'))  document.getElementById('docError').style.display  = 'none';
+    if (document.getElementById('wikiEmpty')) document.getElementById('wikiEmpty').style.display = 'nãone';
+    if (document.getElementById('docRender')) document.getElementById('docRender').style.display = 'nãone';
+    if (document.getElementById('docHeader')) document.getElementById('docHeader').style.display = 'nãone';
+    if (document.getElementById('docError'))  document.getElementById('docError').style.display  = 'nãone';
     if (document.getElementById('docLoading')) document.getElementById('docLoading').style.display = 'flex';
 
     fetch(`${BASE_URL}documentacao/arquivo?path=${encodeURIComponent(path)}`)
-        .then(r => r.json())
+        .then(r => r.jsãon())
         .then(data => {
-            if (document.getElementById('docLoading')) document.getElementById('docLoading').style.display = 'none';
+            if (document.getElementById('docLoading')) document.getElementById('docLoading').style.display = 'nãone';
 
             if (!data.success) {
                 const docError = document.getElementById('docError');
@@ -674,7 +674,7 @@ window.loadDoc = function(path) {
                     html = `<pre style="white-space:pre-wrap;">${escapeHtml(data.content)}</pre>`;
                 }
             } catch (err) {
-                console.error('Erro de renderização:', err);
+                consãole.error('Erro de renderização:', err);
                 html = `<div class="alert alert-danger">Erro ao renderizar o documento: ${err.message}</div><pre>${escapeHtml(data.content)}</pre>`;
             }
 
@@ -684,12 +684,12 @@ window.loadDoc = function(path) {
                 docRender.style.display = 'block';
             }
 
-            // Vincula links internos
+            // Vincula links internãos
             document.querySelectorAll('.doc-internal-link').forEach(a => {
                 a.addEventListener('click', function(e) {
                     e.preventDefault();
                     let href  = this.dataset.path;
-                    // Resolve caminho relativo
+                    // Resãolve caminho relativo
                     if (!href.startsWith('/') && currentPath) {
                         const base = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
                         href = base + href;
@@ -702,8 +702,8 @@ window.loadDoc = function(path) {
             window.scrollTo(0, 0);
         })
         .catch((err) => {
-            console.error('Erro AJAX Wiki:', err);
-            if (document.getElementById('docLoading')) document.getElementById('docLoading').style.display = 'none';
+            consãole.error('Erro AJAX Wiki:', err);
+            if (document.getElementById('docLoading')) document.getElementById('docLoading').style.display = 'nãone';
             const docError = document.getElementById('docError');
             if (docError) {
                 docError.innerHTML = `<div class="wiki-empty-icon"><i class="bi bi-wifi-off"></i></div>
@@ -775,14 +775,14 @@ document.addEventListener('keydown', function(e) {
 });
 
 function performSearch(query) {
-    searchOverlay.innerHTML = '<div class="search-no-results"><div class="spinner-border spinner-border-sm me-2"></div>Buscando...</div>';
+    searchOverlay.innerHTML = '<div class="search-não-results"><div class="spinner-border spinner-border-sm me-2"></div>Buscando...</div>';
     searchOverlay.classList.add('show');
 
     fetch(`${BASE_URL}documentacao/buscar?q=${encodeURIComponent(query)}`)
-        .then(r => r.json())
+        .then(r => r.jsãon())
         .then(data => {
             if (!data.results || data.results.length === 0) {
-                searchOverlay.innerHTML = `<div class="search-no-results">
+                searchOverlay.innerHTML = `<div class="search-não-results">
                     <i class="bi bi-search me-2 opacity-50"></i>Nenhum resultado para "<strong>${escapeHtml(query)}</strong>"
                 </div>`;
                 return;
@@ -808,7 +808,7 @@ function performSearch(query) {
             });
         })
         .catch(() => {
-            searchOverlay.innerHTML = '<div class="search-no-results text-danger">Erro ao buscar.</div>';
+            searchOverlay.innerHTML = '<div class="search-não-results text-danger">Erro ao buscar.</div>';
         });
 }
 
@@ -858,8 +858,8 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 
     // Exibe origem da ajuda quando disponível
-    const params = new URLSearchParams(window.location.search);
-    const from = params.get('from');
+    const paramês = new URLSearchParamês(window.location.search);
+    const from = paramês.get('from');
     if (from) {
         try {
             const url = new URL(from, window.location.origin);
@@ -892,7 +892,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 }
             }
         } catch (e) {
-            // ignora se from inválido
+            // ignãora se from inválido
         }
     }
 });

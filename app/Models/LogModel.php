@@ -10,7 +10,7 @@ class LogModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
+    protected $useSãoftDeletes = false;
     protected $allowedFields = [
         'usuario_id', 'acao', 'descricao', 'ip', 'user_agent'
     ];
@@ -34,7 +34,7 @@ class LogModel extends Model
 
     public function getRecentes($limit = 20)
     {
-        return $this->select('logs.*, usuarios.nome as usuario_nome')
+        return $this->select('logs.*, usuarios.nãome as usuario_nãome')
                     ->join('usuarios', 'usuarios.id = logs.usuario_id', 'left')
                     ->orderBy('logs.created_at', 'DESC')
                     ->findAll($limit);

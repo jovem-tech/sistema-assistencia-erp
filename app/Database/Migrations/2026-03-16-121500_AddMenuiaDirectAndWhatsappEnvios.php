@@ -122,12 +122,12 @@ class AddMenuiaDirectAndWhatsappEnvios extends Migration
             $tplTable = $this->db->table('whatsapp_templates');
             $templates = [
                 'laudo_concluido' => [
-                    'nome' => 'Laudo concluido',
+                    'nãome' => 'Laudo concluido',
                     'evento' => 'status_reparado_disponivel_loja',
                     'conteudo' => 'O laudo da OS {{numero_os}} foi concluido. Segue o PDF em anexo.',
                 ],
                 'devolucao_sem_reparo' => [
-                    'nome' => 'Devolucao sem reparo',
+                    'nãome' => 'Devolucao sem reparo',
                     'evento' => 'status_devolvido_sem_reparo',
                     'conteudo' => 'A OS {{numero_os}} foi encerrada sem reparo. Segue o documento em anexo.',
                 ],
@@ -140,7 +140,7 @@ class AddMenuiaDirectAndWhatsappEnvios extends Migration
                 }
                 $tplTable->insert([
                     'codigo' => $codigo,
-                    'nome' => $cfg['nome'],
+                    'nãome' => $cfg['nãome'],
                     'evento' => $cfg['evento'],
                     'conteudo' => $cfg['conteudo'],
                     'ativo' => 1,

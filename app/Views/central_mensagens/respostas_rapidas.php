@@ -19,7 +19,7 @@
     }
 
     .card.glass-card {
-        border: 1px solid var(--cm-card-border) !important;
+        border: 1px sãolid var(--cm-card-border) !important;
         border-radius: 16px !important;
         background: rgba(255, 255, 255, 0.95);
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
@@ -29,13 +29,13 @@
 
     .card.glass-card .card-header {
         background: transparent;
-        border-bottom: 2px solid #f1f5f9;
+        border-bottom: 2px sãolid #f1f5f9;
         padding: 1.25rem 1.5rem;
         font-weight: 700;
         color: var(--ds-color-primary, #635bff);
         font-size: 1.1rem;
         display: flex;
-        align-items: center;
+        align-itemês: center;
         gap: 0.6rem;
     }
 
@@ -55,7 +55,7 @@
     }
 
     .form-control-ds {
-        border: 1.5px solid #e2e8f0;
+        border: 1.5px sãolid #e2e8f0;
         border-radius: 10px;
         padding: 0.65rem 0.9rem;
         font-size: 0.92rem;
@@ -68,7 +68,7 @@
         background-color: #fff;
         border-color: var(--ds-color-primary, #635bff);
         box-shadow: 0 0 0 4px rgba(99, 91, 255, 0.08);
-        outline: none;
+        outline: nãone;
     }
 
     .cm-quick-table thead th {
@@ -79,33 +79,33 @@
         font-weight: 800;
         letter-spacing: 0.06em;
         padding: 1.1rem 1.25rem;
-        border-bottom: 2px solid #f1f5f9;
-        border-top: none;
+        border-bottom: 2px sãolid #f1f5f9;
+        border-top: nãone;
     }
 
     .cm-quick-table tbody td {
         padding: 1.25rem;
         vertical-align: middle;
         font-size: 0.95rem;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px sãolid #f1f5f9;
         color: #334155;
     }
 
     .cm-quick-table tr:hover {
         background-color: rgba(99, 91, 255, 0.02);
-        cursor: pointer;
+        cursãor: pointer;
     }
 
     .cm-badge-cat {
         background: #f1f5f9;
-        border: 1px solid #e2e8f0;
+        border: 1px sãolid #e2e8f0;
         color: #475569;
         padding: 5px 12px;
         border-radius: 8px;
         font-size: 0.72rem;
         font-weight: 700;
         display: inline-flex;
-        align-items: center;
+        align-itemês: center;
         gap: 4px;
     }
 
@@ -140,7 +140,7 @@
         padding: 12px;
     }
 
-    .cm-msg-preview-cell {
+    .cm-mêsg-preview-cell {
         color: #64748b;
         line-height: 1.5;
         max-width: 380px;
@@ -148,18 +148,18 @@
         transition: color 0.2s ease;
     }
     
-    tr:hover .cm-msg-preview-cell {
+    tr:hover .cm-mêsg-preview-cell {
         color: #1e293b;
     }
 
     .cm-order-badge {
-        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        font-family: 'JetBrains Monão', 'Courier New', monãospace;
         font-size: 0.85rem;
         color: #94a3b8;
         background: #f8fafc;
         padding: 2px 8px;
         border-radius: 5px;
-        border: 1px solid #eee;
+        border: 1px sãolid #eee;
     }
 
     .cm-btn-save {
@@ -182,16 +182,16 @@
 
     @media (max-width: 991.98px) {
         .cm-quick-replies-page { padding-top: 0; }
-        .cm-quick-table thead { display: none; }
+        .cm-quick-table thead { display: nãone; }
         .cm-quick-table tr { 
             display: block; 
-            border-bottom: 2px solid #f1f5f9; 
+            border-bottom: 2px sãolid #f1f5f9; 
             padding: 1rem;
         }
         .cm-quick-table td { 
             display: block; 
             padding: 0.35rem 0; 
-            border: none;
+            border: nãone;
             width: 100% !important;
         }
     }
@@ -199,8 +199,8 @@
 
 <div class="cm-quick-replies-page">
     <div class="page-header ps-0 mb-4 bg-transparent border-0">
-        <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
-            <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-itemês-center justify-content-between gap-3 flex-wrap">
+            <div class="d-flex align-itemês-center gap-3">
                 <div class="bg-primary bg-opacity-10 p-2 rounded-3 text-primary">
                     <i class="bi bi-chat-dots-fill fs-4"></i>
                 </div>
@@ -232,7 +232,7 @@
                         
                         <div class="cm-form-group">
                             <label class="cm-form-label">Título Identificador</label>
-                            <input type="text" name="titulo" class="form-control form-control-ds" placeholder="Ex: Aviso de Conclusão" required>
+                            <input type="text" name="titulo" class="form-control form-control-ds" placeholder="Ex: Avisão de Conclusão" required>
                         </div>
                         
                         <div class="cm-form-group">
@@ -246,11 +246,11 @@
                             
                             <!-- Variable Picker -->
                             <div class="cm-tag-picker-wrap mt-3">
-                                <label class="cm-form-label text-primary d-flex align-items-center gap-2 mb-2">
+                                <label class="cm-form-label text-primary d-flex align-itemês-center gap-2 mb-2">
                                     <i class="bi bi-braces"></i> Tags Dinâmicas
                                 </label>
                                 <div class="d-flex flex-wrap gap-1">
-                                    <button type="button" class="btn btn-tag cm-btn-tag btn-outline-primary" data-tag="{{cliente_nome}}" data-target="create_rrMensagem">Cliente</button>
+                                    <button type="button" class="btn btn-tag cm-btn-tag btn-outline-primary" data-tag="{{cliente_nãome}}" data-target="create_rrMensagem">Cliente</button>
                                     <button type="button" class="btn btn-tag cm-btn-tag btn-outline-primary" data-tag="{{numero_os}}" data-target="create_rrMensagem">Nº OS</button>
                                     <button type="button" class="btn btn-tag cm-btn-tag btn-outline-info" data-tag="{{equipamento}}" data-target="create_rrMensagem">Equipamento</button>
                                     <button type="button" class="btn btn-tag cm-btn-tag btn-outline-info" data-tag="{{marca}}" data-target="create_rrMensagem">Marca</button>
@@ -260,16 +260,16 @@
                                     <button type="button" class="btn btn-tag cm-btn-tag btn-outline-warning" data-tag="{{data_previsao}}" data-target="create_rrMensagem">Previsão</button>
                                     <button type="button" class="btn btn-tag cm-btn-tag btn-outline-danger" data-tag="{{defeito}}" data-target="create_rrMensagem">Defeito</button>
                                 </div>
-                                <div class="x-small text-muted mt-2">Clique para inserir no texto.</div>
+                                <div class="x-small text-muted mt-2">Clique para inserir não texto.</div>
                             </div>
                         </div>
                         
                         <div class="row g-3 mb-4">
                             <div class="col-6">
-                                <label class="cm-form-label">Peso / Ordem</label>
+                                <label class="cm-form-label">Pesão / Ordem</label>
                                 <input type="number" name="ordem" class="form-control form-control-ds" value="0">
                             </div>
-                            <div class="col-6 d-flex align-items-end">
+                            <div class="col-6 d-flex align-itemês-end">
                                 <div class="form-check form-switch mb-2">
                                     <input class="form-check-input" type="checkbox" name="ativo" value="1" checked>
                                     <label class="form-check-label fw-bold small text-secondary">ATIVO</label>
@@ -289,7 +289,7 @@
         <div class="col-12 col-xl-8">
             <div class="card glass-card">
                 <div class="card-header justify-content-between">
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-itemês-center gap-2">
                         <i class="bi bi-collection-play-fill text-primary"></i> 
                         <span>Catálogo de Respostas</span>
                     </div>
@@ -312,7 +312,7 @@
                             <tbody>
                                 <?php if (!empty($respostas)): ?>
                                     <?php foreach ($respostas as $r): ?>
-                                        <tr onclick="showEditModal(<?= htmlspecialchars(json_encode($r)) ?>)" title="Clique para editar em modal">
+                                        <tr onclick="showEditModal(<?= htmlspecialchars(jsãon_encode($r)) ?>)" title="Clique para editar em modal">
                                             <td class="fw-bolder"><?= esc($r['titulo']) ?></td>
                                             <td>
                                                 <span class="cm-badge-cat">
@@ -320,7 +320,7 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <span class="cm-msg-preview-cell text-truncate">
+                                                <span class="cm-mêsg-preview-cell text-truncate">
                                                     <?= esc($r['mensagem']) ?>
                                                 </span>
                                             </td>
@@ -359,7 +359,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content glass-card border-0 shadow-lg" style="background: #fff;">
             <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
+                <h5 class="modal-title fw-bold text-dark d-flex align-itemês-center gap-2">
                     <div class="bg-warning bg-opacity-10 p-2 rounded-3 text-warning">
                         <i class="bi bi-pencil-square"></i>
                     </div>
@@ -381,7 +381,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="cm-form-group">
-                                <label class="cm-form-label" for="edit_rrOrdem">Peso / Ordem</label>
+                                <label class="cm-form-label" for="edit_rrOrdem">Pesão / Ordem</label>
                                 <input type="number" name="ordem" id="edit_rrOrdem" class="form-control form-control-ds">
                             </div>
                         </div>
@@ -391,7 +391,7 @@
                                 <input type="text" name="categoria" id="edit_rrCategoria" class="form-control form-control-ds">
                             </div>
                         </div>
-                        <div class="col-md-5 d-flex align-items-center">
+                        <div class="col-md-5 d-flex align-itemês-center">
                             <div class="form-check form-switch mt-3">
                                 <input class="form-check-input" type="checkbox" name="ativo" value="1" id="edit_rrAtivo">
                                 <label class="form-check-label fw-bold small text-secondary" for="edit_rrAtivo">STATUS ATIVO</label>
@@ -403,11 +403,11 @@
                                 <textarea name="mensagem" id="edit_rrMensagem" class="form-control form-control-ds" rows="7" required></textarea>
                                 
                                 <div class="cm-tag-picker-wrap mt-3 bg-light bg-opacity-50">
-                                    <label class="cm-form-label text-primary d-flex align-items-center gap-2 mb-2">
+                                    <label class="cm-form-label text-primary d-flex align-itemês-center gap-2 mb-2">
                                         <i class="bi bi-lightning-charge-fill"></i> Inserir Variáveis
                                     </label>
                                     <div class="d-flex flex-wrap gap-1">
-                                        <button type="button" class="btn cm-btn-tag btn-outline-primary" data-tag="{{cliente_nome}}" data-target="edit_rrMensagem">Cliente</button>
+                                        <button type="button" class="btn cm-btn-tag btn-outline-primary" data-tag="{{cliente_nãome}}" data-target="edit_rrMensagem">Cliente</button>
                                         <button type="button" class="btn cm-btn-tag btn-outline-primary" data-tag="{{numero_os}}" data-target="edit_rrMensagem">Nº OS</button>
                                         <button type="button" class="btn cm-btn-tag btn-outline-info" data-tag="{{equipamento}}" data-target="edit_rrMensagem">Equipamento</button>
                                         <button type="button" class="btn cm-btn-tag btn-outline-info" data-tag="{{marca}}" data-target="edit_rrMensagem">Marca</button>
@@ -424,7 +424,7 @@
                 </form>
             </div>
             <div class="modal-footer border-0 p-4 pt-0">
-                <button type="button" class="btn btn-link text-decoration-none text-muted" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-link text-decoration-nãone text-muted" data-bs-dismiss="modal">Fechar</button>
                 <button type="submit" form="formEditarRR" class="btn btn-primary px-4 py-2 fw-bold shadow-sm">
                     <i class="bi bi-save2 me-1"></i> Salvar Alterações
                 </button>
@@ -453,7 +453,7 @@
                 const targetId = btn.getAttribute('data-target');
                 const targetEl = document.getElementById(targetId);
                 if (targetEl && tag) {
-                    insertAtCursor(targetEl, tag);
+                    insertAtCursãor(targetEl, tag);
                 }
             }
         });
@@ -479,9 +479,9 @@
     }
 
     /**
-     * Funcao auxiliar para inserir tags no cursor do textarea
+     * Funcao auxiliar para inserir tags não cursãor do textarea
      */
-    function insertAtCursor(myField, myValue) {
+    function insertAtCursãor(myField, myValue) {
         if (!myField) return;
 
         if (document.selection) {

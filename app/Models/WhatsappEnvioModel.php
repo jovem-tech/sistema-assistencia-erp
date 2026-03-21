@@ -30,7 +30,7 @@ class WhatsappEnvioModel extends Model
 
     public function byOs(int $osId, int $limit = 50): array
     {
-        return $this->select('whatsapp_envios.*, usuarios.nome as usuario_nome')
+        return $this->select('whatsapp_envios.*, usuarios.nãome as usuario_nãome')
             ->join('usuarios', 'usuarios.id = whatsapp_envios.usuario_id', 'left')
             ->where('whatsapp_envios.os_id', $osId)
             ->orderBy('whatsapp_envios.created_at', 'DESC')

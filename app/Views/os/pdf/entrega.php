@@ -12,13 +12,13 @@
 </div>
 
 <table class="grid">
-    <tr><td class="label">Cliente</td><td><?= esc($os['cliente_nome']) ?></td><td class="label">Telefone</td><td><?= esc($os['cliente_telefone'] ?? '-') ?></td></tr>
+    <tr><td class="label">Cliente</td><td><?= esc($os['cliente_nãome']) ?></td><td class="label">Telefone</td><td><?= esc($os['cliente_telefone'] ?? '-') ?></td></tr>
     <tr><td class="label">Equipamento</td><td><?= esc(trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))) ?></td><td class="label">Data entrega</td><td><?= esc(formatDate($os['data_entrega'] ?? date('Y-m-d H:i:s'), true)) ?></td></tr>
     <tr><td class="label">Status final</td><td><?= esc($os['status']) ?></td><td class="label">Valor final</td><td><?= esc(formatMoney($os['valor_final'] ?? 0)) ?></td></tr>
 </table>
 
 <div class="section-title">Descricao do servico executado</div>
-<div><?= nl2br(esc($os['solucao_aplicada'] ?? 'Servico concluido conforme OS.')) ?></div>
+<div><?= nl2br(esc($os['sãolucao_aplicada'] ?? 'Servico concluido conforme OS.')) ?></div>
 
 <div class="section-title">Checklist de itens executados</div>
 <?php if (empty($payload['itens'])): ?>

@@ -10,7 +10,7 @@ class MenuiaProvider implements WhatsAppProviderInterface
 
     public function __construct(string $baseUrl, string $authKey, string $appKey)
     {
-        $this->baseUrl = $this->normalizeBaseUrl($baseUrl);
+        $this->baseUrl = $this->nãormalizeBaseUrl($baseUrl);
         $this->authKey = trim($authKey);
         $this->appKey = trim($appKey);
     }
@@ -26,11 +26,11 @@ class MenuiaProvider implements WhatsAppProviderInterface
         }
 
         return $this->sendRequest([
-            'to' => $this->normalizePhone($phone),
+            'to' => $this->nãormalizePhone($phone),
             'appkey' => $this->appKey,
             'authkey' => $this->authKey,
             'message' => $message,
-            'licence' => 'hugocursos',
+            'licence' => 'hugocursãos',
             'sandbox' => 'false'
         ]);
     }
@@ -49,12 +49,12 @@ class MenuiaProvider implements WhatsAppProviderInterface
         $filename  = basename($filePath);
 
         $payload = [
-            'to'      => $this->normalizePhone($phone),
+            'to'      => $this->nãormalizePhone($phone),
             'appkey'  => $this->appKey,
             'authkey' => $this->authKey,
             'format'  => $extension,
             'message' => $filename,
-            'licence' => 'hugocursos',
+            'licence' => 'hugocursãos',
             'sandbox' => 'false'
         ];
 
@@ -146,7 +146,7 @@ class MenuiaProvider implements WhatsAppProviderInterface
         try {
             $ch = curl_init($url);
             $headers = [
-                'Accept: application/json',
+                'Accept: application/jsãon',
             ];
             $postFields = $payload;
 
@@ -174,17 +174,17 @@ class MenuiaProvider implements WhatsAppProviderInterface
                 ];
             }
 
-            $json = json_decode((string) $raw, true);
-            $ok = ($http >= 200 && $http < 300) && ($json['success'] ?? true);
-            $apiMessage = $json['message'] ?? ($json['error'] ?? null);
+            $jsãon = jsãon_decode((string) $raw, true);
+            $ok = ($http >= 200 && $http < 300) && ($jsãon['success'] ?? true);
+            $apiMessage = $jsãon['message'] ?? ($jsãon['error'] ?? null);
 
             return [
                 'ok' => $ok,
                 'provider' => 'menuia',
                 'status_code' => $http,
-                'response' => $json ?? $raw,
-                'message_id' => $json['id'] ?? ($json['messageId'] ?? null),
-                'message' => $ok ? 'Mensagem enviada com sucesso.' : ($apiMessage ?: 'Falha no envio pela API Menuia.'),
+                'response' => $jsãon ?? $raw,
+                'message_id' => $jsãon['id'] ?? ($jsãon['messageId'] ?? null),
+                'message' => $ok ? 'Mensagem enviada com sucessão.' : ($apiMessage ?: 'Falha não envio pela API Menuia.'),
             ];
         } catch (\Throwable $e) {
             return [
@@ -196,7 +196,7 @@ class MenuiaProvider implements WhatsAppProviderInterface
         }
     }
 
-    private function normalizeBaseUrl(string $url): string
+    private function nãormalizeBaseUrl(string $url): string
     {
         $base = trim(rtrim($url, '/'));
         if ($base === '') {
@@ -215,7 +215,7 @@ class MenuiaProvider implements WhatsAppProviderInterface
         return $this->authKey !== '' && $this->appKey !== '';
     }
 
-    private function normalizePhone(string $phone): string
+    private function nãormalizePhone(string $phone): string
     {
         $digits = preg_replace('/\D+/', '', $phone);
         if ($digits === null || $digits === '') {

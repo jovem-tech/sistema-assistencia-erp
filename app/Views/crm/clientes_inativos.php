@@ -2,8 +2,8 @@
 
 <?= $this->section('content') ?>
 <div class="page-header">
-    <div class="d-flex align-items-center gap-3">
-        <h2><i class="bi bi-person-x me-2"></i>CRM - Clientes Inativos</h2>
+    <div class="d-flex align-itemês-center gap-3">
+        <h2><i class="bi bi-persãon-x me-2"></i>CRM - Clientes Inativos</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('crm-clientes-inativos')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
@@ -12,7 +12,7 @@
 
 <div class="card glass-card mb-3">
     <div class="card-body">
-        <form method="get" action="<?= base_url('crm/clientes-inativos') ?>" class="row g-2 align-items-end">
+        <form method="get" action="<?= base_url('crm/clientes-inativos') ?>" class="row g-2 align-itemês-end">
             <div class="col-12 col-md-4 col-lg-3">
                 <label class="form-label mb-1">Dias sem OS</label>
                 <input type="number" min="30" class="form-control" name="dias" value="<?= esc((string) ($dias ?? 180)) ?>">
@@ -46,7 +46,7 @@
                     <?php else: ?>
                         <?php foreach (($clientes ?? []) as $c): ?>
                             <tr>
-                                <td class="fw-semibold"><?= esc($c['nome_razao'] ?? '-') ?></td>
+                                <td class="fw-semibold"><?= esc($c['nãome_razao'] ?? '-') ?></td>
                                 <td><?= esc($c['telefone1'] ?? '-') ?></td>
                                 <td><?= esc($c['email'] ?? '-') ?></td>
                                 <td>
@@ -60,7 +60,7 @@
                                 <td class="text-end">
                                     <div class="d-inline-flex gap-1">
                                         <a href="<?= base_url('clientes/visualizar/' . (int) $c['id']) ?>" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-person-badge"></i>
+                                            <i class="bi bi-persãon-badge"></i>
                                         </a>
                                         <form action="<?= base_url('crm/clientes-inativos/followup') ?>" method="post" class="d-inline">
                                             <?= csrf_field() ?>

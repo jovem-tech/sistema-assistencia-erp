@@ -8,7 +8,7 @@ use CodeIgniter\Modules\Modules as BaseModules;
  * Modules Configuration.
  *
  * NOTE: This class is required prior to Autoloader instantiation,
- *       and does not extend BaseConfig.
+ *       and does nãot extend BaseConfig.
  */
 class Modules extends BaseModules
 {
@@ -18,7 +18,7 @@ class Modules extends BaseModules
      * --------------------------------------------------------------------------
      *
      * If true, then auto-discovery will happen across all elements listed in
-     * $aliases below. If false, no auto-discovery will happen at all,
+     * $aliases below. If false, não auto-discovery will happen at all,
      * giving a slight performance boost.
      *
      * @var bool
@@ -68,7 +68,7 @@ class Modules extends BaseModules
      * Aliases list of all discovery classes that will be active and used during
      * the current application request.
      *
-     * If it is not listed, only the base application elements will be used.
+     * If it is nãot listed, only the base application elements will be used.
      *
      * @var list<string>
      */

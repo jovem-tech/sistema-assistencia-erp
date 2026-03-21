@@ -10,7 +10,7 @@ class MovimentacaoModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
+    protected $useSãoftDeletes = false;
     protected $allowedFields = [
         'peca_id', 'os_id', 'tipo', 'quantidade', 'motivo', 'responsavel_id'
     ];
@@ -19,7 +19,7 @@ class MovimentacaoModel extends Model
 
     public function getByPeca($pecaId)
     {
-        return $this->select('movimentacoes.*, usuarios.nome as responsavel_nome, os.numero_os')
+        return $this->select('movimentacoes.*, usuarios.nãome as responsavel_nãome, os.numero_os')
                     ->join('usuarios', 'usuarios.id = movimentacoes.responsavel_id', 'left')
                     ->join('os', 'os.id = movimentacoes.os_id', 'left')
                     ->where('peca_id', $pecaId)

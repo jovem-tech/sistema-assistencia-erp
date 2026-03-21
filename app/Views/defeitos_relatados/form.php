@@ -3,13 +3,13 @@
 
 <?php
 $isEdit = !empty($relato);
-$categoriasPadrao = ['Energia','Bateria','Tela','Áudio','Câmera','Conectividade','Sistema','Danos','Conectores'];
+$categoriasPadrao = ['Energia','Bateria','Tela','Áudio','Câmera','Conectividade','Sistema','Danãos','Conectores'];
 $categoriasExistentes = $categoriasExistentes ?? [];
 $categoriasSugestao = array_values(array_unique(array_merge($categoriasPadrao, $categoriasExistentes)));
-usort($categoriasSugestao, static fn(string $a, string $b) => strcasecmp($a, $b));
+usãort($categoriasSugestao, static fn(string $a, string $b) => strcasecmp($a, $b));
 ?>
 
-<div class="page-header d-flex justify-content-between align-items-center mb-4">
+<div class="page-header d-flex justify-content-between align-itemês-center mb-4">
     <h2 class="mb-0"><i class="bi bi-pencil-square me-2"></i><?= esc($title) ?></h2>
     <a href="<?= base_url('defeitosrelatados') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('defeitosrelatados') ?>">
         <i class="bi bi-arrow-left me-1"></i>Voltar
@@ -46,10 +46,10 @@ usort($categoriasSugestao, static fn(string $a, string $b) => strcasecmp($a, $b)
                     <label class="form-label fw-bold">Ordem</label>
                     <input type="number" class="form-control" name="ordem_exibicao" value="<?= old('ordem_exibicao', $relato['ordem_exibicao'] ?? 0) ?>" min="0" step="1">
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
+                <div class="col-md-4 d-flex align-itemês-end">
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" id="ativoRelato" name="ativo" value="1" <?= old('ativo', isset($relato['ativo']) ? (int)$relato['ativo'] : 1) ? 'checked' : '' ?>>
-                        <label class="form-check-label" for="ativoRelato">Relato ativo para uso na abertura da OS</label>
+                        <label class="form-check-label" for="ativoRelato">Relato ativo para usão na abertura da OS</label>
                     </div>
                 </div>
             </div>

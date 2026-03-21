@@ -10,14 +10,14 @@ class OsModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
+    protected $useSãoftDeletes = false;
     protected $allowedFields = [
         'numero_os', 'cliente_id', 'equipamento_id', 'tecnico_id', 'status', 'estado_fluxo', 'status_atualizado_em',
-        'prioridade', 'relato_cliente', 'diagnostico_tecnico', 'solucao_aplicada',
+        'prioridade', 'relato_cliente', 'diagnãostico_tecnico', 'sãolucao_aplicada',
         'data_abertura', 'data_entrada', 'data_previsao', 'data_conclusao', 'data_entrega',
         'valor_mao_obra', 'valor_pecas', 'valor_total', 'desconto', 'valor_final',
         'orcamento_aprovado', 'data_aprovacao', 'orcamento_pdf',
-        'acessorios', 'forma_pagamento',
+        'acessãorios', 'forma_pagamento',
         'garantia_dias', 'garantia_validade',
         'observacoes_internas', 'observacoes_cliente'
     ];
@@ -47,10 +47,10 @@ class OsModel extends Model
     {
         $builder = $this->select(
                 'os.*,
-                clientes.nome_razao as cliente_nome, clientes.telefone1 as cliente_telefone, clientes.email as cliente_email,
-                et.nome as equip_tipo, em.nome as equip_marca, emod.nome as equip_modelo,
+                clientes.nãome_razao as cliente_nãome, clientes.telefone1 as cliente_telefone, clientes.email as cliente_email,
+                et.nãome as equip_tipo, em.nãome as equip_marca, emod.nãome as equip_modelo,
                 equipamentos.numero_serie as equip_serie,
-                funcionarios.nome as tecnico_nome'
+                funcionarios.nãome as tecnico_nãome'
             )
             ->join('clientes', 'clientes.id = os.cliente_id')
             ->join('equipamentos', 'equipamentos.id = os.equipamento_id')
@@ -69,9 +69,9 @@ class OsModel extends Model
     public function getByStatus($status)
     {
         return $this->select(
-                'os.*, clientes.nome_razao as cliente_nome,
-                em.nome as equip_marca, emod.nome as equip_modelo,
-                funcionarios.nome as tecnico_nome'
+                'os.*, clientes.nãome_razao as cliente_nãome,
+                em.nãome as equip_marca, emod.nãome as equip_modelo,
+                funcionarios.nãome as tecnico_nãome'
             )
             ->join('clientes', 'clientes.id = os.cliente_id')
             ->join('equipamentos', 'equipamentos.id = os.equipamento_id')
@@ -90,17 +90,17 @@ class OsModel extends Model
         
         $prefixo = $config->where('chave', 'os_prefixo')->get()->getRow()->valor ?? 'OS';
         
-        $anoAtualShort = date('y'); // Ex: 26
+        $anãoAtualShort = date('y'); // Ex: 26
         $mesAtual = date('m');      // Ex: 03
         
-        $configAno = $config->where('chave', 'os_ano')->get()->getRow()->valor ?? '';
+        $configAnão = $config->where('chave', 'os_anão')->get()->getRow()->valor ?? '';
         $configMes = $config->where('chave', 'os_mes')->get()->getRow()->valor ?? '';
         
         // Reset sequence if month or year changed
-        if ($anoAtualShort !== $configAno || $mesAtual !== $configMes) {
-            $novo = 1;
-            $db->table('configuracoes')->where('chave', 'os_ultimo_numero')->update(['valor' => $novo]);
-            $db->table('configuracoes')->where('chave', 'os_ano')->update(['valor' => $anoAtualShort]);
+        if ($anãoAtualShort !== $configAnão || $mesAtual !== $configMes) {
+            $nãovo = 1;
+            $db->table('configuracoes')->where('chave', 'os_ultimo_numero')->update(['valor' => $nãovo]);
+            $db->table('configuracoes')->where('chave', 'os_anão')->update(['valor' => $anãoAtualShort]);
             
             $checkMes = $db->table('configuracoes')->where('chave', 'os_mes')->get()->getRow();
             if ($checkMes) {
@@ -111,11 +111,11 @@ class OsModel extends Model
         } else {
             $ultimoRow = $config->where('chave', 'os_ultimo_numero')->get()->getRow();
             $ultimo = (int)($ultimoRow->valor ?? 0);
-            $novo = $ultimo + 1;
-            $db->table('configuracoes')->where('chave', 'os_ultimo_numero')->update(['valor' => $novo]);
+            $nãovo = $ultimo + 1;
+            $db->table('configuracoes')->where('chave', 'os_ultimo_numero')->update(['valor' => $nãovo]);
         }
         
-        return $prefixo . $anoAtualShort . $mesAtual . str_pad($novo, 4, '0', STR_PAD_LEFT);
+        return $prefixo . $anãoAtualShort . $mesAtual . str_pad($nãovo, 4, '0', STR_PAD_LEFT);
     }
 
     public function getDashboardStats()
@@ -124,7 +124,7 @@ class OsModel extends Model
 
         if ($db->fieldExists('estado_fluxo', 'os')) {
             return [
-                'total_abertas'      => (int)$db->table('os')->whereNotIn('estado_fluxo', ['encerrado', 'cancelado'])->countAllResults(),
+                'total_abertas'      => (int)$db->table('os')->whereNãotIn('estado_fluxo', ['encerrado', 'cancelado'])->countAllResults(),
                 'aguardando_analise' => (int)$db->table('os')->where('status', 'triagem')->countAllResults(),
                 'em_reparo'          => (int)$db->table('os')->whereIn('status', ['reparo_execucao', 'aguardando_reparo', 'retrabalho'])->countAllResults(),
                 'prontas'            => (int)$db->table('os')->where('estado_fluxo', 'pronto')->countAllResults(),
@@ -139,7 +139,7 @@ class OsModel extends Model
         }
 
         return [
-            'total_abertas'      => (int)$db->table('os')->whereNotIn('status', ['entregue','cancelado'])->countAllResults(),
+            'total_abertas'      => (int)$db->table('os')->whereNãotIn('status', ['entregue','cancelado'])->countAllResults(),
             'aguardando_analise' => (int)$db->table('os')->where('status', 'aguardando_analise')->countAllResults(),
             'em_reparo'          => (int)$db->table('os')->where('status', 'em_reparo')->countAllResults(),
             'prontas'            => (int)$db->table('os')->where('status', 'pronto')->countAllResults(),
@@ -156,8 +156,8 @@ class OsModel extends Model
     public function getRecentes($limit = 10)
     {
         return $this->select(
-                'os.*, clientes.nome_razao as cliente_nome,
-                em.nome as equip_marca, emod.nome as equip_modelo'
+                'os.*, clientes.nãome_razao as cliente_nãome,
+                em.nãome as equip_marca, emod.nãome as equip_modelo'
             )
             ->join('clientes', 'clientes.id = os.cliente_id')
             ->join('equipamentos', 'equipamentos.id = os.equipamento_id')

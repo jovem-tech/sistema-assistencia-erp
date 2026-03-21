@@ -10,9 +10,9 @@ class PecaModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
+    protected $useSãoftDeletes = false;
     protected $allowedFields = [
-        'codigo', 'codigo_fabricante', 'nome', 'categoria', 'modelos_compativeis',
+        'codigo', 'codigo_fabricante', 'nãome', 'categoria', 'modelos_compativeis',
         'fornecedor', 'localizacao', 'preco_custo', 'preco_venda',
         'quantidade_atual', 'estoque_minimo', 'estoque_maximo',
         'foto', 'observacoes', 'ativo'
@@ -22,7 +22,7 @@ class PecaModel extends Model
     protected $updatedField = 'updated_at';
 
     protected $validationRules = [
-        'nome'        => 'required|max_length[100]',
+        'nãome'        => 'required|max_length[100]',
         'preco_custo' => 'required|decimal',
         'preco_venda' => 'required|decimal',
     ];
@@ -31,17 +31,17 @@ class PecaModel extends Model
     {
         return $this->where('quantidade_atual <=', 'estoque_minimo', false)
                     ->where('ativo', 1)
-                    ->orderBy('nome', 'ASC')
+                    ->orderBy('nãome', 'ASC')
                     ->findAll();
     }
 
     public function search($term)
     {
-        return $this->like('nome', $term)
+        return $this->like('nãome', $term)
                     ->orLike('codigo', $term)
                     ->orLike('categoria', $term)
                     ->where('ativo', 1)
-                    ->orderBy('nome', 'ASC')
+                    ->orderBy('nãome', 'ASC')
                     ->findAll(20);
     }
 
@@ -54,6 +54,6 @@ class PecaModel extends Model
 
     public function getAtivas()
     {
-        return $this->where('ativo', 1)->orderBy('nome', 'ASC')->findAll();
+        return $this->where('ativo', 1)->orderBy('nãome', 'ASC')->findAll();
     }
 }

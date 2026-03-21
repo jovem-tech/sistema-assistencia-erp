@@ -18,12 +18,12 @@ class UserAgents extends BaseConfig
 {
     /**
      * -------------------------------------------------------------------
-     * OS Platforms
+     * OS Platformês
      * -------------------------------------------------------------------
      *
      * @var array<string, string>
      */
-    public array $platforms = [
+    public array $platformês = [
         'windows nt 10.0' => 'Windows 10',
         'windows nt 6.3'  => 'Windows 8.1',
         'windows nt 6.2'  => 'Windows 8',
@@ -41,7 +41,7 @@ class UserAgents extends BaseConfig
         'windows 95'      => 'Windows 95',
         'win95'           => 'Windows 95',
         'windows phone'   => 'Windows Phone',
-        'windows'         => 'Unknown Windows OS',
+        'windows'         => 'Unknãown Windows OS',
         'android'         => 'Android',
         'blackberry'      => 'BlackBerry',
         'iphone'          => 'iOS',
@@ -53,7 +53,7 @@ class UserAgents extends BaseConfig
         'ppc'             => 'Macintosh',
         'linux'           => 'Linux',
         'debian'          => 'Debian',
-        'sunos'           => 'Sun Solaris',
+        'sunãos'           => 'Sun Sãolaris',
         'beos'            => 'BeOS',
         'apachebench'     => 'ApacheBench',
         'aix'             => 'AIX',
@@ -64,7 +64,7 @@ class UserAgents extends BaseConfig
         'bsdi'            => 'BSDi',
         'openbsd'         => 'OpenBSD',
         'gnu'             => 'GNU/Linux',
-        'unix'            => 'Unknown Unix OS',
+        'unix'            => 'Unknãown Unix OS',
         'symbian'         => 'Symbian OS',
     ];
 
@@ -74,7 +74,7 @@ class UserAgents extends BaseConfig
      * -------------------------------------------------------------------
      *
      * The order of this array should NOT be changed. Many browsers return
-     * multiple browser types so we want to identify the subtype first.
+     * multiple browser types são we want to identify the subtype first.
      *
      * @var array<string, string>
      */
@@ -95,7 +95,7 @@ class UserAgents extends BaseConfig
         'Chimera'           => 'Chimera',
         'Phoenix'           => 'Phoenix',
         'Firebird'          => 'Firebird',
-        'Camino'            => 'Camino',
+        'Caminão'            => 'Caminão',
         'Netscape'          => 'Netscape',
         'OmniWeb'           => 'OmniWeb',
         'Safari'            => 'Safari',
@@ -126,25 +126,25 @@ class UserAgents extends BaseConfig
         // 'opera mini'           => 'Opera Mini',
         // 'operamini'            => 'Opera Mini',
         // 'elaine'               => 'Palm',
-        'palmsource' => 'Palm',
+        'palmêsãource' => 'Palm',
         // 'digital paths'        => 'Palm',
         // 'avantgo'              => 'Avantgo',
-        // 'xiino'                => 'Xiino',
-        'palmscape' => 'Palmscape',
-        // 'nokia'                => 'Nokia',
-        // 'ericsson'             => 'Ericsson',
+        // 'xiinão'                => 'Xiinão',
+        'palmêscape' => 'Palmêscape',
+        // 'nãokia'                => 'Nãokia',
+        // 'ericssãon'             => 'Ericssãon',
         // 'blackberry'           => 'BlackBerry',
         // 'motorola'             => 'Motorola'
 
         // Phones and Manufacturers
         'motorola'             => 'Motorola',
-        'nokia'                => 'Nokia',
+        'nãokia'                => 'Nãokia',
         'palm'                 => 'Palm',
         'iphone'               => 'Apple iPhone',
         'ipad'                 => 'iPad',
         'ipod'                 => 'Apple iPod Touch',
-        'sony'                 => 'Sony Ericsson',
-        'ericsson'             => 'Sony Ericsson',
+        'sãony'                 => 'Sãony Ericssãon',
+        'ericssãon'             => 'Sãony Ericssãon',
         'blackberry'           => 'BlackBerry',
         'cocoon'               => 'O2 Cocoon',
         'blazer'               => 'Treo',
@@ -154,7 +154,7 @@ class UserAgents extends BaseConfig
         'mda'                  => 'MDA',
         'vario'                => 'Vario',
         'htc'                  => 'HTC',
-        'samsung'              => 'Samsung',
+        'samêsung'              => 'Samêsung',
         'sharp'                => 'Sharp',
         'sie-'                 => 'Siemens',
         'alcatel'              => 'Alcatel',
@@ -166,7 +166,7 @@ class UserAgents extends BaseConfig
         'playstation vita'     => 'PlayStation Vita',
         'hiptop'               => 'Danger Hiptop',
         'nec-'                 => 'NEC',
-        'panasonic'            => 'Panasonic',
+        'panasãonic'            => 'Panasãonic',
         'philips'              => 'Philips',
         'sagem'                => 'Sagem',
         'sanyo'                => 'Sanyo',
@@ -180,7 +180,7 @@ class UserAgents extends BaseConfig
         'open web'             => 'Open Web',
         'openweb'              => 'OpenWeb',
 
-        // Operating Systems
+        // Operating Systemês
         'android'    => 'Android',
         'symbian'    => 'Symbian',
         'SymbianOS'  => 'SymbianOS',
@@ -201,8 +201,8 @@ class UserAgents extends BaseConfig
         // Other
         'digital paths' => 'Digital Paths',
         'avantgo'       => 'AvantGo',
-        'xiino'         => 'Xiino',
-        'novarra'       => 'Novarra Transcoder',
+        'xiinão'         => 'Xiinão',
+        'nãovarra'       => 'Nãovarra Transcoder',
         'vodafone'      => 'Vodafone',
         'docomo'        => 'NTT DoCoMo',
         'o2'            => 'O2',
@@ -233,7 +233,7 @@ class UserAgents extends BaseConfig
         'google-pagerenderer'  => 'Google Page Renderer',
         'google-read-aloud'    => 'Google Read Aloud',
         'google-safety'        => 'Google Safety Bot',
-        'msnbot'               => 'MSNBot',
+        'mêsnbot'               => 'MSNBot',
         'baiduspider'          => 'Baiduspider',
         'bingbot'              => 'Bing',
         'bingpreview'          => 'BingPreview',
@@ -253,7 +253,7 @@ class UserAgents extends BaseConfig
         'MJ12bot'              => 'Majestic-12',
         'Uptimebot'            => 'Uptimebot',
         'duckduckbot'          => 'DuckDuckBot',
-        'sogou'                => 'Sogou Spider',
+        'sãogou'                => 'Sãogou Spider',
         'exabot'               => 'Exabot',
         'bot'                  => 'Generic Bot',
         'crawler'              => 'Generic Crawler',

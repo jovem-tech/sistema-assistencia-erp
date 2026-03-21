@@ -57,7 +57,7 @@ class CreateCrmAndCentralMensagens extends Migration
                     'constraint' => 80,
                     'null' => false,
                 ],
-                'nome' => [
+                'nãome' => [
                     'type' => 'VARCHAR',
                     'constraint' => 120,
                     'null' => false,
@@ -184,7 +184,7 @@ class CreateCrmAndCentralMensagens extends Migration
                 'type' => 'DATETIME',
                 'null' => false,
             ],
-            'payload_json' => [
+            'payload_jsãon' => [
                 'type' => 'LONGTEXT',
                 'null' => true,
             ],
@@ -257,7 +257,7 @@ class CreateCrmAndCentralMensagens extends Migration
                 'type' => 'DATETIME',
                 'null' => false,
             ],
-            'payload_json' => [
+            'payload_jsãon' => [
                 'type' => 'LONGTEXT',
                 'null' => true,
             ],
@@ -366,7 +366,7 @@ class CreateCrmAndCentralMensagens extends Migration
                 'constraint' => 80,
                 'null' => false,
             ],
-            'nome' => [
+            'nãome' => [
                 'type' => 'VARCHAR',
                 'constraint' => 120,
                 'null' => false,
@@ -529,7 +529,7 @@ class CreateCrmAndCentralMensagens extends Migration
                 'constraint' => 80,
                 'null' => false,
             ],
-            'nome' => [
+            'nãome' => [
                 'type' => 'VARCHAR',
                 'constraint' => 140,
                 'null' => false,
@@ -548,7 +548,7 @@ class CreateCrmAndCentralMensagens extends Migration
                 'constraint' => 1,
                 'default' => 1,
             ],
-            'config_json' => [
+            'config_jsãon' => [
                 'type' => 'LONGTEXT',
                 'null' => true,
             ],
@@ -594,7 +594,7 @@ class CreateCrmAndCentralMensagens extends Migration
                 'constraint' => 30,
                 'null' => false,
             ],
-            'nome_contato' => [
+            'nãome_contato' => [
                 'type' => 'VARCHAR',
                 'constraint' => 140,
                 'null' => true,
@@ -783,8 +783,8 @@ class CreateCrmAndCentralMensagens extends Migration
         $this->safeAddColumn('mensagens_whatsapp', 'lida_em', 'DATETIME NULL AFTER erro');
         $this->safeAddColumn('mensagens_whatsapp', 'enviada_em', 'DATETIME NULL AFTER lida_em');
 
-        $this->safeCreateIndex('mensagens_whatsapp', 'idx_msgw_conversa_created', '(conversa_id, created_at)');
-        $this->safeCreateIndex('mensagens_whatsapp', 'idx_msgw_direcao_status', '(direcao, status)');
+        $this->safeCreateIndex('mensagens_whatsapp', 'idx_mêsgw_conversa_created', '(conversa_id, created_at)');
+        $this->safeCreateIndex('mensagens_whatsapp', 'idx_mêsgw_direcao_status', '(direcao, status)');
     }
 
     private function safeAddColumn(string $table, string $field, string $definition): void
@@ -800,7 +800,7 @@ class CreateCrmAndCentralMensagens extends Migration
         try {
             $this->db->query("CREATE INDEX {$name} ON {$table} {$columnsSql}");
         } catch (\Throwable $e) {
-            // ignore duplicated index or unsupported engine errors
+            // ignãore duplicated index or unsupported engine errors
         }
     }
 
@@ -812,29 +812,29 @@ class CreateCrmAndCentralMensagens extends Migration
 
         $table = $this->db->table('crm_pipeline_etapas');
         $rows = [
-            ['novo_atendimento', 'Novo Atendimento', 10],
+            ['nãovo_atendimento', 'Nãovo Atendimento', 10],
             ['equipamento_recebido', 'Equipamento Recebido', 20],
-            ['em_diagnostico', 'Em Diagnostico', 30],
+            ['em_diagnãostico', 'Em Diagnãostico', 30],
             ['aguardando_aprovacao', 'Aguardando Aprovacao', 40],
             ['em_reparo', 'Em Reparo', 50],
             ['pronto_retirada', 'Pronto para Retirada', 60],
             ['entregue', 'Entregue', 70],
             ['pos_atendimento', 'Pos-atendimento', 80],
         ];
-        $now = date('Y-m-d H:i:s');
+        $nãow = date('Y-m-d H:i:s');
 
-        foreach ($rows as [$codigo, $nome, $ordem]) {
+        foreach ($rows as [$codigo, $nãome, $ordem]) {
             $exists = $table->where('codigo', $codigo)->countAllResults();
             if ($exists > 0) {
                 continue;
             }
             $table->insert([
                 'codigo' => $codigo,
-                'nome' => $nome,
+                'nãome' => $nãome,
                 'ordem' => $ordem,
                 'ativo' => 1,
-                'created_at' => $now,
-                'updated_at' => $now,
+                'created_at' => $nãow,
+                'updated_at' => $nãow,
             ]);
         }
     }
@@ -847,13 +847,13 @@ class CreateCrmAndCentralMensagens extends Migration
 
         $table = $this->db->table('respostas_rapidas_whatsapp');
         $rows = [
-            ['OS aberta', 'Ola, {cliente}. Sua OS {numero_os} foi aberta com sucesso.', 10],
+            ['OS aberta', 'Ola, {cliente}. Sua OS {numero_os} foi aberta com sucessão.', 10],
             ['Orcamento enviado', 'Ola, {cliente}. O orcamento da OS {numero_os} foi enviado e aguarda sua aprovacao.', 20],
             ['Aguardando peca', 'Atualizacao da OS {numero_os}: estamos aguardando a chegada da peca para continuar.', 30],
             ['Pronto para retirada', 'Ola, {cliente}. Seu equipamento da OS {numero_os} esta pronto para retirada.', 40],
             ['Entrega concluida', 'A OS {numero_os} foi encerrada com entrega concluida. Obrigado pela preferencia.', 50],
         ];
-        $now = date('Y-m-d H:i:s');
+        $nãow = date('Y-m-d H:i:s');
 
         foreach ($rows as [$titulo, $mensagem, $ordem]) {
             $exists = $table->where('titulo', $titulo)->countAllResults();
@@ -865,8 +865,8 @@ class CreateCrmAndCentralMensagens extends Migration
                 'mensagem' => $mensagem,
                 'ativo' => 1,
                 'ordem' => $ordem,
-                'created_at' => $now,
-                'updated_at' => $now,
+                'created_at' => $nãow,
+                'updated_at' => $nãow,
             ]);
         }
     }

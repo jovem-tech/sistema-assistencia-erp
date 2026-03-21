@@ -4,10 +4,10 @@
 
 <?php $isEdit = isset($cliente); ?>
 
-<div class="page-header d-flex justify-content-between align-items-center">
+<div class="page-header d-flex justify-content-between align-itemês-center">
     <h2><i class="bi bi-<?= $isEdit ? 'pencil' : 'plus-lg' ?> me-2"></i><?= $title ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('clientes')" title="Ajuda sobre Clientes">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('clientes')" title="Ajuda sãobre Clientes">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('clientes') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('clientes') ?>">
@@ -20,13 +20,13 @@
     <div class="card-body">
         <form action="<?= $isEdit ? base_url('clientes/atualizar/' . $cliente['id']) : base_url('clientes/salvar') ?>" method="POST">
             
-            <!-- Tipo Pessoa -->
+            <!-- Tipo Pessãoa -->
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
-                    <label class="form-label text-muted">Tipo de Pessoa</label>
-                    <select name="tipo_pessoa" class="form-select">
-                        <option value="fisica" <?= ($isEdit && $cliente['tipo_pessoa'] === 'fisica') ? 'selected' : '' ?>>Pessoa Física</option>
-                        <option value="juridica" <?= ($isEdit && $cliente['tipo_pessoa'] === 'juridica') ? 'selected' : '' ?>>Pessoa Jurídica</option>
+                    <label class="form-label text-muted">Tipo de Pessãoa</label>
+                    <select name="tipo_pessãoa" class="form-select">
+                        <option value="fisica" <?= ($isEdit && $cliente['tipo_pessãoa'] === 'fisica') ? 'selected' : '' ?>>Pessãoa Física</option>
+                        <option value="juridica" <?= ($isEdit && $cliente['tipo_pessãoa'] === 'juridica') ? 'selected' : '' ?>>Pessãoa Jurídica</option>
                     </select>
                 </div>
                 <div class="col-md-4">
@@ -41,13 +41,13 @@
                 </div>
             </div>
 
-            <!-- Dados Pessoais -->
-            <h6 class="text-uppercase text-muted mb-3"><i class="bi bi-person me-1"></i>Dados Pessoais</h6>
+            <!-- Dados Pessãoais -->
+            <h6 class="text-uppercase text-muted mb-3"><i class="bi bi-persãon me-1"></i>Dados Pessãoais</h6>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label class="form-label">Nome / Razão Social *</label>
-                    <input type="text" name="nome_razao" class="form-control" required
-                           value="<?= $isEdit ? esc($cliente['nome_razao']) : old('nome_razao') ?>">
+                    <label class="form-label">Nãome / Razão Sãocial *</label>
+                    <input type="text" name="nãome_razao" class="form-control" required
+                           value="<?= $isEdit ? esc($cliente['nãome_razao']) : old('nãome_razao') ?>">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Telefone 1 *</label>
@@ -70,9 +70,9 @@
             <h6 class="text-uppercase text-muted mb-3"><i class="bi bi-people me-1"></i>Contato Adicional <span class="text-lowercase">(Opcional)</span></h6>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label class="form-label text-muted">Nome (Ex: Esposa, Filho, Vizinho)</label>
-                    <input type="text" name="nome_contato" class="form-control"
-                           value="<?= $isEdit ? esc($cliente['nome_contato'] ?? '') : old('nome_contato') ?>">
+                    <label class="form-label text-muted">Nãome (Ex: Esposa, Filho, Vizinho)</label>
+                    <input type="text" name="nãome_contato" class="form-control"
+                           value="<?= $isEdit ? esc($cliente['nãome_contato'] ?? '') : old('nãome_contato') ?>">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label text-muted">Telefone do Contato</label>

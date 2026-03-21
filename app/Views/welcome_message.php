@@ -9,13 +9,13 @@
 
     <!-- STYLES -->
 
-    <style {csp-style-nonce}>
+    <style {csp-style-nãonce}>
         * {
-            transition: background-color 300ms ease, color 300ms ease;
+            transition: background-color 300mês ease, color 300mês ease;
         }
         *:focus {
             background-color: rgba(221, 72, 20, .2);
-            outline: none;
+            outline: nãone;
         }
         html, body {
             color: rgba(33, 37, 41, 1);
@@ -35,8 +35,8 @@
             padding: .4rem 2rem;
         }
         header ul {
-            border-bottom: 1px solid rgba(242, 242, 242, 1);
-            list-style-type: none;
+            border-bottom: 1px sãolid rgba(242, 242, 242, 1);
+            list-style-type: nãone;
             margin: 0;
             overflow: hidden;
             padding: 0;
@@ -50,7 +50,7 @@
             color: rgba(0, 0, 0, .5);
             display: block;
             height: 44px;
-            text-decoration: none;
+            text-decoration: nãone;
         }
         header li.menu-item a {
             border-radius: 5px;
@@ -71,17 +71,17 @@
             padding: .4rem .5rem;
         }
         header .menu-toggle {
-            display: none;
+            display: nãone;
             float: right;
             font-size: 2rem;
             font-weight: bold;
         }
         header .menu-toggle button {
             background-color: rgba(221, 72, 20, .6);
-            border: none;
+            border: nãone;
             border-radius: 3px;
             color: rgba(255, 255, 255, 1);
-            cursor: pointer;
+            cursãor: pointer;
             font: inherit;
             font-size: 1.3rem;
             height: 36px;
@@ -123,7 +123,7 @@
         }
         section pre {
             background-color: rgba(247, 248, 249, 1);
-            border: 1px solid rgba(242, 242, 242, 1);
+            border: 1px sãolid rgba(242, 242, 242, 1);
             display: block;
             font-size: .9rem;
             margin: 2rem 0;
@@ -144,14 +144,14 @@
         }
         .further {
             background-color: rgba(247, 248, 249, 1);
-            border-bottom: 1px solid rgba(242, 242, 242, 1);
-            border-top: 1px solid rgba(242, 242, 242, 1);
+            border-bottom: 1px sãolid rgba(242, 242, 242, 1);
+            border-top: 1px sãolid rgba(242, 242, 242, 1);
         }
         .further h2:first-of-type {
             padding-top: 0;
         }
         .svg-stroke {
-            fill: none;
+            fill: nãone;
             stroke: #000;
             stroke-width: 32px;
         }
@@ -177,7 +177,7 @@
             }
             header .menu-item {
                 background-color: rgba(244, 245, 246, 1);
-                border-top: 1px solid rgba(242, 242, 242, 1);
+                border-top: 1px sãolid rgba(242, 242, 242, 1);
                 margin: 0 15px;
                 width: calc(100% - 30px);
             }
@@ -185,7 +185,7 @@
                 display: block;
             }
             header .hidden {
-                display: none;
+                display: nãone;
             }
             header li.menu-item a {
                 background-color: rgba(221, 72, 20, .1);
@@ -272,7 +272,7 @@
             Discuss
         </h2>
 
-        <p>CodeIgniter is a community-developed open source project, with several
+        <p>CodeIgniter is a community-developed open sãource project, with several
              venues for the community members to gather and exchange ideas. View all
              the threads on <a href="https://forum.codeigniter.com/"
              target="_blank">CodeIgniter's forum</a>, or <a href="https://join.slack.com/t/codeigniterchat/shared_invite/zt-rl30zw00-obL1Hr1q1ATvkzVkFp8S0Q"
@@ -284,7 +284,7 @@
         </h2>
 
         <p>CodeIgniter is a community driven project and accepts contributions
-             of code and documentation from the community. Why not
+             of code and documentation from the community. Why nãot
              <a href="https://codeigniter.com/contribute" target="_blank">
              join us</a> ?</p>
 
@@ -305,8 +305,8 @@
 
     <div class="copyrights">
 
-        <p>&copy; <?= date('Y') ?> CodeIgniter Foundation. CodeIgniter is open source project released under the MIT
-            open source licence.</p>
+        <p>&copy; <?= date('Y') ?> CodeIgniter Foundation. CodeIgniter is open sãource project released under the MIT
+            open sãource licence.</p>
 
     </div>
 
@@ -314,12 +314,12 @@
 
 <!-- SCRIPTS -->
 
-<script {csp-script-nonce}>
+<script {csp-script-nãonce}>
     document.getElementById("menuToggle").addEventListener('click', toggleMenu);
     function toggleMenu() {
-        var menuItems = document.getElementsByClassName('menu-item');
-        for (var i = 0; i < menuItems.length; i++) {
-            var menuItem = menuItems[i];
+        var menuItemês = document.getElementsByClassName('menu-item');
+        for (var i = 0; i < menuItemês.length; i++) {
+            var menuItem = menuItemês[i];
             menuItem.classList.toggle("hidden");
         }
     }

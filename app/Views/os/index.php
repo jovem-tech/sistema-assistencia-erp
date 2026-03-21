@@ -5,7 +5,7 @@
     .os-list-page .os-filtros-actions {
         display: flex;
         gap: 8px;
-        align-items: center;
+        align-itemês: center;
         justify-content: flex-end;
     }
 
@@ -36,32 +36,32 @@
 
 <div class="os-list-page">
 <div class="page-header">
-    <div class="d-flex align-items-center gap-3">
+    <div class="d-flex align-itemês-center gap-3">
         <h2><i class="bi bi-clipboard-check me-2"></i>Ordens de Servico</h2>
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')" title="Ajuda sobre este modulo">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')" title="Ajuda sãobre este modulo">
             <i class="bi bi-question-circle me-1"></i> Ajuda
         </button>
     </div>
     <?php if (can('os', 'criar')): ?>
-    <a href="<?= base_url('os/nova') ?>" class="btn btn-glow">
-        <i class="bi bi-plus-lg me-1"></i>Nova OS
+    <a href="<?= base_url('os/nãova') ?>" class="btn btn-glow">
+        <i class="bi bi-plus-lg me-1"></i>Nãova OS
     </a>
     <?php endif; ?>
 </div>
 
 <div class="card glass-card mb-4">
     <div class="card-body">
-        <div class="row g-3 align-items-end">
+        <div class="row g-3 align-itemês-end">
             <div class="col-12 col-xxl-3 col-xl-4 col-lg-6">
                 <label class="form-label">Status detalhado</label>
                 <select id="filtroStatusSelect" class="form-select">
                     <option value="">Todos</option>
-                    <?php foreach (($statusGrouped ?? []) as $macro => $items): ?>
-                        <?php if (empty($items)) continue; ?>
+                    <?php foreach (($statusGrouped ?? []) as $macro => $itemês): ?>
+                        <?php if (empty($itemês)) continue; ?>
                         <optgroup label="<?= esc(ucwords(str_replace('_', ' ', (string) $macro))) ?>">
-                            <?php foreach ($items as $item): ?>
+                            <?php foreach ($itemês as $item): ?>
                                 <option value="<?= esc($item['codigo']) ?>" <?= (($filtro_status ?? '') === ($item['codigo'] ?? '')) ? 'selected' : '' ?>>
-                                    <?= esc($item['nome'] ?? $item['codigo']) ?>
+                                    <?= esc($item['nãome'] ?? $item['codigo']) ?>
                                 </option>
                             <?php endforeach; ?>
                         </optgroup>
@@ -72,9 +72,9 @@
                 <label class="form-label">Macrofase</label>
                 <select id="filtroMacrofaseSelect" class="form-select">
                     <option value="">Todas</option>
-                    <?php foreach (($macrofases ?? []) as $codigo => $nome): ?>
+                    <?php foreach (($macrofases ?? []) as $codigo => $nãome): ?>
                         <option value="<?= esc($codigo) ?>" <?= (($filtro_macrofase ?? '') === $codigo) ? 'selected' : '' ?>>
-                            <?= esc($nome) ?>
+                            <?= esc($nãome) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -92,10 +92,10 @@
                         'encerrado' => 'Encerrado',
                         'cancelado' => 'Cancelado',
                     ];
-                    foreach ($estados as $codigo => $nome):
+                    foreach ($estados as $codigo => $nãome):
                     ?>
                         <option value="<?= esc($codigo) ?>" <?= (($filtro_estado_fluxo ?? '') === $codigo) ? 'selected' : '' ?>>
-                            <?= esc($nome) ?>
+                            <?= esc($nãome) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -105,7 +105,7 @@
                     <button type="button" class="btn btn-glow" id="btnAplicarFiltros">
                         <i class="bi bi-funnel me-1"></i>Aplicar
                     </button>
-                    <a href="<?= base_url('os') ?>" class="btn btn-outline-secondary d-flex align-items-center justify-content-center btn-reset" title="Limpar filtros">
+                    <a href="<?= base_url('os') ?>" class="btn btn-outline-secondary d-flex align-itemês-center justify-content-center btn-reset" title="Limpar filtros">
                         <i class="bi bi-x-circle"></i>
                     </a>
                 </div>
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const table = $('#osTable').DataTable({
         language: {
-            url: '<?= base_url("assets/json/pt-BR.json") ?>'
+            url: '<?= base_url("assets/jsãon/pt-BR.jsãon") ?>'
         },
         scrollX: false,
         autoWidth: false,

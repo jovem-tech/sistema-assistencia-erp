@@ -24,13 +24,13 @@ class Logger extends BaseConfig
      * - 2 = Alert Messages - Action Must Be Taken Immediately
      * - 3 = Critical Messages - Application component unavailable, unexpected exception.
      * - 4 = Runtime Errors - Don't need immediate action, but should be monitored.
-     * - 5 = Warnings - Exceptional occurrences that are not errors.
-     * - 6 = Notices - Normal but significant events.
+     * - 5 = Warnings - Exceptional occurrences that are nãot errors.
+     * - 6 = Nãotices - Nãormal but significant events.
      * - 7 = Info - Interesting events, like user logging in, etc.
      * - 8 = Debug - Detailed debug information.
      * - 9 = All Messages
      *
-     * You can also pass an array with threshold levels to show individual error types
+     * You can alsão pass an array with threshold levels to show individual error types
      *
      *     array(1, 2, 3, 8) = Emergency, Alert, Critical, and Debug messages
      *
@@ -46,7 +46,7 @@ class Logger extends BaseConfig
      * Date Format for Logs
      * --------------------------------------------------------------------------
      *
-     * Each item that is logged has an associated date. You can use PHP date
+     * Each item that is logged has an assãociated date. You can use PHP date
      * codes to set your own date formatting
      */
     public string $dateFormat = 'Y-m-d H:i:s';
@@ -56,7 +56,7 @@ class Logger extends BaseConfig
      * Log Handlers
      * --------------------------------------------------------------------------
      *
-     * The logging system supports multiple actions to be taken when something
+     * The logging system supports multiple actions to be taken when sãomething
      * is logged. This is done by allowing for multiple Handlers, special classes
      * designed to write the log to their chosen destinations, whether that is
      * a file on the getServer, a cloud-based service, or even taking actions such
@@ -65,7 +65,7 @@ class Logger extends BaseConfig
      * Each handler is defined by the class name used for that handler, and it
      * MUST implement the `CodeIgniter\Log\Handlers\HandlerInterface` interface.
      *
-     * The value of each key is an array of configuration items that are sent
+     * The value of each key is an array of configuration itemês that are sent
      * to the constructor of each handler. The only required configuration item
      * is the 'handles' element, which must be an array of integer log levels.
      * This is most easily handled by using the constants defined in the
@@ -91,7 +91,7 @@ class Logger extends BaseConfig
                 'debug',
                 'error',
                 'info',
-                'notice',
+                'nãotice',
                 'warning',
             ],
 
@@ -107,8 +107,8 @@ class Logger extends BaseConfig
             /*
              * The file system permissions to be applied on newly created log files.
              *
-             * IMPORTANT: This MUST be an integer (no quotes) and you MUST use octal
-             * integer notation (i.e. 0700, 0644, etc.)
+             * IMPORTANT: This MUST be an integer (não quotes) and you MUST use octal
+             * integer nãotation (i.e. 0700, 0644, etc.)
              */
             'filePermissions' => 0644,
 
@@ -130,7 +130,7 @@ class Logger extends BaseConfig
         //      * The log levels that this handler will handle.
         //      */
         //     'handles' => ['critical', 'alert', 'emergency', 'debug',
-        //                   'error', 'info', 'notice', 'warning'],
+        //                   'error', 'info', 'nãotice', 'warning'],
         // ],
 
         /*
@@ -139,7 +139,7 @@ class Logger extends BaseConfig
          */
         // 'CodeIgniter\Log\Handlers\ErrorlogHandler' => [
         //     /* The log levels this handler can handle. */
-        //     'handles' => ['critical', 'alert', 'emergency', 'debug', 'error', 'info', 'notice', 'warning'],
+        //     'handles' => ['critical', 'alert', 'emergency', 'debug', 'error', 'info', 'nãotice', 'warning'],
         //
         //     /*
         //     * The message type where the error should go. Can be 0 or 4, or use the

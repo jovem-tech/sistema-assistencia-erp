@@ -44,10 +44,10 @@ class ChatbotService
     public function processarInbound(array $conversa, array $mensagem, array $payload = []): array
     {
         if (!$this->isDisponivel()) {
-            return ['ok' => false, 'handled' => false, 'reason' => 'chatbot_indisponivel'];
+            return ['ok' => false, 'handled' => false, 'reasãon' => 'chatbot_indisponivel'];
         }
         if (!$this->isBotEnabled()) {
-            return ['ok' => false, 'handled' => false, 'reason' => 'chatbot_desativado_config'];
+            return ['ok' => false, 'handled' => false, 'reasãon' => 'chatbot_desativado_config'];
         }
 
         $conversaId = (int) ($conversa['id'] ?? 0);
@@ -68,36 +68,36 @@ class ChatbotService
                 'confianca' => 0,
                 'resposta_gerada' => null,
                 'tipo_resposta' => 'manual',
-                'escalado_humano' => 1,
-                'payload_json' => $payload,
+                'escalado_humanão' => 1,
+                'payload_jsãon' => $payload,
             ]);
-            return ['ok' => true, 'handled' => false, 'reason' => 'automacao_desativada'];
+            return ['ok' => true, 'handled' => false, 'reasãon' => 'automacao_desativada'];
         }
 
-        if ((int) ($conversa['aguardando_humano'] ?? 0) === 1) {
+        if ((int) ($conversa['aguardando_humanão'] ?? 0) === 1) {
             $this->registrarLog([
                 'conversa_id' => $conversaId,
                 'cliente_id' => $clienteId,
                 'os_id' => $osId,
                 'mensagem_id' => $mensagemId,
                 'mensagem_recebida' => $textoRecebido,
-                'intencao_detectada' => 'aguardando_humano',
+                'intencao_detectada' => 'aguardando_humanão',
                 'confianca' => 0,
                 'resposta_gerada' => null,
                 'tipo_resposta' => 'manual',
-                'escalado_humano' => 1,
-                'payload_json' => $payload,
+                'escalado_humanão' => 1,
+                'payload_jsãon' => $payload,
             ]);
-            return ['ok' => true, 'handled' => false, 'reason' => 'aguardando_humano'];
+            return ['ok' => true, 'handled' => false, 'reasãon' => 'aguardando_humanão'];
         }
 
-        $novoClienteFlow = $this->processarFluxoNovoCliente($conversa, $mensagem, $payload);
-        if (is_array($novoClienteFlow)) {
-            return $novoClienteFlow;
+        $nãovoClienteFlow = $this->processarFluxoNãovoCliente($conversa, $mensagem, $payload);
+        if (is_array($nãovoClienteFlow)) {
+            return $nãovoClienteFlow;
         }
 
         if ($textoRecebido === '') {
-            return ['ok' => true, 'handled' => false, 'reason' => 'mensagem_vazia'];
+            return ['ok' => true, 'handled' => false, 'reasãon' => 'mensagem_vazia'];
         }
 
         $intencoes = $this->intencaoModel->ativas();
@@ -107,21 +107,21 @@ class ChatbotService
         $score = (float) ($detecao['score'] ?? 0.0);
         $intencao = $detecao['intent'] ?? null;
         $faq = $detecao['faq'] ?? null;
-        $origem = (string) ($detecao['origem'] ?? 'none');
+        $origem = (string) ($detecao['origem'] ?? 'nãone');
 
         $resposta = null;
         $intencaoCodigo = null;
-        $escalarHumano = false;
+        $escalarHumanão = false;
         $tipoResposta = 'automatica';
 
         if ($origem === 'faq' && $faq) {
             $rawResposta = trim((string) ($faq['resposta'] ?? ''));
-            $os = $this->resolverOsContexto($conversa);
+            $os = $this->resãolverOsContexto($conversa);
             $resposta = $this->renderResposta($rawResposta, $conversa, $os);
             $intencaoCodigo = 'faq_' . (string) ($faq['id'] ?? '0');
         } elseif ($origem === 'intent' && $intencao) {
             $intencaoCodigo = (string) ($intencao['codigo'] ?? '');
-            [$resposta, $escalarHumano, $tipoResposta] = $this->resolverRespostaIntencao(
+            [$resposta, $escalarHumanão, $tipoResposta] = $this->resãolverRespostaIntencao(
                 $intencao,
                 $conversa,
                 $mensagem,
@@ -130,10 +130,10 @@ class ChatbotService
         }
 
         if (($resposta === null || trim($resposta) === '') && $score < $confidenceThreshold) {
-            $resposta = (string) get_config('central_mensagens_bot_fallback_message', 'Recebi sua mensagem e vou encaminhar para um atendente humano continuar o atendimento.');
-            $escalarHumano = true;
-            $tipoResposta = 'fallback_humano';
-            $intencaoCodigo = $intencaoCodigo ?: 'fallback_humano';
+            $resposta = (string) get_config('central_mensagens_bot_fallback_message', 'Recebi sua mensagem e vou encaminhar para um atendente humanão continuar o atendimento.');
+            $escalarHumanão = true;
+            $tipoResposta = 'fallback_humanão';
+            $intencaoCodigo = $intencaoCodigo ?: 'fallback_humanão';
         }
 
         if ($resposta === null || trim($resposta) === '') {
@@ -147,16 +147,16 @@ class ChatbotService
                 'confianca' => $score,
                 'resposta_gerada' => null,
                 'tipo_resposta' => 'manual',
-                'escalado_humano' => 1,
-                'payload_json' => $payload,
+                'escalado_humanão' => 1,
+                'payload_jsãon' => $payload,
             ]);
-            return ['ok' => true, 'handled' => false, 'reason' => 'sem_resposta'];
+            return ['ok' => true, 'handled' => false, 'reasãon' => 'sem_resposta'];
         }
 
-        if ($escalarHumano) {
+        if ($escalarHumanão) {
             $this->conversaModel->update($conversaId, [
                 'status' => 'aguardando',
-                'aguardando_humano' => 1,
+                'aguardando_humanão' => 1,
                 'automacao_ativa' => 0,
                 'prioridade' => 'alta',
             ]);
@@ -164,12 +164,12 @@ class ChatbotService
             $this->crmService->createFollowup([
                 'cliente_id' => $clienteId,
                 'os_id' => $osId,
-                'titulo' => 'Atendimento humano solicitado no WhatsApp',
-                'descricao' => 'Cliente solicitou atendimento humano pela Central de Mensagens.',
+                'titulo' => 'Atendimento humanão sãolicitado não WhatsApp',
+                'descricao' => 'Cliente sãolicitou atendimento humanão pela Central de Mensagens.',
                 'data_prevista' => date('Y-m-d H:i:s'),
                 'status' => 'pendente',
                 'usuario_responsavel' => session()->get('user_id') ?: null,
-                'origem_evento' => 'chatbot_escalado_humano',
+                'origem_evento' => 'chatbot_escalado_humanão',
             ]);
         }
 
@@ -192,7 +192,7 @@ class ChatbotService
         if ($mensagemBotId && !$send['ok']) {
             $this->mensagemModel->update($mensagemBotId, [
                 'status' => 'erro',
-                'erro' => $send['message'] ?? 'Falha no envio automatico',
+                'erro' => $send['message'] ?? 'Falha não envio automatico',
             ]);
         }
 
@@ -206,8 +206,8 @@ class ChatbotService
             'confianca' => $score,
             'resposta_gerada' => $resposta,
             'tipo_resposta' => $tipoResposta,
-            'escalado_humano' => $escalarHumano ? 1 : 0,
-                'payload_json' => [
+            'escalado_humanão' => $escalarHumanão ? 1 : 0,
+                'payload_jsãon' => [
                     'inbound' => $payload,
                     'send_result' => $send,
                     'threshold' => $confidenceThreshold,
@@ -219,7 +219,7 @@ class ChatbotService
             'handled' => true,
             'intent' => $intencaoCodigo,
             'score' => $score,
-            'escalado_humano' => $escalarHumano,
+            'escalado_humanão' => $escalarHumanão,
             'result' => $send,
         ];
     }
@@ -254,7 +254,7 @@ class ChatbotService
      * @param array<string,mixed> $payload
      * @return array<string,mixed>|null
      */
-    private function processarFluxoNovoCliente(array $conversa, array $mensagem, array $payload): ?array
+    private function processarFluxoNãovoCliente(array $conversa, array $mensagem, array $payload): ?array
     {
         $clienteId = (int) ($conversa['cliente_id'] ?? 0);
         if ($clienteId > 0) {
@@ -268,8 +268,8 @@ class ChatbotService
 
         $textoRecebido = trim((string) ($mensagem['mensagem'] ?? ''));
 
-        $nomeContatoAtual = trim((string) ($conversa['nome_contato'] ?? ''));
-        if ($this->isNomeCompletoValido($nomeContatoAtual)) {
+        $nãomeContatoAtual = trim((string) ($conversa['nãome_contato'] ?? ''));
+        if ($this->isNãomeCompletoValido($nãomeContatoAtual)) {
             return null;
         }
 
@@ -277,23 +277,23 @@ class ChatbotService
         $telefone = (string) ($conversa['telefone'] ?? '');
         $mensagemId = (int) ($mensagem['id'] ?? 0) ?: null;
 
-        if ($this->isNomeCompletoValido($textoRecebido)) {
-            $nomeCapturado = $this->normalizarNomeHumano($textoRecebido);
-            if ($nomeCapturado !== '') {
+        if ($this->isNãomeCompletoValido($textoRecebido)) {
+            $nãomeCapturado = $this->nãormalizarNãomeHumanão($textoRecebido);
+            if ($nãomeCapturado !== '') {
                 $this->conversaModel->update($conversaId, [
-                    'nome_contato' => $nomeCapturado,
+                    'nãome_contato' => $nãomeCapturado,
                     'ultima_mensagem_em' => date('Y-m-d H:i:s'),
                 ]);
-                $this->sincronizarNomeNoContato($conversa, $nomeCapturado);
+                $this->sincronizarNãomeNãoContato($conversa, $nãomeCapturado);
             }
 
-            $respostaConfirmacao = 'blza ' . $nomeCapturado . ' ! me digite ou mande um audio do que podemos lhe ajudar que logo encaminho para o atendimento de um jovem humano !';
+            $respostaConfirmacao = 'blza ' . $nãomeCapturado . ' ! me digite ou mande um audio do que podemos lhe ajudar que logo encaminho para o atendimento de um jovem humanão !';
             $send = (new WhatsAppService())->sendRaw(
                 $osId ?: 0,
                 0,
                 $telefone,
                 $respostaConfirmacao,
-                'chatbot_novo_cliente_nome_confirmado',
+                'chatbot_nãovo_cliente_nãome_confirmado',
                 null,
                 null,
                 [
@@ -308,12 +308,12 @@ class ChatbotService
                 'os_id' => $osId,
                 'mensagem_id' => $mensagemId,
                 'mensagem_recebida' => $textoRecebido,
-                'intencao_detectada' => 'novo_cliente_nome_confirmado',
+                'intencao_detectada' => 'nãovo_cliente_nãome_confirmado',
                 'confianca' => 1,
                 'resposta_gerada' => $respostaConfirmacao,
                 'tipo_resposta' => 'automatica',
-                'escalado_humano' => 0,
-                'payload_json' => [
+                'escalado_humanão' => 0,
+                'payload_jsãon' => [
                     'inbound' => $payload,
                     'send_result' => $send,
                 ],
@@ -322,24 +322,24 @@ class ChatbotService
             return [
                 'ok' => (bool) ($send['ok'] ?? false),
                 'handled' => true,
-                'intent' => 'novo_cliente_nome_confirmado',
+                'intent' => 'nãovo_cliente_nãome_confirmado',
                 'score' => 1.0,
-                'escalado_humano' => false,
+                'escalado_humanão' => false,
                 'result' => $send,
             ];
         }
 
-        if ($this->enviouPromptNomeRecentemente($conversaId)) {
-            return ['ok' => true, 'handled' => false, 'reason' => 'novo_cliente_aguardando_nome'];
+        if ($this->enviouPromptNãomeRecentemente($conversaId)) {
+            return ['ok' => true, 'handled' => false, 'reasãon' => 'nãovo_cliente_aguardando_nãome'];
         }
 
-        $respostaSolicitacaoNome = $this->saudacaoAutomatica() . ", *atendimento automatico* ! tudo bem ?!\n\npor favor diga APENAS seu nome e sobre nome para prosseguirmos o atendimento !";
+        $respostaSãolicitacaoNãome = $this->saudacaoAutomatica() . ", *atendimento automatico* ! tudo bem ?!\n\npor favor diga APENAS seu nãome e sãobre nãome para prosseguirmos o atendimento !";
         $send = (new WhatsAppService())->sendRaw(
             $osId ?: 0,
             0,
             $telefone,
-            $respostaSolicitacaoNome,
-            'chatbot_novo_cliente_solicitar_nome',
+            $respostaSãolicitacaoNãome,
+            'chatbot_nãovo_cliente_sãolicitar_nãome',
             null,
             null,
             [
@@ -354,12 +354,12 @@ class ChatbotService
             'os_id' => $osId,
             'mensagem_id' => $mensagemId,
             'mensagem_recebida' => $textoRecebido,
-            'intencao_detectada' => 'novo_cliente_solicitar_nome',
+            'intencao_detectada' => 'nãovo_cliente_sãolicitar_nãome',
             'confianca' => 1,
-            'resposta_gerada' => $respostaSolicitacaoNome,
+            'resposta_gerada' => $respostaSãolicitacaoNãome,
             'tipo_resposta' => 'automatica',
-            'escalado_humano' => 0,
-            'payload_json' => [
+            'escalado_humanão' => 0,
+            'payload_jsãon' => [
                 'inbound' => $payload,
                 'send_result' => $send,
             ],
@@ -368,21 +368,21 @@ class ChatbotService
         return [
             'ok' => (bool) ($send['ok'] ?? false),
             'handled' => true,
-            'intent' => 'novo_cliente_solicitar_nome',
+            'intent' => 'nãovo_cliente_sãolicitar_nãome',
             'score' => 1.0,
-            'escalado_humano' => false,
+            'escalado_humanão' => false,
             'result' => $send,
         ];
     }
 
-    private function enviouPromptNomeRecentemente(int $conversaId, int $janelaSegundos = 300): bool
+    private function enviouPromptNãomeRecentemente(int $conversaId, int $janelaSegundos = 300): bool
     {
         $prompt = $this->mensagemModel
             ->select('id, created_at, enviada_em')
             ->where('conversa_id', $conversaId)
             ->where('direcao', 'outbound')
             ->where('enviada_por_bot', 1)
-            ->where('tipo_mensagem', 'chatbot_novo_cliente_solicitar_nome')
+            ->where('tipo_mensagem', 'chatbot_nãovo_cliente_sãolicitar_nãome')
             ->orderBy('id', 'DESC')
             ->first();
 
@@ -412,10 +412,10 @@ class ChatbotService
         if ($hora < 18) {
             return 'boa tarde';
         }
-        return 'boa noite';
+        return 'boa nãoite';
     }
 
-    private function isNomeCompletoValido(string $value): bool
+    private function isNãomeCompletoValido(string $value): bool
     {
         $raw = trim($value);
         if ($raw === '') {
@@ -446,31 +446,31 @@ class ChatbotService
         return $validWords >= 2;
     }
 
-    private function normalizarNomeHumano(string $value): string
+    private function nãormalizarNãomeHumanão(string $value): string
     {
         $parts = preg_split('/\s+/', trim($value)) ?: [];
-        $normalized = [];
+        $nãormalized = [];
         foreach ($parts as $part) {
             $token = trim((string) $part);
             if ($token === '') {
                 continue;
             }
             if (function_exists('mb_convert_case')) {
-                $normalized[] = mb_convert_case($token, MB_CASE_TITLE, 'UTF-8');
+                $nãormalized[] = mb_convert_case($token, MB_CASE_TITLE, 'UTF-8');
             } else {
-                $normalized[] = ucwords(strtolower($token));
+                $nãormalized[] = ucwords(strtolower($token));
             }
         }
-        return trim(implode(' ', $normalized));
+        return trim(implode(' ', $nãormalized));
     }
 
     /**
      * @param array<string,mixed> $conversa
      */
-    private function sincronizarNomeNoContato(array $conversa, string $nome): void
+    private function sincronizarNãomeNãoContato(array $conversa, string $nãome): void
     {
-        $nome = trim($nome);
-        if ($nome === '' || !$this->contatoModel->db->tableExists('contatos')) {
+        $nãome = trim($nãome);
+        if ($nãome === '' || !$this->contatoModel->db->tableExists('contatos')) {
             return;
         }
 
@@ -482,11 +482,11 @@ class ChatbotService
             }
 
             $updates = [];
-            if (empty($contato['nome'])) {
-                $updates['nome'] = $nome;
+            if (empty($contato['nãome'])) {
+                $updates['nãome'] = $nãome;
             }
-            if (empty($contato['whatsapp_nome_perfil'])) {
-                $updates['whatsapp_nome_perfil'] = $nome;
+            if (empty($contato['whatsapp_nãome_perfil'])) {
+                $updates['whatsapp_nãome_perfil'] = $nãome;
             }
             $updates['ultimo_contato_em'] = date('Y-m-d H:i:s');
             if ((int) ($contato['cliente_id'] ?? 0) <= 0) {
@@ -510,11 +510,11 @@ class ChatbotService
         }
 
         $updates = [];
-        if (empty($contato['nome'])) {
-            $updates['nome'] = $nome;
+        if (empty($contato['nãome'])) {
+            $updates['nãome'] = $nãome;
         }
-        if (empty($contato['whatsapp_nome_perfil'])) {
-            $updates['whatsapp_nome_perfil'] = $nome;
+        if (empty($contato['whatsapp_nãome_perfil'])) {
+            $updates['whatsapp_nãome_perfil'] = $nãome;
         }
         $updates['ultimo_contato_em'] = date('Y-m-d H:i:s');
         if ((int) ($contato['cliente_id'] ?? 0) <= 0) {
@@ -532,7 +532,7 @@ class ChatbotService
      * @param array<string, mixed> $mensagem
      * @return array{0:string|null,1:bool,2:string}
      */
-    private function resolverRespostaIntencao(
+    private function resãolverRespostaIntencao(
         array $intencao,
         array $conversa,
         array $mensagem,
@@ -540,34 +540,34 @@ class ChatbotService
     ): array {
         $intencaoCodigo = (string) ($intencao['codigo'] ?? '');
         $respostaPadrao = trim((string) ($intencao['resposta_padrao'] ?? ''));
-        $os = $this->resolverOsContexto($conversa);
-        $clienteNome = trim((string) ($conversa['nome_contato'] ?? 'cliente'));
-        if ($clienteNome === '') {
-            $clienteNome = 'cliente';
+        $os = $this->resãolverOsContexto($conversa);
+        $clienteNãome = trim((string) ($conversa['nãome_contato'] ?? 'cliente'));
+        if ($clienteNãome === '') {
+            $clienteNãome = 'cliente';
         }
 
         switch ($intencaoCodigo) {
             case 'consultar_status_os':
                 if (!$os) {
-                    $msg = $respostaPadrao ?: 'Nao encontrei uma OS ativa vinculada ao seu telefone. Pode informar o numero da OS para eu localizar?';
-                    return [$this->renderResposta($msg, $conversa, null), true, 'fallback_humano'];
+                    $mêsg = $respostaPadrao ?: 'Nao encontrei uma OS ativa vinculada ao seu telefone. Pode informar o numero da OS para eu localizar?';
+                    return [$this->renderResposta($mêsg, $conversa, null), true, 'fallback_humanão'];
                 }
                 $status = ucwords(str_replace('_', ' ', (string) ($os['status'] ?? 'em atendimento')));
-                $msg = $respostaPadrao ?: 'A OS {{numero_os}} esta atualmente em "{{status}}".';
-                return [$this->renderResposta($msg, $conversa, $os), false, 'automatica'];
+                $mêsg = $respostaPadrao ?: 'A OS {{numero_os}} esta atualmente em "{{status}}".';
+                return [$this->renderResposta($mêsg, $conversa, $os), false, 'automatica'];
 
             case 'consultar_orcamento':
                 if (!$os) {
-                    $msg = $respostaPadrao ?: 'Nao localizei uma OS para consultar orcamento neste momento. Informe o numero da OS para eu verificar.';
-                    return [$this->renderResposta($msg, $conversa, null), true, 'fallback_humano'];
+                    $mêsg = $respostaPadrao ?: 'Nao localizei uma OS para consultar orcamento neste momento. Informe o numero da OS para eu verificar.';
+                    return [$this->renderResposta($mêsg, $conversa, null), true, 'fallback_humanão'];
                 }
                 $valor = (float) ($os['valor_final'] ?? 0);
                 if ($valor <= 0) {
-                    $msg = $respostaPadrao ?: 'A OS {{numero_os}} ainda esta sem valor final de orcamento registrado.';
-                    return [$this->renderResposta($msg, $conversa, $os), false, 'automatica'];
+                    $mêsg = $respostaPadrao ?: 'A OS {{numero_os}} ainda esta sem valor final de orcamento registrado.';
+                    return [$this->renderResposta($mêsg, $conversa, $os), false, 'automatica'];
                 }
-                $msg = $respostaPadrao ?: 'O valor atual da OS {{numero_os}} e R$ {{valor_final}}.';
-                return [$this->renderResposta($msg, $conversa, $os), false, 'automatica'];
+                $mêsg = $respostaPadrao ?: 'O valor atual da OS {{numero_os}} e R$ {{valor_final}}.';
+                return [$this->renderResposta($mêsg, $conversa, $os), false, 'automatica'];
 
             case 'aprovar_orcamento':
                 if ($os) {
@@ -581,11 +581,11 @@ class ChatbotService
                         'origem' => 'chatbot',
                         'usuario_id' => null,
                         'data_evento' => date('Y-m-d H:i:s'),
-                        'payload_json' => ['score' => $score],
+                        'payload_jsãon' => ['score' => $score],
                     ]);
                 }
-                $msg = $respostaPadrao ?: 'Perfeito! Registrei sua intencao de aprovacao. Nosso time vai confirmar e dar continuidade no reparo.';
-                return [$this->renderResposta($msg, $conversa, $os), true, 'escalada'];
+                $mêsg = $respostaPadrao ?: 'Perfeito! Registrei sua intencao de aprovacao. Nãossão time vai confirmar e dar continuidade não reparo.';
+                return [$this->renderResposta($mêsg, $conversa, $os), true, 'escalada'];
 
             case 'recusar_orcamento':
                 // ... (registro de evento crm mantido)
@@ -600,57 +600,57 @@ class ChatbotService
                         'origem' => 'chatbot',
                         'usuario_id' => null,
                         'data_evento' => date('Y-m-d H:i:s'),
-                        'payload_json' => ['score' => $score],
+                        'payload_jsãon' => ['score' => $score],
                     ]);
                 }
-                $msg = $respostaPadrao ?: 'Entendido. Registrei sua intencao de recusa. Um atendente humano vai concluir este fluxo com voce.';
-                return [$this->renderResposta($msg, $conversa, $os), true, 'escalada'];
+                $mêsg = $respostaPadrao ?: 'Entendido. Registrei sua intencao de recusa. Um atendente humanão vai concluir este fluxo com vocêe.';
+                return [$this->renderResposta($mêsg, $conversa, $os), true, 'escalada'];
 
             case 'consultar_previsao':
                 if (!$os) {
-                    $msg = $respostaPadrao ?: 'Nao encontrei OS ativa para consultar previsao. Informe o numero da OS para eu continuar.';
-                    return [$this->renderResposta($msg, $conversa, null), true, 'fallback_humano'];
+                    $mêsg = $respostaPadrao ?: 'Nao encontrei OS ativa para consultar previsao. Informe o numero da OS para eu continuar.';
+                    return [$this->renderResposta($mêsg, $conversa, null), true, 'fallback_humanão'];
                 }
                 if (empty($os['data_previsao'])) {
-                    $msg = $respostaPadrao ?: 'A OS {{numero_os}} ainda nao possui previsao registrada.';
-                    return [$this->renderResposta($msg, $conversa, $os), false, 'automatica'];
+                    $mêsg = $respostaPadrao ?: 'A OS {{numero_os}} ainda nao possui previsao registrada.';
+                    return [$this->renderResposta($mêsg, $conversa, $os), false, 'automatica'];
                 }
-                $msg = $respostaPadrao ?: 'A previsao atual da OS {{numero_os}} e {{data_previsao}}.';
-                return [$this->renderResposta($msg, $conversa, $os), false, 'automatica'];
+                $mêsg = $respostaPadrao ?: 'A previsao atual da OS {{numero_os}} e {{data_previsao}}.';
+                return [$this->renderResposta($mêsg, $conversa, $os), false, 'automatica'];
 
             case 'horario_atendimento':
-                $msg = $respostaPadrao ?: 'Nosso horario de atendimento e de segunda a sexta das 08:00 as 18:00 e sabado das 08:00 as 12:00.';
-                return [$this->renderResposta($msg, $conversa, $os), false, 'automatica'];
+                $mêsg = $respostaPadrao ?: 'Nãossão horario de atendimento e de segunda a sexta das 08:00 as 18:00 e sabado das 08:00 as 12:00.';
+                return [$this->renderResposta($mêsg, $conversa, $os), false, 'automatica'];
 
             case 'endereco_loja':
                 $endereco = trim((string) get_config('empresa_endereco', ''));
                 if ($endereco === '') {
-                    $msg = $respostaPadrao ?: 'Posso chamar um atendente para compartilhar o endereco completo da loja com voce.';
-                    return [$this->renderResposta($msg, $conversa, $os), true, 'fallback_humano'];
+                    $mêsg = $respostaPadrao ?: 'Possão chamar um atendente para compartilhar o endereco completo da loja com vocêe.';
+                    return [$this->renderResposta($mêsg, $conversa, $os), true, 'fallback_humanão'];
                 }
-                $msg = $respostaPadrao ?: 'Nosso endereco e: {{empresa_endereco}}.';
-                return [$this->renderResposta($msg, $conversa, $os), false, 'automatica'];
+                $mêsg = $respostaPadrao ?: 'Nãossão endereco e: {{empresa_endereco}}.';
+                return [$this->renderResposta($mêsg, $conversa, $os), false, 'automatica'];
 
             case 'formas_pagamento':
-                $msg = $respostaPadrao ?: 'Aceitamos PIX, cartao de debito, cartao de credito e dinheiro. Parcelamento sujeito as condicoes da loja.';
-                return [$this->renderResposta($msg, $conversa, $os), false, 'automatica'];
+                $mêsg = $respostaPadrao ?: 'Aceitamos PIX, cartao de debito, cartao de credito e dinheiro. Parcelamento sujeito as condicoes da loja.';
+                return [$this->renderResposta($mêsg, $conversa, $os), false, 'automatica'];
 
             case 'garantia':
                 if (!$os) {
-                    $msg = $respostaPadrao ?: 'Posso te ajudar com garantia. Me informe o numero da OS para consultar o prazo exato.';
-                    return [$this->renderResposta($msg, $conversa, null), true, 'fallback_humano'];
+                    $mêsg = $respostaPadrao ?: 'Possão te ajudar com garantia. Me informe o numero da OS para consultar o prazo exato.';
+                    return [$this->renderResposta($mêsg, $conversa, null), true, 'fallback_humanão'];
                 }
                 $garantiaDias = (int) ($os['garantia_dias'] ?? 0);
                 if ($garantiaDias <= 0) {
-                    $msg = $respostaPadrao ?: 'A OS {{numero_os}} nao possui garantia cadastrada no momento.';
-                    return [$this->renderResposta($msg, $conversa, $os), false, 'automatica'];
+                    $mêsg = $respostaPadrao ?: 'A OS {{numero_os}} nao possui garantia cadastrada não momento.';
+                    return [$this->renderResposta($mêsg, $conversa, $os), false, 'automatica'];
                 }
-                $msg = $respostaPadrao ?: 'A garantia registrada para a OS {{numero_os}} e de {{garantia_dias}} dia(s).';
-                return [$this->renderResposta($msg, $conversa, $os), false, 'automatica'];
+                $mêsg = $respostaPadrao ?: 'A garantia registrada para a OS {{numero_os}} e de {{garantia_dias}} dia(s).';
+                return [$this->renderResposta($mêsg, $conversa, $os), false, 'automatica'];
 
-            case 'falar_humano':
-                $msg = $respostaPadrao ?: 'Claro, {{cliente_nome}}. Vou transferir seu atendimento para um atendente humano agora.';
-                return [$this->renderResposta($msg, $conversa, $os), true, 'escalada'];
+            case 'falar_humanão':
+                $mêsg = $respostaPadrao ?: 'Claro, {{cliente_nãome}}. Vou transferir seu atendimento para um atendente humanão agora.';
+                return [$this->renderResposta($mêsg, $conversa, $os), true, 'escalada'];
         }
 
         return [null, false, 'manual'];
@@ -660,7 +660,7 @@ class ChatbotService
      * @param array<string, mixed> $conversa
      * @return array<string, mixed>|null
      */
-    private function resolverOsContexto(array $conversa): ?array
+    private function resãolverOsContexto(array $conversa): ?array
     {
         $osId = (int) ($conversa['os_id_principal'] ?? 0);
         if ($osId > 0) {
@@ -674,7 +674,7 @@ class ChatbotService
 
         return $this->osModel
             ->where('cliente_id', $clienteId)
-            ->whereNotIn('estado_fluxo', ['encerrado', 'cancelado'])
+            ->whereNãotIn('estado_fluxo', ['encerrado', 'cancelado'])
             ->orderBy('id', 'DESC')
             ->first();
     }
@@ -682,7 +682,7 @@ class ChatbotService
     private function renderResposta(string $template, array $conversa, ?array $os = null): string
     {
         $vars = [
-            'cliente_nome' => trim((string) ($conversa['nome_contato'] ?? 'cliente')) ?: 'cliente',
+            'cliente_nãome' => trim((string) ($conversa['nãome_contato'] ?? 'cliente')) ?: 'cliente',
             'empresa_endereco' => trim((string) get_config('empresa_endereco', '')),
         ];
 
@@ -725,11 +725,11 @@ class ChatbotService
             'confianca' => isset($payload['confianca']) ? (float) $payload['confianca'] : null,
             'resposta_gerada' => $payload['resposta_gerada'] ?? null,
             'tipo_resposta' => $payload['tipo_resposta'] ?? 'manual',
-            'escalado_humano' => (int) ($payload['escalado_humano'] ?? 0),
+            'escalado_humanão' => (int) ($payload['escalado_humanão'] ?? 0),
             'usuario_responsavel' => $payload['usuario_responsavel'] ?? null,
-            'payload_json' => is_array($payload['payload_json'] ?? null)
-                ? json_encode($payload['payload_json'], JSON_UNESCAPED_UNICODE)
-                : ($payload['payload_json'] ?? null),
+            'payload_jsãon' => is_array($payload['payload_jsãon'] ?? null)
+                ? jsãon_encode($payload['payload_jsãon'], JSON_UNESCAPED_UNICODE)
+                : ($payload['payload_jsãon'] ?? null),
         ];
 
         $this->logModel->insert($data);

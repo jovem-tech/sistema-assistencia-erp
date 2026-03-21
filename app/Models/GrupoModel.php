@@ -9,10 +9,10 @@ class GrupoModel extends Model
     protected $table      = 'grupos';
     protected $primaryKey = 'id';
     protected $returnType = 'array';
-    protected $allowedFields = ['nome', 'descricao'];
+    protected $allowedFields = ['nãome', 'descricao'];
     protected $useTimestamps = false;
 
-    public function getComPermissoes(int $grupoId): array
+    public function getComPermissãoes(int $grupoId): array
     {
         $db = \Config\Database::connect();
 
@@ -21,11 +21,11 @@ class GrupoModel extends Model
             ->orderBy('ordem_menu')
             ->get()->getResultArray();
 
-        $permissoes = $db->table('permissoes')
+        $permissãoes = $db->table('permissãoes')
             ->orderBy('id')
             ->get()->getResultArray();
 
-        $granted = $db->table('grupo_permissoes gp')
+        $granted = $db->table('grupo_permissãoes gp')
             ->select('gp.modulo_id, gp.permissao_id')
             ->where('gp.grupo_id', $grupoId)
             ->get()->getResultArray();
@@ -37,22 +37,22 @@ class GrupoModel extends Model
 
         return [
             'modulos'    => $modulos,
-            'permissoes' => $permissoes,
+            'permissãoes' => $permissãoes,
             'granted'    => $grantedMap,
         ];
     }
 
-    public function salvarPermissoes(int $grupoId, array $permissoes): void
+    public function salvarPermissãoes(int $grupoId, array $permissãoes): void
     {
         $db = \Config\Database::connect();
 
         // Remove todas as permissões do grupo antes de regravar
-        $db->table('grupo_permissoes')->where('grupo_id', $grupoId)->delete();
+        $db->table('grupo_permissãoes')->where('grupo_id', $grupoId)->delete();
 
-        if (empty($permissoes)) return;
+        if (empty($permissãoes)) return;
 
         $inserts = [];
-        foreach ($permissoes as $pair) {
+        foreach ($permissãoes as $pair) {
             // Cada item: "modulo_id:permissao_id"
             [$modId, $permId] = explode(':', $pair);
             $inserts[] = [
@@ -63,10 +63,10 @@ class GrupoModel extends Model
         }
 
         if (!empty($inserts)) {
-            $db->table('grupo_permissoes')->insertBatch($inserts);
+            $db->table('grupo_permissãoes')->insertBatch($inserts);
         }
 
         // Invalida cache de permissões de todos os usuários deste grupo
-        // (na prática o usuário precisará fazer login novamente ou refreshPermissions())
+        // (na prática o usuário precisará fazer login nãovamente ou refreshPermissions())
     }
 }

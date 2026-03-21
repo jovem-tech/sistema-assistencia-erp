@@ -10,13 +10,13 @@ class EquipamentoTipoModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
-    protected $allowedFields = ['nome', 'ativo'];
+    protected $useSãoftDeletes = false;
+    protected $allowedFields = ['nãome', 'ativo'];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
 
     protected $validationRules = [
-        'nome' => 'required|max_length[100]|is_unique[equipamentos_tipos.nome,id,{id}]'
+        'nãome' => 'required|max_length[100]|is_unique[equipamentos_tipos.nãome,id,{id}]'
     ];
 }

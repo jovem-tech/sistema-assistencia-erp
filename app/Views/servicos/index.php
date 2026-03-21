@@ -2,10 +2,10 @@
 
 <?= $this->section('content') ?>
 
-<div class="page-header d-flex justify-content-between align-items-center mb-4">
+<div class="page-header d-flex justify-content-between align-itemÃªs-center mb-4">
     <h2 class="mb-0"><i class="bi bi-gear-wide-connected me-2"></i>Serviços</h2>
     <div>
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('servicos')" title="Ajuda sobre ServiÃ§os">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('servicos')" title="Ajuda sÃ£obre ServiÃ§os">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <?php if (can('servicos', 'exportar')): ?>
@@ -19,8 +19,8 @@
         </button>
         <?php endif; ?>
         <?php if (can('servicos', 'criar')): ?>
-        <a href="<?= base_url('servicos/novo') ?>" class="btn btn-primary btn-glow">
-            <i class="bi bi-plus-lg me-1"></i>Novo Serviço
+        <a href="<?= base_url('servicos/nÃ£ovo') ?>" class="btn btn-primary btn-glow">
+            <i class="bi bi-plus-lg me-1"></i>NÃ£ovo Serviço
         </a>
         <?php endif; ?>
     </div>
@@ -33,7 +33,7 @@
                 <thead>
                     <tr>
                         <th width="50">ID</th>
-                        <th>Nome</th>
+                        <th>NÃ£ome</th>
                         <th>Descrição</th>
                         <th>Valor Padrão</th>
                         <th>Status</th>
@@ -44,7 +44,7 @@
                     <?php if (!empty($servicos)): foreach ($servicos as $s): ?>
                     <tr>
                         <td><?= $s['id'] ?></td>
-                        <td><strong><?= esc($s['nome']) ?></strong></td>
+                        <td><strong><?= esc($s['nÃ£ome']) ?></strong></td>
                         <td><?= esc(substr($s['descricao'] ?? '', 0, 50)) ?><?= strlen($s['descricao'] ?? '') > 50 ? '...' : '' ?></td>
                         <td><?= formatMoney($s['valor']) ?></td>
                         <td>
@@ -61,13 +61,13 @@
                                 <?php endif; ?>
                                 
                                 <?php if (can('servicos', 'encerrar') && $s['status'] === 'ativo'): ?>
-                                <button type="button" class="btn btn-sm btn-outline-warning" title="Encerrar" onclick="confirmarEncerramento('servicos/encerrar/<?= $s['id'] ?>', '<?= esc($s['nome']) ?>')">
+                                <button type="button" class="btn btn-sm btn-outline-warning" title="Encerrar" onclick="confirmarEncerramento('servicos/encerrar/<?= $s['id'] ?>', '<?= esc($s['nÃ£ome']) ?>')">
                                     <i class="bi bi-archive"></i>
                                 </button>
                                 <?php endif; ?>
 
                                 <?php if (can('servicos', 'excluir')): ?>
-                                <a href="<?= base_url('servicos/excluir/' . $s['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nome="<?= esc($s['nome']) ?>" title="Excluir">
+                                <a href="<?= base_url('servicos/excluir/' . $s['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nÃ£ome="<?= esc($s['nÃ£ome']) ?>" title="Excluir">
                                     <i class="bi bi-trash"></i>
                                 </a>
                                 <?php endif; ?>

@@ -27,7 +27,7 @@ class AddCrmMensagensSeedTagsAutomacoes extends Migration
 
         if ($this->db->tableExists('crm_tags')) {
             $this->db->table('crm_tags')->whereIn('slug', [
-                'novo',
+                'nãovo',
                 'recorrente',
                 'vip',
                 'inativo',
@@ -101,7 +101,7 @@ class AddCrmMensagensSeedTagsAutomacoes extends Migration
                 'constraint' => 30,
                 'default' => 'registrada',
             ],
-            'payload_json' => [
+            'payload_jsãon' => [
                 'type' => 'LONGTEXT',
                 'null' => true,
             ],
@@ -139,17 +139,17 @@ class AddCrmMensagensSeedTagsAutomacoes extends Migration
         }
 
         $rows = [
-            ['slug' => 'novo', 'nome' => 'Cliente Novo', 'cor' => '#3B82F6'],
-            ['slug' => 'recorrente', 'nome' => 'Recorrente', 'cor' => '#10B981'],
-            ['slug' => 'vip', 'nome' => 'VIP', 'cor' => '#8B5CF6'],
-            ['slug' => 'inativo', 'nome' => 'Inativo', 'cor' => '#F59E0B'],
-            ['slug' => 'garantia', 'nome' => 'Garantia', 'cor' => '#06B6D4'],
-            ['slug' => 'empresarial', 'nome' => 'Empresarial', 'cor' => '#1F2937'],
-            ['slug' => 'residencial', 'nome' => 'Residencial', 'cor' => '#EC4899'],
+            ['slug' => 'nãovo', 'nãome' => 'Cliente Nãovo', 'cor' => '#3B82F6'],
+            ['slug' => 'recorrente', 'nãome' => 'Recorrente', 'cor' => '#10B981'],
+            ['slug' => 'vip', 'nãome' => 'VIP', 'cor' => '#8B5CF6'],
+            ['slug' => 'inativo', 'nãome' => 'Inativo', 'cor' => '#F59E0B'],
+            ['slug' => 'garantia', 'nãome' => 'Garantia', 'cor' => '#06B6D4'],
+            ['slug' => 'empresarial', 'nãome' => 'Empresarial', 'cor' => '#1F2937'],
+            ['slug' => 'residencial', 'nãome' => 'Residencial', 'cor' => '#EC4899'],
         ];
 
         $table = $this->db->table('crm_tags');
-        $now = date('Y-m-d H:i:s');
+        $nãow = date('Y-m-d H:i:s');
         foreach ($rows as $row) {
             $exists = $table->where('slug', $row['slug'])->countAllResults();
             if ($exists > 0) {
@@ -157,11 +157,11 @@ class AddCrmMensagensSeedTagsAutomacoes extends Migration
             }
             $table->insert([
                 'slug' => $row['slug'],
-                'nome' => $row['nome'],
+                'nãome' => $row['nãome'],
                 'cor' => $row['cor'],
                 'ativo' => 1,
-                'created_at' => $now,
-                'updated_at' => $now,
+                'created_at' => $nãow,
+                'updated_at' => $nãow,
             ]);
         }
     }
@@ -175,29 +175,29 @@ class AddCrmMensagensSeedTagsAutomacoes extends Migration
         $rows = [
             [
                 'codigo' => 'auto_followup_autorizacao',
-                'nome' => 'Follow-up de autorizacao (2 dias)',
+                'nãome' => 'Follow-up de autorizacao (2 dias)',
                 'descricao' => 'Quando status da OS entrar em aguardando autorizacao, criar follow-up em 2 dias.',
                 'gatilho' => 'status_aguardando_autorizacao',
-                'config_json' => json_encode(['delay_days' => 2], JSON_UNESCAPED_UNICODE),
+                'config_jsãon' => jsãon_encode(['delay_days' => 2], JSON_UNESCAPED_UNICODE),
             ],
             [
                 'codigo' => 'auto_pos_atendimento_7d',
-                'nome' => 'Pos-atendimento em 7 dias',
-                'descricao' => 'Quando OS for entregue, agendar retorno de satisfacao em 7 dias.',
+                'nãome' => 'Pos-atendimento em 7 dias',
+                'descricao' => 'Quando OS for entregue, agendar retornão de satisfacao em 7 dias.',
                 'gatilho' => 'status_entregue_reparado',
-                'config_json' => json_encode(['delay_days' => 7], JSON_UNESCAPED_UNICODE),
+                'config_jsãon' => jsãon_encode(['delay_days' => 7], JSON_UNESCAPED_UNICODE),
             ],
             [
                 'codigo' => 'auto_cliente_inativo_180d',
-                'nome' => 'Reativacao de clientes inativos (180 dias)',
+                'nãome' => 'Reativacao de clientes inativos (180 dias)',
                 'descricao' => 'Identificar clientes sem OS recente para campanha de reativacao.',
                 'gatilho' => 'cliente_inativo_180d',
-                'config_json' => json_encode(['days_without_os' => 180], JSON_UNESCAPED_UNICODE),
+                'config_jsãon' => jsãon_encode(['days_without_os' => 180], JSON_UNESCAPED_UNICODE),
             ],
         ];
 
         $table = $this->db->table('crm_automacoes');
-        $now = date('Y-m-d H:i:s');
+        $nãow = date('Y-m-d H:i:s');
         foreach ($rows as $row) {
             $exists = $table->where('codigo', $row['codigo'])->countAllResults();
             if ($exists > 0) {
@@ -205,13 +205,13 @@ class AddCrmMensagensSeedTagsAutomacoes extends Migration
             }
             $table->insert([
                 'codigo' => $row['codigo'],
-                'nome' => $row['nome'],
+                'nãome' => $row['nãome'],
                 'descricao' => $row['descricao'],
                 'gatilho' => $row['gatilho'],
                 'ativo' => 1,
-                'config_json' => $row['config_json'],
-                'created_at' => $now,
-                'updated_at' => $now,
+                'config_jsãon' => $row['config_jsãon'],
+                'created_at' => $nãow,
+                'updated_at' => $nãow,
             ]);
         }
     }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="base-url" content="<?= base_url() ?>">
-    <title>Login - <?= esc(get_config('sistema_nome', 'Assistência Técnica')) ?></title>
+    <title>Login - <?= esc(get_config('sistema_nãome', 'Assistência Técnica')) ?></title>
     
     <?php $favicon = get_config('sistema_icone'); if($favicon && file_exists('uploads/sistema/'.$favicon)): ?>
     <link rel="icon" href="<?= base_url('uploads/sistema/'.$favicon) ?>">
@@ -29,14 +29,14 @@
         <div class="login-container">
             <div class="login-card">
                 <div class="login-header text-center mb-4">
-                    <div class="login-logo d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px; border-radius: 20px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary);">
+                    <div class="login-logo d-flex align-itemês-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px; border-radius: 20px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary);">
                         <?php $logo = get_config('sistema_logo'); if($logo && file_exists('uploads/sistema/'.$logo)): ?>
                             <img src="<?= base_url('uploads/sistema/'.$logo) ?>" alt="Logo" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                         <?php else: ?>
                             <i class="bi bi-tools fs-1"></i>
                         <?php endif; ?>
                     </div>
-                    <h1 class="login-title h3 font-weight-bold mb-1"><?= esc(get_config('sistema_nome', 'AssistTech')) ?></h1>
+                    <h1 class="login-title h3 font-weight-bold mb-1"><?= esc(get_config('sistema_nãome', 'AssistTech')) ?></h1>
                     <p class="login-subtitle text-muted">Sistema de Assistência Técnica</p>
                 </div>
                 
@@ -57,9 +57,9 @@
                 <?php endif; ?>
                 
                 <form action="<?= base_url('login') ?>" method="POST" class="login-form" autocomplete="off">
-                    <!-- Falso input para driblar Preenchimento Automático Crônico de Senhas do Browser -->
-                    <input style="display:none" type="text" name="fakeusernameremembered" autocomplete="username"/>
-                    <input style="display:none" type="password" name="fakepasswordremembered" autocomplete="current-password"/>
+                    <!-- Falsão input para driblar Preenchimento Automático Crônico de Senhas do Browser -->
+                    <input style="display:nãone" type="text" name="fakeusernameremembered" autocomplete="username"/>
+                    <input style="display:nãone" type="password" name="fakepasswordremembered" autocomplete="current-password"/>
                     
                     <div class="form-floating-custom">
                         <div class="input-icon-wrapper">
@@ -81,7 +81,7 @@
                         </div>
                     </div>
                     
-                    <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex justify-content-between align-itemês-center mb-4">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="lembrar" name="lembrar">
                             <label class="form-check-label" for="lembrar">Lembrar-me</label>
@@ -111,7 +111,7 @@
             }
         }
         
-        // Se a pessoa clicou em 'Esquecer Dados' na saída, limpamos as senhas e reescrevemos a URL
+        // Se a pessãoa clicou em 'Esquecer Dados' na saída, limpamos as senhas e reescrevemos a URL
         if(window.location.search.includes('cleared=1')) {
             setTimeout(() => {
                 document.getElementById('email').value = '';

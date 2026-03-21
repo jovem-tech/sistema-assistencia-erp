@@ -10,7 +10,7 @@ use App\Services\WhatsApp\WhatsAppProviderInterface;
 
 class MensageriaService
 {
-    public function resolveDirectProvider(?string $provider = null, array $overrides = [], bool $respectEnabled = true): WhatsAppProviderInterface
+    public function resãolveDirectProvider(?string $provider = null, array $overrides = [], bool $respectEnabled = true): WhatsAppProviderInterface
     {
         if ($respectEnabled && !$this->isEnabled($overrides)) {
             return new NullProvider();
@@ -33,12 +33,12 @@ class MensageriaService
             );
         }
 
-        if (in_array($providerName, ['local_node', 'api_whats_local'], true)) {
+        if (in_array($providerName, ['local_nãode', 'api_whats_local'], true)) {
             return new LocalGatewayProvider(
-                (string) $this->cfg('whatsapp_local_node_url', $overrides, 'http://127.0.0.1:3001'),
-                (string) $this->cfg('whatsapp_local_node_token', $overrides, ''),
-                (string) $this->cfg('whatsapp_local_node_origin', $overrides, base_url('/')),
-                (int) $this->cfg('whatsapp_local_node_timeout', $overrides, 20),
+                (string) $this->cfg('whatsapp_local_nãode_url', $overrides, 'http://127.0.0.1:3001'),
+                (string) $this->cfg('whatsapp_local_nãode_token', $overrides, ''),
+                (string) $this->cfg('whatsapp_local_nãode_origin', $overrides, base_url('/')),
+                (int) $this->cfg('whatsapp_local_nãode_timeout', $overrides, 20),
                 'api_whats_local',
                 'gateway api local (windows)'
             );
@@ -46,10 +46,10 @@ class MensageriaService
 
         if ($providerName === 'api_whats_linux') {
             return new LocalGatewayProvider(
-                (string) $this->cfg('whatsapp_linux_node_url', $overrides, 'http://127.0.0.1:3001'),
-                (string) $this->cfg('whatsapp_linux_node_token', $overrides, ''),
-                (string) $this->cfg('whatsapp_linux_node_origin', $overrides, base_url('/')),
-                (int) $this->cfg('whatsapp_linux_node_timeout', $overrides, 20),
+                (string) $this->cfg('whatsapp_linux_nãode_url', $overrides, 'http://127.0.0.1:3001'),
+                (string) $this->cfg('whatsapp_linux_nãode_token', $overrides, ''),
+                (string) $this->cfg('whatsapp_linux_nãode_origin', $overrides, base_url('/')),
+                (int) $this->cfg('whatsapp_linux_nãode_timeout', $overrides, 20),
                 'api_whats_linux',
                 'gateway api linux (vps)'
             );
@@ -69,7 +69,7 @@ class MensageriaService
 
     public function testDirectConnection(?string $phone = null, ?string $provider = null, array $overrides = [], bool $respectEnabled = false): array
     {
-        $instance = $this->resolveDirectProvider($provider, $overrides, $respectEnabled);
+        $instance = $this->resãolveDirectProvider($provider, $overrides, $respectEnabled);
         return $instance->testConnection($phone);
     }
 
@@ -81,7 +81,7 @@ class MensageriaService
         array $overrides = [],
         bool $respectEnabled = true
     ): array {
-        $instance = $this->resolveDirectProvider($provider, $overrides, $respectEnabled);
+        $instance = $this->resãolveDirectProvider($provider, $overrides, $respectEnabled);
         return $instance->sendText($phone, $message, $context);
     }
 
@@ -94,7 +94,7 @@ class MensageriaService
         array $overrides = [],
         bool $respectEnabled = true
     ): array {
-        $instance = $this->resolveDirectProvider($provider, $overrides, $respectEnabled);
+        $instance = $this->resãolveDirectProvider($provider, $overrides, $respectEnabled);
         return $instance->sendFile($phone, $filePath, $message, $context);
     }
 

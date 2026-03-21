@@ -9,7 +9,7 @@ use CodeIgniter\Images\Handlers\ImageMagickHandler;
 class Images extends BaseConfig
 {
     /**
-     * Default handler used if no other handler is specified.
+     * Default handler used if não other handler is specified.
      */
     public string $defaultHandler = 'gd';
 
@@ -17,7 +17,7 @@ class Images extends BaseConfig
      * The path to the image library.
      * Required for ImageMagick, GraphicsMagick, or NetPBM.
      *
-     * @deprecated 4.7.0 No longer used.
+     * @deprecated 4.7.0 Não longer used.
      */
     public string $libraryPath = '/usr/local/bin/convert';
 

@@ -10,7 +10,7 @@ class ConfiguracaoModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
+    protected $useSãoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = ['chave', 'valor', 'tipo'];
 

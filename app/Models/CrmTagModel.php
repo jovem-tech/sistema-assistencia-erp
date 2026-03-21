@@ -11,7 +11,7 @@ class CrmTagModel extends Model
     protected $returnType = 'array';
     protected $allowedFields = [
         'slug',
-        'nome',
+        'nãome',
         'cor',
         'ativo',
     ];
@@ -21,7 +21,7 @@ class CrmTagModel extends Model
 
     public function ativas(): array
     {
-        return $this->where('ativo', 1)->orderBy('nome', 'ASC')->findAll();
+        return $this->where('ativo', 1)->orderBy('nãome', 'ASC')->findAll();
     }
 }
 

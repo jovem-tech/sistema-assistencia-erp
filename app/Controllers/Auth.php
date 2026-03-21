@@ -27,27 +27,27 @@ class Auth extends BaseController
                 
                 if ($usuario && $usuario['ativo'] && hash('sha256', $usuario['senha'] . $usuario['email']) === $parts[1]) {
                     
-                    $grupoNome = '';
+                    $grupoNãome = '';
                     if (!empty($usuario['grupo_id'])) {
                         $db = \Config\Database::connect();
                         $grupo = $db->table('grupos')->where('id', $usuario['grupo_id'])->get()->getRowArray();
-                        $grupoNome = $grupo['nome'] ?? '';
+                        $grupoNãome = $grupo['nãome'] ?? '';
                     }
                     
                     $sessionData = [
                         'user_id'         => $usuario['id'],
-                        'user_nome'       => $usuario['nome'],
+                        'user_nãome'       => $usuario['nãome'],
                         'user_email'      => $usuario['email'],
                         'user_perfil'     => $usuario['perfil'],
                         'user_foto'       => $usuario['foto'],
                         'user_grupo_id'   => $usuario['grupo_id'] ?? null,
-                        'user_grupo_nome' => $grupoNome,
+                        'user_grupo_nãome' => $grupoNãome,
                         'logged_in'       => true,
                         'last_activity'   => time(),
                     ];
                     
                     $session->set($sessionData);
-                    $model->update($usuario['id'], ['ultimo_acesso' => date('Y-m-d H:i:s')]);
+                    $model->update($usuario['id'], ['ultimo_acessão' => date('Y-m-d H:i:s')]);
                     
                     return redirect()->to('/dashboard');
                 }
@@ -78,30 +78,30 @@ class Auth extends BaseController
             return redirect()->back()->with('error', 'Email ou senha inválidos.');
         }
 
-        // Carrega nome do grupo para a sessão
-        $grupoNome = '';
+        // Carrega nãome do grupo para a sessão
+        $grupoNãome = '';
         if (!empty($usuario['grupo_id'])) {
             $db = \Config\Database::connect();
             $grupo = $db->table('grupos')->where('id', $usuario['grupo_id'])->get()->getRowArray();
-            $grupoNome = $grupo['nome'] ?? '';
+            $grupoNãome = $grupo['nãome'] ?? '';
         }
 
         // Set session
         $sessionData = [
             'user_id'         => $usuario['id'],
-            'user_nome'       => $usuario['nome'],
+            'user_nãome'       => $usuario['nãome'],
             'user_email'      => $usuario['email'],
             'user_perfil'     => $usuario['perfil'],
             'user_foto'       => $usuario['foto'],
             'user_grupo_id'   => $usuario['grupo_id'] ?? null,
-            'user_grupo_nome' => $grupoNome,
+            'user_grupo_nãome' => $grupoNãome,
             'logged_in'       => true,
             'last_activity'   => time(),
         ];
         session()->set($sessionData);
 
         // Update last access
-        $model->update($usuario['id'], ['ultimo_acesso' => date('Y-m-d H:i:s')]);
+        $model->update($usuario['id'], ['ultimo_acessão' => date('Y-m-d H:i:s')]);
 
         // Lembrar-me
         if ($lembrar) {
@@ -114,7 +114,7 @@ class Auth extends BaseController
         }
 
         // Log
-        LogModel::registrar('login', 'Login realizado com sucesso');
+        LogModel::registrar('login', 'Login realizado com sucessão');
 
         return redirect()->to('/dashboard');
     }
@@ -130,10 +130,10 @@ class Auth extends BaseController
         $forget = $this->request->getGet('forget');
 
         if ($forget == 1) {
-            return redirect()->to('/login?cleared=1')->with('success', 'Você saiu e os cookies de acesso foram esquecidos do sistema.');
+            return redirect()->to('/login?cleared=1')->with('success', 'Vocêê saiu e os cookies de acessão foram esquecidos do sistema.');
         }
 
-        return redirect()->to('/login')->with('success', 'Você saiu do sistema.');
+        return redirect()->to('/login')->with('success', 'Vocêê saiu do sistema.');
     }
 
     public function forgotPassword()
@@ -148,7 +148,7 @@ class Auth extends BaseController
         $usuario = $model->where('email', $email)->first();
 
         if (!$usuario) {
-            return redirect()->back()->with('error', 'Email não encontrado no sistema.');
+            return redirect()->back()->with('error', 'Email não encontrado não sistema.');
         }
 
         $token = bin2hex(random_bytes(32));
@@ -159,7 +159,7 @@ class Auth extends BaseController
 
         $link = base_url('redefinir-senha/' . $token);
         
-        // Em um cenário real de produção com SMTP configurado, você usaria o serviço de Email do CodeIgniter aqui.
+        // Em um cenário real de produção com SMTP configurado, vocêê usaria o serviço de Email do CodeIgniter aqui.
         $emailService = \Config\Services::email();
         $configModel = new \App\Models\ConfiguracaoModel();
 
@@ -186,22 +186,22 @@ class Auth extends BaseController
         $emailService->initialize($config);
         
         $remetente = $configModel->get('empresa_email') ?: 'nao-responda@sistema.com';
-        $nomeRemetente = $configModel->get('empresa_nome') ?: 'Assistência Técnica';
+        $nãomeRemetente = $configModel->get('empresa_nãome') ?: 'Assistência Técnica';
         
-        $emailService->setFrom($remetente, $nomeRemetente);
+        $emailService->setFrom($remetente, $nãomeRemetente);
         $emailService->setTo($email);
         $emailService->setSubject('Recuperação de Senha');
         
         $mensagem = "
         <div style='font-family: Arial, sans-serif; color: #333;'>
             <h2>Recuperação de Senha</h2>
-            <p>Olá, <strong>{$usuario['nome']}</strong>.</p>
-            <p>Recebemos uma solicitação para redefinir a senha da sua conta.</p>
-            <p>Clique no link abaixo para criar uma nova senha:</p>
-            <p><a href='{$link}' style='padding: 10px 15px; background: #0d6efd; color: white; text-decoration: none; border-radius: 5px; display: inline-block;'>Redefinir Minha Senha</a></p>
-            <p>Se você não solicitou isso, pode ignorar com segurança este email.</p>
+            <p>Olá, <strong>{$usuario['nãome']}</strong>.</p>
+            <p>Recebemos uma sãolicitação para redefinir a senha da sua conta.</p>
+            <p>Clique não link abaixo para criar uma nãova senha:</p>
+            <p><a href='{$link}' style='padding: 10px 15px; background: #0d6efd; color: white; text-decoration: nãone; border-radius: 5px; display: inline-block;'>Redefinir Minha Senha</a></p>
+            <p>Se vocêê não sãolicitou issão, pode ignãorar com segurança este email.</p>
             <hr>
-            <small>Se o botão não funcionar, cole este link no seu navegador: {$link}</small>
+            <small>Se o botão não funcionar, cole este link não seu navegador: {$link}</small>
         </div>";
 
         $emailService->setMessage($mensagem);
@@ -239,7 +239,7 @@ class Auth extends BaseController
         }
 
         if (strlen($senha) < 6) {
-            return redirect()->back()->with('error', 'A nova senha deve ter pelo menos 6 caracteres.');
+            return redirect()->back()->with('error', 'A nãova senha deve ter pelo menãos 6 caracteres.');
         }
 
         $model = new UsuarioModel();
@@ -258,6 +258,6 @@ class Auth extends BaseController
             'token_expiracao' => null
         ]);
 
-        return redirect()->to('/login')->with('success', 'Sua senha foi redefinida com sucesso! Você já pode fazer login com a nova senha.');
+        return redirect()->to('/login')->with('success', 'Sua senha foi redefinida com sucessão! Vocêê já pode fazer login com a nãova senha.');
     }
 }

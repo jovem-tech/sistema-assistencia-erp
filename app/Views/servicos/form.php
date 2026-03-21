@@ -1,12 +1,12 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<div class="page-header mb-4 d-flex justify-content-between align-items-center">
+<div class="page-header mb-4 d-flex justify-content-between align-itemÃªs-center">
     <h2 class="mb-0">
         <i class="bi bi-gear-wide-connected me-2"></i>
-        <?= isset($servico) ? 'Editar Serviço' : 'Novo Serviço' ?>
+        <?= isset($servico) ? 'Editar Serviço' : 'NÃ£ovo Serviço' ?>
     </h2>
-    <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('servicos')" title="Ajuda sobre ServiÃ§os">
+    <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('servicos')" title="Ajuda sÃ£obre ServiÃ§os">
         <i class="bi bi-question-circle me-1"></i>Ajuda
     </button>
 </div>
@@ -19,8 +19,8 @@
                     <?= csrf_field() ?>
                     
                     <div class="mb-3">
-                        <label class="form-label">Nome do Serviço <span class="text-danger">*</span></label>
-                        <input type="text" name="nome" class="form-control" value="<?= old('nome', $servico['nome'] ?? '') ?>" required placeholder="Ex: Troca de Tela">
+                        <label class="form-label">NÃ£ome do Serviço <span class="text-danger">*</span></label>
+                        <input type="text" name="nÃ£ome" class="form-control" value="<?= old('nÃ£ome', $servico['nÃ£ome'] ?? '') ?>" required placeholder="Ex: Troca de Tela">
                     </div>
 
                     <div class="mb-3">

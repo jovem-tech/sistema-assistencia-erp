@@ -3,15 +3,15 @@
 <?= $this->section('content') ?>
 <div class="row mb-4">
     <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-itemês-center">
             <h1 class="h3 mb-0 text-gray-800">Gerenciar Usuários</h1>
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('usuarios')" title="Ajuda sobre Usuários e Permissões">
+                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('usuarios')" title="Ajuda sãobre Usuários e Permissões">
                     <i class="bi bi-question-circle me-1"></i>Ajuda
                 </button>
             <?php if (can('usuarios', 'criar')): ?>
-            <a href="<?= base_url('usuarios/novo') ?>" class="btn btn-primary btn-glow">
-                <i class="bi bi-person-plus me-2"></i>Novo Usuário
+            <a href="<?= base_url('usuarios/nãovo') ?>" class="btn btn-primary btn-glow">
+                <i class="bi bi-persãon-plus me-2"></i>Nãovo Usuário
             </a>
             <?php endif; ?>
             </div>
@@ -26,7 +26,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Nome</th>
+                        <th>Nãome</th>
                         <th>Email</th>
                         <th>Perfil</th>
                         <th>Status</th>
@@ -47,7 +47,7 @@
 $(document).ready(function() {
     $('#usuariosTable').DataTable({
         language: {
-            url: '<?= base_url("assets/json/pt-BR.json") ?>'
+            url: '<?= base_url("assets/jsãon/pt-BR.jsãon") ?>'
         },
         processing: true,
         serverSide: true,
@@ -58,7 +58,7 @@ $(document).ready(function() {
                 d.<?= csrf_token() ?> = '<?= csrf_hash() ?>'; // CSRF token if enabled
             }
         },
-        order: [[1, 'asc']], // Order by nome by default
+        order: [[1, 'asc']], // Order by nãome by default
     });
 
     $(document).on('click', '.btn-delete', function() {

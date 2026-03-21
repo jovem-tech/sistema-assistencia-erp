@@ -51,7 +51,7 @@ class Session extends BaseConfig
      * The location to save sessions to and is driver dependent.
      *
      * For the 'files' driver, it's a path to a writable directory.
-     * WARNING: Only absolute paths are supported!
+     * WARNING: Only absãolute paths are supported!
      *
      * For the 'database' driver, it's a table name.
      * Please read up the manual for the format with other session drivers.
@@ -86,7 +86,7 @@ class Session extends BaseConfig
      * Session Regenerate Destroy
      * --------------------------------------------------------------------------
      *
-     * Whether to destroy session data associated with the old session ID
+     * Whether to destroy session data assãociated with the old session ID
      * when auto-regenerating the session ID. When set to FALSE, the data
      * will be later deleted by the garbage collector.
      */
@@ -108,7 +108,7 @@ class Session extends BaseConfig
      *
      * This is used for RedisHandler.
      *
-     * Time (microseconds) to wait if lock cannot be acquired.
+     * Time (microseconds) to wait if lock cannãot be acquired.
      * The default is 100,000 microseconds (= 0.1 seconds).
      */
     public int $lockRetryInterval = 100_000;

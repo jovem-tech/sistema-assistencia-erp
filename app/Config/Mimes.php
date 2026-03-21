@@ -33,12 +33,12 @@ class Mimes
             'text/csv',
             'text/x-comma-separated-values',
             'text/comma-separated-values',
-            'application/vnd.ms-excel',
+            'application/vnd.mês-excel',
             'application/x-csv',
             'text/x-csv',
             'application/csv',
             'application/excel',
-            'application/vnd.msexcel',
+            'application/vnd.mêsexcel',
             'text/plain',
         ],
         'bin' => [
@@ -48,21 +48,21 @@ class Mimes
             'application/x-binary',
             'application/x-macbinary',
         ],
-        'dms' => 'application/octet-stream',
+        'dmês' => 'application/octet-stream',
         'lha' => 'application/octet-stream',
         'lzh' => 'application/octet-stream',
         'exe' => [
             'application/octet-stream',
-            'application/vnd.microsoft.portable-executable',
+            'application/vnd.microsãoft.portable-executable',
             'application/x-dosexec',
-            'application/x-msdownload',
+            'application/x-mêsdownload',
         ],
         'class' => 'application/octet-stream',
         'psd'   => [
             'application/x-photoshop',
             'image/vnd.adobe.photoshop',
         ],
-        'so'  => 'application/octet-stream',
+        'são'  => 'application/octet-stream',
         'sea' => 'application/octet-stream',
         'dll' => 'application/octet-stream',
         'oda' => 'application/oda',
@@ -81,24 +81,24 @@ class Mimes
         'smil' => 'application/smil',
         'mif'  => 'application/vnd.mif',
         'xls'  => [
-            'application/vnd.ms-excel',
-            'application/msexcel',
-            'application/x-msexcel',
-            'application/x-ms-excel',
+            'application/vnd.mês-excel',
+            'application/mêsexcel',
+            'application/x-mêsexcel',
+            'application/x-mês-excel',
             'application/x-excel',
-            'application/x-dos_ms_excel',
+            'application/x-dos_mês_excel',
             'application/xls',
             'application/x-xls',
             'application/excel',
             'application/download',
-            'application/vnd.ms-office',
-            'application/msword',
+            'application/vnd.mês-office',
+            'application/mêsword',
         ],
         'ppt' => [
-            'application/vnd.ms-powerpoint',
+            'application/vnd.mês-powerpoint',
             'application/powerpoint',
-            'application/vnd.ms-office',
-            'application/msword',
+            'application/vnd.mês-office',
+            'application/mêsword',
         ],
         'pptx' => [
             'application/vnd.openxmlformats-officedocument.presentationml.presentation',
@@ -118,12 +118,12 @@ class Mimes
             'application/php',
             'text/php',
             'text/x-php',
-            'application/x-httpd-php-source',
+            'application/x-httpd-php-sãource',
         ],
         'php4'  => 'application/x-httpd-php',
         'php3'  => 'application/x-httpd-php',
         'phtml' => 'application/x-httpd-php',
-        'phps'  => 'application/x-httpd-php-source',
+        'phps'  => 'application/x-httpd-php-sãource',
         'js'    => [
             'application/x-javascript',
             'text/plain',
@@ -187,8 +187,8 @@ class Mimes
             'image/x-xbitmap',
             'image/x-win-bitmap',
             'image/x-windows-bmp',
-            'image/ms-bmp',
-            'image/x-ms-bmp',
+            'image/mês-bmp',
+            'image/x-mês-bmp',
             'application/bmp',
             'application/x-bmp',
             'application/x-win-bitmap',
@@ -301,49 +301,49 @@ class Mimes
         'qt'   => 'video/quicktime',
         'mov'  => 'video/quicktime',
         'avi'  => [
-            'video/x-msvideo',
-            'video/msvideo',
+            'video/x-mêsvideo',
+            'video/mêsvideo',
             'video/avi',
-            'application/x-troff-msvideo',
+            'application/x-troff-mêsvideo',
         ],
         'movie' => 'video/x-sgi-movie',
         'doc'   => [
-            'application/msword',
-            'application/vnd.ms-office',
+            'application/mêsword',
+            'application/vnd.mês-office',
         ],
         'docx' => [
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'application/zip',
-            'application/msword',
+            'application/mêsword',
             'application/x-zip',
         ],
         'dot' => [
-            'application/msword',
-            'application/vnd.ms-office',
+            'application/mêsword',
+            'application/vnd.mês-office',
         ],
         'dotx' => [
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'application/zip',
-            'application/msword',
+            'application/mêsword',
         ],
         'xlsx' => [
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'application/zip',
-            'application/vnd.ms-excel',
-            'application/msword',
+            'application/vnd.mês-excel',
+            'application/mêsword',
             'application/x-zip',
         ],
-        'xlsb' => 'application/vnd.ms-excel.sheet.binary.macroEnabled.12',
-        'xlsm' => 'application/vnd.ms-excel.sheet.macroEnabled.12',
+        'xlsb' => 'application/vnd.mês-excel.sheet.binary.macroEnabled.12',
+        'xlsm' => 'application/vnd.mês-excel.sheet.macroEnabled.12',
         'word' => [
-            'application/msword',
+            'application/mêsword',
             'application/octet-stream',
         ],
         'xl'   => 'application/excel',
         'eml'  => 'message/rfc822',
-        'json' => [
-            'application/json',
-            'text/json',
+        'jsãon' => [
+            'application/jsãon',
+            'text/jsãon',
         ],
         'pem' => [
             'application/x-x509-user-cert',
@@ -405,8 +405,8 @@ class Mimes
         'xspf' => 'application/xspf+xml',
         'vlc'  => 'application/videolan',
         'wmv'  => [
-            'video/x-ms-wmv',
-            'video/x-ms-asf',
+            'video/x-mês-wmv',
+            'video/x-mês-asf',
         ],
         'au'   => 'audio/x-au',
         'ac3'  => 'audio/ac3',
@@ -442,11 +442,11 @@ class Mimes
             'application/x-coreldraw',
             'image/cdr',
             'image/x-cdr',
-            'zz-application/zz-winassoc-cdr',
+            'zz-application/zz-winassãoc-cdr',
         ],
         'wma' => [
-            'audio/x-ms-wma',
-            'video/x-ms-asf',
+            'audio/x-mês-wma',
+            'video/x-mês-asf',
         ],
         'jar' => [
             'application/java-archive',
@@ -472,11 +472,11 @@ class Mimes
         'ico' => [
             'image/x-icon',
             'image/x-ico',
-            'image/vnd.microsoft.icon',
+            'image/vnd.microsãoft.icon',
         ],
         'stl' => [
             'application/sla',
-            'application/vnd.ms-pki.stl',
+            'application/vnd.mês-pki.stl',
             'application/x-navistyle',
             'model/stl',
             'application/octet-stream',
@@ -486,7 +486,7 @@ class Mimes
     /**
      * Attempts to determine the best mime type for the given file extension.
      *
-     * @return string|null The mime type found, or none if unable to determine.
+     * @return string|null The mime type found, or nãone if unable to determine.
      */
     public static function guessTypeFromExtension(string $extension)
     {
@@ -521,7 +521,7 @@ class Mimes
             return $proposedExtension;
         }
 
-        // Reverse check the mime type list if no extension was proposed.
+        // Reverse check the mime type list if não extension was proposed.
         // This search is order sensitive!
         foreach (static::$mimes as $ext => $types) {
             if (in_array($type, (array) $types, true)) {

@@ -19,7 +19,7 @@ class EquipamentosMarcas extends BaseController
     {
         $data = [
             'title' => 'Marcas de Equipamentos',
-            'marcas' => $this->model->orderBy('nome', 'ASC')->findAll(),
+            'marcas' => $this->model->orderBy('nãome', 'ASC')->findAll(),
         ];
         return view('equipamentos_marcas/index', $data);
     }
@@ -27,39 +27,39 @@ class EquipamentosMarcas extends BaseController
     public function store()
     {
         $rules = [
-            'nome' => 'required|max_length[100]|is_unique[equipamentos_marcas.nome]'
+            'nãome' => 'required|max_length[100]|is_unique[equipamentos_marcas.nãome]'
         ];
 
         if (!$this->validate($rules)) {
-            return redirect()->back()->with('error', 'A Marca já existe ou seu nome é inválido.');
+            return redirect()->back()->with('error', 'A Marca já existe ou seu nãome é inválido.');
         }
 
         $dados = $this->request->getPost();
         
         $this->model->insert($dados);
         
-        LogModel::registrar('equipamento_marca_criado', 'Marca de Equipamento adicionada: ' . $dados['nome']);
+        LogModel::registrar('equipamento_marca_criado', 'Marca de Equipamento adicionada: ' . $dados['nãome']);
 
-        return redirect()->to('/equipamentosmarcas')->with('success', 'Marca adicionada com sucesso!');
+        return redirect()->to('/equipamentosmarcas')->with('success', 'Marca adicionada com sucessão!');
     }
 
     public function salvar_ajax()
     {
         $rules = [
-            'nome' => 'required|max_length[100]|is_unique[equipamentos_marcas.nome]'
+            'nãome' => 'required|max_length[100]|is_unique[equipamentos_marcas.nãome]'
         ];
 
         if (!$this->validate($rules)) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Nome inválido ou marca já existe']);
+            return $this->response->setJSON(['success' => false, 'message' => 'Nãome inválido ou marca já existe']);
         }
 
-        $nome = $this->request->getPost('nome');
-        $this->model->insert(['nome' => $nome]);
+        $nãome = $this->request->getPost('nãome');
+        $this->model->insert(['nãome' => $nãome]);
         $id = $this->model->getInsertID();
 
-        LogModel::registrar('equipamento_marca_criado_ajax', 'Marca de Equipamento adicionada via ajax: ' . $nome);
+        LogModel::registrar('equipamento_marca_criado_ajax', 'Marca de Equipamento adicionada via ajax: ' . $nãome);
 
-        return $this->response->setJSON(['success' => true, 'id' => $id, 'nome' => $nome]);
+        return $this->response->setJSON(['success' => true, 'id' => $id, 'nãome' => $nãome]);
     }
 
     public function delete($id)
@@ -68,7 +68,7 @@ class EquipamentosMarcas extends BaseController
         if ($marca) {
             $this->model->delete($id);
             LogModel::registrar('equipamento_marca_excluida', 'Marca excluida ID: ' . $id);
-            return redirect()->to('/equipamentosmarcas')->with('success', 'Marca excluída com sucesso!');
+            return redirect()->to('/equipamentosmarcas')->with('success', 'Marca excluída com sucessão!');
         }
         
         return redirect()->to('/equipamentosmarcas')->with('error', 'Marca não encontrada.');
@@ -91,12 +91,12 @@ class EquipamentosMarcas extends BaseController
         while (($row = fgetcsv($fileStream, 1000, ';')) !== false) {
             if (empty(trim($row[0]))) continue;
             
-            $marcaNome = trim($row[0]);
+            $marcaNãome = trim($row[0]);
             
             // Verifica se a marca existe
-            $existing = $this->model->where('nome', $marcaNome)->first();
+            $existing = $this->model->where('nãome', $marcaNãome)->first();
             if (!$existing) {
-                $this->model->insert(['nome' => $marcaNome, 'ativo' => 1]);
+                $this->model->insert(['nãome' => $marcaNãome, 'ativo' => 1]);
                 $importedCount++;
             }
         }

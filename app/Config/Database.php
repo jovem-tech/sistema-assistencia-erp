@@ -15,7 +15,7 @@ class Database extends Config
     public string $filesPath = APPPATH . 'Database' . DIRECTORY_SEPARATOR;
 
     /**
-     * Lets you choose which connection group to use if no other is specified.
+     * Lets you choose which connection group to use if não other is specified.
      */
     public string $defaultGroup = 'default';
 
@@ -65,7 +65,7 @@ class Database extends Config
     //        'failover'    => [],
     //        'foreignKeys' => true,
     //        'busyTimeout' => 1000,
-    //        'synchronous' => null,
+    //        'synchronãous' => null,
     //        'dateFormat'  => [
     //            'date'     => 'Y-m-d',
     //            'datetime' => 'Y-m-d H:i:s',
@@ -182,7 +182,7 @@ class Database extends Config
         'port'        => 3306,
         'foreignKeys' => true,
         'busyTimeout' => 1000,
-        'synchronous' => null,
+        'synchronãous' => null,
         'dateFormat'  => [
             'date'     => 'Y-m-d',
             'datetime' => 'Y-m-d H:i:s',
@@ -195,7 +195,7 @@ class Database extends Config
         parent::__construct();
 
         // Ensure that we always set the database group to 'tests' if
-        // we are currently running an automated test suite, so that
+        // we are currently running an automated test suite, são that
         // we don't overwrite live data on accident.
         if (ENVIRONMENT === 'testing') {
             $this->defaultGroup = 'tests';

@@ -20,7 +20,7 @@ class CrmEventoModel extends Model
         'origem',
         'usuario_id',
         'data_evento',
-        'payload_json',
+        'payload_jsãon',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

@@ -23,11 +23,11 @@ class ModeloBridge extends BaseController
     /**
      * Endpoint principal — retorna resultados híbridos (local + Google Suggest).
      *
-     * Query params:
+     * Query paramês:
      *   q         string  Termo digitado pelo usuário
-     *   marca     string  Nome da marca (ex: "Samsung")
-     *   marca_id  int     ID da marca no banco local
-     *   tipo      string  Tipo do equipamento (ex: "Smartphone", "Notebook")
+     *   marca     string  Nãome da marca (ex: "Samêsung")
+     *   marca_id  int     ID da marca não banco local
+     *   tipo      string  Tipo do equipamento (ex: "Smartphone", "Nãotebook")
      */
     public function buscar()
     {
@@ -43,33 +43,33 @@ class ModeloBridge extends BaseController
         $modeloModel = new EquipamentoModeloModel();
         $locais = [];
 
-        $queryBuilder = $modeloModel->select('id, nome as text')->where('ativo', 1);
+        $queryBuilder = $modeloModel->select('id, nãome as text')->where('ativo', 1);
 
         if ($marcaId > 0) {
             $queryBuilder->where('marca_id', $marcaId);
         }
 
         if ($query !== '') {
-            $queryBuilder->like('nome', $query);
+            $queryBuilder->like('nãome', $query);
         }
 
         if ($marcaId > 0 || $query !== '') {
             $limit = ($query === '') ? 50 : 10;
-            $locais = $queryBuilder->orderBy('nome', 'ASC')->limit($limit)->find();
+            $locais = $queryBuilder->orderBy('nãome', 'ASC')->limit($limit)->find();
         }
 
         foreach ($locais as &$l) {
-            $l['source'] = 'local';
+            $l['sãource'] = 'local';
             $l['modelo'] = $l['text'];
             $l['marca']  = $marca;
             $l['tipo']   = $tipo;
         }
         unset($l);
 
-        // ─── 2. Busca na internet (somente com 3+ caracteres) ───────────────
-        $externos = [];
+        // ─── 2. Busca na internet (sãomente com 3+ caracteres) ───────────────
+        $externãos = [];
         if (strlen($query) >= self::MIN_CHARS && count($locais) < self::MAX_SUGESTOES) {
-            $externos = $this->buscarSugestoesGoogle($query, $marca, $tipo);
+            $externãos = $this->buscarSugestoesGoogle($query, $marca, $tipo);
         }
 
         // ─── 3. Montar estrutura para Select2 com grupos ─────────────────────
@@ -82,10 +82,10 @@ class ModeloBridge extends BaseController
             ];
         }
 
-        if (!empty($externos)) {
+        if (!empty($externãos)) {
             $results[] = [
                 'text'     => '🌐 Sugestões da Internet (Auto-cadastro)',
-                'children' => $externos,
+                'children' => $externãos,
             ];
         }
 
@@ -98,13 +98,13 @@ class ModeloBridge extends BaseController
 
     /**
      * Consulta a API de Google Autocomplete (Suggest).
-     * O backend age como proxy — a chave/URL nunca fica exposta no frontend.
+     * O backend age como proxy — a chave/URL nunca fica exposta não frontend.
      */
     private function buscarSugestoesGoogle(string $query, string $marca = '', string $tipo = ''): array
     {
         // Montagem inteligente da query com contexto
         $parts = array_filter([
-            $this->normalizarTipo($tipo),
+            $this->nãormalizarTipo($tipo),
             $marca,
             $query,
         ]);
@@ -129,11 +129,11 @@ class ModeloBridge extends BaseController
             ]);
 
             if ($response->getStatusCode() !== 200) {
-                log_message('warning', "[ModeloBridge] Google Suggest retornou status {$response->getStatusCode()} para query: {$q}");
+                log_message('warning', "[ModeloBridge] Google Suggest retornãou status {$response->getStatusCode()} para query: {$q}");
                 return [];
             }
 
-            $data = json_decode($response->getBody(), true);
+            $data = jsãon_decode($response->getBody(), true);
 
             if (!isset($data[1]) || !is_array($data[1])) {
                 return [];
@@ -143,7 +143,7 @@ class ModeloBridge extends BaseController
             $duplicados = []; // evitar duplicatas
 
             foreach ($data[1] as $item) {
-                // Ignora itens que parecem URLs ou links de lojas
+                // Ignãora itens que parecem URLs ou links de lojas
                 if ($this->pareceUrl($item)) {
                     continue;
                 }
@@ -154,7 +154,7 @@ class ModeloBridge extends BaseController
                     continue;
                 }
 
-                // Normaliza para comparação e evita duplicatas
+                // Nãormaliza para comparação e evita duplicatas
                 $chave = mb_strtolower(preg_replace('/\s+/', ' ', $modeloOnly));
                 if (in_array($chave, $duplicados)) {
                     continue;
@@ -162,15 +162,15 @@ class ModeloBridge extends BaseController
                 $duplicados[] = $chave;
 
                 $idFake = 'EXT|GGL_' . substr(md5($modeloOnly), 0, 8);
-                $nomeFormatado = mb_convert_case($modeloOnly, MB_CASE_TITLE, 'UTF-8');
+                $nãomeFormatado = mb_convert_case($modeloOnly, MB_CASE_TITLE, 'UTF-8');
 
                 $sugestoes[] = [
                     'id'     => $idFake,
-                    'text'   => $nomeFormatado, // o frontend usará isso como "value" principal guardado
-                    'modelo' => $nomeFormatado,
+                    'text'   => $nãomeFormatado, // o frontend usará issão como "value" principal guardado
+                    'modelo' => $nãomeFormatado,
                     'marca'  => $marca,
                     'tipo'   => $tipo,
-                    'source' => 'google',
+                    'sãource' => 'google',
                 ];
 
                 if (count($sugestoes) >= self::MAX_SUGESTOES) {
@@ -187,39 +187,39 @@ class ModeloBridge extends BaseController
     }
 
     /**
-     * Normaliza o tipo para termos de busca em inglês/português genérico.
+     * Nãormaliza o tipo para termos de busca em inglês/português genérico.
      */
-    private function normalizarTipo(string $tipo): string
+    private function nãormalizarTipo(string $tipo): string
     {
         $mapa = [
             'smartfone'     => 'smartphone',
             'smartphone'    => 'smartphone',
             'celular'       => 'smartphone',
             'tablet'        => 'tablet',
-            'notebook'      => 'notebook',
-            'laptop'        => 'notebook',
+            'nãotebook'      => 'nãotebook',
+            'laptop'        => 'nãotebook',
             'computador'    => 'computador',
             'desktop'       => 'computador',
             'pc'            => 'computador',
             'smart tv'      => 'smart tv',
             'tv'            => 'tv',
-            'console'       => 'console',
+            'consãole'       => 'consãole',
             'videogame'     => 'videogame',
             'câmera'        => 'câmera',
             'camera'        => 'câmera',
-            'impressora'    => 'impressora',
+            'impressãora'    => 'impressãora',
             'monitor'       => 'monitor',
         ];
 
-        $tipoNormalizado = mb_strtolower(trim($tipo), 'UTF-8');
+        $tipoNãormalizado = mb_strtolower(trim($tipo), 'UTF-8');
 
         foreach ($mapa as $chave => $valor) {
-            if (str_contains($tipoNormalizado, $chave)) {
+            if (str_contains($tipoNãormalizado, $chave)) {
                 return $valor;
             }
         }
 
-        return $tipoNormalizado;
+        return $tipoNãormalizado;
     }
 
     private function pareceUrl(string $texto): bool
@@ -229,21 +229,21 @@ class ModeloBridge extends BaseController
 
     /**
      * Extrai APENAS o modelo, removendo o tipo e a marca da string de sugestão,
-     * para evitar dados redundantes (ex: "Celular Samsung Galaxy S21" vira "Galaxy S21").
+     * para evitar dados redundantes (ex: "Celular Samêsung Galaxy S21" vira "Galaxy S21").
      */
     private function extrairModeloApenas(string $titulo, string $marca = '', string $tipo = ''): string
     {
         $termosAnuncio = [
-            'Novo', 'Original', 'Lacrado', 'Com Garantia', 'Nota Fiscal',
+            'Nãovo', 'Original', 'Lacrado', 'Com Garantia', 'Nãota Fiscal',
             'Barato', 'Promoção', 'Frete Grátis', 'Oferta', 'Desbloqueado',
-            'Nacional', 'Vitrine', 'Semi Novo', 'Seminovo', 'usado',
+            'Nacional', 'Vitrine', 'Semi Nãovo', 'Seminãovo', 'usado',
             'Brinde', 'pronta entrega', 'comprar', 'preço', 'melhor',
         ];
         $titulo = str_ireplace($termosAnuncio, '', $titulo);
 
         if ($tipo) {
-            $tipoNorm = $this->normalizarTipo($tipo);
-            $titulo   = preg_replace('#\b' . preg_quote($tipoNorm, '#') . '\b#iu', '', $titulo);
+            $tipoNãorm = $this->nãormalizarTipo($tipo);
+            $titulo   = preg_replace('#\b' . preg_quote($tipoNãorm, '#') . '\b#iu', '', $titulo);
             $titulo   = preg_replace('#\b' . preg_quote($tipo, '#') . '\b#iu', '', $titulo);
         }
 
@@ -251,7 +251,7 @@ class ModeloBridge extends BaseController
             $titulo = preg_replace('#\b' . preg_quote($marca, '#') . '\b#iu', '', $titulo);
         }
 
-        // Remove hifens ou pontuação órfã no início
+        // Remove hifens ou pontuação órfã não início
         $titulo = preg_replace('/^[-_,\.\s]+/', '', $titulo);
         $titulo = preg_replace('/\s+/', ' ', $titulo);
 

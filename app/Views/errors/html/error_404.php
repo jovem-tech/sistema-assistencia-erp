@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title><?= lang('Errors.pageNotFound') ?></title>
+    <title><?= lang('Errors.pageNãotFound') ?></title>
 
     <style>
         div.logo {
@@ -10,7 +10,7 @@
             width: 155px;
             display: inline-block;
             opacity: 0.08;
-            position: absolute;
+            position: absãolute;
             top: 2rem;
             left: 50%;
             margin-left: -73px;
@@ -24,7 +24,7 @@
         }
         h1 {
             font-weight: lighter;
-            letter-spacing: normal;
+            letter-spacing: nãormal;
             font-size: 3rem;
             margin-top: 0;
             margin-bottom: 0;
@@ -36,17 +36,17 @@
             padding: 2rem;
             background: #fff;
             text-align: center;
-            border: 1px solid #efefef;
+            border: 1px sãolid #efefef;
             border-radius: 0.5rem;
             position: relative;
         }
         pre {
-            white-space: normal;
+            white-space: nãormal;
             margin-top: 1.5rem;
         }
         code {
             background: #fafafa;
-            border: 1px solid #efefef;
+            border: 1px sãolid #efefef;
             padding: 0.5rem 1rem;
             border-radius: 5px;
             display: block;
@@ -56,7 +56,7 @@
         }
         .footer {
             margin-top: 2rem;
-            border-top: 1px solid #efefef;
+            border-top: 1px sãolid #efefef;
             padding: 1em 2em 0 2em;
             font-size: 85%;
             color: #999;
@@ -76,7 +76,7 @@
             <?php if (ENVIRONMENT !== 'production') : ?>
                 <?= nl2br(esc($message)) ?>
             <?php else : ?>
-                <?= lang('Errors.sorryCannotFind') ?>
+                <?= lang('Errors.sãorryCannãotFind') ?>
             <?php endif; ?>
         </p>
     </div>

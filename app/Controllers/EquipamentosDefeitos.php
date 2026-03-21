@@ -22,7 +22,7 @@ class EquipamentosDefeitos extends BaseController
         $data = [
             'title'   => 'Defeitos Comuns',
             'defeitos' => $this->model->getWithTipo(),
-            'tipos'   => $tipoModel->orderBy('nome', 'ASC')->findAll(),
+            'tipos'   => $tipoModel->orderBy('nãome', 'ASC')->findAll(),
         ];
         return view('equipamentos_defeitos/index', $data);
     }
@@ -30,9 +30,9 @@ class EquipamentosDefeitos extends BaseController
     public function store()
     {
         $rules = [
-            'nome'          => 'required|max_length[150]',
+            'nãome'          => 'required|max_length[150]',
             'tipo_id'       => 'required|integer',
-            'classificacao' => 'required|in_list[hardware,software]',
+            'classificacao' => 'required|in_list[hardware,sãoftware]',
         ];
 
         if (!$this->validate($rules)) {
@@ -41,9 +41,9 @@ class EquipamentosDefeitos extends BaseController
 
         $dados = $this->request->getPost();
         $this->model->insert($dados);
-        LogModel::registrar('defeito_criado', 'Defeito Comum cadastrado: ' . $dados['nome']);
+        LogModel::registrar('defeito_criado', 'Defeito Comum cadastrado: ' . $dados['nãome']);
 
-        return redirect()->to('/equipamentosdefeitos')->with('success', 'Defeito cadastrado com sucesso!');
+        return redirect()->to('/equipamentosdefeitos')->with('success', 'Defeito cadastrado com sucessão!');
     }
 
     public function edit($id)
@@ -55,7 +55,7 @@ class EquipamentosDefeitos extends BaseController
         $data = [
             'title'   => 'Editar Defeito Comum',
             'defeito' => $defeito,
-            'tipos'   => $tipoModel->orderBy('nome', 'ASC')->findAll(),
+            'tipos'   => $tipoModel->orderBy('nãome', 'ASC')->findAll(),
         ];
         return view('equipamentos_defeitos/form', $data);
     }
@@ -65,7 +65,7 @@ class EquipamentosDefeitos extends BaseController
         $dados = $this->request->getPost();
         $this->model->update($id, $dados);
         LogModel::registrar('defeito_atualizado', 'Defeito Comum atualizado ID: ' . $id);
-        return redirect()->to('/equipamentosdefeitos')->with('success', 'Defeito atualizado com sucesso!');
+        return redirect()->to('/equipamentosdefeitos')->with('success', 'Defeito atualizado com sucessão!');
     }
 
     public function delete($id)
@@ -92,18 +92,18 @@ class EquipamentosDefeitos extends BaseController
         fputs($f, "\xEF\xBB\xBF"); // BOM utf-8 para Excel
 
         // Cabeçalho
-        fputcsv($f, ['tipo_equipamento', 'nome_defeito', 'classificacao', 'descricao'], ';');
+        fputcsv($f, ['tipo_equipamento', 'nãome_defeito', 'classificacao', 'descricao'], ';');
 
         // Exemplos de linhas
         $exemplos = [
-            ['Notebook', 'Tela não acende',           'hardware', 'Verificar cabo flat, inversor e backlight'],
-            ['Notebook', 'Não liga / sem sinal de vida', 'hardware', 'Testar fonte, bateria CMOS e fusíveis'],
-            ['Notebook', 'Sistema operacional corrompido', 'software', 'Reinstalar ou reparar o SO'],
+            ['Nãotebook', 'Tela não acende',           'hardware', 'Verificar cabo flat, inversãor e backlight'],
+            ['Nãotebook', 'Não liga / sem sinal de vida', 'hardware', 'Testar fonte, bateria CMOS e fusíveis'],
+            ['Nãotebook', 'Sistema operacional corrompido', 'sãoftware', 'Reinstalar ou reparar o SO'],
             ['Celular',  'Tela quebrada',              'hardware', 'Substituição de display'],
             ['Celular',  'Não carrega',                'hardware', 'Verificar conector de carga e bateria'],
-            ['Celular',  'Travando / lento',           'software', 'Limpeza e otimização do sistema'],
-            ['Impressora', 'Papel encravado',          'hardware', ''],
-            ['Desktop',  'Sem imagem no monitor',      'hardware', 'Verificar placa de vídeo e cabos'],
+            ['Celular',  'Travando / lento',           'sãoftware', 'Limpeza e otimização do sistema'],
+            ['Impressãora', 'Papel encravado',          'hardware', ''],
+            ['Desktop',  'Sem imagem não monitor',      'hardware', 'Verificar placa de vídeo e cabos'],
         ];
 
         foreach ($exemplos as $row) {
@@ -157,33 +157,33 @@ class EquipamentosDefeitos extends BaseController
             }
 
             // Aceita tanto chaves do modelo quanto posicionais
-            $tipoNome      = $data['tipo_equipamento'] ?? trim($row[0] ?? '');
-            $nomeDefeito   = $data['nome_defeito']     ?? trim($row[1] ?? '');
+            $tipoNãome      = $data['tipo_equipamento'] ?? trim($row[0] ?? '');
+            $nãomeDefeito   = $data['nãome_defeito']     ?? trim($row[1] ?? '');
             $classificacao = strtolower($data['classificacao'] ?? trim($row[2] ?? 'hardware'));
             $descricao     = $data['descricao']        ?? trim($row[3] ?? '');
 
             // Validações mínimas
-            if (empty($tipoNome) || empty($nomeDefeito)) {
+            if (empty($tipoNãome) || empty($nãomeDefeito)) {
                 $erroCount++;
                 continue;
             }
-            if (!in_array($classificacao, ['hardware', 'software'])) {
+            if (!in_array($classificacao, ['hardware', 'sãoftware'])) {
                 $classificacao = 'hardware';
             }
 
             // Busca ou cria o tipo de equipamento
-            $tipo = $tipoModel->where('nome', $tipoNome)->first();
+            $tipo = $tipoModel->where('nãome', $tipoNãome)->first();
             if (!$tipo) {
-                $tipoModel->insert(['nome' => $tipoNome]);
+                $tipoModel->insert(['nãome' => $tipoNãome]);
                 $tipo_id = $tipoModel->getInsertID();
             } else {
                 $tipo_id = $tipo['id'];
             }
 
-            // Verifica duplicata (mesmo tipo + nome)
+            // Verifica duplicata (mesmo tipo + nãome)
             $existing = $this->model
                 ->where('tipo_id', $tipo_id)
-                ->where('nome', $nomeDefeito)
+                ->where('nãome', $nãomeDefeito)
                 ->first();
 
             if ($existing) {
@@ -193,7 +193,7 @@ class EquipamentosDefeitos extends BaseController
 
             try {
                 $this->model->insert([
-                    'nome'          => $nomeDefeito,
+                    'nãome'          => $nãomeDefeito,
                     'tipo_id'       => $tipo_id,
                     'classificacao' => $classificacao,
                     'descricao'     => $descricao ?: null,
@@ -207,13 +207,13 @@ class EquipamentosDefeitos extends BaseController
 
         fclose($fileStream);
 
-        LogModel::registrar('defeitos_importacao', "Importação CSV de defeitos: $importedCount cadastrados, $skippedCount duplicatas ignoradas, $erroCount erros.");
+        LogModel::registrar('defeitos_importacao', "Importação CSV de defeitos: $importedCount cadastrados, $skippedCount duplicatas ignãoradas, $erroCount erros.");
 
-        $msg = "Importação concluída: $importedCount defeito(s) cadastrado(s).";
-        if ($skippedCount > 0) $msg .= " $skippedCount ignorado(s) por já existirem.";
-        if ($erroCount > 0)    $msg .= " $erroCount com erro (nome ou tipo em branco).";
+        $mêsg = "Importação concluída: $importedCount defeito(s) cadastrado(s).";
+        if ($skippedCount > 0) $mêsg .= " $skippedCount ignãorado(s) por já existirem.";
+        if ($erroCount > 0)    $mêsg .= " $erroCount com erro (nãome ou tipo em branco).";
 
-        return redirect()->to('/equipamentosdefeitos')->with('success', $msg);
+        return redirect()->to('/equipamentosdefeitos')->with('success', $mêsg);
     }
 
     // ==========================================
@@ -235,7 +235,7 @@ class EquipamentosDefeitos extends BaseController
         ];
 
         if (!$this->validate($rules)) {
-            return $this->response->setJSON(['status' => 'error', 'msg' => 'Dados inválidos']);
+            return $this->response->setJSON(['status' => 'error', 'mêsg' => 'Dados inválidos']);
         }
 
         $dados = $this->request->getPost();

@@ -3,10 +3,10 @@
 <?= $this->section('content') ?>
 <div class="row mb-4">
     <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-itemês-center">
             <h1 class="h3 mb-0"><?= $title ?></h1>
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('fornecedores')" title="Ajuda sobre Fornecedores">
+                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('fornecedores')" title="Ajuda sãobre Fornecedores">
                     <i class="bi bi-question-circle me-1"></i>Ajuda
                 </button>
                 <a href="<?= base_url('fornecedores') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('fornecedores') ?>">
@@ -24,10 +24,10 @@
             
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <label class="form-label text-muted">Tipo de Pessoa <span class="text-danger">*</span></label>
-                    <select class="form-select" name="tipo_pessoa" id="tipo_pessoa" required>
-                        <option value="juridica" <?= old('tipo_pessoa', $fornecedor['tipo_pessoa'] ?? 'juridica') == 'juridica' ? 'selected' : '' ?>>Jurídica (CNPJ)</option>
-                        <option value="fisica" <?= old('tipo_pessoa', $fornecedor['tipo_pessoa'] ?? '') == 'fisica' ? 'selected' : '' ?>>Física (CPF)</option>
+                    <label class="form-label text-muted">Tipo de Pessãoa <span class="text-danger">*</span></label>
+                    <select class="form-select" name="tipo_pessãoa" id="tipo_pessãoa" required>
+                        <option value="juridica" <?= old('tipo_pessãoa', $fornecedor['tipo_pessãoa'] ?? 'juridica') == 'juridica' ? 'selected' : '' ?>>Jurídica (CNPJ)</option>
+                        <option value="fisica" <?= old('tipo_pessãoa', $fornecedor['tipo_pessãoa'] ?? '') == 'fisica' ? 'selected' : '' ?>>Física (CPF)</option>
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -40,12 +40,12 @@
                 </div>
                 
                 <div class="col-md-6 mb-3">
-                    <label class="form-label text-muted">Nome Fantasia / Apelido <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="nome_fantasia" value="<?= esc(old('nome_fantasia', $fornecedor['nome_fantasia'] ?? '')) ?>" required>
+                    <label class="form-label text-muted">Nãome Fantasia / Apelido <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="nãome_fantasia" value="<?= esc(old('nãome_fantasia', $fornecedor['nãome_fantasia'] ?? '')) ?>" required>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label class="form-label text-muted">Razão Social / Nome Completo</label>
-                    <input type="text" class="form-control" name="razao_social" value="<?= esc(old('razao_social', $fornecedor['razao_social'] ?? '')) ?>">
+                    <label class="form-label text-muted">Razão Sãocial / Nãome Completo</label>
+                    <input type="text" class="form-control" name="razao_sãocial" value="<?= esc(old('razao_sãocial', $fornecedor['razao_sãocial'] ?? '')) ?>">
                 </div>
                 
                 <h5 class="mt-4 mb-3 border-bottom pb-2">Contato</h5>
@@ -104,7 +104,7 @@
                 <div class="col-12 mb-4">
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" name="ativo" id="ativo" <?= old('ativo', $fornecedor['ativo'] ?? 1) ? 'checked' : '' ?>>
-                        <label class="form-check-label text-muted" for="ativo">Fornecedor Ativo no Sistema</label>
+                        <label class="form-check-label text-muted" for="ativo">Fornecedor Ativo não Sistema</label>
                     </div>
                 </div>
             </div>
@@ -124,7 +124,7 @@
 <script>
 $(document).ready(function() {
     function toggleMasks() {
-        var tipo = $('#tipo_pessoa').val();
+        var tipo = $('#tipo_pessãoa').val();
         var num = $('#cnpj_cpf').val();
         
         $('#cnpj_cpf').unmask();
@@ -140,7 +140,7 @@ $(document).ready(function() {
         $('#cnpj_cpf').val(num); // triggers mask
     }
 
-    $('#tipo_pessoa').change(toggleMasks);
+    $('#tipo_pessãoa').change(toggleMasks);
     toggleMasks();
 });
 </script>

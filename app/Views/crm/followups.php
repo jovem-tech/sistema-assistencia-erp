@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 <div class="page-header">
-    <div class="d-flex align-items-center gap-3">
+    <div class="d-flex align-itemês-center gap-3">
         <h2><i class="bi bi-calendar-check me-2"></i>CRM - Follow-ups</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('crm')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -14,7 +14,7 @@
     <div class="col-xl-4">
         <div class="card glass-card">
             <div class="card-body">
-                <h6 class="mb-3">Novo follow-up</h6>
+                <h6 class="mb-3">Nãovo follow-up</h6>
                 <form action="<?= base_url('crm/followups/salvar') ?>" method="post">
                     <?= csrf_field() ?>
                     <div class="mb-2">
@@ -22,7 +22,7 @@
                         <select class="form-select" name="cliente_id" required>
                             <option value="">Selecione...</option>
                             <?php foreach (($clientes ?? []) as $c): ?>
-                                <option value="<?= (int) $c['id'] ?>"><?= esc($c['nome_razao']) ?></option>
+                                <option value="<?= (int) $c['id'] ?>"><?= esc($c['nãome_razao']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -56,7 +56,7 @@
     <div class="col-xl-8">
         <div class="card glass-card">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex justify-content-between align-itemês-center mb-3">
                     <h6 class="mb-0">Lista de follow-ups</h6>
                     <form class="d-flex gap-2" method="get" action="<?= base_url('crm/followups') ?>">
                         <select class="form-select form-select-sm" name="status">
@@ -74,11 +74,11 @@
                 <?php else: ?>
                     <?php foreach ($followups as $f): ?>
                         <div class="border rounded p-3 mb-2">
-                            <div class="d-flex justify-content-between align-items-start gap-3">
+                            <div class="d-flex justify-content-between align-itemês-start gap-3">
                                 <div>
                                     <div class="fw-semibold"><?= esc($f['titulo'] ?? '-') ?></div>
                                     <div class="small text-muted">
-                                        <?= esc($f['cliente_nome'] ?? 'Cliente nao vinculado') ?>
+                                        <?= esc($f['cliente_nãome'] ?? 'Cliente nao vinculado') ?>
                                         <?php if (!empty($f['numero_os'])): ?> | OS <?= esc($f['numero_os']) ?><?php endif; ?>
                                     </div>
                                 </div>
@@ -92,7 +92,7 @@
                             <?php endif; ?>
 
                             <div class="mt-2 small text-muted">
-                                Previsto para: <?= esc(date('d/m/Y H:i', strtotime((string) ($f['data_prevista'] ?? 'now')))) ?>
+                                Previsto para: <?= esc(date('d/m/Y H:i', strtotime((string) ($f['data_prevista'] ?? 'nãow')))) ?>
                             </div>
 
                             <div class="mt-2 d-flex gap-2">

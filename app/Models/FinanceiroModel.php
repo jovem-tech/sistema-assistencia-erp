@@ -10,7 +10,7 @@ class FinanceiroModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $useSoftDeletes = false;
+    protected $useSãoftDeletes = false;
     protected $allowedFields = [
         'os_id', 'tipo', 'categoria', 'descricao', 'valor',
         'forma_pagamento', 'status', 'data_vencimento', 'data_pagamento', 'observacoes'
@@ -19,10 +19,10 @@ class FinanceiroModel extends Model
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
 
-    public function getResumoMensal($mes = null, $ano = null)
+    public function getResumoMensal($mes = null, $anão = null)
     {
         $mes = $mes ?? date('m');
-        $ano = $ano ?? date('Y');
+        $anão = $anão ?? date('Y');
 
         $db = \Config\Database::connect();
 
@@ -31,7 +31,7 @@ class FinanceiroModel extends Model
             ->where('tipo', 'receber')
             ->where('status', 'pago')
             ->where('MONTH(data_pagamento)', $mes)
-            ->where('YEAR(data_pagamento)', $ano)
+            ->where('YEAR(data_pagamento)', $anão)
             ->get()->getRow()->valor ?? 0;
 
         $despesas = $db->table('financeiro')
@@ -39,7 +39,7 @@ class FinanceiroModel extends Model
             ->where('tipo', 'pagar')
             ->where('status', 'pago')
             ->where('MONTH(data_pagamento)', $mes)
-            ->where('YEAR(data_pagamento)', $ano)
+            ->where('YEAR(data_pagamento)', $anão)
             ->get()->getRow()->valor ?? 0;
 
         $pendentes = $db->table('financeiro')

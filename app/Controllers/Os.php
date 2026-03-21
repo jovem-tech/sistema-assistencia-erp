@@ -15,8 +15,8 @@ use App\Models\DefeitoModel;
 use App\Models\LogModel;
 use App\Models\OsFotoModel;
 use App\Models\EquipamentoFotoModel;
-use App\Models\AcessorioOsModel;
-use App\Models\FotoAcessorioModel;
+use App\Models\AcessãorioOsModel;
+use App\Models\FotoAcessãorioModel;
 use App\Models\EstadoFisicoOsModel;
 use App\Models\FotoEstadoFisicoModel;
 use App\Models\ContatoModel;
@@ -79,10 +79,10 @@ class Os extends BaseController
         
         $builder = $this->model->select(
                 'os.*,
-                clientes.nome_razao as cliente_nome,
-                em.nome as equip_marca, emod.nome as equip_modelo,
-                funcionarios.nome as tecnico_nome' . ($hasStatusTable ? ',
-                os_status.nome as status_nome,
+                clientes.nãome_razao as cliente_nãome,
+                em.nãome as equip_marca, emod.nãome as equip_modelo,
+                funcionarios.nãome as tecnico_nãome' . ($hasStatusTable ? ',
+                os_status.nãome as status_nãome,
                 os_status.grupo_macro as status_grupo_macro' : '')
             )
             ->join('clientes', 'clientes.id = os.cliente_id')
@@ -106,11 +106,11 @@ class Os extends BaseController
         }
 
         $columns = [
-            'os.numero_os', 'clientes.nome_razao', 'em.nome', 
+            'os.numero_os', 'clientes.nãome_razao', 'em.nãome', 
             'os.relato_cliente', 'os.data_abertura', 'os.status', 'os.valor_final', 'os.estado_fluxo'
         ];
         
-        $searchable = ['os.numero_os', 'clientes.nome_razao', 'em.nome', 'emod.nome'];
+        $searchable = ['os.numero_os', 'clientes.nãome_razao', 'em.nãome', 'emod.nãome'];
 
         return $this->respondDatatable($builder, $columns, $searchable, function ($row) {
             
@@ -138,7 +138,7 @@ class Os extends BaseController
 
             return [
                 '<strong>#' . esc($row['numero_os']) . '</strong>',
-                '<div class="fw-semibold">'.esc($row['cliente_nome']).'</div>',
+                '<div class="fw-semibold">'.esc($row['cliente_nãome']).'</div>',
                 esc($equipamento),
                 '<span class="text-truncate d-inline-block" style="max-width: 150px;">'.esc($row['relato_cliente']).'</span>',
                 $dataAbertura,
@@ -160,7 +160,7 @@ class Os extends BaseController
         $origemConversaId = (int) ($this->request->getGet('origem_conversa_id') ?? 0);
         $origemContatoId = (int) ($this->request->getGet('origem_contato_id') ?? 0);
         $clientePreSelecionado = (int) ($this->request->getGet('cliente_id') ?? 0);
-        $nomeHint = trim((string) ($this->request->getGet('nome_hint') ?? ''));
+        $nãomeHint = trim((string) ($this->request->getGet('nãome_hint') ?? ''));
         $telefoneHint = preg_replace('/\D+/', '', (string) ($this->request->getGet('telefone') ?? '')) ?? '';
 
         $origemConversa = null;
@@ -178,10 +178,10 @@ class Os extends BaseController
                     if ($telefoneHint === '') {
                         $telefoneHint = preg_replace('/\D+/', '', (string) ($origemConversa['telefone'] ?? '')) ?? '';
                     }
-                    if ($nomeHint === '') {
-                        $nomeConversa = trim((string) ($origemConversa['nome_contato'] ?? ''));
-                        if ($nomeConversa !== '' && !$this->isLikelyPhoneValue($nomeConversa)) {
-                            $nomeHint = $nomeConversa;
+                    if ($nãomeHint === '') {
+                        $nãomeConversa = trim((string) ($origemConversa['nãome_contato'] ?? ''));
+                        if ($nãomeConversa !== '' && !$this->isLikelyPhoneValue($nãomeConversa)) {
+                            $nãomeHint = $nãomeConversa;
                         }
                     }
                 }
@@ -196,22 +196,22 @@ class Os extends BaseController
                     if ($clientePreSelecionado <= 0) {
                         $clientePreSelecionado = (int) ($origemContato['cliente_id'] ?? 0);
                     }
-                    if ($nomeHint === '') {
-                        $nomeHint = trim((string) ($origemContato['nome'] ?? $origemContato['whatsapp_nome_perfil'] ?? ''));
+                    if ($nãomeHint === '') {
+                        $nãomeHint = trim((string) ($origemContato['nãome'] ?? $origemContato['whatsapp_nãome_perfil'] ?? ''));
                     }
                     if ($telefoneHint === '') {
-                        $telefoneHint = preg_replace('/\D+/', '', (string) ($origemContato['telefone_normalizado'] ?? $origemContato['telefone'] ?? '')) ?? '';
+                        $telefoneHint = preg_replace('/\D+/', '', (string) ($origemContato['telefone_nãormalizado'] ?? $origemContato['telefone'] ?? '')) ?? '';
                     }
                 }
             }
         }
 
         $data = [
-            'title'    => 'Nova Ordem de Servico',
-            'clientes' => $clienteModel->orderBy('nome_razao', 'ASC')->findAll(),
+            'title'    => 'Nãova Ordem de Servico',
+            'clientes' => $clienteModel->orderBy('nãome_razao', 'ASC')->findAll(),
             'tecnicos' => $funcionarioModel->getTecnicos(),
-            'tipos'    => $tipoModel->orderBy('nome', 'ASC')->findAll(),
-            'marcas'   => $marcaModel->orderBy('nome', 'ASC')->findAll(),
+            'tipos'    => $tipoModel->orderBy('nãome', 'ASC')->findAll(),
+            'marcas'   => $marcaModel->orderBy('nãome', 'ASC')->findAll(),
             'relatosRapidos' => $defeitoRelatadoModel->getActiveGrouped(),
             'statusGrouped' => (new OsStatusFlowService())->getStatusGrouped(),
             'statusDefault' => 'triagem',
@@ -220,7 +220,7 @@ class Os extends BaseController
             'origemConversa' => $origemConversa,
             'origemContato' => $origemContato ?? null,
             'clientePreSelecionado' => $clientePreSelecionado > 0 ? $clientePreSelecionado : null,
-            'origemNomeHint' => $nomeHint,
+            'origemNãomeHint' => $nãomeHint,
             'origemTelefoneHint' => $telefoneHint,
         ];
         return view('os/form', $data);
@@ -243,11 +243,11 @@ class Os extends BaseController
         $origemContatoId = (int) ($dados['origem_contato_id'] ?? 0);
         unset($dados['origem_conversa_id'], $dados['origem_contato_id']);
         $statusFlowService = new OsStatusFlowService();
-        $novoStatus = strtolower(trim((string) ($dados['status'] ?? 'triagem')));
+        $nãovoStatus = strtolower(trim((string) ($dados['status'] ?? 'triagem')));
         $dados['numero_os']    = $this->model->generateNumeroOs();
         $dados['data_abertura'] = date('Y-m-d H:i:s');
-        $dados['status'] = $novoStatus;
-        $dados['estado_fluxo'] = $statusFlowService->resolveEstadoFluxo($novoStatus);
+        $dados['status'] = $nãovoStatus;
+        $dados['estado_fluxo'] = $statusFlowService->resãolveEstadoFluxo($nãovoStatus);
         $dados['status_atualizado_em'] = date('Y-m-d H:i:s');
 
         $this->model->insert($dados);
@@ -258,7 +258,7 @@ class Os extends BaseController
             $historicoModel->insert([
                 'os_id' => $osId,
                 'status_anterior' => null,
-                'status_novo' => $novoStatus,
+                'status_nãovo' => $nãovoStatus,
                 'estado_fluxo' => $dados['estado_fluxo'],
                 'usuario_id' => session()->get('user_id') ?: null,
                 'observacao' => 'OS aberta',
@@ -272,9 +272,9 @@ class Os extends BaseController
                 $osId,
                 'os_aberta',
                 'OS aberta',
-                'Ordem de servico aberta no ERP',
+                'Ordem de servico aberta não ERP',
                 session()->get('user_id') ?: null,
-                ['status' => $novoStatus]
+                ['status' => $nãovoStatus]
             );
         } catch (\Throwable $e) {
             log_message('warning', 'Falha ao registrar evento CRM na abertura da OS: ' . $e->getMessage());
@@ -298,7 +298,7 @@ class Os extends BaseController
                     if ($img->isValid() && !$img->hasMoved()) {
                         $ext = $img->getExtension();
                         $newName = $slug . '_entrada_' . ($index + 1) . '_' . time() . '.' . $ext;
-                        $img->move(FCPATH . 'uploads/os_anormalidades', $newName);
+                        $img->move(FCPATH . 'uploads/os_anãormalidades', $newName);
                         
                         $fotoOsModel->insert([
                             'os_id'    => $osId,
@@ -310,9 +310,9 @@ class Os extends BaseController
             }
         }
 
-        $this->persistAccessoryData($osId, $dados['numero_os']);
+        $this->persistAccessãoryData($osId, $dados['numero_os']);
         $this->persistEstadoFisicoData($osId, $dados['numero_os']);
-        $this->triggerAutomaticEventsOnStatus($osId, $novoStatus, session()->get('user_id') ?: null);
+        $this->triggerAutomaticEventsOnStatus($osId, $nãovoStatus, session()->get('user_id') ?: null);
         $this->sincronizarOrigemWhatsappNaAbertura(
             $osId,
             (int) ($dados['cliente_id'] ?? 0),
@@ -323,7 +323,7 @@ class Os extends BaseController
         LogModel::registrar('os_criada', 'OS criada: ' . $dados['numero_os']);
 
         return redirect()->to('/os/visualizar/' . $osId)
-            ->with('success', 'Ordem de Serviço ' . $dados['numero_os'] . ' criada com sucesso!');
+            ->with('success', 'Ordem de Serviço ' . $dados['numero_os'] . ' criada com sucessão!');
     }
 
     public function show($id)
@@ -343,26 +343,26 @@ class Os extends BaseController
             $defeito['procedimentos'] = $procedimentoModel->getByDefeito($defeito['defeito_id']);
         }
 
-        $acessorioModel = new AcessorioOsModel();
-        $fotoAcessorioModel = new FotoAcessorioModel();
-        $acessoriosFolder = 'uploads/acessorios/OS_' . $this->normalizeOsSlug($os['numero_os']) . '/';
-        $acessorios = $acessorioModel->where('os_id', $id)->orderBy('id', 'ASC')->findAll();
-        foreach ($acessorios as &$acessorio) {
-            $fotos = $fotoAcessorioModel->where('acessorio_id', $acessorio['id'])->findAll();
+        $acessãorioModel = new AcessãorioOsModel();
+        $fotoAcessãorioModel = new FotoAcessãorioModel();
+        $acessãoriosFolder = 'uploads/acessãorios/OS_' . $this->nãormalizeOsSlug($os['numero_os']) . '/';
+        $acessãorios = $acessãorioModel->where('os_id', $id)->orderBy('id', 'ASC')->findAll();
+        foreach ($acessãorios as &$acessãorio) {
+            $fotos = $fotoAcessãorioModel->where('acessãorio_id', $acessãorio['id'])->findAll();
             foreach ($fotos as &$foto) {
-                $fotoPath = FCPATH . $acessoriosFolder . $foto['arquivo'];
+                $fotoPath = FCPATH . $acessãoriosFolder . $foto['arquivo'];
                 if (!file_exists($fotoPath)) {
                     $foto = null;
                     continue;
                 }
-                $foto['url'] = base_url($acessoriosFolder . $foto['arquivo']);
+                $foto['url'] = base_url($acessãoriosFolder . $foto['arquivo']);
             }
-            $acessorio['fotos'] = array_values(array_filter($fotos));
+            $acessãorio['fotos'] = array_values(array_filter($fotos));
         }
 
         $estadoFisicoModel = new EstadoFisicoOsModel();
         $fotoEstadoFisicoModel = new FotoEstadoFisicoModel();
-        $estadoFisicoFolder = 'uploads/estado_fisico/OS_' . $this->normalizeOsSlug($os['numero_os']) . '/';
+        $estadoFisicoFolder = 'uploads/estado_fisico/OS_' . $this->nãormalizeOsSlug($os['numero_os']) . '/';
         $estadosFisicos = $estadoFisicoModel->where('os_id', $id)->orderBy('id', 'ASC')->findAll();
         foreach ($estadosFisicos as &$estadoItem) {
             $fotosEstado = $fotoEstadoFisicoModel->where('estado_fisico_id', $estadoItem['id'])->findAll();
@@ -391,9 +391,9 @@ class Os extends BaseController
 
         $fotos_entrada = $fotoOsModel->where('os_id', $id)->where('tipo', 'recepcao')->findAll();
         foreach ($fotos_entrada as &$f) {
-            $pathAnormal = FCPATH . 'uploads/os_anormalidades/' . $f['arquivo'];
-            $f['url'] = file_exists($pathAnormal) 
-                ? base_url('uploads/os_anormalidades/' . $f['arquivo']) 
+            $pathAnãormal = FCPATH . 'uploads/os_anãormalidades/' . $f['arquivo'];
+            $f['url'] = file_exists($pathAnãormal) 
+                ? base_url('uploads/os_anãormalidades/' . $f['arquivo']) 
                 : base_url('uploads/os/' . $f['arquivo']);
         }
 
@@ -404,8 +404,8 @@ class Os extends BaseController
             'defeitos'       => $defeitos,
             'fotos_equip'    => $fotos_equip,
             'fotos_entrada'  => $fotos_entrada,
-            'acessorios'     => $acessorios,
-            'acessorios_folder' => $acessoriosFolder,
+            'acessãorios'     => $acessãorios,
+            'acessãorios_folder' => $acessãoriosFolder,
             'estados_fisicos' => $estadosFisicos,
             'estado_fisico_folder' => $estadoFisicoFolder,
             'statusGrouped' => (new OsStatusFlowService())->getStatusGrouped(),
@@ -447,9 +447,9 @@ class Os extends BaseController
         $fotoOsModel = new OsFotoModel();
         $fotos_entrada = $fotoOsModel->where('os_id', $id)->where('tipo', 'recepcao')->findAll();
         foreach ($fotos_entrada as &$f) {
-            $pathAnormal = FCPATH . 'uploads/os_anormalidades/' . $f['arquivo'];
-            $f['url'] = file_exists($pathAnormal) 
-                ? base_url('uploads/os_anormalidades/' . $f['arquivo']) 
+            $pathAnãormal = FCPATH . 'uploads/os_anãormalidades/' . $f['arquivo'];
+            $f['url'] = file_exists($pathAnãormal) 
+                ? base_url('uploads/os_anãormalidades/' . $f['arquivo']) 
                 : base_url('uploads/os/' . $f['arquivo']);
         }
 
@@ -458,7 +458,7 @@ class Os extends BaseController
         $data = [
             'title'        => 'Editar OS ' . $os['numero_os'],
             'os'           => $os,
-            'clientes'     => $clienteModel->orderBy('nome_razao', 'ASC')->findAll(),
+            'clientes'     => $clienteModel->orderBy('nãome_razao', 'ASC')->findAll(),
             'equipamentos' => $equipamentoModel->getByCliente($os['cliente_id']),
             'tecnicos'     => $funcionarioModel->getTecnicos(),
             'itens'        => $itemModel->getByOs($id),
@@ -476,10 +476,10 @@ class Os extends BaseController
     {
         $dados = $this->request->getPost();
         $osAnterior = $this->model->find($id);
-        $statusNovo = strtolower(trim((string) ($dados['status'] ?? '')));
-        $statusAlterado = $statusNovo !== '' && !empty($osAnterior) && $statusNovo !== (string) ($osAnterior['status'] ?? '');
+        $statusNãovo = strtolower(trim((string) ($dados['status'] ?? '')));
+        $statusAlterado = $statusNãovo !== '' && !empty($osAnterior) && $statusNãovo !== (string) ($osAnterior['status'] ?? '');
         $statusService = new OsStatusFlowService();
-        if ($statusAlterado && !$statusService->isTransitionAllowed((string) ($osAnterior['status'] ?? ''), $statusNovo)) {
+        if ($statusAlterado && !$statusService->isTransitionAllowed((string) ($osAnterior['status'] ?? ''), $statusNãovo)) {
             return redirect()->to('/os/editar/' . $id)
                 ->withInput()
                 ->with('error', 'Transicao de status invalida para esta OS.');
@@ -502,14 +502,14 @@ class Os extends BaseController
         if ($statusAlterado) {
             $statusService->applyStatus(
                 (int) $id,
-                $statusNovo,
+                $statusNãovo,
                 session()->get('user_id') ?: null,
                 'Alterado na edicao da OS'
             );
-            $this->triggerAutomaticEventsOnStatus((int) $id, $statusNovo, session()->get('user_id') ?: null);
+            $this->triggerAutomaticEventsOnStatus((int) $id, $statusNãovo, session()->get('user_id') ?: null);
         }
         
-        // Salva novas fotos de estado do equipamento
+        // Salva nãovas fotos de estado do equipamento
         if ($files = $this->request->getFiles()) {
             if (!empty($files['fotos_entrada'])) {
                 $fotoOsModel = new \App\Models\OsFotoModel();
@@ -520,7 +520,7 @@ class Os extends BaseController
                     if ($img && $img->isValid() && !$img->hasMoved()) {
                         $ext = $img->getExtension();
                         $newName = $slug . '_edit_' . ($index + 1) . '_' . time() . '.' . $ext;
-                        $img->move(FCPATH . 'uploads/os_anormalidades', $newName);
+                        $img->move(FCPATH . 'uploads/os_anãormalidades', $newName);
                         
                         $fotoOsModel->insert([
                             'os_id'    => $id,
@@ -539,14 +539,14 @@ class Os extends BaseController
 
         $osRecord = $this->model->find($id);
         if ($osRecord) {
-            $this->persistAccessoryData($id, $osRecord['numero_os'], true);
+            $this->persistAccessãoryData($id, $osRecord['numero_os'], true);
             $this->persistEstadoFisicoData($id, $osRecord['numero_os'], true);
         }
 
         LogModel::registrar('os_atualizada', 'OS atualizada ID: ' . $id);
 
         return redirect()->to('/os/visualizar/' . $id)
-            ->with('success', 'OS atualizada com sucesso!');
+            ->with('success', 'OS atualizada com sucessão!');
     }
 
     public function updateStatus($id)
@@ -606,7 +606,7 @@ class Os extends BaseController
         LogModel::registrar('os_status', 'Status da OS ' . $os['numero_os'] . ' alterado para: ' . $status);
 
         return redirect()->to('/os/visualizar/' . $id)
-            ->with('success', 'Status atualizado com sucesso!');
+            ->with('success', 'Status atualizado com sucessão!');
     }
 
     public function sendWhatsApp($id)
@@ -675,10 +675,10 @@ class Os extends BaseController
         }
 
         if (!empty($result['ok'])) {
-            return redirect()->to('/os/visualizar/' . $id)->with('success', 'Mensagem WhatsApp enviada com sucesso.');
+            return redirect()->to('/os/visualizar/' . $id)->with('success', 'Mensagem WhatsApp enviada com sucessão.');
         }
 
-        return redirect()->to('/os/visualizar/' . $id)->with('error', $result['message'] ?? 'Falha ao enviar mensagem no WhatsApp.');
+        return redirect()->to('/os/visualizar/' . $id)->with('error', $result['message'] ?? 'Falha ao enviar mensagem não WhatsApp.');
     }
 
     public function generatePdf($id)
@@ -699,7 +699,7 @@ class Os extends BaseController
             return redirect()->to('/os/visualizar/' . $id)->with('error', $result['message'] ?? 'Falha ao gerar PDF.');
         }
 
-        return redirect()->to('/os/visualizar/' . $id)->with('success', 'PDF gerado com sucesso.');
+        return redirect()->to('/os/visualizar/' . $id)->with('success', 'PDF gerado com sucessão.');
     }
 
     private function triggerAutomaticEventsOnStatus(int $osId, string $statusCode, ?int $userId = null): void
@@ -777,8 +777,8 @@ class Os extends BaseController
         if ($digits === '') {
             return false;
         }
-        $nonDigits = preg_replace('/[0-9+\-().\s]/', '', $raw) ?? '';
-        return strlen($digits) >= 8 && strlen($nonDigits) <= 2;
+        $nãonDigits = preg_replace('/[0-9+\-().\s]/', '', $raw) ?? '';
+        return strlen($digits) >= 8 && strlen($nãonDigits) <= 2;
     }
 
     public function addItem()
@@ -815,7 +815,7 @@ class Os extends BaseController
         $this->recalcularTotaisOs($dados['os_id']);
 
         return redirect()->to('/os/visualizar/' . $dados['os_id'])
-            ->with('success', 'Item adicionado com sucesso!');
+            ->with('success', 'Item adicionado com sucessão!');
     }
 
     public function removeItem($id)
@@ -841,7 +841,7 @@ class Os extends BaseController
             $this->recalcularTotaisOs($osId);
 
             return redirect()->to('/os/visualizar/' . $osId)
-                ->with('success', 'Item removido com sucesso!');
+                ->with('success', 'Item removido com sucessão!');
         }
 
         return redirect()->back()->with('error', 'Item não encontrado.');
@@ -876,24 +876,24 @@ class Os extends BaseController
         ]);
     }
 
-    private function persistAccessoryData(int $osId, string $numeroOs, bool $replaceExisting = false): void
+    private function persistAccessãoryData(int $osId, string $numeroOs, bool $replaceExisting = false): void
     {
-        $entries = $this->getAccessoryEntries();
-        $filesMap = $this->collectAccessoryFiles();
+        $entries = $this->getAccessãoryEntries();
+        $filesMap = $this->collectAccessãoryFiles();
 
         if ($replaceExisting) {
-            (new AcessorioOsModel())->deleteByOs($osId);
-            $this->clearAccessoryFolder($numeroOs);
+            (new AcessãorioOsModel())->deleteByOs($osId);
+            $this->clearAccessãoryFolder($numeroOs);
         }
 
         if (empty($entries) && empty($filesMap)) {
             return;
         }
 
-        $acessorioModel = new AcessorioOsModel();
-        $fotoModel = new FotoAcessorioModel();
-        $slug = $this->normalizeOsSlug($numeroOs);
-        $folder = $this->ensureAccessoryDirectory($slug);
+        $acessãorioModel = new AcessãorioOsModel();
+        $fotoModel = new FotoAcessãorioModel();
+        $slug = $this->nãormalizeOsSlug($numeroOs);
+        $folder = $this->ensureAccessãoryDirectory($slug);
         $sequence = 1;
 
         foreach ($entries as $entry) {
@@ -902,33 +902,33 @@ class Os extends BaseController
                 continue;
             }
 
-            $acessorioModel->insert([
+            $acessãorioModel->insert([
                 'os_id' => $osId,
                 'descricao' => $description,
                 'tipo' => $entry['key'] ?? null,
-                'valores' => !empty($entry['values']) ? json_encode($entry['values'], JSON_UNESCAPED_UNICODE) : null,
+                'valores' => !empty($entry['values']) ? jsãon_encode($entry['values'], JSON_UNESCAPED_UNICODE) : null,
             ]);
 
-            $acessorioId = $acessorioModel->getInsertID();
-            if (!$acessorioId) {
+            $acessãorioId = $acessãorioModel->getInsertID();
+            if (!$acessãorioId) {
                 continue;
             }
 
             $entryFiles = $filesMap[$entry['id']] ?? [];
             foreach ($entryFiles as $file) {
-                $this->saveAccessoryPhoto($file, $folder, $slug, $sequence, $acessorioId, $fotoModel);
+                $this->saveAccessãoryPhoto($file, $folder, $slug, $sequence, $acessãorioId, $fotoModel);
             }
         }
     }
 
-    private function getAccessoryEntries(): array
+    private function getAccessãoryEntries(): array
     {
-        $raw = $this->request->getPost('acessorios_data');
+        $raw = $this->request->getPost('acessãorios_data');
         if (empty($raw)) {
             return [];
         }
 
-        $decoded = json_decode($raw, true);
+        $decoded = jsãon_decode($raw, true);
         if (!is_array($decoded)) {
             return [];
         }
@@ -938,21 +938,21 @@ class Os extends BaseController
         }));
     }
 
-    private function collectAccessoryFiles(): array
+    private function collectAccessãoryFiles(): array
     {
         $mapped = [];
-        if (empty($_FILES['fotos_acessorios']['name'] ?? null)) {
+        if (empty($_FILES['fotos_acessãorios']['name'] ?? null)) {
             return $mapped;
         }
 
-        foreach ($_FILES['fotos_acessorios']['name'] as $entryId => $files) {
+        foreach ($_FILES['fotos_acessãorios']['name'] as $entryId => $files) {
             foreach ($files as $index => $name) {
-                $error = $_FILES['fotos_acessorios']['error'][$entryId][$index] ?? UPLOAD_ERR_NO_FILE;
+                $error = $_FILES['fotos_acessãorios']['error'][$entryId][$index] ?? UPLOAD_ERR_NO_FILE;
                 if ($error !== UPLOAD_ERR_OK) {
                     continue;
                 }
 
-                $tmpName = $_FILES['fotos_acessorios']['tmp_name'][$entryId][$index];
+                $tmpName = $_FILES['fotos_acessãorios']['tmp_name'][$entryId][$index];
                 if (!is_uploaded_file($tmpName)) {
                     continue;
                 }
@@ -967,16 +967,16 @@ class Os extends BaseController
         return $mapped;
     }
 
-    private function normalizeOsSlug(string $numeroOs): string
+    private function nãormalizeOsSlug(string $numeroOs): string
     {
         $clean = preg_replace('/[^A-Za-z0-9_]/', '', str_replace('-', '_', $numeroOs));
         $clean = preg_replace('/^OS_?/i', '', $clean);
         return $clean ?: 'os';
     }
 
-    private function ensureAccessoryDirectory(string $slug): string
+    private function ensureAccessãoryDirectory(string $slug): string
     {
-        $base = FCPATH . 'uploads/acessorios/';
+        $base = FCPATH . 'uploads/acessãorios/';
         if (!is_dir($base)) {
             mkdir($base, 0755, true);
         }
@@ -988,10 +988,10 @@ class Os extends BaseController
         return $path;
     }
 
-    private function clearAccessoryFolder(string $numeroOs): void
+    private function clearAccessãoryFolder(string $numeroOs): void
     {
-        $slug = $this->normalizeOsSlug($numeroOs);
-        $path = FCPATH . 'uploads/acessorios/OS_' . $slug . '/';
+        $slug = $this->nãormalizeOsSlug($numeroOs);
+        $path = FCPATH . 'uploads/acessãorios/OS_' . $slug . '/';
         if (!is_dir($path)) {
             return;
         }
@@ -1003,11 +1003,11 @@ class Os extends BaseController
         }
     }
 
-    private function saveAccessoryPhoto(array $file, string $folder, string $slug, int &$sequence, int $acessorioId, FotoAcessorioModel $fotoModel): void
+    private function saveAccessãoryPhoto(array $file, string $folder, string $slug, int &$sequence, int $acessãorioId, FotoAcessãorioModel $fotoModel): void
     {
         try {
             $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $name = "acessorio_{$slug}_{$sequence}";
+            $name = "acessãorio_{$slug}_{$sequence}";
             if ($extension) {
                 $name .= '.' . $extension;
             }
@@ -1018,7 +1018,7 @@ class Os extends BaseController
             }
 
             $fotoModel->insert([
-                'acessorio_id' => $acessorioId,
+                'acessãorio_id' => $acessãorioId,
                 'arquivo' => $name,
             ]);
             $sequence++;
@@ -1038,7 +1038,7 @@ class Os extends BaseController
 
         $estadoModel = new EstadoFisicoOsModel();
         $fotoModel = new FotoEstadoFisicoModel();
-        $slug = $this->normalizeOsSlug($numeroOs);
+        $slug = $this->nãormalizeOsSlug($numeroOs);
         $legacyPhotosByIndex = [];
         $savedFiles = [];
 
@@ -1071,9 +1071,9 @@ class Os extends BaseController
 
             $estadoModel->insert([
                 'os_id' => $osId,
-                'descricao_dano' => $description,
+                'descricao_danão' => $description,
                 'tipo' => $entry['key'] ?? null,
-                'valores' => !empty($entry['values']) ? json_encode($entry['values'], JSON_UNESCAPED_UNICODE) : null,
+                'valores' => !empty($entry['values']) ? jsãon_encode($entry['values'], JSON_UNESCAPED_UNICODE) : null,
             ]);
 
             $estadoItemId = $estadoModel->getInsertID();
@@ -1127,7 +1127,7 @@ class Os extends BaseController
             return [];
         }
 
-        $decoded = json_decode($raw, true);
+        $decoded = jsãon_decode($raw, true);
         if (!is_array($decoded)) {
             return [];
         }
@@ -1182,7 +1182,7 @@ class Os extends BaseController
 
     private function clearEstadoFisicoFolder(string $numeroOs): void
     {
-        $slug = $this->normalizeOsSlug($numeroOs);
+        $slug = $this->nãormalizeOsSlug($numeroOs);
         $path = FCPATH . 'uploads/estado_fisico/OS_' . $slug . '/';
         if (!is_dir($path)) {
             return;

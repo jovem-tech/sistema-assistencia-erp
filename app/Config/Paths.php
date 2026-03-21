@@ -14,7 +14,7 @@ namespace Config;
  * All paths are relative to the project's root folder.
  *
  * NOTE: This class is required prior to Autoloader instantiation,
- *       and does not extend BaseConfig.
+ *       and does nãot extend BaseConfig.
  */
 class Paths
 {
@@ -24,7 +24,7 @@ class Paths
      * ---------------------------------------------------------------
      *
      * This must contain the name of your "system" folder. Include
-     * the path if the folder is not in the same directory as this file.
+     * the path if the folder is nãot in the same directory as this file.
      */
     public string $systemDirectory = __DIR__ . '/../../vendor/codeigniter4/framework/system';
 
@@ -35,7 +35,7 @@ class Paths
      *
      * If you want this front controller to use a different "app"
      * folder than the default one you can set its name here. The folder
-     * can also be renamed or relocated anywhere on your server. If
+     * can alsão be renamed or relocated anywhere on your server. If
      * you do, use a full server path.
      *
      * @see http://codeigniter.com/user_guide/general/managing_apps.html
@@ -72,7 +72,7 @@ class Paths
      * This variable must contain the name of the directory that
      * contains the view files used by your application. By
      * default this is in `app/Views`. This value
-     * is used when no value is provided to `Services::renderer()`.
+     * is used when não value is provided to `Services::renderer()`.
      */
     public string $viewDirectory = __DIR__ . '/../Views';
 }

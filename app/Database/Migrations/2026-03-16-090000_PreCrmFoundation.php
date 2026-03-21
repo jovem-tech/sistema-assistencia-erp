@@ -37,7 +37,7 @@ class PreCrmFoundation extends Migration
                     'constraint' => 80,
                     'null'       => false,
                 ],
-                'nome' => [
+                'nãome' => [
                     'type'       => 'VARCHAR',
                     'constraint' => 120,
                     'null'       => false,
@@ -115,7 +115,7 @@ class PreCrmFoundation extends Migration
                     'constraint' => 11,
                     'unsigned'   => true,
                 ],
-                'status_destino_id' => [
+                'status_destinão_id' => [
                     'type'       => 'INT',
                     'constraint' => 11,
                     'unsigned'   => true,
@@ -135,9 +135,9 @@ class PreCrmFoundation extends Migration
                 ],
             ]);
             $this->forge->addKey('id', true);
-            $this->forge->addUniqueKey(['status_origem_id', 'status_destino_id']);
+            $this->forge->addUniqueKey(['status_origem_id', 'status_destinão_id']);
             $this->forge->addForeignKey('status_origem_id', 'os_status', 'id', 'CASCADE', 'CASCADE');
-            $this->forge->addForeignKey('status_destino_id', 'os_status', 'id', 'CASCADE', 'CASCADE');
+            $this->forge->addForeignKey('status_destinão_id', 'os_status', 'id', 'CASCADE', 'CASCADE');
             $this->forge->createTable('os_status_transicoes', true);
         }
 
@@ -158,7 +158,7 @@ class PreCrmFoundation extends Migration
                     'constraint' => 80,
                     'null'       => true,
                 ],
-                'status_novo' => [
+                'status_nãovo' => [
                     'type'       => 'VARCHAR',
                     'constraint' => 80,
                     'null'       => false,
@@ -184,7 +184,7 @@ class PreCrmFoundation extends Migration
             ]);
             $this->forge->addKey('id', true);
             $this->forge->addKey(['os_id', 'created_at']);
-            $this->forge->addKey(['status_novo']);
+            $this->forge->addKey(['status_nãovo']);
             $this->forge->addForeignKey('os_id', 'os', 'id', 'CASCADE', 'CASCADE');
             $this->forge->addForeignKey('usuario_id', 'usuarios', 'id', 'SET NULL', 'CASCADE');
             $this->forge->createTable('os_status_historico', true);
@@ -203,7 +203,7 @@ class PreCrmFoundation extends Migration
                     'constraint' => 80,
                     'null'       => false,
                 ],
-                'nome' => [
+                'nãome' => [
                     'type'       => 'VARCHAR',
                     'constraint' => 140,
                     'null'       => false,
@@ -444,9 +444,9 @@ class PreCrmFoundation extends Migration
 
         $statuses = [
             ['triagem', 'Triagem', 'recepcao', 'bi-search', 'secondary', 10, 0, 0, 1, 'em_atendimento'],
-            ['diagnostico', 'Diagnostico Tecnico', 'diagnostico', 'bi-heart-pulse', 'primary', 20, 0, 0, 1, 'em_atendimento'],
-            ['aguardando_avaliacao', 'Aguardando Avaliacao', 'diagnostico', 'bi-hourglass-split', 'info', 30, 0, 0, 1, 'em_atendimento'],
-            ['verificacao_garantia', 'Verificacao de Garantia', 'diagnostico', 'bi-shield-check', 'info', 40, 0, 0, 1, 'em_atendimento'],
+            ['diagnãostico', 'Diagnãostico Tecnico', 'diagnãostico', 'bi-heart-pulse', 'primary', 20, 0, 0, 1, 'em_atendimento'],
+            ['aguardando_avaliacao', 'Aguardando Avaliacao', 'diagnãostico', 'bi-hourglass-split', 'info', 30, 0, 0, 1, 'em_atendimento'],
+            ['verificacao_garantia', 'Verificacao de Garantia', 'diagnãostico', 'bi-shield-check', 'info', 40, 0, 0, 1, 'em_atendimento'],
             ['aguardando_orcamento', 'Aguardando Orcamento', 'orcamento', 'bi-cash-stack', 'indigo', 50, 0, 0, 1, 'em_atendimento'],
             ['aguardando_autorizacao', 'Aguardando Autorizacao', 'orcamento', 'bi-pencil-square', 'purple', 60, 0, 1, 1, 'pausado'],
             ['aguardando_reparo', 'Aguardando Reparo', 'execucao', 'bi-tools', 'warning', 70, 0, 0, 1, 'em_execucao'],
@@ -470,14 +470,14 @@ class PreCrmFoundation extends Migration
             ['cancelado', 'Cancelado', 'cancelado', 'bi-slash-circle', 'secondary', 250, 1, 0, 1, 'cancelado'],
         ];
 
-        $now = date('Y-m-d H:i:s');
+        $nãow = date('Y-m-d H:i:s');
         foreach ($statuses as $row) {
             if (in_array($row[0], $existing, true)) {
                 continue;
             }
             $table->insert([
                 'codigo'              => $row[0],
-                'nome'                => $row[1],
+                'nãome'                => $row[1],
                 'grupo_macro'         => $row[2],
                 'icone'               => $row[3],
                 'cor'                 => $row[4],
@@ -487,8 +487,8 @@ class PreCrmFoundation extends Migration
                 'gera_evento_crm'     => $row[8],
                 'estado_fluxo_padrao' => $row[9],
                 'ativo'               => 1,
-                'created_at'          => $now,
-                'updated_at'          => $now,
+                'created_at'          => $nãow,
+                'updated_at'          => $nãow,
             ]);
         }
     }
@@ -506,10 +506,10 @@ class PreCrmFoundation extends Migration
         }
 
         $transitions = [
-            ['triagem', 'diagnostico'],
-            ['diagnostico', 'aguardando_avaliacao'],
-            ['diagnostico', 'verificacao_garantia'],
-            ['diagnostico', 'aguardando_orcamento'],
+            ['triagem', 'diagnãostico'],
+            ['diagnãostico', 'aguardando_avaliacao'],
+            ['diagnãostico', 'verificacao_garantia'],
+            ['diagnãostico', 'aguardando_orcamento'],
             ['aguardando_avaliacao', 'aguardando_orcamento'],
             ['verificacao_garantia', 'aguardando_orcamento'],
             ['aguardando_orcamento', 'aguardando_autorizacao'],
@@ -535,7 +535,7 @@ class PreCrmFoundation extends Migration
             ['irreparavel_disponivel_loja', 'devolvido_sem_reparo'],
             ['reparo_recusado', 'devolvido_sem_reparo'],
             ['triagem', 'cancelado'],
-            ['diagnostico', 'cancelado'],
+            ['diagnãostico', 'cancelado'],
             ['aguardando_orcamento', 'cancelado'],
             ['aguardando_autorizacao', 'cancelado'],
             ['reparo_execucao', 'cancelado'],
@@ -543,24 +543,24 @@ class PreCrmFoundation extends Migration
         ];
 
         $table = $this->db->table('os_status_transicoes');
-        $now = date('Y-m-d H:i:s');
+        $nãow = date('Y-m-d H:i:s');
         foreach ($transitions as [$from, $to]) {
             if (!isset($map[$from], $map[$to])) {
                 continue;
             }
             $exists = $table
                 ->where('status_origem_id', $map[$from])
-                ->where('status_destino_id', $map[$to])
+                ->where('status_destinão_id', $map[$to])
                 ->countAllResults();
             if ($exists > 0) {
                 continue;
             }
             $table->insert([
                 'status_origem_id' => $map[$from],
-                'status_destino_id' => $map[$to],
+                'status_destinão_id' => $map[$to],
                 'ativo' => 1,
-                'created_at' => $now,
-                'updated_at' => $now,
+                'created_at' => $nãow,
+                'updated_at' => $nãow,
             ]);
         }
     }
@@ -569,7 +569,7 @@ class PreCrmFoundation extends Migration
     {
         $table = $this->db->table('whatsapp_templates');
         $existing = array_column($table->select('codigo')->get()->getResultArray(), 'codigo');
-        $now = date('Y-m-d H:i:s');
+        $nãow = date('Y-m-d H:i:s');
 
         $templates = [
             ['os_aberta', 'OS aberta', 'os_aberta', 'Sua OS {{numero_os}} foi aberta em {{data_abertura}}. Equipamento: {{equipamento}}.'],
@@ -582,18 +582,18 @@ class PreCrmFoundation extends Migration
             ['pos_atendimento', 'Pos-atendimento', 'followup_satisfacao', 'Como foi sua experiencia com a OS {{numero_os}}? Sua opiniao e importante.'],
         ];
 
-        foreach ($templates as [$codigo, $nome, $evento, $conteudo]) {
+        foreach ($templates as [$codigo, $nãome, $evento, $conteudo]) {
             if (in_array($codigo, $existing, true)) {
                 continue;
             }
             $table->insert([
                 'codigo' => $codigo,
-                'nome' => $nome,
+                'nãome' => $nãome,
                 'evento' => $evento,
                 'conteudo' => $conteudo,
                 'ativo' => 1,
-                'created_at' => $now,
-                'updated_at' => $now,
+                'created_at' => $nãow,
+                'updated_at' => $nãow,
             ]);
         }
     }

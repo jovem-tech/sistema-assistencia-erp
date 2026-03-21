@@ -10,10 +10,10 @@ class ChatbotFluxoModel extends Model
     protected $primaryKey = 'id';
     protected $returnType = 'array';
     protected $allowedFields = [
-        'nome',
+        'nãome',
         'descricao',
         'tipo_fluxo',
-        'etapas_json',
+        'etapas_jsãon',
         'ativo',
         'ordem',
     ];

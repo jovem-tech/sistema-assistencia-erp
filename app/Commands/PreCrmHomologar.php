@@ -18,18 +18,18 @@ use Config\Database;
 
 class PreCrmHomologar extends BaseCommand
 {
-    protected $group       = 'Diagnostico';
+    protected $group       = 'Diagnãostico';
     protected $name        = 'precrm:homologar';
     protected $description = 'Executa homologacao pre-CRM: fluxo de status, WhatsApp e PDF da OS.';
 
-    protected $usage = 'precrm:homologar [--os_id ID] [--no-webhook]';
+    protected $usage = 'precrm:homologar [--os_id ID] [--não-webhook]';
 
     protected $options = [
         '--os_id'      => 'Usa uma OS existente para os testes (nao cria OS de homologacao).',
-        '--no-webhook' => 'Pula a validacao HTTP do endpoint /webhooks/whatsapp.',
+        '--não-webhook' => 'Pula a validacao HTTP do endpoint /webhooks/whatsapp.',
     ];
 
-    public function run(array $params)
+    public function run(array $paramês)
     {
         helper(['sistema', 'url']);
 
@@ -106,7 +106,7 @@ class PreCrmHomologar extends BaseCommand
                 'status' => 'triagem',
                 'estado_fluxo' => 'em_atendimento',
                 'status_atualizado_em' => date('Y-m-d H:i:s'),
-                'prioridade' => 'normal',
+                'prioridade' => 'nãormal',
                 'relato_cliente' => 'Homologacao pre-CRM automatica',
                 'data_abertura' => date('Y-m-d H:i:s'),
                 'data_entrada' => date('Y-m-d H:i:s'),
@@ -130,7 +130,7 @@ class PreCrmHomologar extends BaseCommand
                 $historicoModel->insert([
                     'os_id' => $targetOsId,
                     'status_anterior' => null,
-                    'status_novo' => 'triagem',
+                    'status_nãovo' => 'triagem',
                     'estado_fluxo' => 'em_atendimento',
                     'usuario_id' => $userId > 0 ? $userId : null,
                     'observacao' => 'Abertura da OS de homologacao',
@@ -151,7 +151,7 @@ class PreCrmHomologar extends BaseCommand
 
         $flowService = new OsStatusFlowService();
         $statusSequence = [
-            'diagnostico',
+            'diagnãostico',
             'aguardando_orcamento',
             'aguardando_autorizacao',
             'aguardando_reparo',
@@ -172,17 +172,17 @@ class PreCrmHomologar extends BaseCommand
                 $errors[] = 'Falha na transicao para "' . $nextStatus . '": ' . ($result['message'] ?? 'erro desconhecido');
                 break;
             }
-            $evidence[] = 'Transicao OK: ' . ($result['status_anterior'] ?: 'abertura') . ' -> ' . $result['status_novo'];
+            $evidence[] = 'Transicao OK: ' . ($result['status_anterior'] ?: 'abertura') . ' -> ' . $result['status_nãovo'];
         }
 
         $invalidTransition = $flowService->applyStatus(
             $targetOsId,
-            'diagnostico',
+            'diagnãostico',
             $userId > 0 ? $userId : null,
             'Teste de transicao invalida'
         );
         if (!empty($invalidTransition['ok'])) {
-            $warnings[] = 'Transicao invalida esperada nao foi bloqueada (entregue_reparado -> diagnostico).';
+            $warnings[] = 'Transicao invalida esperada nao foi bloqueada (entregue_reparado -> diagnãostico).';
         } else {
             $evidence[] = 'Bloqueio de transicao invalida: OK';
         }
@@ -202,9 +202,9 @@ class PreCrmHomologar extends BaseCommand
                 continue;
             }
 
-            $absolute = FCPATH . ltrim((string) ($result['relative'] ?? ''), '/\\');
-            if (!is_file($absolute)) {
-                $errors[] = 'PDF informado como gerado, mas arquivo nao existe em disco: ' . $absolute;
+            $absãolute = FCPATH . ltrim((string) ($result['relative'] ?? ''), '/\\');
+            if (!is_file($absãolute)) {
+                $errors[] = 'PDF informado como gerado, mas arquivo nao existe em disco: ' . $absãolute;
                 continue;
             }
             $pdfResults[$pdfType] = $result;
@@ -252,14 +252,14 @@ class PreCrmHomologar extends BaseCommand
             $evidence[] = 'WhatsApp manual log_id: ' . $whatsManualResult['log_id'] . ' / status=' . ($whatsManualResult['ok'] ? 'enviado' : 'erro');
         }
 
-        $msgCount = (int) $whatsModel->where('os_id', $targetOsId)->countAllResults();
+        $mêsgCount = (int) $whatsModel->where('os_id', $targetOsId)->countAllResults();
         $envioCount = (int) $envioModel->where('os_id', $targetOsId)->countAllResults();
-        $evidence[] = 'Mensagens registradas (whatsapp_mensagens): ' . $msgCount;
+        $evidence[] = 'Mensagens registradas (whatsapp_mensagens): ' . $mêsgCount;
         $evidence[] = 'Envios rastreados (whatsapp_envios): ' . $envioCount;
 
         $cfgModel->setConfig('whatsapp_enabled', (string) $originalWhatsappEnabled);
 
-        if (! CLI::getOption('no-webhook')) {
+        if (! CLI::getOption('não-webhook')) {
             CLI::newLine();
             CLI::write('4) Validando webhook inbound (HTTP)...', 'yellow');
 
@@ -277,38 +277,38 @@ class PreCrmHomologar extends BaseCommand
                 $payload = [
                     'from' => $phone,
                     'message' => 'Inbound de homologacao pre-CRM para OS ' . ($os['numero_os'] ?? $targetOsId),
-                    'source' => 'precrm_homologar_cli',
+                    'sãource' => 'precrm_homologar_cli',
                 ];
 
                 $resp = service('curlrequest')->post($webhookUrl, [
                     'headers' => [
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/jsãon',
+                        'Content-Type' => 'application/jsãon',
                         'X-Webhook-Token' => $token,
                     ],
-                    'json' => $payload,
+                    'jsãon' => $payload,
                 ]);
 
                 $statusCode = $resp->getStatusCode();
                 $body = (string) $resp->getBody();
-                $decoded = json_decode($body, true);
+                $decoded = jsãon_decode($body, true);
 
                 if ($statusCode >= 200 && $statusCode < 300 && !empty($decoded['ok'])) {
                     $afterInbound = (int) $inboundModel->countAllResults();
                     if ($afterInbound <= $beforeInbound) {
-                        $warnings[] = 'Webhook respondeu sucesso, mas contagem de inbound nao aumentou.';
+                        $warnings[] = 'Webhook respondeu sucessão, mas contagem de inbound nao aumentou.';
                     } else {
                         $evidence[] = 'Webhook inbound HTTP: OK (status ' . $statusCode . ', +'
                             . ($afterInbound - $beforeInbound) . ' registro(s))';
                     }
                 } else {
-                    $warnings[] = 'Webhook HTTP retornou status ' . $statusCode . ' com resposta: ' . $body;
+                    $warnings[] = 'Webhook HTTP retornãou status ' . $statusCode . ' com resposta: ' . $body;
                 }
             } catch (\Throwable $e) {
                 $warnings[] = 'Webhook HTTP nao validado (falha de conexao): ' . $e->getMessage();
             }
         } else {
-            $warnings[] = 'Validacao de webhook pulada por --no-webhook.';
+            $warnings[] = 'Validacao de webhook pulada por --não-webhook.';
         }
 
         if ($createdOs) {

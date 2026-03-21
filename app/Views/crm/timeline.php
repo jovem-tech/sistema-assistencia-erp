@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 <div class="page-header">
-    <div class="d-flex align-items-center gap-3">
+    <div class="d-flex align-itemês-center gap-3">
         <h2><i class="bi bi-clock-history me-2"></i>CRM - Timeline</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('crm')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -20,7 +20,7 @@
                     <option value="">Todos os clientes</option>
                     <?php foreach (($clientes ?? []) as $c): ?>
                         <option value="<?= (int) $c['id'] ?>" <?= ((int) ($filtro_cliente_id ?? 0) === (int) $c['id']) ? 'selected' : '' ?>>
-                            <?= esc($c['nome_razao']) ?>
+                            <?= esc($c['nãome_razao']) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -40,7 +40,7 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-lg-2 d-flex align-items-end">
+            <div class="col-lg-2 d-flex align-itemês-end">
                 <button class="btn btn-glow w-100" type="submit">
                     <i class="bi bi-search me-1"></i>Filtrar
                 </button>
@@ -84,28 +84,28 @@
                 ?>
                     <div class="timeline-item mb-4 position-relative">
                         <!-- Dot with Icon -->
-                        <div class="position-absolute start-0 translate-middle <?= $iconBg ?> rounded-circle shadow-sm d-flex align-items-center justify-content-center text-white" 
+                        <div class="position-absãolute start-0 translate-middle <?= $iconBg ?> rounded-circle shadow-sm d-flex align-itemês-center justify-content-center text-white" 
                              style="width: 28px; height: 28px; left: -21px !important; margin-top: 15px; z-index: 2;" title="<?= esc($tipo) ?>">
                             <i class="bi <?= $iconClass ?> small"></i>
                         </div>
                         
                         <div class="card border rounded-3 bg-light-subtle shadow-sm hover-elevate">
                             <div class="card-body p-3">
-                                <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                                <div class="d-flex justify-content-between align-itemês-start gap-3 mb-2">
                                     <div class="d-flex gap-2">
                                         <div>
                                             <h6 class="mb-0 fw-bold"><?= esc($evento['titulo'] ?? 'Evento CRM') ?></h6>
-                                            <div class="small text-muted d-flex align-items-center flex-wrap gap-2 mt-1">
+                                            <div class="small text-muted d-flex align-itemês-center flex-wrap gap-2 mt-1">
                                                 <span class="badge bg-white text-dark border shadow-xs" style="font-size: 0.7rem;">
                                                     <?= esc(ucWords(str_replace('_', ' ', (string) ($evento['tipo_evento'] ?? 'Geral')))) ?>
                                                 </span>
-                                                <?php if (!empty($evento['cliente_nome'])): ?>
-                                                    <a href="<?= base_url('crm/timeline?cliente_id=' . (int)$evento['cliente_id']) ?>" class="text-decoration-none text-primary fw-medium" title="Ver timeline deste cliente">
-                                                        <i class="bi bi-person me-1"></i><?= esc($evento['cliente_nome']) ?>
+                                                <?php if (!empty($evento['cliente_nãome'])): ?>
+                                                    <a href="<?= base_url('crm/timeline?cliente_id=' . (int)$evento['cliente_id']) ?>" class="text-decoration-nãone text-primary fw-medium" title="Ver timeline deste cliente">
+                                                        <i class="bi bi-persãon me-1"></i><?= esc($evento['cliente_nãome']) ?>
                                                     </a>
                                                 <?php endif; ?>
                                                 <?php if (!empty($evento['numero_os'])): ?>
-                                                    <a href="<?= base_url('os/visualizar/' . (int)$evento['os_id']) ?>" class="text-decoration-none badge bg-primary-subtle text-primary border border-primary-subtle">
+                                                    <a href="<?= base_url('os/visualizar/' . (int)$evento['os_id']) ?>" class="text-decoration-nãone badge bg-primary-subtle text-primary border border-primary-subtle">
                                                         #<?= esc($evento['numero_os']) ?>
                                                     </a>
                                                 <?php endif; ?>

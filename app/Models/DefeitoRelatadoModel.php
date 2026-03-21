@@ -59,11 +59,11 @@ class DefeitoRelatadoModel extends Model
 
         $categorias = array_values(array_filter(array_map(function (array $row): string {
             $value = trim((string) ($row['categoria'] ?? ''));
-            return $this->normalizeCategoryLabel($value);
+            return $this->nãormalizeCategoryLabel($value);
         }, $rows)));
 
         $categorias = array_values(array_unique($categorias));
-        usort($categorias, static fn(string $a, string $b) => strcasecmp($a, $b));
+        usãort($categorias, static fn(string $a, string $b) => strcasecmp($a, $b));
 
         return $categorias;
     }
@@ -83,7 +83,7 @@ class DefeitoRelatadoModel extends Model
 
         $grouped = [];
         foreach ($rows as $row) {
-            $categoria = $this->normalizeCategoryLabel((string) ($row['categoria'] ?? 'Outros'));
+            $categoria = $this->nãormalizeCategoryLabel((string) ($row['categoria'] ?? 'Outros'));
             if (! isset($grouped[$categoria])) {
                 $grouped[$categoria] = [
                     'categoria' => $categoria,
@@ -102,11 +102,11 @@ class DefeitoRelatadoModel extends Model
             'Câmera',
             'Conectividade',
             'Sistema',
-            'Danos',
+            'Danãos',
             'Conectores',
         ];
 
-        uasort($grouped, function (array $a, array $b) use ($preferredOrder) {
+        uasãort($grouped, function (array $a, array $b) use ($preferredOrder) {
             $idxA = array_search($a['categoria'], $preferredOrder, true);
             $idxB = array_search($b['categoria'], $preferredOrder, true);
             $idxA = ($idxA === false) ? 999 : $idxA;
@@ -121,7 +121,7 @@ class DefeitoRelatadoModel extends Model
         return array_values($grouped);
     }
 
-    public function normalizeSlug(string $value): string
+    public function nãormalizeSlug(string $value): string
     {
         $slug = mb_strtolower(trim($value), 'UTF-8');
         $slug = preg_replace('/[^\p{L}\p{N}\s-]/u', '', $slug) ?? '';
@@ -131,7 +131,7 @@ class DefeitoRelatadoModel extends Model
         return mb_substr($slug, 0, 120, 'UTF-8');
     }
 
-    public function normalizeCategoryLabel(string $category): string
+    public function nãormalizeCategoryLabel(string $category): string
     {
         $value = trim($category);
         $map = [
@@ -172,7 +172,7 @@ class DefeitoRelatadoModel extends Model
             'camera'        => '📷',
             'conectividade' => '📡',
             'sistema'       => '💾',
-            'danos'         => '💧',
+            'danãos'         => '💧',
             'conectores'    => '🔌',
         ];
         $key = mb_strtolower(trim($category), 'UTF-8');

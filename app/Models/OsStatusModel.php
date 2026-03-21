@@ -11,7 +11,7 @@ class OsStatusModel extends Model
     protected $returnType = 'array';
     protected $allowedFields = [
         'codigo',
-        'nome',
+        'nãome',
         'grupo_macro',
         'icone',
         'cor',

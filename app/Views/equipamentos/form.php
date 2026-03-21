@@ -4,8 +4,8 @@
 <?php $isEdit = isset($equipamento); ?>
 
 <div class="equip-form-page ds-form-layout">
-<div class="page-header d-flex justify-content-between align-items-center">
-    <div class="d-flex align-items-center gap-3">
+<div class="page-header d-flex justify-content-between align-itemês-center">
+    <div class="d-flex align-itemês-center gap-3">
         <h2><i class="bi bi-<?= $isEdit ? 'pencil' : 'plus-lg' ?> me-2"></i><?= $title ?></h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('equipamentos')">Ajuda</button>
     </div>
@@ -20,7 +20,7 @@
         .custom-color-accordion .accordion-button {
             transition: all 0.2s ease;
         }
-        .custom-color-accordion .accordion-button:not(.collapsed) {
+        .custom-color-accordion .accordion-button:nãot(.collapsed) {
             color: var(--bs-primary) !important;
             background-color: rgba(var(--bs-primary-rgb), 0.05) !important;
         }
@@ -30,14 +30,14 @@
         }
         .custom-color-accordion .list-group-item {
             transition: all 0.15s ease;
-            cursor: pointer;
+            cursãor: pointer;
         }
         .custom-color-accordion .list-group-item:hover {
             background-color: rgba(0,0,0,0.03);
             transform: translateX(3px);
         }
         .custom-color-accordion .list-group-item.active {
-            border-left: 3px solid var(--bs-primary) !important;
+            border-left: 3px sãolid var(--bs-primary) !important;
         }
         .custom-scrollbar::-webkit-scrollbar {
             width: 4px;
@@ -71,20 +71,20 @@
             .equip-form-page .equip-photo-grid {
                 justify-content: center !important;
             }
-            .equip-form-page .d-flex.justify-content-between.align-items-center.mt-5.pt-3.border-top {
+            .equip-form-page .d-flex.justify-content-between.align-itemês-center.mt-5.pt-3.border-top {
                 flex-direction: column-reverse;
-                align-items: stretch !important;
+                align-itemês: stretch !important;
                 gap: 10px;
             }
-            .equip-form-page .d-flex.justify-content-between.align-items-center.mt-5.pt-3.border-top .btn {
+            .equip-form-page .d-flex.justify-content-between.align-itemês-center.mt-5.pt-3.border-top .btn {
                 width: 100%;
             }
-            .equip-form-page .d-flex.justify-content-between.align-items-center.mt-5.pt-3.border-top .btn-link {
+            .equip-form-page .d-flex.justify-content-between.align-itemês-center.mt-5.pt-3.border-top .btn-link {
                 text-align: center;
             }
         }
     </style>
-    <input type="hidden" name="modelo_nome_ext" id="modelo_nome_ext">
+    <input type="hidden" name="modelo_nãome_ext" id="modelo_nãome_ext">
 
             <!-- Navega��o por Abas -->
             <ul class="nav nav-tabs nav-fill ds-tabs-scroll mb-4" id="equipamentoTabs" role="tablist">
@@ -111,18 +111,18 @@
                 <div class="tab-pane fade show active" id="info-pane" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label d-flex align-items-center gap-2">
+                            <label class="form-label d-flex align-itemês-center gap-2">
                                 Cliente *
-                                <button class="btn btn-warning btn-sm py-0 px-2" type="button" data-bs-toggle="modal" data-bs-target="#modalNovoCliente"
-                                        title="Novo Cliente" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
-                                    <i class="bi bi-plus-lg"></i> Novo
+                                <button class="btn btn-warning btn-sm py-0 px-2" type="button" data-bs-toggle="modal" data-bs-target="#modalNãovoCliente"
+                                        title="Nãovo Cliente" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
+                                    <i class="bi bi-plus-lg"></i> Nãovo
                                 </button>
                             </label>
                             <select name="cliente_id" id="clienteSelect" class="form-select select2-clientes" required>
                                 <option value="">Selecione ou busque um cliente...</option>
                                 <?php foreach ($clientes as $c): ?>
                                 <option value="<?= $c['id'] ?>" <?= ($isEdit && $equipamento['cliente_id'] == $c['id']) ? 'selected' : '' ?>>
-                                    <?= esc($c['nome_razao']) ?> <?= !empty($c['cpf_cnpj']) ? ' - ' . esc($c['cpf_cnpj']) : '' ?> <?= !empty($c['telefone1']) ? ' - ' . esc($c['telefone1']) : '' ?>
+                                    <?= esc($c['nãome_razao']) ?> <?= !empty($c['cpf_cnpj']) ? ' - ' . esc($c['cpf_cnpj']) : '' ?> <?= !empty($c['telefone1']) ? ' - ' . esc($c['telefone1']) : '' ?>
                                 </option>
                                 <?php endforeach; ?>
                             </select>
@@ -132,7 +132,7 @@
                             <select name="tipo_id" class="form-select" required>
                                 <option value="">Selecione o Tipo...</option>
                                 <?php foreach ($tipos as $t): ?>
-                                <option value="<?= $t['id'] ?>" <?= ($isEdit && ($equipamento['tipo_id'] ?? '') == $t['id']) ? 'selected' : '' ?>><?= esc($t['nome']) ?></option>
+                                <option value="<?= $t['id'] ?>" <?= ($isEdit && ($equipamento['tipo_id'] ?? '') == $t['id']) ? 'selected' : '' ?>><?= esc($t['nãome']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -140,33 +140,33 @@
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label d-flex align-items-center gap-2">
+                            <label class="form-label d-flex align-itemês-center gap-2">
                                 Marca *
-                                <button class="btn btn-warning btn-sm py-0 px-2" type="button" data-bs-toggle="modal" data-bs-target="#modalNovaMarca"
-                                        title="Nova Marca" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
-                                    <i class="bi bi-plus-lg"></i> Novo
+                                <button class="btn btn-warning btn-sm py-0 px-2" type="button" data-bs-toggle="modal" data-bs-target="#modalNãovaMarca"
+                                        title="Nãova Marca" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
+                                    <i class="bi bi-plus-lg"></i> Nãovo
                                 </button>
                             </label>
                             <select name="marca_id" id="marcaSelect" class="form-select select2-basic" required>
                                 <option value="">Selecione a Marca...</option>
                                 <?php foreach ($marcas as $m): ?>
-                                <option value="<?= $m['id'] ?>" <?= ($isEdit && ($equipamento['marca_id'] ?? '') == $m['id']) ? 'selected' : '' ?>><?= esc($m['nome']) ?></option>
+                                <option value="<?= $m['id'] ?>" <?= ($isEdit && ($equipamento['marca_id'] ?? '') == $m['id']) ? 'selected' : '' ?>><?= esc($m['nãome']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label d-flex align-items-center gap-2">
+                            <label class="form-label d-flex align-itemês-center gap-2">
                                 Modelo *
-                                <button class="btn btn-warning btn-sm py-0 px-2" type="button" data-bs-toggle="modal" data-bs-target="#modalNovoModelo"
-                                        title="Novo Modelo" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
-                                    <i class="bi bi-plus-lg"></i> Novo
+                                <button class="btn btn-warning btn-sm py-0 px-2" type="button" data-bs-toggle="modal" data-bs-target="#modalNãovoModelo"
+                                        title="Nãovo Modelo" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
+                                    <i class="bi bi-plus-lg"></i> Nãovo
                                 </button>
                             </label>
                             <select name="modelo_id" id="modeloSelect" class="form-select select2-basic" required>
                                 <option value="">Selecione a Marca primeiro...</option>
                                 <?php if ($isEdit && !empty($modelos)): ?>
                                     <?php foreach ($modelos as $md): ?>
-                                    <option value="<?= $md['id'] ?>" <?= ($equipamento['modelo_id'] ?? '') == $md['id'] ? 'selected' : '' ?>><?= esc($md['nome']) ?></option>
+                                    <option value="<?= $md['id'] ?>" <?= ($equipamento['modelo_id'] ?? '') == $md['id'] ? 'selected' : '' ?>><?= esc($md['nãome']) ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
@@ -179,14 +179,14 @@
                             <input type="text" name="numero_serie" class="form-control" placeholder="IMEI ou S�rie" value="<?= $isEdit ? esc($equipamento['numero_serie'] ?? '') : '' ?>">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label d-flex justify-content-between align-items-center">
-                                Senha de Acesso
+                            <label class="form-label d-flex justify-content-between align-itemês-center">
+                                Senha de Acessão
                                 <div class="btn-group btn-group-sm" role="group">
                                     <button type="button" class="btn btn-outline-secondary py-0 px-2 btn-senha-tipo" data-placeholder="Num�rico (PIN)" title="PIN/Desenho"><i class="bi bi-grip-vertical"></i></button>
                                     <button type="button" class="btn btn-outline-secondary py-0 px-2 btn-senha-tipo" data-placeholder="Alfanum�rico" title="Texto"><i class="bi bi-fonts"></i></button>
                                 </div>
                             </label>
-                            <input type="text" name="senha_acesso" id="inputSenhaAcesso" class="form-control" placeholder="PIN ou senha" value="<?= $isEdit ? esc($equipamento['senha_acesso'] ?? '') : '' ?>">
+                            <input type="text" name="senha_acessão" id="inputSenhaAcessão" class="form-control" placeholder="PIN ou senha" value="<?= $isEdit ? esc($equipamento['senha_acessão'] ?? '') : '' ?>">
                         </div>
                     </div>
 
@@ -200,13 +200,13 @@
                                 Acess�rios
                                 <small class="text-muted">Clique para adicionar</small>
                             </label>
-                            <textarea name="acessorios" id="textareaAcessorios" class="form-control mb-2" rows="3" placeholder="O que o cliente enviou?"><?= $isEdit ? esc($equipamento['acessorios'] ?? '') : '' ?></textarea>
+                            <textarea name="acessãorios" id="textareaAcessãorios" class="form-control mb-2" rows="3" placeholder="O que o cliente enviou?"><?= $isEdit ? esc($equipamento['acessãorios'] ?? '') : '' ?></textarea>
                             <div class="d-flex flex-wrap gap-1">
-                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Carregador</button>
-                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Cabo USB</button>
-                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Capa</button>
-                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Chip</button>
-                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Cart�o Mem�ria</button>
+                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessãorio" style="font-size: 0.75rem;">+ Carregador</button>
+                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessãorio" style="font-size: 0.75rem;">+ Cabo USB</button>
+                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessãorio" style="font-size: 0.75rem;">+ Capa</button>
+                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessãorio" style="font-size: 0.75rem;">+ Chip</button>
+                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessãorio" style="font-size: 0.75rem;">+ Cart�o Mem�ria</button>
                             </div>
                         </div>
                     </div>
@@ -222,48 +222,48 @@
                 <!-- ABA 2: COR -->
                 <div class="tab-pane fade" id="cor-pane" role="tabpanel" aria-labelledby="cor-tab" tabindex="0">
                     <div class="p-3 border rounded bg-light bg-opacity-10 mb-4">
-                        <h6 class="mb-3 d-flex align-items-center"><i class="bi bi-brush me-2 text-primary"></i> Seletor Profissional de Cor</h6>
+                        <h6 class="mb-3 d-flex align-itemês-center"><i class="bi bi-brush me-2 text-primary"></i> Seletor Profissional de Cor</h6>
                         
                         <!-- HIDDEN: campos reais enviados ao banco -->
                         <input type="hidden" name="cor_hex" id="corHexReal" value="<?= $isEdit ? esc($equipamento['cor_hex'] ?? '#1A1A1A') : '#1A1A1A' ?>">
                         <input type="hidden" name="cor_rgb" id="corRgbReal" value="<?= $isEdit ? esc($equipamento['cor_rgb'] ?? '26,26,26') : '26,26,26' ?>">
-                        <input type="hidden" name="cor" id="corNomeReal" value="<?= $isEdit ? esc($equipamento['cor'] ?? 'Preto') : 'Preto' ?>">
+                        <input type="hidden" name="cor" id="corNãomeReal" value="<?= $isEdit ? esc($equipamento['cor'] ?? 'Preto') : 'Preto' ?>">
 
                         <div class="row g-3">
                             <!-- Coluna Esquerda: Preview + Picker -->
                             <div class="col-md-5">
                                 <!-- Detec��o por foto (smart) -->
-                                <div class="p-2 mb-3 rounded border border-warning border-opacity-50 bg-warning bg-opacity-10 d-none" id="smartColorContainer">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="p-2 mb-3 rounded border border-warning border-opacity-50 bg-warning bg-opacity-10 d-nãone" id="smartColorContainer">
+                                    <div class="d-flex justify-content-between align-itemês-center mb-1">
                                         <span style="font-size: 0.72rem;" class="text-warning fw-semibold"><i class="bi bi-magic me-1"></i>Detectado na foto:</span>
-                                        <button type="button" class="btn btn-sm text-success p-0 border-0 fw-bold" id="btnAcceptColor" style="font-size: 0.75rem;">Aplicar <i class="bi bi-check2-circle ms-1"></i></button>
+                                        <button type="button" class="btn btn-sm text-success p-0 border-0 fw-bold" id="btnAcceptColor" style="font-size: 0.75rem;">Aplicar <i class="bi bi-check2-circle mês-1"></i></button>
                                     </div>
-                                    <div class="d-flex align-items-center gap-2">
+                                    <div class="d-flex align-itemês-center gap-2">
                                         <div id="smartColorSwatch" class="rounded-circle shadow border" style="width: 28px; height: 28px;"></div>
                                         <strong id="smartColorName" class="fs-6">Nenhuma</strong>
-                                        <small id="smartColorHex" class="text-muted ms-auto font-monospace" style="font-size: 0.7rem;"></small>
+                                        <small id="smartColorHex" class="text-muted mês-auto font-monãospace" style="font-size: 0.7rem;"></small>
                                     </div>
                                 </div>
 
                                 <!-- Preview Grande -->
-                                <div id="colorPreviewBox" class="rounded-4 shadow border mb-3 d-flex flex-column align-items-center justify-content-center" style="height: 140px; background: #1A1A1A; transition: all 0.3s ease;">
-                                    <span id="colorPreviewHex" class="fw-bold font-monospace" style="font-size: 1.2rem; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); letter-spacing: 1px;">#1A1A1A</span>
+                                <div id="colorPreviewBox" class="rounded-4 shadow border mb-3 d-flex flex-column align-itemês-center justify-content-center" style="height: 140px; background: #1A1A1A; transition: all 0.3s ease;">
+                                    <span id="colorPreviewHex" class="fw-bold font-monãospace" style="font-size: 1.2rem; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); letter-spacing: 1px;">#1A1A1A</span>
                                     <span id="colorPreviewName" class="mt-1 fw-semibold" style="font-size: 0.9rem; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));">Preto</span>
                                     <span id="colorPreviewRgb" class="mt-1 opacity-75" style="font-size: 0.7rem;">RGB: 26, 26, 26</span>
                                 </div>
 
                                 <div class="row g-2 mb-3">
                                     <div class="col-auto">
-                                        <input type="color" id="corHexPicker" class="form-control form-control-color p-1 shadow-sm" value="<?= $isEdit ? esc($equipamento['cor_hex'] ?? '#1A1A1A') : '#1A1A1A' ?>" title="Escolha a cor" style="width: 55px; height: 45px; cursor: pointer; border-radius: 10px;">
+                                        <input type="color" id="corHexPicker" class="form-control form-control-color p-1 shadow-sm" value="<?= $isEdit ? esc($equipamento['cor_hex'] ?? '#1A1A1A') : '#1A1A1A' ?>" title="Escolha a cor" style="width: 55px; height: 45px; cursãor: pointer; border-radius: 10px;">
                                     </div>
                                     <div class="col">
-                                        <input type="text" id="corHexInput" class="form-control font-monospace h-100 shadow-sm" placeholder="#000000" value="<?= $isEdit ? esc($equipamento['cor_hex'] ?? '#1A1A1A') : '#1A1A1A' ?>" maxlength="7">
+                                        <input type="text" id="corHexInput" class="form-control font-monãospace h-100 shadow-sm" placeholder="#000000" value="<?= $isEdit ? esc($equipamento['cor_hex'] ?? '#1A1A1A') : '#1A1A1A' ?>" maxlength="7">
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Nome da Cor Especial</label>
-                                    <input type="text" id="corNomeInput" class="form-control shadow-sm" placeholder="Ex: Vermelho Ferrari, Azul Sierra..." value="<?= $isEdit ? esc($equipamento['cor'] ?? 'Preto') : 'Preto' ?>">
+                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Nãome da Cor Especial</label>
+                                    <input type="text" id="corNãomeInput" class="form-control shadow-sm" placeholder="Ex: Vermelho Ferrari, Azul Sierra..." value="<?= $isEdit ? esc($equipamento['cor'] ?? 'Preto') : 'Preto' ?>">
                                 </div>
 
                                 <div id="coresProximasBox">
@@ -285,7 +285,7 @@
 
                 <!-- ABA 3: FOTOS -->
                 <div class="tab-pane fade" id="fotos-pane" role="tabpanel" aria-labelledby="fotos-tab" tabindex="0">
-                    <div class="p-3 border rounded bg-light bg-opacity-10 mb-4 text-center py-5" id="fotosContainerVazio" style="display: none;">
+                    <div class="p-3 border rounded bg-light bg-opacity-10 mb-4 text-center py-5" id="fotosContainerVazio" style="display: nãone;">
                         <i class="bi bi-cloud-upload display-1 text-muted opacity-25"></i>
                         <h5 class="mt-3 text-muted">Nenhuma foto anexada</h5>
                         <p class="text-muted small">Adicione fotos para documentar o estado do equipamento.</p>
@@ -298,11 +298,11 @@
                         <button type="button" class="btn btn-outline-secondary btn-lg rounded-pill px-4 shadow-sm" id="btnAbrirGaleria">
                             <i class="bi bi-images me-2"></i>Abrir Galeria
                         </button>
-                        <input type="file" id="fotoInput" class="d-none" accept="image/*" multiple>
-                        <input type="file" name="fotos[]" id="fotoInputReal" class="d-none" multiple>
+                        <input type="file" id="fotoInput" class="d-nãone" accept="image/*" multiple>
+                        <input type="file" name="fotos[]" id="fotoInputReal" class="d-nãone" multiple>
                     </div>
 
-                    <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4 mx-auto" style="max-width: 600px;">
+                    <div class="alert alert-info border-0 shadow-sm d-flex align-itemês-center mb-4 mx-auto" style="max-width: 600px;">
                         <i class="bi bi-info-circle-fill fs-4 me-3"></i>
                         <div class="small">
                             Envie at� <strong>4 fotos</strong> (M�ximo 2MB cada). A primeira foto ser� usada como imagem principal do perfil do equipamento.
@@ -316,26 +316,26 @@
                             <div class="position-relative foto-item-wrapper" id="foto-existente-<?= $f['id'] ?>">
                                 <div class="card shadow-sm border h-100" style="width: 160px;">
                                     <?php $urlExistente = $f['url'] ?? null; ?>
-                                    <img src="<?= $urlExistente ?? base_url('assets/img/no-image.png') ?>" class="card-img-top rounded-top" style="height: 140px; object-fit: cover;">
+                                    <img src="<?= $urlExistente ?? base_url('assets/img/não-image.png') ?>" class="card-img-top rounded-top" style="height: 140px; object-fit: cover;">
                                     <div class="card-body p-2 text-center">
                                         <span class="badge <?= $f['is_principal'] ? 'bg-primary' : 'bg-light text-dark border' ?> w-100" style="font-size: 0.65rem;">
                                             <?= $f['is_principal'] ? 'PRINCIPAL' : 'ANEXO' ?>
                                         </span>
                                     </div>
-                                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 shadow-sm btn-del-foto-existente" data-id="<?= $f['id'] ?>" style="width: 24px; height: 24px; padding: 0; line-height: 1;">&times;</button>
+                                    <button type="button" class="btn btn-sm btn-danger position-absãolute top-0 end-0 m-1 shadow-sm btn-del-foto-existente" data-id="<?= $f['id'] ?>" style="width: 24px; height: 24px; padding: 0; line-height: 1;">&times;</button>
                                 </div>
                             </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
 
-                        <!-- Container para Previews din�micos de Novas -->
-                        <div id="fotoPreviewNovas" class="d-flex flex-wrap gap-4"></div>
+                        <!-- Container para Previews din�micos de Nãovas -->
+                        <div id="fotoPreviewNãovas" class="d-flex flex-wrap gap-4"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
-                <a href="<?= base_url('equipamentos') ?>" class="btn btn-link text-secondary text-decoration-none"><i class="bi bi-x-lg me-1"></i> Descartar Altera��es</a>
+            <div class="d-flex justify-content-between align-itemês-center mt-5 pt-3 border-top">
+                <a href="<?= base_url('equipamentos') ?>" class="btn btn-link text-secondary text-decoration-nãone"><i class="bi bi-x-lg me-1"></i> Descartar Altera��es</a>
                 <button type="submit" class="btn btn-glow btn-lg px-5 shadow"><i class="bi bi-save me-2 text-warning"></i><?= $isEdit ? 'Atualizar Equipamento' : 'Finalizar Cadastro' ?></button>
             </div>
         </form>
@@ -345,19 +345,19 @@
 
 <!-- ================= MODAIS DE CADASTRO R�PIDO ================= -->
 
-<!-- Modal Novo Cliente -->
-<div class="modal fade" id="modalNovoCliente" tabindex="-1">
+<!-- Modal Nãovo Cliente -->
+<div class="modal fade" id="modalNãovoCliente" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content glass-card">
             <div class="modal-header border-bottom border-light">
-                <h5 class="modal-title">Novo Cliente R�pido</h5>
+                <h5 class="modal-title">Nãovo Cliente R�pido</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="formNovoCliente">
+                <form id="formNãovoCliente">
                     <div class="mb-3">
-                        <label>Nome Completo *</label>
-                        <input type="text" name="nome_razao" id="cNome" class="form-control" required>
+                        <label>Nãome Completo *</label>
+                        <input type="text" name="nãome_razao" id="cNãome" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label>Telefone/WhatsApp *</label>
@@ -381,16 +381,16 @@
     </div>
 </div>
 
-<!-- Modal Nova Marca -->
-<div class="modal fade" id="modalNovaMarca" tabindex="-1">
+<!-- Modal Nãova Marca -->
+<div class="modal fade" id="modalNãovaMarca" tabindex="-1">
     <div class="modal-dialog modal-sm">
         <div class="modal-content glass-card">
             <div class="modal-header border-bottom border-light">
-                <h5 class="modal-title">Nova Marca</h5>
+                <h5 class="modal-title">Nãova Marca</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <input type="text" id="mNome" class="form-control" placeholder="Ex: Samsung, Apple...">
+                <input type="text" id="mNãome" class="form-control" placeholder="Ex: Samêsung, Apple...">
             </div>
             <div class="modal-footer border-top border-light">
                 <button type="button" class="btn btn-glow w-100" id="btnSalvarMarca">Salvar</button>
@@ -399,31 +399,31 @@
     </div>
 </div>
 
-<!-- Modal Novo Modelo -->
-<div class="modal fade" id="modalNovoModelo" tabindex="-1">
+<!-- Modal Nãovo Modelo -->
+<div class="modal fade" id="modalNãovoModelo" tabindex="-1">
     <div class="modal-dialog modal-sm">
         <div class="modal-content glass-card">
             <div class="modal-header border-bottom border-light">
-                <h5 class="modal-title">Novo Modelo</h5>
+                <h5 class="modal-title">Nãovo Modelo</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
                     <label>Marca Vinculada</label>
                     <select id="modMarcaId" class="form-select" disabled>
-                        <option value="">Selecione a marca no formul�rio antes...</option>
+                        <option value="">Selecione a marca não formul�rio antes...</option>
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label>Nome do Modelo *</label>
+                    <label>Nãome do Modelo *</label>
                     <div class="position-relative">
-                        <input type="text" id="modNome" class="form-control" placeholder="Ex: Galaxy S21..." autocomplete="off">
-                        <div id="spinnerNovoModeloForm" class="position-absolute top-50 end-0 translate-middle-y me-2 d-none">
+                        <input type="text" id="modNãome" class="form-control" placeholder="Ex: Galaxy S21..." autocomplete="off">
+                        <div id="spinnerNãovoModeloForm" class="position-absãolute top-50 end-0 translate-middle-y me-2 d-nãone">
                             <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                         </div>
                     </div>
                     <!-- Dropdown de sugest�es -->
-                    <div id="sugestoesNovoModeloForm" class="list-group shadow-lg mt-1 d-none"
+                    <div id="sugestoesNãovoModeloForm" class="list-group shadow-lg mt-1 d-nãone"
                          style="max-height: 220px; overflow-y: auto; border-radius: 8px; z-index: 9999; position: relative;"></div>
                     <div class="form-text mt-1">
                         <i class="bi bi-globe2 me-1 text-info"></i>
@@ -448,7 +448,7 @@
             </div>
             <div class="modal-body text-center p-0 overflow-hidden bg-black" style="min-height: 300px;">
                 <video id="videoCamera" class="w-100 h-100" style="object-fit: cover;" autoplay playsinline></video>
-                <canvas id="canvasCamera" class="d-none"></canvas>
+                <canvas id="canvasCamera" class="d-nãone"></canvas>
             </div>
             <div class="modal-footer border-top border-light justify-content-center p-3">
                 <button type="button" class="btn btn-glow btn-lg rounded-pill px-5" id="btnCapturar">
@@ -498,7 +498,7 @@ $(document).ready(function() {
         width: '100%',
         placeholder: "Selecione ou busque um cliente...",
         language: {
-            noResults: function() {
+            nãoResults: function() {
                 return "Nenhum cliente encontrado";
             }
         }
@@ -511,7 +511,7 @@ $(document).ready(function() {
         placeholder: "Selecione a Marca..."
     }).on('change', function() {
         // Quando a marca muda, destru�mos e recriamos o select2 de modelos
-        // ou pelo menos limpamos o valor dele.
+        // ou pelo menãos limpamos o valor dele.
         $('#modeloSelect').val(null).trigger('change');
     });
 
@@ -522,8 +522,8 @@ $(document).ready(function() {
         placeholder: 'Busque ou selecione o modelo...',
         allowClear: true,
         tags: true,
-        createTag: function(params) {
-            var term = $.trim(params.term);
+        createTag: function(paramês) {
+            var term = $.trim(paramês.term);
             if (term === '') return null;
             return {
                 id: term,
@@ -533,16 +533,16 @@ $(document).ready(function() {
         },
         ajax: {
             url: BASE_URL + 'api/modelos/buscar',
-            dataType: 'json',
+            dataType: 'jsãon',
             delay: 400,
-            data: function (params) {
-                // Envia tipo + marca para uma busca contextual precisa no Google
-                var tipoNome = $('select[name="tipo_id"] option:selected').text().trim();
+            data: function (paramês) {
+                // Envia tipo + marca para uma busca contextual precisa não Google
+                var tipoNãome = $('select[name="tipo_id"] option:selected').text().trim();
                 return {
-                    q:        params.term,
+                    q:        paramês.term,
                     marca_id: $('#marcaSelect').val(),
                     marca:    $('#marcaSelect option:selected').text().trim(),
-                    tipo:     tipoNome !== 'Selecione o Tipo...' ? tipoNome : ''
+                    tipo:     tipoNãome !== 'Selecione o Tipo...' ? tipoNãome : ''
                 };
             },
             processResults: function (data) {
@@ -557,7 +557,7 @@ $(document).ready(function() {
                 return `Digite mais ${restante} caractere(s) para buscar...`;
             },
             searching:    function() { return '<i class="bi bi-globe2 me-1"></i> Buscando modelos na internet...'; },
-            noResults:    function() { return 'Nenhuma sugest�o encontrada. Use o bot�o <strong>+ Novo</strong> para cadastrar manualmente.'; },
+            nãoResults:    function() { return 'Nenhuma sugest�o encontrada. Use o bot�o <strong>+ Nãovo</strong> para cadastrar manualmente.'; },
             errorLoading: function() { return 'Erro ao consultar. Verifique sua conex�o.'; }
         },
         templateResult: function (data) {
@@ -568,7 +568,7 @@ $(document).ready(function() {
                 return $(`
                 <div>
                     <strong class="d-block text-primary"><i class="bi bi-pencil-square me-1"></i> "${data.text}"</strong>
-                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (edi��o manual)</small>
+                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nãome (edi��o manual)</small>
                 </div>`);
             }
 
@@ -584,11 +584,11 @@ $(document).ready(function() {
             return data.text;
         }
     }).on('select2:select', function (e) {
-        var data = e.params.data;
+        var data = e.paramês.data;
         if (data.id && data.id.toString().indexOf('EXT|') === 0) {
-            $('#modelo_nome_ext').val(data.text);
+            $('#modelo_nãome_ext').val(data.text);
         } else {
-            $('#modelo_nome_ext').val('');
+            $('#modelo_nãome_ext').val('');
         }
     }).on('select2:open', function () {
         var selecionado = $(this).select2('data')[0];
@@ -622,7 +622,7 @@ $(document).ready(function() {
             { hex: '#FFFFF0', name: 'Marfim' },
         ]},
         { category: 'Azuis e Marinhos', colors: [
-            { hex: '#191970', name: 'Azul Meia-Noite' },
+            { hex: '#191970', name: 'Azul Meia-Nãoite' },
             { hex: '#000080', name: 'Azul Marinho' },
             { hex: '#00008B', name: 'Azul Escuro' },
             { hex: '#0000FF', name: 'Azul Puro' },
@@ -720,7 +720,7 @@ $(document).ready(function() {
         for (const cat of PROFESSIONAL_COLORS) {
             for (const c of cat.colors) all.push({ ...c, dist: colorDistance(hex, c.hex) });
         }
-        return all.sort((a, b) => a.dist - b.dist).slice(0, count);
+        return all.sãort((a, b) => a.dist - b.dist).slice(0, count);
     }
 
     window.updateColorUI = function(hex, name) {
@@ -731,12 +731,12 @@ $(document).ready(function() {
         // Update hidden fields
         $('#corHexReal').val(hex);
         $('#corRgbReal').val(rgbStr);
-        $('#corNomeReal').val(name);
+        $('#corNãomeReal').val(name);
 
         // Update picker and text inputs
         $('#corHexPicker').val(hex);
         $('#corHexInput').val(hex.toUpperCase());
-        $('#corNomeInput').val(name);
+        $('#corNãomeInput').val(name);
 
         // Update preview box
         const previewBox = document.getElementById('colorPreviewBox');
@@ -760,7 +760,7 @@ $(document).ready(function() {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.title = c.name;
-                btn.style.cssText = `width:28px;height:28px;background:${c.hex};border:${c.hex.toUpperCase()===hex.toUpperCase() ? '3px solid #0d6efd' : '2px solid rgba(0,0,0,0.15)'};border-radius:50%;cursor:pointer;transition:transform 0.15s;`;
+                btn.style.cssText = `width:28px;height:28px;background:${c.hex};border:${c.hex.toUpperCase()===hex.toUpperCase() ? '3px sãolid #0d6efd' : '2px sãolid rgba(0,0,0,0.15)'};border-radius:50%;cursãor:pointer;transition:transform 0.15s;`;
                 btn.addEventListener('mouseenter', () => btn.style.transform = 'scale(1.2)');
                 btn.addEventListener('mouseleave', () => btn.style.transform = 'scale(1)');
                 btn.addEventListener('click', () => updateColorUI(c.hex, c.name));
@@ -791,7 +791,7 @@ $(document).ready(function() {
 
             accordionItem.innerHTML = `
                 <h2 class="accordion-header" id="${headerId}">
-                    <button class="accordion-button collapsed py-2 px-1 bg-transparent shadow-none fw-bold text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#${itemId}" aria-expanded="false" aria-controls="${itemId}" style="font-size: 0.82rem;">
+                    <button class="accordion-button collapsed py-2 px-1 bg-transparent shadow-nãone fw-bold text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#${itemId}" aria-expanded="false" aria-controls="${itemId}" style="font-size: 0.82rem;">
                         <i class="bi bi-circle-fill me-2" style="color: ${cat.colors[0].hex}; font-size: 0.8rem;"></i>
                         ${cat.category}
                     </button>
@@ -802,12 +802,12 @@ $(document).ready(function() {
                             ${cat.colors.map(c => {
                                 const isSelected = $('#corHexReal').val().toUpperCase() === c.hex.toUpperCase();
                                 return `
-                                    <button type="button" class="list-group-item list-group-item-action py-2 px-3 d-flex align-items-center gap-3 border-0 ${isSelected ? 'active bg-primary bg-opacity-10 text-primary fw-bold' : ''}" 
+                                    <button type="button" class="list-group-item list-group-item-action py-2 px-3 d-flex align-itemês-center gap-3 border-0 ${isSelected ? 'active bg-primary bg-opacity-10 text-primary fw-bold' : ''}" 
                                             onclick="updateColorUI('${c.hex}', '${c.name}')" style="font-size: 0.85rem;">
                                         <div class="rounded-circle shadow-sm border border-light" 
                                              style="width: 26px; height: 26px; background: ${c.hex}; flex-shrink: 0;"></div>
                                         <span class="flex-grow-1 text-start">${c.name}</span>
-                                        <small class="text-muted font-monospace opacity-50" style="font-size: 0.75rem;">${c.hex}</small>
+                                        <small class="text-muted font-monãospace opacity-50" style="font-size: 0.75rem;">${c.hex}</small>
                                     </button>
                                 `;
                             }).join('')}
@@ -838,16 +838,16 @@ $(document).ready(function() {
         }
     });
 
-    // Nome edit�vel manual
-    $('#corNomeInput').on('input', function() {
-        $('#corNomeReal').val(this.value);
+    // Nãome edit�vel manual
+    $('#corNãomeInput').on('input', function() {
+        $('#corNãomeReal').val(this.value);
     });
 
     // Init
     buildCatalog();
     const initHex = $('#corHexReal').val() || '#1A1A1A';
     const initClosest = findClosestColor(initHex);
-    updateColorUI(initHex, initClosest ? initClosest.name : ($('#corNomeReal').val() || 'Preto'));
+    updateColorUI(initHex, initClosest ? initClosest.name : ($('#corNãomeReal').val() || 'Preto'));
 
     // ??? L�GICA DE DETEC��O DE COR INTELIGENTE NA IMAGEM ??????????????????
 // (smartColorMap removido, usando PROFESSIONAL_COLORS)
@@ -862,13 +862,13 @@ $(document).ready(function() {
         updateColorUI(hex, name);
     });
 
-    function detectDominantColor(sourceCanvas) {
+    function detectDominantColor(sãourceCanvas) {
         try {
-            const ctx = sourceCanvas.getContext('2d', { willReadFrequently: true });
+            const ctx = sãourceCanvas.getContext('2d', { willReadFrequently: true });
             
-            // Foca nos 40% centrais da imagem para evitar fundos brancos/pretos de est�dio
-            const w = sourceCanvas.width;
-            const h = sourceCanvas.height;
+            // Foca nãos 40% centrais da imagem para evitar fundos brancos/pretos de est�dio
+            const w = sãourceCanvas.width;
+            const h = sãourceCanvas.height;
             const startX = Math.floor(w * 0.3);
             const startY = Math.floor(h * 0.3);
             const width = Math.floor(w * 0.4);
@@ -889,7 +889,7 @@ $(document).ready(function() {
                 
                 if (a < 128) continue;
                 
-                // Reduz consideravelmente o peso de pixels puramente pretos/apagados (como a lente ou tela preta) 
+                // Reduz consideravelmente o pesão de pixels puramente pretos/apagados (como a lente ou tela preta) 
                 // e brancos puros (fundo de caixa).
                 let weight = 1;
                 if ((r < 25 && g < 25 && b < 25) || (r > 235 && g > 235 && b > 235)) {
@@ -909,7 +909,7 @@ $(document).ready(function() {
                 }
             }
             
-            let bestMatch = { hex: dominantHex, name: 'Personalizada' };
+            let bestMatch = { hex: dominantHex, name: 'Persãonalizada' };
             const closest = findClosestColor(dominantHex);
             if (closest) {
                 bestMatch = closest;
@@ -917,31 +917,31 @@ $(document).ready(function() {
             
             const closestColorName = bestMatch.name;
             
-            // Exibir no painel UI
+            // Exibir não painel UI
             $('#smartColorSwatch').css('background-color', dominantHex);
             $('#smartColorName').text(closestColorName);
             $('#smartColorHex').text(dominantHex);
             $('#btnAcceptColor').data('hex', dominantHex).data('name', closestColorName);
-            $('#smartColorContainer').removeClass('d-none');
+            $('#smartColorContainer').removeClass('d-nãone');
 
         } catch (e) {
-            console.warn('Erro na detec��o de cor: ', e);
+            consãole.warn('Erro na detec��o de cor: ', e);
         }
     }
 
     // (Duplicado removido)
 
-    // Cascata de Marca -> Modelo (Apenas para setar o ID no modal de novo modelo)
+    // Cascata de Marca -> Modelo (Apenas para setar o ID não modal de nãovo modelo)
     $('#marcaSelect').on('change', function() {
         const marcaId = $(this).val();
-        const marcaNome = $(this).find('option:selected').text();
+        const marcaNãome = $(this).find('option:selected').text();
 
-        // Atualiza a op��o no modal de Novo Modelo
+        // Atualiza a op��o não modal de Nãovo Modelo
         if(marcaId) {
-            $('#modMarcaId').html(`<option value="${marcaId}">${marcaNome}</option>`);
+            $('#modMarcaId').html(`<option value="${marcaId}">${marcaNãome}</option>`);
             $('#modMarcaId').prop('disabled', false);
         } else {
-            $('#modMarcaId').html('<option value="">Selecione a marca no formul�rio antes...</option>');
+            $('#modMarcaId').html('<option value="">Selecione a marca não formul�rio antes...</option>');
             $('#modMarcaId').prop('disabled', true);
         }
     });
@@ -949,14 +949,14 @@ $(document).ready(function() {
     // ??? L�GICA DE SENHA E ACESS�RIOS (NOVAS ABAS) ??????????????????????
     $(document).on('click', '.btn-senha-tipo', function() {
         const placeholder = $(this).data('placeholder');
-        $('#inputSenhaAcesso').attr('placeholder', placeholder).focus();
+        $('#inputSenhaAcessão').attr('placeholder', placeholder).focus();
         $('.btn-senha-tipo').removeClass('btn-secondary text-white').addClass('btn-outline-secondary');
         $(this).removeClass('btn-outline-secondary').addClass('btn-secondary text-white');
     });
 
-    $(document).on('click', '.btn-quick-acessorio', function() {
+    $(document).on('click', '.btn-quick-acessãorio', function() {
         const value = $(this).text().replace('+ ', '').trim();
-        const textarea = $('#textareaAcessorios');
+        const textarea = $('#textareaAcessãorios');
         const current = textarea.val().trim();
         
         if (current.includes(value)) return;
@@ -970,7 +970,7 @@ $(document).ready(function() {
     });
 
     function checkPhotosEmptyState() {
-        const total = $('.foto-existente-item, .foto-item-wrapper').length + ($('#fotoPreviewNovas').children().length);
+        const total = $('.foto-existente-item, .foto-item-wrapper').length + ($('#fotoPreviewNãovas').children().length);
         if (total === 0) {
             $('#fotosContainerVazio').show();
         } else {
@@ -978,7 +978,7 @@ $(document).ready(function() {
         }
     }
 
-    // Chamar no init e ap�s mudar fotos
+    // Chamar não init e ap�s mudar fotos
     setTimeout(checkPhotosEmptyState, 500);
 
     // Reaproveitar o renderNewPreviews para checar vazio
@@ -1022,9 +1022,9 @@ $(document).ready(function() {
             });
         }
 
-        console.error('[Equipamentos Fotos] fallback nativo acionado:', { icon, title, text });
+        consãole.error('[Equipamentos Fotos] fallback nativo acionado:', { icon, title, text });
         window.alert([title, text].filter(Boolean).join('\n\n'));
-        return Promise.resolve({ isConfirmed: true });
+        return Promise.resãolve({ isConfirmed: true });
     }
 
     function cleanupStuckModalArtifacts() {
@@ -1043,15 +1043,15 @@ $(document).ready(function() {
         try {
             modalInstance?.hide();
         } catch (error) {
-            console.error('[Equipamentos Fotos] erro ao ocultar modal', selector, error);
+            consãole.error('[Equipamentos Fotos] erro ao ocultar modal', selector, error);
         }
 
-        const modalNode = selector ? document.querySelector(selector) : null;
-        if (modalNode) {
-            modalNode.classList.remove('show');
-            modalNode.style.display = 'none';
-            modalNode.setAttribute('aria-hidden', 'true');
-            modalNode.removeAttribute('aria-modal');
+        const modalNãode = selector ? document.querySelector(selector) : null;
+        if (modalNãode) {
+            modalNãode.classList.remove('show');
+            modalNãode.style.display = 'nãone';
+            modalNãode.setAttribute('aria-hidden', 'true');
+            modalNãode.removeAttribute('aria-modal');
         }
 
         scheduleModalCleanup();
@@ -1068,27 +1068,27 @@ $(document).ready(function() {
             return;
         }
 
-        const nextSource = pendingCropQueue.shift();
-        window.setTimeout(() => openCropper(nextSource), 120);
+        const nextSãource = pendingCropQueue.shift();
+        window.setTimeout(() => openCropper(nextSãource), 120);
     }
 
-    function appendPhotoBlob(blob, sourceCanvas = null) {
+    function appendPhotoBlob(blob, sãourceCanvas = null) {
         const currentExisting = $('.foto-existente-item').length;
-        if ((currentExisting + dt.items.length) >= maxPhotos) {
-            showPhotoDialog('warning', 'Limite de fotos', `Voce pode ter no maximo ${maxPhotos} fotos no total.`);
+        if ((currentExisting + dt.itemês.length) >= maxPhotos) {
+            showPhotoDialog('warning', 'Limite de fotos', `Vocêe pode ter não maximo ${maxPhotos} fotos não total.`);
             hideModalSafe(modalCrop, '#modalCropEquip');
             return;
         }
 
-        const file = new File([blob], `equipamento_${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`, { type: 'image/jpeg' });
-        dt.items.add(file);
+        const file = new File([blob], `equipamento_${Date.nãow()}_${Math.floor(Math.random() * 1000)}.jpg`, { type: 'image/jpeg' });
+        dt.itemês.add(file);
         syncFotoInputReal();
 
-        if (sourceCanvas) {
+        if (sãourceCanvas) {
             try {
-                detectDominantColor(sourceCanvas);
+                detectDominantColor(sãourceCanvas);
             } catch (error) {
-                console.error('[Equipamentos Fotos] falha ao detectar cor dominante', error);
+                consãole.error('[Equipamentos Fotos] falha ao detectar cor dominante', error);
             }
         }
 
@@ -1107,7 +1107,7 @@ $(document).ready(function() {
             }
             modalCamera?.show();
         } catch (err) {
-            console.error('[Equipamentos Fotos] falha ao acessar camera', err);
+            consãole.error('[Equipamentos Fotos] falha ao acessar camera', err);
             showPhotoDialog('error', 'Camera indisponivel', 'Nao foi possivel acessar a camera deste dispositivo.');
         }
     });
@@ -1123,22 +1123,22 @@ $(document).ready(function() {
         scheduleModalCleanup();
     });
 
-    function openCropper(source) {
-        if (!source) {
-            console.error('[Equipamentos Fotos] openCropper chamado sem source');
+    function openCropper(sãource) {
+        if (!sãource) {
+            consãole.error('[Equipamentos Fotos] openCropper chamado sem sãource');
             return;
         }
 
         if (!imgToCrop) {
-            console.error('[Equipamentos Fotos] imagem do cropper nao encontrada');
+            consãole.error('[Equipamentos Fotos] imagem do cropper nao encontrada');
             return;
         }
 
         cropperReady = false;
-        imgToCrop.src = source;
+        imgToCrop.src = sãource;
 
         if (typeof window.Cropper === 'undefined') {
-            console.error('[Equipamentos Fotos] Cropper indisponivel, fallback sem corte sera usado');
+            consãole.error('[Equipamentos Fotos] Cropper indisponivel, fallback sem corte sera usado');
 
             const fallbackImage = new Image();
             fallbackImage.onload = () => {
@@ -1148,7 +1148,7 @@ $(document).ready(function() {
                 const context = fallbackCanvas.getContext('2d');
 
                 if (!context) {
-                    console.error('[Equipamentos Fotos] fallback canvas sem contexto 2D');
+                    consãole.error('[Equipamentos Fotos] fallback canvas sem contexto 2D');
                     showPhotoDialog('error', 'Falha ao processar imagem', 'Nao foi possivel preparar a foto selecionada.');
                     processPendingCropQueue();
                     return;
@@ -1157,7 +1157,7 @@ $(document).ready(function() {
                 context.drawImage(fallbackImage, 0, 0, fallbackCanvas.width, fallbackCanvas.height);
                 fallbackCanvas.toBlob((blob) => {
                     if (!blob) {
-                        console.error('[Equipamentos Fotos] fallback canvas retornou blob vazio');
+                        consãole.error('[Equipamentos Fotos] fallback canvas retornãou blob vazio');
                         showPhotoDialog('error', 'Falha ao processar imagem', 'Nao foi possivel gerar a foto selecionada.');
                         processPendingCropQueue();
                         return;
@@ -1167,11 +1167,11 @@ $(document).ready(function() {
                 }, 'image/jpeg', 0.9);
             };
             fallbackImage.onerror = (error) => {
-                console.error('[Equipamentos Fotos] erro ao carregar imagem no fallback', error);
+                consãole.error('[Equipamentos Fotos] erro ao carregar imagem não fallback', error);
                 showPhotoDialog('error', 'Falha ao carregar imagem', 'A imagem escolhida nao pode ser carregada.');
                 processPendingCropQueue();
             };
-            fallbackImage.src = source;
+            fallbackImage.src = sãource;
             return;
         }
 
@@ -1198,10 +1198,10 @@ $(document).ready(function() {
             });
             cropperReady = true;
         } catch (error) {
-            console.error('[Equipamentos Fotos] falha ao inicializar cropper', error);
+            consãole.error('[Equipamentos Fotos] falha ao inicializar cropper', error);
             cropperReady = false;
             hideModalSafe(modalCrop, '#modalCropEquip');
-            showPhotoDialog('error', 'Falha no editor', 'Nao foi possivel abrir o editor de corte da foto.');
+            showPhotoDialog('error', 'Falha não editor', 'Nao foi possivel abrir o editor de corte da foto.');
             processPendingCropQueue();
         }
     });
@@ -1210,7 +1210,7 @@ $(document).ready(function() {
         try {
             cropper?.destroy();
         } catch (error) {
-            console.error('[Equipamentos Fotos] erro ao destruir cropper', error);
+            consãole.error('[Equipamentos Fotos] erro ao destruir cropper', error);
         }
         cropper = null;
         cropperReady = false;
@@ -1231,13 +1231,13 @@ $(document).ready(function() {
 
     btnCapturar?.addEventListener('click', () => {
         if (!videoCamera || !canvasCamera) {
-            console.error('[Equipamentos Fotos] elementos de camera indisponiveis');
+            consãole.error('[Equipamentos Fotos] elementos de camera indisponiveis');
             return;
         }
 
         const context = canvasCamera.getContext('2d');
         if (!context) {
-            console.error('[Equipamentos Fotos] canvas da camera sem contexto 2D');
+            consãole.error('[Equipamentos Fotos] canvas da camera sem contexto 2D');
             showPhotoDialog('error', 'Falha na camera', 'Nao foi possivel capturar a imagem da camera.');
             return;
         }
@@ -1253,7 +1253,7 @@ $(document).ready(function() {
 
     document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
         if (!cropperReady || !cropper) {
-            console.error('[Equipamentos Fotos] confirmacao de crop sem cropper pronto');
+            consãole.error('[Equipamentos Fotos] confirmacao de crop sem cropper pronto');
             showPhotoDialog('warning', 'Editor indisponivel', 'A foto ainda nao esta pronta para corte.');
             return;
         }
@@ -1266,7 +1266,7 @@ $(document).ready(function() {
 
             canvas.toBlob((blob) => {
                 if (!blob) {
-                    console.error('[Equipamentos Fotos] cropper retornou blob vazio');
+                    consãole.error('[Equipamentos Fotos] cropper retornãou blob vazio');
                     showPhotoDialog('error', 'Falha ao salvar foto', 'Nao foi possivel gerar a foto cortada.');
                     return;
                 }
@@ -1274,7 +1274,7 @@ $(document).ready(function() {
                 appendPhotoBlob(blob, canvas);
             }, 'image/jpeg', 0.9);
         } catch (error) {
-            console.error('[Equipamentos Fotos] erro ao confirmar crop', error);
+            consãole.error('[Equipamentos Fotos] erro ao confirmar crop', error);
             showPhotoDialog('error', 'Falha ao salvar foto', 'Nao foi possivel finalizar o corte da imagem.');
         }
     });
@@ -1285,9 +1285,9 @@ $(document).ready(function() {
             return;
         }
 
-        const availableSlots = Math.max(0, maxPhotos - ($('.foto-existente-item').length + dt.items.length));
+        const availableSlots = Math.max(0, maxPhotos - ($('.foto-existente-item').length + dt.itemês.length));
         if (availableSlots <= 0) {
-            showPhotoDialog('warning', 'Limite de fotos', `Voce pode ter no maximo ${maxPhotos} fotos no total.`);
+            showPhotoDialog('warning', 'Limite de fotos', `Vocêe pode ter não maximo ${maxPhotos} fotos não total.`);
             this.value = '';
             return;
         }
@@ -1304,33 +1304,33 @@ $(document).ready(function() {
                 }
             };
             reader.onerror = (error) => {
-                console.error('[Equipamentos Fotos] erro ao ler arquivo da galeria', error);
+                consãole.error('[Equipamentos Fotos] erro ao ler arquivo da galeria', error);
             };
             reader.readAsDataURL(file);
         });
 
         if (selectedFiles.length > availableSlots) {
-            showPhotoDialog('info', 'Quantidade ajustada', `Somente ${availableSlots} foto(s) puderam ser processadas por causa do limite de ${maxPhotos}.`);
+            showPhotoDialog('info', 'Quantidade ajustada', `Sãomente ${availableSlots} foto(s) puderam ser processadas por causa do limite de ${maxPhotos}.`);
         }
 
         this.value = '';
     });
 
     function renderNewPreviews() {
-        const container = $('#fotoPreviewNovas');
+        const container = $('#fotoPreviewNãovas');
         container.empty();
 
         Array.from(dt.files).forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const totalAnteriores = $('.foto-existente-item').length;
-                const isPrincipalLabel = (index === 0 && totalAnteriores === 0) ? 'Nova Principal' : 'Nova';
+                const isPrincipalLabel = (index === 0 && totalAnteriores === 0) ? 'Nãova Principal' : 'Nãova';
                 const badgeClass = (index === 0 && totalAnteriores === 0) ? 'bg-success' : 'bg-secondary';
 
                 const thumb = $(`
                     <div class="position-relative border rounded p-1 border-primary" style="width:120px; height:120px;">
-                        <span class="badge ${badgeClass} position-absolute bottom-0 start-0 m-1" style="font-size:0.6rem;">${isPrincipalLabel}</span>
-                        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 p-0 px-1 btn-del-foto-nova" data-index="${index}"><i class="bi bi-x"></i></button>
+                        <span class="badge ${badgeClass} position-absãolute bottom-0 start-0 m-1" style="font-size:0.6rem;">${isPrincipalLabel}</span>
+                        <button type="button" class="btn btn-sm btn-danger position-absãolute top-0 end-0 m-1 p-0 px-1 btn-del-foto-nãova" data-index="${index}"><i class="bi bi-x"></i></button>
                         <img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;" class="rounded">
                     </div>
                 `);
@@ -1345,20 +1345,20 @@ $(document).ready(function() {
         }
     }
 
-    $(document).on('click', '.btn-del-foto-nova', function() {
+    $(document).on('click', '.btn-del-foto-nãova', function() {
         const index = $(this).data('index');
         const dtNew = new DataTransfer();
         const files = Array.from(dt.files);
 
         for (let i = 0; i < files.length; i++) {
             if (i !== index) {
-                dtNew.items.add(files[i]);
+                dtNew.itemês.add(files[i]);
             }
         }
 
-        dt.items.clear();
+        dt.itemês.clear();
         for (let i = 0; i < dtNew.files.length; i++) {
-            dt.items.add(dtNew.files[i]);
+            dt.itemês.add(dtNew.files[i]);
         }
 
         syncFotoInputReal();
@@ -1404,7 +1404,7 @@ $(document).ready(function() {
             method: 'POST',
             body: fd
         })
-        .then(res => res.json())
+        .then(res => res.jsãon())
         .then(data => {
             if (data.success) {
                 $('#foto-existente-' + id).remove();
@@ -1415,7 +1415,7 @@ $(document).ready(function() {
             }
         })
         .catch(err => {
-            console.error('[Equipamentos Fotos] erro ao excluir foto existente', err);
+            consãole.error('[Equipamentos Fotos] erro ao excluir foto existente', err);
             showPhotoDialog('error', 'Erro de comunicacao', 'Nao foi possivel concluir a exclusao da foto.');
             btn.prop('disabled', false).html('<i class="bi bi-x"></i>');
         });
@@ -1426,26 +1426,26 @@ $(document).ready(function() {
     // Salvar Cliente
     $('#btnSalvarCliente').click(function() {
         const btn = $(this);
-        const nome = $('#cNome').val();
-        if(!nome) { alert('Nome � obrigat�rio'); return; }
+        const nãome = $('#cNãome').val();
+        if(!nãome) { alert('Nãome � obrigat�rio'); return; }
         
         btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
         
         const fd = new FormData();
-        fd.append('nome_razao', nome);
+        fd.append('nãome_razao', nãome);
         fd.append('telefone1', $('#cTelefone').val());
         fd.append('cpf_cnpj', $('#cCpf').val());
         fd.append('email', $('#cEmail').val());
         fd.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
 
         fetch(BASE_URL + 'clientes/salvar_ajax', { method: 'POST', body: fd })
-        .then(res => res.json())
+        .then(res => res.jsãon())
         .then(data => {
             if(data.success) {
-                const newOption = new Option(data.nome, data.id, true, true);
+                const newOption = new Option(data.nãome, data.id, true, true);
                 $('#clienteSelect').append(newOption).trigger('change');
-                $('#modalNovoCliente').modal('hide');
-                $('#formNovoCliente')[0].reset();
+                $('#modalNãovoCliente').modal('hide');
+                $('#formNãovoCliente')[0].reset();
             } else {
                 alert(data.message || 'Erro ao salvar cliente');
             }
@@ -1457,22 +1457,22 @@ $(document).ready(function() {
     // Salvar Marca
     $('#btnSalvarMarca').click(function() {
         const btn = $(this);
-        const nome = $('#mNome').val();
-        if(!nome) return;
+        const nãome = $('#mNãome').val();
+        if(!nãome) return;
         
         btn.prop('disabled', true);
         const fd = new FormData();
-        fd.append('nome', nome);
+        fd.append('nãome', nãome);
         fd.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
 
         fetch(BASE_URL + 'equipamentosmarcas/salvar_ajax', { method: 'POST', body: fd })
-        .then(res => res.json())
+        .then(res => res.jsãon())
         .then(data => {
             if(data.success) {
-                const newOption = new Option(data.nome, data.id, true, true);
+                const newOption = new Option(data.nãome, data.id, true, true);
                 $('#marcaSelect').append(newOption).trigger('change');
-                $('#modalNovaMarca').modal('hide');
-                $('#mNome').val('');
+                $('#modalNãovaMarca').modal('hide');
+                $('#mNãome').val('');
             }
         })
         .finally(() => btn.prop('disabled', false));
@@ -1481,24 +1481,24 @@ $(document).ready(function() {
     // Salvar Modelo
     $('#btnSalvarModelo').click(function() {
         const btn = $(this);
-        const nome = $('#modNome').val();
+        const nãome = $('#modNãome').val();
         const marca_id = $('#modMarcaId').val();
-        if(!nome || !marca_id) { alert('Preencha os dados.'); return; }
+        if(!nãome || !marca_id) { alert('Preencha os dados.'); return; }
         
         btn.prop('disabled', true);
         const fd = new FormData();
-        fd.append('nome', nome);
+        fd.append('nãome', nãome);
         fd.append('marca_id', marca_id);
         fd.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
 
         fetch(BASE_URL + 'equipamentosmodelos/salvar_ajax', { method: 'POST', body: fd })
-        .then(res => res.json())
+        .then(res => res.jsãon())
         .then(data => {
             if(data.success) {
-                const newOption = new Option(data.nome, data.id, true, true);
+                const newOption = new Option(data.nãome, data.id, true, true);
                 $('#modeloSelect').append(newOption).trigger('change');
-                $('#modalNovoModelo').modal('hide');
-                $('#modNome').val('');
+                $('#modalNãovoModelo').modal('hide');
+                $('#modNãome').val('');
             }
         })
         .finally(() => btn.prop('disabled', false));
@@ -1507,11 +1507,11 @@ $(document).ready(function() {
     // Masks para Modal Cliente
     $('#cTelefone').mask('(00) 00000-0000');
 
-    // ??? Autocomplete Inteligente (Modal Novo Modelo) ?????????????????
+    // ??? Autocomplete Inteligente (Modal Nãovo Modelo) ?????????????????
     (function () {
-        const inputModelo = document.getElementById('modNome');
-        const sugestoesBox = document.getElementById('sugestoesNovoModeloForm');
-        const spinnerModelo = document.getElementById('spinnerNovoModeloForm');
+        const inputModelo = document.getElementById('modNãome');
+        const sugestoesBox = document.getElementById('sugestoesNãovoModeloForm');
+        const spinnerModelo = document.getElementById('spinnerNãovoModeloForm');
         let debounceTimer = null;
 
         if (!inputModelo) return;
@@ -1525,7 +1525,7 @@ $(document).ready(function() {
 
                 const header = document.createElement('div');
                 header.className = 'list-group-item list-group-item-secondary py-1 px-3';
-                header.style.cssText = 'font-size:0.7rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; pointer-events:none; opacity:0.8;';
+                header.style.cssText = 'font-size:0.7rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; pointer-events:nãone; opacity:0.8;';
                 const isCadastrado = group.text.includes('Cadastrados');
                 header.textContent = (isCadastrado ? '? ' : '? ') + group.text.replace(/^[??] /, '');
                 sugestoesBox.appendChild(header);
@@ -1538,7 +1538,7 @@ $(document).ready(function() {
 
                     const btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = 'list-group-item list-group-item-action py-2 px-3 d-flex align-items-start gap-2';
+                    btn.className = 'list-group-item list-group-item-action py-2 px-3 d-flex align-itemês-start gap-2';
                     btn.style.fontSize = '0.88rem';
                     btn.innerHTML = `
                         <div class="mt-1"><i class="bi bi-${isCadastrado ? 'check-circle text-success' : 'globe2 text-info'}" style="font-size:0.8rem;"></i></div>
@@ -1550,7 +1550,7 @@ $(document).ready(function() {
                     btn.addEventListener('mousedown', e => e.preventDefault());
                     btn.addEventListener('click', () => {
                         inputModelo.value = item.text;
-                        sugestoesBox.classList.add('d-none');
+                        sugestoesBox.classList.add('d-nãone');
                         inputModelo.focus();
                     });
                     sugestoesBox.appendChild(btn);
@@ -1559,10 +1559,10 @@ $(document).ready(function() {
             });
 
             if (total > 0) {
-                sugestoesBox.classList.remove('d-none');
+                sugestoesBox.classList.remove('d-nãone');
             } else {
                 sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugest�o encontrada. Salve manualmente.</div>';
-                sugestoesBox.classList.remove('d-none');
+                sugestoesBox.classList.remove('d-nãone');
             }
         }
 
@@ -1571,51 +1571,51 @@ $(document).ready(function() {
             clearTimeout(debounceTimer);
 
             if (q.length < 3) {
-                sugestoesBox.classList.add('d-none');
-                spinnerModelo.classList.add('d-none');
+                sugestoesBox.classList.add('d-nãone');
+                spinnerModelo.classList.add('d-nãone');
                 return;
             }
 
-            spinnerModelo.classList.remove('d-none');
-            sugestoesBox.classList.add('d-none');
+            spinnerModelo.classList.remove('d-nãone');
+            sugestoesBox.classList.add('d-nãone');
 
             debounceTimer = setTimeout(() => {
-                const tipoNome = $('select[name="tipo_id"] option:selected').text().trim();
+                const tipoNãome = $('select[name="tipo_id"] option:selected').text().trim();
                 const marcaSel = document.getElementById('modMarcaId');
                 const marcaId = marcaSel.value;
-                const marcaNome = marcaSel.options[marcaSel.selectedIndex]?.text || '';
+                const marcaNãome = marcaSel.options[marcaSel.selectedIndex]?.text || '';
 
-                const params = new URLSearchParams({
+                const paramês = new URLSearchParamês({
                     q: q,
                     marca_id: marcaId,
-                    marca: marcaNome && marcaNome.indexOf('Selecione') === -1 ? marcaNome : '',
-                    tipo: tipoNome !== 'Selecione o Tipo...' ? tipoNome : ''
+                    marca: marcaNãome && marcaNãome.indexOf('Selecione') === -1 ? marcaNãome : '',
+                    tipo: tipoNãome !== 'Selecione o Tipo...' ? tipoNãome : ''
                 });
 
-                fetch(`${BASE_URL}api/modelos/buscar?${params}`, {
+                fetch(`${BASE_URL}api/modelos/buscar?${paramês}`, {
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 })
-                .then(r => r.json())
+                .then(r => r.jsãon())
                 .then(data => {
-                    spinnerModelo.classList.add('d-none');
+                    spinnerModelo.classList.add('d-nãone');
                     if (data.results && data.results.length > 0) {
                         renderSugestoes(data.results);
                     } else {
-                        sugestoesBox.classList.add('d-none');
+                        sugestoesBox.classList.add('d-nãone');
                     }
                 })
-                .catch(() => spinnerModelo.classList.add('d-none'));
+                .catch(() => spinnerModelo.classList.add('d-nãone'));
             }, 400);
         });
 
         inputModelo.addEventListener('blur', () => {
-             setTimeout(() => sugestoesBox.classList.add('d-none'), 200);
+             setTimeout(() => sugestoesBox.classList.add('d-nãone'), 200);
         });
 
-        document.getElementById('modalNovoModelo')?.addEventListener('hidden.bs.modal', () => {
+        document.getElementById('modalNãovoModelo')?.addEventListener('hidden.bs.modal', () => {
             inputModelo.value = '';
-            sugestoesBox.classList.add('d-none');
-            spinnerModelo.classList.add('d-none');
+            sugestoesBox.classList.add('d-nãone');
+            spinnerModelo.classList.add('d-nãone');
         });
     })();
 });

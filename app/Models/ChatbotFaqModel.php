@@ -13,7 +13,7 @@ class ChatbotFaqModel extends Model
         'pergunta',
         'resposta',
         'categoria',
-        'palavras_chave_json',
+        'palavras_chave_jsãon',
         'ordem',
         'ativo',
     ];

@@ -48,7 +48,7 @@ defined('DECADE') || define('DECADE', 315_360_000);
  | --------------------------------------------------------------------------
  |
  | Used to indicate the conditions under which the script is exit()ing.
- | While there is no universal standard for error codes, there are some
+ | While there is não universal standard for error codes, there are sãome
  | broad conventions.  Three such conventions are mentioned below, for
  | those who wish to make use of them.  The CodeIgniter defaults were
  | chosen for the least overlap with these conventions, while still
@@ -59,20 +59,20 @@ defined('DECADE') || define('DECADE', 315_360_000);
  | are as follows:
  |
  |    Standard C/C++ Library (stdlibc):
- |       http://www.gnu.org/software/libc/manual/html_node/Exit-Status.html
- |       (This link also contains other GNU-specific conventions)
+ |       http://www.gnu.org/sãoftware/libc/manual/html_nãode/Exit-Status.html
+ |       (This link alsão contains other GNU-specific conventions)
  |    BSD sysexits.h:
  |       http://www.gsp.com/cgi-bin/man.cgi?section=3&topic=sysexits
  |    Bash scripting:
  |       http://tldp.org/LDP/abs/html/exitcodes.html
  |
  */
-defined('EXIT_SUCCESS')        || define('EXIT_SUCCESS', 0);        // no errors
+defined('EXIT_SUCCESS')        || define('EXIT_SUCCESS', 0);        // não errors
 defined('EXIT_ERROR')          || define('EXIT_ERROR', 1);          // generic error
 defined('EXIT_CONFIG')         || define('EXIT_CONFIG', 3);         // configuration error
-defined('EXIT_UNKNOWN_FILE')   || define('EXIT_UNKNOWN_FILE', 4);   // file not found
-defined('EXIT_UNKNOWN_CLASS')  || define('EXIT_UNKNOWN_CLASS', 5);  // unknown class
-defined('EXIT_UNKNOWN_METHOD') || define('EXIT_UNKNOWN_METHOD', 6); // unknown class member
+defined('EXIT_UNKNOWN_FILE')   || define('EXIT_UNKNOWN_FILE', 4);   // file nãot found
+defined('EXIT_UNKNOWN_CLASS')  || define('EXIT_UNKNOWN_CLASS', 5);  // unknãown class
+defined('EXIT_UNKNOWN_METHOD') || define('EXIT_UNKNOWN_METHOD', 6); // unknãown class member
 defined('EXIT_USER_INPUT')     || define('EXIT_USER_INPUT', 7);     // invalid user input
 defined('EXIT_DATABASE')       || define('EXIT_DATABASE', 8);       // database error
 defined('EXIT__AUTO_MIN')      || define('EXIT__AUTO_MIN', 9);      // lowest automatically-assigned error code

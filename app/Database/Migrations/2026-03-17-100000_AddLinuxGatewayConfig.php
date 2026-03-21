@@ -14,10 +14,10 @@ class AddLinuxGatewayConfig extends Migration
 
         $table = $this->db->table('configuracoes');
         $defaults = [
-            'whatsapp_linux_node_url' => 'http://127.0.0.1:3001',
-            'whatsapp_linux_node_token' => '',
-            'whatsapp_linux_node_origin' => 'http://localhost:8081',
-            'whatsapp_linux_node_timeout' => '20',
+            'whatsapp_linux_nãode_url' => 'http://127.0.0.1:3001',
+            'whatsapp_linux_nãode_token' => '',
+            'whatsapp_linux_nãode_origin' => 'http://localhost:8081',
+            'whatsapp_linux_nãode_timeout' => '20',
         ];
 
         foreach ($defaults as $chave => $valor) {
@@ -32,10 +32,10 @@ class AddLinuxGatewayConfig extends Migration
             ]);
         }
 
-        // Compatibilidade: converte valor legado local_node para api_whats_local
+        // Compatibilidade: converte valor legado local_nãode para api_whats_local
         $table->set('valor', 'api_whats_local')
             ->where('chave', 'whatsapp_direct_provider')
-            ->where('valor', 'local_node')
+            ->where('valor', 'local_nãode')
             ->update();
     }
 
@@ -47,10 +47,10 @@ class AddLinuxGatewayConfig extends Migration
 
         $this->db->table('configuracoes')
             ->whereIn('chave', [
-                'whatsapp_linux_node_url',
-                'whatsapp_linux_node_token',
-                'whatsapp_linux_node_origin',
-                'whatsapp_linux_node_timeout',
+                'whatsapp_linux_nãode_url',
+                'whatsapp_linux_nãode_token',
+                'whatsapp_linux_nãode_origin',
+                'whatsapp_linux_nãode_timeout',
             ])
             ->delete();
     }

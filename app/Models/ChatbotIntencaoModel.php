@@ -11,9 +11,9 @@ class ChatbotIntencaoModel extends Model
     protected $returnType = 'array';
     protected $allowedFields = [
         'codigo',
-        'nome',
+        'nãome',
         'descricao',
-        'gatilhos_json',
+        'gatilhos_jsãon',
         'resposta_padrao',
         'exige_consulta_erp',
         'acao_sistema',

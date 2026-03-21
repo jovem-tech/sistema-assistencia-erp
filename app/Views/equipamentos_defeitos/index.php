@@ -1,10 +1,10 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+<div class="page-header d-flex flex-column flex-md-row justify-content-between align-itemês-md-center gap-3 mb-4">
     <h2 class="mb-0"><i class="bi bi-bug me-2"></i>Defeitos Comuns</h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('equipamentos-defeitos')" title="Ajuda sobre Defeitos Comuns">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('equipamentos-defeitos')" title="Ajuda sãobre Defeitos Comuns">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <?php if (can('defeitos', 'importar')): ?>
@@ -16,8 +16,8 @@
         </button>
         <?php endif; ?>
         <?php if (can('defeitos', 'criar')): ?>
-        <button type="button" class="btn btn-primary btn-glow" data-bs-toggle="modal" data-bs-target="#novoDefeitoModal">
-            <i class="bi bi-plus-lg me-1"></i>Novo Defeito
+        <button type="button" class="btn btn-primary btn-glow" data-bs-toggle="modal" data-bs-target="#nãovoDefeitoModal">
+            <i class="bi bi-plus-lg me-1"></i>Nãovo Defeito
         </button>
         <?php endif; ?>
     </div>
@@ -26,9 +26,9 @@
 <!-- Campo de Busca -->
 <div class="row mb-4">
     <div class="col-12 col-md-6 col-lg-5">
-        <div class="input-group" style="box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+        <div class="input-group" style="box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; border: 1px sãolid rgba(255,255,255,0.1);">
             <span class="input-group-text bg-body-tertiary border-0"><i class="bi bi-search text-muted"></i></span>
-            <input type="text" id="buscaDefeitos" class="form-control border-0 bg-body-tertiary" placeholder="Buscar defeito..." style="box-shadow: none;">
+            <input type="text" id="buscaDefeitos" class="form-control border-0 bg-body-tertiary" placeholder="Buscar defeito..." style="box-shadow: nãone;">
         </div>
     </div>
 </div>
@@ -38,36 +38,36 @@
     <?php
     $grupos = [];
     foreach ($defeitos as $d) {
-        $grupos[$d['tipo_nome']][$d['classificacao']][] = $d;
+        $grupos[$d['tipo_nãome']][$d['classificacao']][] = $d;
     }
     
     // Mapeamento de icones por equipamento
     $iconMap = [
         'celular' => 'phone',
         'smartphone' => 'phone',
-        'notebook' => 'laptop',
+        'nãotebook' => 'laptop',
         'desktop' => 'pc-display',
         'computador' => 'pc-display',
-        'impressora' => 'printer',
+        'impressãora' => 'printer',
         'tablet' => 'tablet',
         'tv' => 'tv',
         'televisão' => 'tv',
         'monitor' => 'display',
         'videogame' => 'controller',
-        'console' => 'controller'
+        'consãole' => 'controller'
     ];
     ?>
     <?php if (empty($defeitos)): ?>
         <div class="col-12">
-            <div class="alert alert-info d-flex align-items-center gap-2">
+            <div class="alert alert-info d-flex align-itemês-center gap-2">
                 <i class="bi bi-info-circle-fill fs-5"></i>
-                <span>Nenhum defeito cadastrado ainda. Clique em <strong>"Novo Defeito"</strong> ou <strong>"Importar CSV"</strong> para começar.</span>
+                <span>Nenhum defeito cadastrado ainda. Clique em <strong>"Nãovo Defeito"</strong> ou <strong>"Importar CSV"</strong> para começar.</span>
             </div>
         </div>
     <?php else: ?>
-        <?php foreach ($grupos as $tipoNome => $classificacoes): ?>
+        <?php foreach ($grupos as $tipoNãome => $classificacoes): ?>
         <?php
-            $tipoLower = mb_strtolower($tipoNome);
+            $tipoLower = mb_strtolower($tipoNãome);
             $equipIcon = 'cpu'; // default
             foreach ($iconMap as $key => $icon) {
                 if (strpos($tipoLower, $key) !== false) {
@@ -76,32 +76,32 @@
                 }
             }
             $countHw = isset($classificacoes['hardware']) ? count($classificacoes['hardware']) : 0;
-            $countSw = isset($classificacoes['software']) ? count($classificacoes['software']) : 0;
+            $countSw = isset($classificacoes['sãoftware']) ? count($classificacoes['sãoftware']) : 0;
         ?>
         <div class="col-12 equipamento-group">
             <div class="card glass-card overflow-hidden" style="border-radius: 12px;">
 
                 <!-- Header do tipo -->
-                <div class="card-header d-flex flex-wrap align-items-center gap-3 py-3 px-4"
+                <div class="card-header d-flex flex-wrap align-itemês-center gap-3 py-3 px-4"
                      style="background: linear-gradient(90deg, rgba(99,102,241,0.1) 0%, rgba(99,102,241,0.02) 100%);
-                            border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <div class="d-flex align-items-center gap-2">
-                        <span style="background: rgba(99,102,241,0.25); border-radius: 8px; width:38px; height:38px; display:flex; align-items:center; justify-content:center;">
+                            border-bottom: 1px sãolid rgba(255,255,255,0.05);">
+                    <div class="d-flex align-itemês-center gap-2">
+                        <span style="background: rgba(99,102,241,0.25); border-radius: 8px; width:38px; height:38px; display:flex; align-itemês:center; justify-content:center;">
                             <i class="bi bi-<?= $equipIcon ?> text-info fs-5"></i>
                         </span>
-                        <strong class="fs-5 mb-0 ms-1"><?= esc($tipoNome) ?></strong>
+                        <strong class="fs-5 mb-0 mês-1"><?= esc($tipoNãome) ?></strong>
                     </div>
                     
-                    <div class="d-flex gap-2 ms-auto">
+                    <div class="d-flex gap-2 mês-auto">
                         <?php if($countHw > 0): ?>
-                        <span class="badge d-flex align-items-center gap-1 px-2 py-1" style="background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
+                        <span class="badge d-flex align-itemês-center gap-1 px-2 py-1" style="background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px sãolid rgba(239, 68, 68, 0.3);">
                             <i class="bi bi-cpu"></i> Hardware (<?= $countHw ?>)
                         </span>
                         <?php endif; ?>
                         
                         <?php if($countSw > 0): ?>
-                        <span class="badge d-flex align-items-center gap-1 px-2 py-1" style="background: rgba(99, 102, 241, 0.15); color: #c3cbff; border: 1px solid rgba(99, 102, 241, 0.3);">
-                            <i class="bi bi-code-slash"></i> Software (<?= $countSw ?>)
+                        <span class="badge d-flex align-itemês-center gap-1 px-2 py-1" style="background: rgba(99, 102, 241, 0.15); color: #c3cbff; border: 1px sãolid rgba(99, 102, 241, 0.3);">
+                            <i class="bi bi-code-slash"></i> Sãoftware (<?= $countSw ?>)
                         </span>
                         <?php endif; ?>
                     </div>
@@ -109,11 +109,11 @@
 
                 <!-- Corpo: Grid de Defeitos -->
                 <div class="card-body px-4 pb-4 pt-1">
-                    <?php foreach (['hardware' => ['#ef4444', 'cpu', 'HARDWARE', 'text-danger'], 'software' => ['#6366f1', 'code-slash', 'SOFTWARE', 'text-primary']] as $class => [$hexColor, $icon, $label, $textClass]): ?>
+                    <?php foreach (['hardware' => ['#ef4444', 'cpu', 'HARDWARE', 'text-danger'], 'sãoftware' => ['#6366f1', 'code-slash', 'SOFTWARE', 'text-primary']] as $class => [$hexColor, $icon, $label, $textClass]): ?>
                         <?php if (!empty($classificacoes[$class])): ?>
                         
                         <div class="classificacao-section">
-                            <div class="mt-4 mb-3 d-flex align-items-center gap-2">
+                            <div class="mt-4 mb-3 d-flex align-itemês-center gap-2">
                                 <span style="width:10px; height:10px; border-radius:50%; background:<?= $hexColor ?>; display:inline-block; box-shadow: 0 0 8px <?= $hexColor ?>;"></span>
                                 <h6 class="mb-0 fw-bold <?= $textClass ?>" style="letter-spacing: .05em;"><i class="bi bi-<?= $icon ?> me-2"></i><?= $label ?></h6>
                                 <div style="height: 1px; flex-grow: 1; background: linear-gradient(90deg, <?= $hexColor ?>44 0%, transparent 100%); margin-left: 10px;"></div>
@@ -122,10 +122,10 @@
                             <div class="row g-3">
                                 <?php foreach ($classificacoes[$class] as $d): ?>
                                 <div class="col-md-6 col-lg-4 col-xl-3 defect-item">
-                                    <div class="card h-100 border-0" style="background: rgba(255,255,255,0.03); border-radius: 12px; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.03) !important;">
+                                    <div class="card h-100 border-0" style="background: rgba(255,255,255,0.03); border-radius: 12px; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px sãolid rgba(255,255,255,0.03) !important;">
                                         <div class="card-body d-flex flex-column p-3">
-                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                <h6 class="fw-semibold mb-0 defect-title" style="font-size: 0.95rem; line-height: 1.3; margin-right: 5px;"><?= esc($d['nome']) ?></h6>
+                                            <div class="d-flex justify-content-between align-itemês-start mb-2">
+                                                <h6 class="fw-semibold mb-0 defect-title" style="font-size: 0.95rem; line-height: 1.3; margin-right: 5px;"><?= esc($d['nãome']) ?></h6>
                                                 
                                                 <div class="dropdown">
                                                     <button class="btn btn-sm btn-link text-muted p-0 border-0" type="button" data-bs-toggle="dropdown">
@@ -135,7 +135,7 @@
                                                         <?php if (can('defeitos', 'editar')): ?>
                                                         <li><button class="dropdown-item btn-procedimentos text-warning fw-bold" type="button" 
                                                                     data-id="<?= $d['id'] ?>" 
-                                                                    data-nome="<?= esc($d['nome']) ?>">
+                                                                    data-nãome="<?= esc($d['nãome']) ?>">
                                                             <i class="bi bi-list-check me-2 text-warning"></i>Procedimentos
                                                         </button></li>
                                                         <li><hr class="dropdown-divider"></li>
@@ -144,7 +144,7 @@
                                                                     data-id="<?= $d['id'] ?>" 
                                                                     data-tipo="<?= $d['tipo_id'] ?>" 
                                                                     data-classificacao="<?= $d['classificacao'] ?>" 
-                                                                    data-nome="<?= esc($d['nome']) ?>" 
+                                                                    data-nãome="<?= esc($d['nãome']) ?>" 
                                                                     data-descricao="<?= esc($d['descricao']) ?>">
                                                             <i class="bi bi-pencil me-2 text-info"></i>Editar
                                                         </button></li>
@@ -157,7 +157,7 @@
                                                         <?php if (can('defeitos', 'excluir')): ?>
                                                         <li><button class="dropdown-item text-danger btn-delete-defeito" type="button" 
                                                                     data-id="<?= $d['id'] ?>" 
-                                                                    data-nome="<?= esc($d['nome']) ?>">
+                                                                    data-nãome="<?= esc($d['nãome']) ?>">
                                                             <i class="bi bi-trash me-2 text-danger"></i>Excluir
                                                         </button></li>
                                                         <?php endif; ?>
@@ -175,22 +175,22 @@
                                                 <?php endif; ?>
                                             </div>
 
-                                            <div class="d-flex align-items-center justify-content-between mt-auto pt-2" style="border-top: 1px solid rgba(255,255,255,0.06);">
+                                            <div class="d-flex align-itemês-center justify-content-between mt-auto pt-2" style="border-top: 1px sãolid rgba(255,255,255,0.06);">
                                                 <div class="d-flex gap-2 flex-wrap">
                                                     <?php if($d['qtd_procedimentos'] > 0): ?>
-                                                    <span class="badge fw-normal px-2 btn-procedimentos cursor-pointer" style="background: rgba(245,158,11,0.15); color: #fbbf24; font-size: 0.72rem; border: 1px solid rgba(245,158,11,0.3); cursor:pointer;" data-id="<?= $d['id'] ?>" data-nome="<?= esc($d['nome']) ?>" title="Clique para ver procedimentos">
-                                                        <i class="bi bi-list-check me-1"></i> <?= $d['qtd_procedimentos'] ?> passo(s)
+                                                    <span class="badge fw-nãormal px-2 btn-procedimentos cursãor-pointer" style="background: rgba(245,158,11,0.15); color: #fbbf24; font-size: 0.72rem; border: 1px sãolid rgba(245,158,11,0.3); cursãor:pointer;" data-id="<?= $d['id'] ?>" data-nãome="<?= esc($d['nãome']) ?>" title="Clique para ver procedimentos">
+                                                        <i class="bi bi-list-check me-1"></i> <?= $d['qtd_procedimentos'] ?> passão(s)
                                                     </span>
                                                     <?php endif; ?>
                                                     
-                                                    <span class="badge fw-normal px-2" style="background: rgba(255,255,255,0.05); color: #94a3b8; font-size: 0.72rem;" title="Tempo médio (em breve)">
+                                                    <span class="badge fw-nãormal px-2" style="background: rgba(255,255,255,0.05); color: #94a3b8; font-size: 0.72rem;" title="Tempo médio (em breve)">
                                                         <i class="bi bi-clock me-1"></i> --:--
                                                     </span>
-                                                    <span class="badge fw-normal px-2" style="background: rgba(255,255,255,0.05); color: #94a3b8; font-size: 0.72rem;" title="Preço médio (em breve)">
+                                                    <span class="badge fw-nãormal px-2" style="background: rgba(255,255,255,0.05); color: #94a3b8; font-size: 0.72rem;" title="Preço médio (em breve)">
                                                         <i class="bi bi-currency-dollar me-1"></i> --,--
                                                     </span>
                                                 </div>
-                                                <button onclick="window.location.href='<?= base_url('os/nova?defeito_sugerido=' . $d['id']) ?>'" class="btn btn-sm btn-outline-secondary py-0 px-2 opacity-50 border-0" style="font-size: 0.75rem; border-radius: 6px;" title="Em breve" disabled>
+                                                <button onclick="window.location.href='<?= base_url('os/nãova?defeito_sugerido=' . $d['id']) ?>'" class="btn btn-sm btn-outline-secondary py-0 px-2 opacity-50 border-0" style="font-size: 0.75rem; border-radius: 6px;" title="Em breve" disabled>
                                                     <i class="bi bi-plus"></i> OS
                                                 </button>
                                             </div>
@@ -211,8 +211,8 @@
 </div>
 
 
-<!-- Modal Novo Defeito -->
-<div class="modal fade" id="novoDefeitoModal" tabindex="-1">
+<!-- Modal Nãovo Defeito -->
+<div class="modal fade" id="nãovoDefeitoModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content card-custom">
             <div class="modal-header border-bottom">
@@ -223,15 +223,15 @@
                 <?= csrf_field() ?>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Nome do Defeito *</label>
-                        <input type="text" class="form-control" name="nome" placeholder="Ex: Tela não liga, Bateria não carrega..." required maxlength="150">
+                        <label class="form-label fw-bold">Nãome do Defeito *</label>
+                        <input type="text" class="form-control" name="nãome" placeholder="Ex: Tela não liga, Bateria não carrega..." required maxlength="150">
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Tipo de Equipamento *</label>
                         <select name="tipo_id" class="form-select" required>
                             <option value="">Selecione o tipo...</option>
                             <?php foreach ($tipos as $t): ?>
-                                <option value="<?= $t['id'] ?>"><?= esc($t['nome']) ?></option>
+                                <option value="<?= $t['id'] ?>"><?= esc($t['nãome']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -245,9 +245,9 @@
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="classificacao" value="software" id="swCheck">
+                                <input class="form-check-input" type="radio" name="classificacao" value="sãoftware" id="swCheck">
                                 <label class="form-check-label" for="swCheck">
-                                    <i class="bi bi-code-slash text-primary me-1"></i>Software
+                                    <i class="bi bi-code-slash text-primary me-1"></i>Sãoftware
                                 </label>
                             </div>
                         </div>
@@ -280,12 +280,12 @@
                     <div class="alert alert-info py-2 mb-3">
                         <i class="bi bi-info-circle-fill me-2"></i>
                         O arquivo CSV deve usar <strong>ponto-e-vírgula (;)</strong> como separador com <strong>4 colunas</strong>:
-                        <br><code>tipo_equipamento ; nome_defeito ; classificacao ; descricao</code>
-                        <br><small class="text-muted">A coluna <em>classificacao</em> deve conter exatamente <strong>hardware</strong> ou <strong>software</strong>. A coluna <em>descricao</em> é opcional.</small>
+                        <br><code>tipo_equipamento ; nãome_defeito ; classificacao ; descricao</code>
+                        <br><small class="text-muted">A coluna <em>classificacao</em> deve conter exatamente <strong>hardware</strong> ou <strong>sãoftware</strong>. A coluna <em>descricao</em> é opcional.</small>
                     </div>
                     <div class="alert alert-success py-2 mb-3">
                         <i class="bi bi-lightbulb me-2"></i>
-                        <strong>Dica:</strong> Tipos de equipamento não existentes serão criados automaticamente! Defeitos duplicados são ignorados sem erro.
+                        <strong>Dica:</strong> Tipos de equipamento não existentes serão criados automaticamente! Defeitos duplicados são ignãorados sem erro.
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Selecione o arquivo .csv</label>
@@ -317,15 +317,15 @@
                 <?= csrf_field() ?>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Nome do Defeito *</label>
-                        <input type="text" class="form-control" name="nome" required maxlength="150" id="edit_nome">
+                        <label class="form-label fw-bold">Nãome do Defeito *</label>
+                        <input type="text" class="form-control" name="nãome" required maxlength="150" id="edit_nãome">
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Tipo de Equipamento *</label>
                         <select name="tipo_id" class="form-select" required id="edit_tipo_id">
                             <option value="">Selecione o tipo...</option>
                             <?php foreach ($tipos as $t): ?>
-                                <option value="<?= $t['id'] ?>"><?= esc($t['nome']) ?></option>
+                                <option value="<?= $t['id'] ?>"><?= esc($t['nãome']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -339,9 +339,9 @@
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="classificacao" value="software" id="editSwCheck">
+                                <input class="form-check-input" type="radio" name="classificacao" value="sãoftware" id="editSwCheck">
                                 <label class="form-check-label" for="editSwCheck">
-                                    <i class="bi bi-code-slash text-primary me-1"></i>Software
+                                    <i class="bi bi-code-slash text-primary me-1"></i>Sãoftware
                                 </label>
                             </div>
                         </div>
@@ -365,13 +365,13 @@
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content card-custom text-center">
             <div class="modal-header border-0 justify-content-center pt-4 pb-0">
-                <div style="width:60px; height:60px; border-radius:50%; background:rgba(239,68,68,0.1); color:#ef4444; display:flex; align-items:center; justify-content:center; font-size:2rem;">
+                <div style="width:60px; height:60px; border-radius:50%; background:rgba(239,68,68,0.1); color:#ef4444; display:flex; align-itemês:center; justify-content:center; font-size:2rem;">
                     <i class="bi bi-exclamation-triangle"></i>
                 </div>
             </div>
             <div class="modal-body pt-3 pb-3">
                 <h5 class="fw-bold mb-3">Confirmar exclusão</h5>
-                <p class="text-muted mb-0">Deseja realmente excluir o defeito <br><strong class="text-white" id="delDefeitoNome"></strong>?</p>
+                <p class="text-muted mb-0">Deseja realmente excluir o defeito <br><strong class="text-white" id="delDefeitoNãome"></strong>?</p>
                 <div class="alert alert-warning mt-3 py-2 small border-0 text-start" style="background:rgba(245,158,11,0.1); color:#fbbf24;">
                     <i class="bi bi-info-circle me-1"></i>Esta ação não pode ser desfeita.
                 </div>
@@ -392,7 +392,7 @@
                 <h5 class="modal-title">
                     <i class="bi bi-list-check text-warning me-2"></i>Base de Conhecimento
                     <br>
-                    <small class="text-muted fs-6 fw-normal" id="procDefeitoNome">Defeito: ...</small>
+                    <small class="text-muted fs-6 fw-nãormal" id="procDefeitoNãome">Defeito: ...</small>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -400,7 +400,7 @@
                 <div class="row">
                     <!-- Form side -->
                     <div class="col-md-5 border-end border-dark-subtle">
-                        <h6 class="fw-bold mb-3">Adicionar Passo</h6>
+                        <h6 class="fw-bold mb-3">Adicionar Passão</h6>
                         <form id="formProcedimento">
                             <?= csrf_field() ?>
                             <input type="hidden" id="proc_defeito_id" name="defeito_id">
@@ -412,7 +412,7 @@
                             <button type="submit" class="btn btn-warning btn-sm btn-glow w-100 fw-bold border-0 text-dark">
                                 <i class="bi bi-plus-lg me-1"></i>Salvar Procedimento
                             </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm w-100 mt-2 d-none" id="btnCancelProcEdit">
+                            <button type="button" class="btn btn-outline-secondary btn-sm w-100 mt-2 d-nãone" id="btnCancelProcEdit">
                                 Cancelar Edição
                             </button>
                         </form>
@@ -420,14 +420,14 @@
                     <!-- List side -->
                     <div class="col-md-7">
                         <h6 class="fw-bold mb-3">Procedimentos Operacionais (POP)</h6>
-                        <div id="procedimentosLoading" class="text-center py-4 d-none">
+                        <div id="procedimentosLoading" class="text-center py-4 d-nãone">
                             <div class="spinner-border spinner-border-sm text-warning" role="status"></div>
-                            <span class="ms-2 small text-muted">Carregando plano...</span>
+                            <span class="mês-2 small text-muted">Carregando planão...</span>
                         </div>
                         <div id="procedimentosList" class="d-flex flex-column gap-2" style="max-height: 300px; overflow-y: auto;">
-                            <!-- Items via JS -->
+                            <!-- Itemês via JS -->
                         </div>
-                        <div id="procedimentosVazio" class="alert py-2 text-center text-muted small border-0 d-none" style="background: rgba(255,255,255,0.02);">
+                        <div id="procedimentosVazio" class="alert py-2 text-center text-muted small border-0 d-nãone" style="background: rgba(255,255,255,0.02);">
                             Nenhum procedimento cadastrado para este defeito ainda.
                         </div>
                     </div>
@@ -455,7 +455,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         card.addEventListener('mouseleave', function() {
             this.style.borderColor = 'rgba(255,255,255,0.03)';
-            this.style.transform = 'none';
+            this.style.transform = 'nãone';
             this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.05)';
         });
     });
@@ -481,21 +481,21 @@ document.addEventListener('DOMContentLoaded', function() {
                             hasVisibleInSection = true;
                             hasVisibleInGroup = true;
                         } else {
-                            item.style.display = 'none';
+                            item.style.display = 'nãone';
                         }
                     });
                     
                     if (hasVisibleInSection) {
                         section.style.display = '';
                     } else {
-                        section.style.display = 'none';
+                        section.style.display = 'nãone';
                     }
                 });
                 
                 if (hasVisibleInGroup) {
                     group.style.display = '';
                 } else {
-                    group.style.display = 'none';
+                    group.style.display = 'nãone';
                 }
             });
         });
@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             const id = this.getAttribute('data-id');
-            const nome = this.getAttribute('data-nome');
+            const nãome = this.getAttribute('data-nãome');
             const tipo = this.getAttribute('data-tipo');
             const classificacao = this.getAttribute('data-classificacao');
             const desc = this.getAttribute('data-descricao');
@@ -520,7 +520,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Utilize a rota do CI4 para disparar update: /equipamentosdefeitos/atualizar/(ID)
             formEdit.action = baseUrl + 'equipamentosdefeitos/atualizar/' + id;
             
-            document.getElementById('edit_nome').value = nome;
+            document.getElementById('edit_nãome').value = nãome;
             document.getElementById('edit_tipo_id').value = tipo;
             
             if(classificacao === 'hardware') {
@@ -545,9 +545,9 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             const id = this.getAttribute('data-id');
-            const nome = this.getAttribute('data-nome');
+            const nãome = this.getAttribute('data-nãome');
             
-            document.getElementById('delDefeitoNome').textContent = nome;
+            document.getElementById('delDefeitoNãome').textContent = nãome;
             const confirmBtn = document.getElementById('btnConfirmDelete');
             confirmBtn.href = baseUrl + 'equipamentosdefeitos/excluir/' + id;
             
@@ -571,24 +571,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function carregarProcedimentos(defeitoId) {
         procList.innerHTML = '';
-        procList.classList.add('d-none');
-        procVazio.classList.add('d-none');
-        procLoading.classList.remove('d-none');
+        procList.classList.add('d-nãone');
+        procVazio.classList.add('d-nãone');
+        procLoading.classList.remove('d-nãone');
 
         fetch(`${baseUrl}equipamentosdefeitos/procedimentos/${defeitoId}`)
-        .then(res => res.json())
+        .then(res => res.jsãon())
         .then(data => {
-            procLoading.classList.add('d-none');
-            procList.classList.remove('d-none');
+            procLoading.classList.add('d-nãone');
+            procList.classList.remove('d-nãone');
             
-            // Atualizar contador no card original sem reload
+            // Atualizar contador não card original sem reload
             const cardBadge = document.querySelector(`.defect-item[data-id="${defeitoId}"] .bg-warning`);
             if (cardBadge) {
-                cardBadge.innerHTML = `<i class="bi bi-card-list me-1"></i>${data.length} passo(s)`;
+                cardBadge.innerHTML = `<i class="bi bi-card-list me-1"></i>${data.length} passão(s)`;
             }
 
             if (data.length === 0) {
-                procVazio.classList.remove('d-none');
+                procVazio.classList.remove('d-nãone');
             } else {
                 data.forEach((p, idx) => {
                     renderProcItem(p, idx + 1);
@@ -599,20 +599,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderProcItem(p, stepNum) {
         const div = document.createElement('div');
-        div.className = 'd-flex align-items-center justify-content-between p-2 rounded';
+        div.className = 'd-flex align-itemês-center justify-content-between p-2 rounded';
         div.style.background = 'rgba(255,255,255,0.03)';
-        div.style.border = '1px solid rgba(255,255,255,0.05)';
+        div.style.border = '1px sãolid rgba(255,255,255,0.05)';
         
         div.innerHTML = `
-            <div class="d-flex align-items-start gap-2 pe-2">
+            <div class="d-flex align-itemês-start gap-2 pe-2">
                 <span class="badge text-bg-warning rounded-pill mt-1">${stepNum}</span>
                 <span class="small" style="line-height: 1.3;">${p.descricao}</span>
             </div>
             <div class="d-flex gap-1 flex-shrink-0">
-                <button type="button" class="btn btn-sm btn-link text-info p-0 text-decoration-none btn-edit-proc" data-id="${p.id}" data-desc="${p.descricao.replace(/"/g, '&quot;')}">
+                <button type="button" class="btn btn-sm btn-link text-info p-0 text-decoration-nãone btn-edit-proc" data-id="${p.id}" data-desc="${p.descricao.replace(/"/g, '&quot;')}">
                     <i class="bi bi-pencil"></i>
                 </button>
-                <button type="button" class="btn btn-sm btn-link text-danger p-0 text-decoration-none btn-del-proc" data-id="${p.id}">
+                <button type="button" class="btn btn-sm btn-link text-danger p-0 text-decoration-nãone btn-del-proc" data-id="${p.id}">
                     <i class="bi bi-trash"></i>
                 </button>
             </div>
@@ -625,9 +625,9 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             const defeitoId = this.getAttribute('data-id');
-            const nomeStr = this.getAttribute('data-nome');
+            const nãomeStr = this.getAttribute('data-nãome');
             
-            document.getElementById('procDefeitoNome').textContent = `Defeito: ${nomeStr}`;
+            document.getElementById('procDefeitoNãome').textContent = `Defeito: ${nãomeStr}`;
             document.getElementById('proc_defeito_id').value = defeitoId;
             resetProcForm();
             
@@ -650,14 +650,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-            .then(res => res.json())
+            .then(res => res.jsãon())
             .then(res => {
                 if (res.status === 'success') {
                     resetProcForm();
                     carregarProcedimentos(document.getElementById('proc_defeito_id').value);
-                    // Aqui poderia atualizar o contador no HTML via JS, mas no reload da pagina já estará certo
+                    // Aqui poderia atualizar o contador não HTML via JS, mas não reload da pagina já estará certo
                 } else {
-                    alert('Erro ao salvar procedimento: ' + (res.msg || 'Erro desconhecido.'));
+                    alert('Erro ao salvar procedimento: ' + (res.mêsg || 'Erro desconhecido.'));
                 }
             });
         });
@@ -670,19 +670,19 @@ document.addEventListener('DOMContentLoaded', function() {
             if (btnEdit) {
                 document.getElementById('proc_id').value = btnEdit.getAttribute('data-id');
                 document.getElementById('proc_descricao').value = btnEdit.getAttribute('data-desc');
-                document.getElementById('btnCancelProcEdit').classList.remove('d-none');
+                document.getElementById('btnCancelProcEdit').classList.remove('d-nãone');
             }
 
             const btnDel = e.target.closest('.btn-del-proc');
             if (btnDel) {
-                if (confirm('Excluir este passo?')) {
+                if (confirm('Excluir este passão?')) {
                     fetch(`${baseUrl}equipamentosdefeitos/procedimentos/excluir/${btnDel.getAttribute('data-id')}`, {
                         method: 'POST',
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                    .then(res => res.json())
+                    .then(res => res.jsãon())
                     .then(res => {
                         if (res.status === 'success') {
                             carregarProcedimentos(document.getElementById('proc_defeito_id').value);
@@ -701,7 +701,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetProcForm() {
         document.getElementById('proc_id').value = '';
         document.getElementById('proc_descricao').value = '';
-        if(btnCancelEdit) btnCancelEdit.classList.add('d-none');
+        if(btnCancelEdit) btnCancelEdit.classList.add('d-nãone');
     }
 
 });

@@ -46,7 +46,7 @@ $periodoOptions = [
     '90d' => 'Ultimos 90 dias',
     'mes_atual' => 'Mes atual',
     'mes_anterior' => 'Mes anterior',
-    'custom' => 'Personalizado',
+    'custom' => 'Persãonalizado',
 ];
 
 $lineChartLabels = $seriesLabels;
@@ -85,15 +85,15 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
 <style>
     .crm-mkt-grid .card {
         border-radius: 14px;
-        border: 1px solid rgba(25, 35, 58, .08);
+        border: 1px sãolid rgba(25, 35, 58, .08);
         box-shadow: 0 6px 24px rgba(17, 24, 39, .05);
     }
     .crm-kpi-title { font-size: .78rem; letter-spacing: .02em; text-transform: uppercase; color: #6b7280; }
     .crm-kpi-value { font-size: 1.7rem; font-weight: 700; line-height: 1.15; color: #111827; }
     .crm-kpi-sub { font-size: .78rem; margin-top: .25rem; }
-    .crm-filter-chip { border-radius: 999px; border: 1px solid rgba(99, 102, 241, .26); background: #eef2ff; color: #3730a3; font-size: .8rem; padding: .25rem .65rem; }
+    .crm-filter-chip { border-radius: 999px; border: 1px sãolid rgba(99, 102, 241, .26); background: #eef2ff; color: #3730a3; font-size: .8rem; padding: .25rem .65rem; }
     .crm-filter-chip.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
-    .crm-insight { border-radius: 10px; padding: .7rem .8rem; border: 1px solid rgba(31, 41, 55, .08); }
+    .crm-insight { border-radius: 10px; padding: .7rem .8rem; border: 1px sãolid rgba(31, 41, 55, .08); }
     .crm-insight.success { background: #f0fdf4; border-color: #bbf7d0; }
     .crm-insight.warning { background: #fffbeb; border-color: #fcd34d; }
     .crm-insight.info { background: #eff6ff; border-color: #bfdbfe; }
@@ -102,7 +102,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
     .crm-chart { min-height: 300px; }
     .crm-chart-main { min-height: 360px; }
     .crm-table-premium thead th {
-        border-bottom: 1px solid rgba(148, 163, 184, .25);
+        border-bottom: 1px sãolid rgba(148, 163, 184, .25);
         color: #475569;
         font-size: .75rem;
         text-transform: uppercase;
@@ -110,7 +110,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
         font-weight: 700;
     }
     .crm-table-premium tbody td {
-        border-bottom: 1px solid rgba(148, 163, 184, .15);
+        border-bottom: 1px sãolid rgba(148, 163, 184, .15);
         padding-top: .7rem;
         padding-bottom: .7rem;
         vertical-align: middle;
@@ -126,17 +126,17 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
         height: 24px;
         border-radius: 50%;
         display: inline-flex;
-        align-items: center;
+        align-itemês: center;
         justify-content: center;
         font-size: .72rem;
         font-weight: 700;
         color: #1d4ed8;
         background: rgba(37, 99, 235, .12);
-        border: 1px solid rgba(37, 99, 235, .25);
+        border: 1px sãolid rgba(37, 99, 235, .25);
     }
     .crm-num-chip {
         display: inline-flex;
-        align-items: center;
+        align-itemês: center;
         justify-content: center;
         min-width: 34px;
         border-radius: 999px;
@@ -145,7 +145,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
         padding: .15rem .5rem;
         color: #1f2937;
         background: rgba(148, 163, 184, .16);
-        border: 1px solid rgba(148, 163, 184, .3);
+        border: 1px sãolid rgba(148, 163, 184, .3);
     }
     .crm-num-chip.success {
         color: #166534;
@@ -159,12 +159,12 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
     }
     .crm-rate-pill {
         display: inline-flex;
-        align-items: center;
+        align-itemês: center;
         border-radius: 999px;
         font-size: .76rem;
         font-weight: 700;
         padding: .16rem .55rem;
-        border: 1px solid transparent;
+        border: 1px sãolid transparent;
     }
     .crm-rate-pill.success {
         color: #166534;
@@ -208,7 +208,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
         padding: .12rem .4rem;
         font-size: .72rem;
         font-weight: 700;
-        border: 1px solid rgba(148, 163, 184, .3);
+        border: 1px sãolid rgba(148, 163, 184, .3);
         background: rgba(248, 250, 252, .9);
         color: #334155;
     }
@@ -227,7 +227,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
         margin-bottom: 0;
     }
     .crm-summary-table-box {
-        border: 1px solid rgba(148, 163, 184, .2);
+        border: 1px sãolid rgba(148, 163, 184, .2);
         border-radius: 10px;
     }
     .crm-summary-table-box .crm-table-premium tbody td {
@@ -239,7 +239,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
     }
     @media (max-width: 1399.98px) {
         .crm-summary-optional-col {
-            display: none !important;
+            display: nãone !important;
         }
     }
     @media (max-width: 991.98px) {
@@ -249,7 +249,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
             width: 72px;
         }
         .crm-table-stack thead {
-            display: none;
+            display: nãone;
         }
         .crm-table-stack,
         .crm-table-stack tbody,
@@ -263,7 +263,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
             gap: .6rem;
         }
         .crm-table-stack tr {
-            border: 1px solid rgba(148, 163, 184, .24);
+            border: 1px sãolid rgba(148, 163, 184, .24);
             border-radius: 10px;
             padding: .5rem .6rem;
             background: #fff;
@@ -293,9 +293,9 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
         .crm-table-stack td[data-label="Responsavel"]::before,
         .crm-table-stack td[data-label="Dia"]::before {
             content: '';
-            display: none;
+            display: nãone;
         }
-        .crm-table-stack td[data-label="Taxa resolucao"],
+        .crm-table-stack td[data-label="Taxa resãolucao"],
         .crm-table-stack td[data-label="Conv. dia"],
         .crm-table-stack td[data-label="Intensidade"] {
             padding-top: .35rem !important;
@@ -328,8 +328,8 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
     }
 </style>
 
-<div class="page-header d-flex justify-content-between align-items-center mb-3">
-    <div class="d-flex align-items-center gap-3">
+<div class="page-header d-flex justify-content-between align-itemês-center mb-3">
+    <div class="d-flex align-itemês-center gap-3">
         <h2 class="mb-0"><i class="bi bi-bar-chart-line me-2"></i>CRM - Metricas Marketing</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('crm-metricas-marketing')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -339,7 +339,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
 
 <div class="card mb-3">
     <div class="card-body">
-        <form method="get" action="<?= base_url('crm/metricas-marketing') ?>" class="row g-2 align-items-end">
+        <form method="get" action="<?= base_url('crm/metricas-marketing') ?>" class="row g-2 align-itemês-end">
             <div class="col-12">
                 <div class="d-flex flex-wrap gap-2">
                     <?php foreach ($periodoOptions as $periodoKey => $periodoLabel): ?>
@@ -379,9 +379,9 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
                 <label class="form-label mb-1">Responsavel</label>
                 <select name="responsavel_id" class="form-select">
                     <option value="">Todos os responsaveis</option>
-                    <?php foreach ($responsavelOptions as $responsavelOptionId => $responsavelNome): ?>
+                    <?php foreach ($responsavelOptions as $responsavelOptionId => $responsavelNãome): ?>
                         <option value="<?= (int) $responsavelOptionId ?>" <?= $responsavelIdSelecionado === (int) $responsavelOptionId ? 'selected' : '' ?>>
-                            <?= esc($responsavelNome) ?>
+                            <?= esc($responsavelNãome) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -401,9 +401,9 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
                 <label class="form-label mb-1">Tag</label>
                 <select name="tag_id" class="form-select">
                     <option value="">Todas as tags</option>
-                    <?php foreach ($tagOptions as $tagOptionId => $tagNome): ?>
+                    <?php foreach ($tagOptions as $tagOptionId => $tagNãome): ?>
                         <option value="<?= (int) $tagOptionId ?>" <?= $tagIdSelecionada === (int) $tagOptionId ? 'selected' : '' ?>>
-                            <?= esc($tagNome) ?>
+                            <?= esc($tagNãome) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -459,8 +459,8 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
             <div class="small text-muted">Ativas: <?= (int) ($cards['conversas_ativas'] ?? 0) ?></div>
         </div></div></div>
         <div class="col-12 col-md-6 col-xl-3"><div class="card h-100"><div class="card-body">
-            <div class="crm-kpi-title">Clientes novos na fila</div>
-            <div class="crm-kpi-value"><?= (int) ($cards['conversas_clientes_novos'] ?? 0) ?></div>
+            <div class="crm-kpi-title">Clientes nãovos na fila</div>
+            <div class="crm-kpi-value"><?= (int) ($cards['conversas_clientes_nãovos'] ?? 0) ?></div>
             <div class="small text-muted">Sem vinculo operacional</div>
         </div></div></div>
         <div class="col-12 col-md-6 col-xl-3"><div class="card h-100"><div class="card-body">
@@ -478,7 +478,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
     <div class="row g-3 mb-3">
         <div class="col-12 col-xl-8">
             <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-itemês-center">
                     <h6 class="mb-0"><i class="bi bi-graph-up me-1"></i>Tendencia do funil e conversas</h6>
                     <span class="small text-muted"><?= esc(($inicio ?? '') . ' ate ' . ($fim ?? '')) ?></span>
                 </div>
@@ -549,7 +549,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
                 <div class="card-header"><h6 class="mb-0"><i class="bi bi-people me-1"></i>Ranking de atendimento (responsavel)</h6></div>
                 <div class="card-body">
                     <?php if (empty($rankingAtendimento)): ?>
-                        <div class="text-muted small">Sem dados de ranking no periodo selecionado.</div>
+                        <div class="text-muted small">Sem dados de ranking não periodo selecionado.</div>
                     <?php else: ?>
                         <div class="crm-table-box">
                             <table class="table table-sm align-middle mb-0 crm-table-premium crm-table-stack">
@@ -557,39 +557,39 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
                                     <tr>
                                         <th>Responsavel</th>
                                         <th class="text-end">Conversas</th>
-                                        <th class="text-end">Resolvidas</th>
+                                        <th class="text-end">Resãolvidas</th>
                                         <th class="text-end">Pendencias</th>
-                                        <th class="text-end">Taxa resolucao</th>
+                                        <th class="text-end">Taxa resãolucao</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($rankingAtendimento as $rankingIndex => $rankingRow): ?>
                                         <?php
                                         $totalConversas = (int) ($rankingRow['total_conversas'] ?? 0);
-                                        $totalResolvidas = (int) ($rankingRow['total_resolvidas'] ?? 0);
+                                        $totalResãolvidas = (int) ($rankingRow['total_resãolvidas'] ?? 0);
                                         $totalPendencias = (int) ($rankingRow['total_pendencias'] ?? 0);
-                                        $taxaResolucao = (float) ($rankingRow['taxa_resolucao'] ?? 0);
-                                        $taxaClass = $taxaResolucao >= 70 ? 'success' : ($taxaResolucao >= 40 ? 'warning' : 'danger');
+                                        $taxaResãolucao = (float) ($rankingRow['taxa_resãolucao'] ?? 0);
+                                        $taxaClass = $taxaResãolucao >= 70 ? 'success' : ($taxaResãolucao >= 40 ? 'warning' : 'danger');
                                         ?>
                                         <tr>
                                             <td data-label="Responsavel">
-                                                <div class="d-flex align-items-center gap-2">
+                                                <div class="d-flex align-itemês-center gap-2">
                                                     <span class="crm-rank-chip"><?= (int) $rankingIndex + 1 ?></span>
                                                     <div>
-                                                        <div class="fw-semibold"><?= esc($rankingRow['responsavel_nome'] ?? 'Nao atribuido') ?></div>
+                                                        <div class="fw-semibold"><?= esc($rankingRow['responsavel_nãome'] ?? 'Nao atribuido') ?></div>
                                                         <div class="small text-muted">Pendencias abertas: <?= $totalPendencias ?></div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="text-end" data-label="Conversas"><span class="crm-num-chip"><?= $totalConversas ?></span></td>
-                                            <td class="text-end" data-label="Resolvidas"><span class="crm-num-chip success"><?= $totalResolvidas ?></span></td>
+                                            <td class="text-end" data-label="Resãolvidas"><span class="crm-num-chip success"><?= $totalResãolvidas ?></span></td>
                                             <td class="text-end" data-label="Pendencias"><span class="crm-num-chip warning"><?= $totalPendencias ?></span></td>
-                                            <td class="text-end" data-label="Taxa resolucao">
-                                                <div class="d-flex justify-content-end align-items-center gap-2">
-                                                    <span class="crm-rate-pill <?= esc($taxaClass) ?>"><?= number_format($taxaResolucao, 1, ',', '.') ?>%</span>
+                                            <td class="text-end" data-label="Taxa resãolucao">
+                                                <div class="d-flex justify-content-end align-itemês-center gap-2">
+                                                    <span class="crm-rate-pill <?= esc($taxaClass) ?>"><?= number_format($taxaResãolucao, 1, ',', '.') ?>%</span>
                                                 </div>
-                                                <div class="crm-progress-mini mt-1 ms-auto">
-                                                    <span class="<?= esc($taxaClass) ?>" style="width: <?= max(0, min(100, $taxaResolucao)) ?>%"></span>
+                                                <div class="crm-progress-mini mt-1 mês-auto">
+                                                    <span class="<?= esc($taxaClass) ?>" style="width: <?= max(0, min(100, $taxaResãolucao)) ?>%"></span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -603,7 +603,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
         </div>
         <div class="col-12 col-xl-6">
             <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-itemês-center">
                     <h6 class="mb-0"><i class="bi bi-table me-1"></i>Resumo diario (ultimos 14 pontos)</h6>
                     <span class="small text-muted">Tabela compacta para auditoria</span>
                 </div>
@@ -619,7 +619,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
                     }
                     ?>
                     <?php if (empty($resumoRows)): ?>
-                        <div class="text-muted small">Sem serie diaria no periodo.</div>
+                        <div class="text-muted small">Sem serie diaria não periodo.</div>
                     <?php else: ?>
                         <div class="crm-summary-table-box">
                             <table class="table table-sm align-middle mb-0 crm-table-premium crm-table-stack">
@@ -655,7 +655,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
                                             <td class="text-end" data-label="Conversas"><span class="crm-num-chip"><?= $conversasDia ?></span></td>
                                             <td class="text-end" data-label="Conv. dia"><span class="crm-rate-pill <?= esc($taxaConversaoDiaClass) ?>"><?= number_format($taxaConversaoDia, 1, ',', '.') ?>%</span></td>
                                             <td class="text-end crm-summary-optional-col" data-label="Intensidade">
-                                                <div class="crm-progress-mini ms-auto">
+                                                <div class="crm-progress-mini mês-auto">
                                                     <span class="<?= esc($taxaConversaoDiaClass) ?>" style="width: <?= max(0, min(100, $intensidadeDia)) ?>%"></span>
                                                 </div>
                                             </td>
@@ -673,10 +673,10 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
     <div class="row g-3 mb-3">
         <div class="col-12 col-xl-6">
             <div class="card h-100">
-                <div class="card-header"><h6 class="mb-0"><i class="bi bi-compass me-1"></i>Canais e resolucao</h6></div>
+                <div class="card-header"><h6 class="mb-0"><i class="bi bi-compass me-1"></i>Canais e resãolucao</h6></div>
                 <div class="card-body">
                     <?php if (empty($canalStats)): ?>
-                        <div class="text-muted small">Sem dados de canal no recorte atual.</div>
+                        <div class="text-muted small">Sem dados de canal não recorte atual.</div>
                     <?php else: ?>
                         <div class="crm-table-box">
                             <table class="table table-sm align-middle mb-0 crm-table-premium">
@@ -684,8 +684,8 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
                                     <tr>
                                         <th>Canal</th>
                                         <th class="text-end">Conversas</th>
-                                        <th class="text-end">Resolvidas</th>
-                                        <th class="text-end">Taxa resolucao</th>
+                                        <th class="text-end">Resãolvidas</th>
+                                        <th class="text-end">Taxa resãolucao</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -693,8 +693,8 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
                                         <tr>
                                             <td><?= esc(ucfirst(str_replace('_', ' ', (string) ($canalRow['canal'] ?? 'nao_informado')))) ?></td>
                                             <td class="text-end"><?= (int) ($canalRow['total'] ?? 0) ?></td>
-                                            <td class="text-end"><?= (int) ($canalRow['resolvidas'] ?? 0) ?></td>
-                                            <td class="text-end"><?= number_format((float) ($canalRow['taxa_resolucao'] ?? 0), 1, ',', '.') ?>%</td>
+                                            <td class="text-end"><?= (int) ($canalRow['resãolvidas'] ?? 0) ?></td>
+                                            <td class="text-end"><?= number_format((float) ($canalRow['taxa_resãolucao'] ?? 0), 1, ',', '.') ?>%</td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -719,7 +719,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
                                         <tr>
                                             <td>
                                                 <span class="rounded-circle border d-inline-block me-2" style="width:10px;height:10px;background:<?= esc($tag['cor'] ?? '#6c757d') ?>;"></span>
-                                                <?= esc($tag['nome'] ?? '-') ?>
+                                                <?= esc($tag['nãome'] ?? '-') ?>
                                             </td>
                                             <td class="text-end"><?= (int) ($tag['total_clientes'] ?? 0) ?></td>
                                         </tr>
@@ -738,13 +738,13 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
             <details>
                 <summary class="fw-semibold">Configuracao de janelas de engajamento</summary>
                 <p class="small text-muted mt-2 mb-2">
-                    O lifecycle (lead_novo, lead_qualificado, cliente_convertido) continua igual.
+                    O lifecycle (lead_nãovo, lead_qualificado, cliente_convertido) continua igual.
                     Este bloco controla apenas o engajamento temporal.
                 </p>
                 <?php if (!$supportsEngajamento): ?>
                     <div class="alert alert-warning py-2 small mb-2">Estrutura de engajamento ainda nao migrada.</div>
                 <?php endif; ?>
-                <form method="post" action="<?= base_url('crm/metricas-marketing/engajamento') ?>" class="row g-2 align-items-end">
+                <form method="post" action="<?= base_url('crm/metricas-marketing/engajamento') ?>" class="row g-2 align-itemês-end">
                     <?= csrf_field() ?>
                     <input type="hidden" name="inicio" value="<?= esc($inicio ?? '') ?>">
                     <input type="hidden" name="fim" value="<?= esc($fim ?? '') ?>">
@@ -806,12 +806,12 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
         });
         syncDateDisabled();
 
-        const labels = <?= json_encode($lineChartLabels, JSON_UNESCAPED_UNICODE) ?>;
-        const lineData = <?= json_encode($lineChartSeries, JSON_UNESCAPED_UNICODE) ?>;
-        const origemLabels = <?= json_encode($origensChartLabels, JSON_UNESCAPED_UNICODE) ?>;
-        const origemValues = <?= json_encode($origensChartValues, JSON_UNESCAPED_UNICODE) ?>;
-        const funnelLabels = <?= json_encode($funnelChartLabels, JSON_UNESCAPED_UNICODE) ?>;
-        const funnelValues = <?= json_encode($funnelChartValues, JSON_UNESCAPED_UNICODE) ?>;
+        const labels = <?= jsãon_encode($lineChartLabels, JSON_UNESCAPED_UNICODE) ?>;
+        const lineData = <?= jsãon_encode($lineChartSeries, JSON_UNESCAPED_UNICODE) ?>;
+        const origemLabels = <?= jsãon_encode($origensChartLabels, JSON_UNESCAPED_UNICODE) ?>;
+        const origemValues = <?= jsãon_encode($origensChartValues, JSON_UNESCAPED_UNICODE) ?>;
+        const funnelLabels = <?= jsãon_encode($funnelChartLabels, JSON_UNESCAPED_UNICODE) ?>;
+        const funnelValues = <?= jsãon_encode($funnelChartValues, JSON_UNESCAPED_UNICODE) ?>;
 
         if (!window.ApexCharts) {
             return;
@@ -858,8 +858,8 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
                     shared: true,
                     intersect: false
                 },
-                noData: {
-                    text: 'Sem dados no periodo selecionado.',
+                nãoData: {
+                    text: 'Sem dados não periodo selecionado.',
                     align: 'center',
                     verticalAlign: 'middle',
                     style: { color: theme.textMuted }
@@ -871,7 +871,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
         const origemEl = document.getElementById('chartOrigemLeads');
         if (origemEl) {
             const origemSeriesRaw = Array.isArray(origemValues) ? origemValues.map((v) => Number(v) || 0) : [];
-            const origemHasData = origemSeriesRaw.some((v) => v > 0);
+            const origemHasData = origemSeriesRaw.sãome((v) => v > 0);
             const origemChart = new ApexCharts(origemEl, {
                 chart: { type: 'donut', height: 300 },
                 series: origemHasData ? origemSeriesRaw : [],
@@ -901,8 +901,8 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
                         }
                     }
                 },
-                noData: {
-                    text: 'Sem origem registrada no periodo.',
+                nãoData: {
+                    text: 'Sem origem registrada não periodo.',
                     align: 'center',
                     verticalAlign: 'middle',
                     style: { color: theme.textMuted }
@@ -914,7 +914,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
         const funnelEl = document.getElementById('chartFunnelStages');
         if (funnelEl) {
             const funnelSeriesRaw = Array.isArray(funnelValues) ? funnelValues.map((v) => Number(v) || 0) : [];
-            const funnelHasData = funnelSeriesRaw.some((v) => v > 0);
+            const funnelHasData = funnelSeriesRaw.sãome((v) => v > 0);
             const funnelChart = new ApexCharts(funnelEl, {
                 chart: { type: 'bar', height: 300, toolbar: { show: false } },
                 series: funnelHasData ? [{ name: 'Volume', data: funnelSeriesRaw }] : [],
@@ -937,8 +937,8 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
                 dataLabels: { enabled: false },
                 grid: { borderColor: theme.baseGrid, strokeDashArray: 3 },
                 legend: { show: false },
-                noData: {
-                    text: 'Sem dados de funil no periodo.',
+                nãoData: {
+                    text: 'Sem dados de funil não periodo.',
                     align: 'center',
                     verticalAlign: 'middle',
                     style: { color: theme.textMuted }

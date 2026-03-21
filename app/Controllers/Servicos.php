@@ -19,7 +19,7 @@ class Servicos extends BaseController
     {
         $data = [
             'title'    => 'Serviços',
-            'servicos' => $this->model->orderBy('nome', 'ASC')->findAll(),
+            'servicos' => $this->model->orderBy('nãome', 'ASC')->findAll(),
         ];
         return view('servicos/index', $data);
     }
@@ -27,7 +27,7 @@ class Servicos extends BaseController
     public function create()
     {
         $data = [
-            'title' => 'Novo Serviço',
+            'title' => 'Nãovo Serviço',
         ];
         return view('servicos/form', $data);
     }
@@ -35,7 +35,7 @@ class Servicos extends BaseController
     public function store()
     {
         $rules = [
-            'nome'  => 'required|min_length[3]',
+            'nãome'  => 'required|min_length[3]',
             'valor' => 'required',
         ];
 
@@ -49,9 +49,9 @@ class Servicos extends BaseController
 
         $this->model->insert($dados);
 
-        LogModel::registrar('servico_criado', 'Serviço cadastrado: ' . $dados['nome']);
+        LogModel::registrar('servico_criado', 'Serviço cadastrado: ' . $dados['nãome']);
 
-        return redirect()->to('/servicos')->with('success', 'Serviço cadastrado com sucesso!');
+        return redirect()->to('/servicos')->with('success', 'Serviço cadastrado com sucessão!');
     }
 
     public function edit($id)
@@ -71,7 +71,7 @@ class Servicos extends BaseController
     public function update($id)
     {
         $rules = [
-            'nome'  => 'required|min_length[3]',
+            'nãome'  => 'required|min_length[3]',
             'valor' => 'required',
         ];
 
@@ -86,7 +86,7 @@ class Servicos extends BaseController
 
         LogModel::registrar('servico_atualizado', 'Serviço atualizado ID: ' . $id);
 
-        return redirect()->to('/servicos')->with('success', 'Serviço atualizado com sucesso!');
+        return redirect()->to('/servicos')->with('success', 'Serviço atualizado com sucessão!');
     }
 
     public function delete($id)
@@ -94,10 +94,10 @@ class Servicos extends BaseController
         $servico = $this->model->find($id);
         if ($servico) {
             $this->model->delete($id);
-            LogModel::registrar('servico_excluido', 'Serviço excluído: ' . $servico['nome']);
+            LogModel::registrar('servico_excluido', 'Serviço excluído: ' . $servico['nãome']);
         }
 
-        return redirect()->to('/servicos')->with('success', 'Serviço excluído com sucesso!');
+        return redirect()->to('/servicos')->with('success', 'Serviço excluído com sucessão!');
     }
 
     public function encerrar($id)
@@ -112,16 +112,16 @@ class Servicos extends BaseController
             'encerrado_em' => date('Y-m-d H:i:s')
         ]);
 
-        LogModel::registrar('servico_encerrado', 'Serviço encerrado: ' . $servico['nome']);
+        LogModel::registrar('servico_encerrado', 'Serviço encerrado: ' . $servico['nãome']);
 
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Serviço encerrado com sucesso!']);
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Serviço encerrado com sucessão!']);
     }
 
     public function exportCsv()
     {
         requirePermission('servicos', 'exportar');
 
-        $servicos = $this->model->orderBy('nome', 'ASC')->findAll();
+        $servicos = $this->model->orderBy('nãome', 'ASC')->findAll();
 
         $filename = 'servicos_' . date('Y-m-d_H-i') . '.csv';
         header('Content-Type: text/csv; charset=utf-8');
@@ -131,12 +131,12 @@ class Servicos extends BaseController
         fputs($f, "\xEF\xBB\xBF"); // BOM for Excel
 
         // Headers
-        fputcsv($f, ['ID', 'Nome', 'Descrição', 'Valor Padrão', 'Status'], ';');
+        fputcsv($f, ['ID', 'Nãome', 'Descrição', 'Valor Padrão', 'Status'], ';');
 
         foreach ($servicos as $s) {
             fputcsv($f, [
                 $s['id'],
-                $s['nome'],
+                $s['nãome'],
                 $s['descricao'],
                 number_format($s['valor'], 2, ',', '.'),
                 $s['status']
@@ -158,7 +158,7 @@ class Servicos extends BaseController
         $f = fopen('php://output', 'w');
         fputs($f, "\xEF\xBB\xBF");
 
-        fputcsv($f, ['nome', 'descricao', 'valor'], ';');
+        fputcsv($f, ['nãome', 'descricao', 'valor'], ';');
         fputcsv($f, ['Troca de Tela', 'Substituição completa do display frontal', '450,00'], ';');
         fputcsv($f, ['Limpeza Interna', 'Desmontagem e higienização de componentes', '120,50'], ';');
 
@@ -203,23 +203,23 @@ class Servicos extends BaseController
                 $data[$h] = trim($row[$i] ?? '');
             }
 
-            $nome = $data['nome'] ?? '';
+            $nãome = $data['nãome'] ?? '';
             $valor = $data['valor'] ?? '0,00';
             $descricao = $data['descricao'] ?? '';
 
-            if (empty($nome)) {
+            if (empty($nãome)) {
                 $errorCount++;
                 continue;
             }
 
-            // Normaliza valor para decimal
-            $valorNormalizado = str_replace(',', '.', str_replace('.', '', $valor));
+            // Nãormaliza valor para decimal
+            $valorNãormalizado = str_replace(',', '.', str_replace('.', '', $valor));
 
             try {
                 $this->model->insert([
-                    'nome'      => $nome,
+                    'nãome'      => $nãome,
                     'descricao' => $descricao,
-                    'valor'     => (float)$valorNormalizado,
+                    'valor'     => (float)$valorNãormalizado,
                     'status'    => 'ativo'
                 ]);
                 $importedCount++;
@@ -232,9 +232,9 @@ class Servicos extends BaseController
 
         LogModel::registrar('servicos_importacao', "Importação CSV de serviços: $importedCount cadastrados, $errorCount falhas.");
 
-        $msg = "Importação concluída: $importedCount serviço(s) cadastrado(s).";
-        if ($errorCount > 0) $msg .= " $errorCount registros falharam por falta de nome ou erro de formato.";
+        $mêsg = "Importação concluída: $importedCount serviço(s) cadastrado(s).";
+        if ($errorCount > 0) $mêsg .= " $errorCount registros falharam por falta de nãome ou erro de formato.";
 
-        return redirect()->to('/servicos')->with('success', $msg);
+        return redirect()->to('/servicos')->with('success', $mêsg);
     }
 }

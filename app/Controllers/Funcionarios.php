@@ -19,7 +19,7 @@ class Funcionarios extends BaseController
     {
         $data = [
             'title'        => 'Funcionários',
-            'funcionarios' => $this->model->orderBy('nome', 'ASC')->findAll(),
+            'funcionarios' => $this->model->orderBy('nãome', 'ASC')->findAll(),
         ];
         return view('funcionarios/index', $data);
     }
@@ -27,7 +27,7 @@ class Funcionarios extends BaseController
     public function create()
     {
         $data = [
-            'title' => 'Novo Funcionário',
+            'title' => 'Nãovo Funcionário',
         ];
         return view('funcionarios/form', $data);
     }
@@ -35,7 +35,7 @@ class Funcionarios extends BaseController
     public function store()
     {
         $rules = [
-            'nome'     => 'required|min_length[3]',
+            'nãome'     => 'required|min_length[3]',
             'cpf'      => 'required',
             'telefone' => 'required',
         ];
@@ -48,9 +48,9 @@ class Funcionarios extends BaseController
         $dados['ativo'] = isset($dados['ativo']) && $dados['ativo'] === 'on' ? 1 : 0;
         $this->model->insert($dados);
 
-        LogModel::registrar('funcionario_criado', 'Funcionário cadastrado: ' . $dados['nome']);
+        LogModel::registrar('funcionario_criado', 'Funcionário cadastrado: ' . $dados['nãome']);
 
-        return redirect()->to('/funcionarios')->with('success', 'Funcionário cadastrado com sucesso!');
+        return redirect()->to('/funcionarios')->with('success', 'Funcionário cadastrado com sucessão!');
     }
 
     public function edit($id)
@@ -70,7 +70,7 @@ class Funcionarios extends BaseController
     public function update($id)
     {
         $rules = [
-            'nome'     => 'required|min_length[3]',
+            'nãome'     => 'required|min_length[3]',
             'cpf'      => 'required',
             'telefone' => 'required',
         ];
@@ -85,7 +85,7 @@ class Funcionarios extends BaseController
 
         LogModel::registrar('funcionario_atualizado', 'Funcionário atualizado ID: ' . $id);
 
-        return redirect()->to('/funcionarios')->with('success', 'Funcionário atualizado com sucesso!');
+        return redirect()->to('/funcionarios')->with('success', 'Funcionário atualizado com sucessão!');
     }
 
     public function delete($id)
@@ -93,9 +93,9 @@ class Funcionarios extends BaseController
         $funcionario = $this->model->find($id);
         if ($funcionario) {
             $this->model->delete($id);
-            LogModel::registrar('funcionario_excluido', 'Funcionário excluído: ' . $funcionario['nome']);
+            LogModel::registrar('funcionario_excluido', 'Funcionário excluído: ' . $funcionario['nãome']);
         }
 
-        return redirect()->to('/funcionarios')->with('success', 'Funcionário excluído com sucesso!');
+        return redirect()->to('/funcionarios')->with('success', 'Funcionário excluído com sucessão!');
     }
 }

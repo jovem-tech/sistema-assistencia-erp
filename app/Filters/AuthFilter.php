@@ -24,42 +24,42 @@ class AuthFilter implements FilterInterface
                     
                     if ($usuario && $usuario['ativo'] && hash('sha256', $usuario['senha'] . $usuario['email']) === $parts[1]) {
                         
-                        $grupoNome = '';
+                        $grupoNãome = '';
                         if (!empty($usuario['grupo_id'])) {
                             $db = \Config\Database::connect();
                             $grupo = $db->table('grupos')->where('id', $usuario['grupo_id'])->get()->getRowArray();
-                            $grupoNome = $grupo['nome'] ?? '';
+                            $grupoNãome = $grupo['nãome'] ?? '';
                         }
                         
                         $sessionData = [
                             'user_id'         => $usuario['id'],
-                            'user_nome'       => $usuario['nome'],
+                            'user_nãome'       => $usuario['nãome'],
                             'user_email'      => $usuario['email'],
                             'user_perfil'     => $usuario['perfil'],
                             'user_foto'       => $usuario['foto'],
                             'user_grupo_id'   => $usuario['grupo_id'] ?? null,
-                            'user_grupo_nome' => $grupoNome,
+                            'user_grupo_nãome' => $grupoNãome,
                             'logged_in'       => true,
                             'last_activity'   => time(),
                         ];
                         
                         $session->set($sessionData);
-                        $model->update($usuario['id'], ['ultimo_acesso' => date('Y-m-d H:i:s')]);
+                        $model->update($usuario['id'], ['ultimo_acessão' => date('Y-m-d H:i:s')]);
                         
-                        return; // Sessão restaurada com sucesso, pode continuar acessando a rota
+                        return; // Sessão restaurada com sucessão, pode continuar acessando a rota
                     }
                 }
             }
 
             return redirect()->to('/login')
-                ->with('error', 'Você precisa fazer login para acessar esta página.');
+                ->with('error', 'Vocêê precisa fazer login para acessar esta página.');
         }
 
         // Check for session timeout (30 minutes of inactivity)
         $lastActivity = $session->get('last_activity');
         
         helper('cookie');
-        // Se o cookie lembrar-me existir, ignoramos o tempo de inatividade da sessão e o resetamos
+        // Se o cookie lembrar-me existir, ignãoramos o tempo de inatividade da sessão e o resetamos
         if (get_cookie('remember_login')) {
             $session->set('last_activity', time());
             return;
@@ -76,6 +76,6 @@ class AuthFilter implements FilterInterface
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        // Nothing to do here
+        // Nãothing to do here
     }
 }

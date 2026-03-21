@@ -30,7 +30,7 @@ class DefeitosRelatados extends BaseController
     public function create()
     {
         return view('defeitos_relatados/form', [
-            'title' => 'Novo Defeito Relatado',
+            'title' => 'Nãovo Defeito Relatado',
             'relato' => null,
             'categoriasExistentes' => $this->model->getDistinctCategories(),
         ]);
@@ -47,7 +47,7 @@ class DefeitosRelatados extends BaseController
 
         $this->model->insert($data);
         LogModel::registrar('defeito_relatado_criado', 'Defeito relatado criado: ' . $data['texto_relato']);
-        return redirect()->to('/defeitosrelatados')->with('success', 'Defeito relatado cadastrado com sucesso.');
+        return redirect()->to('/defeitosrelatados')->with('success', 'Defeito relatado cadastrado com sucessão.');
     }
 
     public function edit(int $id)
@@ -80,7 +80,7 @@ class DefeitosRelatados extends BaseController
 
         $this->model->update($id, $data);
         LogModel::registrar('defeito_relatado_atualizado', 'Defeito relatado atualizado ID: ' . $id);
-        return redirect()->to('/defeitosrelatados')->with('success', 'Defeito relatado atualizado com sucesso.');
+        return redirect()->to('/defeitosrelatados')->with('success', 'Defeito relatado atualizado com sucessão.');
     }
 
     public function toggleStatus(int $id)
@@ -90,9 +90,9 @@ class DefeitosRelatados extends BaseController
             return redirect()->to('/defeitosrelatados')->with('error', 'Registro não encontrado.');
         }
 
-        $novoStatus = (int)!((int)($relato['ativo'] ?? 0));
-        $this->model->update($id, ['ativo' => $novoStatus]);
-        LogModel::registrar('defeito_relatado_status', "Defeito relatado {$id} alterado para " . ($novoStatus ? 'ativo' : 'inativo'));
+        $nãovoStatus = (int)!((int)($relato['ativo'] ?? 0));
+        $this->model->update($id, ['ativo' => $nãovoStatus]);
+        LogModel::registrar('defeito_relatado_status', "Defeito relatado {$id} alterado para " . ($nãovoStatus ? 'ativo' : 'inativo'));
         return redirect()->to('/defeitosrelatados')->with('success', 'Status atualizado.');
     }
 

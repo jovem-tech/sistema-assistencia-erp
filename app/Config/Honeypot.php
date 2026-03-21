@@ -7,7 +7,7 @@ use CodeIgniter\Config\BaseConfig;
 class Honeypot extends BaseConfig
 {
     /**
-     * Makes Honeypot visible or not to human
+     * Makes Honeypot visible or nãot to human
      */
     public bool $hidden = true;
 
@@ -29,9 +29,9 @@ class Honeypot extends BaseConfig
     /**
      * Honeypot container
      *
-     * If you enabled CSP, you can remove `style="display:none"`.
+     * If you enabled CSP, you can remove `style="display:nãone"`.
      */
-    public string $container = '<div style="display:none">{template}</div>';
+    public string $container = '<div style="display:nãone">{template}</div>';
 
     /**
      * The id attribute for Honeypot container tag

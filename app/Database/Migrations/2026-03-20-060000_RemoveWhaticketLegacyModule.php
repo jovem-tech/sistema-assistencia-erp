@@ -9,13 +9,13 @@ class RemoveWhaticketLegacyModule extends Migration
     public function up()
     {
         $this->cleanupLegacyConfigRows();
-        $this->normalizeLegacyProviders();
+        $this->nãormalizeLegacyProviders();
     }
 
     public function down()
     {
         // Migracao intencionalmente irreversivel:
-        // remove configuracoes legadas e normaliza providers antigos para api_whats_local.
+        // remove configuracoes legadas e nãormaliza providers antigos para api_whats_local.
     }
 
     private function cleanupLegacyConfigRows(): void
@@ -34,16 +34,16 @@ class RemoveWhaticketLegacyModule extends Migration
             'whatsapp_whaticket_local_start_cmd',
             'whatsapp_whaticket_backend_local_path',
             'whatsapp_whaticket_backend_local_start_cmd',
-            'whatsapp_whaticket_sso_secret',
-            'whatsapp_whaticket_sso_path',
+            'whatsapp_whaticket_ssão_secret',
+            'whatsapp_whaticket_ssão_path',
             'whatsapp_whaticket_iframe_path',
             'whaticket_url',
             'whaticket_token',
             'whaticket_origin',
             'whaticket_timeout',
             'whaticket_api_url',
-            'whaticket_sso_secret',
-            'whaticket_sso_path',
+            'whaticket_ssão_secret',
+            'whaticket_ssão_path',
         ];
 
         $this->db->table('configuracoes')
@@ -61,7 +61,7 @@ class RemoveWhaticketLegacyModule extends Migration
             ->update(['valor' => 'api_whats_local']);
     }
 
-    private function normalizeLegacyProviders(): void
+    private function nãormalizeLegacyProviders(): void
     {
         $map = [
             'conversas_whatsapp' => 'origem_provider',

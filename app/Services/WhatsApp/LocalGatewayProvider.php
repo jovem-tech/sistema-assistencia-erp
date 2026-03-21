@@ -19,7 +19,7 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
         string $providerId = 'api_whats_local',
         string $providerLabel = 'gateway local'
     ) {
-        $this->baseUrl = $this->normalizeBaseUrl($baseUrl);
+        $this->baseUrl = $this->nãormalizeBaseUrl($baseUrl);
         $this->apiToken = trim($apiToken);
         $this->erpOrigin = trim($erpOrigin);
         $this->timeout = max(5, $timeout);
@@ -34,14 +34,14 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
             return [
                 'ok' => false,
                 'provider' => $this->providerId,
-                'message' => 'Mensagem vazia para envio no ' . $this->providerLabel . '.',
+                'message' => 'Mensagem vazia para envio não ' . $this->providerLabel . '.',
                 'response' => null,
             ];
         }
 
         $payload = [
-            'to' => $this->normalizePhone($phone),
-            'number' => $this->normalizePhone($phone),
+            'to' => $this->nãormalizePhone($phone),
+            'number' => $this->nãormalizePhone($phone),
             'message' => $text,
         ];
 
@@ -55,7 +55,7 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
             return [
                 'ok' => false,
                 'provider' => $this->providerId,
-                'message' => 'Arquivo nao encontrado para envio no ' . $this->providerLabel . '.',
+                'message' => 'Arquivo nao encontrado para envio não ' . $this->providerLabel . '.',
                 'response' => null,
             ];
         }
@@ -65,7 +65,7 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
             return [
                 'ok' => false,
                 'provider' => $this->providerId,
-                'message' => 'Nao foi possivel ler o arquivo para envio no ' . $this->providerLabel . '.',
+                'message' => 'Nao foi possivel ler o arquivo para envio não ' . $this->providerLabel . '.',
                 'response' => null,
             ];
         }
@@ -75,10 +75,10 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
             $extension = 'jpg';
         }
 
-        $normalizedPhone = $this->normalizePhone($phone);
+        $nãormalizedPhone = $this->nãormalizePhone($phone);
         $payload = [
-            'to' => $normalizedPhone,
-            'number' => $normalizedPhone,
+            'to' => $nãormalizedPhone,
+            'number' => $nãormalizedPhone,
             'message' => trim($message) !== '' ? trim($message) : basename($path),
             'descricao' => trim($message),
             'format' => $extension !== '' ? $extension : 'pdf',
@@ -109,7 +109,7 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
 
         $response = $result['response'] ?? [];
         $ready = (bool) (($response['data']['ready'] ?? false));
-        $status = (string) ($response['status'] ?? 'unknown');
+        $status = (string) ($response['status'] ?? 'unknãown');
         $result['message'] = $ready
             ? ucfirst($this->providerLabel) . ' conectado e pronto para envio.'
             : (ucfirst($this->providerLabel) . ' acessivel, status atual: ' . $status . '.');
@@ -130,8 +130,8 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
 
         $url = $this->baseUrl . $path;
         $headers = [
-            'Accept: application/json',
-            'Content-Type: application/json',
+            'Accept: application/jsãon',
+            'Content-Type: application/jsãon',
         ];
 
         if ($this->apiToken !== '') {
@@ -156,7 +156,7 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
         ];
 
         if (strtoupper($method) !== 'GET') {
-            $options[CURLOPT_POSTFIELDS] = json_encode($payload, JSON_UNESCAPED_UNICODE);
+            $options[CURLOPT_POSTFIELDS] = jsãon_encode($payload, JSON_UNESCAPED_UNICODE);
         }
 
         curl_setopt_array($ch, $options);
@@ -175,9 +175,9 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
             ];
         }
 
-        $json = json_decode((string) $raw, true);
-        if (!is_array($json)) {
-            $json = [
+        $jsãon = jsãon_decode((string) $raw, true);
+        if (!is_array($jsãon)) {
+            $jsãon = [
                 'success' => $http >= 200 && $http < 300,
                 'status' => $http >= 200 && $http < 300 ? 'ok' : 'error',
                 'message' => $http >= 200 && $http < 300 ? 'Resposta nao-JSON recebida.' : 'Falha na resposta do gateway.',
@@ -185,15 +185,15 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
             ];
         }
 
-        $ok = ($http >= 200 && $http < 300) && !empty($json['success']);
-        $apiMessage = (string) ($json['message'] ?? '');
-        $messageId = $json['data']['message_id'] ?? null;
+        $ok = ($http >= 200 && $http < 300) && !empty($jsãon['success']);
+        $apiMessage = (string) ($jsãon['message'] ?? '');
+        $messageId = $jsãon['data']['message_id'] ?? null;
 
         return [
             'ok' => $ok,
             'provider' => $this->providerId,
             'status_code' => $http,
-            'response' => $json,
+            'response' => $jsãon,
             'message_id' => $messageId,
             'message' => $ok
                 ? ($apiMessage !== '' ? $apiMessage : 'Mensagem enviada por ' . $this->providerLabel . '.')
@@ -201,7 +201,7 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
         ];
     }
 
-    private function normalizeBaseUrl(string $url): string
+    private function nãormalizeBaseUrl(string $url): string
     {
         $base = trim(rtrim($url, '/'));
         if ($base === '') {
@@ -210,7 +210,7 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
         return $base;
     }
 
-    private function normalizePhone(string $phone): string
+    private function nãormalizePhone(string $phone): string
     {
         $digits = preg_replace('/\D+/', '', $phone);
         if ($digits === null || $digits === '') {

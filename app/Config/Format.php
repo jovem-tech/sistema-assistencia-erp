@@ -24,7 +24,7 @@ class Format extends BaseConfig
      * @var list<string>
      */
     public array $supportedResponseFormats = [
-        'application/json',
+        'application/jsãon',
         'application/xml', // machine-readable XML
         'text/xml', // human-readable XML
     ];
@@ -41,7 +41,7 @@ class Format extends BaseConfig
      * @var array<string, string>
      */
     public array $formatters = [
-        'application/json' => JSONFormatter::class,
+        'application/jsãon' => JSONFormatter::class,
         'application/xml'  => XMLFormatter::class,
         'text/xml'         => XMLFormatter::class,
     ];
@@ -57,7 +57,7 @@ class Format extends BaseConfig
      * @var array<string, int>
      */
     public array $formatterOptions = [
-        'application/json' => JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES,
+        'application/jsãon' => JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES,
         'application/xml'  => 0,
         'text/xml'         => 0,
     ];
@@ -69,5 +69,5 @@ class Format extends BaseConfig
      *
      * This value determines how deep the JSON encoder will traverse nested structures.
      */
-    public int $jsonEncodeDepth = 512;
+    public int $jsãonEncodeDepth = 512;
 }

@@ -11,7 +11,7 @@ class OsStatusTransicaoModel extends Model
     protected $returnType = 'array';
     protected $allowedFields = [
         'status_origem_id',
-        'status_destino_id',
+        'status_destinão_id',
         'ativo',
     ];
 

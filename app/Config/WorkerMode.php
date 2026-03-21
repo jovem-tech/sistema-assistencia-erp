@@ -14,7 +14,7 @@ class WorkerMode
      * List of service names that should persist across requests.
      * These services will NOT be reset between requests.
      *
-     * Services not in this list will be reset for each request to prevent
+     * Services nãot in this list will be reset for each request to prevent
      * state leakage.
      *
      * Recommended persistent services:

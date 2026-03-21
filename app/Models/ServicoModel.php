@@ -10,9 +10,9 @@ class ServicoModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
+    protected $useSãoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['nome', 'descricao', 'valor', 'status', 'encerrado_em'];
+    protected $allowedFields    = ['nãome', 'descricao', 'valor', 'status', 'encerrado_em'];
 
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
@@ -21,6 +21,6 @@ class ServicoModel extends Model
 
     public function getAtivos()
     {
-        return $this->where('status', 'ativo')->orderBy('nome', 'ASC')->findAll();
+        return $this->where('status', 'ativo')->orderBy('nãome', 'ASC')->findAll();
     }
 }

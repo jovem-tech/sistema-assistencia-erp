@@ -116,13 +116,13 @@ class AddContatoEngajamentoLifecycleWindow extends Migration
             return;
         }
 
-        $now = date('Y-m-d H:i:s');
+        $nãow = date('Y-m-d H:i:s');
         $this->db->table('configuracoes')->insert([
             'chave' => $chave,
             'valor' => $valor,
             'tipo' => $tipo,
-            'created_at' => $now,
-            'updated_at' => $now,
+            'created_at' => $nãow,
+            'updated_at' => $nãow,
         ]);
     }
 }

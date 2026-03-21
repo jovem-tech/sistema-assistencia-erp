@@ -3,9 +3,9 @@
 <?= $this->section('content') ?>
 
 <div class="page-header">
-    <h2><i class="bi bi-person me-2"></i><?= esc($cliente['nome_razao']) ?></h2>
+    <h2><i class="bi bi-persãon me-2"></i><?= esc($cliente['nãome_razao']) ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('clientes')" title="Ajuda sobre Clientes">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('clientes')" title="Ajuda sãobre Clientes">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <?php if (can('clientes', 'editar')): ?>
@@ -29,7 +29,7 @@
             <div class="card-body">
                 <div class="detail-group">
                     <div class="detail-label">Tipo</div>
-                    <div class="detail-value"><?= $cliente['tipo_pessoa'] === 'fisica' ? 'Pessoa Física' : 'Pessoa Jurídica' ?></div>
+                    <div class="detail-value"><?= $cliente['tipo_pessãoa'] === 'fisica' ? 'Pessãoa Física' : 'Pessãoa Jurídica' ?></div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">CPF/CNPJ</div>
@@ -43,11 +43,11 @@
                     <div class="detail-label">Email</div>
                     <div class="detail-value"><?= esc($cliente['email'] ?? '-') ?></div>
                 </div>
-                <?php if (!empty($cliente['nome_contato']) || !empty($cliente['telefone_contato'])): ?>
+                <?php if (!empty($cliente['nãome_contato']) || !empty($cliente['telefone_contato'])): ?>
                 <div class="detail-group">
                     <div class="detail-label">Contato Adicional</div>
                     <div class="detail-value">
-                        <?= esc($cliente['nome_contato'] ?? '') ?> 
+                        <?= esc($cliente['nãome_contato'] ?? '') ?> 
                         <?= !empty($cliente['telefone_contato']) ? ' - ' . esc($cliente['telefone_contato']) : '' ?>
                     </div>
                 </div>
@@ -78,11 +78,11 @@
     <!-- OS History -->
     <div class="col-md-8">
         <div class="card glass-card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-itemês-center">
                 <h5 class="card-title mb-0"><i class="bi bi-clipboard-check me-2"></i>Ordens de Serviço</h5>
                 <?php if (can('os', 'criar')): ?>
-                <a href="<?= base_url('os/nova?cliente_id=' . $cliente['id']) ?>" class="btn btn-glow btn-sm">
-                    <i class="bi bi-plus-lg me-1"></i>Nova OS
+                <a href="<?= base_url('os/nãova?cliente_id=' . $cliente['id']) ?>" class="btn btn-glow btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i>Nãova OS
                 </a>
                 <?php endif; ?>
             </div>
@@ -142,9 +142,9 @@
                             <tr><td colspan="5" class="text-center py-3 text-muted">Nenhum equipamento cadastrado</td></tr>
                             <?php else: foreach ($equipamentos as $eq): ?>
                             <tr>
-                                <td><?= getEquipTipo($eq['tipo_nome']) ?></td>
-                                <td><?= esc($eq['marca_nome']) ?></td>
-                                <td><?= esc($eq['modelo_nome']) ?></td>
+                                <td><?= getEquipTipo($eq['tipo_nãome']) ?></td>
+                                <td><?= esc($eq['marca_nãome']) ?></td>
+                                <td><?= esc($eq['modelo_nãome']) ?></td>
                                 <td><?= esc($eq['numero_serie'] ?? '-') ?></td>
                                 <td>
                                     <?php if (can('equipamentos', 'editar')): ?>
@@ -160,7 +160,7 @@
         </div>
 
         <div class="card glass-card mt-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-itemês-center">
                 <h5 class="card-title mb-0"><i class="bi bi-graph-up-arrow me-2"></i>CRM - Relacionamento</h5>
                 <div class="d-flex gap-2">
                     <a href="<?= base_url('crm/timeline?cliente_id=' . $cliente['id']) ?>" class="btn btn-sm btn-outline-primary">
@@ -194,7 +194,7 @@
                 </div>
 
                 <div class="border rounded p-2">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex justify-content-between align-itemês-center mb-2">
                         <h6 class="mb-0"><i class="bi bi-list-stars me-1"></i>Timeline CRM</h6>
                         <a href="<?= base_url('crm/followups') ?>" class="btn btn-sm btn-outline-warning">
                             <i class="bi bi-calendar-check me-1"></i>Follow-ups
@@ -207,7 +207,7 @@
                             <ul class="list-group list-group-flush">
                                 <?php foreach (($crmTimeline ?? []) as $linha): ?>
                                     <li class="list-group-item px-0 py-2">
-                                        <div class="d-flex justify-content-between align-items-start gap-2">
+                                        <div class="d-flex justify-content-between align-itemês-start gap-2">
                                             <div>
                                                 <div class="fw-semibold small"><?= esc($linha['titulo'] ?? 'Evento CRM') ?></div>
                                                 <?php if (!empty($linha['descricao'])): ?>
@@ -220,7 +220,7 @@
                                                     <?php endif; ?>
                                                 </div>
                                             </div>
-                                            <div class="small text-muted text-nowrap">
+                                            <div class="small text-muted text-nãowrap">
                                                 <?= esc(!empty($linha['data']) ? formatDate($linha['data'], true) : '-') ?>
                                             </div>
                                         </div>
@@ -232,7 +232,7 @@
                 </div>
 
                 <div class="border rounded p-2 mt-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex justify-content-between align-itemês-center mb-2">
                         <h6 class="mb-0"><i class="bi bi-whatsapp me-1"></i>Conversas WhatsApp</h6>
                         <a href="<?= base_url('atendimento-whatsapp') ?>" class="btn btn-sm btn-outline-success">
                             <i class="bi bi-arrow-up-right-square me-1"></i>Abrir Central
@@ -248,7 +248,7 @@
                                         <th>Telefone</th>
                                         <th>Status</th>
                                         <th>Nao lidas</th>
-                                        <th>Ultima msg</th>
+                                        <th>Ultima mêsg</th>
                                         <th></th>
                                     </tr>
                                 </thead>

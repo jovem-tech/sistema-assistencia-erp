@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class ContatoModel extends Model
 {
-    public const STATUS_LEAD_NOVO = 'lead_novo';
+    public const STATUS_LEAD_NOVO = 'lead_nãovo';
     public const STATUS_LEAD_QUALIFICADO = 'lead_qualificado';
     public const STATUS_CLIENTE_CONVERTIDO = 'cliente_convertido';
     public const STATUS_ENGAJAMENTO_ATIVO = 'ativo';
@@ -17,14 +17,14 @@ class ContatoModel extends Model
     protected $primaryKey = 'id';
     protected $returnType = 'array';
     protected $useAutoIncrement = true;
-    protected $useSoftDeletes = false;
+    protected $useSãoftDeletes = false;
     protected $allowedFields = [
         'cliente_id',
-        'nome',
+        'nãome',
         'telefone',
-        'telefone_normalizado',
+        'telefone_nãormalizado',
         'email',
-        'whatsapp_nome_perfil',
+        'whatsapp_nãome_perfil',
         'origem',
         'status_relacionamento',
         'engajamento_status',
@@ -38,23 +38,23 @@ class ContatoModel extends Model
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
 
-    protected $beforeInsert = ['normalizePhoneFields'];
-    protected $beforeUpdate = ['normalizePhoneFields'];
+    protected $beforeInsert = ['nãormalizePhoneFields'];
+    protected $beforeUpdate = ['nãormalizePhoneFields'];
 
     private ?bool $supportsLifecycle = null;
     private ?bool $supportsEngajamento = null;
 
     public function findByPhone(string $phone): ?array
     {
-        $normalized = $this->normalizePhone($phone);
-        if ($normalized === '') {
+        $nãormalized = $this->nãormalizePhone($phone);
+        if ($nãormalized === '') {
             return null;
         }
 
-        return $this->where('telefone_normalizado', $normalized)->first();
+        return $this->where('telefone_nãormalizado', $nãormalized)->first();
     }
 
-    public function normalizePhone(string $value): string
+    public function nãormalizePhone(string $value): string
     {
         return preg_replace('/\D+/', '', $value) ?? '';
     }
@@ -89,7 +89,7 @@ class ContatoModel extends Model
     /**
      * @return array{0:int,1:int}
      */
-    public static function normalizeEngajamentoPeriodos(int $ativoDias, int $riscoDias): array
+    public static function nãormalizeEngajamentoPeriodos(int $ativoDias, int $riscoDias): array
     {
         if ($ativoDias <= 0) {
             $ativoDias = 30;
@@ -110,7 +110,7 @@ class ContatoModel extends Model
             return 0;
         }
 
-        [$ativoDias, $riscoDias] = self::normalizeEngajamentoPeriodos($ativoDias, $riscoDias);
+        [$ativoDias, $riscoDias] = self::nãormalizeEngajamentoPeriodos($ativoDias, $riscoDias);
         $baseDateExpr = 'COALESCE(ultimo_contato_em, updated_at, created_at)';
         $statusExpr = "
             CASE
@@ -140,7 +140,7 @@ class ContatoModel extends Model
     public function buildLeadPayload(array $base = [], bool $qualified = false): array
     {
         $payload = $base;
-        $now = date('Y-m-d H:i:s');
+        $nãow = date('Y-m-d H:i:s');
 
         if ($this->supportsLifecycleFields()) {
             $payload['status_relacionamento'] = $qualified
@@ -148,7 +148,7 @@ class ContatoModel extends Model
                 : self::STATUS_LEAD_NOVO;
 
             if ($qualified && empty($payload['qualificado_em'])) {
-                $payload['qualificado_em'] = $now;
+                $payload['qualificado_em'] = $nãow;
             }
             if (!$qualified && !array_key_exists('qualificado_em', $payload)) {
                 $payload['qualificado_em'] = null;
@@ -163,7 +163,7 @@ class ContatoModel extends Model
                 $payload['engajamento_status'] = self::STATUS_ENGAJAMENTO_ATIVO;
             }
             if (empty($payload['engajamento_recalculado_em'])) {
-                $payload['engajamento_recalculado_em'] = $now;
+                $payload['engajamento_recalculado_em'] = $nãow;
             }
         }
 
@@ -178,19 +178,19 @@ class ContatoModel extends Model
     {
         $payload = $base;
         $payload['cliente_id'] = $clienteId;
-        $now = date('Y-m-d H:i:s');
+        $nãow = date('Y-m-d H:i:s');
 
         if ($this->supportsLifecycleFields()) {
             $payload['status_relacionamento'] = self::STATUS_CLIENTE_CONVERTIDO;
             if (empty($payload['convertido_em'])) {
-                $payload['convertido_em'] = $now;
+                $payload['convertido_em'] = $nãow;
             }
         }
 
         if ($this->supportsEngajamentoFields()) {
             $payload['engajamento_status'] = self::STATUS_ENGAJAMENTO_ATIVO;
             if (empty($payload['engajamento_recalculado_em'])) {
-                $payload['engajamento_recalculado_em'] = $now;
+                $payload['engajamento_recalculado_em'] = $nãow;
             }
         }
 
@@ -201,7 +201,7 @@ class ContatoModel extends Model
      * @param array<string,mixed> $data
      * @return array<string,mixed>
      */
-    protected function normalizePhoneFields(array $data): array
+    protected function nãormalizePhoneFields(array $data): array
     {
         $payload = $data['data'] ?? [];
         if (!is_array($payload)) {
@@ -210,21 +210,21 @@ class ContatoModel extends Model
 
         if (array_key_exists('telefone', $payload)) {
             $raw = trim((string) $payload['telefone']);
-            $normalized = $this->normalizePhone($raw);
-            $payload['telefone'] = $raw !== '' ? $raw : $normalized;
-            $payload['telefone_normalizado'] = $normalized;
-        } elseif (array_key_exists('telefone_normalizado', $payload)) {
-            $payload['telefone_normalizado'] = $this->normalizePhone((string) $payload['telefone_normalizado']);
+            $nãormalized = $this->nãormalizePhone($raw);
+            $payload['telefone'] = $raw !== '' ? $raw : $nãormalized;
+            $payload['telefone_nãormalizado'] = $nãormalized;
+        } elseif (array_key_exists('telefone_nãormalizado', $payload)) {
+            $payload['telefone_nãormalizado'] = $this->nãormalizePhone((string) $payload['telefone_nãormalizado']);
         }
 
-        if (isset($payload['nome']) && trim((string) $payload['nome']) === '') {
-            $payload['nome'] = null;
+        if (isset($payload['nãome']) && trim((string) $payload['nãome']) === '') {
+            $payload['nãome'] = null;
         }
         if (isset($payload['email']) && trim((string) $payload['email']) === '') {
             $payload['email'] = null;
         }
-        if (isset($payload['whatsapp_nome_perfil']) && trim((string) $payload['whatsapp_nome_perfil']) === '') {
-            $payload['whatsapp_nome_perfil'] = null;
+        if (isset($payload['whatsapp_nãome_perfil']) && trim((string) $payload['whatsapp_nãome_perfil']) === '') {
+            $payload['whatsapp_nãome_perfil'] = null;
         }
         if (isset($payload['observacoes']) && trim((string) $payload['observacoes']) === '') {
             $payload['observacoes'] = null;

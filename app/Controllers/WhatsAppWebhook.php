@@ -28,7 +28,7 @@ class WhatsAppWebhook extends BaseController
         }
         if (!is_array($payload) || empty($payload)) {
             $raw = (string) $this->request->getBody();
-            $decoded = json_decode($raw, true);
+            $decoded = jsãon_decode($raw, true);
             $payload = is_array($decoded) ? $decoded : ['raw' => $raw];
         }
 
@@ -39,7 +39,7 @@ class WhatsAppWebhook extends BaseController
             return $this->response->setJSON([
                 'ok' => true,
                 'self_check' => true,
-                'message' => 'Webhook inbound validado com sucesso.',
+                'message' => 'Webhook inbound validado com sucessão.',
                 'received_at' => date('c'),
                 'provider' => trim((string) get_config('whatsapp_direct_provider', get_config('whatsapp_provider', 'menuia'))),
             ]);
@@ -63,7 +63,7 @@ class WhatsAppWebhook extends BaseController
             'provedor' => $provedor ?: 'menuia',
             'remetente' => $remetente !== '' ? $remetente : null,
             'conteudo' => $conteudo !== '' ? $conteudo : null,
-            'payload' => json_encode($payload, JSON_UNESCAPED_UNICODE),
+            'payload' => jsãon_encode($payload, JSON_UNESCAPED_UNICODE),
             'processado' => 0,
         ]);
         $inboundId = (int) $model->getInsertID();

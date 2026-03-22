@@ -304,6 +304,11 @@ function openDocPage(page) {
         'deploy-vps': '10-deploy/manual-tecnico-oficial-vps-ubuntu-24-ci4.md',
         'deploy-vps-script': '10-deploy/scripts/install_erp.sh',
         'deploy-vps-guia': '10-deploy/linux-vps-deployment.md',
+        'deploy-vps-atualizacao': '10-deploy/atualizacao-vps-sem-downtime.md',
+        'deploy-vps-ubuntu26': '10-deploy/atualizacao-vps-sem-downtime.md',
+        'upgrade-vps': '10-deploy/atualizacao-vps-sem-downtime.md',
+        'deploy-agente-autonomo': '10-deploy/agente-autonomo-devops-engenharia-fullstack.md',
+        'agente-devops': '10-deploy/agente-autonomo-devops-engenharia-fullstack.md',
         'vendas': '06-modulos-do-sistema/vendas.md'
     };
 

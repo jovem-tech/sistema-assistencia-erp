@@ -322,6 +322,13 @@ Regras:
 - normalizacao de nome de arquivo e controle de sobrescrita (`_1`, `_2`, ...)
 - a mensagem salva em banco registra `arquivo`, `anexo_path`, `mime_type` e `tipo_conteudo`
 
+Fallback para referencias orfas (VPS sem sincronismo de `uploads`):
+- quando a referencia da midia existe no banco, mas o arquivo fisico nao existe em `public/uploads`, o backend marca a mensagem com:
+  - `arquivo_disponivel = 0`
+  - `arquivo_original` / `anexo_path_original` (rastreamento da referencia legada)
+- nessas mensagens, `arquivo` e `anexo_path` sao retornados como `null` para evitar requests HTTP quebrados.
+- o frontend renderiza aviso de "Arquivo indisponivel no servidor" em vez de tentar baixar/abrir o arquivo.
+
 <a id="chatbot"></a>
 ### 2) Chatbot / Automacao
 Rota: `/atendimento-whatsapp/chatbot`

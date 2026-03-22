@@ -89,6 +89,10 @@ Query params suportados em `GET /crm/metricas-marketing`:
 Notas de resposta:
 - `GET /atendimento-whatsapp/conversas` retorna metadados da ultima mensagem para UX estilo WhatsApp (`ultima_mensagem_texto`, `ultima_mensagem_tipo`, `ultima_mensagem_direcao`, `ultima_mensagem_bot`).
 - `GET /atendimento-whatsapp/conversa/{id}` retorna `unread_before` para permitir separador visual de nao lidas na thread antes de marcar como lida.
+- mensagens com anexo podem retornar metadados de disponibilidade de arquivo:
+  - `arquivo_disponivel` (`1` disponivel, `0` ausente no disco)
+  - `arquivo_original` e `anexo_path_original` quando a referencia legada existe, mas o arquivo fisico nao foi encontrado
+  - quando `arquivo_disponivel=0`, os campos `arquivo` e `anexo_path` retornam `null` para evitar 404 no frontend
 - `GET /atendimento-whatsapp/conversa/{id}/novas` retorna apenas mensagens com `id > after_id`, sem recarregar toda a thread.
 - `GET /atendimento-whatsapp/conversa/{id}/stream` suporta:
   - `probe=1` (pre-check em JSON)

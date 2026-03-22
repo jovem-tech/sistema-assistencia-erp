@@ -1336,7 +1336,20 @@
     };
 
     const renderMedia = (msg, outbound) => {
+        const mediaAvailable = Number(msg?.arquivo_disponivel ?? 1) === 1;
         const arquivo = String(msg?.arquivo || msg?.anexo_path || '').trim();
+        if (!mediaAvailable) {
+            const rawMissingName = String(msg?.arquivo_original || msg?.anexo_path_original || msg?.arquivo || msg?.anexo_path || '').trim();
+            const filename = escapeHtml(rawMissingName || mediaCaptionLabel(msg));
+            return `
+                <div class="alert alert-warning py-2 px-3 mt-2 mb-0 small">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Arquivo indisponivel no servidor.
+                    ${filename ? `<span class="d-block text-truncate mt-1">${filename}</span>` : ''}
+                </div>
+            `;
+        }
+
         if (!arquivo) {
             return '';
         }

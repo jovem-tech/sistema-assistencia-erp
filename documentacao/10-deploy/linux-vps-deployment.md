@@ -9,6 +9,7 @@ Este guia prepara a aplicacao para producao em VPS Linux (Ubuntu/Debian), manten
 Para procedimento integral de provisionamento e operacao do ERP CI4 em Ubuntu 24.04, consulte:
 
 - `manual-tecnico-oficial-vps-ubuntu-24-ci4.md`
+- `atualizacao-vps-sem-downtime.md`
 - `scripts/install_erp.sh`
 
 ## 1. Arquitetura alvo

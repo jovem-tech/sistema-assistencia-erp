@@ -9,7 +9,9 @@ Este guia resume a entrada em producao do ERP com gateway WhatsApp Node em VPS L
 Para procedimento completo (do zero, com troubleshooting real e validacoes operacionais), use:
 
 - `manual-tecnico-oficial-vps-ubuntu-24-ci4.md`
+- `atualizacao-vps-sem-downtime.md`
 - `scripts/install_erp.sh`
+- `agente-autonomo-devops-engenharia-fullstack.md`
 
 ## 1. Requisitos
 

@@ -37,6 +37,7 @@
 - Rotas pre-CRM: `05-api/rotas.md`
 - Correcao Central (erros + observabilidade + clientes novos + funil): `08-correcoes/2026-03-20-central-mensagens-codigos-erro-observabilidade-clientes-novos.md`
 - Correcao CRM/Contatos (engajamento temporal configuravel): `08-correcoes/2026-03-20-engajamento-temporal-contatos-crm.md`
+- Guia de atualizacao de VPS sem downtime (contingencia + Ubuntu novo): `08-correcoes/2026-03-22-guia-atualizacao-vps-sem-downtime.md`
 - Entrega pre-CRM base: `07-novas-implementacoes/2026-03-pre-crm-foundation-os-whatsapp-pdf.md`
 - Entrega CRM + Central: `07-novas-implementacoes/2026-03-crm-central-mensagens-integrados.md`
 - Evolucao faseada da Central de Atendimento: `07-novas-implementacoes/2026-03-central-atendimento-inteligente-faseada.md`
@@ -44,5 +45,7 @@
 - Gateway local WhatsApp (producao-ready): `07-novas-implementacoes/2026-03-gateway-local-whatsapp-producao.md`
 - Deploy em VPS Linux: `10-deploy/linux-vps-deployment.md`
 - Manual tecnico oficial VPS Ubuntu 24.04 (com troubleshooting real): `10-deploy/manual-tecnico-oficial-vps-ubuntu-24-ci4.md`
+- Atualizacao de VPS sem downtime (Blue/Green + contingencia): `10-deploy/atualizacao-vps-sem-downtime.md`
 - Script oficial de automacao de deploy: `10-deploy/scripts/install_erp.sh`
+- Politica operacional do agente autonomo DevOps + Engenharia Fullstack: `10-deploy/agente-autonomo-devops-engenharia-fullstack.md`
 - Roadmap: `09-roadmap/funcionalidades-planejadas.md`

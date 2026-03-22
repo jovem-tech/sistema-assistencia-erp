@@ -97,10 +97,100 @@ class MensagemWhatsappModel extends Model
                 continue;
             }
             $row['origem'] = $this->resolveOrigem($row);
+            $row = $this->normalizeMediaAvailability($row);
         }
         unset($row);
 
         return $rows;
+    }
+
+    private function normalizeMediaAvailability(array $row): array
+    {
+        $arquivo = trim((string) ($row['arquivo'] ?? ''));
+        $anexoPath = trim((string) ($row['anexo_path'] ?? ''));
+        $candidate = $arquivo !== '' ? $arquivo : $anexoPath;
+
+        if ($candidate === '') {
+            $row['arquivo_disponivel'] = 1;
+            return $row;
+        }
+
+        if ($this->isExternalMediaPath($candidate)) {
+            $row['arquivo_disponivel'] = 1;
+            return $row;
+        }
+
+        $relative = $this->normalizeRelativeUploadPath($candidate);
+        if ($relative === '') {
+            $row['arquivo_disponivel'] = 0;
+            $row['arquivo_original'] = $arquivo !== '' ? $arquivo : $candidate;
+            $row['anexo_path_original'] = $anexoPath !== '' ? $anexoPath : $candidate;
+            $row['arquivo'] = null;
+            $row['anexo_path'] = null;
+            return $row;
+        }
+
+        $publicRoot = $this->publicRootPath();
+        $absolute = $publicRoot . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relative);
+
+        if (is_file($absolute)) {
+            $row['arquivo_disponivel'] = 1;
+            return $row;
+        }
+
+        // Mantem o historico da mensagem sem gerar request 404 no frontend.
+        $row['arquivo_disponivel'] = 0;
+        $row['arquivo_original'] = $arquivo !== '' ? $arquivo : $candidate;
+        $row['anexo_path_original'] = $anexoPath !== '' ? $anexoPath : $candidate;
+        $row['arquivo'] = null;
+        $row['anexo_path'] = null;
+
+        return $row;
+    }
+
+    private function normalizeRelativeUploadPath(string $path): string
+    {
+        $clean = trim($path);
+        if ($clean === '') {
+            return '';
+        }
+
+        $clean = preg_replace('/[#?].*$/', '', $clean) ?? '';
+        $clean = trim(str_replace('\\', '/', $clean));
+        $clean = preg_replace('#^/+?#', '', $clean) ?? '';
+        $clean = preg_replace('#^\./+#', '', $clean) ?? '';
+
+        if (str_starts_with($clean, 'public/')) {
+            $clean = substr($clean, 7);
+        }
+
+        if ($clean === '' || str_contains($clean, '..')) {
+            return '';
+        }
+
+        return $clean;
+    }
+
+    private function isExternalMediaPath(string $path): bool
+    {
+        $value = strtolower(trim($path));
+        if ($value === '') {
+            return false;
+        }
+
+        return str_starts_with($value, 'http://')
+            || str_starts_with($value, 'https://')
+            || str_starts_with($value, '//')
+            || str_starts_with($value, 'data:');
+    }
+
+    private function publicRootPath(): string
+    {
+        if (defined('FCPATH') && is_string(FCPATH) && FCPATH !== '') {
+            return rtrim(FCPATH, '\\/');
+        }
+
+        return rtrim(ROOTPATH . 'public', '\\/');
     }
 
     private function resolveOrigem(array $row): string

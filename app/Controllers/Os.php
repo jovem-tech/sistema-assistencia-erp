@@ -383,18 +383,12 @@ class Os extends BaseController
 
         $fotos_equip = $fotoEquipModel->where('equipamento_id', $os['equipamento_id'])->findAll();
         foreach ($fotos_equip as &$f) {
-            $pathPerfil = FCPATH . 'uploads/equipamentos_perfil/' . $f['arquivo'];
-            $f['url'] = file_exists($pathPerfil) 
-                ? base_url('uploads/equipamentos_perfil/' . $f['arquivo']) 
-                : base_url('uploads/equipamentos/' . basename((string) $f['arquivo']));
+            $f['url'] = $this->resolveEquipamentoFotoPublicUrl((string) ($f['arquivo'] ?? ''));
         }
 
         $fotos_entrada = $fotoOsModel->where('os_id', $id)->where('tipo', 'recepcao')->findAll();
         foreach ($fotos_entrada as &$f) {
-            $pathAnormal = FCPATH . 'uploads/os_anormalidades/' . $f['arquivo'];
-            $f['url'] = file_exists($pathAnormal) 
-                ? base_url('uploads/os_anormalidades/' . $f['arquivo']) 
-                : base_url('uploads/os/' . $f['arquivo']);
+            $f['url'] = $this->resolveOsEntradaFotoPublicUrl((string) ($f['arquivo'] ?? ''));
         }
 
         $data = [
@@ -447,10 +441,7 @@ class Os extends BaseController
         $fotoOsModel = new OsFotoModel();
         $fotos_entrada = $fotoOsModel->where('os_id', $id)->where('tipo', 'recepcao')->findAll();
         foreach ($fotos_entrada as &$f) {
-            $pathAnormal = FCPATH . 'uploads/os_anormalidades/' . $f['arquivo'];
-            $f['url'] = file_exists($pathAnormal) 
-                ? base_url('uploads/os_anormalidades/' . $f['arquivo']) 
-                : base_url('uploads/os/' . $f['arquivo']);
+            $f['url'] = $this->resolveOsEntradaFotoPublicUrl((string) ($f['arquivo'] ?? ''));
         }
 
         $estadoFisicoEntries = (new EstadoFisicoOsModel())->where('os_id', $id)->orderBy('id', 'ASC')->findAll();
@@ -1231,6 +1222,84 @@ class Os extends BaseController
             }
         }
         return $max + 1;
+    }
+
+    private function resolveEquipamentoFotoPublicUrl(string $arquivo): string
+    {
+        $arquivo = str_replace('\\', '/', ltrim($arquivo, '/'));
+        if ($arquivo === '') {
+            return $this->missingImageDataUri();
+        }
+
+        $arquivoFs = str_replace('/', DIRECTORY_SEPARATOR, $arquivo);
+        $basename = basename($arquivo);
+        $candidates = [
+            [
+                'path' => FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'equipamentos_perfil' . DIRECTORY_SEPARATOR . $arquivoFs,
+                'url'  => base_url('uploads/equipamentos_perfil/' . $arquivo),
+            ],
+            [
+                'path' => FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'equipamentos_perfil' . DIRECTORY_SEPARATOR . $basename,
+                'url'  => base_url('uploads/equipamentos_perfil/' . $basename),
+            ],
+            [
+                'path' => FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'equipamentos' . DIRECTORY_SEPARATOR . $basename,
+                'url'  => base_url('uploads/equipamentos/' . $basename),
+            ],
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_file($candidate['path'])) {
+                return $candidate['url'];
+            }
+        }
+
+        return $this->missingImageDataUri();
+    }
+
+    private function resolveOsEntradaFotoPublicUrl(string $arquivo): string
+    {
+        $arquivo = str_replace('\\', '/', ltrim($arquivo, '/'));
+        if ($arquivo === '') {
+            return $this->missingImageDataUri();
+        }
+
+        $arquivoFs = str_replace('/', DIRECTORY_SEPARATOR, $arquivo);
+        $basename = basename($arquivo);
+        $candidates = [
+            [
+                'path' => FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'os_anormalidades' . DIRECTORY_SEPARATOR . $arquivoFs,
+                'url'  => base_url('uploads/os_anormalidades/' . $arquivo),
+            ],
+            [
+                'path' => FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'os_anormalidades' . DIRECTORY_SEPARATOR . $basename,
+                'url'  => base_url('uploads/os_anormalidades/' . $basename),
+            ],
+            [
+                'path' => FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'os' . DIRECTORY_SEPARATOR . $basename,
+                'url'  => base_url('uploads/os/' . $basename),
+            ],
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_file($candidate['path'])) {
+                return $candidate['url'];
+            }
+        }
+
+        return $this->missingImageDataUri();
+    }
+
+    private function missingImageDataUri(): string
+    {
+        static $uri = null;
+        if ($uri !== null) {
+            return $uri;
+        }
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="180" height="120" viewBox="0 0 180 120"><rect width="180" height="120" rx="10" fill="#eef2ff"/><rect x="62" y="34" width="56" height="36" rx="6" fill="#c7d2fe"/><circle cx="90" cy="52" r="10" fill="#818cf8"/><text x="90" y="96" text-anchor="middle" font-size="12" fill="#64748b">sem foto</text></svg>';
+        $uri = 'data:image/svg+xml;base64,' . base64_encode($svg);
+        return $uri;
     }
 
     public function print($id)

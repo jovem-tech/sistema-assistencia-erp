@@ -660,6 +660,10 @@ class Equipamentos extends BaseController
     private function buildFotoPublicUrl(string $arquivo): string
     {
         $arquivo = str_replace('\\', '/', ltrim($arquivo, '/'));
+        if ($arquivo === '') {
+            return $this->missingImageDataUri();
+        }
+
         $pathPerfil = $this->buildPerfilAbsolutePath($arquivo);
         if (is_file($pathPerfil)) {
             return base_url('uploads/equipamentos_perfil/' . $arquivo);
@@ -670,7 +674,24 @@ class Equipamentos extends BaseController
             return base_url('uploads/equipamentos_perfil/' . basename($arquivo));
         }
 
-        return base_url('uploads/equipamentos/' . basename($arquivo));
+        $legacyUploadPath = FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'equipamentos' . DIRECTORY_SEPARATOR . basename($arquivo);
+        if (is_file($legacyUploadPath)) {
+            return base_url('uploads/equipamentos/' . basename($arquivo));
+        }
+
+        return $this->missingImageDataUri();
+    }
+
+    private function missingImageDataUri(): string
+    {
+        static $uri = null;
+        if ($uri !== null) {
+            return $uri;
+        }
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="180" height="120" viewBox="0 0 180 120"><rect width="180" height="120" rx="10" fill="#eef2ff"/><rect x="62" y="34" width="56" height="36" rx="6" fill="#c7d2fe"/><circle cx="90" cy="52" r="10" fill="#818cf8"/><text x="90" y="96" text-anchor="middle" font-size="12" fill="#64748b">sem foto</text></svg>';
+        $uri = 'data:image/svg+xml;base64,' . base64_encode($svg);
+        return $uri;
     }
 
     private function buildPerfilAbsolutePath(string $arquivo): string

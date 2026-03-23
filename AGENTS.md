@@ -32,6 +32,27 @@ Sempre que houver implementacao ou ajuste de interface no sistema:
    - Preferir endpoints que retornem `fotos` atualizadas para re-render imediato (ex.: salvar/atualizar/excluir).
    - Quando houver acao de definir principal, usar endpoint dedicado e refletir no card e no modal.
 
+## Padrao Global de Responsividade (Ultra Compatibilidade)
+
+Sempre que houver implementacao de interface nova ou manutencao de telas existentes:
+
+1. Aplicar responsividade agressiva por padrao em **todas** as telas e componentes.
+2. Cobrir, no minimo, os breakpoints:
+   - `<= 430px` (smartphones gerais)
+   - `<= 390px` (iPhones compactos)
+   - `<= 360px` (androids pequenos)
+   - `<= 320px` (ultra compacto)
+3. Garantir obrigatoriamente:
+   - nenhum corte horizontal da pagina;
+   - cards, titulos e botoes sem truncamento visual;
+   - tabelas legiveis em mobile (stack/card ou scroll controlado);
+   - formularios sem estouro lateral;
+   - modais usaveis em telas pequenas;
+   - graficos com reflow/recalc ao trocar orientacao/dispositivo.
+4. Novas tabelas devem aceitar `data-label` por coluna para stack mobile.
+5. Toda entrega de UI deve incluir validacao em viewport mobile real no DevTools (320px e 360px, no minimo).
+6. Esse padrao e obrigatorio para implementacoes futuras, nao opcional.
+
 ## Regra Operacional para Fotos e Modais
 
 Sempre que a IA criar ou alterar qualquer fluxo de:

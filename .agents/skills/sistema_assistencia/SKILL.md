@@ -1,45 +1,75 @@
 ---
 name: sistema_assistencia
-description: "Padrões, arquitetura e convenções do Sistema de Assistência Técnica (CodeIgniter 4 + Bootstrap 5)."
+description: "Padroes, arquitetura e convencoes do Sistema de Assistencia Tecnica (CodeIgniter 4 + Bootstrap 5)."
 ---
 
-# Skill: Sistema de Assistência Técnica
+# Skill: Sistema de Assistencia Tecnica
 
-Este documento define os padrões, a arquitetura e as convenções de desenvolvimento para o projeto **Sistema de Assistência Técnica**.
+## Arquitetura e stack
+- Backend: PHP 8+ com CodeIgniter 4.
+- Banco: MySQL/MariaDB.
+- Frontend: Bootstrap 5.3, jQuery e CSS proprio.
+- Layout base: `app/Views/layouts/main.php`, `sidebar.php`, `navbar.php`.
+- Design system principal: `public/assets/css/estilo.css` e `public/assets/css/design-system/`.
 
-## Arquitetura e Tecnologias
-- **Backend:** PHP 8+ com framework **CodeIgniter 4**.
-- **Banco de Dados:** MySQL/MariaDB.
-- **Frontend:** HTML5, CSS3, JavaScript (jQuery), **Bootstrap 5.3**.
-- **Tema Visual:** Dark theme premium focado em **Glassmorphism**.
-- **Ícones:** Bootstrap Icons.
+## Estrutura importante
+- Controllers: `app/Controllers/`
+- Models: `app/Models/`
+- Views: `app/Views/`
+- Helpers globais: `app/Helpers/`
+- JS global: `public/assets/js/scripts.js`
+- Responsividade global: `public/assets/css/design-system/layouts/responsive-layout.css`
 
-## Estrutura de Diretórios Importante
-- `app/Controllers/`: Controladores. Tudo herda de `BaseController`.
-- `app/Models/`: Modelos do BD. Sempre use os recursos do CI4 (validações, timestamps).
-- `app/Views/ layouts/`: Templates globais:
-  - `main.php`: Template base.
-  - `sidebar.php`: Menu lateral (já implementa lógica de exibição baseada em permissões e módulos).
-  - `navbar.php`: Top navbar.
-- `public/assets/css/estilo.css`: **Fonte da verdade para o Design System.** Modifica variáveis nativas do Bootstrap para um visual premium (dark/glass effect).
+## Regras tecnicas obrigatorias
+1. Reutilizar estrutura existente antes de criar fluxo novo.
+2. Manter separacao Controller/Service/Model/View.
+3. Evitar duplicacao de CSS e JS por pagina quando o comportamento for global.
+4. Respeitar padrao de permissao (`can`, `canModule`, `requirePermission`).
+5. Atualizar documentacao em `documentacao/` em toda mudanca de codigo.
 
-## Diretrizes de Frontend e Design System
-Qualquer nova tela deve utilizar o design estabilizado presente em `estilo.css`:
+## Padrao de responsividade ultra compatibilidade (obrigatorio)
 
-1. **Painéis Principais:** Utilize a classe `.glass-card` em vez do tradicional `.card`. Ele fornece fundo semitransparente com blur nativo do CSS e comportamento visual de hover.
-2. **Cards de Dashboard:** Utilize `.stat-card` acoplado com variantes (ex: `.stat-card-success`, `.stat-card-primary`). Ver estrutura no arquivo `estilo.css`.
-3. **Botões Exclusivos:**
-   - Botão de Ação Primária Absoluta: classe `.btn-glow` (possui animação gradiente premium e box-shadow brilhante).
-   - Botões Secundários: use `.btn-outline-light` para adequação à paleta noturna.
-4. **Tabelas:** Classes de DataTables e tabelas comuns já foram remapeadas no global. Sempre use `.table` e gerencie em visual escuro transparente `.table-hover`.
-5. **Formulários:** As classes `.form-control` e `.form-select` estão ajustadas. Não reescreva inputs básicos na view.
+Toda implementacao de UI deve funcionar sem quebra em:
+- `<= 430px`
+- `<= 390px`
+- `<= 360px`
+- `<= 320px`
 
-> **Dica:** Há um laboratório de design vivo em `public/design-system.html` contendo todos os trechos e visualizações prontos das classes.
+Checklist obrigatorio:
+1. Sem corte horizontal da pagina.
+2. Cards, titulos e botoes legiveis em telas pequenas.
+3. Tabelas:
+   - stack mobile com `data-label` quando aplicavel; ou
+   - scroll horizontal controlado com `.table-responsive`.
+4. Formularios e modais sem estouro lateral.
+5. Graficos com reflow ao trocar orientacao/dispositivo.
+6. Validacao final em DevTools nos tamanhos 320px e 360px.
 
-## Diretrizes de Backend
-1. **Flashdata para Respostas:** Operacionais e fluxos de criação e edição não usam ajax complexo a menos que requisitado; eles fazem recarregamento da página enviando:
-   - Sucesso: `session()->setFlashdata('success', 'Gravado com sucesso!');`
-   - Erro: `session()->setFlashdata('error', 'Algo deu errado');`
-   - Erros do Formulário (Validation): `session()->setFlashdata('errors', $validation->getErrors());` -- o HTML global captura e preenche.
-2. **Autorizações de Visualização:** Novas páginas que não sejam públicas devem ter Filtros (Filters) nas rotas ou verificação condicional em seu core (se helper próprio criado), e suas opções de menu devem consultar `canModule('nome')`.
-3. **Views:** Mantenha a injeção via block do CI4: estenda `layouts/main` (`<?= $this->extend('layouts/main') ?>`) e empurre a tela na tag `<?= $this->section('content') ?>`.
+Implementacao padrao:
+- CSS global no arquivo de responsividade.
+- Ajustes de tabela e reflow de graficos no JS global.
+
+## Controle de versao e release (obrigatorio)
+
+Regra operacional para qualquer alteracao no sistema:
+1. Trabalhar em branch dedicada com prefixo `codex/` (ou branch de feature definida pela equipe).
+2. Nao fazer commit/push sem autorizacao explicita do usuario.
+3. Seguir padrao de commit claro e rastreavel:
+   - `feat(modulo): ...`
+   - `fix(modulo): ...`
+   - `refactor(modulo): ...`
+   - `docs(modulo): ...`
+4. Quando houver release funcional:
+   - atualizar `app/Config/SystemRelease.php` com versao SemVer (`MAJOR.MINOR.PATCH`);
+   - manter sincronia entre versao exibida no rodape e versao de release;
+   - atualizar obrigatoriamente `documentacao/07-novas-implementacoes/historico-de-versoes.md`;
+   - criar tag git no padrao `vMAJOR.MINOR.PATCH` quando autorizado.
+5. Se existir override de versao em banco (`configuracoes.sistema_versao`), validar consistencia com a versao de codigo antes de publicar.
+6. Antes de deploy:
+   - revisar `git status`;
+   - validar migracoes pendentes;
+   - validar changelog/documentacao em `documentacao/`;
+   - confirmar plano de rollback.
+7. Depois de deploy:
+   - validar dashboard, OS, atendimento WhatsApp e uploads;
+   - registrar no historico de implementacao/correcao da documentacao.

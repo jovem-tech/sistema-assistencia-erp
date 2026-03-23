@@ -172,6 +172,15 @@ $(document).ready(function () {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
+    // =====================================================
+    // ULTRA RESPONSIVE ENHANCEMENTS (GLOBAL)
+    // =====================================================
+    initUltraResponsiveLayout();
+    clearStuckModalState();
+    document.addEventListener('hidden.bs.modal', function () {
+        setTimeout(clearStuckModalState, 60);
+    });
+
 });
 
 // Global base URL
@@ -309,6 +318,7 @@ function openDocPage(page) {
         'upgrade-vps': '10-deploy/atualizacao-vps-sem-downtime.md',
         'deploy-agente-autonomo': '10-deploy/agente-autonomo-devops-engenharia-fullstack.md',
         'agente-devops': '10-deploy/agente-autonomo-devops-engenharia-fullstack.md',
+        'padrao-responsividade': '11-padroes/boas-praticas.md#responsividade-ultra-compatibilidade-obrigatorio',
         'vendas': '06-modulos-do-sistema/vendas.md'
     };
 
@@ -318,5 +328,151 @@ function openDocPage(page) {
 
     const from = encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
     window.location.href = `${baseUrl}documentacao?from=${from}#${encodeURIComponent(path)}`;
+}
+
+// =====================================================
+// ULTRA RESPONSIVE CORE
+// =====================================================
+let ultraResponsiveObserver = null;
+let ultraResponsiveScheduleToken = null;
+let chartReflowTimer = null;
+
+function scheduleUltraResponsiveApply() {
+    if (ultraResponsiveScheduleToken) {
+        return;
+    }
+
+    ultraResponsiveScheduleToken = window.requestAnimationFrame(function () {
+        ultraResponsiveScheduleToken = null;
+        applyUltraResponsiveTables(document);
+    });
+}
+
+function applyUltraResponsiveTables(root) {
+    const scope = root || document;
+    const tables = scope.querySelectorAll('.page-content table:not(.no-mobile-stack)');
+
+    tables.forEach(function (table) {
+        if (!table.closest('.table-responsive') && !table.classList.contains('dataTable')) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'table-responsive ds-ultra-table-scroll';
+            table.parentNode.insertBefore(wrapper, table);
+            wrapper.appendChild(table);
+        }
+
+        const headCells = Array.from(table.querySelectorAll('thead th'));
+        if (!headCells.length) {
+            return;
+        }
+
+        const labels = headCells.map(function (th, index) {
+            const text = (th.textContent || '').replace(/\s+/g, ' ').trim();
+            return text !== '' ? text : ('Campo ' + (index + 1));
+        });
+
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(function (row) {
+            const cells = Array.from(row.children).filter(function (cell) {
+                return cell.tagName === 'TD' || cell.tagName === 'TH';
+            });
+
+            cells.forEach(function (cell, index) {
+                if (!cell.hasAttribute('data-label') || cell.getAttribute('data-label').trim() === '') {
+                    const label = labels[index] || ('Campo ' + (index + 1));
+                    cell.setAttribute('data-label', label);
+                }
+            });
+        });
+    });
+}
+
+function reflowAllCharts() {
+    try {
+        if (window.Chart && window.Chart.instances) {
+            const instancesRaw = window.Chart.instances;
+            const instances = Array.isArray(instancesRaw)
+                ? instancesRaw
+                : Object.keys(instancesRaw).map(function (key) { return instancesRaw[key]; });
+
+            instances.forEach(function (chart) {
+                if (!chart || typeof chart.resize !== 'function') {
+                    return;
+                }
+                chart.resize();
+                if (typeof chart.update === 'function') {
+                    chart.update('none');
+                }
+            });
+        }
+    } catch (error) {
+        console.error('[UltraResponsive] falha no reflow de Chart.js', error);
+    }
+}
+
+function scheduleChartsReflow() {
+    if (chartReflowTimer) {
+        clearTimeout(chartReflowTimer);
+    }
+
+    chartReflowTimer = setTimeout(function () {
+        reflowAllCharts();
+    }, 180);
+}
+
+function initUltraResponsiveLayout() {
+    scheduleUltraResponsiveApply();
+
+    if (ultraResponsiveObserver) {
+        ultraResponsiveObserver.disconnect();
+    }
+
+    const pageContent = document.querySelector('.page-content');
+    if (pageContent) {
+        ultraResponsiveObserver = new MutationObserver(function () {
+            scheduleUltraResponsiveApply();
+        });
+
+        ultraResponsiveObserver.observe(pageContent, {
+            childList: true,
+            subtree: true,
+        });
+    }
+
+    window.addEventListener('resize', function () {
+        scheduleUltraResponsiveApply();
+        scheduleChartsReflow();
+    }, { passive: true });
+
+    window.addEventListener('orientationchange', function () {
+        scheduleUltraResponsiveApply();
+        scheduleChartsReflow();
+    }, { passive: true });
+
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', function () {
+            scheduleUltraResponsiveApply();
+            scheduleChartsReflow();
+        }, { passive: true });
+    }
+}
+
+function clearStuckModalState() {
+    const body = document.body;
+    if (!body || !body.classList.contains('modal-open')) {
+        return;
+    }
+
+    const hasVisibleModal = document.querySelector('.modal.show');
+    if (hasVisibleModal) {
+        return;
+    }
+
+    body.classList.remove('modal-open');
+    body.style.removeProperty('overflow');
+    body.style.removeProperty('padding-right');
+
+    document.querySelectorAll('.modal-backdrop').forEach(function (el) {
+        el.remove();
+    });
 }
 

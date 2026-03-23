@@ -128,6 +128,14 @@ Fluxo interno:
   - primeiro tenta `configuracoes.sistema_versao` (se existir)
   - se nao existir, usa `SystemRelease::$version`.
 
+## Camada global de responsividade
+- CSS base: `public/assets/css/design-system/layouts/responsive-layout.css`
+- JS base: `public/assets/js/scripts.js` (`initUltraResponsiveLayout`)
+- Escopo:
+  - prevencao de overflow horizontal global;
+  - stack mobile para tabelas comuns via `data-label`;
+  - reflow automatico de graficos em resize/orientacao/visualViewport.
+
 Beneficios:
 - desacoplamento por provider
 - troca de provider sem alterar regra de negocio

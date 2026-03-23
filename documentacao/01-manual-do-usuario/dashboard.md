@@ -1,44 +1,79 @@
-# Manual do Usuário — Dashboard
+# Manual do Usuario - Dashboard
 
-## 📊 Visão Geral
+## Visao geral
 
-O Dashboard é a tela inicial do sistema após o login. Apresenta os principais indicadores (KPIs) em tempo real.
+O Dashboard e a tela inicial operacional do ERP. Ele concentra indicadores rapidos, graficos e atalhos para Ordens de Servico (OS), sem exigir navegacao para outros modulos.
 
----
+## Cards principais
 
-## 📈 Indicadores (KPIs)
+O topo do Dashboard exibe 4 cards:
 
-| Card | O que mostra |
-|------|-------------|
-| **OS Abertas** | Total de ordens no status ativo (não entregues/canceladas) |
-| **OS do Mês** | Ordens abertas no mês atual |
-| **Faturamento do Mês** | Soma dos valores finais das OS encerradas no mês |
-| **Clientes Ativos** | Total de clientes cadastrados |
+1. `OS abertas`: total de OS ainda ativas.
+2. `Faturamento mes`: total financeiro do mes corrente.
+3. `Equipamento entregue`: quantidade de OS no status oficial **Equipamento Entregue**.
+4. `Resumo geral`: total consolidado de:
+   - equipamentos cadastrados
+   - clientes cadastrados
+   - total de OS registradas
 
----
+## Graficos
 
-## 📉 Gráficos
+### 1) OS abertas por mes (principal)
 
-### OS por Status
-Gráfico de pizza mostrando a distribuição das OS por status atual.
+- Grafico em destaque.
+- Exibe janeiro a dezembro do ano atual.
+- Mostra quantidade de OS abertas por mes.
+- Mes sem movimento aparece com valor `0`.
 
-### Faturamento dos Últimos 6 Meses
-Gráfico de barras com a evolução do faturamento mensal.
+### 2) OS por status
 
----
+- Grafico de distribuicao (doughnut).
+- Usa macrofases quando disponiveis na estrutura `os_status`.
+- Mostra leitura rapida do estado operacional atual.
 
-## 🔔 OS Urgentes / Pendentes
+### 3) Resumo financeiro (barras horizontais)
 
-Lista das OS com prioridade **Urgente** ou **Alta** em aberto, permitindo acesso rápido.
+- Grafico horizontal comparando:
+  - receitas
+  - despesas
+  - lucro
+  - pendentes
+- Abaixo do grafico existe um mini resumo numerico com os mesmos valores.
 
----
+## Ultimas Ordens de Servico
 
-## 🔗 Ações Rápidas
+A grade de `Ultimas Ordens de Servico` agora abre em modal:
 
-Botões de atalho no topo:
-- **`+ Nova OS`** — Disponível em todas as telas
-- **Perfil** — Acesso às configurações da conta
+- Botao `Visualizar` abre a OS em modal sem recarregar o dashboard.
+- Botao `Nova OS` abre o formulario de criacao em modal.
+- O modal possui opcao `Abrir pagina` para abrir a tela completa em nova aba.
 
----
+## Responsividade
 
-> 💡 Os dados do dashboard são atualizados a cada requisição de página (sem auto-refresh).
+O dashboard foi ajustado para:
+
+- celular
+- tablet
+- notebook
+- desktop
+
+Comportamento responsivo aplicado:
+
+- alturas de graficos adaptadas por breakpoint
+- legendas e labels ajustados para leitura em telas menores
+- cards reorganizados sem quebra de layout
+- modal em fullscreen no mobile
+- tabela de `Ultimas Ordens de Servico` convertida para layout em blocos no smartphone (sem zoom horizontal)
+- ajuste de escala para telas estreitas (320px a 390px), incluindo Galaxy S9+/S8+, Pixel e iPhone
+- troca de orientacao/dispositivo recalcula os graficos automaticamente para evitar corte
+- breakpoints de ajuste fino para smartphone:
+  - ate `320px` (compacto extremo)
+  - ate `360px` (smartphones pequenos)
+  - ate `390px` (iPhones/Android compactos)
+  - ate `430px` (smartphones grandes)
+
+## Observacoes de uso
+
+- Os dados dos graficos sao carregados via endpoint interno `GET /admin/stats`.
+- Se houver erro de rede, o dashboard mantem os cards e exibe fallback nos graficos.
+- A versao oficial do ERP aparece no rodape lateral do sistema (menu esquerdo), no formato `Versao x.y.z`.

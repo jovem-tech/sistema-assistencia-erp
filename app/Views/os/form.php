@@ -47,9 +47,12 @@ $isOrigemCentralWhatsapp = !$isEdit
 $clienteSelecionadoNoForm = $isEdit
     ? (int) ($os['cliente_id'] ?? 0)
     : ($clientePreSelecionado > 0 ? $clientePreSelecionado : 0);
+
+$isEmbedded = (bool) ($isEmbedded ?? false);
+$embedQuery = $isEmbedded ? '?embed=1' : '';
 ?>
 
-<?= $this->extend('layouts/main') ?>
+<?= $this->extend($layout ?? 'layouts/main') ?>
 
 <?= $this->section('content') ?>
 
@@ -58,9 +61,11 @@ $clienteSelecionadoNoForm = $isEdit
         <h2><i class="bi bi-<?= $isEdit ? 'pencil' : 'plus-lg' ?> me-2"></i><?= $title ?></h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')">Ajuda</button>
     </div>
+    <?php if (!$isEmbedded): ?>
     <a href="<?= base_url('os') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('os') ?>">
         <i class="bi bi-arrow-left me-1"></i>Voltar
     </a>
+    <?php endif; ?>
 </div>
 
 <!-- LAYOUT PRINCIPAL: SIDEBAR (foto) + CONTEÚDO -->
@@ -223,7 +228,7 @@ $clienteSelecionadoNoForm = $isEdit
     <div class="col-12 col-xl-8 col-xxl-9 ds-split-main" id="formCol">
         <div class="card glass-card">
             <div class="card-body">
-                <form action="<?= $isEdit ? base_url('os/atualizar/' . $os['id']) : base_url('os/salvar') ?>"
+                <form action="<?= $isEdit ? base_url('os/atualizar/' . $os['id']) : base_url('os/salvar') ?><?= $embedQuery ?>"
                       method="POST" enctype="multipart/form-data" id="formOs" novalidate>
                     <?= csrf_field() ?>
                     <?php if (!$isEdit): ?>
@@ -631,7 +636,7 @@ $clienteSelecionadoNoForm = $isEdit
                                 </div>
                                 <div class="card-body">
                                     <p class="text-muted small mb-2">Adicione peças e serviços na tela de visualização da OS.</p>
-                                    <a href="<?= base_url('os/visualizar/' . $os['id']) ?>" class="btn btn-sm btn-outline-info">Abrir OS e lançar itens</a>
+                                    <a href="<?= base_url('os/visualizar/' . $os['id']) ?><?= $embedQuery ?>" class="btn btn-sm btn-outline-info">Abrir OS e lancar itens</a>
                                 </div>
                             </div>
                         </div>
@@ -710,7 +715,9 @@ $clienteSelecionadoNoForm = $isEdit
                         <button type="submit" class="btn btn-glow">
                             <i class="bi bi-check-lg me-1"></i><?= $isEdit ? 'Atualizar' : 'Abrir OS' ?>
                         </button>
+                        <?php if (!$isEmbedded): ?>
                         <a href="<?= base_url('os') ?>" class="btn btn-outline-secondary">Cancelar</a>
+                        <?php endif; ?>
                         <?php if (!$isEdit): ?>
                         <button type="button" class="btn btn-outline-warning" id="btnLimparRascunho">
                             <i class="bi bi-trash3 me-1"></i>Limpar rascunho

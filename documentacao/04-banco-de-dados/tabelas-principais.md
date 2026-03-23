@@ -1,7 +1,7 @@
 # Tabelas Principais do Banco de Dados
 
 Base: `assistencia_tecnica`  
-Atualizado em 20/03/2026 (modulo WhatsApp unificado + CRM/Central + contatos)
+Atualizado em 22/03/2026 (modulo WhatsApp unificado + CRM/Central + contatos + versao no rodape)
 
 ## Nucleo operacional
 - `clientes`
@@ -178,6 +178,9 @@ Tipos usados:
 ### CRM (engajamento temporal)
 - `crm_engajamento_ativo_dias`
 - `crm_engajamento_risco_dias`
+
+### Versao de release (rodape)
+- `sistema_versao` (opcional, override da versao exibida no rodape)
 
 ## Migrations relacionadas
 - `2026-03-16-090000_PreCrmFoundation.php`

@@ -341,6 +341,9 @@
     </div>
 
     <div class="sidebar-footer">
+        <div class="system-version-label">
+            <span class="system-version-text">Versao <?= esc(get_system_version()) ?></span>
+        </div>
         <a href="<?= base_url('logout') ?>" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 py-2 logout-btn" title="Sair do Sistema">
             <i class="bi bi-box-arrow-left fs-5"></i>
             <span class="logout-text">Sair do Sistema</span>

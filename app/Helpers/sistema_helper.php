@@ -137,6 +137,24 @@ function get_config($chave, $default = null)
 }
 
 /**
+ * Retorna a versao de release do sistema com fallback seguro.
+ */
+function get_system_version(): string
+{
+    $releaseConfig = config('SystemRelease');
+    $defaultVersion = is_object($releaseConfig) && property_exists($releaseConfig, 'version')
+        ? (string) $releaseConfig->version
+        : '2.1.0';
+
+    $configuredVersion = trim((string) get_config('sistema_versao', ''));
+    if ($configuredVersion !== '') {
+        return $configuredVersion;
+    }
+
+    return $defaultVersion;
+}
+
+/**
  * Retorna o tema atual configurado (light ou dark)
  */
 function get_theme()

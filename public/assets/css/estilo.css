@@ -439,7 +439,9 @@ a:hover {
 .sidebar.collapsed .nav-link span,
 .sidebar.collapsed .nav-section,
 .sidebar.collapsed .user-info,
-.sidebar.collapsed .logout-text {
+.sidebar.collapsed .logout-text,
+.sidebar.collapsed .system-version-text,
+.sidebar.collapsed .system-version-label {
     display: none;
 }
 
@@ -581,6 +583,25 @@ a:hover {
 .sidebar-footer {
     padding: 16px;
     border-top: 1px solid var(--border-color);
+}
+
+.system-version-label {
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.system-version-text {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .user-mini-profile {

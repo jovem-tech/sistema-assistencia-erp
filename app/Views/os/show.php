@@ -1,4 +1,8 @@
-<?= $this->extend('layouts/main') ?>
+<?php
+$isEmbedded = (bool) ($isEmbedded ?? false);
+$embedQuery = $isEmbedded ? '?embed=1' : '';
+?>
+<?= $this->extend($layout ?? 'layouts/main') ?>
 
 <?= $this->section('content') ?>
 
@@ -38,16 +42,18 @@
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <?php if (can('os', 'editar')): ?>
-        <a href="<?= base_url('os/editar/' . $os['id']) ?>" class="btn btn-outline-secondary">
+        <a href="<?= base_url('os/editar/' . $os['id']) ?><?= $embedQuery ?>" class="btn btn-outline-secondary">
             <i class="bi bi-pencil me-1"></i>Editar
         </a>
         <?php endif; ?>
         <a href="<?= base_url('os/imprimir/' . $os['id']) ?>" class="btn btn-outline-secondary" target="_blank">
             <i class="bi bi-printer me-1"></i>Imprimir
         </a>
+        <?php if (!$isEmbedded): ?>
         <a href="<?= base_url('os') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('os') ?>">
             <i class="bi bi-arrow-left me-1"></i>Voltar
         </a>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -116,7 +122,7 @@
                     <?= getPriorityBadge($os['prioridade'] ?? 'normal') ?>
                 </div>
                                 <?php if (can('os', 'editar')): ?>
-                <form action="<?= base_url('os/status/' . $os['id']) ?>" method="POST" class="os-status-update-form">
+                <form action="<?= base_url('os/status/' . $os['id']) ?><?= $embedQuery ?>" method="POST" class="os-status-update-form">
                     <select name="status" class="form-select form-select-sm">
                         <?php
                         $statusOptionsForView = !empty($statusOptions ?? []) ? $statusOptions : [];
@@ -191,7 +197,7 @@
                 <h6 class="mb-0"><i class="bi bi-file-earmark-pdf me-1"></i>Documentos PDF</h6>
             </div>
             <div class="card-body">
-                <form action="<?= base_url('os/pdf/' . $os['id'] . '/gerar') ?>" method="POST" class="os-doc-form mb-3">
+                <form action="<?= base_url('os/pdf/' . $os['id'] . '/gerar') ?><?= $embedQuery ?>" method="POST" class="os-doc-form mb-3">
                     <?= csrf_field() ?>
                     <select name="tipo_documento" class="form-select form-select-sm" required>
                         <option value="">Selecionar tipo...</option>
@@ -225,7 +231,7 @@
                                         <i class="bi bi-download"></i>
                                     </a>
                                     <?php if (can('os', 'editar')): ?>
-                                        <form action="<?= base_url('os/whatsapp/' . $os['id']) ?>" method="POST" class="d-inline">
+                                        <form action="<?= base_url('os/whatsapp/' . $os['id']) ?><?= $embedQuery ?>" method="POST" class="d-inline">
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="telefone" value="<?= esc($os['cliente_telefone'] ?? '') ?>">
                                             <input type="hidden" name="documento_id" value="<?= esc((string) ($doc['id'] ?? '')) ?>">
@@ -250,7 +256,7 @@
             </div>
             <div class="card-body">
                 <?php if (can('os', 'editar')): ?>
-                    <form action="<?= base_url('os/whatsapp/' . $os['id']) ?>" method="POST" class="d-flex flex-column gap-2 mb-3">
+                    <form action="<?= base_url('os/whatsapp/' . $os['id']) ?><?= $embedQuery ?>" method="POST" class="d-flex flex-column gap-2 mb-3">
                         <?= csrf_field() ?>
                         <select name="template_codigo" class="form-select form-select-sm">
                             <option value="">Template...</option>
@@ -387,7 +393,7 @@
                 <h5 class="card-title mb-0">Adicionar Item</h5>
             </div>
             <div class="card-body">
-                <form action="<?= base_url('os/item/salvar') ?>" method="POST">
+                <form action="<?= base_url('os/item/salvar') ?><?= $embedQuery ?>" method="POST">
                     <input type="hidden" name="os_id" value="<?= $os['id'] ?>">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-2">
@@ -453,7 +459,7 @@
                                 <td><strong><?= formatMoney($item['valor_total']) ?></strong></td>
                                 <td>
                                     <?php if (can('os', 'editar')): ?>
-                                    <a href="<?= base_url('os/item/excluir/' . $item['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nome="<?= esc($item['descricao']) ?>">
+                                    <a href="<?= base_url('os/item/excluir/' . $item['id']) ?><?= $embedQuery ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nome="<?= esc($item['descricao']) ?>">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                     <?php endif; ?>

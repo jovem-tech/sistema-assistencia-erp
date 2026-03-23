@@ -74,6 +74,12 @@ Persistencia:
 - `POST /os/whatsapp/{id}`
 - `POST /os/pdf/{id}/gerar`
 
+## Modo embed (dashboard e atalhos rapidos)
+- `GET /os/nova?embed=1`
+- `GET /os/visualizar/{id}?embed=1`
+- Em embed, as telas usam `layouts/embed.php` para abrir em modal sem sidebar/navbar.
+- Formularios de criacao/edicao preservam `embed=1` para manter o fluxo dentro do modal.
+
 ## Integracao com CRM e inbox
 - Alteracao de status dispara `CrmService` para registrar eventos/follow-ups no CRM.
 - Mensagens da OS passam a refletir em `mensagens_whatsapp` com `conversa_id` quando houver thread.

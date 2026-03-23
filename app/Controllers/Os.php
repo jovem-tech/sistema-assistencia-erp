@@ -151,6 +151,7 @@ class Os extends BaseController
 
     public function create()
     {
+        $isEmbedded = $this->isEmbedRequest();
         $clienteModel    = new ClienteModel();
         $funcionarioModel = new FuncionarioModel();
         $tipoModel       = new \App\Models\EquipamentoTipoModel();
@@ -222,6 +223,8 @@ class Os extends BaseController
             'clientePreSelecionado' => $clientePreSelecionado > 0 ? $clientePreSelecionado : null,
             'origemNomeHint' => $nomeHint,
             'origemTelefoneHint' => $telefoneHint,
+            'layout' => $isEmbedded ? 'layouts/embed' : 'layouts/main',
+            'isEmbedded' => $isEmbedded,
         ];
         return view('os/form', $data);
     }
@@ -322,12 +325,13 @@ class Os extends BaseController
 
         LogModel::registrar('os_criada', 'OS criada: ' . $dados['numero_os']);
 
-        return redirect()->to('/os/visualizar/' . $osId)
+        return redirect()->to($this->osViewUrl((int) $osId))
             ->with('success', 'Ordem de Serviço ' . $dados['numero_os'] . ' criada com sucesso!');
     }
 
     public function show($id)
     {
+        $isEmbedded = $this->isEmbedRequest();
         $os = $this->model->getComplete($id);
         if (!$os) {
             return redirect()->to('/os')
@@ -419,12 +423,15 @@ class Os extends BaseController
                 ? (new OsDocumentoModel())->byOs((int) $id)
                 : [],
             'pdfTipos' => (new OsPdfService())->tiposDisponiveis(),
+            'layout' => $isEmbedded ? 'layouts/embed' : 'layouts/main',
+            'isEmbedded' => $isEmbedded,
         ];
         return view('os/show', $data);
     }
 
     public function edit($id)
     {
+        $isEmbedded = $this->isEmbedRequest();
         $os = $this->model->getComplete($id);
         if (!$os) {
             return redirect()->to('/os')
@@ -459,6 +466,8 @@ class Os extends BaseController
             'estadoFisicoEntries' => $estadoFisicoEntries,
             'statusGrouped' => (new OsStatusFlowService())->getStatusGrouped(),
             'statusDefault' => (string) ($os['status'] ?? 'triagem'),
+            'layout' => $isEmbedded ? 'layouts/embed' : 'layouts/main',
+            'isEmbedded' => $isEmbedded,
         ];
         return view('os/form', $data);
     }
@@ -471,7 +480,7 @@ class Os extends BaseController
         $statusAlterado = $statusNovo !== '' && !empty($osAnterior) && $statusNovo !== (string) ($osAnterior['status'] ?? '');
         $statusService = new OsStatusFlowService();
         if ($statusAlterado && !$statusService->isTransitionAllowed((string) ($osAnterior['status'] ?? ''), $statusNovo)) {
-            return redirect()->to('/os/editar/' . $id)
+            return redirect()->to($this->osEditUrl((int) $id))
                 ->withInput()
                 ->with('error', 'Transicao de status invalida para esta OS.');
         }
@@ -536,7 +545,7 @@ class Os extends BaseController
 
         LogModel::registrar('os_atualizada', 'OS atualizada ID: ' . $id);
 
-        return redirect()->to('/os/visualizar/' . $id)
+        return redirect()->to($this->osViewUrl((int) $id))
             ->with('success', 'OS atualizada com sucesso!');
     }
 
@@ -559,7 +568,7 @@ class Os extends BaseController
         );
 
         if (empty($result['ok'])) {
-            return redirect()->to('/os/visualizar/' . $id)
+            return redirect()->to($this->osViewUrl((int) $id))
                 ->with('error', $result['message'] ?? 'Nao foi possivel atualizar o status.');
         }
 
@@ -596,7 +605,7 @@ class Os extends BaseController
 
         LogModel::registrar('os_status', 'Status da OS ' . $os['numero_os'] . ' alterado para: ' . $status);
 
-        return redirect()->to('/os/visualizar/' . $id)
+        return redirect()->to($this->osViewUrl((int) $id))
             ->with('success', 'Status atualizado com sucesso!');
     }
 
@@ -609,7 +618,7 @@ class Os extends BaseController
 
         $telefone = trim((string) ($this->request->getPost('telefone') ?: ($os['cliente_telefone'] ?? '')));
         if ($telefone === '') {
-            return redirect()->to('/os/visualizar/' . $id)->with('error', 'Cliente sem telefone para envio.');
+            return redirect()->to($this->osViewUrl((int) $id))->with('error', 'Cliente sem telefone para envio.');
         }
 
         $templateCode = trim((string) $this->request->getPost('template_codigo'));
@@ -652,7 +661,7 @@ class Os extends BaseController
             );
         } else {
             if ($templateCode === '') {
-                return redirect()->to('/os/visualizar/' . $id)->with('error', 'Selecione um template ou informe uma mensagem manual.');
+                return redirect()->to($this->osViewUrl((int) $id))->with('error', 'Selecione um template ou informe uma mensagem manual.');
             }
             $extra = [];
             if ($pdfUrl !== '') {
@@ -666,10 +675,10 @@ class Os extends BaseController
         }
 
         if (!empty($result['ok'])) {
-            return redirect()->to('/os/visualizar/' . $id)->with('success', 'Mensagem WhatsApp enviada com sucesso.');
+            return redirect()->to($this->osViewUrl((int) $id))->with('success', 'Mensagem WhatsApp enviada com sucesso.');
         }
 
-        return redirect()->to('/os/visualizar/' . $id)->with('error', $result['message'] ?? 'Falha ao enviar mensagem no WhatsApp.');
+        return redirect()->to($this->osViewUrl((int) $id))->with('error', $result['message'] ?? 'Falha ao enviar mensagem no WhatsApp.');
     }
 
     public function generatePdf($id)
@@ -681,16 +690,16 @@ class Os extends BaseController
 
         $tipo = trim((string) $this->request->getPost('tipo_documento'));
         if ($tipo === '') {
-            return redirect()->to('/os/visualizar/' . $id)->with('error', 'Tipo de documento nao informado.');
+            return redirect()->to($this->osViewUrl((int) $id))->with('error', 'Tipo de documento nao informado.');
         }
 
         $pdfService = new OsPdfService();
         $result = $pdfService->gerar((int) $id, $tipo, session()->get('user_id') ?: null);
         if (empty($result['ok'])) {
-            return redirect()->to('/os/visualizar/' . $id)->with('error', $result['message'] ?? 'Falha ao gerar PDF.');
+            return redirect()->to($this->osViewUrl((int) $id))->with('error', $result['message'] ?? 'Falha ao gerar PDF.');
         }
 
-        return redirect()->to('/os/visualizar/' . $id)->with('success', 'PDF gerado com sucesso.');
+        return redirect()->to($this->osViewUrl((int) $id))->with('success', 'PDF gerado com sucesso.');
     }
 
     private function triggerAutomaticEventsOnStatus(int $osId, string $statusCode, ?int $userId = null): void
@@ -805,7 +814,7 @@ class Os extends BaseController
         // Update OS totals
         $this->recalcularTotaisOs($dados['os_id']);
 
-        return redirect()->to('/os/visualizar/' . $dados['os_id'])
+        return redirect()->to($this->osViewUrl((int) $dados['os_id']))
             ->with('success', 'Item adicionado com sucesso!');
     }
 
@@ -831,7 +840,7 @@ class Os extends BaseController
             $itemModel->delete($id);
             $this->recalcularTotaisOs($osId);
 
-            return redirect()->to('/os/visualizar/' . $osId)
+            return redirect()->to($this->osViewUrl((int) $osId))
                 ->with('success', 'Item removido com sucesso!');
         }
 
@@ -1300,6 +1309,30 @@ class Os extends BaseController
         $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="180" height="120" viewBox="0 0 180 120"><rect width="180" height="120" rx="10" fill="#eef2ff"/><rect x="62" y="34" width="56" height="36" rx="6" fill="#c7d2fe"/><circle cx="90" cy="52" r="10" fill="#818cf8"/><text x="90" y="96" text-anchor="middle" font-size="12" fill="#64748b">sem foto</text></svg>';
         $uri = 'data:image/svg+xml;base64,' . base64_encode($svg);
         return $uri;
+    }
+
+    private function isEmbedRequest(): bool
+    {
+        $embed = strtolower(trim((string) $this->request->getGet('embed')));
+        return in_array($embed, ['1', 'true', 'yes', 'sim'], true);
+    }
+
+    private function osViewUrl(int $osId): string
+    {
+        $url = '/os/visualizar/' . $osId;
+        if ($this->isEmbedRequest()) {
+            $url .= '?embed=1';
+        }
+        return $url;
+    }
+
+    private function osEditUrl(int $osId): string
+    {
+        $url = '/os/editar/' . $osId;
+        if ($this->isEmbedRequest()) {
+            $url .= '?embed=1';
+        }
+        return $url;
     }
 
     public function print($id)

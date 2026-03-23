@@ -1,6 +1,6 @@
 # Documentacao - Sistema de Assistencia Tecnica
 
-> Jovem Tech - Atualizado em 20/03/2026
+> Jovem Tech - Atualizado em 22/03/2026
 
 ## Estrutura
 
@@ -37,10 +37,12 @@
 - Rotas pre-CRM: `05-api/rotas.md`
 - Correcao Central (erros + observabilidade + clientes novos + funil): `08-correcoes/2026-03-20-central-mensagens-codigos-erro-observabilidade-clientes-novos.md`
 - Correcao CRM/Contatos (engajamento temporal configuravel): `08-correcoes/2026-03-20-engajamento-temporal-contatos-crm.md`
+- Correcao Dashboard (responsividade, modais de OS e graficos): `08-correcoes/2026-03-22-dashboard-refactor-responsivo-modal-os.md`
 - Guia de atualizacao de VPS sem downtime (contingencia + Ubuntu novo): `08-correcoes/2026-03-22-guia-atualizacao-vps-sem-downtime.md`
 - Entrega pre-CRM base: `07-novas-implementacoes/2026-03-pre-crm-foundation-os-whatsapp-pdf.md`
 - Entrega CRM + Central: `07-novas-implementacoes/2026-03-crm-central-mensagens-integrados.md`
 - Evolucao faseada da Central de Atendimento: `07-novas-implementacoes/2026-03-central-atendimento-inteligente-faseada.md`
+- Release 2.1.0 (dashboard + versao no rodape): `07-novas-implementacoes/2026-03-release-2.1.0-dashboard-versao-rodape.md`
 - Gateway local WhatsApp (arquitetura): `07-novas-implementacoes/2026-03-como-foi-implementado-a-api-local-do-whatsapp.md`
 - Gateway local WhatsApp (producao-ready): `07-novas-implementacoes/2026-03-gateway-local-whatsapp-producao.md`
 - Deploy em VPS Linux: `10-deploy/linux-vps-deployment.md`

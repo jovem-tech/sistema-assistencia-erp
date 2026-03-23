@@ -137,6 +137,7 @@ whatsapp-api/dist/
 whatsapp-api/.wwebjs_auth/
 whatsapp-api/.wwebjs_cache/
 .agents/
+.codex_keys/
 *.log
 error_log
 .gemini/

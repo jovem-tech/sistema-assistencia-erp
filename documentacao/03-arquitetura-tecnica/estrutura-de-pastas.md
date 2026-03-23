@@ -1,10 +1,13 @@
 # Estrutura de Pastas (resumo tecnico)
 
-Atualizado em 20/03/2026.
+Atualizado em 22/03/2026.
 
 ```text
 sistema-assistencia/
 |-- app/
+|   |-- Config/
+|   |   `-- SystemRelease.php
+|   |
 |   |-- Controllers/
 |   |   |-- Os.php
 |   |   |-- Configuracoes.php
@@ -114,6 +117,16 @@ sistema-assistencia/
 ## Camada de mensageria
 Fluxo interno:
 `Controller -> WhatsAppService -> MensageriaService -> Provider`
+
+## Observacao de layout embed
+- Novo layout tecnico: `app/Views/layouts/embed.php`
+- Uso principal: abrir telas de OS (`nova` e `visualizar`) em modal no dashboard, sem carregar shell completo.
+
+## Controle de versao visual (rodape)
+- A versao de release exibida no rodape vem de `app/Config/SystemRelease.php` (`$version`).
+- O helper `get_system_version()` (em `app/Helpers/sistema_helper.php`) aplica fallback:
+  - primeiro tenta `configuracoes.sistema_versao` (se existir)
+  - se nao existir, usa `SystemRelease::$version`.
 
 Beneficios:
 - desacoplamento por provider

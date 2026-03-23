@@ -504,6 +504,17 @@ sudo ufw status verbose
 
 ## 12. Runbook de manutencao
 
+### Cofre local de credenciais (operacao)
+
+Para execucao operacional assistida por IA/local, manter credenciais tecnicas apenas em arquivo local nao versionado:
+
+- `.codex_keys/vps_credentials.local.md`
+
+Regras:
+- nunca commitar esse arquivo;
+- revisar credenciais apos qualquer troca de senha;
+- migrar gradualmente para autenticacao por chave SSH.
+
 ### Ver logs
 
 ```bash
@@ -551,7 +562,65 @@ sudo systemctl restart php8.3-fpm nginx
 
 ---
 
-## 13. Anexo com comandos de diagnostico rapido
+## 13. Controle de versao e release
+
+### Fonte da versao exibida no ERP
+
+- Rodape lateral do sistema: `Versao x.y.z`.
+- Fonte padrao: `app/Config/SystemRelease.php` (`public string $version`).
+- Override opcional por banco: chave `sistema_versao` na tabela `configuracoes`.
+- Regra do helper: `get_system_version()` usa banco primeiro e fallback no arquivo de release.
+
+Override opcional via SQL:
+
+```sql
+INSERT INTO configuracoes (chave, valor, created_at, updated_at)
+VALUES ('sistema_versao', '2.1.0', NOW(), NOW())
+ON DUPLICATE KEY UPDATE valor = VALUES(valor), updated_at = NOW();
+```
+
+### Fluxo recomendado de release
+
+```bash
+# local (desenvolvimento)
+git checkout main
+git pull origin main
+git add .
+git commit -m "feat(release): dashboard responsivo + versao no rodape"
+git tag -a v2.1.0 -m "Release v2.1.0"
+git push origin main --tags
+```
+
+### Update seguro na VPS (sem reinstalar)
+
+```bash
+cd /var/www/sistema-hml
+git fetch --all --tags
+git checkout main
+git pull origin main
+composer install --no-dev --optimize-autoloader
+php spark migrate --all
+php spark cache:clear
+sudo systemctl restart php8.3-fpm
+sudo systemctl restart nginx
+```
+
+### Validacao de release em producao
+
+```bash
+curl -I http://SEU_IP_OU_DOMINIO/login
+php spark --version
+git describe --tags --always
+```
+
+Checklist visual:
+- rodape lateral exibindo a versao esperada;
+- dashboard abrindo sem erro JS/PHP;
+- modais de `Ultimas OS` funcionando.
+
+---
+
+## 14. Anexo com comandos de diagnostico rapido
 
 ```bash
 # porta 80
@@ -582,7 +651,7 @@ grep -E "upload_max_filesize|post_max_size|max_execution_time|max_input_time|mem
 
 ---
 
-## 14. Script oficial de automacao (integral)
+## 15. Script oficial de automacao (integral)
 
 O script completo esta versionado em:
 
@@ -594,4 +663,3 @@ Execucao:
 chmod +x documentacao/10-deploy/scripts/install_erp.sh
 sudo ./documentacao/10-deploy/scripts/install_erp.sh
 ```
-

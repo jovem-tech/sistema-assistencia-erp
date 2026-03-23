@@ -1,76 +1,73 @@
 # Sobre o Sistema
 
-## 🏢 Identificação
+## Identificacao
 
 | Campo | Valor |
-|-------|-------|
-| **Nome** | Sistema de Gestão de Assistência Técnica |
+|---|---|
+| **Nome** | Sistema de Gestao de Assistencia Tecnica |
 | **Nome Comercial** | Jovem Tech ERP |
-| **Versão** | 2.0 (Março 2026) |
-| **Tipo** | ERP Web para Assistência Técnica |
-| **Ambiente** | XAMPP Local / Servidor Apache |
+| **Versao** | 2.1.0 (Marco 2026) |
+| **Tipo** | ERP Web para Assistencia Tecnica |
+| **Ambiente** | XAMPP Local / VPS Ubuntu (Nginx + PHP-FPM) |
 
 ---
 
-## 🎯 Objetivo
+## Objetivo
 
-Sistema completo de gestão para assistências técnicas de eletrônicos. Centraliza o controle de:
+Sistema completo de gestao para assistencias tecnicas de eletronicos. Centraliza:
 
-- **Clientes** e seus equipamentos
-- **Ordens de Serviço** com fluxo completo
-- **Estoque de Peças** com movimentações
-- **Serviços** padronizados com valores
-- **Financeiro** (contas a pagar/receber)
-- **Relatórios** gerenciais
-- **Controle de Acesso** por grupos (RBAC)
+- Clientes e seus equipamentos
+- Ordens de Servico (OS) com fluxo completo
+- Estoque de Pecas com movimentacoes
+- Servicos padronizados com valores
+- Financeiro (contas a pagar/receber)
+- Relatorios gerenciais
+- Controle de acesso por grupos (RBAC)
 
 ---
 
-## 👥 Público-Alvo
+## Publico-alvo
 
 | Perfil | Uso |
-|--------|-----|
+|---|---|
 | **Atendente** | Clientes, abertura de OS |
-| **Técnico** | Diagnóstico, orçamento, reparo |
-| **Gerente** | Relatórios, financeiro |
-| **Administrador** | Configurações, usuários, permissões |
+| **Tecnico** | Diagnostico, orcamento, reparo |
+| **Gerente** | Relatorios, financeiro |
+| **Administrador** | Configuracoes, usuarios, permissoes |
 
 ---
 
-## 📦 Principais Módulos
+## Principais modulos
 
 ### Operacional
-- **Ordens de Serviço (OS)** — Core do sistema. Gerencia todo ciclo de vida de um reparo.
-- **Serviços** — Catálogo de serviços com preços padrão.
-- **Estoque de Peças** — Controle de entrada/saída.
-- **Base de Defeitos** — Biblioteca de problemas e soluções por tipo de equipamento.
+- Ordens de Servico (OS): core do sistema, gerencia o ciclo de vida do reparo.
+- Servicos: catalogo com precos padrao.
+- Estoque de Pecas: controle de entrada e saida.
+- Base de Defeitos: biblioteca de problemas e solucoes por tipo de equipamento.
 
 ### Comercial
-- **Clientes** — Cadastro com endereço, contatos e histórico.
-- **Equipamentos** — Vinculados a clientes, com fotos e ficha técnica.
-- **Fornecedores** — Gestão de fornecedores de peças.
-- **Vendas** — Em desenvolvimento.
+- Clientes: cadastro com contato e historico.
+- Equipamentos: vinculacao com clientes e ficha tecnica.
+- Fornecedores: gestao de fornecedores de pecas.
+- Vendas: em evolucao.
 
-### Financeiro & Resultados
-- **Financeiro** — Lançamentos de receitas e despesas.
-- **Relatórios** — OS por período, financeiro, estoque, clientes.
+### Financeiro e Resultados
+- Financeiro: lancamentos de receitas e despesas.
+- Relatorios: OS por periodo, financeiro, estoque e clientes.
 
-### Configurações
-- **Dados da Empresa** — Logo, nome, informações fiscais.
-- **Usuários** — Gestão de contas de acesso.
-- **Níveis de Acesso** — Grupos com permissões granulares (RBAC).
+### Configuracoes
+- Dados da Empresa: logo, nome e dados fiscais.
+- Usuarios: gestao de contas de acesso.
+- Niveis de Acesso: grupos com permissoes granulares.
 
 ---
 
-## 🔗 Acesso ao Sistema
+## Acesso ao sistema
 
-```
-URL Local: http://localhost:8081
-URL Dev:   http://localhost:8080
-
-Login padrão (admin):
-  Usuário: admin@sistema.com
-  Senha:   admin123
+```text
+URL Local: http://localhost:8084
+URL VPS:   http://SEU_IP_OU_DOMINIO
 ```
 
-> **Recomendação:** troque a senha imediatamente após o primeiro acesso.
+Recomendacao: trocar a senha de administrador no primeiro acesso em cada ambiente.
+

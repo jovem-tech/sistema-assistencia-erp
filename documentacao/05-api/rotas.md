@@ -1,6 +1,16 @@
 # Rotas Internas (ERP + CRM + Mensageria)
 
-Atualizado em 20/03/2026.
+Atualizado em 22/03/2026.
+
+## ERP - Dashboard
+
+| Metodo | Rota | Objetivo | Permissao |
+|---|---|---|---|
+| GET | `/dashboard` | Tela principal de indicadores operacionais | `dashboard:visualizar` |
+| GET | `/admin/stats` | Dataset dos graficos do dashboard (status, financeiro e OS abertas no ano) | `dashboard:visualizar` |
+
+Query params suportados em `GET /admin/stats`:
+- `ano`: ano de referencia para a serie mensal de OS abertas (padrao: ano atual).
 
 ## ERP - Ordens de Servico
 
@@ -14,6 +24,10 @@ Atualizado em 20/03/2026.
 | POST | `/os/status/{id}` | Alterar status | `os:editar` |
 | POST | `/os/whatsapp/{id}` | Envio WhatsApp (texto/PDF/template) | `os:editar` |
 | POST | `/os/pdf/{id}/gerar` | Gerar documento PDF | `os:visualizar` |
+
+Notas da interface de OS:
+- `GET /os/nova` e `GET /os/visualizar/{id}` aceitam `?embed=1` para renderizacao em modal interno (sem sidebar/navbar).
+- Em modo embed, formularios e acoes internas preservam o contexto para manter o fluxo dentro do modal.
 
 ## ERP - Pessoas (Contatos)
 

@@ -33,6 +33,7 @@ Regra operacional:
 - `whatsapp_bulk_provider`
 - `whatsapp_test_phone`
 - `whatsapp_webhook_token`
+- `sistema_versao` (opcional, sobrescreve a versao padrao exibida no rodape)
 
 ### Menuia
 - `whatsapp_menuia_url`
@@ -108,3 +109,6 @@ Metadados:
 - rodar Node com PM2
 - manter logs em `/whatsapp-api/logs`
 - manter porta do gateway fechada para internet (uso interno)
+- manter a versao da release atualizada no rodape:
+  - padrao tecnico em `app/Config/SystemRelease.php`
+  - override opcional por chave `sistema_versao` na tabela `configuracoes`

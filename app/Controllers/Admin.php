@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\OsModel;
 use App\Models\ClienteModel;
+use App\Models\EquipamentoModel;
 use App\Models\PecaModel;
 use App\Models\FinanceiroModel;
 use App\Models\LogModel;
@@ -19,16 +20,40 @@ class Admin extends BaseController
     {
         $osModel = new OsModel();
         $clienteModel = new ClienteModel();
+        $equipamentoModel = new EquipamentoModel();
         $pecaModel = new PecaModel();
         $financeiroModel = new FinanceiroModel();
+        $db = \Config\Database::connect();
+
+        $stats = $osModel->getDashboardStats();
+        $statusEquipamentoEntregue = 'entregue_reparado';
+        if ($db->tableExists('os_status')) {
+            $statusEntregueRow = $db->table('os_status')
+                ->select('codigo')
+                ->where('nome', 'Equipamento Entregue')
+                ->where('ativo', 1)
+                ->get()
+                ->getRowArray();
+            if (!empty($statusEntregueRow['codigo'])) {
+                $statusEquipamentoEntregue = (string) $statusEntregueRow['codigo'];
+            }
+        }
+        $stats['equipamento_entregue'] = (int) $db->table('os')
+            ->where('status', $statusEquipamentoEntregue)
+            ->countAllResults();
+        $anoAtual = (int) date('Y');
 
         $data = [
             'title'          => 'Dashboard',
-            'stats'          => $osModel->getDashboardStats(),
+            'stats'          => $stats,
             'os_recentes'    => $osModel->getRecentes(5),
             'estoque_baixo'  => $pecaModel->getEstoqueBaixo(),
             'resumo_financeiro' => $financeiroModel->getResumoMensal(),
             'total_clientes' => $clienteModel->countAll(),
+            'total_equipamentos' => $equipamentoModel->countAll(),
+            'total_os' => $osModel->countAll(),
+            'ano_dashboard' => $anoAtual,
+            'status_entregue_codigo' => $statusEquipamentoEntregue,
         ];
 
         return view('admin/dashboard', $data);
@@ -83,7 +108,7 @@ class Admin extends BaseController
         }
         $macroCount = $macroBuilder->get()->getResultArray();
 
-        // Monthly revenue for chart (last 6 months)
+        // Monthly revenue for chart (last 6 months) - mantido para compatibilidade
         $faturamento = [];
         for ($i = 5; $i >= 0; $i--) {
             $mes = date('m', strtotime("-$i months"));
@@ -103,10 +128,60 @@ class Admin extends BaseController
             ];
         }
 
+        $anoAtual = (int) ($this->request->getGet('ano') ?: date('Y'));
+        $inicioAno = sprintf('%04d-01-01 00:00:00', $anoAtual);
+        $inicioProximoAno = sprintf('%04d-01-01 00:00:00', $anoAtual + 1);
+        $hasDataAbertura = $db->fieldExists('data_abertura', 'os');
+        $hasCreatedAt = $db->fieldExists('created_at', 'os');
+        $dateExpr = $hasDataAbertura && $hasCreatedAt
+            ? 'COALESCE(data_abertura, created_at)'
+            : ($hasDataAbertura ? 'data_abertura' : ($hasCreatedAt ? 'created_at' : 'NULL'));
+
+        $rowsOsAbertas = [];
+        if ($dateExpr !== 'NULL') {
+            $rowsOsAbertas = $db->query(
+                "SELECT MONTH($dateExpr) AS mes, COUNT(*) AS total
+                 FROM os
+                 WHERE $dateExpr >= ?
+                   AND $dateExpr < ?
+                 GROUP BY MONTH($dateExpr)",
+                [$inicioAno, $inicioProximoAno]
+            )->getResultArray();
+        }
+
+        $mapaOsAbertas = array_fill(1, 12, 0);
+        foreach ($rowsOsAbertas as $row) {
+            $mes = (int) ($row['mes'] ?? 0);
+            if ($mes >= 1 && $mes <= 12) {
+                $mapaOsAbertas[$mes] = (int) ($row['total'] ?? 0);
+            }
+        }
+
+        $labelsMes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        $osAbertasAno = [];
+        for ($mes = 1; $mes <= 12; $mes++) {
+            $osAbertasAno[] = [
+                'mes' => $mes,
+                'label' => $labelsMes[$mes - 1],
+                'total' => $mapaOsAbertas[$mes],
+            ];
+        }
+
+        $financeiroModel = new FinanceiroModel();
+        $resumoFinanceiro = $financeiroModel->getResumoMensal();
+
         return $this->response->setJSON([
             'status_count' => $statusCount,
             'macro_count' => $macroCount,
             'faturamento'  => $faturamento,
+            'ano_referencia' => $anoAtual,
+            'os_abertas_ano' => $osAbertasAno,
+            'resumo_financeiro' => [
+                'receitas' => (float) ($resumoFinanceiro['receitas'] ?? 0),
+                'despesas' => (float) ($resumoFinanceiro['despesas'] ?? 0),
+                'lucro' => (float) ($resumoFinanceiro['lucro'] ?? 0),
+                'pendentes' => (float) ($resumoFinanceiro['pendentes'] ?? 0),
+            ],
         ]);
     }
 }

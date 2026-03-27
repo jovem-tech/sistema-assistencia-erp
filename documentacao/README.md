@@ -1,6 +1,6 @@
 # Documentacao - Sistema de Assistencia Tecnica
 
-> Jovem Tech - Atualizado em 26/03/2026
+> Jovem Tech - Atualizado em 27/03/2026
 
 ## Estrutura
 
@@ -54,6 +54,7 @@
 - Deploy em VPS Linux: `10-deploy/linux-vps-deployment.md`
 - Manual tecnico oficial VPS Ubuntu 24.04 (com troubleshooting real): `10-deploy/manual-tecnico-oficial-vps-ubuntu-24-ci4.md`
 - Atualizacao de VPS sem downtime (Blue/Green + contingencia): `10-deploy/atualizacao-vps-sem-downtime.md`
+- Registro de deploy da release v2.5.9 na VPS: `10-deploy/2026-03-27-atualizacao-vps-release-v2.5.9.md`
 - Script oficial de automacao de deploy: `10-deploy/scripts/install_erp.sh`
 - Politica operacional do agente autonomo DevOps + Engenharia Fullstack: `10-deploy/agente-autonomo-devops-engenharia-fullstack.md`
 - Roadmap: `09-roadmap/funcionalidades-planejadas.md`

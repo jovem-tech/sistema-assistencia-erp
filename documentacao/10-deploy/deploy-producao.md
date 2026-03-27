@@ -1,8 +1,15 @@
 # Deploy em Producao (VPS Linux)
 
-Atualizado em 17/03/2026.
+Atualizado em 27/03/2026.
 
 Este guia resume a entrada em producao do ERP com gateway WhatsApp Node em VPS Linux.
+
+## Ultima implantacao registrada
+
+- Data: `27/03/2026`
+- Release: `v2.5.9`
+- Commit: `c2f1fb9`
+- Evidencia detalhada: `documentacao/10-deploy/2026-03-27-atualizacao-vps-release-v2.5.9.md`
 
 ## Guia oficial completo
 

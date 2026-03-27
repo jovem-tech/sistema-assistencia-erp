@@ -1,7 +1,7 @@
 # Tabelas Principais do Banco de Dados
 
 Base: `assistencia_tecnica`  
-Atualizado em 22/03/2026 (modulo WhatsApp unificado + CRM/Central + contatos + versao no rodape)
+Atualizado em 26/03/2026 (modulo WhatsApp unificado + CRM/Central + contatos + otimizacoes da listagem de OS + timeout configuravel de sessao + workflow configuravel de status)
 
 ## Nucleo operacional
 - `clientes`
@@ -16,10 +16,47 @@ Atualizado em 22/03/2026 (modulo WhatsApp unificado + CRM/Central + contatos + v
 - `estado_fisico_equipamento`
 - `estado_fisico_fotos`
 
+Indices operacionais para listagem avancada de OS:
+- `idx_os_status` (`os.status`)
+- `idx_os_estado_fluxo` (`os.estado_fluxo`)
+- `idx_os_data_abertura` (`os.data_abertura`)
+- `idx_os_tecnico_id` (`os.tecnico_id`)
+- `idx_os_valor_final` (`os.valor_final`)
+- `idx_os_data_abertura_id` (`os.data_abertura`, `os.id`)
+- `idx_os_status_data_abertura_id` (`os.status`, `os.data_abertura`, `os.id`)
+- `idx_os_estado_fluxo_data_abertura_id` (`os.estado_fluxo`, `os.data_abertura`, `os.id`)
+- `idx_os_tecnico_data_abertura_id` (`os.tecnico_id`, `os.data_abertura`, `os.id`)
+- `idx_os_valor_final_id` (`os.valor_final`, `os.id`)
+- `idx_os_cliente_data_abertura_id` (`os.cliente_id`, `os.data_abertura`, `os.id`)
+- `idx_os_equipamento_data_abertura_id` (`os.equipamento_id`, `os.data_abertura`, `os.id`)
+- `idx_os_relato_cliente_fulltext` (`FULLTEXT` em `os.relato_cliente`)
+- `idx_os_itens_os_tipo_descricao` (`os_itens.os_id`, `os_itens.tipo`, `os_itens.descricao`)
+- `idx_os_itens_tipo_descricao_os_id` (`os_itens.tipo`, `os_itens.descricao`, `os_itens.os_id`)
+- `idx_funcionarios_nome` (`funcionarios.nome`)
+- `idx_equipamentos_modelos_nome` (`equipamentos_modelos.nome`)
+- `idx_equipamentos_marca_id` (`equipamentos.marca_id`)
+- `idx_equipamentos_modelo_id` (`equipamentos.modelo_id`)
+
+Objetivo dos compostos:
+- sustentar ordenacao por `data_abertura` com paginacao server-side
+- reduzir custo de filtros por `status`, `estado_fluxo`, `tecnico_id`, `cliente_id` e `equipamento_id` quando combinados com ordenacao cronologica
+- acelerar filtro por `tipo_servico` sem depender de scan amplo em `os_itens`
+- sustentar a busca global `q` por catálogos relacionados sem forcar joins amplos na query principal da listagem
+- acelerar o fallback textual de `relato_cliente` sem depender de `LIKE '%...%'` como caminho principal
+
 ## Fluxo de OS (pre-CRM)
 - `os_status`
 - `os_status_transicoes`
 - `os_status_historico`
+
+Uso operacional atual:
+- `os_status` guarda nome, codigo, macrofase, flags (`ativo`, `status_final`, `status_pausa`) e `ordem_fluxo`
+- `os_status_transicoes` define os destinos permitidos configurados na tela `Gestao de Conhecimento > Fluxo de Trabalho OS`
+- `os_status_historico` continua registrando cada troca de status executada pelo sistema ou pelo usuario
+
+Regra de fallback do workflow:
+- se `os_status_transicoes` nao tiver transicoes ativas configuradas, o ERP usa fallback automatico pela `ordem_fluxo`
+- nesse modo, cada status ativo pode avancar para o proximo ou retornar para o anterior na sequencia
 
 ## CRM integrado
 
@@ -179,6 +216,9 @@ Tipos usados:
 - `crm_engajamento_ativo_dias`
 - `crm_engajamento_risco_dias`
 
+### Sessao e seguranca
+- `sessao_inatividade_minutos`
+
 ### Versao de release (rodape)
 - `sistema_versao` (opcional, override da versao exibida no rodape)
 
@@ -193,3 +233,9 @@ Tipos usados:
 - `2026-03-20-070500_CreateContatosAndLinkConversas.php`
 - `2026-03-20-091500_AddContatoLifecycleMarketingFields.php`
 - `2026-03-20-120500_AddContatoEngajamentoLifecycleWindow.php`
+- `2026-03-23-031500_AddOsAdvancedFilterIndexes.php`
+- `2026-03-24-014500_AddOsListPerformanceIndexes.php`
+- `2026-03-24-021500_AddOsSearchLookupIndexes.php`
+- `2026-03-24-022500_AddOsLookupOrderingIndexes.php`
+- `2026-03-24-023500_DropRedundantEquipamentoMarcaSearchIndex.php`
+- `2026-03-24-024500_AddOsRelatoFulltextIndex.php`

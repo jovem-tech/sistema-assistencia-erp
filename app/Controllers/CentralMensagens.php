@@ -765,6 +765,20 @@ class CentralMensagens extends BaseController
     {
         $endpoint = 'conversa';
 
+        if (!$this->request->isAJAX()) {
+            $conversaModel = new ConversaWhatsappModel();
+            if (!$this->isCentralDisponivel($conversaModel)) {
+                return redirect()->to('/dashboard')->with('error', 'Modulo Central de Mensagens ainda nao foi migrado.');
+            }
+
+            $conversa = $conversaModel->find($id);
+            if (!$conversa) {
+                return redirect()->to('/atendimento-whatsapp')->with('error', 'Conversa nao encontrada.');
+            }
+
+            return redirect()->to(base_url('atendimento-whatsapp') . '?conversa_id=' . $id);
+        }
+
         try {
             $service = new CentralMensagensService();
             $service->syncInboundQueue(80);
@@ -1193,10 +1207,12 @@ class CentralMensagens extends BaseController
             );
 
             if (empty($result['ok'])) {
+                $providerFailure = $this->resolveEnvioProviderFailure($result);
+
                 return $this->apiError(
-                    'CM_ENVIO_PROVIDER_FAILED',
-                    (string) ($result['message'] ?? 'Falha ao enviar mensagem.'),
-                    422,
+                    $providerFailure['code'],
+                    $providerFailure['message'],
+                    $providerFailure['status'],
                     [
                         'endpoint' => $endpoint,
                         'conversa_id' => $conversaId,
@@ -1643,6 +1659,70 @@ class CentralMensagens extends BaseController
     private function normalizePhone(string $phone): string
     {
         return preg_replace('/\D+/', '', $phone) ?? '';
+    }
+
+    /**
+     * @param array<string,mixed> $result
+     * @return array{code:string,message:string,status:int}
+     */
+    private function resolveEnvioProviderFailure(array $result): array
+    {
+        $statusCode = (int) ($result['status_code'] ?? 0);
+        $provider = trim((string) ($result['provider'] ?? ''));
+        $failureType = trim((string) ($result['failure_type'] ?? ''));
+        $rawMessage = trim((string) ($result['message'] ?? 'Falha ao enviar mensagem.'));
+        $message = function_exists('mb_strtolower')
+            ? mb_strtolower($rawMessage, 'UTF-8')
+            : strtolower($rawMessage);
+        $providerKey = function_exists('mb_strtolower')
+            ? mb_strtolower($provider, 'UTF-8')
+            : strtolower($provider);
+        $failureKey = function_exists('mb_strtolower')
+            ? mb_strtolower($failureType, 'UTF-8')
+            : strtolower($failureType);
+
+        $isMisconfigured = in_array($failureKey, ['gateway_misconfigured', 'provider_misconfigured'], true)
+            || str_contains($message, 'nao configurada')
+            || str_contains($message, 'configuracao')
+            || str_contains($message, 'incompleta');
+
+        if ($isMisconfigured) {
+            return [
+                'code' => 'CM_ENVIO_PROVIDER_UNAVAILABLE',
+                'message' => 'Configuracao do provedor de WhatsApp incompleta ou indisponivel. Revise as configuracoes e tente novamente.',
+                'status' => 503,
+            ];
+        }
+
+        $isUnavailable = in_array($failureKey, ['gateway_unreachable', 'gateway_timeout', 'provider_unavailable', 'provider_timeout'], true)
+            || $statusCode === 0
+            || $statusCode === 408
+            || $statusCode === 429
+            || ($statusCode >= 500 && $statusCode <= 599)
+            || str_contains($message, 'falha de rede')
+            || str_contains($message, 'couldn')
+            || str_contains($message, 'timeout')
+            || str_contains($message, 'timed out')
+            || str_contains($message, 'inacessivel')
+            || str_contains($message, 'indisponivel');
+
+        if ($isUnavailable) {
+            $friendlyMessage = in_array($providerKey, ['api_whats_local', 'api_whats_linux', 'local_node'], true)
+                ? 'Servidor do gateway WhatsApp esta inacessivel no momento. Inicie ou reinicie o gateway e tente novamente.'
+                : 'Servico de mensageria temporariamente indisponivel. Tente novamente em instantes.';
+
+            return [
+                'code' => 'CM_ENVIO_PROVIDER_UNAVAILABLE',
+                'message' => $friendlyMessage,
+                'status' => 503,
+            ];
+        }
+
+        return [
+            'code' => 'CM_ENVIO_PROVIDER_FAILED',
+            'message' => $rawMessage !== '' ? $rawMessage : 'Falha ao enviar mensagem.',
+            'status' => 422,
+        ];
     }
 
     private function isLikelyPhoneValue(string $value): bool

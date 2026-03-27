@@ -66,7 +66,7 @@
             <table class="table table-hover datatable">
                 <thead>
                     <tr>
-                        <th>Descri??o</th>
+                        <th>Descrição</th>
                         <th>Tipo</th>
                         <th>Data Venc.</th>
                         <th>Valor</th>

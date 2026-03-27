@@ -30,11 +30,31 @@
 - Use IDs descritivos para facilitar JS e testes.
 - Padronize botoes de voltar com `data-back-default`.
 - Use `openDocPage()` para apontar ajuda para documentacao correta.
+- Em operacoes CRUD, atualize imediatamente a UI afetada sem exigir refresh manual da pagina.
+- Preserve contexto de modal, iframe embed, filtros, pagina atual e scroll util sempre que tecnicamente possivel.
+- Sincronize componentes enriquecidos (`Select2`, `DataTables`, cards, badges, chips, galerias e resumos`) tanto no dado interno quanto no valor renderizado.
+- Prefira AJAX, eventos customizados, callbacks e `postMessage` a recarga total da pagina.
 
 ### Nao faca
 - Evite style inline fora de casos pontuais.
 - Nao duplique logica que ja existe em `public/assets/js/scripts.js`.
 - Evite `!important` fora de emergencia tecnica.
+- Nao use `window.location.reload()` ou redirecionamento como mecanismo principal de sincronizacao de interface quando existir alternativa reativa viavel.
+- Nao deixe `Select2`, listas, tabelas ou contadores com estado antigo depois de um `save`, `update` ou `delete`.
+
+---
+
+## Regra global de reatividade de interface (obrigatorio)
+
+Esse padrao vale para todo o sistema e para qualquer nova implementacao.
+
+Checklist obrigatorio:
+1. Criou, editou, excluiu, vinculou ou mudou status: a interface deve refletir o novo estado imediatamente.
+2. A tela nao pode depender de `F5`, reabertura de modal ou nova navegacao para exibir o valor correto.
+3. Em modal, drawer, aba ou iframe embed, atualizar apenas os componentes afetados e preservar o restante do fluxo.
+4. Quando houver componentes enriquecidos, sincronizar o valor interno e o texto renderizado.
+5. Em fluxos embed, usar evento dedicado ou `postMessage` para atualizar a tela pai sem perder contexto.
+6. Falhas de sincronizacao devem gerar `console.error` com contexto suficiente para diagnostico.
 
 ---
 
@@ -101,4 +121,3 @@ Campos unicos opcionais devem aceitar `NULL`.
 - Limpar logs periodicamente em `writable/logs/`.
 - Manter `documentacao/08-correcoes/` atualizada a cada bugfix.
 - Atualizar roadmap quando um item for concluido.
-

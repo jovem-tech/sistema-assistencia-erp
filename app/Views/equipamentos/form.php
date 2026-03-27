@@ -86,11 +86,11 @@
     </style>
     <input type="hidden" name="modelo_nome_ext" id="modelo_nome_ext">
 
-            <!-- Navega??o por Abas -->
+            <!-- Navegação por Abas -->
             <ul class="nav nav-tabs nav-fill ds-tabs-scroll mb-4" id="equipamentoTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active fw-bold" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab" aria-controls="info-pane" aria-selected="true">
-                        <i class="bi bi-info-circle me-2"></i>Informa??es
+                        <i class="bi bi-info-circle me-2"></i>Informações
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -107,7 +107,7 @@
 
             <div class="tab-content" id="equipamentoTabsContent">
                 
-                <!-- ABA 1: INFORMA??ES -->
+                <!-- ABA 1: INFORMAÇÕES -->
                 <div class="tab-pane fade show active" id="info-pane" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
@@ -140,11 +140,11 @@
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label d-flex align-items-center gap-2">
-                                Marca *
-                                <button class="btn btn-warning btn-sm py-0 px-2" type="button" data-bs-toggle="modal" data-bs-target="#modalNovaMarca"
-                                        title="Nova Marca" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
-                                    <i class="bi bi-plus-lg"></i> Novo
+                            <label class="form-label d-flex align-items-center justify-content-between gap-2">
+                                <span>Marca *</span>
+                                <button class="btn btn-success btn-sm ds-inline-add-btn" type="button" data-bs-toggle="modal" data-bs-target="#modalNovaMarca"
+                                        title="Nova Marca">
+                                    <i class="bi bi-plus-lg"></i><span>Adicionar</span>
                                 </button>
                             </label>
                             <select name="marca_id" id="marcaSelect" class="form-select select2-basic" required>
@@ -155,11 +155,11 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label d-flex align-items-center gap-2">
-                                Modelo *
-                                <button class="btn btn-warning btn-sm py-0 px-2" type="button" data-bs-toggle="modal" data-bs-target="#modalNovoModelo"
-                                        title="Novo Modelo" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
-                                    <i class="bi bi-plus-lg"></i> Novo
+                            <label class="form-label d-flex align-items-center justify-content-between gap-2">
+                                <span>Modelo *</span>
+                                <button class="btn btn-success btn-sm ds-inline-add-btn" type="button" data-bs-toggle="modal" data-bs-target="#modalNovoModelo"
+                                        title="Novo Modelo">
+                                    <i class="bi bi-plus-lg"></i><span>Adicionar</span>
                                 </button>
                             </label>
                             <select name="modelo_id" id="modeloSelect" class="form-select select2-basic" required>
@@ -175,18 +175,37 @@
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">N? Série</label>
-                            <input type="text" name="numero_serie" class="form-control" placeholder="IMEI ou Série" value="<?= $isEdit ? esc($equipamento['numero_serie'] ?? '') : '' ?>">
+                            <label class="form-label">Nº Série ou IMEI</label>
+                            <input type="text" name="numero_serie" class="form-control" placeholder="IMEI ou Série (*#06#)" value="<?= $isEdit ? esc($equipamento['numero_serie'] ?? '') : '' ?>">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label d-flex justify-content-between align-items-center">
-                                Senha de Acesso
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <button type="button" class="btn btn-outline-secondary py-0 px-2 btn-senha-tipo" data-placeholder="Numérico (PIN)" title="PIN/Desenho"><i class="bi bi-grip-vertical"></i></button>
-                                    <button type="button" class="btn btn-outline-secondary py-0 px-2 btn-senha-tipo" data-placeholder="Alfanumérico" title="Texto"><i class="bi bi-fonts"></i></button>
+                            <div class="ds-password-field" id="equipSenhaBox">
+                                <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                                    <label class="form-label mb-0" for="inputSenhaAcessoText">Senha de Acesso</label>
+                                    <div class="btn-group btn-group-sm ds-password-mode-switch" role="group">
+                                        <button type="button" class="btn btn-outline-secondary active" data-password-mode="desenho">DESENHO</button>
+                                        <button type="button" class="btn btn-outline-secondary" data-password-mode="texto">TEXTO</button>
+                                    </div>
                                 </div>
-                            </label>
-                            <input type="text" name="senha_acesso" id="inputSenhaAcesso" class="form-control" placeholder="PIN ou senha" value="<?= $isEdit ? esc($equipamento['senha_acesso'] ?? '') : '' ?>">
+                                <input type="hidden" name="senha_acesso" id="inputSenhaAcesso" value="<?= $isEdit ? esc($equipamento['senha_acesso'] ?? '') : '' ?>" data-password-hidden>
+                                <input type="hidden" name="senha_tipo" value="desenho" data-password-mode-input>
+                                <input type="hidden" name="senha_desenho" data-password-pattern-input>
+                                <div class="ds-pattern-password__pattern" data-password-pattern-wrap>
+                                    <div class="ds-pattern-password__toolbar">
+                                        <span class="ds-pattern-password__hint">Passe o mouse pelos 9 pontos para formar o desenho.</span>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" data-password-clear>Limpar desenho</button>
+                                    </div>
+                                    <div class="ds-pattern-password__grid" data-pattern-grid>
+                                        <?php for ($patternIndex = 1; $patternIndex <= 9; $patternIndex++): ?>
+                                        <button type="button" class="ds-pattern-node" data-pattern-node="<?= $patternIndex ?>" aria-label="Ponto <?= $patternIndex ?>"></button>
+                                        <?php endfor; ?>
+                                    </div>
+                                    <div class="ds-pattern-password__preview" data-password-preview>Nenhum desenho definido.</div>
+                                </div>
+                                <div class="ds-pattern-password__text" data-password-text-wrap hidden>
+                                    <input type="text" id="inputSenhaAcessoText" class="form-control" placeholder="Digite a senha do aparelho" data-password-text-input>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -213,7 +232,7 @@
 
                     <div class="row g-3 mb-4">
                         <div class="col-12">
-                            <label class="form-label text-muted">Observa??es Internas (Opcional)</label>
+                            <label class="form-label text-muted">Observações Internas (Opcional)</label>
                             <textarea name="observacoes" class="form-control" rows="2"><?= $isEdit ? esc($equipamento['observacoes'] ?? '') : '' ?></textarea>
                         </div>
                     </div>
@@ -232,7 +251,7 @@
                         <div class="row g-3">
                             <!-- Coluna Esquerda: Preview + Picker -->
                             <div class="col-md-5">
-                                <!-- Detec??o por foto (smart) -->
+                                <!-- Detecção por foto (smart) -->
                                 <div class="p-2 mb-3 rounded border border-warning border-opacity-50 bg-warning bg-opacity-10 d-none" id="smartColorContainer">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                         <span style="font-size: 0.72rem;" class="text-warning fw-semibold"><i class="bi bi-magic me-1"></i>Detectado na foto:</span>
@@ -335,7 +354,7 @@
             </div>
 
             <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
-                <a href="<?= base_url('equipamentos') ?>" class="btn btn-link text-secondary text-decoration-none"><i class="bi bi-x-lg me-1"></i> Descartar Altera??es</a>
+                <a href="<?= base_url('equipamentos') ?>" class="btn btn-link text-secondary text-decoration-none"><i class="bi bi-x-lg me-1"></i> Descartar Alterações</a>
                 <button type="submit" class="btn btn-glow btn-lg px-5 shadow"><i class="bi bi-save me-2 text-warning"></i><?= $isEdit ? 'Atualizar Equipamento' : 'Finalizar Cadastro' ?></button>
             </div>
         </form>
@@ -357,7 +376,7 @@
                 <form id="formNovoCliente">
                     <div class="mb-3">
                         <label>Nome Completo *</label>
-                        <input type="text" name="nome_razao" id="cNome" class="form-control" required>
+                        <input type="text" name="nome_razao" id="cNome" class="form-control" data-auto-title-case="person-name" required>
                     </div>
                     <div class="mb-3">
                         <label>Telefone/WhatsApp *</label>
@@ -492,6 +511,10 @@
 const BASE_URL = document.querySelector('meta[name="base-url"]').content;
 
 $(document).ready(function() {
+    const equipSenhaController = typeof window.initPatternPasswordField === 'function'
+        ? window.initPatternPasswordField({ root: '#equipSenhaBox', defaultMode: 'desenho' })
+        : null;
+
     // Inicializar Select2
     $('.select2-clientes').select2({
         theme: 'bootstrap-5',
@@ -568,7 +591,7 @@ $(document).ready(function() {
                 return $(`
                 <div>
                     <strong class="d-block text-primary"><i class="bi bi-pencil-square me-1"></i> "${data.text}"</strong>
-                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (edi??o manual)</small>
+                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (edição manual)</small>
                 </div>`);
             }
 
@@ -946,14 +969,7 @@ $(document).ready(function() {
         }
     });
 
-    // --- LÓGICA DE SENHA E ACESSÓRIOS (NOVAS ABAS) ---
-    $(document).on('click', '.btn-senha-tipo', function() {
-        const placeholder = $(this).data('placeholder');
-        $('#inputSenhaAcesso').attr('placeholder', placeholder).focus();
-        $('.btn-senha-tipo').removeClass('btn-secondary text-white').addClass('btn-outline-secondary');
-        $(this).removeClass('btn-outline-secondary').addClass('btn-secondary text-white');
-    });
-
+    // --- LÓGICA DE ACESSÓRIOS (NOVAS ABAS) ---
     $(document).on('click', '.btn-quick-acessorio', function() {
         const value = $(this).text().replace('+ ', '').trim();
         const textarea = $('#textareaAcessorios');
@@ -1450,7 +1466,7 @@ $(document).ready(function() {
                 alert(data.message || 'Erro ao salvar cliente');
             }
         })
-        .catch(err => alert('Erro na comunica??o'))
+        .catch(err => alert('Erro na comunicação'))
         .finally(() => btn.prop('disabled', false).html('Salvar Cliente'));
     });
 
@@ -1527,7 +1543,7 @@ $(document).ready(function() {
                 header.className = 'list-group-item list-group-item-secondary py-1 px-3';
                 header.style.cssText = 'font-size:0.7rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; pointer-events:none; opacity:0.8;';
                 const isCadastrado = group.text.includes('Cadastrados');
-                header.textContent = (isCadastrado ? '? ' : '? ') + group.text.replace(/^[??] /, '');
+                header.textContent = (isCadastrado ? '✓ ' : '• ') + group.text.replace(/^[✓•]\s+/, '');
                 sugestoesBox.appendChild(header);
 
                 group.children.forEach(item => {

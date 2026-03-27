@@ -1,56 +1,76 @@
-# Módulo: Clientes
+# Modulo: Clientes
 
 ## Finalidade
 
-Gerenciar o cadastro de clientes (pessoas físicas e jurídicas), seus dados de contato, endereço e contatos alternativos.
+Gerenciar o cadastro de clientes, pessoas fisicas e juridicas, com dados de contato, endereco, contatos alternativos e relacionamento operacional com equipamentos e ordens de servico.
 
-## Tabelas Utilizadas
+## Tabelas utilizadas
 
 | Tabela | Papel |
-|--------|-------|
-| `clientes` | Principal — armazena todos os dados do cliente |
+|---|---|
+| `clientes` | Cadastro principal do cliente |
 
 ## Relacionamentos
 
-```
-clientes (1) ──► (N) equipamentos
-clientes (1) ──► (N) os
+```text
+clientes (1) -> (N) equipamentos
+clientes (1) -> (N) os
 ```
 
 ## Controller
 
-`app/Controllers/Clientes.php`
+Arquivo principal: `app/Controllers/Clientes.php`
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| `index()` | GET /clientes | Listagem |
-| `create()` | GET /clientes/novo | Formulário novo |
-| `store()` | POST /clientes/salvar | Salva novo |
-| `edit($id)` | GET /clientes/editar/{id} | Form edição |
-| `update($id)` | POST /clientes/atualizar/{id} | Atualiza |
-| `delete($id)` | GET /clientes/excluir/{id} | Exclui |
-| `show($id)` | GET /clientes/visualizar/{id} | Detalhes |
-| `search()` | GET /clientes/buscar | Busca AJAX |
-| `salvar_ajax()` | POST /clientes/salvar_ajax | Cadastro rápido |
-| `importCsv()` | POST /clientes/importar | Importação CSV |
+| Metodo | Rota | Descricao |
+|---|---|---|
+| `index()` | `GET /clientes` | Listagem |
+| `create()` | `GET /clientes/novo` | Formulario de cadastro |
+| `store()` | `POST /clientes/salvar` | Salva novo cliente |
+| `edit($id)` | `GET /clientes/editar/{id}` | Formulario de edicao |
+| `update($id)` | `POST /clientes/atualizar/{id}` | Atualiza cliente |
+| `delete($id)` | `GET /clientes/excluir/{id}` | Exclui cliente |
+| `show($id)` | `GET /clientes/visualizar/{id}` | Detalhes do cliente |
+| `search()` | `GET /clientes/buscar` | Busca AJAX |
+| `getJson($id)` | `GET /clientes/json/{id}` | Payload usado em edicao rapida |
+| `salvar_ajax()` | `POST /clientes/salvar_ajax` | Cadastro rapido em modal |
+| `downloadCsvTemplate()` | `GET /clientes/modelo-csv` | Baixa modelo de importacao |
+| `importCsv()` | `POST /clientes/importar` | Importacao CSV |
 
-## Permissões Requeridas
+## Permissoes requeridas
 
 `visualizar`, `criar`, `editar`, `excluir`, `importar`
 
-## Fluxo de Operação Normal
+## Fluxo operacional normal
 
+```text
+1. Atendente abre a Nova OS
+2. Busca cliente por nome, telefone ou cadastro existente
+3. Se nao encontrar, usa o botao + Novo
+4. Preenche nome e telefone
+5. O sistema salva e devolve o cliente selecionado para a OS
 ```
-1. Atendente abre o formulário de Nova OS
-2. Busca cliente pelo nome/telefone (Select2 AJAX)
-3. Se não encontrar → clica "+ Novo" → modal de cadastro rápido
-4. Preenche nome e telefone (obrigatórios)
-5. Sistema salva e já seleciona o cliente na OS
-```
 
-## Regras de Negócio
+## Regras de negocio
 
-- Apenas **Nome** e **Telefone 1** são obrigatórios
-- `cpf_cnpj` e `email` são únicos mas podem ser `NULL` (múltiplos clientes sem CPF)
-- Campos vazios de CPF, email, etc. são convertidos para `NULL` pelo hook `nullifyEmptyFields`
-- Clientes **não têm** permissão `encerrar` — registros são permanentes por integridade histórica
+- Apenas `nome_razao` e `telefone1` sao obrigatorios.
+- `cpf_cnpj` e `email` podem ser nulos.
+- Campos vazios seguem a normalizacao padrao do model/hook do modulo.
+- Clientes nao usam permissao `encerrar`; o registro e historico.
+- O lookup de CEP e executado no frontend global (`public/assets/js/scripts.js`) e preenche `endereco`, `bairro`, `cidade` e `uf` dentro do formulario/modal correto, sem depender de refresh da pagina.
+- Ao concluir o lookup do CEP, o foco operacional vai para `numero`.
+
+## Padrao automatico de nome
+
+- O campo `nome_razao` passa por normalizacao automatica em todos os fluxos de criacao e edicao.
+- A regra aplicada e title case por palavra.
+- Exemplo:
+  - entrada: `paULO silVA sousa`
+  - saida persistida: `Paulo Silva Sousa`
+- O frontend aplica esse padrao enquanto o usuario digita nos formularios e modais marcados com `data-auto-title-case="person-name"`.
+- O backend reaplica a mesma normalizacao em `store()`, `update()`, `salvar_ajax()` e `importCsv()` para impedir inconsistencias por envio manual ou integracao futura sem JS.
+
+## Fluxos com reatividade
+
+- No cadastro rapido da OS, o cliente salvo volta selecionado imediatamente no Select2.
+- O card de resumo do cliente e a listagem pai em modo embed sao sincronizados sem refresh completo.
+- O cadastro rapido e o formulario principal compartilham o mesmo comportamento automatico de CEP.

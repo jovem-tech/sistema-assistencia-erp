@@ -35,3 +35,10 @@ Use **Exportar CSV** para baixar o catálogo atual.
 
 ## 🔒 Encerrar / Inativar
 Serviços podem ser inativados sem apagar histórico.
+
+---
+
+## Qualidade visual de textos
+
+- A listagem e o modal de importação do módulo tiveram normalização de acentuação.
+- Cabeçalhos e ações como `Descrição`, `Ações`, `Importação CSV` e `Iniciar Importação` passaram a ser exibidos corretamente.

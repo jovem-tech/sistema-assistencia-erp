@@ -57,6 +57,11 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="sessao-tab" data-bs-toggle="tab" data-bs-target="#tab-sessao" type="button" role="tab">
+                        <i class="bi bi-shield-lock me-2"></i>Sessao e Seguranca
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
                     <button class="nav-link d-flex align-items-center" id="integracoes-tab" data-bs-toggle="tab" data-bs-target="#tab-integracoes" type="button" role="tab">
                         <i class="bi bi-whatsapp me-2"></i>Integrações
                         <span id="tabBadgeStatus" class="ms-2 badge bg-secondary" style="font-size: 0.65rem;">...</span>
@@ -120,6 +125,41 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                         <div class="col-12 mb-3">
                             <label class="form-label text-muted">Endereco</label>
                             <input type="text" class="form-control" name="empresa_endereco" value="<?= esc($configs['empresa_endereco'] ?? '') ?>">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aba Sessao -->
+                <div class="tab-pane fade" id="tab-sessao" role="tabpanel">
+                    <h5 class="mb-3 border-bottom pb-2">Sessao e Seguranca Operacional</h5>
+                    <div class="row mb-4">
+                        <div class="col-lg-5 col-md-6 mb-3">
+                            <label class="form-label text-muted">Tempo maximo de inatividade (minutos)</label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="sessao_inatividade_minutos"
+                                min="5"
+                                max="1440"
+                                step="5"
+                                value="<?= esc($configs['sessao_inatividade_minutos'] ?? '30') ?>"
+                            >
+                            <small class="text-muted d-block mt-2">
+                                Apos esse periodo sem atividade real, a sessao e encerrada e o sistema avisa claramente antes de o usuario perder tempo tentando salvar formularios.
+                            </small>
+                        </div>
+                        <div class="col-lg-7 mb-3">
+                            <div class="alert alert-info h-100 mb-0">
+                                <div class="fw-semibold mb-2">
+                                    <i class="bi bi-info-circle me-1"></i>Como o aviso funciona
+                                </div>
+                                <ul class="mb-0 ps-3">
+                                    <li>O frontend acompanha digitacao, cliques, foco e interacao com a tela.</li>
+                                    <li>Enquanto houver atividade, um heartbeat discreto mantem a sessao coerente com o timeout configurado.</li>
+                                    <li>Quando a sessao expira, um SweetAlert2 explica o motivo e redireciona para o login.</li>
+                                    <li>Se o usuario entrou com "Lembrar-me", a expiracao por inatividade continua ignorada, como no fluxo atual.</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>

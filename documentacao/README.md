@@ -1,6 +1,6 @@
 # Documentacao - Sistema de Assistencia Tecnica
 
-> Jovem Tech - Atualizado em 22/03/2026
+> Jovem Tech - Atualizado em 26/03/2026
 
 ## Estrutura
 
@@ -21,6 +21,7 @@
 
 ## Leitura rapida recomendada
 - Operacao de OS: `01-manual-do-usuario/ordens-de-servico.md`
+- Workflow administrativo de OS: `02-manual-administrador/fluxo-de-trabalho-os.md`
 - Operacao de Contatos: `01-manual-do-usuario/contatos.md`
 - Configuracao pre-CRM: `02-manual-administrador/configuracao-do-sistema.md`
 - Fluxo tecnico pre-CRM: `06-modulos-do-sistema/ordens-de-servico.md`
@@ -39,6 +40,8 @@
 - Correcao CRM/Contatos (engajamento temporal configuravel): `08-correcoes/2026-03-20-engajamento-temporal-contatos-crm.md`
 - Correcao Dashboard (responsividade, modais de OS e graficos): `08-correcoes/2026-03-22-dashboard-refactor-responsivo-modal-os.md`
 - Correcao Dashboard (alinhamento do "Ver ..." no rodape dos 4 cards): `08-correcoes/2026-03-23-dashboard-alinhamento-footer-cards.md`
+- Correcao OS (botao `+ Nova OS` abrindo modal sem redirecionamento): `08-correcoes/2026-03-23-os-nova-os-modal-sem-redirecionamento.md`
+- Correcao OS (filtros avancados premium com AJAX, chips, persistencia e drawer mobile): `08-correcoes/2026-03-23-os-filtros-avancados-premium-ajax.md`
 - Correcao padrao global de responsividade ultra compatibilidade: `08-correcoes/2026-03-22-padrao-global-responsividade-ultra-compatibilidade.md`
 - Guia de atualizacao de VPS sem downtime (contingencia + Ubuntu novo): `08-correcoes/2026-03-22-guia-atualizacao-vps-sem-downtime.md`
 - Entrega pre-CRM base: `07-novas-implementacoes/2026-03-pre-crm-foundation-os-whatsapp-pdf.md`

@@ -8,6 +8,13 @@ use CodeIgniter\Session\Handlers\FileHandler;
 
 class Session extends BaseConfig
 {
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->expiration = $this->resolveConfiguredExpiration();
+    }
+
     /**
      * --------------------------------------------------------------------------
      * Session Driver
@@ -125,4 +132,39 @@ class Session extends BaseConfig
      * seconds.
      */
     public int $lockMaxRetries = 300;
+
+    private function resolveConfiguredExpiration(): int
+    {
+        $defaultExpiration = $this->expiration;
+        $defaultInactivityMinutes = 30;
+
+        try {
+            $db = \Config\Database::connect();
+
+            if (!$db->tableExists('configuracoes')) {
+                return $defaultExpiration;
+            }
+
+            $row = $db->table('configuracoes')
+                ->select('valor')
+                ->where('chave', 'sessao_inatividade_minutos')
+                ->get()
+                ->getRowArray();
+
+            $configuredMinutes = isset($row['valor']) ? (int) $row['valor'] : $defaultInactivityMinutes;
+            if ($configuredMinutes < 5) {
+                $configuredMinutes = $defaultInactivityMinutes;
+            }
+
+            $configuredMinutes = min($configuredMinutes, 1440);
+
+            // Mantem a sessao tecnica do CI acima do timeout de inatividade
+            // para que o filtro de autenticacao seja a fonte principal de expiracao.
+            $requiredExpiration = ($configuredMinutes * 60) + 3600;
+
+            return max($defaultExpiration, $requiredExpiration);
+        } catch (\Throwable $e) {
+            return $defaultExpiration;
+        }
+    }
 }

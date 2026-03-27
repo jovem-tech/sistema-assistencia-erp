@@ -46,7 +46,7 @@
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label class="form-label">Nome / Razão Social *</label>
-                    <input type="text" name="nome_razao" class="form-control" required
+                    <input type="text" name="nome_razao" class="form-control" data-auto-title-case="person-name" required
                            value="<?= $isEdit ? esc($cliente['nome_razao']) : old('nome_razao') ?>">
                 </div>
                 <div class="col-md-3">

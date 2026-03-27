@@ -31,6 +31,18 @@ class OsStatusFlowService
         return $this->statusModel->getActiveGrouped();
     }
 
+    public function getAllStatusesOrdered(): array
+    {
+        if (! $this->statusModel->db->tableExists('os_status')) {
+            return [];
+        }
+
+        return $this->statusModel
+            ->orderBy('ordem_fluxo', 'ASC')
+            ->orderBy('nome', 'ASC')
+            ->findAll();
+    }
+
     public function getStatusByCode(string $codigo): ?array
     {
         if (! $this->statusModel->db->tableExists('os_status')) {
@@ -51,19 +63,7 @@ class OsStatusFlowService
             return true;
         }
 
-        $from = $this->statusModel->byCode($fromCode);
-        $to = $this->statusModel->byCode($toCode);
-        if (!$from || !$to) {
-            return true;
-        }
-
-        $count = $this->transicaoModel
-            ->where('status_origem_id', $from['id'])
-            ->where('status_destino_id', $to['id'])
-            ->where('ativo', 1)
-            ->countAllResults();
-
-        return $count > 0;
+        return in_array($toCode, $this->getAllowedTransitionCodes($fromCode), true);
     }
 
     public function resolveEstadoFluxo(string $statusCode): string
@@ -139,21 +139,189 @@ class OsStatusFlowService
 
     public function buildTransitionHints(?string $statusAtual): array
     {
-        $grouped = $this->getStatusGrouped();
         $flat = [];
-        foreach ($grouped as $items) {
-            foreach ($items as $s) {
-                $flat[] = $s;
+        foreach ($this->getStatusGrouped() as $items) {
+            foreach ($items as $status) {
+                $flat[] = $status;
             }
         }
 
-        if (!$statusAtual) {
+        if (! $statusAtual) {
             return $flat;
         }
 
-        return array_values(array_filter($flat, function (array $status) use ($statusAtual): bool {
-            return $status['codigo'] === $statusAtual || $this->isTransitionAllowed($statusAtual, $status['codigo']);
+        $allowedCodes = array_merge([$statusAtual], $this->getAllowedTransitionCodes($statusAtual));
+
+        return array_values(array_filter($flat, static function (array $status) use ($allowedCodes): bool {
+            $code = (string) ($status['codigo'] ?? '');
+            return $code !== '' && in_array($code, $allowedCodes, true);
         }));
+    }
+
+    public function getTransitionMap(bool $withFallback = true): array
+    {
+        $statuses = $this->getAllStatusesOrdered();
+        if (empty($statuses)) {
+            return [];
+        }
+
+        if (! $this->statusModel->db->tableExists('os_status_transicoes')) {
+            return $withFallback ? $this->buildFallbackTransitionMap($statuses) : [];
+        }
+
+        if (! $this->hasConfiguredTransitions()) {
+            return $withFallback ? $this->buildFallbackTransitionMap($statuses) : [];
+        }
+
+        $rows = $this->transicaoModel
+            ->select('os_status_transicoes.status_origem_id, os_status_transicoes.status_destino_id, s1.codigo as origem_codigo, s2.codigo as destino_codigo')
+            ->join('os_status s1', 's1.id = os_status_transicoes.status_origem_id')
+            ->join('os_status s2', 's2.id = os_status_transicoes.status_destino_id')
+            ->where('os_status_transicoes.ativo', 1)
+            ->orderBy('s1.ordem_fluxo', 'ASC')
+            ->orderBy('s2.ordem_fluxo', 'ASC')
+            ->findAll();
+
+        $map = [];
+        foreach ($statuses as $status) {
+            $code = (string) ($status['codigo'] ?? '');
+            if ($code !== '') {
+                $map[$code] = [];
+            }
+        }
+
+        foreach ($rows as $row) {
+            $origem = (string) ($row['origem_codigo'] ?? '');
+            $destino = (string) ($row['destino_codigo'] ?? '');
+            if ($origem === '' || $destino === '') {
+                continue;
+            }
+            $map[$origem][] = $destino;
+        }
+
+        return $map;
+    }
+
+    public function hasConfiguredTransitions(): bool
+    {
+        if (! $this->statusModel->db->tableExists('os_status_transicoes')) {
+            return false;
+        }
+
+        return $this->transicaoModel
+            ->where('ativo', 1)
+            ->countAllResults() > 0;
+    }
+
+    public function saveWorkflowConfig(array $statusPayload, array $transitionPayload): array
+    {
+        if (! $this->statusModel->db->tableExists('os_status') || ! $this->statusModel->db->tableExists('os_status_transicoes')) {
+            return [
+                'ok' => false,
+                'message' => 'Tabelas de workflow da OS nao encontradas.',
+            ];
+        }
+
+        $db = $this->statusModel->db;
+        $db->transBegin();
+
+        try {
+            foreach ($this->getAllStatusesOrdered() as $status) {
+                $statusId = (int) ($status['id'] ?? 0);
+                if ($statusId <= 0) {
+                    continue;
+                }
+
+                $payload = $statusPayload[$statusId] ?? [];
+                $update = [
+                    'ordem_fluxo' => (int) ($payload['ordem_fluxo'] ?? $status['ordem_fluxo'] ?? 0),
+                    'ativo' => !empty($payload['ativo']) ? 1 : 0,
+                    'status_final' => !empty($payload['status_final']) ? 1 : 0,
+                    'status_pausa' => !empty($payload['status_pausa']) ? 1 : 0,
+                ];
+
+                $this->statusModel->update($statusId, $update);
+            }
+
+            $this->transicaoModel->where('id >', 0)->delete();
+
+            $pairs = [];
+            foreach ($transitionPayload as $originId => $destinations) {
+                $originId = (int) $originId;
+                if ($originId <= 0 || !is_array($destinations)) {
+                    continue;
+                }
+
+                foreach ($destinations as $destinationId) {
+                    $destinationId = (int) $destinationId;
+                    if ($destinationId <= 0 || $destinationId === $originId) {
+                        continue;
+                    }
+
+                    $pairKey = $originId . ':' . $destinationId;
+                    $pairs[$pairKey] = [
+                        'status_origem_id' => $originId,
+                        'status_destino_id' => $destinationId,
+                        'ativo' => 1,
+                    ];
+                }
+            }
+
+            if (!empty($pairs)) {
+                $this->transicaoModel->insertBatch(array_values($pairs));
+            }
+
+            if ($db->transStatus() === false) {
+                throw new \RuntimeException('Falha ao salvar o workflow da OS.');
+            }
+
+            $db->transCommit();
+
+            return [
+                'ok' => true,
+                'message' => 'Fluxo de trabalho salvo com sucesso.',
+            ];
+        } catch (\Throwable $e) {
+            $db->transRollback();
+
+            return [
+                'ok' => false,
+                'message' => $e->getMessage() ?: 'Nao foi possivel salvar o workflow da OS.',
+            ];
+        }
+    }
+
+    private function getAllowedTransitionCodes(string $fromCode): array
+    {
+        $map = $this->getTransitionMap(true);
+        $codes = $map[$fromCode] ?? [];
+        $codes = array_values(array_unique(array_filter(array_map('strval', $codes))));
+        return array_values(array_filter($codes, static fn (string $code): bool => $code !== $fromCode));
+    }
+
+    private function buildFallbackTransitionMap(array $statuses): array
+    {
+        $ordered = array_values(array_filter($statuses, static fn (array $status): bool => (int) ($status['ativo'] ?? 1) === 1));
+        $map = [];
+
+        foreach ($ordered as $index => $status) {
+            $code = (string) ($status['codigo'] ?? '');
+            if ($code === '') {
+                continue;
+            }
+
+            $allowed = [];
+            if (isset($ordered[$index - 1]['codigo'])) {
+                $allowed[] = (string) $ordered[$index - 1]['codigo'];
+            }
+            if (isset($ordered[$index + 1]['codigo'])) {
+                $allowed[] = (string) $ordered[$index + 1]['codigo'];
+            }
+
+            $map[$code] = array_values(array_unique(array_filter($allowed)));
+        }
+
+        return $map;
     }
 
     private function legacyStatusGrouped(): array

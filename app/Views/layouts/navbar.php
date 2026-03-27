@@ -1,5 +1,11 @@
 <!-- Top Navbar -->
 <!-- Top Navbar -->
+<?php
+$uri = service('uri');
+$currentModule = $uri->getSegment(1);
+$currentSubroute = $uri->getSegment(2);
+$isOsListPage = $currentModule === 'os' && empty($currentSubroute);
+?>
 <nav class="top-navbar">
     <div class="navbar-left">
         <button class="btn btn-link mobile-toggle" id="mobileToggle">
@@ -110,7 +116,7 @@
     <div class="navbar-right">
         <!-- Quick Actions -->
         <div class="navbar-actions">
-            <?php if (can('os', 'criar')): ?>
+            <?php if (can('os', 'criar') && !$isOsListPage): ?>
             <a href="<?= base_url('os/nova') ?>" class="btn btn-glow btn-sm" title="Nova OS">
                 <i class="bi bi-plus-lg me-1"></i><span class="nav-action-label">Nova OS</span>
             </a>

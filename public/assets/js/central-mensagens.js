@@ -2411,12 +2411,17 @@
             });
         } catch (error) {
             const timeoutAbort = (error && (error.name === 'AbortError' || String(error.message || '').toLowerCase().includes('timeout')));
+            const providerUnavailable = Number(error?.status || 0) === 503
+                || String(error?.payload?.code || '') === 'CM_ENVIO_PROVIDER_UNAVAILABLE';
             await swal({
                 icon: 'error',
-                title: 'Falha no envio',
+                title: providerUnavailable ? 'Gateway indisponivel' : 'Falha no envio',
                 text: timeoutAbort
                     ? 'O envio excedeu o tempo limite de 16s. Verifique o gateway e tente novamente.'
                     : (error.message || 'Nao foi possivel enviar.'),
+                footer: providerUnavailable
+                    ? 'Verifique Configuracoes > WhatsApp e confirme se o gateway esta em execucao.'
+                    : undefined,
             });
         } finally {
             setButtonLoading(sendButton, false);

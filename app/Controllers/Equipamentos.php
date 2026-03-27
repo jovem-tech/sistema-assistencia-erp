@@ -62,7 +62,8 @@ class Equipamentos extends BaseController
 
         $dados = (array) $this->request->getPost();
         $dados = $this->processarMarcaModelo($dados);
-        
+        $dados = $this->normalizeSenhaAcessoPayload($dados);
+
         $this->model->insert($dados);
         $equipId = $this->model->getInsertID();
         $uploadResult = $this->appendEquipamentoFotos(
@@ -156,7 +157,8 @@ class Equipamentos extends BaseController
     {
         $dados = (array) $this->request->getPost();
         $dados = $this->processarMarcaModelo($dados);
-        
+        $dados = $this->normalizeSenhaAcessoPayload($dados);
+
         $this->model->update($id, $dados);
         $this->normalizeEquipamentoFotosStorage((int) $id);
         $uploadResult = $this->appendEquipamentoFotos(
@@ -335,24 +337,34 @@ class Equipamentos extends BaseController
         ];
 
         if (!$this->validate($rules)) {
+            $validationErrors = $this->validator->getErrors();
             return $this->response->setJSON([
-                'status' => 'error',
-                'errors' => $this->validator->getErrors()
+                'status'    => 'error',
+                'errors'    => $this->translateEquipamentoValidationErrors($validationErrors),
+                'focus_tab' => $this->resolveEquipamentoValidationFocusTab($validationErrors),
             ]);
         }
 
         $dados = (array) $this->request->getPost();
         $dados = $this->processarMarcaModelo($dados);
-
-
+        $dados = $this->normalizeSenhaAcessoPayload($dados);
         $dados['cor_hex'] = $dados['cor_hex'] ?? null;
+        $uploadedFiles = $this->collectAjaxUploadedFotos();
+        $assetValidation = $this->validateAjaxEquipamentoAssets($dados, $uploadedFiles);
+        if (!empty($assetValidation['errors'])) {
+            return $this->response->setJSON([
+                'status'    => 'error',
+                'errors'    => $assetValidation['errors'],
+                'focus_tab' => $assetValidation['focus_tab'],
+            ]);
+        }
 
         $this->model->insert($dados);
         $equipId = $this->model->getInsertID();
 
         $uploadResult = $this->appendEquipamentoFotos(
             $equipId,
-            $this->collectAjaxUploadedFotos(),
+            $uploadedFiles,
             false
         );
         $fotoUrl = $uploadResult['principal_url'] ?? null;
@@ -399,22 +411,34 @@ class Equipamentos extends BaseController
         ];
 
         if (!$this->validate($rules)) {
+            $validationErrors = $this->validator->getErrors();
             return $this->response->setJSON([
-                'status' => 'error',
-                'errors' => $this->validator->getErrors()
+                'status'    => 'error',
+                'errors'    => $this->translateEquipamentoValidationErrors($validationErrors),
+                'focus_tab' => $this->resolveEquipamentoValidationFocusTab($validationErrors),
             ]);
         }
 
         $dados = (array) $this->request->getPost();
         $dados = $this->processarMarcaModelo($dados);
+        $dados = $this->normalizeSenhaAcessoPayload($dados);
         $dados['cor_hex'] = $dados['cor_hex'] ?? null;
+        $uploadedFiles = $this->collectAjaxUploadedFotos();
+        $assetValidation = $this->validateAjaxEquipamentoAssets($dados, $uploadedFiles, (int) $id);
+        if (!empty($assetValidation['errors'])) {
+            return $this->response->setJSON([
+                'status'    => 'error',
+                'errors'    => $assetValidation['errors'],
+                'focus_tab' => $assetValidation['focus_tab'],
+            ]);
+        }
 
         $this->model->update($id, $dados);
         $this->normalizeEquipamentoFotosStorage((int) $id);
 
         $uploadResult = $this->appendEquipamentoFotos(
             (int) $id,
-            $this->collectAjaxUploadedFotos(),
+            $uploadedFiles,
             false
         );
         $fotoUrl = $uploadResult['principal_url'] ?? null;
@@ -549,6 +573,79 @@ class Equipamentos extends BaseController
         }
 
         return $files;
+    }
+
+    private function validateAjaxEquipamentoAssets(array $dados, array $uploadedFiles, int $equipamentoId = 0): array
+    {
+        $errors = [];
+        $focusTab = null;
+
+        $corHex = trim((string) ($dados['cor_hex'] ?? ''));
+        $corNome = trim((string) ($dados['cor'] ?? ''));
+        if ($corHex === '' || $corNome === '') {
+            $errors['cor'] = 'Informe a cor correta do equipamento.';
+            $focusTab = 'cor';
+        }
+
+        $fotosExistentes = 0;
+        if ($equipamentoId > 0) {
+            $fotoModel = new EquipamentoFotoModel();
+            $fotosExistentes = (int) $fotoModel->where('equipamento_id', $equipamentoId)->countAllResults();
+        }
+
+        if (($fotosExistentes + count($uploadedFiles)) <= 0) {
+            $errors['fotos'] = 'Adicione ao menos uma foto do equipamento.';
+            $focusTab = $focusTab ?: 'foto';
+        }
+
+        return [
+            'errors'    => $errors,
+            'focus_tab' => $focusTab,
+        ];
+    }
+
+    private function resolveEquipamentoValidationFocusTab(array $errors): string
+    {
+        foreach (['tipo_id', 'marca_id', 'modelo_id', 'cliente_id'] as $field) {
+            if (!empty($errors[$field])) {
+                return 'info';
+            }
+        }
+
+        foreach (['cor', 'cor_hex'] as $field) {
+            if (!empty($errors[$field])) {
+                return 'cor';
+            }
+        }
+
+        foreach (['fotos', 'foto_perfil'] as $field) {
+            if (!empty($errors[$field])) {
+                return 'foto';
+            }
+        }
+
+        return 'info';
+    }
+
+    private function translateEquipamentoValidationErrors(array $errors): array
+    {
+        $labels = [
+            'cliente_id' => 'Selecione o cliente do equipamento.',
+            'tipo_id'    => 'Selecione o tipo do equipamento.',
+            'marca_id'   => 'Selecione a marca do equipamento.',
+            'modelo_id'  => 'Selecione o modelo do equipamento.',
+            'cor'        => 'Informe a cor correta do equipamento.',
+            'cor_hex'    => 'Informe a cor correta do equipamento.',
+            'fotos'      => 'Adicione ao menos uma foto do equipamento.',
+            'foto_perfil'=> 'Adicione ao menos uma foto do equipamento.',
+        ];
+
+        $translated = [];
+        foreach ($errors as $field => $message) {
+            $translated[$field] = $labels[$field] ?? $message;
+        }
+
+        return $translated;
     }
 
     private function appendEquipamentoFotos(int $equipamentoId, array $uploadedFiles, bool $forceNewAsPrincipal = false): array
@@ -949,6 +1046,42 @@ class Equipamentos extends BaseController
         $normalized = preg_replace('/[^a-z0-9]+/i', $delimiter, $normalized ?? '');
         $normalized = trim((string) $normalized, $delimiter);
         return $normalized !== '' ? $normalized : 'item';
+    }
+
+    private function normalizeSenhaAcessoPayload(array $dados): array
+    {
+        $senhaTipo = strtolower(trim((string) ($dados['senha_tipo'] ?? '')));
+        $senhaTexto = trim((string) ($dados['senha_acesso'] ?? ''));
+        $senhaDesenho = trim((string) ($dados['senha_desenho'] ?? ''));
+
+        $patternSource = '';
+        if ($senhaTipo === 'desenho' && $senhaDesenho !== '') {
+            $patternSource = $senhaDesenho;
+        } elseif ($senhaTipo !== 'texto' && str_starts_with($senhaTexto, 'desenho_')) {
+            $patternSource = substr($senhaTexto, 8);
+            $senhaTipo = 'desenho';
+        }
+
+        if ($senhaTipo === 'desenho') {
+            $parts = preg_split('/[^1-9]+/', $patternSource) ?: [];
+            $sequence = [];
+            foreach ($parts as $part) {
+                $point = (string) $part;
+                if ($point === '' || in_array($point, $sequence, true)) {
+                    continue;
+                }
+                $sequence[] = $point;
+            }
+
+            $dados['senha_acesso'] = !empty($sequence)
+                ? 'desenho_' . implode('-', $sequence)
+                : '';
+        } else {
+            $dados['senha_acesso'] = $senhaTexto;
+        }
+
+        unset($dados['senha_tipo'], $dados['senha_desenho']);
+        return $dados;
     }
 
     /**

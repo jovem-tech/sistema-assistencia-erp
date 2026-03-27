@@ -34,6 +34,7 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
             return [
                 'ok' => false,
                 'provider' => $this->providerId,
+                'failure_type' => 'validation',
                 'message' => 'Mensagem vazia para envio no ' . $this->providerLabel . '.',
                 'response' => null,
             ];
@@ -55,6 +56,7 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
             return [
                 'ok' => false,
                 'provider' => $this->providerId,
+                'failure_type' => 'file_unavailable',
                 'message' => 'Arquivo nao encontrado para envio no ' . $this->providerLabel . '.',
                 'response' => null,
             ];
@@ -65,6 +67,7 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
             return [
                 'ok' => false,
                 'provider' => $this->providerId,
+                'failure_type' => 'file_unavailable',
                 'message' => 'Nao foi possivel ler o arquivo para envio no ' . $this->providerLabel . '.',
                 'response' => null,
             ];
@@ -123,6 +126,7 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
             return [
                 'ok' => false,
                 'provider' => $this->providerId,
+                'failure_type' => 'gateway_misconfigured',
                 'message' => 'URL do ' . $this->providerLabel . ' nao configurada.',
                 'response' => null,
             ];
@@ -166,10 +170,12 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
         curl_close($ch);
 
         if ($raw === false || $error !== '') {
+            $failureType = $this->classifyCurlFailure($error);
             return [
                 'ok' => false,
                 'provider' => $this->providerId,
                 'status_code' => 0,
+                'failure_type' => $failureType,
                 'message' => 'Falha de rede ao comunicar com ' . $this->providerLabel . ': ' . $error,
                 'response' => null,
             ];
@@ -193,6 +199,7 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
             'ok' => $ok,
             'provider' => $this->providerId,
             'status_code' => $http,
+            'failure_type' => $ok ? null : $this->classifyHttpFailure($http),
             'response' => $json,
             'message_id' => $messageId,
             'message' => $ok
@@ -218,5 +225,35 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
         }
 
         return str_starts_with($digits, '55') ? $digits : ('55' . $digits);
+    }
+
+    private function classifyCurlFailure(string $error): string
+    {
+        $normalized = function_exists('mb_strtolower')
+            ? mb_strtolower(trim($error), 'UTF-8')
+            : strtolower(trim($error));
+
+        if ($normalized === '') {
+            return 'gateway_unreachable';
+        }
+
+        if (str_contains($normalized, 'timed out') || str_contains($normalized, 'timeout')) {
+            return 'gateway_timeout';
+        }
+
+        return 'gateway_unreachable';
+    }
+
+    private function classifyHttpFailure(int $httpCode): string
+    {
+        if ($httpCode === 408 || $httpCode === 429) {
+            return 'provider_unavailable';
+        }
+
+        if ($httpCode >= 500) {
+            return 'provider_unavailable';
+        }
+
+        return 'provider_rejected';
     }
 }

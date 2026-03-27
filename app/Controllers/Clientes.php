@@ -49,7 +49,7 @@ class Clientes extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $dados = $this->request->getPost();
+        $dados = $this->normalizeClientePayload((array) $this->request->getPost());
         $this->model->insert($dados);
 
         LogModel::registrar('cliente_criado', 'Cliente cadastrado: ' . $dados['nome_razao']);
@@ -84,7 +84,7 @@ class Clientes extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $dados = $this->request->getPost();
+        $dados = $this->normalizeClientePayload((array) $this->request->getPost());
         $this->model->update($id, $dados);
 
         LogModel::registrar('cliente_atualizado', 'Cliente atualizado ID: ' . $id);
@@ -231,20 +231,34 @@ class Clientes extends BaseController
             ]);
         }
 
-        $dados = $this->request->getPost();
+        $dados = $this->normalizeClientePayload((array) $this->request->getPost());
+        $id = $this->request->getPost('id');
         
         try {
-            $this->model->insert($dados);
-            $insertId = $this->model->getInsertID();
-
-            LogModel::registrar('cliente_criado_ajax', 'Cliente cadastrado via Ajax: ' . $dados['nome_razao']);
-
-            return $this->response->setJSON([
-                'success' => true,
-                'id'      => $insertId,
-                'nome'    => $dados['nome_razao']
-            ]);
-            
+            if (!empty($id)) {
+                $this->model->update($id, $dados);
+                $clienteAtualizado = $this->model->find($id);
+                LogModel::registrar('cliente_atualizado_ajax', 'Cliente atualizado via Ajax ID: ' . $id);
+                return $this->response->setJSON([
+                    'success' => true,
+                    'id'      => $id,
+                    'nome'    => $dados['nome_razao'],
+                    'cliente' => $clienteAtualizado,
+                    'is_update' => true
+                ]);
+            } else {
+                $this->model->insert($dados);
+                $insertId = $this->model->getInsertID();
+                $clienteCriado = $this->model->find($insertId);
+                LogModel::registrar('cliente_criado_ajax', 'Cliente cadastrado via Ajax: ' . $dados['nome_razao']);
+                return $this->response->setJSON([
+                    'success' => true,
+                    'id'      => $insertId,
+                    'nome'    => $dados['nome_razao'],
+                    'cliente' => $clienteCriado,
+                    'is_update' => false
+                ]);
+            }
         } catch (\Exception $e) {
             return $this->response->setJSON([
                 'success' => false,
@@ -357,6 +371,8 @@ class Clientes extends BaseController
                 continue;
             }
 
+            $clienteData = $this->normalizeClientePayload($clienteData);
+
             try {
                 $this->model->insert($clienteData);
                 $importedCount++;
@@ -375,5 +391,28 @@ class Clientes extends BaseController
         }
 
         return redirect()->to('/clientes')->with('success', $msg);
+    }
+
+    private function normalizeClientePayload(array $dados): array
+    {
+        if (array_key_exists('nome_razao', $dados)) {
+            $dados['nome_razao'] = $this->normalizeClienteNome((string) $dados['nome_razao']);
+        }
+
+        return $dados;
+    }
+
+    private function normalizeClienteNome(string $nome): string
+    {
+        $nome = preg_replace('/\s+/u', ' ', trim($nome)) ?? '';
+        if ($nome === '') {
+            return '';
+        }
+
+        if (function_exists('mb_strtolower') && function_exists('mb_convert_case')) {
+            return mb_convert_case(mb_strtolower($nome, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+        }
+
+        return ucwords(strtolower($nome));
     }
 }

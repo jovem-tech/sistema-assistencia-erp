@@ -248,7 +248,7 @@ class GlobalSearchService
             $found[] = [
                 'title' => mb_strimwidth($row['mensagem'], 0, 50, '...'),
                 'subtitle' => ($row['cliente_nome'] ?? $row['telefone']) . ' - ' . date('d/m/Y H:i', strtotime($row['created_at'])),
-                'url' => base_url('atendimento-whatsapp/conversa/' . $row['conversa_id']),
+                'url' => base_url('atendimento-whatsapp?conversa_id=' . $row['conversa_id']),
                 'icon' => 'bi-whatsapp',
                 'badge' => 'Mensagem'
             ];

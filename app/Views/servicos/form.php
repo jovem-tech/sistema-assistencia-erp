@@ -24,7 +24,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Descri??o</label>
+                        <label class="form-label">Descrição</label>
                         <textarea name="descricao" class="form-control" rows="3" placeholder="Detalhes técnicos do serviço..."><?= old('descricao', $servico['descricao'] ?? '') ?></textarea>
                     </div>
 

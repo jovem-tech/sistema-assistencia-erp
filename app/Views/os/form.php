@@ -48,6 +48,32 @@ $clienteSelecionadoNoForm = $isEdit
     ? (int) ($os['cliente_id'] ?? 0)
     : ($clientePreSelecionado > 0 ? $clientePreSelecionado : 0);
 
+$clientes = $clientes ?? [];
+$clientesMeta = [];
+foreach ($clientes as $clienteItem) {
+    $clienteId = (string) ($clienteItem['id'] ?? '');
+    if ($clienteId === '') {
+        continue;
+    }
+
+    $clienteNome = trim((string) ($clienteItem['nome_razao'] ?? ''));
+    $clienteTelefone = trim((string) ($clienteItem['telefone1'] ?? $clienteItem['telefone'] ?? ''));
+    $clienteEnderecoPartes = array_filter([
+        trim((string) ($clienteItem['endereco'] ?? '')),
+        trim((string) ($clienteItem['numero'] ?? '')),
+        trim((string) ($clienteItem['bairro'] ?? '')),
+        trim((string) ($clienteItem['cidade'] ?? '')),
+        trim((string) ($clienteItem['uf'] ?? '')),
+    ], static fn ($value) => $value !== '');
+
+    $clientesMeta[$clienteId] = [
+        'id' => $clienteId,
+        'nome' => $clienteNome,
+        'telefone' => $clienteTelefone,
+        'endereco' => implode(', ', $clienteEnderecoPartes),
+    ];
+}
+
 $isEmbedded = (bool) ($isEmbedded ?? false);
 $embedQuery = $isEmbedded ? '?embed=1' : '';
 ?>
@@ -75,32 +101,29 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
     <!-- SIDEBAR: Painel da foto do equipamento -->
     <div class="col-12 col-xl-4 col-xxl-3 ds-split-sidebar" id="sidebarEquipamento">
         <div class="d-flex flex-column gap-3 ds-sticky-panel">
-            <div class="card glass-card">
+            <div class="card glass-card os-sidebar-card">
                 <div class="card-body p-3">
-                    <h6 class="fw-bold mb-3 text-uppercase text-muted" style="font-size:0.7rem; letter-spacing:1px;">
+                    <h6 class="os-panel-title">
                         <i class="bi bi-image me-1"></i>Foto do Equipamento
                     </h6>
                     <!-- Foto Principal -->
                     <div id="fotoPrincipalWrap" class="mb-3 text-center">
-                        <div id="fotoMainBox" class="rounded overflow-hidden d-none"
-                             style="height: 200px; background: #111; border: 2px solid rgba(255,255,255,0.1); position:relative;">
-                            <a href="javascript:void(0)" id="fotoPrincipalLink" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="" class="d-block w-100 h-100" style="cursor: zoom-in;">
+                        <div id="fotoMainBox" class="os-photo-mainbox rounded overflow-hidden d-none">
+                            <a href="javascript:void(0)" id="fotoPrincipalLink" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="" class="os-photo-mainlink d-block w-100 h-100">
                                 <img id="fotoPrincipalImg" src="" alt="Foto do equipamento"
-                                     class="w-100 h-100"
-                                     style="object-fit: contain; transition: opacity 0.2s;">
+                                     class="os-photo-mainimg w-100 h-100">
                             </a>
                         </div>
-                        <div id="fotoPlaceholder" class="rounded align-items-center justify-content-center d-flex"
-                             style="height: 200px; background: rgba(255,255,255,0.04); border: 2px dashed rgba(255,255,255,0.1);">
+                        <div id="fotoPlaceholder" class="os-photo-placeholder rounded align-items-center justify-content-center d-flex">
                             <div class="text-center text-muted">
-                                <i class="bi bi-image" style="font-size: 2rem;"></i>
+                                <i class="bi bi-image os-photo-placeholder-icon"></i>
                                 <p class="small mt-2 mb-0">Selecione um equipamento</p>
                             </div>
                         </div>
                     </div>
 
                     <div id="equipColorInfo" class="d-flex align-items-center gap-2 small text-muted mb-2 d-none">
-                        <span id="equipColorSwatch" class="d-inline-block rounded-circle border" style="width: 14px; height: 14px; background: #333;"></span>
+                        <span id="equipColorSwatch" class="os-color-swatch d-inline-block rounded-circle border"></span>
                         <span id="equipColorName">Cor não informada</span>
                     </div>
 
@@ -108,7 +131,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                     <div id="fotosMiniaturas" class="d-flex flex-wrap gap-2 justify-content-center"></div>
 
                     <!-- Info do Equipamento -->
-                    <div id="equipInfoBox" class="mt-3 p-2 rounded" style="background: rgba(255,255,255,0.04); font-size: 0.78rem; display:none;">
+                    <div id="equipInfoBox" class="os-equipment-info mt-3 p-2 rounded d-none">
                         <div id="equipInfoContent" class="text-muted"></div>
                     </div>
                     <?php if (can('equipamentos', 'editar')): ?>
@@ -122,101 +145,101 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                 </div>
             </div>
 
-            <div class="card glass-card" id="resumoOsCard">
+            <div class="card glass-card os-sidebar-card" id="resumoOsCard">
                 <div class="card-body p-3">
-                    <h6 class="fw-bold mb-3 text-uppercase text-muted" style="font-size:0.7rem; letter-spacing:1px;">
+                    <h6 class="os-panel-title">
                         <i class="bi bi-clipboard2-check me-1"></i>Resumo da OS
                     </h6>
                     <div class="d-flex flex-column gap-2 small">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Cliente</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoCliente" class="text-white-50">Não selecionado</span>
-                                <span id="statusCliente" class="text-danger">?</span>
+                                <span id="resumoCliente" class="os-summary-value">Não selecionado</span>
+                                <span id="statusCliente" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Equipamento</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoEquipamento" class="text-white-50">Não selecionado</span>
-                                <span id="statusEquipamento" class="text-danger">?</span>
+                                <span id="resumoEquipamento" class="os-summary-value">Não selecionado</span>
+                                <span id="statusEquipamento" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Técnico</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoTecnico" class="text-white-50">Não atribuído</span>
-                                <span id="statusTecnico" class="text-danger">?</span>
+                                <span id="resumoTecnico" class="os-summary-value">Não atribuído</span>
+                                <span id="statusTecnico" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Prioridade</span>
                             <span class="d-flex align-items-center gap-2">
                                 <span id="resumoPrioridade" class="badge text-bg-secondary">Normal</span>
-                                <span id="statusPrioridade" class="text-success">??</span>
+                                <span id="statusPrioridade" class="text-success" title="Preenchido"><i class="bi bi-check-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Preenchido</span></span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Status</span>
                             <span class="d-flex align-items-center gap-2">
                                 <span id="resumoStatus" class="badge text-bg-secondary"><?= esc($statusDefaultLabel) ?></span>
-                                <span id="statusStatus" class="text-success">??</span>
+                                <span id="statusStatus" class="text-success" title="Preenchido"><i class="bi bi-check-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Preenchido</span></span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Entrada</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoEntrada" class="text-white-50">-</span>
-                                <span id="statusEntrada" class="text-danger">?</span>
+                                <span id="resumoEntrada" class="os-summary-value">-</span>
+                                <span id="statusEntrada" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Previsão</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoPrevisao" class="text-white-50">-</span>
-                                <span id="statusPrevisao" class="text-danger">?</span>
+                                <span id="resumoPrevisao" class="os-summary-value">-</span>
+                                <span id="statusPrevisao" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Relato</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoRelato" class="text-white-50">Vazio</span>
-                                <span id="statusRelato" class="text-danger">?</span>
+                                <span id="resumoRelato" class="os-summary-value">Vazio</span>
+                                <span id="statusRelato" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Acessórios</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoAcessorios" class="text-white-50">Não informado</span>
-                                <span id="statusAcessorios" class="text-danger">?</span>
+                                <span id="resumoAcessorios" class="os-summary-value">Não informado</span>
+                                <span id="statusAcessorios" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Estado físico</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoEstadoFisico" class="text-white-50">Não informado</span>
-                                <span id="statusEstadoFisico" class="text-danger">?</span>
+                                <span id="resumoEstadoFisico" class="os-summary-value">Não informado</span>
+                                <span id="statusEstadoFisico" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Fotos de entrada</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoFotosEntrada" class="text-white-50">0</span>
-                                <span id="statusFotos" class="text-danger">?</span>
+                                <span id="resumoFotosEntrada" class="os-summary-value">0</span>
+                                <span id="statusFotos" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
                         <?php if ($isEdit): ?>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Defeitos marcados</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoDefeitos" class="text-white-50">0</span>
-                                <span id="statusDefeitos" class="text-danger">?</span>
+                                <span id="resumoDefeitos" class="os-summary-value">0</span>
+                                <span id="statusDefeitos" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
                         <?php endif; ?>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Rascunho</span>
-                            <span id="resumoRascunho" class="text-white-50">Não salvo</span>
+                            <span id="resumoRascunho" class="os-summary-value">Não salvo</span>
                         </div>
                     </div>
                 </div>
@@ -226,11 +249,17 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
 
     <!-- ÁREA PRINCIPAL DO FORMULÁRIO -->
     <div class="col-12 col-xl-8 col-xxl-9 ds-split-main" id="formCol">
-        <div class="card glass-card">
+        <div class="card glass-card os-form-shell">
             <div class="card-body">
                 <form action="<?= $isEdit ? base_url('os/atualizar/' . $os['id']) : base_url('os/salvar') ?><?= $embedQuery ?>"
                       method="POST" enctype="multipart/form-data" id="formOs" novalidate>
                     <?= csrf_field() ?>
+                    <div id="osSubmitLoading" class="os-form-loading" aria-hidden="true">
+                        <div class="os-form-loading-inner" role="status" aria-live="polite">
+                            <div class="spinner-border spinner-border-sm text-primary" aria-hidden="true"></div>
+                            <span><?= $isEdit ? 'Atualizando a OS...' : 'Abrindo a OS...' ?></span>
+                        </div>
+                    </div>
                     <?php if (!$isEdit): ?>
                     <input type="hidden" name="origem_conversa_id" value="<?= $origemConversaId > 0 ? $origemConversaId : '' ?>">
                     <input type="hidden" name="origem_contato_id" value="<?= $origemContatoId > 0 ? $origemContatoId : '' ?>">
@@ -252,7 +281,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                         </a>
                     </div>
                     <?php endif; ?>
-                    <div id="osDraftAlert" class="alert alert-info d-flex align-items-center justify-content-between gap-3 d-none">
+                    <div id="osDraftAlert" class="alert alert-info os-draft-alert d-flex align-items-center justify-content-between gap-3 d-none">
                         <div class="small mb-0">
                             <i class="bi bi-clock-history me-1"></i>Encontramos um rascunho salvo automaticamente para esta OS.
                         </div>
@@ -265,10 +294,16 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
 
                     <ul class="nav nav-tabs ds-tabs-scroll mb-3" id="osTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active fw-bold" id="tab-dados-btn" data-bs-toggle="tab" data-bs-target="#tab-dados" type="button" role="tab" aria-controls="tab-dados" aria-selected="true">Dados</button>
+                            <button class="nav-link active fw-bold" id="tab-cliente-btn" data-bs-toggle="tab" data-bs-target="#tab-cliente" type="button" role="tab" aria-controls="tab-cliente" aria-selected="true">Cliente</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold" id="tab-relato-btn" data-bs-toggle="tab" data-bs-target="#tab-relato" type="button" role="tab" aria-controls="tab-relato" aria-selected="false"><?= $isEdit ? 'Relato e Defeitos' : 'Relato do Cliente' ?></button>
+                            <button class="nav-link fw-bold" id="tab-equipamento-btn" data-bs-toggle="tab" data-bs-target="#tab-equipamento" type="button" role="tab" aria-controls="tab-equipamento" aria-selected="false">Equipamento</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold" id="tab-defeito-btn" data-bs-toggle="tab" data-bs-target="#tab-defeito" type="button" role="tab" aria-controls="tab-defeito" aria-selected="false">Defeito</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold" id="tab-relato-btn" data-bs-toggle="tab" data-bs-target="#tab-relato" type="button" role="tab" aria-controls="tab-relato" aria-selected="false">Dados Operacionais</button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link fw-bold" id="tab-fotos-btn" data-bs-toggle="tab" data-bs-target="#tab-fotos" type="button" role="tab" aria-controls="tab-fotos" aria-selected="false">Fotos</button>
@@ -280,9 +315,369 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                         <?php endif; ?>
                     </ul>
 
-                    <div class="tab-content">
-                        <div class="tab-pane fade show active" id="tab-dados" role="tabpanel" aria-labelledby="tab-dados-btn" tabindex="0">
+                    <div class="tab-content" id="osTabsContent">
+                        <div class="tab-pane fade show active" id="tab-cliente" role="tabpanel" aria-labelledby="tab-cliente-btn" tabindex="0">
+                            <div class="os-data-section mb-4">
+                                <div class="os-data-section-title">
+                                    <i class="bi bi-person-badge me-1"></i>Dados do cliente
+                                </div>
+                                <div class="os-tab-helper">
+                                    Defina quem trouxe o equipamento e visualize rapidamente os dados de contato para atendimento.
+                                </div>
+                                <div class="row g-3 align-items-start">
+                                    <div class="col-12">
+                                        <div class="os-inline-label">
+                                            <label for="clienteOsSelect" class="form-label mb-0">
+                                                <span>Cliente *</span>
+                                            </label>
+                                            <span class="os-inline-actions">
+                                                <?php if (can('clientes', 'criar')): ?>
+                                                <button class="btn btn-warning btn-sm os-inline-action-btn" type="button" id="btnNovoCliente" title="Cadastrar novo cliente">
+                                                    <i class="bi bi-plus-lg"></i><span>Novo</span>
+                                                </button>
+                                                <?php endif; ?>
+                                                <?php if (can('clientes', 'editar')): ?>
+                                                <button class="btn btn-outline-info btn-sm os-inline-action-btn d-none" type="button" id="btnEditarClienteOS" title="Editar cliente selecionado">
+                                                    <i class="bi bi-pencil"></i><span>Editar</span>
+                                                </button>
+                                                <?php endif; ?>
+                                            </span>
+                                        </div>
+                                        <select name="cliente_id" id="clienteOsSelect" class="form-select select2-clientes" required>
+                                            <option value="">Selecione o cliente...</option>
+                                            <?php foreach ($clientes as $c): ?>
+                                            <?php $clienteMeta = $clientesMeta[(string) ($c['id'] ?? '')] ?? ['nome' => trim((string) ($c['nome_razao'] ?? '')), 'telefone' => '', 'endereco' => '']; ?>
+                                            <option value="<?= $c['id'] ?>"
+                                                data-nome="<?= esc($clienteMeta['nome']) ?>"
+                                                data-telefone="<?= esc($clienteMeta['telefone']) ?>"
+                                                data-endereco="<?= esc($clienteMeta['endereco']) ?>"
+                                                <?= ($clienteSelecionadoNoForm === (int) $c['id']) ? 'selected' : '' ?>>
+                                                <?= esc($clienteMeta['nome']) ?>
+                                            </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <?php if (!$isEdit && $isOrigemCentralWhatsapp && $clienteSelecionadoNoForm <= 0): ?>
+                                        <div class="form-text text-warning">
+                                            Este contato ainda nao esta vinculado ao cadastro de clientes. Selecione o cliente para abrir a OS.
+                                        </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="os-data-section mb-4">
+                                <div class="os-data-section-title">
+                                    <i class="bi bi-card-text me-1"></i>Resumo do cliente selecionado
+                                </div>
+                                <div class="os-client-card" id="clienteInfoCard">
+                                    <div class="os-client-card__empty" id="clienteInfoEmpty">Selecione um cliente para visualizar nome, telefone e endereco de atendimento.</div>
+                                    <div class="os-client-card__content d-none" id="clienteInfoContent">
+                                        <div class="os-client-card__name" id="clienteInfoNome">-</div>
+                                        <div class="os-client-card__meta-list">
+                                            <div class="os-client-card__meta-item d-none" id="clienteInfoTelefoneWrap"><i class="bi bi-telephone"></i><span id="clienteInfoTelefone">-</span></div>
+                                            <div class="os-client-card__meta-item d-none" id="clienteInfoEnderecoWrap"><i class="bi bi-geo-alt"></i><span id="clienteInfoEndereco">-</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="tab-equipamento" role="tabpanel" aria-labelledby="tab-equipamento-btn" tabindex="0">
 
+                            <div class="os-data-section mb-4">
+                                <div class="os-data-section-title">
+                                    <i class="bi bi-laptop me-1"></i>Equipamento em atendimento
+                                </div>
+                                <div class="os-tab-helper">
+                                    Escolha o aparelho do cliente e registre as condicoes tecnicas observadas na entrada.
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="os-inline-label">
+                                            <label for="equipamentoSelect" class="form-label mb-0">
+                                                <span>Equipamento *</span>
+                                            </label>
+                                            <span class="os-inline-actions">
+                                                <?php if (can('equipamentos', 'criar')): ?>
+                                                <button class="btn btn-warning btn-sm os-inline-action-btn" type="button" id="btnNovoEquipamento" title="Cadastrar novo equipamento">
+                                                    <i class="bi bi-plus-lg"></i><span>Novo</span>
+                                                </button>
+                                                <?php endif; ?>
+                                            </span>
+                                        </div>
+                                        <select name="equipamento_id" id="equipamentoSelect" class="form-select select2-equip" required>
+                                            <option value="">Selecione o cliente primeiro...</option>
+                                            <?php if ($isEdit && !empty($equipamentos)): foreach ($equipamentos as $eq): ?>
+                                            <option value="<?= $eq['id'] ?>"
+                                                data-tipo="<?= $eq['tipo_id'] ?? '' ?>"
+                                                data-marca="<?= esc($eq['marca_nome'] ?? $eq['marca'] ?? '') ?>"
+                                                data-modelo="<?= esc($eq['modelo_nome'] ?? $eq['modelo'] ?? '') ?>"
+                                                data-serie="<?= esc($eq['numero_serie'] ?? '') ?>"
+                                                data-cor="<?= esc($eq['cor'] ?? '') ?>"
+                                                data-cor_hex="<?= esc($eq['cor_hex'] ?? '') ?>"
+                                                data-tipo_nome="<?= esc($eq['tipo_nome'] ?? $eq['tipo'] ?? '') ?>"
+                                                data-marca_id="<?= esc($eq['marca_id'] ?? '') ?>"
+                                                data-modelo_id="<?= esc($eq['modelo_id'] ?? '') ?>"
+                                                data-cliente_id="<?= esc($eq['cliente_id'] ?? '') ?>"
+                                                data-senha_acesso="<?= esc($eq['senha_acesso'] ?? '') ?>"
+                                                data-estado_fisico="<?= esc($eq['estado_fisico'] ?? '') ?>"
+                                                data-acessorios="<?= esc($eq['acessorios'] ?? '') ?>"
+                                                <?= $os['equipamento_id'] == $eq['id'] ? 'selected' : '' ?>>
+                                                <?= esc(($eq['marca_nome'] ?? $eq['marca'] ?? '') . ' ' . ($eq['modelo_nome'] ?? $eq['modelo'] ?? '') . ' (' . ($eq['tipo_nome'] ?? $eq['tipo'] ?? '') . ')') ?>
+                                            </option>
+                                            <?php endforeach; endif; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-12 col-xxl-6">
+                                    <div class="os-data-section mb-4 h-100">
+                                        <div class="os-data-section-title">
+                                            <i class="bi bi-shield-exclamation me-1"></i>Estado fisico do equipamento
+                                        </div>
+                                        <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100">
+                                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="tela_trincada">+ Tela trincada</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="arranhoes">+ Arranhoes</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="carcaca_quebrada">+ Carcaca quebrada</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="vidro_traseiro_quebrado">+ Vidro traseiro quebrado</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="amassado">+ Amassado</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="botao_quebrado">+ Botao quebrado</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="outro">+ Outro dano</button>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="estadoFisicoSemAvarias" value="1">
+                                                <label class="form-check-label" for="estadoFisicoSemAvarias">Sem avarias aparentes na entrada</label>
+                                            </div>
+                                            <div id="estadoFisicoQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <strong id="estadoFisicoQuickTitle"></strong>
+                                                    <button type="button" class="btn-close" id="estadoFisicoQuickClose"></button>
+                                                </div>
+                                                <div id="estadoFisicoQuickFields" class="row g-2"></div>
+                                                <div class="mt-3">
+                                                    <button type="button" class="btn btn-sm btn-primary" id="estadoFisicoQuickSave">Salvar item</button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="estadoFisicoQuickCancel">Cancelar</button>
+                                                </div>
+                                            </div>
+                                            <div id="estadoFisicoList" class="list-group"></div>
+                                            <small class="form-text text-muted mt-3">Registre danos observados na recepcao com foto para evidenciar o estado de entrada.</small>
+                                            <textarea name="estado_fisico" id="estadoFisicoInput" class="d-none"><?= $isEdit ? esc($os['estado_fisico'] ?? '') : old('estado_fisico') ?></textarea>
+                                            <input type="hidden" name="estado_fisico_data" id="estadoFisicoDataInput">
+                                            <input type="file" id="estadoFisicoPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
+                                            <div id="estadoFisicoFilesInputs" class="d-none"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-xxl-6">
+                                    <div class="os-data-section mb-4 h-100">
+                                        <div class="os-data-section-title">
+                                            <i class="bi bi-box-seam me-1"></i>Acessorios e Componentes (na entrada)
+                                        </div>
+                                        <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100">
+                                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="chip">+ Chip</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="capinha">+ Capinha celular</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="capa">+ Capa</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="mochila">+ Mochila</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="bolsa">+ Bolsa notebook</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="cabo">+ Cabo</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="carregador">+ Carregador</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acessorio</button>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="acessoriosSemItens" name="acessorios_sem_itens" value="1" <?= old('acessorios_sem_itens') ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="acessoriosSemItens">Equipamento recebido sem acessorios</label>
+                                            </div>
+                                            <div id="acessoriosQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <strong id="acessoriosQuickTitle"></strong>
+                                                    <button type="button" class="btn-close" id="acessoriosQuickClose"></button>
+                                                </div>
+                                                <div id="acessoriosQuickFields" class="row g-2"></div>
+                                                <div class="mt-3">
+                                                    <button type="button" class="btn btn-sm btn-primary" id="acessoriosQuickSave">Salvar item</button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="acessoriosQuickCancel">Cancelar</button>
+                                                </div>
+                                            </div>
+                                            <div id="acessoriosList" class="list-group"></div>
+                                            <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acessorios comuns.</small>
+                                            <textarea name="acessorios" id="acessoriosInput" class="d-none"><?= $isEdit ? esc($os['acessorios'] ?? '') : old('acessorios') ?></textarea>
+                                            <input type="hidden" name="acessorios_data" id="acessoriosDataInput">
+                                            <input type="file" id="acessoriosPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
+                                            <div id="acessoriosFilesInputs" class="d-none"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="tab-pane fade" id="tab-defeito" role="tabpanel" aria-labelledby="tab-defeito-btn" tabindex="0">
+                            <div class="os-data-section mb-4">
+                                <div class="os-data-section-title">
+                                    <i class="bi bi-chat-left-text me-1"></i>Relato do cliente
+                                </div>
+                                <div class="os-tab-helper">
+                                    Registre o que foi informado na entrada antes de detalhar o equipamento e as condicoes tecnicas.
+                                </div>
+                                <?php if (!$isEdit): ?>
+                                <div class="mb-3">
+                                    <div id="relatoQuickButtons" class="d-flex flex-wrap gap-2 relato-quick-grid">
+                                        <?php if (!empty($relatosRapidos)): ?>
+                                            <?php foreach ($relatosRapidos as $categoria): ?>
+                                                <?php $itensCategoria = array_values(array_filter((array) ($categoria['itens'] ?? []), static function ($item) {
+                                                    return trim((string) ($item['texto_relato'] ?? '')) !== '';
+                                                })); ?>
+                                                <?php if (empty($itensCategoria)) continue; ?>
+                                                <div class="dropdown">
+                                                    <button
+                                                        class="btn btn-sm btn-outline-secondary dropdown-toggle os-relato-dropdown-btn"
+                                                        type="button"
+                                                        data-bs-toggle="dropdown"
+                                                        aria-expanded="false"
+                                                        title="<?= esc((string) ($categoria['categoria'] ?? 'Relatos')) ?>">
+                                                        <?= esc($categoria['icone'] ?? '?') ?> <?= esc($categoria['categoria'] ?? 'Relatos') ?>
+                                                    </button>
+                                                    <ul class="dropdown-menu shadow-sm os-relato-dropdown-menu">
+                                                        <?php foreach ($itensCategoria as $item): ?>
+                                                            <?php $relatoTexto = trim((string) ($item['texto_relato'] ?? '')); ?>
+                                                            <li>
+                                                                <button
+                                                                    type="button"
+                                                                    class="dropdown-item btn-relato-opcao"
+                                                                    data-relato-opcao="<?= esc($relatoTexto) ?>"
+                                                                    title="<?= esc($relatoTexto) ?>">
+                                                                    <?= esc($relatoTexto) ?>
+                                                                </button>
+                                                            </li>
+                                                        <?php endforeach; ?>
+                                                    </ul>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <span class="text-muted small">
+                                                Nenhum relato rapido ativo. Cadastre em
+                                                <a href="<?= base_url('defeitosrelatados') ?>">Defeitos Relatados</a>.
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <small class="text-muted d-block mt-2">Escolha a categoria e clique em um item rapido para inserir no relato.</small>
+                                </div>
+                                <?php endif; ?>
+                                <textarea name="relato_cliente" id="relatoClienteInput" class="form-control" rows="6"><?= $isEdit ? esc($os['relato_cliente']) : old('relato_cliente') ?></textarea>
+                                <?php if (!$isEdit): ?>
+                                <small class="text-muted d-block mt-2">Voce pode complementar manualmente o relato a qualquer momento.</small>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="os-data-section mb-4">
+                                <div class="os-data-section-title">
+                                    <i class="bi bi-person-workspace me-1"></i>Tecnico responsavel
+                                </div>
+                                <div class="os-tab-helper">
+                                    Defina o tecnico apos concluir o contexto do equipamento e dos itens recebidos.
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-12 col-xl-6">
+                                        <label class="form-label">Tecnico Responsavel</label>
+                                        <select name="tecnico_id" class="form-select">
+                                            <option value="">Nao atribuido</option>
+                                            <?php foreach ($tecnicos as $t): ?>
+                                            <option value="<?= $t['id'] ?>" <?= ($isEdit && ($os['tecnico_id'] ?? '') == $t['id']) ? 'selected' : '' ?>><?= esc($t['nome']) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <?php if ($isEdit): ?>
+                            <div class="os-data-section mb-4" id="defeitosSection" style="display:none;">
+                                <div class="os-data-section-title">
+                                    <i class="bi bi-bug me-1"></i>Defeitos comuns do tipo de equipamento
+                                </div>
+                                <div class="border rounded-3 p-3 bg-white bg-opacity-10">
+                                    <div class="small text-muted mb-3">Selecione os defeitos que se aplicam ao diagnostico atual.</div>
+                                    <div id="defeitosContainer">
+                                        <span class="text-muted small">Selecione o equipamento para carregar os defeitos...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="tab-pane fade" id="tab-relato" role="tabpanel" aria-labelledby="tab-relato-btn" tabindex="0">
+                            <div class="os-data-section mb-4">
+                                <div class="os-data-section-title">
+                                    <i class="bi bi-calendar-check me-1"></i>Dados Operacionais
+                                </div>
+                                <div class="os-tab-helper">
+                                    Gerencie prioridade, datas, garantia e status operacional sem misturar esse fluxo com cadastro, relato e diagnostico.
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Prioridade</label>
+                                        <select name="prioridade" class="form-select">
+                                            <option value="baixa"   <?= ($isEdit && $os['prioridade'] === 'baixa')   ? 'selected' : '' ?>>Baixa</option>
+                                            <option value="normal"  <?= (!$isEdit || $os['prioridade'] === 'normal')  ? 'selected' : '' ?>>Normal</option>
+                                            <option value="alta"    <?= ($isEdit && $os['prioridade'] === 'alta')    ? 'selected' : '' ?>>Alta</option>
+                                            <option value="urgente" <?= ($isEdit && $os['prioridade'] === 'urgente') ? 'selected' : '' ?>>Urgente</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Data de Entrada *</label>
+                                        <input type="datetime-local" name="data_entrada" class="form-control" value="<?= $isEdit ? ($os['data_entrada'] ?? date('Y-m-d\TH:i')) : date('Y-m-d\TH:i') ?>" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Previsao de Entrega</label>
+                                        <select id="prazoEntregaSelect" class="form-select mb-2">
+                                            <option value="">Prazo (dias)</option>
+                                            <option value="1">1 dia</option>
+                                            <option value="3">3 dias</option>
+                                            <option value="7">7 dias</option>
+                                            <option value="30">30 dias</option>
+                                        </select>
+                                        <input type="date" name="data_previsao" class="form-control" value="<?= $isEdit ? ($os['data_previsao'] ?? '') : '' ?>">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Status</label>
+                                        <select name="status" class="form-select">
+                                            <?php if (!empty($statusGrouped)): ?>
+                                                <?php foreach ($statusGrouped as $macro => $items): ?>
+                                                    <?php if (empty($items) || !is_array($items)) continue; ?>
+                                                    <optgroup label="<?= esc(ucwords(str_replace('_', ' ', (string) $macro))) ?>">
+                                                        <?php foreach ($items as $item): ?>
+                                                            <?php $codigo = (string) ($item['codigo'] ?? ''); ?>
+                                                            <?php if ($codigo === '') continue; ?>
+                                                            <option value="<?= esc($codigo) ?>" data-status-cor="<?= esc((string) ($item['cor'] ?? 'secondary')) ?>" <?= ((string) ($os['status'] ?? $statusDefault) === $codigo) ? 'selected' : '' ?>>
+                                                                <?= esc((string) ($item['nome'] ?? $codigo)) ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </optgroup>
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
+                                                <?php $currStatus = (string) ($os['status'] ?? $statusDefault); ?>
+                                                <option value="triagem" <?= $currStatus === 'triagem' ? 'selected' : '' ?>>Triagem</option>
+                                                <option value="diagnostico" <?= $currStatus === 'diagnostico' ? 'selected' : '' ?>>Diagnostico Tecnico</option>
+                                                <option value="aguardando_orcamento" <?= $currStatus === 'aguardando_orcamento' ? 'selected' : '' ?>>Aguardando Orcamento</option>
+                                                <option value="aguardando_autorizacao" <?= $currStatus === 'aguardando_autorizacao' ? 'selected' : '' ?>>Aguardando Autorizacao</option>
+                                                <option value="reparo_execucao" <?= $currStatus === 'reparo_execucao' ? 'selected' : '' ?>>Em Execucao</option>
+                                                <option value="reparado_disponivel_loja" <?= $currStatus === 'reparado_disponivel_loja' ? 'selected' : '' ?>>Pronto para retirada</option>
+                                                <option value="entregue_reparado" <?= $currStatus === 'entregue_reparado' ? 'selected' : '' ?>>Entregue</option>
+                                                <option value="cancelado" <?= $currStatus === 'cancelado' ? 'selected' : '' ?>>Cancelado</option>
+                                            <?php endif; ?>
+                                        </select>
+                                    </div>
+                                    <?php if ($isEdit): ?>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Garantia (dias)</label>
+                                        <input type="number" name="garantia_dias" class="form-control" value="<?= $os['garantia_dias'] ?? 90 ?>">
+                                    </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <?php if (false): ?>
                     <div class="os-data-section mb-4">
                         <div class="os-data-section-title">
                             <i class="bi bi-people me-1"></i>Cliente, Equipamento e Técnico Responsável
@@ -295,6 +690,12 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                 <button class="btn btn-warning btn-sm py-0 px-2" type="button" id="btnNovoCliente"
                                         title="Cadastrar novo cliente" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
                                     <i class="bi bi-plus-lg"></i> Novo
+                                </button>
+                                <?php endif; ?>
+                                <?php if (can('clientes', 'editar')): ?>
+                                <button class="btn btn-outline-info btn-sm py-0 px-2 d-none" type="button" id="btnEditarClienteOS"
+                                        title="Editar cliente selecionado" style="font-size:0.75rem; border-radius:6px; line-height:1.6;">
+                                    <i class="bi bi-pencil"></i> Editar
                                 </button>
                                 <?php endif; ?>
                             </label>
@@ -426,7 +827,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
 
                     </div>
 
-                    <!-- LINHA EXTRA (edi??o): Garantia -->
+<!-- LINHA EXTRA (edição): Garantia -->
                     <?php if ($isEdit): ?>
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
@@ -546,12 +947,12 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                         </span>
                                     <?php endif; ?>
                                 </div>
-                                <small class="text-muted d-block mt-2">Clique em uma op??o para inserir no relato.</small>
+                                <small class="text-muted d-block mt-2">Clique em uma opção para inserir no relato.</small>
                             </div>
                             <?php endif; ?>
                             <textarea name="relato_cliente" id="relatoClienteInput" class="form-control" rows="6"><?= $isEdit ? esc($os['relato_cliente']) : old('relato_cliente') ?></textarea>
                             <?php if (!$isEdit): ?>
-                            <small class="text-muted d-block mt-2">Voc? pode complementar manualmente o relato a qualquer momento.</small>
+                            <small class="text-muted d-block mt-2">Você pode complementar manualmente o relato a qualquer momento.</small>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -572,25 +973,26 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                     </div>
                     <?php endif; ?>
 
+                        <?php endif; ?>
                         </div>
                         <div class="tab-pane fade" id="tab-fotos" role="tabpanel" aria-labelledby="tab-fotos-btn" tabindex="0">
                     <!-- FOTOS DE ENTRADA DO EQUIPAMENTO -->
                     <div class="row g-3 mb-4">
                         <div class="col-12">
-                    <div class="card" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;">
-                        <div class="card-header py-3 d-flex flex-column flex-md-row justify-content-between gap-2" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <div class="card os-tab-card os-photo-card">
+                        <div class="card-header os-tab-card-header py-3 d-flex flex-column flex-md-row justify-content-between gap-2">
                             <div>
                                 <strong><i class="bi bi-camera me-2 text-info"></i>Fotos de Entrada do Equipamento</strong>
                                 <small class="text-muted ms-2">(opcional: acessórios, estado físico, placa interna, etc.)</small>
                             </div>
-                            <div class="d-flex justify-content-center justify-content-md-end gap-2 flex-wrap">
+                            <div class="os-photo-card-actions d-flex justify-content-center justify-content-md-end gap-2 flex-wrap">
                                 <button type="button" class="btn btn-outline-light btn-sm d-none" id="btnFotosEscolher">
                                     <i class="bi bi-folder2-open me-1"></i>Escolher Arquivos
                                 </button>
-                                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" id="btnFotosEntradaCamera">
+                                <button type="button" class="btn btn-primary btn-sm" id="btnFotosEntradaCamera">
                                     <i class="bi bi-camera-fill me-1"></i>Capturar Foto
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="btnFotosEntradaGaleria">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="btnFotosEntradaGaleria">
                                     <i class="bi bi-images me-1"></i>Abrir Galeria
                                 </button>
                                 <button type="button" class="btn btn-outline-warning btn-sm" id="btnLimparFotos">
@@ -603,17 +1005,16 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                             <input type="file" name="fotos_entrada[]" id="fotosEntradaInput"
                                    accept="image/jpeg,image/png,image/webp"
                                    multiple class="d-none">
-                            <div class="p-3 border rounded bg-light bg-opacity-10 mb-4 text-center py-4" id="fotosEntradaEmptyState" style="display:none;">
+                            <div class="os-empty-state p-3 border rounded mb-4 text-center py-4 d-none" id="fotosEntradaEmptyState">
                                 <i class="bi bi-cloud-upload display-5 text-muted opacity-25"></i>
                                 <h6 class="mt-3 text-muted mb-1">Nenhuma foto anexada</h6>
                                 <p class="text-muted small mb-0">Use Capturar Foto ou Abrir Galeria para adicionar as imagens da entrada.</p>
                             </div>
-                            <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-3 mx-auto" style="max-width: 680px;">
+                            <div class="alert alert-info os-photo-info-banner border-0 shadow-sm d-flex align-items-center mb-3 mx-auto">
                                 <i class="bi bi-info-circle-fill fs-5 me-2"></i>
                                 <div class="small">At&eacute; <strong>4 fotos</strong>, 2MB cada. O sistema abre o ajuste de corte antes de importar.</div>
                             </div>
-                            <div id="osFotosDropzone" class="border rounded-4 d-none align-items-center justify-content-center flex-column gap-2 text-center py-4 mb-3"
-                                 style="min-height: 180px; transition: background 0.2s;">
+                            <div id="osFotosDropzone" class="os-photo-dropzone border rounded-4 d-none align-items-center justify-content-center flex-column gap-2 text-center py-4 mb-3">
                                 <i class="bi bi-cloud-upload display-4 text-muted"></i>
                                 <p class="text-muted mb-0 fw-semibold">Clique para selecionar ou arraste arquivos aqui.</p>
                                 <small class="text-muted">At? 4 fotos, 2MB cada.</small>
@@ -670,7 +1071,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                             <textarea name="diagnostico_tecnico" class="form-control" rows="3"><?= esc($os['diagnostico_tecnico'] ?? '') ?></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Solu??o Aplicada</label>
+                                <label class="form-label">Solução Aplicada</label>
                             <textarea name="solucao_aplicada" class="form-control" rows="3"><?= esc($os['solucao_aplicada'] ?? '') ?></textarea>
                         </div>
                     </div>
@@ -696,14 +1097,14 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                         </div>
                     </div>
 
-                    <!-- Observa??es -->
+                        <!-- Observações -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">Observa??es Internas</label>
+                                <label class="form-label">Observações Internas</label>
                             <textarea name="observacoes_internas" class="form-control" rows="2"><?= esc($os['observacoes_internas'] ?? '') ?></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Observa??es para o Cliente</label>
+                                <label class="form-label">Observações para o Cliente</label>
                             <textarea name="observacoes_cliente" class="form-control" rows="2"><?= esc($os['observacoes_cliente'] ?? '') ?></textarea>
                         </div>
                     </div>
@@ -712,7 +1113,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                     <?php endif; ?>
 
                     <div class="os-form-actions">
-                        <button type="submit" class="btn btn-glow">
+                        <button type="submit" class="btn btn-glow" id="btnSubmitOs" data-loading-text="<?= esc($isEdit ? 'Atualizando OS...' : 'Abrindo OS...') ?>">
                             <i class="bi bi-check-lg me-1"></i><?= $isEdit ? 'Atualizar' : 'Abrir OS' ?>
                         </button>
                         <?php if (!$isEmbedded): ?>
@@ -732,22 +1133,23 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
 </div>
 
 <!-- ===== MODAL: CADASTRAR NOVO CLIENTE ===== -->
-<div class="modal fade" id="modalNovoCliente" tabindex="-1">
+<div class="modal fade" id="modalNovoCliente" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content glass-card">
             <div class="modal-header border-bottom">
                 <h5 class="modal-title">
                     <i class="bi bi-person-plus text-warning me-2"></i>Cadastro Rápido de Cliente
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
                 <form id="formNovoClienteAjax">
                     <?= csrf_field() ?>
+                    <input type="hidden" name="id" id="modalNovoClienteId">
                     <div class="row g-3">
                         <div class="col-md-8">
                             <label class="form-label">Nome / Razão Social *</label>
-                            <input type="text" name="nome_razao" class="form-control" required>
+                            <input type="text" name="nome_razao" class="form-control" data-auto-title-case="person-name" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Telefone 1 *</label>
@@ -779,7 +1181,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                             <input type="text" name="endereco" class="form-control js-logradouro">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label text-muted">N?</label>
+                            <label class="form-label text-muted">Nº</label>
                             <input type="text" name="numero" class="form-control js-numero">
                         </div>
                         <div class="col-md-5">
@@ -822,7 +1224,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                 <form id="formNovoEquipAjax" enctype="multipart/form-data">
                     <?= csrf_field() ?>
                     
-                    <!-- Navega??o por Abas no Modal -->
+<!-- Navegação por Abas no Modal -->
                     <ul class="nav nav-pills nav-fill mb-3 bg-light p-1 rounded-3" id="modalEquipTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active small py-1" id="m-info-tab" data-bs-toggle="tab" data-bs-target="#m-info-pane" type="button" role="tab"><i class="bi bi-info-circle me-1"></i>Info</button>
@@ -849,40 +1251,63 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                     </select>
                                 </div>
                                 <div class="col-md-6 text-start">
-                                    <label class="form-label mb-1 small fw-bold">Marca *</label>
-                                    <div class="input-group input-group-sm">
-                                        <select name="marca_id" id="novoEquipMarca" class="form-select select2-modal" required>
-                                            <option value="">Marca...</option>
-                                            <?php foreach ($marcas as $m): ?>
-                                            <option value="<?= $m['id'] ?>"><?= esc($m['nome']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <button class="btn btn-warning" type="button" id="btnNovaMarcaOS"><i class="bi bi-plus"></i></button>
-                                    </div>
+                                    <label class="form-label mb-1 small fw-bold d-flex align-items-center justify-content-between gap-2">
+                                        <span>Marca *</span>
+                                        <button class="btn btn-success btn-sm ds-inline-add-btn" type="button" id="btnNovaMarcaOS">
+                                            <i class="bi bi-plus-lg"></i><span>Adicionar</span>
+                                        </button>
+                                    </label>
+                                    <select name="marca_id" id="novoEquipMarca" class="form-select select2-modal" required>
+                                        <option value="">Marca...</option>
+                                        <?php foreach ($marcas as $m): ?>
+                                        <option value="<?= $m['id'] ?>"><?= esc($m['nome']) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
-                                    <label class="form-label mb-1 small fw-bold">Modelo *</label>
-                                    <div class="input-group input-group-sm">
-                                        <select name="modelo_id" id="novoEquipModelo" class="form-select" required>
-                                            <option value="">Modelo...</option>
-                                        </select>
-                                        <button class="btn btn-warning" type="button" id="btnNovoModeloOS"><i class="bi bi-plus"></i></button>
-                                    </div>
+                                    <label class="form-label mb-1 small fw-bold d-flex align-items-center justify-content-between gap-2">
+                                        <span>Modelo *</span>
+                                        <button class="btn btn-success btn-sm ds-inline-add-btn" type="button" id="btnNovoModeloOS">
+                                            <i class="bi bi-plus-lg"></i><span>Adicionar</span>
+                                        </button>
+                                    </label>
+                                    <select name="modelo_id" id="novoEquipModelo" class="form-select" required>
+                                        <option value="">Modelo...</option>
+                                    </select>
                                     <input type="hidden" name="modelo_nome_ext" id="novoEquipModeloNomeExt">
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
-                                    <label class="form-label mb-1 small fw-bold">N? de Série</label>
+                                    <label class="form-label mb-1 small fw-bold">Nº de Série</label>
                                     <input type="text" name="numero_serie" class="form-control form-control-sm" placeholder="IMEI ou Série">
                                 </div>
                                 <div class="col-12 text-start mt-2">
-                                    <label class="form-label mb-1 small d-flex justify-content-between">
-                                        <span class="fw-bold">Senha de Acesso</span>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-light border py-0 px-2 btn-senha-tipo-os" data-placeholder="Numérico (PIN)" title="PIN/Desenho" style="font-size:0.65rem;">PIN</button>
-                                            <button type="button" class="btn btn-light border py-0 px-2 btn-senha-tipo-os" data-placeholder="Alfanumérico" title="Texto" style="font-size:0.65rem;">TEXTO</button>
+                                    <div class="ds-password-field" id="novoEquipSenhaBoxOS">
+                                        <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                                            <label class="form-label mb-0 small fw-bold" for="inputSenhaAcessoOSText">Senha de Acesso</label>
+                                            <div class="btn-group btn-group-sm ds-password-mode-switch" role="group">
+                                                <button type="button" class="btn btn-outline-secondary active" data-password-mode="desenho">DESENHO</button>
+                                                <button type="button" class="btn btn-outline-secondary" data-password-mode="texto">TEXTO</button>
+                                            </div>
                                         </div>
-                                    </label>
-                                    <input type="text" name="senha_acesso" id="inputSenhaAcessoOS" class="form-control form-control-sm" placeholder="Senha do aparelho">
+                                        <input type="hidden" name="senha_acesso" id="inputSenhaAcessoOS" data-password-hidden>
+                                        <input type="hidden" name="senha_tipo" value="desenho" data-password-mode-input>
+                                        <input type="hidden" name="senha_desenho" data-password-pattern-input>
+                                        <div class="ds-pattern-password__pattern" data-password-pattern-wrap>
+                                            <div class="ds-pattern-password__toolbar">
+                                                <span class="ds-pattern-password__hint">Passe o mouse pelos 9 pontos para montar o desenho.</span>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-password-clear>Limpar desenho</button>
+                                            </div>
+                                            <div class="ds-pattern-password__grid" data-pattern-grid>
+                                                <?php for ($patternIndex = 1; $patternIndex <= 9; $patternIndex++): ?>
+                                                <button type="button" class="ds-pattern-node" data-pattern-node="<?= $patternIndex ?>" aria-label="Ponto <?= $patternIndex ?>"></button>
+                                                <?php endfor; ?>
+                                            </div>
+                                            <div class="ds-pattern-password__preview" data-password-preview>Nenhum desenho definido.</div>
+                                        </div>
+                                        <div class="ds-pattern-password__text" data-password-text-wrap hidden>
+                                            <input type="text" id="inputSenhaAcessoOSText" class="form-control form-control-sm" placeholder="Digite a senha do aparelho" data-password-text-input>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
                                     <label class="form-label mb-1 small fw-bold text-muted">Estado Físico</label>
@@ -908,9 +1333,9 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                         <!-- ABA 2: COR -->
                         <div class="tab-pane fade" id="m-cor-pane" role="tabpanel">
                             <div class="p-2 border rounded bg-light bg-opacity-25">
-                                <input type="hidden" name="cor_hex" id="corHexRealOS" value="#1A1A1A">
-                                <input type="hidden" name="cor_rgb" id="corRgbRealOS" value="26,26,26">
-                                <input type="hidden" name="cor" id="corNomeRealOS" value="Preto">
+                                <input type="hidden" name="cor_hex" id="corHexRealOS" value="">
+                                <input type="hidden" name="cor_rgb" id="corRgbRealOS" value="">
+                                <input type="hidden" name="cor" id="corNomeRealOS" value="">
 
                                 <!-- Smart Detection -->
                                 <div class="p-2 mb-2 rounded border border-warning border-opacity-50 bg-warning bg-opacity-10 d-none" id="smartColorContainerOS">
@@ -931,8 +1356,8 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                             <span id="colorPreviewNameOS" class="mt-1" style="font-size: 0.7rem; color: rgba(255,255,255,0.8);">Preto</span>
                                         </div>
                                         <div class="d-flex gap-2 mb-2">
-                                            <input type="color" id="corHexPickerOS" class="form-control form-control-color p-1" value="#1A1A1A" style="width: 40px; height: 32px;">
-                                            <input type="text" id="corNomeInputOS" class="form-control form-control-sm" placeholder="Nome" value="Preto">
+                                            <input type="color" id="corHexPickerOS" class="form-control form-control-color p-1" value="" style="width: 40px; height: 32px;">
+                                            <input type="text" id="corNomeInputOS" class="form-control form-control-sm" placeholder="Nome" value="">
                                         </div>
                                         <div id="coresProximasGridOS" class="d-flex flex-wrap gap-1 mb-2"></div>
                                     </div>
@@ -1099,74 +1524,6 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
 <!-- Cropper.js -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
-<style>
-    .custom-color-accordion .accordion-button { transition: all 0.2s ease; }
-    .custom-color-accordion .accordion-button:not(.collapsed) {
-        color: var(--bs-primary) !important;
-        background-color: rgba(var(--bs-primary-rgb), 0.05) !important;
-    }
-    .custom-color-accordion .list-group-item { transition: all 0.15s ease; cursor: pointer; }
-    .custom-color-accordion .list-group-item:hover { background-color: rgba(0,0,0,0.03); transform: translateX(3px); }
-    .custom-color-accordion .list-group-item.active { border-left: 3px solid var(--bs-primary) !important; }
-    .relato-quick-grid .dropdown-menu {
-        max-height: 280px;
-        overflow-y: auto;
-    }
-    .os-data-section {
-        border: 1px solid rgba(99, 91, 255, 0.2);
-        border-radius: 12px;
-        padding: 14px;
-        background: rgba(255, 255, 255, 0.03);
-        box-shadow: 0 2px 8px rgba(12, 22, 44, 0.04);
-    }
-    .os-data-section-title {
-        font-size: 0.78rem;
-        letter-spacing: 0.08rem;
-        text-transform: uppercase;
-        font-weight: 700;
-        color: #5f6c86;
-        margin-bottom: 0.75rem;
-        display: flex;
-        align-items: center;
-    }
-    .os-data-section + .os-data-section {
-        margin-top: 0.2rem;
-    }
-    .os-data-section .row:last-child {
-        margin-bottom: 0;
-    }
-    .os-form-page .relato-quick-grid .btn-group {
-        flex: 0 0 auto;
-    }
-    .os-form-page #estadoFisicoList .list-group-item,
-    .os-form-page #acessoriosList .list-group-item {
-        padding: 0.8rem;
-    }
-    @media (max-width: 1199.98px) {
-        .os-form-page .os-data-section {
-            padding: 12px;
-        }
-    }
-    @media (max-width: 767.98px) {
-        .os-form-page .os-data-section {
-            border-radius: 10px;
-            padding: 10px;
-        }
-        .os-form-page .os-data-section-title {
-            font-size: 0.72rem;
-            letter-spacing: 0.06rem;
-        }
-        .os-form-page .relato-quick-grid {
-            overflow-x: auto;
-            flex-wrap: nowrap !important;
-            padding-bottom: 4px;
-        }
-        .os-form-page .relato-quick-grid .btn-group {
-            flex: 0 0 auto;
-        }
-    }
-</style>
-
 <script>
 const BASE_URL = document.querySelector('meta[name="base-url"]').content;
 const isEdit   = <?= $isEdit ? 'true' : 'false' ?>;
@@ -1245,13 +1602,293 @@ if (typeof $.fn.select2 !== 'undefined') {
     // O botão '+ Novo' já resolve bem.
 }
 
-// --- Modal: Cadastrar Novo Cliente ---
+// --- Modal: Cadastrar ou Editar Cliente ---
 const btnNovoCliente = document.getElementById('btnNovoCliente');
+const btnEditarClienteOS = document.getElementById('btnEditarClienteOS');
+const clienteOsSelect = $('#clienteOsSelect');
+const modalClienteElement = document.getElementById('modalNovoCliente');
+const clientesMeta = <?= json_encode($clientesMeta, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?> || {};
+
+function normalizeClienteMeta(cliente = {}) {
+    const id = String(cliente.id || '');
+    const nome = String(cliente.nome || cliente.nome_razao || '').trim();
+    const telefone = String(cliente.telefone || cliente.telefone1 || '').trim();
+    const endereco = String(
+        cliente.endereco_resumo
+        || cliente.endereco
+        || [
+            cliente.endereco,
+            cliente.numero,
+            cliente.bairro,
+            cliente.cidade,
+            cliente.uf
+        ].filter((value) => String(value || '').trim() !== '').join(', ')
+    ).trim();
+
+    return { id, nome, telefone, endereco };
+}
+
+function syncClienteOptionDataset(optionElement, meta) {
+    if (!optionElement || !meta) {
+        return;
+    }
+
+    optionElement.dataset.nome = meta.nome || '';
+    optionElement.dataset.telefone = meta.telefone || '';
+    optionElement.dataset.endereco = meta.endereco || '';
+}
+
+function renderClienteInfoCard(clienteId) {
+    const emptyState = document.getElementById('clienteInfoEmpty');
+    const content = document.getElementById('clienteInfoContent');
+    const nomeEl = document.getElementById('clienteInfoNome');
+    const telefoneWrap = document.getElementById('clienteInfoTelefoneWrap');
+    const telefoneEl = document.getElementById('clienteInfoTelefone');
+    const enderecoWrap = document.getElementById('clienteInfoEnderecoWrap');
+    const enderecoEl = document.getElementById('clienteInfoEndereco');
+
+    if (!emptyState || !content || !nomeEl || !telefoneWrap || !telefoneEl || !enderecoWrap || !enderecoEl) {
+        return;
+    }
+
+    const option = document.querySelector(`#clienteOsSelect option[value="${String(clienteId || '')}"]`);
+    const meta = clientesMeta[String(clienteId || '')] || (option ? {
+        id: String(clienteId || ''),
+        nome: option.dataset.nome || option.textContent.trim(),
+        telefone: option.dataset.telefone || '',
+        endereco: option.dataset.endereco || ''
+    } : null);
+    if (!meta || !meta.nome) {
+        emptyState.classList.remove('d-none');
+        content.classList.add('d-none');
+        nomeEl.textContent = '-';
+        telefoneEl.textContent = '-';
+        enderecoEl.textContent = '-';
+        telefoneWrap.classList.add('d-none');
+        enderecoWrap.classList.add('d-none');
+        return;
+    }
+
+    emptyState.classList.add('d-none');
+    content.classList.remove('d-none');
+    nomeEl.textContent = meta.nome;
+    telefoneEl.textContent = meta.telefone || 'Telefone nao informado';
+    enderecoEl.textContent = meta.endereco || 'Endereco nao informado';
+    telefoneWrap.classList.toggle('d-none', !meta.telefone);
+    enderecoWrap.classList.toggle('d-none', !meta.endereco);
+}
+
+function initClienteOsSelect2() {
+    if (typeof $.fn.select2 === 'undefined' || !clienteOsSelect.length) {
+        return false;
+    }
+
+    if (clienteOsSelect.hasClass('select2-hidden-accessible')) {
+        clienteOsSelect.off('select2:open.osClienteSelect2');
+        clienteOsSelect.select2('destroy');
+    }
+
+    clienteOsSelect
+        .select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Buscar cliente...',
+            allowClear: true,
+            width: '100%'
+        })
+        .off('select2:open.osClienteSelect2')
+        .on('select2:open.osClienteSelect2', function() {
+            // Mantido para futuras extensoes do dropdown do cliente.
+        });
+
+    return true;
+}
+
+// Inicializa a instância do modal uma unica vez para evitar conflitos de backdrop
+let modalClienteInstance;
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!modalClienteElement) return;
+    if (typeof bootstrap !== 'undefined') {
+        modalClienteInstance = bootstrap.Modal.getOrCreateInstance(modalClienteElement);
+    }
+});
+
+function syncClienteOption(cliente, options = {}) {
+    if (!cliente || !cliente.id) {
+        return;
+    }
+
+    const meta = normalizeClienteMeta(cliente);
+    const clienteId = meta.id;
+    const clienteNome = meta.nome;
+    const shouldReloadDependents = Boolean(options.reloadDependents);
+    const select2WasActive = typeof $.fn.select2 !== 'undefined' && clienteOsSelect.hasClass('select2-hidden-accessible');
+    let option = clienteOsSelect.find(`option[value="${clienteId}"]`);
+    let optionElement = option.get(0) || null;
+    clientesMeta[clienteId] = meta;
+
+    if (!option.length) {
+        option = $(new Option(clienteNome, clienteId, true, true));
+        clienteOsSelect.append(option);
+        optionElement = option.get(0) || null;
+    } else {
+        option.text(clienteNome);
+        option.prop('selected', true);
+        optionElement = option.get(0) || null;
+        if (optionElement) {
+            optionElement.text = clienteNome;
+            optionElement.label = clienteNome;
+            optionElement.selected = true;
+        }
+    }
+
+    syncClienteOptionDataset(optionElement, meta);
+
+    const nativeSelect = document.getElementById('clienteOsSelect');
+    if (nativeSelect) {
+        nativeSelect.value = clienteId;
+    }
+
+    if (select2WasActive) {
+        initClienteOsSelect2();
+    }
+
+    if (typeof $.fn.select2 !== 'undefined' && clienteOsSelect.hasClass('select2-hidden-accessible')) {
+        clienteOsSelect.val(clienteId);
+        clienteOsSelect.trigger('change.select2');
+
+        const select2Instance = clienteOsSelect.data('select2');
+        const renderedSelection = select2Instance?.$container?.find('.select2-selection__rendered');
+        if (renderedSelection?.length) {
+            renderedSelection.text(clienteNome);
+            renderedSelection.attr('title', clienteNome);
+        }
+
+        const renderedContainerId = clienteOsSelect.attr('id')
+            ? `#select2-${clienteOsSelect.attr('id')}-container`
+            : null;
+        if (renderedContainerId) {
+            $(renderedContainerId).text(clienteNome).attr('title', clienteNome);
+        }
+
+        const openResult = select2Instance?.$dropdown?.find(`[id$="-${clienteId}"]`);
+        if (openResult?.length) {
+            openResult.text(clienteNome);
+        }
+
+        if (optionElement) {
+            clienteOsSelect.trigger({
+                type: 'select2:select',
+                params: {
+                    data: {
+                        id: clienteId,
+                        text: clienteNome,
+                        element: optionElement,
+                    },
+                },
+            });
+        }
+    }
+
+    if (shouldReloadDependents) {
+        clienteOsSelect.val(clienteId).trigger('change');
+    } else {
+        renderClienteInfoCard(clienteId);
+        updateResumo();
+        scheduleDraftSave();
+    }
+
+    if (btnEditarClienteOS) {
+        btnEditarClienteOS.classList.toggle('d-none', clienteId === '');
+    }
+}
+
+function notifyParentClienteUpdated(cliente) {
+    if (!window.parent || window.parent === window) {
+        return;
+    }
+
+    try {
+        window.parent.postMessage({
+            type: 'os:list-refresh',
+            reason: 'cliente-updated',
+            cliente: {
+                id: Number(cliente.id || 0),
+                nome: String(cliente.nome || cliente.nome_razao || ''),
+            },
+        }, window.location.origin);
+    } catch (error) {
+        console.error('[OSForm] Falha ao notificar janela pai sobre atualizacao de cliente.', error);
+    }
+}
+
 if (btnNovoCliente) {
-    btnNovoCliente.addEventListener('click', function() {
-        new bootstrap.Modal(document.getElementById('modalNovoCliente')).show();
+    btnNovoCliente.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        document.getElementById('formNovoClienteAjax').reset();
+        document.getElementById('modalNovoClienteId').value = '';
+        document.querySelector('#modalNovoCliente .modal-title').innerHTML = '<i class="bi bi-person-plus text-warning me-2"></i>Cadastro Rápido de Cliente';
+        document.getElementById('btnSalvarNovoCliente').innerHTML = '<i class="bi bi-check-lg me-1"></i>Cadastrar Cliente';
+        document.getElementById('modalClienteErrors')?.classList.add('d-none');
+        modalClienteInstance?.show();
     });
 }
+
+if (btnEditarClienteOS) {
+    btnEditarClienteOS.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const clienteId = clienteOsSelect.val();
+        if(!clienteId) return;
+
+        fetch(`${BASE_URL}clientes/json/${clienteId}`)
+            .then(r => r.json())
+            .then(res => {
+                if(res.error) {
+                    Swal.fire('Erro', res.error, 'error');
+                    return;
+                }
+                const form = document.getElementById('formNovoClienteAjax');
+                form.reset();
+                document.getElementById('modalNovoClienteId').value = res.id;
+                form.elements['nome_razao'].value = res.nome_razao || '';
+                form.elements['telefone1'].value = res.telefone1 || '';
+                form.elements['email'].value = res.email || '';
+                form.elements['cpf_cnpj'].value = res.cpf_cnpj || '';
+                form.elements['nome_contato'].value = res.nome_contato || '';
+                form.elements['telefone_contato'].value = res.telefone_contato || '';
+                form.elements['cep'].value = res.cep || '';
+                form.elements['endereco'].value = res.endereco || '';
+                form.elements['numero'].value = res.numero || '';
+                form.elements['bairro'].value = res.bairro || '';
+                form.elements['cidade'].value = res.cidade || '';
+                form.elements['uf'].value = res.uf || '';
+
+                document.querySelector('#modalNovoCliente .modal-title').innerHTML = '<i class="bi bi-pencil text-warning me-2"></i>Editar Cliente';
+                document.getElementById('btnSalvarNovoCliente').innerHTML = '<i class="bi bi-check-lg me-1"></i>Atualizar Cliente';
+                document.getElementById('modalClienteErrors')?.classList.add('d-none');
+                modalClienteInstance?.show();
+            })
+            .catch((err) => {
+                console.error("Erro no fetch Editar Cliente:", err);
+                Swal.fire('Erro', 'Não foi possível buscar ou renderizar os dados do cliente: ' + err.message, 'error');
+            });
+    });
+}
+
+// Toggle do botao editar com base na selecao
+clienteOsSelect.on('change', function() {
+    if(btnEditarClienteOS) {
+        if($(this).val()) {
+            btnEditarClienteOS.classList.remove('d-none');
+        } else {
+            btnEditarClienteOS.classList.add('d-none');
+        }
+    }
+});
+// Dispara no carregamento
+clienteOsSelect.trigger('change');
 
 document.getElementById('btnSalvarNovoCliente')?.addEventListener('click', function() {
     const form = document.getElementById('formNovoClienteAjax');
@@ -1268,22 +1905,40 @@ document.getElementById('btnSalvarNovoCliente')?.addEventListener('click', funct
     .then(r => r.json())
     .then(res => {
         if (!res.success) {
-            errors.innerHTML = res.message || 'Erro ao cadastrar cliente.';
+            errors.innerHTML = res.message || 'Erro ao salvar cliente.';
             errors.classList.remove('d-none');
             return;
         }
 
-        // Adiciona ao Select2
-        const sel = $('#clienteOsSelect');
-        const opt = new Option(res.nome, res.id, true, true);
-        sel.append(opt).trigger('change');
+        const clientePayload = res.cliente || {
+            id: res.id,
+            nome: res.nome,
+            telefone1: res.telefone1 || '',
+            endereco: res.endereco || '',
+            numero: res.numero || '',
+            bairro: res.bairro || '',
+            cidade: res.cidade || '',
+            uf: res.uf || ''
+        };
 
-        // Fecha modal
-        bootstrap.Modal.getInstance(document.getElementById('modalNovoCliente'))?.hide();
+        if (res.is_update) {
+            syncClienteOption(clientePayload, { reloadDependents: false });
+        } else {
+            syncClienteOption(clientePayload, { reloadDependents: true });
+            if (false) {
+            // Adiciona novo ao Select2
+            const opt = new Option(res.nome, res.id, true, true);
+            clienteOsSelect.append(opt).trigger('change');
+            
+            // Dispara o mudou(cliente) para recarregar equipamentos do novo cliente (virão vazios mas reseta combobox)
+            _onClienteChange(res.id);
+            }
+        }
+
+        notifyParentClienteUpdated(clientePayload);
+        modalClienteInstance?.hide();
         form.reset();
         
-        // Dispara o change para carregar equipamentos (que virão vazios, claro, mas reseta o combo)
-        _onClienteChange(res.id);
     })
     .catch(() => {
         errors.innerHTML = 'Erro inesperado. Tente novamente.';
@@ -1350,8 +2005,11 @@ function _setResumoBadge(id, text, cls) {
 function _setFieldStatus(id, ok) {
     const el = document.getElementById(id);
     if (!el) return;
-    el.textContent = ok ? '??' : '?';
+    el.innerHTML = ok
+        ? '<i class="bi bi-check-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Preenchido</span>'
+        : '<i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span>';
     el.className = ok ? 'text-success' : 'text-danger';
+    el.title = ok ? 'Preenchido' : 'Pendente';
 }
 
 function updateResumo() {
@@ -1617,7 +2275,7 @@ const acessoriosConfig = {
     },
     outro: {
         title: 'Outro acessório',
-        fields: [{ name: 'descricao', label: 'Descri??o', placeholder: 'Ex: cabo adaptador' }],
+        fields: [{ name: 'descricao', label: 'Descrição', placeholder: 'Ex: cabo adaptador' }],
         format: values => `${values.descricao || 'Outro acessório'}`
     }
 };
@@ -2937,8 +3595,80 @@ function getTotalEntradaFotos() {
 
 const formOs = document.getElementById('formOs');
 if (formOs) {
+    const btnSubmitOs = document.getElementById('btnSubmitOs');
+    const osSubmitLoading = document.getElementById('osSubmitLoading');
+    const osActionControls = Array.from(formOs.querySelectorAll('.os-form-actions .btn, .os-form-actions a'));
+    const defaultSubmitButtonHtml = btnSubmitOs ? btnSubmitOs.innerHTML : '';
+    const submitLoadingText = btnSubmitOs?.dataset.loadingText || 'Salvando...';
+
+    const toggleOsSubmitLoading = (isLoading) => {
+        const loading = Boolean(isLoading);
+        formOs.dataset.submitting = loading ? '1' : '0';
+        formOs.setAttribute('aria-busy', loading ? 'true' : 'false');
+        osSubmitLoading?.classList.toggle('show', loading);
+        osSubmitLoading?.setAttribute('aria-hidden', loading ? 'false' : 'true');
+
+        osActionControls.forEach((control) => {
+            if (!control || control === btnSubmitOs) {
+                return;
+            }
+
+            if ('disabled' in control) {
+                control.disabled = loading;
+            }
+
+            if (control.tagName === 'A') {
+                control.classList.toggle('disabled', loading);
+                control.setAttribute('aria-disabled', loading ? 'true' : 'false');
+                if (loading) {
+                    control.dataset.originalTabindex = control.getAttribute('tabindex') || '';
+                    control.setAttribute('tabindex', '-1');
+                } else if (Object.prototype.hasOwnProperty.call(control.dataset, 'originalTabindex')) {
+                    const originalTabindex = control.dataset.originalTabindex;
+                    if (originalTabindex === '') {
+                        control.removeAttribute('tabindex');
+                    } else {
+                        control.setAttribute('tabindex', originalTabindex);
+                    }
+                    delete control.dataset.originalTabindex;
+                }
+            }
+        });
+
+        if (!btnSubmitOs) {
+            return;
+        }
+
+        btnSubmitOs.disabled = loading;
+        btnSubmitOs.innerHTML = loading
+            ? `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span><span>${submitLoadingText}</span>`
+            : defaultSubmitButtonHtml;
+    };
+
+    const finalizeOsSubmit = () => {
+        if (formOs.dataset.submitting === '1') {
+            return;
+        }
+
+        toggleOsSubmitLoading(true);
+        formOs.dataset.bypassValidation = '1';
+        localStorage.removeItem(DRAFT_KEY);
+        _setResumoRascunho('Nao salvo');
+        window.setTimeout(() => formOs.submit(), 0);
+    };
+
+    window.addEventListener('pageshow', () => {
+        if (formOs.dataset.submitting === '1') {
+            toggleOsSubmitLoading(false);
+            formOs.dataset.bypassValidation = '0';
+        }
+    });
+
     formOs.addEventListener('submit', (e) => {
-        if (formOs.dataset.bypassValidation === '1') return;
+        if (formOs.dataset.submitting === '1' || formOs.dataset.bypassValidation === '1') {
+            e.preventDefault();
+            return;
+        }
         e.preventDefault();
         clearValidationMarks();
 
@@ -2950,25 +3680,25 @@ if (formOs) {
         };
 
         const requiredFields = [
-            { selector: '#clienteOsSelect', label: 'Cliente', tabBtnId: 'tab-dados-btn' },
-            { selector: '#equipamentoSelect', label: 'Equipamento', tabBtnId: 'tab-dados-btn' },
-            { selector: 'select[name="tecnico_id"]', label: 'Tecnico', tabBtnId: 'tab-dados-btn' },
-            { selector: 'input[name="data_entrada"]', label: 'Data de Entrada', tabBtnId: 'tab-dados-btn' },
-            { selector: '#relatoClienteInput', label: 'Relato do Cliente', tabBtnId: 'tab-relato-btn' },
+            { selector: '#clienteOsSelect', label: 'Cliente', tabBtnId: 'tab-cliente-btn' },
+            { selector: '#equipamentoSelect', label: 'Equipamento', tabBtnId: 'tab-equipamento-btn' },
+            { selector: 'select[name="tecnico_id"]', label: 'Tecnico', tabBtnId: 'tab-defeito-btn' },
+            { selector: 'input[name="data_entrada"]', label: 'Data de Entrada', tabBtnId: 'tab-relato-btn' },
+            { selector: '#relatoClienteInput', label: 'Relato do Cliente', tabBtnId: 'tab-defeito-btn' },
         ];
 
         const optionalChecks = [
-            { selector: 'input[name="data_previsao"]', label: 'Previsao de Entrega', tabBtnId: 'tab-dados-btn', isMissing: (el) => !el?.value },
+            { selector: 'input[name="data_previsao"]', label: 'Previsao de Entrega', tabBtnId: 'tab-relato-btn', isMissing: (el) => !el?.value },
             {
                 selector: '#acessoriosSemItens',
                 label: 'Acessorios/Componentes',
-                tabBtnId: 'tab-dados-btn',
+                tabBtnId: 'tab-equipamento-btn',
                 isMissing: () => !isAcessoriosSemItensChecked() && !((acessoriosInput?.value || '').trim())
             },
             {
                 selector: '#estadoFisicoSemAvarias',
                 label: 'Estado fisico',
-                tabBtnId: 'tab-dados-btn',
+                tabBtnId: 'tab-equipamento-btn',
                 isMissing: () => !isEstadoFisicoSemAvariasChecked() && !((estadoFisicoInput?.value || '').trim())
             },
             { selector: '#osFotosPreview', label: 'Fotos de Entrada', tabBtnId: 'tab-fotos-btn', isMissing: () => getTotalEntradaFotos() === 0 },
@@ -2992,7 +3722,7 @@ if (formOs) {
         if (missingRequired.length) {
             const openRequiredFocus = () => {
                 if (firstFocus) {
-                    goToField(firstFocus, firstTabBtn?.id || 'tab-dados-btn');
+                    goToField(firstFocus, firstTabBtn?.id || 'tab-cliente-btn');
                     markInvalid(firstFocus);
                 }
             };
@@ -3020,12 +3750,7 @@ if (formOs) {
             const labels = missingOptional.map((m) => m.label).join(', ');
             const firstMissing = missingOptional[0];
             const target = document.querySelector(firstMissing.selector);
-            const proceedWithoutOptional = () => {
-                formOs.dataset.bypassValidation = '1';
-                localStorage.removeItem(DRAFT_KEY);
-                _setResumoRascunho('Nao salvo');
-                formOs.submit();
-            };
+            const proceedWithoutOptional = () => finalizeOsSubmit();
             const fillOptional = () => {
                 markWarning(target);
                 goToField(target, firstMissing.tabBtnId);
@@ -3058,10 +3783,7 @@ if (formOs) {
             return;
         }
 
-        formOs.dataset.bypassValidation = '1';
-        localStorage.removeItem(DRAFT_KEY);
-        _setResumoRascunho('Nao salvo');
-        formOs.submit();
+        finalizeOsSubmit();
     });
 }
 
@@ -3268,6 +3990,7 @@ function carregarFotosEquipamento(equipId, equipData, fotosOverride = null) {
 function _onClienteChange(clienteId) {
     const equipamentoSelect = document.getElementById('equipamentoSelect');
     if (!equipamentoSelect) return;
+    renderClienteInfoCard(clienteId);
 
     // Destroi Select2 do equipamento antes de popular (apenas se estiver inicializado)
     if (typeof $.fn.select2 !== 'undefined' && $('#equipamentoSelect').hasClass("select2-hidden-accessible")) {
@@ -3404,7 +4127,7 @@ if (equipSelect) {
         }
     });
 
-    // Na edi??o, carrega automaticamente
+// Na edição, carrega automaticamente
     if (isEdit && equipSelect.value) {
         const opt = equipSelect.options[equipSelect.selectedIndex];
         const tipoId = opt ? opt.getAttribute('data-tipo') : null;
@@ -3623,6 +4346,9 @@ const btnEditarEquip = document.getElementById('btnEditarEquipamento');
 const modalNovoEquipamentoEl = document.getElementById('modalNovoEquipamento');
 const modalNovoEquipamento = modalNovoEquipamentoEl ? new bootstrap.Modal(modalNovoEquipamentoEl) : null;
 const formNovoEquipAjax = document.getElementById('formNovoEquipAjax');
+const novoEquipSenhaController = typeof window.initPatternPasswordField === 'function'
+    ? window.initPatternPasswordField({ root: '#novoEquipSenhaBoxOS', defaultMode: 'desenho' })
+    : null;
 const labelModalNovoEquip = document.getElementById('labelModalNovoEquip');
 const btnSalvarNovoEquip = document.getElementById('btnSalvarNovoEquip');
 const modalEquipFotosExistentesWrap = document.getElementById('modalEquipFotosExistentesWrap');
@@ -3640,7 +4366,7 @@ function bumpModalEquipFotosVersion() {
     modalEquipFotosVersion = Date.now();
 }
 
-function showWarningDialog(message, title = 'Aten??o') {
+function showWarningDialog(message, title = 'Atenção') {
     if (window.Swal && typeof window.Swal.fire === 'function') {
         Swal.fire({
             icon: 'warning',
@@ -3704,6 +4430,156 @@ function getTotalModalEquipFotos() {
     return (modalEquipExistingFotos?.length || 0) + (novoEquipFotosDataTransfer?.files?.length || 0);
 }
 
+function showNovoEquipModalTab(tabKey) {
+    const tabMap = {
+        info: 'm-info-tab',
+        cor: 'm-cor-tab',
+        foto: 'm-foto-tab',
+        fotos: 'm-foto-tab',
+    };
+
+    const tabBtn = document.getElementById(tabMap[tabKey] || tabMap.info);
+    if (!tabBtn || typeof bootstrap === 'undefined' || !bootstrap.Tab) {
+        return;
+    }
+
+    bootstrap.Tab.getOrCreateInstance(tabBtn).show();
+}
+
+function clearNovoEquipModalValidationState() {
+    const errors = document.getElementById('modalEquipErrors');
+    if (errors) {
+        errors.classList.add('d-none');
+        errors.innerHTML = '';
+    }
+
+    document.getElementById('novoEquipTipo')?.classList.remove('is-invalid');
+    document.getElementById('novoEquipModelo')?.classList.remove('is-invalid');
+    $('#novoEquipMarca').removeClass('is-invalid');
+    $('#novoEquipMarca').next('.select2-container').find('.select2-selection').removeClass('border-danger', 'border-2');
+    $('#novoEquipModelo').next('.select2-container').find('.select2-selection').removeClass('border-danger', 'border-2');
+    document.getElementById('colorPreviewBoxOS')?.classList.remove('border-danger', 'border-2');
+    document.getElementById('corNomeInputOS')?.classList.remove('is-invalid');
+    document.getElementById('fotoVaziaOS')?.classList.remove('border', 'border-danger', 'border-2', 'rounded-3');
+    document.getElementById('btnAbrirGaleria')?.classList.remove('btn-danger', 'text-white');
+    document.getElementById('btnAbrirCamera')?.classList.remove('btn-danger', 'text-white');
+}
+
+function markNovoEquipPendingState(tabKey) {
+    if (tabKey === 'info') {
+        const tipoField = document.getElementById('novoEquipTipo');
+        const marcaField = document.getElementById('novoEquipMarca');
+        const modeloField = document.getElementById('novoEquipModelo');
+
+        if (!String(tipoField?.value || '').trim()) {
+            tipoField?.classList.add('is-invalid');
+        }
+        if (!String(marcaField?.value || '').trim()) {
+            $('#novoEquipMarca').next('.select2-container').find('.select2-selection').addClass('border-danger', 'border-2');
+        }
+        if (!String(modeloField?.value || '').trim()) {
+            if (modeloField?.classList.contains('select2-hidden-accessible')) {
+                $('#novoEquipModelo').next('.select2-container').find('.select2-selection').addClass('border-danger', 'border-2');
+            } else {
+                modeloField?.classList.add('is-invalid');
+            }
+        }
+        return;
+    }
+
+    if (tabKey === 'cor') {
+        document.getElementById('colorPreviewBoxOS')?.classList.add('border-danger', 'border-2');
+        document.getElementById('corNomeInputOS')?.classList.add('is-invalid');
+        return;
+    }
+
+    if (tabKey === 'foto' || tabKey === 'fotos') {
+        document.getElementById('fotoVaziaOS')?.classList.add('border', 'border-danger', 'border-2', 'rounded-3');
+        document.getElementById('btnAbrirGaleria')?.classList.add('btn-danger', 'text-white');
+        document.getElementById('btnAbrirCamera')?.classList.add('btn-danger', 'text-white');
+    }
+}
+
+function focusNovoEquipPendingField(tabKey) {
+    const focusMap = {
+        info: '#novoEquipTipo',
+        cor: '#corNomeInputOS',
+        foto: '#btnAbrirGaleria',
+        fotos: '#btnAbrirGaleria',
+    };
+
+    const selector = focusMap[tabKey];
+    if (!selector) {
+        return;
+    }
+
+    window.setTimeout(() => {
+        const element = document.querySelector(selector);
+        if (element && typeof element.focus === 'function') {
+            element.focus({ preventScroll: false });
+        }
+    }, 180);
+}
+
+function normalizeNovoEquipErrorText(message) {
+    return String(message || '')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<[^>]+>/g, '')
+        .trim();
+}
+
+function handleNovoEquipValidationFeedback(message, tabKey = 'info', showDialog = true) {
+    const errors = document.getElementById('modalEquipErrors');
+    if (errors && message) {
+        errors.innerHTML = message;
+        errors.classList.remove('d-none');
+    }
+
+    showNovoEquipModalTab(tabKey);
+    markNovoEquipPendingState(tabKey);
+    focusNovoEquipPendingField(tabKey);
+
+    if (showDialog) {
+        showWarningDialog(normalizeNovoEquipErrorText(message) || 'Existe uma pendencia obrigatoria no cadastro do equipamento.', 'Pendencia obrigatoria');
+    }
+}
+
+function validateNovoEquipRequiredFields() {
+    clearNovoEquipModalValidationState();
+
+    const tipoId = String(document.getElementById('novoEquipTipo')?.value || '').trim();
+    if (!tipoId) {
+        handleNovoEquipValidationFeedback('Selecione o tipo do equipamento antes de salvar.', 'info');
+        return false;
+    }
+
+    const marcaId = String($('#novoEquipMarca').val() || '').trim();
+    if (!marcaId) {
+        handleNovoEquipValidationFeedback('Selecione a marca do equipamento antes de salvar.', 'info');
+        return false;
+    }
+
+    const modeloId = String($('#novoEquipModelo').val() || '').trim();
+    if (!modeloId) {
+        handleNovoEquipValidationFeedback('Selecione o modelo do equipamento antes de salvar.', 'info');
+        return false;
+    }
+
+    const corHex = String(document.getElementById('corHexRealOS')?.value || '').trim();
+    const corNome = String(document.getElementById('corNomeRealOS')?.value || '').trim();
+    if (!corHex || !corNome) {
+        handleNovoEquipValidationFeedback('Informe a cor correta do equipamento antes de salvar.', 'cor');
+        return false;
+    }
+
+    if (getTotalModalEquipFotos() <= 0) {
+        handleNovoEquipValidationFeedback('Adicione ao menos uma foto do equipamento antes de salvar.', 'foto');
+        return false;
+    }
+
+    return true;
+}
+
 function renderNovoEquipFotosNovas() {
     if (!previewDiv || !novoEquipFotosNovasList) return;
     const files = Array.from(novoEquipFotosDataTransfer.files || []);
@@ -3719,6 +4595,11 @@ function renderNovoEquipFotosNovas() {
     previewDiv.style.display = 'block';
     const fotoVazia = document.getElementById('fotoVaziaOS');
     if (fotoVazia) fotoVazia.style.display = 'none';
+    if (getTotalModalEquipFotos() > 0) {
+        document.getElementById('fotoVaziaOS')?.classList.remove('border', 'border-danger', 'border-2', 'rounded-3');
+        document.getElementById('btnAbrirGaleria')?.classList.remove('btn-danger', 'text-white');
+        document.getElementById('btnAbrirCamera')?.classList.remove('btn-danger', 'text-white');
+    }
 
     files.forEach((file, index) => {
         const objectUrl = URL.createObjectURL(file);
@@ -3775,6 +4656,11 @@ function renderModalEquipFotosExistentes(fotos = []) {
     modalEquipFotosExistentes.innerHTML = '';
     const lista = Array.isArray(fotos) ? fotos : [];
     modalEquipExistingFotos = lista;
+    if ((lista.length || novoEquipFotosDataTransfer.files.length) > 0) {
+        document.getElementById('fotoVaziaOS')?.classList.remove('border', 'border-danger', 'border-2', 'rounded-3');
+        document.getElementById('btnAbrirGaleria')?.classList.remove('btn-danger', 'text-white');
+        document.getElementById('btnAbrirCamera')?.classList.remove('btn-danger', 'text-white');
+    }
     if (equipamentoModalMode !== 'edit' || !lista.length) {
         modalEquipFotosExistentesWrap.classList.add('d-none');
         return;
@@ -3863,7 +4749,7 @@ function setNovoEquipModalMode(mode) {
             labelModalNovoEquip.innerHTML = '<i class="bi bi-pencil-square text-primary me-2"></i>Editar Equipamento';
         }
         if (btnSalvarNovoEquip) {
-            btnSalvarNovoEquip.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Salvar Altera??es';
+        btnSalvarNovoEquip.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Salvar Alterações';
         }
         return;
     }
@@ -3881,18 +4767,16 @@ setEquipamentoEditButtonState();
 function resetNovoEquipModalForm() {
     if (!formNovoEquipAjax) return;
     formNovoEquipAjax.reset();
+    showNovoEquipModalTab('info');
     $('#novoEquipModeloNomeExt').val('');
     $('#novoEquipModelo').html('<option value="">Modelo...</option>');
     $('#novoEquipMarca').val('').trigger('change');
     $('#novoEquipTipo').val('');
-    updateColorUIOS('#1A1A1A', 'Preto');
+    novoEquipSenhaController?.clear();
+    updateColorUIOS('', '');
     resetNovoEquipPreview();
     renderModalEquipFotosExistentes([]);
-    const errors = document.getElementById('modalEquipErrors');
-    if (errors) {
-        errors.classList.add('d-none');
-        errors.innerHTML = '';
-    }
+    clearNovoEquipModalValidationState();
 }
 
 function fillNovoEquipModalFromData(eq) {
@@ -3919,12 +4803,11 @@ function fillNovoEquipModalFromData(eq) {
     }, 120);
 
     const numeroSerie = formNovoEquipAjax.querySelector('input[name="numero_serie"]');
-    const senhaAcesso = formNovoEquipAjax.querySelector('input[name="senha_acesso"]');
     const estadoFisico = formNovoEquipAjax.querySelector('textarea[name="estado_fisico"]');
     const acessoriosEquip = formNovoEquipAjax.querySelector('textarea[name="acessorios"]');
 
     if (numeroSerie) numeroSerie.value = eq.numero_serie || '';
-    if (senhaAcesso) senhaAcesso.value = eq.senha_acesso || '';
+    novoEquipSenhaController?.setValue(eq.senha_acesso || '');
     if (estadoFisico) estadoFisico.value = eq.estado_fisico || '';
     if (acessoriosEquip) acessoriosEquip.value = eq.acessorios || '';
 
@@ -3991,6 +4874,7 @@ function openNovoEquipamentoModal() {
     ensureNovoEquipClienteInput(clienteId);
     ensureModalEquipSelect2();
     initModeloSelect2();
+    showNovoEquipModalTab('info');
     modalNovoEquipamento?.show();
 }
 
@@ -4006,10 +4890,15 @@ function openEditarEquipamentoModal() {
     ensureModalEquipSelect2();
     initModeloSelect2();
     fillNovoEquipModalFromData(selectedEq);
+    showNovoEquipModalTab('info');
     modalNovoEquipamento?.show();
 }
 
-btnNovoEquip?.addEventListener('click', openNovoEquipamentoModal);
+btnNovoEquip?.addEventListener('click', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    openNovoEquipamentoModal();
+});
 btnEditarEquip?.addEventListener('click', openEditarEquipamentoModal);
 modalNovoEquipamentoEl?.addEventListener('hidden.bs.modal', () => {
     setNovoEquipModalMode('create');
@@ -4108,8 +4997,8 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
             const header = document.createElement('div');
             header.className = 'list-group-item list-group-item-secondary py-1 px-3';
             header.style.cssText = 'font-size:0.7rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; pointer-events:none;';
-            const icon = group.text.includes('Cadastrados') ? '?' : '?';
-            header.textContent = icon + ' ' + group.text.replace(/^[??] /, '');
+            const icon = group.text.includes('Cadastrados') ? '✓' : '•';
+            header.textContent = icon + ' ' + group.text.replace(/^[✓•]\s+/, '');
             sugestoesBox.appendChild(header);
 
             // Itens do grupo
@@ -4243,7 +5132,7 @@ const PROFESSIONAL_COLORS_OS = [
         { hex: '#F5F5DC', name: 'Bege' }, { hex: '#FFF8DC', name: 'Marfim' },
     ]},
     { category: 'Roxos, Pinks e Lilás', colors: [
-        { hex: '#4B0082', name: '?ndigo' }, { hex: '#2D1B69', name: 'Violeta' }, { hex: '#800080', name: 'Roxo Puro' },
+        { hex: '#4B0082', name: 'Índigo' }, { hex: '#2D1B69', name: 'Violeta' }, { hex: '#800080', name: 'Roxo Puro' },
         { hex: '#DA70D6', name: 'Lilás' }, { hex: '#FF1493', name: 'Pink' }, { hex: '#AA336A', name: 'Rose Gold' },
     ]},
 ];
@@ -4267,29 +5156,45 @@ function getTextColorOS(hex) {
 }
 
 window.updateColorUIOS = function(hex, name) {
-    const rgb = hexToRgbOS(hex);
+    const isEmpty = !hex || hex === '';
+    const safeHex = isEmpty ? '#e9ecef' : hex;
+    const safeName = isEmpty ? 'Cor não selecionada' : name;
+    
+    const rgb = hexToRgbOS(safeHex);
     const rgbStr = rgb ? `${rgb.r},${rgb.g},${rgb.b}` : '';
-    const textColor = getTextColorOS(hex);
+    const textColor = isEmpty ? '#6c757d' : getTextColorOS(safeHex);
 
-    $('#corHexRealOS').val(hex);
-    $('#corRgbRealOS').val(rgbStr);
-    $('#corNomeRealOS').val(name);
+    $('#corHexRealOS').val(hex || '');
+    $('#corRgbRealOS').val(hex ? rgbStr : '');
+    $('#corNomeRealOS').val(name || '');
 
-    $('#corHexPickerOS').val(hex);
-    $('#corNomeInputOS').val(name);
+    $('#corHexPickerOS').val(isEmpty ? '#ffffff' : safeHex);
+    $('#corNomeInputOS').val(name || '');
 
     const preview = document.getElementById('colorPreviewBoxOS');
     if (preview) {
-        preview.style.background = hex;
-        document.getElementById('colorPreviewHexOS').style.color = textColor;
-        document.getElementById('colorPreviewHexOS').textContent = hex.toUpperCase();
-        document.getElementById('colorPreviewNameOS').style.color = textColor === '#ffffff' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)';
-        document.getElementById('colorPreviewNameOS').textContent = name;
+        preview.style.background = isEmpty ? 'rgba(0,0,0,0.05)' : safeHex;
+        const hexDisplay = document.getElementById('colorPreviewHexOS');
+        const nameDisplay = document.getElementById('colorPreviewNameOS');
+        
+        if (hexDisplay) {
+            hexDisplay.style.color = textColor;
+            hexDisplay.textContent = isEmpty ? '---' : safeHex.toUpperCase();
+        }
+        if (nameDisplay) {
+            nameDisplay.style.color = isEmpty ? '#6c757d' : (textColor === '#ffffff' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)');
+            nameDisplay.textContent = safeName;
+        }
+    }
+
+    if (!isEmpty) {
+        document.getElementById('colorPreviewBoxOS')?.classList.remove('border-danger', 'border-2');
+        document.getElementById('corNomeInputOS')?.classList.remove('is-invalid');
     }
 
     // Similar colors
     let all = [];
-    PROFESSIONAL_COLORS_OS.forEach(cat => cat.colors.forEach(c => all.push({ ...c, d: colorDistanceOS(hex, c.hex) })));
+    PROFESSIONAL_COLORS_OS.forEach(cat => cat.colors.forEach(c => all.push({ ...c, d: colorDistanceOS(safeHex, c.hex) })));
     const nearest = all.sort((a,b) => a.d - b.d).slice(0, 6);
     
     const grid = document.getElementById('coresProximasGridOS');
@@ -4467,14 +5372,7 @@ function detectDominantColorOS(sourceCanvas) {
     }
 }
 
-// --- LÓGICA DE SENHA E ACESSÓRIOS (MODAL OS) ---
-$(document).on('click', '.btn-senha-tipo-os', function() {
-    const placeholder = $(this).data('placeholder');
-    $('#inputSenhaAcessoOS').attr('placeholder', placeholder).focus();
-    $('.btn-senha-tipo-os').removeClass('btn-secondary text-white').addClass('btn-light border');
-    $(this).removeClass('btn-light border').addClass('btn-secondary text-white');
-});
-
+// --- LÓGICA DE ACESSÓRIOS (MODAL OS) ---
 $(document).on('click', '.btn-quick-acessorio-os', function() {
     const value = $(this).text().replace('+ ', '').trim();
     const textarea = $('#textareaAcessoriosOS');
@@ -5314,7 +6212,7 @@ function initModeloSelect2() {
         placeholder: 'Busque ou selecione o modelo...',
         allowClear: true,
         dropdownParent: $('#modalNovoEquipamento'),
-        tags: true, // HABILITA EDI??O E NOVAS TAGS LIVRES
+            tags: true, // HABILITA EDIÇÃO E NOVAS TAGS LIVRES
         createTag: function(params) {
             var term = $.trim(params.term);
             if (term === '') return null;
@@ -5360,7 +6258,7 @@ function initModeloSelect2() {
                 return $(`
                 <div>
                     <strong class="d-block text-primary"><i class="bi bi-pencil-square me-1"></i> "${data.text}"</strong>
-                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (edi??o manual)</small>
+                            <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (edição manual)</small>
                 </div>`);
             }
 
@@ -5398,6 +6296,7 @@ function initModeloSelect2() {
 
 // Reinicializa ao trocar marca
 $('#novoEquipMarca').on('change', function() {
+    clearNovoEquipModalValidationState();
     var marcaId = $(this).val();
     if (marcaId) {
         initModeloSelect2();
@@ -5408,12 +6307,29 @@ $('#novoEquipMarca').on('change', function() {
     }
 });
 
+$('#novoEquipTipo').on('change', function() {
+    if (String(this.value || '').trim()) {
+        this.classList.remove('is-invalid');
+    }
+});
+
+$('#novoEquipModelo').on('change', function() {
+    if (String($(this).val() || '').trim()) {
+        this.classList.remove('is-invalid');
+        $(this).next('.select2-container').find('.select2-selection').removeClass('border-danger', 'border-2');
+    }
+});
+
 // Salvar equipamento via AJAX
 document.getElementById('btnSalvarNovoEquip')?.addEventListener('click', function() {
     const form = document.getElementById('formNovoEquipAjax');
     const errors = document.getElementById('modalEquipErrors');
     if (!form || !errors) return;
-    errors.classList.add('d-none');
+    clearNovoEquipModalValidationState();
+
+    if (!validateNovoEquipRequiredFields()) {
+        return;
+    }
 
     const formData = new FormData(form);
 
@@ -5435,8 +6351,13 @@ document.getElementById('btnSalvarNovoEquip')?.addEventListener('click', functio
     .then(r => r.json())
     .then(res => {
         if (res.status !== 'success') {
-            errors.innerHTML = Object.values(res.errors || {}).join('<br>') || (res.message || 'Erro ao salvar equipamento.');
-            errors.classList.remove('d-none');
+            const message = Object.values(res.errors || {}).join('<br>') || (res.message || 'Erro ao salvar equipamento.');
+            if (res.focus_tab) {
+                handleNovoEquipValidationFeedback(message, res.focus_tab, false);
+            } else {
+                errors.innerHTML = message;
+                errors.classList.remove('d-none');
+            }
             return;
         }
 

@@ -87,6 +87,7 @@ Observabilidade de falhas por endpoint:
 - toda falha relevante gera `code` estavel (ex.: `CM_ENVIO_PROVIDER_FAILED`, `CM_META_UPDATE_FAILED`, `CM_SYNC_INBOUND_ERROR`)
 - controller registra contexto tecnico (endpoint, ids, filtros, URI, metodo, IP) em `log_message`
 - mesmo contexto e persistido na tabela `logs` para diagnostico operacional rapido sem depender apenas do console do navegador
+- falhas de indisponibilidade do provider/gateway no envio agora retornam `CM_ENVIO_PROVIDER_UNAVAILABLE` com HTTP `503`, separando erro operacional de erro de validacao do usuario
 
 ## Compatibilidade com schema em migracao
 
@@ -428,6 +429,12 @@ Parametros da central:
 - `POST /atendimento-whatsapp/chatbot/regra/salvar`
 - `POST /atendimento-whatsapp/faq/salvar`
 - `POST /atendimento-whatsapp/respostas-rapidas/salvar`
+
+Comportamento canonico de navegacao:
+- a tela principal da Central e `GET /atendimento-whatsapp`
+- para abrir uma thread especifica no navegador, a URL canonica passa a ser `GET /atendimento-whatsapp?conversa_id={id}`
+- `GET /atendimento-whatsapp/conversa/{id}` permanece como endpoint JSON para AJAX da propria central
+- se essa rota for aberta diretamente no navegador (sem AJAX), o controller redireciona para a tela principal com `?conversa_id={id}`, evitando exibir JSON cru ao usuario
 - `POST /atendimento-whatsapp/fluxos/salvar`
 - `POST /atendimento-whatsapp/filas/atualizar`
 - `POST /atendimento-whatsapp/metricas/consolidar-diario`
@@ -513,4 +520,12 @@ Para garantir visao completa da conversa, a Central agora registra tambem mensag
 - `POST /atendimento-whatsapp/enviar` no cliente passou a usar timeout de 16s.
 - Evita spinner preso indefinidamente quando o gateway demora/instabiliza.
 - Em timeout, o usuario recebe alerta SweetAlert2 com orientacao de reenvio.
+
+### 6) Gateway indisponivel tratado como erro operacional
+- Quando o provider de envio estiver fora do ar, sem URL valida ou inacessivel por rede, a Central nao devolve mais `422`.
+- O endpoint `POST /atendimento-whatsapp/enviar` responde `503` com `code = CM_ENVIO_PROVIDER_UNAVAILABLE`.
+- A UI mostra mensagem operacional clara:
+  - gateway local offline: orientar inicio/reinicio do servico
+  - provider externo indisponivel: orientar nova tentativa apos estabilizacao
+- O detalhe tecnico bruto continua apenas em log/contexto, evitando expor erro de baixo nivel ao operador final.
 

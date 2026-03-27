@@ -37,6 +37,11 @@ Campos opcionais:
 - contato alternativo
 - endereco completo (com apoio de CEP)
 
+Comportamento do CEP:
+- ao completar um CEP valido, o sistema consulta automaticamente o endereco
+- os campos `Endereco`, `Bairro`, `Cidade` e `UF` sao preenchidos sem refresh
+- depois do preenchimento automatico, o foco vai para o campo `Numero`
+
 ## Visualizar cliente
 Na acao `Visualizar`, o ERP exibe:
 - dados cadastrais
@@ -47,6 +52,12 @@ Na acao `Visualizar`, o ERP exibe:
 ## Cadastro rapido durante abertura de OS
 Na tela de nova OS existe botao `Novo` ao lado do campo cliente.
 Ao salvar o modal rapido, o cliente ja volta selecionado no formulario.
+
+Padrao de digitacao aplicado:
+- o campo `Nome / Razao Social` normaliza automaticamente o valor para title case enquanto o usuario digita
+- caps lock, shift ou digitacao toda em caixa alta/baixa nao alteram o padrao final
+- exemplo: `paULO silVA sousa` vira `Paulo Silva Sousa`
+- o campo `CEP` do modal rapido usa a mesma consulta automatica de endereco do cadastro principal
 
 ## Importacao em lote (CSV)
 Caminho: `Clientes -> Importar CSV`

@@ -36,6 +36,15 @@ class Configuracoes extends BaseController
         $model = new ConfiguracaoModel();
         $posts = $this->request->getPost();
 
+        if (array_key_exists('sessao_inatividade_minutos', $posts)) {
+            $timeoutMinutes = (int) $posts['sessao_inatividade_minutos'];
+            if ($timeoutMinutes < 5) {
+                $timeoutMinutes = 5;
+            }
+
+            $posts['sessao_inatividade_minutos'] = (string) min($timeoutMinutes, 1440);
+        }
+
         foreach ($posts as $chave => $valor) {
             if ($chave !== 'csrf_test_name') {
                 $model->setConfig($chave, $valor);

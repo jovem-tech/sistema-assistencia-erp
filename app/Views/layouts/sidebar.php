@@ -92,10 +92,11 @@
             </li>
             <?php endif; ?>
 
-            <?php if (canModule('defeitos')): ?>
+            <?php if (canModule('defeitos') || canModule('os')): ?>
             <?php
             $isConhecimentoActive = str_starts_with(uri_string(), 'equipamentosdefeitos')
-                || str_starts_with(uri_string(), 'defeitosrelatados');
+                || str_starts_with(uri_string(), 'defeitosrelatados')
+                || str_starts_with(uri_string(), 'osworkflow');
             ?>
             <li class="nav-item">
                 <a class="nav-link <?= $isConhecimentoActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#conhecimentoSubmenu" role="button">
@@ -107,6 +108,7 @@
                 </a>
                 <div class="collapse <?= $isConhecimentoActive ? 'show' : '' ?>" id="conhecimentoSubmenu">
                     <ul class="nav flex-column">
+                        <?php if (canModule('defeitos')): ?>
                         <li class="nav-item">
                             <a class="nav-link <?= str_starts_with(uri_string(), 'equipamentosdefeitos') ? 'active' : '' ?>" href="<?= base_url('equipamentosdefeitos') ?>">
                                 <i class="bi bi-bug-fill"></i><span>Base de Defeitos</span>
@@ -117,6 +119,14 @@
                                 <i class="bi bi-chat-square-text-fill"></i><span>Defeitos Relatados</span>
                             </a>
                         </li>
+                        <?php endif; ?>
+                        <?php if (canModule('os')): ?>
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'osworkflow') ? 'active' : '' ?>" href="<?= base_url('osworkflow') ?>">
+                                <i class="bi bi-diagram-3-fill"></i><span>Fluxo de Trabalho OS</span>
+                            </a>
+                        </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </li>

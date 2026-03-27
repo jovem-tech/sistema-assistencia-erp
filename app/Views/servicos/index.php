@@ -34,10 +34,10 @@
                     <tr>
                         <th width="50">ID</th>
                         <th>Nome</th>
-                        <th>Descri??o</th>
+                        <th>Descrição</th>
                         <th>Valor Padrão</th>
                         <th>Status</th>
-                        <th width="150" class="text-center">A??es</th>
+                        <th width="150" class="text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -81,7 +81,7 @@
     </div>
 </div>
 
-<!-- Modal de Importa??o CSV -->
+<!-- Modal de Importação CSV -->
 <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content card-custom">
@@ -111,7 +111,7 @@
                 <div class="modal-footer border-top">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-success btn-glow">
-                        <i class="bi bi-upload me-2"></i>Iniciar Importa??o
+                        <i class="bi bi-upload me-2"></i>Iniciar Importação
                     </button>
                 </div>
             </form>

@@ -1,38 +1,39 @@
-# Fluxo de Autenticação
+# Fluxo de Autenticacao
 
-## Visão Geral
+## Visao Geral
 
-```
-[Browser] ──GET /dashboard──► [AuthFilter]
-                                    │ sem sessão?
-                                    ▼
-                              redirect /login
-                                    │ com sessão?
-                                    ▼
-                            [PermissionFilter]
-                                    │ sem permissão?
-                                    ▼
-                               403 Forbidden
-                                    │ com permissão?
-                                    ▼
-                            [Controller::method()]
+```text
+[Browser] --GET /dashboard--> [AuthFilter]
+                                | sem sessao?
+                                v
+                          redirect /login
+                                | com sessao?
+                                v
+                        [PermissionFilter]
+                                | sem permissao?
+                                v
+                           403 Forbidden
+                                | com permissao?
+                                v
+                        [Controller::method()]
 ```
 
 ---
 
 ## Login (`Auth::attemptLogin`)
 
-```
-1. Usuário preenche email + senha em /login
-2. POST → Auth::attemptLogin()
-3. Busca usuário pelo email no banco
-4. Verifica se usuário está ativo
+```text
+1. Usuario preenche email + senha em /login
+   - a tela exibe a versao atual via get_system_version()
+2. POST -> Auth::attemptLogin()
+3. Busca usuario pelo email no banco
+4. Verifica se usuario esta ativo
 5. Verifica password_verify($senha, $hash)
-6. Se válido:
-   - Cria sessão com: user_id, user_name, user_email, user_group_id
+6. Se valido:
+   - Cria sessao com: user_id, user_name, user_email, user_group_id
    - Registra log de acesso
    - Redireciona para /dashboard
-7. Se inválido:
+7. Se invalido:
    - Incrementa tentativas falhas
    - Retorna com mensagem de erro
 ```
@@ -44,7 +45,7 @@
 Executado em **todas** as rotas do grupo protegido.
 
 ```php
-// Verifica se existe sessão ativa
+// Verifica se existe sessao ativa
 if (!session()->get('user_id')) {
     return redirect()->to('/login');
 }
@@ -57,56 +58,66 @@ if (!session()->get('user_id')) {
 Executado nas rotas com `['filter' => 'permission:modulo:acao']`.
 
 ```php
-// Busca permissões do grupo do usuário logado
-// Verifica se 'modulo:acao' está na lista de permissões
-// Se não: responde com 403
+// Busca permissoes do grupo do usuario logado
+// Verifica se 'modulo:acao' esta na lista de permissoes
+// Se nao: responde com 403
 ```
 
 ---
 
-## Helpers de Permissão (`sistema_helper.php`)
+## Helpers de Permissao (`sistema_helper.php`)
 
 ```php
-// Verifica se o usuário tem permissão (retorna bool)
+// Verifica se o usuario tem permissao (retorna bool)
 can('clientes', 'criar')          // true ou false
 
-// Bloqueia acesso e redireciona com erro se não tem permissão
+// Bloqueia acesso e redireciona com erro se nao tem permissao
 requirePermission('clientes')
 
-// Obtém usuário logado
-current_user()                     // array com dados do usuário
+// Obtem usuario logado
+current_user()                     // array com dados do usuario
 ```
 
 ---
 
-## Sessão
+## Sessao
 
-Dados armazenados na sessão de cada usuário:
+Dados armazenados na sessao de cada usuario:
 
 | Chave | Valor |
 |-------|-------|
-| `user_id` | ID do usuário |
-| `user_name` | Nome para exibição |
+| `user_id` | ID do usuario |
+| `user_name` | Nome para exibicao |
 | `user_email` | Email de login |
-| `user_group_id` | ID do grupo de permissões |
+| `user_group_id` | ID do grupo de permissoes |
+
+---
+
+## Exibicao de versao na autenticacao
+
+- A view `app/Views/auth/login.php` exibe a versao oficial do sistema antes do login.
+- A fonte da versao e o helper `get_system_version()`.
+- O helper respeita:
+  - valor padrao em `app/Config/SystemRelease.php`
+  - override opcional em `configuracoes.sistema_versao`
 
 ---
 
 ## Logout
 
-```
-GET /logout → Auth::logout()
-  → session()->destroy()
-  → redirect /login
+```text
+GET /logout -> Auth::logout()
+  -> session()->destroy()
+  -> redirect /login
 ```
 
 ---
 
-## Recuperação de Senha
+## Recuperacao de Senha
 
-```
-1. GET  /esqueci-senha → formulário de e-mail
-2. POST /esqueci-senha → gera token único + envia e-mail
-3. GET  /redefinir-senha/{token} → formulário de nova senha
-4. POST /redefinir-senha/{token} → atualiza senha + invalida token
+```text
+1. GET  /esqueci-senha -> formulario de e-mail
+2. POST /esqueci-senha -> gera token unico + envia e-mail
+3. GET  /redefinir-senha/{token} -> formulario de nova senha
+4. POST /redefinir-senha/{token} -> atualiza senha + invalida token
 ```

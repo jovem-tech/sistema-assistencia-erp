@@ -20,6 +20,8 @@
 @import url("./components/composite/gallery.css");
 
 @import url("./layouts/dashboard-layout.css");
+@import url("./layouts/os-list-layout.css");
+@import url("./layouts/os-form-layout.css");
 @import url("./layouts/form-layout.css");
 @import url("./layouts/detail-layout.css");
 @import url("./layouts/responsive-layout.css");

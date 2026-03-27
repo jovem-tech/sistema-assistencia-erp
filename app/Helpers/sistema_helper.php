@@ -164,6 +164,28 @@ function get_theme()
 }
 
 /**
+ * Retorna o tempo maximo de inatividade da sessao em minutos.
+ */
+function get_session_inactivity_minutes(int $default = 30): int
+{
+    $value = (int) get_config('sessao_inatividade_minutos', $default);
+
+    if ($value < 5) {
+        return 30;
+    }
+
+    return min($value, 1440);
+}
+
+/**
+ * Retorna o tempo maximo de inatividade da sessao em segundos.
+ */
+function get_session_inactivity_seconds(int $defaultMinutes = 30): int
+{
+    return get_session_inactivity_minutes($defaultMinutes) * 60;
+}
+
+/**
  * Carrega e cacheia no session o mapa de permissoes do usuario logado.
  * Estrutura: ['clientes' => ['visualizar', 'criar', 'editar'], ...]
  */

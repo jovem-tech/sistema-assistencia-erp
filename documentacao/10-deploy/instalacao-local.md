@@ -66,3 +66,4 @@ Em `Configuracoes -> Integracoes WhatsApp`:
 - `forbidden_origin`: `ERP_ORIGIN` nao inclui o host/porta ativo do ERP (ex.: `http://localhost:8084`).
 - inbound nao chega no CRM/central: `ERP_WEBHOOK_URL` do gateway aponta para host/porta diferente do ERP.
 - `not_ready`: QR ainda nao autenticado.
+- na `Central de Mensagens`, falha de envio com `CM_ENVIO_PROVIDER_UNAVAILABLE` e HTTP `503` indica indisponibilidade do gateway/provedor, nao erro de digitacao do operador.

@@ -11,30 +11,184 @@ $(document).ready(function () {
     const sidebarToggle = document.getElementById('sidebarToggle');
     const mobileToggle = document.getElementById('mobileToggle');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const sidebarDesktopBreakpoint = 992;
+    const sidebarAutoCollapsePage = document.querySelector('[data-sidebar-auto-collapse="hover"]');
+    let sidebarResizeTimer = null;
+
+    const isDesktopSidebarViewport = function () {
+        return window.innerWidth >= sidebarDesktopBreakpoint;
+    };
+
+    const shouldUseSidebarAutoCollapse = function () {
+        return Boolean(sidebar && sidebarAutoCollapsePage) && isDesktopSidebarViewport();
+    };
+
+    const clearSidebarAutoCollapseState = function () {
+        document.body.classList.remove('os-sidebar-auto-collapse');
+
+        if (!sidebar) {
+            return;
+        }
+
+        sidebar.classList.remove('os-auto-collapsed');
+        sidebar.classList.remove('os-hover-expanded');
+    };
+
+    const syncSidebarBodyState = function () {
+        const mobileSidebarOpen = Boolean(sidebar) && !isDesktopSidebarViewport() && sidebar.classList.contains('show');
+        document.body.classList.toggle('sidebar-mobile-open', mobileSidebarOpen);
+    };
+
+    const closeMobileSidebar = function () {
+        if (!sidebar) {
+            document.body.classList.remove('sidebar-mobile-open');
+            return;
+        }
+
+        sidebar.classList.remove('show');
+        syncSidebarBodyState();
+    };
+
+    const applySidebarViewportState = function () {
+        if (!sidebar) {
+            return;
+        }
+
+        const storedCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+        if (isDesktopSidebarViewport()) {
+            sidebar.classList.remove('show');
+
+            if (shouldUseSidebarAutoCollapse()) {
+                document.body.classList.add('os-sidebar-auto-collapse');
+                sidebar.classList.add('collapsed');
+                sidebar.classList.add('os-auto-collapsed');
+                sidebar.classList.remove('os-hover-expanded');
+            } else {
+                clearSidebarAutoCollapseState();
+                sidebar.classList.toggle('collapsed', storedCollapsed);
+            }
+        } else {
+            clearSidebarAutoCollapseState();
+            sidebar.classList.remove('collapsed');
+            sidebar.classList.remove('show');
+        }
+
+        syncSidebarBodyState();
+    };
 
     if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', function () {
+        sidebarToggle.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            if (!sidebar) {
+                return;
+            }
+
+            if (!isDesktopSidebarViewport()) {
+                closeMobileSidebar();
+                return;
+            }
+
+            if (shouldUseSidebarAutoCollapse()) {
+                return;
+            }
+
             sidebar.classList.toggle('collapsed');
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            syncSidebarBodyState();
         });
     }
 
     if (mobileToggle) {
-        mobileToggle.addEventListener('click', function () {
+        mobileToggle.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            if (!sidebar || isDesktopSidebarViewport()) {
+                return;
+            }
+
             sidebar.classList.toggle('show');
+            syncSidebarBodyState();
         });
     }
 
     if (sidebarOverlay) {
         sidebarOverlay.addEventListener('click', function () {
-            sidebar.classList.remove('show');
+            closeMobileSidebar();
         });
     }
 
-    // Restore sidebar state
-    if (localStorage.getItem('sidebarCollapsed') === 'true') {
-        sidebar && sidebar.classList.add('collapsed');
-    }
+    sidebar?.addEventListener('click', function (event) {
+        if (isDesktopSidebarViewport()) {
+            return;
+        }
+
+        const clickedLink = event.target.closest('a.nav-link[href]');
+        if (!clickedLink) {
+            return;
+        }
+
+        if (clickedLink.getAttribute('data-bs-toggle') === 'collapse') {
+            return;
+        }
+
+        closeMobileSidebar();
+    });
+
+    sidebar?.addEventListener('mouseenter', function () {
+        if (!shouldUseSidebarAutoCollapse()) {
+            return;
+        }
+
+        sidebar.classList.add('os-hover-expanded');
+    });
+
+    sidebar?.addEventListener('mouseleave', function () {
+        if (!shouldUseSidebarAutoCollapse()) {
+            return;
+        }
+
+        sidebar.classList.remove('os-hover-expanded');
+    });
+
+    sidebar?.addEventListener('focusin', function () {
+        if (!shouldUseSidebarAutoCollapse()) {
+            return;
+        }
+
+        sidebar.classList.add('os-hover-expanded');
+    });
+
+    sidebar?.addEventListener('focusout', function () {
+        if (!shouldUseSidebarAutoCollapse()) {
+            return;
+        }
+
+        window.setTimeout(function () {
+            if (!sidebar.contains(document.activeElement)) {
+                sidebar.classList.remove('os-hover-expanded');
+            }
+        }, 0);
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeMobileSidebar();
+        }
+    });
+
+    window.addEventListener('resize', function () {
+        if (sidebarResizeTimer) {
+            window.clearTimeout(sidebarResizeTimer);
+        }
+
+        sidebarResizeTimer = window.setTimeout(function () {
+            applySidebarViewportState();
+        }, 120);
+    });
+
+    applySidebarViewportState();
 
     // =====================================================
     // DATATABLES INITIALIZATION
@@ -64,6 +218,72 @@ $(document).ready(function () {
         $('.mask-money').mask('#.##0,00', { reverse: true });
     }
 
+    const autoTitleCaseSelector = '[data-auto-title-case="person-name"]';
+
+    function normalizePersonNameValue(value, trimEdges) {
+        const raw = String(value || '').replace(/^\s+/g, '');
+        const hasTrailingSpace = !trimEdges && /\s$/.test(raw);
+        const core = raw.replace(/\s+/g, ' ').trim();
+
+        if (core === '') {
+            return '';
+        }
+
+        let normalized = core
+            .toLocaleLowerCase('pt-BR')
+            .replace(/(^|[\s\-'])([A-Za-zÀ-ÖØ-öø-ÿ])/g, function (match, prefix, letter) {
+                return prefix + letter.toLocaleUpperCase('pt-BR');
+            });
+
+        if (hasTrailingSpace) {
+            normalized += ' ';
+        }
+
+        return normalized;
+    }
+
+    function applyAutoTitleCaseField(input, trimEdges) {
+        if (!input) {
+            return;
+        }
+
+        const previousValue = input.value || '';
+        const normalizedValue = normalizePersonNameValue(previousValue, !!trimEdges);
+
+        if (previousValue === normalizedValue) {
+            return;
+        }
+
+        const cursorStart = typeof input.selectionStart === 'number' ? input.selectionStart : null;
+        const cursorEnd = typeof input.selectionEnd === 'number' ? input.selectionEnd : null;
+        input.value = normalizedValue;
+
+        if (document.activeElement === input && cursorStart !== null && cursorEnd !== null) {
+            const delta = normalizedValue.length - previousValue.length;
+            const nextStart = Math.max(0, cursorStart + delta);
+            const nextEnd = Math.max(0, cursorEnd + delta);
+            input.setSelectionRange(nextStart, nextEnd);
+        }
+    }
+
+    document.querySelectorAll(autoTitleCaseSelector).forEach(function (input) {
+        applyAutoTitleCaseField(input, true);
+    });
+
+    $(document).on('input', autoTitleCaseSelector, function () {
+        applyAutoTitleCaseField(this, false);
+    });
+
+    $(document).on('blur change', autoTitleCaseSelector, function () {
+        applyAutoTitleCaseField(this, true);
+    });
+
+    $(document).on('submit', 'form', function () {
+        this.querySelectorAll(autoTitleCaseSelector).forEach(function (input) {
+            applyAutoTitleCaseField(input, true);
+        });
+    });
+
     // Dynamic CPF/CNPJ mask based on person type
     $('select[name="tipo_pessoa"]').on('change', function () {
         const campo = $('input[name="cpf_cnpj"]');
@@ -79,20 +299,123 @@ $(document).ready(function () {
     // =====================================================
     // CEP LOOKUP (VIA CEP API)
     // =====================================================
+    const resolveCepLookupContainer = function ($input) {
+        const $form = $input.closest('form');
+        if ($form.length) {
+            return $form;
+        }
+
+        const $modal = $input.closest('.modal-content, .modal-body, .modal');
+        if ($modal.length) {
+            return $modal.first();
+        }
+
+        const $row = $input.closest('.row');
+        if ($row.length) {
+            return $row;
+        }
+
+        return $input.parent();
+    };
+
+    const clearCepLookupSpinner = function ($input) {
+        $input.siblings('.js-cep-lookup-spinner').remove();
+        $input.removeClass('loading-input');
+        $input.removeData('cepLookupInFlight');
+    };
+
+    const notifyCepLookupWarning = function (message) {
+        if (window.Swal && typeof window.Swal.fire === 'function') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'CEP nao encontrado',
+                text: message,
+                confirmButtonText: 'Fechar',
+                customClass: { popup: 'glass-card' }
+            });
+            return;
+        }
+
+        alert(message);
+    };
+
     const handleCepLookup = function (el) {
         const $input = $(el);
-        const cep = $input.val().replace(/\D/g, '');
-        const $container = $input.closest('form, .modal-body, .row');
+        const cep = String($input.val() || '').replace(/\D/g, '');
 
-        if (cep.length === 8) {
-            // Adiciona feedback de loading
-            $input.addClass('loading-input').parent().addClass('position-relative');
-            const $spinner = $('<div class="spinner-border spinner-border-sm position-absolute" style="right: 10px; top: 12px; z-index: 5;" role="status"></div>');
-            $input.after($spinner);
+        if (cep.length !== 8) {
+            if (cep.length < 8) {
+                $input.removeData('cepLookupResolved');
+            }
+            clearCepLookupSpinner($input);
+            return;
+        }
 
-            $.getJSON(`https://viacep.com.br/ws/${cep}/json/`, function (data) {
-                $spinner.remove();
-                $input.removeClass('loading-input');
+        if ($input.data('cepLookupInFlight') === true || $input.data('cepLookupResolved') === cep) {
+            return;
+        }
+
+        const $lookupContainer = resolveCepLookupContainer($input);
+
+        $input.addClass('loading-input').parent().addClass('position-relative');
+        $input.data('cepLookupInFlight', true);
+        $input.siblings('.js-cep-lookup-spinner').remove();
+
+        const $lookupSpinner = $('<div class="spinner-border spinner-border-sm position-absolute js-cep-lookup-spinner" style="right: 10px; top: 12px; z-index: 5;" role="status" aria-hidden="true"></div>');
+        $input.after($lookupSpinner);
+
+        $.getJSON(`https://viacep.com.br/ws/${cep}/json/`, function (data) {
+            clearCepLookupSpinner($input);
+
+            if (!data.erro) {
+                $lookupContainer.find('[name="endereco"], .js-logradouro').first().val(data.logradouro || '').trigger('change');
+                $lookupContainer.find('[name="bairro"], .js-bairro').first().val(data.bairro || '').trigger('change');
+                $lookupContainer.find('[name="cidade"], .js-cidade').first().val(data.localidade || '').trigger('change');
+                $lookupContainer.find('[name="uf"], .js-uf').first().val(data.uf || '').trigger('change');
+
+                const $numeroField = $lookupContainer.find('[name="numero"], .js-numero').first();
+                if ($numeroField.length) {
+                    $numeroField.trigger('focus');
+                }
+
+                $input.data('cepLookupResolved', cep);
+                return;
+            }
+
+            $input.removeData('cepLookupResolved');
+            notifyCepLookupWarning('O CEP informado nao foi encontrado. Confira os digitos e tente novamente.');
+            $input.val('').trigger('change').focus();
+        }).fail(function() {
+            clearCepLookupSpinner($input);
+            $input.removeData('cepLookupResolved');
+            console.warn('[CEP Lookup] Servico de CEP temporariamente indisponivel.');
+        });
+
+        return;
+        /*
+
+        if (cep.length !== 8) {
+            if (cep.length < 8) {
+                $input.removeData('cepLookupResolved');
+            }
+            clearCepLookupSpinner($input);
+            return;
+        }
+
+        if ($input.data('cepLookupInFlight') === true || $input.data('cepLookupResolved') === cep) {
+            return;
+        }
+
+        const $container = resolveCepLookupContainer($input);
+
+        $input.addClass('loading-input').parent().addClass('position-relative');
+        $input.data('cepLookupInFlight', true);
+        $input.siblings('.js-cep-lookup-spinner').remove();
+        const $spinner = $('<div class="spinner-border spinner-border-sm position-absolute js-cep-lookup-spinner" style="right: 10px; top: 12px; z-index: 5;" role="status" aria-hidden="true"></div>');
+        $input.after($spinner);
+
+        $.getJSON(`https://viacep.com.br/ws/${cep}/json/`, function (data) {
+            clearCepLookupSpinner($input);
 
                 if (!data.erro) {
                     // Preenchimento inteligente baseado em nomes ou classes
@@ -113,11 +436,21 @@ $(document).ready(function () {
                 console.warn('Serviço de CEP temporariamente indisponível.');
             });
         }
+        */
     };
 
     // Gatilho no Blur
     $(document).on('blur', '.mask-cep, input[name="cep"]', function () {
         handleCepLookup(this);
+    });
+    $(document).on('input', '.mask-cep, input[name="cep"]', function () {
+        const cep = String($(this).val() || '').replace(/\D/g, '');
+        if (cep.length < 8) {
+            $(this).removeData('cepLookupResolved');
+        }
+        if (cep.length === 8) {
+            handleCepLookup(this);
+        }
     });
 
     // Gatilho automático ao completar os 8 dígitos (via mask callback se disponível)
@@ -130,6 +463,292 @@ $(document).ready(function () {
     }
 
 
+
+    // =====================================================
+    // SESSION MONITOR
+    // =====================================================
+    const sessionTimeoutMeta = document.querySelector('meta[name="session-timeout-minutes"]');
+    const sessionHeartbeatMeta = document.querySelector('meta[name="session-heartbeat-url"]');
+    const sessionLoginMeta = document.querySelector('meta[name="session-login-url"]');
+    const sessionRememberMeta = document.querySelector('meta[name="session-remember-active"]');
+
+    const sessionMonitor = {
+        timeoutMinutes: Math.max(0, parseInt(sessionTimeoutMeta?.content || '0', 10)),
+        heartbeatUrl: String(sessionHeartbeatMeta?.content || '').trim(),
+        loginUrl: String(sessionLoginMeta?.content || '').trim(),
+        rememberActive: String(sessionRememberMeta?.content || '0') === '1',
+        timeoutMs: 0,
+        heartbeatIntervalMs: 0,
+        lastActivityAt: Date.now(),
+        lastHeartbeatAt: Date.now(),
+        activityDirty: false,
+        heartbeatInFlight: false,
+        expired: false,
+        alertOpen: false,
+        enabled: false
+    };
+
+    const resolveSessionRedirectTarget = function () {
+        try {
+            if (window.top && window.top.location && window.top.location.origin === window.location.origin) {
+                return window.top;
+            }
+        } catch (error) {
+            console.warn('[SessionMonitor] sem acesso ao contexto superior', error);
+        }
+
+        return window;
+    };
+
+    const parseSessionPayload = function (raw) {
+        if (!raw) {
+            return null;
+        }
+
+        try {
+            return JSON.parse(raw);
+        } catch (error) {
+            return null;
+        }
+    };
+
+    const showSessionExpiredAlert = function (message) {
+        if (sessionMonitor.alertOpen) {
+            return;
+        }
+
+        sessionMonitor.expired = true;
+        sessionMonitor.alertOpen = true;
+
+        const redirectTarget = resolveSessionRedirectTarget();
+        const redirectToLogin = function () {
+            redirectTarget.location.href = sessionMonitor.loginUrl || (baseUrl + 'login');
+        };
+
+        if (window.Swal && typeof window.Swal.fire === 'function') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sessao expirada',
+                text: message || 'Sua sessao expirou. Faca login novamente para continuar.',
+                confirmButtonText: 'Ir para login',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                customClass: { popup: 'glass-card' }
+            }).then(redirectToLogin);
+            return;
+        }
+
+        alert(message || 'Sua sessao expirou. Faca login novamente para continuar.');
+        redirectToLogin();
+    };
+
+    const handleSessionAuthFailure = function (payload) {
+        if (sessionMonitor.expired) {
+            return;
+        }
+
+        const message = String(payload?.message || 'Sua sessao expirou. Faca login novamente para continuar.');
+        showSessionExpiredAlert(message);
+    };
+
+    const touchSessionActivity = function (isHighFrequency) {
+        if (!sessionMonitor.enabled || sessionMonitor.expired) {
+            return;
+        }
+
+        const now = Date.now();
+        if (isHighFrequency && (now - sessionMonitor.lastActivityAt) < 1000) {
+            return;
+        }
+
+        sessionMonitor.lastActivityAt = now;
+        sessionMonitor.activityDirty = true;
+    };
+
+    const sendSessionHeartbeat = function () {
+        if (!sessionMonitor.enabled || sessionMonitor.expired || sessionMonitor.heartbeatInFlight) {
+            return;
+        }
+
+        sessionMonitor.heartbeatInFlight = true;
+
+        fetch(sessionMonitor.heartbeatUrl, {
+            method: 'GET',
+            cache: 'no-store',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).then(function (response) {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    return null;
+                }
+
+                throw new Error('HTTP ' + response.status);
+            }
+
+            return response.json();
+        }).then(function (payload) {
+            if (!payload || payload.ok !== true) {
+                return;
+            }
+
+            sessionMonitor.lastHeartbeatAt = Date.now();
+            sessionMonitor.activityDirty = false;
+        }).catch(function (error) {
+            if (sessionMonitor.expired) {
+                return;
+            }
+
+            console.error('[SessionMonitor] falha no heartbeat', error);
+        }).finally(function () {
+            sessionMonitor.heartbeatInFlight = false;
+        });
+    };
+
+    const initSessionMonitor = function () {
+        if (sessionMonitor.timeoutMinutes <= 0 || sessionMonitor.heartbeatUrl === '' || sessionMonitor.rememberActive) {
+            return;
+        }
+
+        sessionMonitor.enabled = true;
+        sessionMonitor.timeoutMs = sessionMonitor.timeoutMinutes * 60 * 1000;
+        sessionMonitor.heartbeatIntervalMs = Math.min(
+            Math.max(45000, Math.floor(sessionMonitor.timeoutMs / 3)),
+            120000
+        );
+
+        const checkSessionState = function () {
+            if (!sessionMonitor.enabled || sessionMonitor.expired) {
+                return;
+            }
+
+            const now = Date.now();
+            const inactiveMs = now - sessionMonitor.lastActivityAt;
+
+            if (inactiveMs >= sessionMonitor.timeoutMs) {
+                handleSessionAuthFailure({
+                    session_expired: true,
+                    message: 'Sua sessao expirou por inatividade. Faca login novamente.'
+                });
+                return;
+            }
+
+            if ((now - sessionMonitor.lastHeartbeatAt) >= sessionMonitor.heartbeatIntervalMs
+                && sessionMonitor.activityDirty === true) {
+                sendSessionHeartbeat();
+            }
+        };
+
+        const trackedEvents = ['click', 'keydown', 'input', 'focusin', 'touchstart'];
+        trackedEvents.forEach(function (eventName) {
+            document.addEventListener(eventName, function () {
+                touchSessionActivity(false);
+            }, true);
+        });
+
+        document.addEventListener('mousemove', function () {
+            touchSessionActivity(true);
+        }, { passive: true });
+
+        document.addEventListener('scroll', function () {
+            touchSessionActivity(true);
+        }, { passive: true, capture: true });
+
+        $(document).on('submit', 'form', function (event) {
+            if (sessionMonitor.expired) {
+                event.preventDefault();
+                handleSessionAuthFailure({
+                    session_expired: true,
+                    message: 'Sua sessao expirou. Faca login novamente antes de salvar.'
+                });
+                return false;
+            }
+
+            touchSessionActivity(false);
+        });
+
+        if (window.fetch && !window.__ERP_SESSION_FETCH_PATCHED__) {
+            const nativeFetch = window.fetch.bind(window);
+            window.__ERP_SESSION_FETCH_PATCHED__ = true;
+
+            window.fetch = function (input, init) {
+                const rawUrl = typeof input === 'string' ? input : (input?.url || '');
+                let sameOrigin = false;
+
+                try {
+                    sameOrigin = new URL(rawUrl, window.location.origin).origin === window.location.origin;
+                } catch (error) {
+                    sameOrigin = false;
+                }
+
+                const nextInit = init ? Object.assign({}, init) : {};
+
+                if (sameOrigin) {
+                    const headers = new Headers(nextInit.headers || (input && input.headers) || {});
+                    if (!headers.has('X-Requested-With')) {
+                        headers.set('X-Requested-With', 'XMLHttpRequest');
+                    }
+                    if (!headers.has('Accept')) {
+                        headers.set('Accept', 'application/json, text/plain, */*');
+                    }
+
+                    nextInit.headers = headers;
+                    if (!nextInit.credentials) {
+                        nextInit.credentials = 'same-origin';
+                    }
+                }
+
+                return nativeFetch(input, nextInit).then(function (response) {
+                    if (!sameOrigin || response.status !== 401) {
+                        return response;
+                    }
+
+                    const contentType = String(response.headers.get('content-type') || '').toLowerCase();
+                    if (contentType.indexOf('application/json') !== -1) {
+                        response.clone().json().then(function (payload) {
+                            if (payload?.auth_required || payload?.session_expired) {
+                                handleSessionAuthFailure(payload);
+                            }
+                        }).catch(function () {
+                            handleSessionAuthFailure({});
+                        });
+                    } else {
+                        handleSessionAuthFailure({});
+                    }
+
+                    return response;
+                });
+            };
+        }
+
+        $(document).ajaxError(function (_event, jqXHR) {
+            if (!jqXHR || jqXHR.status !== 401) {
+                return;
+            }
+
+            const payload = jqXHR.responseJSON || parseSessionPayload(jqXHR.responseText);
+            if (payload?.auth_required || payload?.session_expired) {
+                handleSessionAuthFailure(payload);
+                return;
+            }
+
+            handleSessionAuthFailure({});
+        });
+
+        window.addEventListener('pageshow', function () {
+            sessionMonitor.expired = false;
+            sessionMonitor.alertOpen = false;
+            sessionMonitor.lastActivityAt = Date.now();
+            sessionMonitor.lastHeartbeatAt = Date.now();
+            sessionMonitor.activityDirty = false;
+        });
+
+        setInterval(checkSessionState, 15000);
+    };
+
+    initSessionMonitor();
 
     // =====================================================
     // CONFIRM DELETE
@@ -287,6 +906,7 @@ function openDocPage(page) {
         'equipamentos-modelos': '06-modulos-do-sistema/equipamentos-modelos.md',
         'equipamentos-defeitos': '06-modulos-do-sistema/defeitos-comuns.md',
         'defeitos-relatados': '06-modulos-do-sistema/defeitos-relatados.md',
+        'os-workflow': '02-manual-administrador/fluxo-de-trabalho-os.md',
         'crm': '06-modulos-do-sistema/crm.md',
         'crm-campanhas': '06-modulos-do-sistema/crm.md#campanhas',
         'crm-metricas-marketing': '06-modulos-do-sistema/crm.md#metricas-marketing',
@@ -475,4 +1095,216 @@ function clearStuckModalState() {
         el.remove();
     });
 }
+
+window.initPatternPasswordField = function initPatternPasswordField(config) {
+    const settings = config || {};
+    const root = typeof settings.root === 'string'
+        ? document.querySelector(settings.root)
+        : settings.root;
+
+    if (!root) {
+        return null;
+    }
+
+    if (root._patternPasswordController) {
+        return root._patternPasswordController;
+    }
+
+    const hiddenInput = root.querySelector('[data-password-hidden]');
+    const modeInput = root.querySelector('[data-password-mode-input]');
+    const patternInput = root.querySelector('[data-password-pattern-input]');
+    const textInput = root.querySelector('[data-password-text-input]');
+    const textWrap = root.querySelector('[data-password-text-wrap]');
+    const patternWrap = root.querySelector('[data-password-pattern-wrap]');
+    const preview = root.querySelector('[data-password-preview]');
+    const clearButton = root.querySelector('[data-password-clear]');
+    const nodes = Array.from(root.querySelectorAll('[data-pattern-node]'));
+    const buttons = Array.from(root.querySelectorAll('[data-password-mode]'));
+
+    if (!hiddenInput || !modeInput || !patternInput || !textInput || !textWrap || !patternWrap || !nodes.length) {
+        return null;
+    }
+
+    let mode = 'desenho';
+    let pointerActive = false;
+    let drawingSequence = [];
+    let committedSequence = [];
+
+    const normalizeSequence = function (input) {
+        return String(input || '')
+            .split(/[^0-9]+/)
+            .map(function (part) { return part.trim(); })
+            .filter(function (part) { return /^[1-9]$/.test(part); })
+            .filter(function (part, index, list) { return list.indexOf(part) === index; });
+    };
+
+    const renderNodes = function (sequence) {
+        nodes.forEach(function (node) {
+            node.classList.remove('is-active');
+            node.removeAttribute('data-step');
+        });
+
+        sequence.forEach(function (value, index) {
+            const node = root.querySelector('[data-pattern-node="' + value + '"]');
+            if (!node) {
+                return;
+            }
+
+            node.classList.add('is-active');
+            node.setAttribute('data-step', String(index + 1));
+        });
+    };
+
+    const syncStoredValue = function () {
+        modeInput.value = mode;
+
+        if (mode === 'desenho') {
+            const serialized = committedSequence.join('-');
+            patternInput.value = serialized;
+            hiddenInput.value = serialized ? ('desenho_' + serialized) : '';
+            preview.textContent = serialized
+                ? ('Desenho salvo: ' + serialized)
+                : 'Nenhum desenho definido.';
+            return;
+        }
+
+        patternInput.value = '';
+        hiddenInput.value = String(textInput.value || '').trim();
+        preview.textContent = hiddenInput.value !== ''
+            ? 'Senha em texto pronta para salvar.'
+            : 'Nenhuma senha informada.';
+    };
+
+    const setMode = function (nextMode, shouldFocus) {
+        mode = nextMode === 'texto' ? 'texto' : 'desenho';
+        root.dataset.passwordMode = mode;
+
+        buttons.forEach(function (button) {
+            const isActive = button.getAttribute('data-password-mode') === mode;
+            button.classList.toggle('active', isActive);
+            button.classList.toggle('btn-outline-secondary', !isActive);
+            button.classList.toggle('btn-secondary', isActive);
+            button.classList.toggle('text-white', isActive);
+        });
+
+        textWrap.hidden = mode !== 'texto';
+        patternWrap.hidden = mode !== 'desenho';
+        syncStoredValue();
+
+        if (shouldFocus && mode === 'texto') {
+            textInput.focus();
+        }
+    };
+
+    const clearDrawing = function () {
+        committedSequence = [];
+        drawingSequence = [];
+        renderNodes(committedSequence);
+        syncStoredValue();
+    };
+
+    const finalizeDrawing = function () {
+        if (!pointerActive) {
+            return;
+        }
+
+        pointerActive = false;
+        root.classList.remove('is-drawing');
+        committedSequence = drawingSequence.slice();
+        renderNodes(committedSequence);
+        syncStoredValue();
+    };
+
+    const registerNode = function (node) {
+        const value = String(node.getAttribute('data-pattern-node') || '').trim();
+        if (!/^[1-9]$/.test(value) || drawingSequence.indexOf(value) !== -1) {
+            return;
+        }
+
+        drawingSequence.push(value);
+        renderNodes(drawingSequence);
+    };
+
+    buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            setMode(button.getAttribute('data-password-mode'), true);
+        });
+    });
+
+    textInput.addEventListener('input', function () {
+        if (mode === 'texto') {
+            syncStoredValue();
+        }
+    });
+
+    nodes.forEach(function (node) {
+        node.addEventListener('pointerdown', function (event) {
+            if (mode !== 'desenho') {
+                return;
+            }
+
+            event.preventDefault();
+            pointerActive = true;
+            drawingSequence = [];
+            root.classList.add('is-drawing');
+            registerNode(node);
+        });
+
+        node.addEventListener('pointerenter', function () {
+            if (mode !== 'desenho' || !pointerActive) {
+                return;
+            }
+
+            registerNode(node);
+        });
+
+        node.addEventListener('click', function (event) {
+            if (mode === 'desenho') {
+                event.preventDefault();
+            }
+        });
+    });
+
+    document.addEventListener('pointerup', finalizeDrawing);
+    clearButton?.addEventListener('click', clearDrawing);
+
+    const controller = {
+        clear: function () {
+            textInput.value = '';
+            clearDrawing();
+            setMode(settings.defaultMode === 'texto' ? 'texto' : 'desenho', false);
+        },
+        setValue: function (value) {
+            const raw = String(value || '').trim();
+
+            if (raw.startsWith('desenho_')) {
+                committedSequence = normalizeSequence(raw.replace(/^desenho_/, ''));
+                drawingSequence = committedSequence.slice();
+                renderNodes(committedSequence);
+                textInput.value = '';
+                setMode('desenho', false);
+                syncStoredValue();
+                return;
+            }
+
+            textInput.value = raw;
+            committedSequence = [];
+            drawingSequence = [];
+            renderNodes([]);
+            setMode(raw !== '' ? 'texto' : (settings.defaultMode === 'texto' ? 'texto' : 'desenho'), false);
+            syncStoredValue();
+        },
+        getValue: function () {
+            return String(hiddenInput.value || '');
+        },
+        getMode: function () {
+            return mode;
+        }
+    };
+
+    root._patternPasswordController = controller;
+    controller.setValue(hiddenInput.value || '');
+
+    return controller;
+};
 

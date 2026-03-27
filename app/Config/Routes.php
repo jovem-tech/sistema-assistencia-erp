@@ -30,6 +30,7 @@ $routes->post('webhooks/whatsapp', 'WhatsAppWebhook::receive');
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 // ── Dashboard (todos os autenticados) ──────────────────────────────
+    $routes->get('sessao/heartbeat', 'Sessao::heartbeat');
     $routes->get('dashboard',   'Admin::index', ['filter' => 'permission:dashboard:visualizar']);
     $routes->get('admin/stats', 'Admin::stats', ['filter' => 'permission:dashboard:visualizar']);
 
@@ -235,17 +236,22 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     // -- Ordens de Serviço -------------------------------------------------
     $routes->get('os',                    'Os::index',              ['filter' => 'permission:os:visualizar']);
     $routes->post('os/datatable',         'Os::datatable',          ['filter' => 'permission:os:visualizar']);
+    $routes->get('os/fotos/(:num)',      'Os::photos/$1',          ['filter' => 'permission:os:visualizar']);
     $routes->get('os/nova',              'Os::create',             ['filter' => 'permission:os:criar']);
     $routes->post('os/salvar',            'Os::store',              ['filter' => 'permission:os:criar']);
     $routes->get('os/editar/(:num)',      'Os::edit/$1',            ['filter' => 'permission:os:editar']);
     $routes->post('os/atualizar/(:num)',  'Os::update/$1',          ['filter' => 'permission:os:editar']);
     $routes->get('os/visualizar/(:num)', 'Os::show/$1',            ['filter' => 'permission:os:visualizar']);
+    $routes->get('os/status-meta/(:num)', 'Os::statusMeta/$1',      ['filter' => 'permission:os:visualizar']);
+    $routes->post('os/status-ajax/(:num)','Os::updateStatusAjax/$1',['filter' => 'permission:os:editar']);
     $routes->post('os/status/(:num)',    'Os::updateStatus/$1',    ['filter' => 'permission:os:editar']);
     $routes->get('os/imprimir/(:num)',   'Os::print/$1',           ['filter' => 'permission:os:visualizar']);
     $routes->post('os/whatsapp/(:num)',  'Os::sendWhatsApp/$1',    ['filter' => 'permission:os:editar']);
     $routes->post('os/pdf/(:num)/gerar', 'Os::generatePdf/$1',     ['filter' => 'permission:os:visualizar']);
     $routes->post('os/item/salvar',       'Os::addItem',            ['filter' => 'permission:os:editar']);
     $routes->get('os/item/excluir/(:num)','Os::removeItem/$1',     ['filter' => 'permission:os:editar']);
+    $routes->get('osworkflow',            'OsWorkflow::index',      ['filter' => 'permission:os:editar']);
+    $routes->post('osworkflow/salvar',    'OsWorkflow::save',       ['filter' => 'permission:os:editar']);
 
     // -- Serviços ----------------------------------------------------------
     $routes->get('servicos',                  'Servicos::index',            ['filter' => 'permission:servicos:visualizar']);

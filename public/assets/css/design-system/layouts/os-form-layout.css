@@ -1,0 +1,668 @@
+.os-form-page {
+    --os-surface-bg: #ffffff;
+    --os-surface-bg-hover: #ffffff;
+    --os-surface-bg-active: #eef2ff;
+    --os-surface-border: #e2e8f0;
+    --os-surface-border-hover: #cbd5e1;
+    --os-surface-border-active: rgba(99, 102, 241, 0.34);
+    --os-surface-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    --os-surface-shadow-active: 0 0 0 3px rgba(99, 102, 241, 0.12), 0 10px 24px rgba(99, 102, 241, 0.08);
+    --os-field-bg: #ffffff;
+    --os-field-border: #dbe2ea;
+    --os-soft-text: #64748b;
+    --os-title-text: #475569;
+}
+
+.custom-color-accordion .accordion-button {
+    transition: all 0.2s ease;
+}
+
+.custom-color-accordion .accordion-button:not(.collapsed) {
+    color: var(--bs-primary) !important;
+    background-color: rgba(var(--bs-primary-rgb), 0.05) !important;
+}
+
+.custom-color-accordion .list-group-item {
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.custom-color-accordion .list-group-item:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+    transform: translateX(3px);
+}
+
+.custom-color-accordion .list-group-item.active {
+    border-left: 3px solid var(--bs-primary) !important;
+}
+
+.os-form-page .os-form-shell {
+    background: var(--bg-secondary);
+}
+
+.os-form-page #formOs {
+    position: relative;
+}
+
+.os-form-page .os-sidebar-card {
+    background: var(--bg-secondary);
+}
+
+.os-form-page .os-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: var(--space-4);
+    font-size: 0.72rem;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.08rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.os-form-page .os-summary-value {
+    color: var(--text-secondary);
+}
+
+.os-form-page #resumoOsCard .card-body > .d-flex.flex-column.gap-2.small {
+    gap: 0.6rem !important;
+}
+
+.os-form-page #resumoOsCard .card-body > .d-flex.flex-column.gap-2.small > .d-flex {
+    display: grid !important;
+    grid-template-columns: minmax(96px, 112px) minmax(0, 1fr);
+    align-items: flex-start !important;
+    column-gap: 0.95rem;
+}
+
+.os-form-page #resumoOsCard .card-body > .d-flex.flex-column.gap-2.small > .d-flex > .text-muted {
+    padding-top: 0.08rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--os-title-text) !important;
+}
+
+.os-form-page #resumoOsCard .card-body > .d-flex.flex-column.gap-2.small > .d-flex > .d-flex {
+    min-width: 0;
+    justify-content: flex-end;
+    gap: 0.55rem !important;
+    padding-left: 0.4rem;
+}
+
+.os-form-page #resumoOsCard .os-summary-value,
+.os-form-page #resumoOsCard .badge {
+    display: inline-block;
+    max-width: 100%;
+    line-height: 1.4;
+    text-align: right;
+}
+
+.os-form-page .os-photo-mainbox,
+.os-form-page .os-photo-placeholder {
+    height: 200px;
+    border-radius: var(--radius-lg);
+}
+
+.os-form-page .os-photo-mainbox {
+    position: relative;
+    border: 1px solid var(--border-color);
+    background: #0f172a;
+}
+
+.os-form-page .os-photo-mainlink {
+    cursor: zoom-in;
+}
+
+.os-form-page .os-photo-mainimg {
+    object-fit: contain;
+    transition: opacity 0.2s ease;
+}
+
+.os-form-page .os-photo-placeholder {
+    border: 1px dashed var(--border-color);
+    background: var(--bg-tertiary);
+}
+
+.os-form-page .os-photo-placeholder-icon {
+    font-size: 2rem;
+}
+
+.os-form-page .os-color-swatch {
+    width: 14px;
+    height: 14px;
+    background: #334155;
+}
+
+.os-form-page .os-equipment-info {
+    background: var(--bg-tertiary);
+    font-size: 0.78rem;
+}
+
+.os-form-page .os-draft-alert {
+    border-radius: var(--radius-lg);
+}
+
+.os-form-page .card.glass-card,
+.os-form-page .os-data-section,
+.os-form-page .os-client-card,
+.os-form-page #estadoFisicoQuickForm,
+.os-form-page #acessoriosQuickForm,
+.os-form-page .tab-pane .border.rounded-3,
+.os-form-page .tab-pane .border.rounded {
+    background: var(--os-surface-bg);
+    border: 1px solid var(--os-surface-border) !important;
+    border-radius: 16px;
+    box-shadow: var(--os-surface-shadow);
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.os-form-page .card.glass-card:hover,
+.os-form-page .os-data-section:hover,
+.os-form-page .os-client-card:hover,
+.os-form-page #estadoFisicoQuickForm:hover,
+.os-form-page #acessoriosQuickForm:hover,
+.os-form-page .tab-pane .border.rounded-3:hover,
+.os-form-page .tab-pane .border.rounded:hover {
+    background: var(--os-surface-bg-hover);
+    border-color: var(--os-surface-border-hover) !important;
+}
+
+.os-form-page .card.glass-card:focus-within,
+.os-form-page .os-data-section:focus-within,
+.os-form-page .os-client-card:focus-within,
+.os-form-page #estadoFisicoQuickForm:focus-within,
+.os-form-page #acessoriosQuickForm:focus-within,
+.os-form-page .tab-pane .border.rounded-3:focus-within,
+.os-form-page .tab-pane .border.rounded:focus-within {
+    background: var(--os-surface-bg-active);
+    border-color: var(--os-surface-border-active) !important;
+    box-shadow: var(--os-surface-shadow-active);
+}
+
+.os-form-page .card.glass-card {
+    background: #ffffff;
+    border-color: #e2e8f0 !important;
+}
+
+.os-form-page .card.glass-card .card-body {
+    padding: 20px;
+}
+
+.os-form-page .os-data-section {
+    padding: 20px;
+}
+
+.os-form-page .os-data-section + .os-data-section {
+    margin-top: 0.2rem;
+}
+
+.os-form-page .os-data-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08rem;
+    text-transform: uppercase;
+    color: var(--os-title-text);
+}
+
+.os-form-page .os-tab-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.os-form-page .os-tab-helper {
+    margin-bottom: 0.9rem;
+    color: var(--os-soft-text);
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.os-form-page .os-inline-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.os-form-page .os-inline-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.os-form-page .os-inline-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 8px;
+    padding-inline: 0.6rem;
+    line-height: 1.5;
+}
+
+.ds-inline-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 30px;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.ds-password-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.ds-password-mode-switch .btn {
+    min-width: 84px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.ds-password-mode-switch .btn.active {
+    background: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: #fff;
+}
+
+.ds-pattern-password__pattern,
+.ds-pattern-password__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.ds-pattern-password__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.ds-pattern-password__hint,
+.ds-pattern-password__preview {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.45;
+}
+
+.ds-pattern-password__preview {
+    font-weight: 600;
+}
+
+.ds-pattern-password__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 58px);
+    gap: 0.7rem;
+    width: fit-content;
+    max-width: 100%;
+    align-self: flex-start;
+    padding: 0.75rem;
+    border: 1px solid #dbe2ea;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    user-select: none;
+}
+
+.ds-pattern-password.is-drawing .ds-pattern-password__grid {
+    border-color: rgba(99, 102, 241, 0.45);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.10);
+}
+
+.ds-pattern-node {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    padding: 0;
+}
+
+.ds-pattern-node::before {
+    content: '';
+    position: absolute;
+    inset: 18%;
+    border-radius: 999px;
+    border: 2px solid #94a3b8;
+    background: rgba(255, 255, 255, 0.92);
+    transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ds-pattern-node:hover::before {
+    transform: scale(1.05);
+    border-color: #6366f1;
+}
+
+.ds-pattern-node.is-active::before {
+    border-color: #4f46e5;
+    background: rgba(99, 102, 241, 0.18);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.10);
+}
+
+.ds-pattern-node::after {
+    content: attr(data-step);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #312e81;
+}
+
+.ds-pattern-node:not(.is-active)::after {
+    content: '';
+}
+
+.os-form-page .os-client-card {
+    padding: 1rem 1.1rem;
+    min-height: 132px;
+}
+
+.os-form-page .os-client-card__empty {
+    display: flex;
+    align-items: center;
+    min-height: 100px;
+    color: var(--os-soft-text);
+    font-size: 0.95rem;
+    line-height: 1.55;
+}
+
+.os-form-page .os-client-card__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.os-form-page .os-client-card__name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--bs-body-color);
+    word-break: break-word;
+}
+
+.os-form-page .os-client-card__meta-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.os-form-page .os-client-card__meta-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    color: var(--os-soft-text);
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+
+.os-form-page .os-client-card__meta-item i {
+    margin-top: 0.1rem;
+    color: var(--bs-info);
+}
+
+.os-form-page .relato-quick-grid .dropdown {
+    flex: 0 0 auto;
+}
+
+.os-form-page .os-relato-dropdown-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 38px;
+    max-width: 100%;
+    border-radius: 10px;
+    padding-inline: 0.85rem;
+    white-space: nowrap;
+}
+
+.os-form-page .os-relato-dropdown-menu {
+    min-width: 260px;
+    max-width: min(380px, 90vw);
+    max-height: 320px;
+    padding-block: 0.45rem;
+    overflow-y: auto;
+    border-radius: 12px;
+    border-color: var(--border-color);
+}
+
+.os-form-page .relato-quick-grid .btn-relato-opcao {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    width: 100%;
+    min-height: 36px;
+    max-width: 100%;
+    border-radius: 8px;
+    padding: 0.55rem 0.9rem;
+    text-align: left;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.os-form-page .os-tab-card {
+    background: var(--bg-secondary);
+}
+
+.os-form-page .os-tab-card-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.os-form-page .os-photo-card-meta {
+    display: inline-block;
+}
+
+.os-form-page .os-photo-card-actions .btn {
+    min-width: 132px;
+}
+
+.os-form-page .os-empty-state {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color) !important;
+}
+
+.os-form-page .os-photo-info-banner {
+    max-width: 680px;
+}
+
+.os-form-page .os-photo-dropzone {
+    min-height: 180px;
+    border-color: var(--border-color) !important;
+    background: var(--bg-tertiary);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.os-form-page .os-photo-dropzone:hover,
+.os-form-page .os-photo-dropzone:focus-within {
+    background: var(--os-surface-bg-active);
+    border-color: var(--os-surface-border-active) !important;
+}
+
+.os-form-page .os-form-loading {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(2px);
+    border-radius: 18px;
+    z-index: 20;
+}
+
+.os-form-page .os-form-loading.show {
+    display: flex;
+}
+
+.os-form-page .os-form-loading .os-form-loading-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.7rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: var(--shadow-sm);
+    font-size: 0.88rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.os-form-page .os-form-actions .btn[disabled],
+.os-form-page .os-form-actions a.disabled {
+    opacity: 0.72;
+    pointer-events: none;
+}
+
+.os-form-page .form-control,
+.os-form-page .form-select,
+.os-form-page textarea,
+.os-form-page .select2-container--bootstrap-5 .select2-selection {
+    background: var(--os-field-bg) !important;
+    border: 1px solid var(--os-field-border) !important;
+    border-radius: 12px !important;
+    box-shadow: none;
+}
+
+.os-form-page .form-control:focus,
+.os-form-page .form-select:focus,
+.os-form-page textarea:focus,
+.os-form-page .select2-container--bootstrap-5.select2-container--focus .select2-selection,
+.os-form-page .select2-container--bootstrap-5 .select2-selection:focus {
+    background: #ffffff !important;
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
+}
+
+.os-form-page .form-check-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.os-form-page #resumoOsCard .text-muted,
+.os-form-page #sidebarEquipamento .text-muted {
+    color: var(--os-soft-text) !important;
+}
+
+.os-form-page #estadoFisicoList .list-group-item,
+.os-form-page #acessoriosList .list-group-item {
+    padding: 0.8rem;
+    background: #ffffff;
+    border-color: var(--os-field-border);
+}
+
+@media (max-width: 1199.98px) {
+    .os-form-page .card.glass-card .card-body,
+    .os-form-page .os-data-section {
+        padding: 14px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .os-form-page #resumoOsCard .card-body > .d-flex.flex-column.gap-2.small > .d-flex {
+        grid-template-columns: minmax(82px, 96px) minmax(0, 1fr);
+        column-gap: 0.75rem;
+    }
+
+    .os-form-page #resumoOsCard .card-body > .d-flex.flex-column.gap-2.small > .d-flex > .d-flex {
+        padding-left: 0.25rem;
+    }
+
+    .os-form-page .os-data-section,
+    .os-form-page .card.glass-card,
+    .os-form-page .os-client-card,
+    .os-form-page #estadoFisicoQuickForm,
+    .os-form-page #acessoriosQuickForm,
+    .os-form-page .tab-pane .border.rounded-3,
+    .os-form-page .tab-pane .border.rounded {
+        border-radius: 14px;
+    }
+
+    .os-form-page .card.glass-card .card-body,
+    .os-form-page .os-data-section {
+        padding: 12px;
+    }
+
+    .os-form-page .os-data-section-title {
+        font-size: 0.72rem;
+        letter-spacing: 0.06rem;
+    }
+
+    .os-form-page .os-inline-label {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .os-form-page .os-inline-actions {
+        width: 100%;
+    }
+
+    .os-form-page .os-inline-action-btn {
+        justify-content: center;
+    }
+
+    .ds-inline-add-btn {
+        width: 100%;
+    }
+
+    .ds-password-mode-switch {
+        width: 100%;
+    }
+
+    .ds-password-mode-switch .btn {
+        flex: 1 1 0;
+    }
+
+    .ds-pattern-password__toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ds-pattern-password__grid {
+        grid-template-columns: repeat(3, 52px);
+        gap: 0.55rem;
+        padding: 0.65rem;
+    }
+
+    .os-form-page .relato-quick-grid {
+        overflow-x: auto;
+        flex-wrap: nowrap !important;
+        padding-bottom: 4px;
+    }
+
+    .os-form-page .relato-quick-grid .dropdown {
+        flex: 0 0 auto;
+    }
+
+    .os-form-page .os-relato-dropdown-menu {
+        min-width: 240px;
+    }
+
+    .os-form-page .os-photo-card-actions .btn {
+        min-width: auto;
+    }
+
+    .os-form-page .os-form-loading {
+        border-radius: 14px;
+    }
+
+    .os-form-page .os-form-loading .os-form-loading-inner {
+        max-width: min(92vw, 320px);
+        text-align: center;
+    }
+}

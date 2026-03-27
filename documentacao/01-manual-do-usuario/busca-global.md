@@ -30,6 +30,12 @@ Os resultados são organizados por categorias selecionadas para facilitar a visu
 - **WhatsApp**: Últimas mensagens que contêm o termo pesquisado.
 - **Estoque / Peças**: Peças com saldo e preço de venda.
 
+### Resultado de WhatsApp
+
+- ao clicar em um resultado da categoria `WhatsApp`, o sistema abre a `Central de Mensagens` com a conversa ja selecionada
+- a navegacao correta usa a tela principal da central com `?conversa_id={id}`, e nao a rota JSON interna da thread
+- isso evita exibir dados brutos da conversa no navegador
+
 ## Dicas Sugeridas
 
 - A busca aguarda **2 caracteres** para começar a sugerir resultados.

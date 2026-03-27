@@ -1,5 +1,17 @@
-﻿select.form-select {
+select.form-select {
     padding-right: 34px;
+}
+
+.select2-container {
+    width: 100% !important;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.select2-container .selection {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .select2-container--bootstrap-5 .select2-selection {
@@ -7,6 +19,63 @@
     border-radius: var(--radius-md);
     border-color: var(--border-color);
     background: var(--bg-secondary);
+}
+
+.select2-container--bootstrap-5 .select2-selection--single {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding-left: 12px;
+    padding-right: 40px;
+    overflow: hidden;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single.select2-selection--clearable {
+    padding-right: 64px;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    display: block;
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.35;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__placeholder {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear,
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-top: 0;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    right: 12px;
+    width: 14px;
+    height: 14px;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear {
+    right: 32px;
+    padding: 0;
+    line-height: 1;
 }
 
 .select2-container--bootstrap-5 .select2-selection:focus,

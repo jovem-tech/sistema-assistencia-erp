@@ -1,6 +1,6 @@
 # Estrutura de Pastas (resumo tecnico)
 
-Atualizado em 22/03/2026.
+Atualizado em 23/03/2026.
 
 ```text
 sistema-assistencia/
@@ -70,7 +70,8 @@ sistema-assistencia/
 |   |   |-- 2026-03-17-235500_AddCentralAtendimentoInteligente.php
 |   |   |-- 2026-03-20-070500_CreateContatosAndLinkConversas.php
 |   |   |-- 2026-03-20-091500_AddContatoLifecycleMarketingFields.php
-|   |   `-- 2026-03-20-120500_AddContatoEngajamentoLifecycleWindow.php
+|   |   |-- 2026-03-20-120500_AddContatoEngajamentoLifecycleWindow.php
+|   |   `-- 2026-03-23-031500_AddOsAdvancedFilterIndexes.php
 |   |
 |   `-- Views/
 |       |-- crm/
@@ -131,6 +132,9 @@ Fluxo interno:
 ## Camada global de responsividade
 - CSS base: `public/assets/css/design-system/layouts/responsive-layout.css`
 - JS base: `public/assets/js/scripts.js` (`initUltraResponsiveLayout`)
+- CSS dedicado da listagem de OS: `public/assets/css/design-system/layouts/os-list-layout.css`
+- CSS dedicado do modal/formulario de OS: `public/assets/css/design-system/layouts/os-form-layout.css`
+- JS dedicado da listagem de OS: `public/assets/js/os-list-filters.js`
 - Escopo:
   - prevencao de overflow horizontal global;
   - stack mobile para tabelas comuns via `data-label`;

@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="base-url" content="<?= base_url() ?>">
+    <?php helper('cookie'); ?>
+    <meta name="session-timeout-minutes" content="<?= esc((string) get_session_inactivity_minutes(30)) ?>">
+    <meta name="session-heartbeat-url" content="<?= base_url('sessao/heartbeat') ?>">
+    <meta name="session-login-url" content="<?= base_url('login') ?>">
+    <meta name="session-remember-active" content="<?= get_cookie('remember_login') ? '1' : '0' ?>">
     <title><?= $title ?? 'Sistema' ?> - <?= esc(get_config('sistema_nome', 'Assistencia Tecnica')) ?></title>
 
     <link rel="icon" href="<?= base_url('favicon.ico') ?>">

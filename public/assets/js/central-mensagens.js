@@ -5,17 +5,23 @@
     window.__CM_JS_BOOTED__ = true;
 
     const cfg = window.CM_CFG || {};
+    const workspaceEl = document.getElementById('cmWorkspace');
     const listEl = document.getElementById('conversaList');
     const threadMessages = document.getElementById('threadMessages');
     const threadTitle = document.getElementById('threadTitle');
     const threadSubtitle = document.getElementById('threadSubtitle');
     const threadStatusBadge = document.getElementById('threadStatusBadge');
+    const threadStatusLabelEl = threadStatusBadge?.querySelector('.cm-btn-label') || null;
+    const actionBarEl = document.getElementById('cmChatActionsBar');
     const formEnviar = document.getElementById('formEnviarMensagem');
     const conversaIdInput = document.getElementById('cmConversaId');
     const msgInput = document.getElementById('cmMensagem');
     const tipoMensagemInput = document.getElementById('cmTipoMensagem');
     const documentoSelect = document.getElementById('cmDocumentoId');
     const contextoEl = document.getElementById('contextoConversa');
+    const replyPreviewEl = document.getElementById('cmReplyPreview');
+    const replyPreviewTextEl = document.getElementById('cmReplyPreviewText');
+    const replyCancelBtn = document.getElementById('cmReplyCancel');
 
     if (!cfg.endpointConversas || !cfg.endpointConversaPrefix || !listEl || !threadMessages || !formEnviar) {
         return;
@@ -30,14 +36,21 @@
     const filtroClientesNovos = document.getElementById('filtroConversaClientesNovos');
     const btnFiltrar = document.getElementById('btnFiltrarConversas');
     const btnLimparFiltros = document.getElementById('btnLimparFiltros');
+    const btnToggleQueueFilters = document.getElementById('btnToggleQueueFilters');
+    const advancedFiltersEl = document.getElementById('cmAdvancedFilters');
     const btnSyncInbound = document.getElementById('btnSyncInbound');
     const btnNovaConversa = document.getElementById('btnNovaConversa');
     const btnAtualizarConversa = document.getElementById('btnAtualizarConversa');
     const btnAssumirConversa = document.getElementById('btnAssumirConversa');
     const btnAtribuirConversa = document.getElementById('btnAtribuirConversa');
+    const btnPrioridadeConversa = document.getElementById('btnPrioridadeConversa');
+    const btnPrioridadeConversaLabel = document.getElementById('btnPrioridadeConversaLabel');
+    const btnModoAtendimento = document.getElementById('btnModoAtendimento');
+    const btnModoAtendimentoLabel = document.getElementById('btnModoAtendimentoLabel');
+    const btnModoAguardandoHumano = document.getElementById('btnModoAguardandoHumano');
     const btnEncerrarConversa = document.getElementById('btnEncerrarConversa');
-    const btnSyncInboundMobile = document.getElementById('btnSyncInboundMobile');
-    const btnNovaConversaMobile = document.getElementById('btnNovaConversaMobile');
+    const btnMaisAcoesConversa = document.getElementById('btnMaisAcoesConversa');
+    const btnToggleContextDock = document.getElementById('btnToggleContextDock');
     const btnAnexarMidia = document.getElementById('btnAnexarMidia');
     const btnEmojiPicker = document.getElementById('btnEmojiPicker');
     const anexoInput = document.getElementById('cmAnexoInput');
@@ -48,6 +61,11 @@
     const conversaCountEl = document.getElementById('cmConversaCount');
     const naoLidasCountEl = document.getElementById('cmNaoLidasCount');
     const realtimeBadgeEl = document.getElementById('cmRealtimeBadge');
+    const inboundBadgeEl = document.getElementById('cmInboundBadge');
+    const connectionStripEl = document.getElementById('cmConnectionStrip');
+    const connectionTextEl = document.getElementById('cmConnectionText');
+    const quickFilterButtons = Array.from(document.querySelectorAll('.cm-quick-filter-btn[data-cm-quick-filter]'));
+    const actionBarTooltipTargets = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
 
     const imageModalEl = document.getElementById('imageModal');
     const imageModalImg = document.getElementById('imageModalImg');
@@ -64,10 +82,14 @@
     const imageModalInstance = (window.bootstrap && imageModalEl)
         ? window.bootstrap.Modal.getOrCreateInstance(imageModalEl)
         : null;
+    const advancedFiltersCollapse = (window.bootstrap && advancedFiltersEl)
+        ? window.bootstrap.Collapse.getOrCreateInstance(advancedFiltersEl, { toggle: false })
+        : null;
 
     const autoSyncIntervalMs = Math.max(5000, Number(cfg.autoSyncSeconds || 15) * 1000);
+    const autoInboundSyncIntervalMs = Math.max(14000, Number(cfg.autoInboundSyncSeconds || 28) * 1000);
     const slaPrimeiraRespostaMin = Math.max(1, Number(cfg.slaPrimeiraRespostaMin || 60));
-    const defaultRequestTimeoutMs = Math.max(8000, Number(cfg.requestTimeoutMs || 20000));
+    const defaultRequestTimeoutMs = Math.max(10000, Number(cfg.requestTimeoutMs || 30000));
     const sseEnabledByConfig = (() => {
         const raw = String(cfg.enableSse ?? '1').trim().toLowerCase();
         return !['0', 'false', 'no', 'nao', 'off'].includes(raw);
@@ -99,6 +121,12 @@
         activeConversationUnread: 0,
         pollTimer: null,
         pollRunning: false,
+        inboundSyncTimer: null,
+        inboundSyncRunning: false,
+        inboundSyncPromise: null,
+        lastInboundSyncAt: 0,
+        lastInboundSyncCount: 0,
+        filterDebounceTimer: null,
         streamSource: null,
         streamForConversaId: null,
         streamReady: false,
@@ -110,8 +138,15 @@
         imageItems: [],
         imageIndex: -1,
         currentContext: null,
+        sendingMessage: false,
         authRedirectInProgress: false,
         lastPollErrorLogAt: 0,
+        lastConversaListSyncAt: 0,
+        contextDockCollapsed: false,
+        networkFailureStreak: 0,
+        lastNetworkSuccessAt: 0,
+        connectionMode: 'online',
+        pendingMessageKey: 0,
         recording: {
             active: false,
             type: null, // 'audio' | 'video'
@@ -121,15 +156,127 @@
             blob: null,
             startTime: 0,
             timer: null
+        },
+        replyTarget: null
+    };
+
+    const setTooltipText = (el, text) => {
+        if (!el) {
+            return;
         }
+        const normalized = String(text || '').trim();
+        const toggleType = String(el.getAttribute('data-bs-toggle') || '').trim().toLowerCase();
+        const tooltipCompatible = (toggleType === '' || toggleType === 'tooltip');
+        if (normalized !== '') {
+            el.setAttribute('title', normalized);
+            if (tooltipCompatible) {
+                el.setAttribute('data-bs-original-title', normalized);
+            } else {
+                el.removeAttribute('data-bs-original-title');
+            }
+            if (window.bootstrap && window.bootstrap.Tooltip) {
+                const instance = window.bootstrap.Tooltip.getInstance(el);
+                if (instance && typeof instance.setContent === 'function') {
+                    try {
+                        instance.setContent({ '.tooltip-inner': normalized });
+                    } catch (error) {
+                        // segue sem bloquear quando tooltip ainda nao estiver montado.
+                    }
+                }
+            }
+            return;
+        }
+        el.removeAttribute('title');
+        el.removeAttribute('data-bs-original-title');
+    };
+
+    const initActionBarTooltips = () => {
+        if (!actionBarEl || !window.bootstrap || !window.bootstrap.Tooltip) {
+            return;
+        }
+        const targets = Array.from(new Set([
+            ...actionBarTooltipTargets,
+        ].filter(Boolean)));
+
+        const isConflictingToggle = (el) => {
+            const toggle = String(el?.getAttribute('data-bs-toggle') || '').trim().toLowerCase();
+            return toggle !== '' && toggle !== 'tooltip';
+        };
+
+        // Evita conflito Bootstrap "one instance per element" em botoes de dropdown/modal/etc.
+        [btnMaisAcoesConversa].forEach((el) => {
+            if (!el) {
+                return;
+            }
+            const existingTooltip = window.bootstrap.Tooltip.getInstance(el);
+            if (existingTooltip) {
+                existingTooltip.dispose();
+            }
+        });
+
+        targets.forEach((el) => {
+            if (isConflictingToggle(el)) {
+                return;
+            }
+            const text = String(el.getAttribute('title') || '').trim();
+            if (!text) {
+                return;
+            }
+            window.bootstrap.Tooltip.getOrCreateInstance(el, {
+                container: 'body',
+                trigger: 'hover focus',
+            });
+        });
+    };
+
+    const normalizeMojibake = (value) => {
+        if (typeof value !== 'string' || value === '') {
+            return value;
+        }
+
+        const replacements = [
+            ['NÃ£o', 'Nao'],
+            ['nÃ£o', 'nao'],
+            ['Ãudio', 'Audio'],
+            ['Ã¡udio', 'audio'],
+            ['VÃ­deo', 'Video'],
+            ['vÃ­deo', 'video'],
+            ['ResponsÃ¡vel', 'Responsavel'],
+            ['responsÃ¡vel', 'responsavel'],
+            ['cÃ¢mera', 'camera'],
+            ['permissÃµes', 'permissoes'],
+            ['forÃ§ado', 'forcado'],
+            ['aÃ§Ãµes', 'acoes'],
+            ['opÃ§Ãµes', 'opcoes'],
+            ['PrÃ³xima', 'Proxima'],
+            ['VisualizaÃ§Ã£o', 'Visualizacao'],
+            ['rÃ¡pidas', 'rapidas'],
+            ['OrÃ§amento', 'Orcamento'],
+            ['â€¢', '|'],
+        ];
+
+        let normalized = value;
+        replacements.forEach(([source, target]) => {
+            normalized = normalized.split(source).join(target);
+        });
+        return normalized;
     };
 
     const swal = (options) => {
+        const normalizedOptions = options && typeof options === 'object'
+            ? {
+                ...options,
+                title: normalizeMojibake(options.title),
+                text: normalizeMojibake(options.text),
+                html: normalizeMojibake(options.html),
+            }
+            : options;
+
         if (window.Swal) {
-            return window.Swal.fire(options);
+            return window.Swal.fire(normalizedOptions);
         }
-        const title = options?.title || 'Aviso';
-        const text = options?.text || '';
+        const title = normalizeMojibake(normalizedOptions?.title || 'Aviso');
+        const text = normalizeMojibake(normalizedOptions?.text || '');
         // Fallback tecnico caso SweetAlert2 indisponivel.
         alert((title ? title + '\n' : '') + text);
         return Promise.resolve();
@@ -156,25 +303,167 @@
         return String(value).replace('T', ' ').substring(0, 16);
     };
 
+    const formatElapsedShort = (timestampMs) => {
+        const value = Number(timestampMs || 0);
+        if (!Number.isFinite(value) || value <= 0) {
+            return '';
+        }
+        const diffSec = Math.max(0, Math.floor((Date.now() - value) / 1000));
+        if (diffSec < 5) return 'agora';
+        if (diffSec < 60) return `${diffSec}s`;
+        const diffMin = Math.floor(diffSec / 60);
+        if (diffMin < 60) return `${diffMin}min`;
+        const diffHour = Math.floor(diffMin / 60);
+        if (diffHour < 24) return `${diffHour}h`;
+        const diffDay = Math.floor(diffHour / 24);
+        return `${diffDay}d`;
+    };
+
+    const draftStorageKey = (conversaId) => {
+        const id = Number(conversaId || 0);
+        if (!Number.isFinite(id) || id <= 0) {
+            return '';
+        }
+        return `cm_draft_${id}`;
+    };
+
+    const readDraftForConversation = (conversaId) => {
+        const key = draftStorageKey(conversaId);
+        if (!key) {
+            return '';
+        }
+        try {
+            return String(window.localStorage.getItem(key) || '');
+        } catch (error) {
+            return '';
+        }
+    };
+
+    const persistDraftForCurrentConversation = () => {
+        const key = draftStorageKey(state.currentConversaId);
+        if (!key || !msgInput) {
+            return;
+        }
+        try {
+            const value = String(msgInput.value || '');
+            if (value.trim() === '') {
+                window.localStorage.removeItem(key);
+            } else {
+                window.localStorage.setItem(key, value);
+            }
+        } catch (error) {
+            // Falha de storage nao deve bloquear o fluxo da conversa.
+        }
+    };
+
+    const clearDraftForConversation = (conversaId) => {
+        const key = draftStorageKey(conversaId);
+        if (!key) {
+            return;
+        }
+        try {
+            window.localStorage.removeItem(key);
+        } catch (error) {
+            // Falha de storage nao deve bloquear o fluxo da conversa.
+        }
+    };
+
+    const normalizeMessageId = (value) => {
+        const id = Number(value || 0);
+        return Number.isFinite(id) && id > 0 ? id : 0;
+    };
+
+    const messageIdentityKey = (msg) => {
+        const messageId = normalizeMessageId(msg?.id);
+        if (messageId > 0) {
+            return `id:${messageId}`;
+        }
+
+        return [
+            'fp',
+            String(msg?.direcao || ''),
+            String(msg?.provider || ''),
+            String(msg?.provider_message_id || ''),
+            String(msg?.created_at || msg?.enviada_em || msg?.recebida_em || ''),
+            String(msg?.tipo_conteudo || ''),
+            String(msg?.mime_type || ''),
+            String(msg?.arquivo || msg?.anexo_path || ''),
+            String(msg?.mensagem || ''),
+        ].join('|');
+    };
+
+    const compareMensagens = (left, right) => {
+        const leftTime = toSortableTimestamp(left?.created_at || left?.enviada_em || left?.recebida_em || '');
+        const rightTime = toSortableTimestamp(right?.created_at || right?.enviada_em || right?.recebida_em || '');
+        if (leftTime !== rightTime) {
+            return leftTime - rightTime;
+        }
+
+        const leftId = normalizeMessageId(left?.id);
+        const rightId = normalizeMessageId(right?.id);
+        if (leftId !== rightId) {
+            return leftId - rightId;
+        }
+
+        return String(messageIdentityKey(left)).localeCompare(String(messageIdentityKey(right)));
+    };
+
+    const mergeMensagens = (current, incoming) => {
+        const merged = [];
+        const indexByKey = new Map();
+
+        const pushMessage = (msg) => {
+            if (!msg || typeof msg !== 'object') {
+                return;
+            }
+
+            const key = messageIdentityKey(msg);
+            if (indexByKey.has(key)) {
+                const existingIndex = indexByKey.get(key);
+                merged[existingIndex] = {
+                    ...merged[existingIndex],
+                    ...msg,
+                };
+                return;
+            }
+
+            indexByKey.set(key, merged.length);
+            merged.push({ ...msg });
+        };
+
+        (Array.isArray(current) ? current : []).forEach(pushMessage);
+        (Array.isArray(incoming) ? incoming : []).forEach(pushMessage);
+
+        merged.sort(compareMensagens);
+        return merged;
+    };
+
     const toSortableTimestamp = (value) => {
         const dt = parseDate(value);
         return dt ? dt.getTime() : 0;
     };
+
+    const conversaMovementAt = (item) => (
+        item?.ultima_movimentacao_em
+        || item?.ultima_mensagem_em
+        || item?.updated_at
+        || item?.created_at
+        || ''
+    );
 
     const sortConversasByRecency = (items) => {
         if (!Array.isArray(items)) {
             return [];
         }
 
-        return [...items].sort((a, b) => {
-            const aUnread = Number(a?.nao_lidas || 0) > 0 ? 1 : 0;
-            const bUnread = Number(b?.nao_lidas || 0) > 0 ? 1 : 0;
-            if (aUnread !== bUnread) {
-                return bUnread - aUnread;
-            }
+        const previousOrder = new Map(
+            (Array.isArray(state.currentList) ? state.currentList : []).map((item, index) => [Number(item?.id || 0), index])
+        );
 
-            const aTs = toSortableTimestamp(a?.ultima_mensagem_em);
-            const bTs = toSortableTimestamp(b?.ultima_mensagem_em);
+        return [...items].sort((a, b) => {
+            // Ordem cronologica estavel da ultima interacao (recebida ou enviada), sem priorizacao por flags.
+            const aTs = toSortableTimestamp(conversaMovementAt(a));
+            const bTs = toSortableTimestamp(conversaMovementAt(b));
             if (aTs !== bTs) {
                 return bTs - aTs;
             }
@@ -187,6 +476,12 @@
 
             const aId = Number(a?.id || 0);
             const bId = Number(b?.id || 0);
+            const aPrev = previousOrder.has(aId) ? Number(previousOrder.get(aId)) : Number.MAX_SAFE_INTEGER;
+            const bPrev = previousOrder.has(bId) ? Number(previousOrder.get(bId)) : Number.MAX_SAFE_INTEGER;
+            if (aPrev !== bPrev) {
+                return aPrev - bPrev;
+            }
+
             return bId - aId;
         });
     };
@@ -231,9 +526,9 @@
         const mime = String(message?.mime_type || '').toLowerCase();
         const arquivo = String(message?.arquivo || message?.anexo_path || '').toLowerCase();
 
-        if (tipo === 'imagem' || tipo === 'image') return 'imagem';
-        if (tipo === 'audio') return 'audio';
-        if (tipo === 'video') return 'video';
+        if (tipo === 'imagem' || tipo === 'image' || tipo.includes('image')) return 'imagem';
+        if (tipo === 'audio' || tipo === 'ptt' || tipo.includes('voice') || tipo.includes('audio')) return 'audio';
+        if (tipo === 'video' || tipo.includes('video')) return 'video';
         if (tipo === 'pdf') return 'pdf';
         if (tipo === 'arquivo') return 'arquivo';
         if (tipo && tipo !== 'texto') return 'arquivo';
@@ -347,12 +642,293 @@
         return 'Aberta';
     };
 
+    const normalizeStatusValue = (value) => {
+        const status = String(value || 'aberta').toLowerCase().trim();
+        if (['aberta', 'aguardando', 'resolvida', 'arquivada'].includes(status)) {
+            return status;
+        }
+        return 'aberta';
+    };
+
+    const normalizePriorityValue = (value) => {
+        const priority = String(value || 'normal').toLowerCase().trim();
+        if (['baixa', 'normal', 'alta', 'urgente'].includes(priority)) {
+            return priority;
+        }
+        return 'normal';
+    };
+
     const priorityBadgeClass = (priority) => {
         const normalized = String(priority || 'normal').toLowerCase();
         if (normalized === 'urgente') return 'text-bg-danger';
         if (normalized === 'alta') return 'text-bg-warning text-dark';
         if (normalized === 'baixa') return 'text-bg-secondary';
         return 'text-bg-light border text-secondary';
+    };
+
+    const getCurrentConversaFromList = () => {
+        const currentId = Number(state.currentConversaId || 0);
+        if (currentId <= 0) {
+            return null;
+        }
+        return (Array.isArray(state.currentList) ? state.currentList : [])
+            .find((item) => Number(item?.id || 0) === currentId) || null;
+    };
+
+    const getCurrentMetaSnapshot = () => {
+        const ctxMeta = state.currentContext?.meta || {};
+        const currentItem = getCurrentConversaFromList();
+        const status = normalizeStatusValue(ctxMeta.status || currentItem?.status || 'aberta');
+        const prioridade = normalizePriorityValue(ctxMeta.prioridade || currentItem?.prioridade || 'normal');
+        const automacaoAtiva = Number(ctxMeta.automacao_ativa ?? currentItem?.automacao_ativa ?? 1) === 1 ? 1 : 0;
+        const aguardandoHumano = Number(ctxMeta.aguardando_humano ?? currentItem?.aguardando_humano ?? 0) === 1 ? 1 : 0;
+        const responsavelId = Number(ctxMeta.responsavel_id ?? currentItem?.responsavel_id ?? 0);
+        const responsaveis = Array.isArray(ctxMeta.responsaveis) ? ctxMeta.responsaveis : [];
+        const statusOptions = (Array.isArray(ctxMeta.status_options) && ctxMeta.status_options.length)
+            ? ctxMeta.status_options.map((item) => normalizeStatusValue(item))
+            : ['aberta', 'aguardando', 'resolvida', 'arquivada'];
+
+        return {
+            status,
+            prioridade,
+            automacao_ativa: automacaoAtiva,
+            aguardando_humano: aguardandoHumano,
+            responsavel_id: responsavelId > 0 ? responsavelId : 0,
+            responsaveis,
+            status_options: statusOptions,
+        };
+    };
+
+    const resolveAtendimentoMode = (meta) => {
+        const automacaoAtiva = Number(meta?.automacao_ativa || 0) === 1;
+        if (automacaoAtiva) {
+            return 'bot';
+        }
+        return 'human';
+    };
+
+    const atendimentoModeLabel = (mode) => {
+        if (mode === 'bot') {
+            return 'Bot ativo';
+        }
+        return 'Aguardando atendimento humano';
+    };
+
+    const updateHeaderMetaButtonsState = () => {
+        const hasActive = Number(state.currentConversaId || 0) > 0;
+        const meta = getCurrentMetaSnapshot();
+        const atendimentoMode = resolveAtendimentoMode(meta);
+        const prioridade = normalizePriorityValue(meta.prioridade || 'normal');
+        const prioridadeLabel = prioridade.charAt(0).toUpperCase() + prioridade.slice(1);
+
+        if (threadStatusBadge) {
+            threadStatusBadge.disabled = !hasActive;
+            setTooltipText(threadStatusBadge, hasActive
+                ? 'Alterar status da conversa'
+                : 'Abra uma conversa para alterar o status');
+        }
+
+        [btnAssumirConversa, btnAtribuirConversa, btnPrioridadeConversa, btnModoAtendimento, btnModoAguardandoHumano, btnEncerrarConversa].forEach((btn) => {
+            if (btn) {
+                btn.disabled = !hasActive;
+            }
+        });
+
+        if (btnAssumirConversa) {
+            setTooltipText(btnAssumirConversa, hasActive
+                ? 'Assumir conversa'
+                : 'Abra uma conversa para assumir');
+        }
+
+        if (btnAtribuirConversa) {
+            setTooltipText(btnAtribuirConversa, hasActive
+                ? 'Atribuir responsavel'
+                : 'Abra uma conversa para atribuir');
+        }
+
+        if (btnEncerrarConversa) {
+            setTooltipText(btnEncerrarConversa, hasActive
+                ? 'Encerrar conversa'
+                : 'Abra uma conversa para encerrar');
+        }
+
+        if (btnPrioridadeConversa) {
+            btnPrioridadeConversa.classList.remove(
+                'is-priority-baixa',
+                'is-priority-normal',
+                'is-priority-alta',
+                'is-priority-urgente'
+            );
+            btnPrioridadeConversa.classList.add(`is-priority-${prioridade}`);
+            if (btnPrioridadeConversaLabel) {
+                btnPrioridadeConversaLabel.textContent = `Prioridade: ${prioridadeLabel}`;
+            }
+            setTooltipText(btnPrioridadeConversa, hasActive
+                ? `Prioridade atual: ${prioridadeLabel}`
+                : 'Abra uma conversa para alterar prioridade');
+        }
+
+        if (btnModoAtendimento) {
+            btnModoAtendimento.classList.remove('is-mode-none', 'is-mode-bot', 'is-mode-human');
+            const botAtivo = atendimentoMode === 'bot';
+            btnModoAtendimento.classList.add(botAtivo ? 'is-mode-bot' : 'is-mode-none');
+            btnModoAtendimento.setAttribute('aria-pressed', botAtivo ? 'true' : 'false');
+            if (btnModoAtendimentoLabel) {
+                btnModoAtendimentoLabel.textContent = botAtivo ? 'Bot ativo' : 'Bot desativado';
+            }
+            setTooltipText(btnModoAtendimento, hasActive
+                ? (botAtivo
+                    ? 'Bot ativo. Clique para ativar aguardando atendimento humano.'
+                    : 'Bot desativado. Clique para ativar o bot.')
+                : 'Abra uma conversa para controlar o bot');
+        }
+
+        if (btnModoAguardandoHumano) {
+            const humanAtivo = atendimentoMode !== 'bot';
+            btnModoAguardandoHumano.classList.remove('is-human-active', 'is-human-inactive');
+            btnModoAguardandoHumano.classList.add(humanAtivo ? 'is-human-active' : 'is-human-inactive');
+            btnModoAguardandoHumano.disabled = !hasActive || !humanAtivo;
+            btnModoAguardandoHumano.setAttribute('aria-pressed', humanAtivo ? 'true' : 'false');
+            setTooltipText(btnModoAguardandoHumano, hasActive
+                ? (humanAtivo
+                    ? 'Aguardando atendimento humano ativo. Clique para reativar bot.'
+                    : 'Aguardando atendimento humano desativado porque o bot esta ativo.')
+                : 'Abra uma conversa para alterar o modo de atendimento');
+        }
+    };
+
+    const contextDockStorageKey = 'cm_context_dock_collapsed_v1';
+
+    const isDesktopWide = () => window.matchMedia('(min-width: 1200px)').matches;
+
+    const readContextDockState = () => {
+        try {
+            return window.localStorage.getItem(contextDockStorageKey) === '1';
+        } catch (error) {
+            return false;
+        }
+    };
+
+    const persistContextDockState = (collapsed) => {
+        try {
+            window.localStorage.setItem(contextDockStorageKey, collapsed ? '1' : '0');
+        } catch (error) {
+            // storage pode estar indisponivel em navegacao privada.
+        }
+    };
+
+    const applyContextDockState = (collapsed, options) => {
+        const opts = options || {};
+        state.contextDockCollapsed = !!collapsed;
+
+        if (workspaceEl) {
+            workspaceEl.classList.toggle('is-context-collapsed', !!collapsed && isDesktopWide());
+        }
+
+        if (btnToggleContextDock) {
+            const shouldShowActive = !!collapsed && isDesktopWide();
+            btnToggleContextDock.classList.toggle('is-active-context', shouldShowActive);
+            btnToggleContextDock.setAttribute('aria-pressed', shouldShowActive ? 'true' : 'false');
+            btnToggleContextDock.innerHTML = shouldShowActive
+                ? '<i class="bi bi-layout-sidebar-inset"></i><span class="visually-hidden">Mostrar contexto</span>'
+                : '<i class="bi bi-layout-sidebar-inset-reverse"></i><span class="visually-hidden">Ocultar contexto</span>';
+            setTooltipText(btnToggleContextDock, shouldShowActive ? 'Mostrar painel de contexto' : 'Ocultar painel de contexto');
+        }
+
+        if (!opts.skipPersist) {
+            persistContextDockState(!!collapsed);
+        }
+    };
+
+    const toggleContextDockState = () => {
+        applyContextDockState(!state.contextDockCollapsed);
+    };
+
+    const clearFilterDebounce = () => {
+        if (state.filterDebounceTimer) {
+            clearTimeout(state.filterDebounceTimer);
+            state.filterDebounceTimer = null;
+        }
+    };
+
+    const scheduleFilterRefresh = (delayMs) => {
+        clearFilterDebounce();
+        const delay = Number.isFinite(Number(delayMs)) ? Number(delayMs) : 260;
+        state.filterDebounceTimer = setTimeout(() => {
+            state.filterDebounceTimer = null;
+            updateFilterFeedback();
+            safeLoadConversas(true);
+        }, Math.max(120, delay));
+    };
+
+    const resolveQuickFilterKey = (filters) => {
+        if (!filters || typeof filters !== 'object') {
+            return 'all';
+        }
+        const hasQ = !!String(filters.q || '').trim();
+        const hasStatus = !!String(filters.status || '').trim();
+        const hasResp = !!String(filters.responsavel_id || '').trim();
+        const hasTag = !!String(filters.tag_id || '').trim();
+        const hasUnread = String(filters.nao_lidas || '0') === '1';
+        const hasOs = String(filters.com_os_aberta || '0') === '1';
+        const hasNew = String(filters.clientes_novos || '0') === '1';
+
+        if (!hasQ && !hasStatus && !hasResp && !hasTag && !hasUnread && !hasOs && !hasNew) {
+            return 'all';
+        }
+        if (!hasQ && !hasStatus && !hasResp && !hasTag && hasUnread && !hasOs && !hasNew) {
+            return 'unread';
+        }
+        if (!hasQ && String(filters.status || '') === 'aberta' && !hasResp && !hasTag && !hasUnread && !hasOs && !hasNew) {
+            return 'open';
+        }
+        if (!hasQ && String(filters.status || '') === 'arquivada' && !hasResp && !hasTag && !hasUnread && !hasOs && !hasNew) {
+            return 'archived';
+        }
+        if (!hasQ && !hasStatus && !hasResp && !hasTag && !hasUnread && hasOs && !hasNew) {
+            return 'os';
+        }
+        if (!hasQ && !hasStatus && !hasResp && !hasTag && !hasUnread && !hasOs && hasNew) {
+            return 'clients_new';
+        }
+        return '';
+    };
+
+    const syncQuickFilterButtons = (filters) => {
+        if (!quickFilterButtons.length) {
+            return;
+        }
+        const activeKey = resolveQuickFilterKey(filters || currentFilters());
+        quickFilterButtons.forEach((btn) => {
+            const isActive = String(btn.getAttribute('data-cm-quick-filter') || '') === activeKey;
+            btn.classList.toggle('active', isActive);
+        });
+    };
+
+    const applyQuickFilter = (filterKey) => {
+        const key = String(filterKey || '').trim().toLowerCase();
+        if (filtroQ) filtroQ.value = '';
+        if (filtroStatus) filtroStatus.value = '';
+        if (filtroResponsavel) filtroResponsavel.value = '';
+        if (filtroTag) filtroTag.value = '';
+        if (filtroNaoLidas) filtroNaoLidas.checked = false;
+        if (filtroOsAberta) filtroOsAberta.checked = false;
+        if (filtroClientesNovos) filtroClientesNovos.checked = false;
+
+        if (key === 'unread' && filtroNaoLidas) {
+            filtroNaoLidas.checked = true;
+        } else if (key === 'open' && filtroStatus) {
+            filtroStatus.value = 'aberta';
+        } else if (key === 'archived' && filtroStatus) {
+            filtroStatus.value = 'arquivada';
+        } else if (key === 'os' && filtroOsAberta) {
+            filtroOsAberta.checked = true;
+        } else if (key === 'clients_new' && filtroClientesNovos) {
+            filtroClientesNovos.checked = true;
+        }
+
+        updateFilterFeedback();
+        safeLoadConversas(true);
     };
 
     const updateFilterFeedback = () => {
@@ -371,9 +947,11 @@
 
         if (chips.length === 0) {
             filterFeedbackEl.textContent = 'Sem filtros ativos.';
+            syncQuickFilterButtons(filters);
             return;
         }
-        filterFeedbackEl.textContent = 'Filtros ativos: ' + chips.join(' • ');
+        filterFeedbackEl.textContent = 'Filtros ativos: ' + chips.join(' | ');
+        syncQuickFilterButtons(filters);
     };
 
     const updateConversationCounters = (items) => {
@@ -391,23 +969,210 @@
         }
     };
 
-    const setRealtimeBadge = (mode) => {
+    const setRealtimeBadge = (mode, detail) => {
         if (!realtimeBadgeEl) {
             return;
         }
         realtimeBadgeEl.classList.remove('live', 'polling', 'warn');
+        const suffix = detail ? ` <small class="text-muted ms-1">${escapeHtml(detail)}</small>` : '';
         if (mode === 'live') {
             realtimeBadgeEl.classList.add('live');
-            realtimeBadgeEl.innerHTML = '<i class="bi bi-broadcast-pin me-1"></i>Tempo real';
+            realtimeBadgeEl.innerHTML = `<i class="bi bi-broadcast-pin me-1"></i>Tempo real${suffix}`;
             return;
         }
         if (mode === 'warn') {
             realtimeBadgeEl.classList.add('warn');
-            realtimeBadgeEl.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i>Instavel';
+            realtimeBadgeEl.innerHTML = `<i class="bi bi-exclamation-triangle me-1"></i>Instavel${suffix}`;
             return;
         }
         realtimeBadgeEl.classList.add('polling');
-        realtimeBadgeEl.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>Polling';
+        realtimeBadgeEl.innerHTML = `<i class="bi bi-arrow-repeat me-1"></i>Polling${suffix}`;
+    };
+
+    const updateAdvancedFiltersToggleState = () => {
+        if (!btnToggleQueueFilters || !advancedFiltersEl) {
+            return;
+        }
+
+        const expanded = advancedFiltersEl.classList.contains('show');
+        btnToggleQueueFilters.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        btnToggleQueueFilters.innerHTML = expanded
+            ? '<i class="bi bi-funnel-fill me-1"></i>Ocultar filtros'
+            : '<i class="bi bi-funnel me-1"></i>Filtros avancados';
+        btnToggleQueueFilters.classList.toggle('is-open', expanded);
+    };
+
+    const composerBaseHeight = () => {
+        if (!msgInput) {
+            return 42;
+        }
+
+        const computed = window.getComputedStyle(msgInput);
+        const minHeight = Math.max(34, parseFloat(computed.minHeight) || 40);
+        const sendHeight = sendButton
+            ? Math.max(0, parseFloat(window.getComputedStyle(sendButton).height) || sendButton.offsetHeight || 0)
+            : 0;
+
+        return Math.max(minHeight, sendHeight);
+    };
+
+    const applyComposerHeight = (height, overflowY = 'hidden') => {
+        if (!msgInput) {
+            return;
+        }
+
+        const nextHeight = Math.max(34, Math.round(Number(height) || 0));
+        msgInput.style.setProperty('height', `${nextHeight}px`, 'important');
+        msgInput.style.setProperty('overflow-y', overflowY, 'important');
+    };
+
+    const autoResizeComposer = () => {
+        if (!msgInput) {
+            return;
+        }
+
+        const computed = window.getComputedStyle(msgInput);
+        const baseHeight = composerBaseHeight();
+        const maxHeight = Math.max(baseHeight, parseFloat(computed.maxHeight) || 120);
+        const rawValue = String(msgInput.value || '').replace(/\r/g, '');
+        const hasMeaningfulContent = rawValue.trim() !== '';
+
+        applyComposerHeight(baseHeight, 'hidden');
+
+        if (!hasMeaningfulContent) {
+            msgInput.value = '';
+            msgInput.rows = 1;
+            return;
+        }
+
+        const needsExpansion = rawValue.includes('\n') || ((msgInput.scrollHeight || baseHeight) - baseHeight) > 6;
+        if (!needsExpansion) {
+            return;
+        }
+
+        const next = Math.min(maxHeight, Math.max(baseHeight, msgInput.scrollHeight || baseHeight));
+        applyComposerHeight(next, (msgInput.scrollHeight > maxHeight) ? 'auto' : 'hidden');
+    };
+
+    const setInboundBadge = (mode, detail) => {
+        if (!inboundBadgeEl) {
+            return;
+        }
+        inboundBadgeEl.classList.remove('syncing', 'ok', 'warn');
+        const suffix = detail ? `<small class="text-muted ms-1">${escapeHtml(detail)}</small>` : '';
+
+        if (mode === 'syncing') {
+            inboundBadgeEl.classList.add('syncing');
+            inboundBadgeEl.innerHTML = `<i class="bi bi-arrow-repeat me-1"></i>Sincronizando${suffix}`;
+            return;
+        }
+        if (mode === 'ok') {
+            inboundBadgeEl.classList.add('ok');
+            inboundBadgeEl.innerHTML = `<i class="bi bi-check2-circle me-1"></i>Inbound ok${suffix}`;
+            return;
+        }
+        if (mode === 'warn') {
+            inboundBadgeEl.classList.add('warn');
+            inboundBadgeEl.innerHTML = `<i class="bi bi-exclamation-triangle me-1"></i>Falha inbound${suffix}`;
+            return;
+        }
+        inboundBadgeEl.innerHTML = `<i class="bi bi-arrow-down-up me-1"></i>Inbound ocioso${suffix}`;
+    };
+
+    const setConnectionHealth = (mode, detail, options) => {
+        if (!connectionStripEl || !connectionTextEl) {
+            return;
+        }
+        const opts = options || {};
+        const isProminent = !!opts.prominent;
+        state.connectionMode = String(mode || 'online');
+        connectionStripEl.classList.remove('is-online', 'is-syncing', 'is-warn', 'is-offline');
+        connectionStripEl.classList.add(
+            mode === 'offline'
+                ? 'is-offline'
+                : mode === 'warn'
+                    ? 'is-warn'
+                    : mode === 'syncing'
+                        ? 'is-syncing'
+                        : 'is-online'
+        );
+        connectionStripEl.hidden = !(
+            mode === 'warn'
+            || mode === 'offline'
+            || (mode === 'syncing' && isProminent)
+        );
+        connectionTextEl.textContent = detail || (
+            mode === 'offline'
+                ? 'Sem conexao com o servidor'
+                : mode === 'warn'
+                    ? 'Conexao instavel'
+                    : mode === 'syncing'
+                        ? 'Sincronizando mensagens'
+                        : 'Conectado ao servidor'
+        );
+    };
+
+    const registerNetworkSuccess = () => {
+        state.networkFailureStreak = 0;
+        state.lastNetworkSuccessAt = Date.now();
+        if (state.connectionMode !== 'syncing') {
+            setConnectionHealth('online', `Conectado | atualizado ${formatElapsedShort(state.lastNetworkSuccessAt)}`);
+        }
+    };
+
+    const registerNetworkFailure = (errorOrStatus) => {
+        const status = Number(errorOrStatus?.status || errorOrStatus || 0);
+        if (status > 0 && status < 500 && status !== 0) {
+            return;
+        }
+        state.networkFailureStreak += 1;
+        if (state.networkFailureStreak >= 4) {
+            setConnectionHealth('offline', 'Sem resposta do servidor. Tentando reconectar...');
+            return;
+        }
+        setConnectionHealth('warn', `Conexao instavel | tentativa ${state.networkFailureStreak}`);
+    };
+
+    const renderListSkeleton = (count) => {
+        const total = Math.max(3, Math.min(9, Number(count || 6)));
+        listEl.innerHTML = Array.from({ length: total }).map(() => `
+            <div class="cm-conversa-item cm-skeleton-card" aria-hidden="true">
+                <div class="cm-conversa-head">
+                    <div class="cm-conversa-main">
+                        <span class="cm-skeleton cm-skeleton-avatar"></span>
+                        <div class="flex-grow-1">
+                            <span class="cm-skeleton cm-skeleton-line w-75"></span>
+                            <span class="cm-skeleton cm-skeleton-line w-50 mt-2"></span>
+                        </div>
+                    </div>
+                    <span class="cm-skeleton cm-skeleton-line" style="width:38px"></span>
+                </div>
+                <span class="cm-skeleton cm-skeleton-line w-100 mt-2"></span>
+                <span class="cm-skeleton cm-skeleton-line w-50 mt-2"></span>
+            </div>
+        `).join('');
+    };
+
+    const renderThreadSkeleton = () => {
+        threadMessages.innerHTML = `
+            <div class="cm-thread-skeleton" aria-hidden="true">
+                <div class="cm-bubble cm-bubble-skeleton inbound">
+                    <span class="cm-skeleton cm-skeleton-line w-25"></span>
+                    <span class="cm-skeleton cm-skeleton-line w-100 mt-2"></span>
+                    <span class="cm-skeleton cm-skeleton-line w-75 mt-2"></span>
+                </div>
+                <div class="cm-bubble cm-bubble-skeleton outbound">
+                    <span class="cm-skeleton cm-skeleton-line w-25"></span>
+                    <span class="cm-skeleton cm-skeleton-line w-100 mt-2"></span>
+                    <span class="cm-skeleton cm-skeleton-line w-50 mt-2"></span>
+                </div>
+                <div class="cm-bubble cm-bubble-skeleton inbound">
+                    <span class="cm-skeleton cm-skeleton-line w-25"></span>
+                    <span class="cm-skeleton cm-skeleton-line w-100 mt-2"></span>
+                    <span class="cm-skeleton cm-skeleton-line mt-2" style="width:65%"></span>
+                </div>
+            </div>
+        `;
     };
 
     const computeListSignature = (items) => {
@@ -423,7 +1188,7 @@
             Number(item.nao_lidas || 0),
             String(item.status || ''),
             String(item.prioridade || ''),
-            String(item.ultima_mensagem_em || ''),
+            String(conversaMovementAt(item)),
             String(item.ultima_mensagem_tipo || ''),
             String(item.ultima_mensagem_direcao || ''),
             String(item.nome_contato || ''),
@@ -563,14 +1328,17 @@
                 ? `Tempo limite excedido (${Math.round(requestTimeoutMs / 1000)}s).`
                 : 'Tempo limite excedido.';
             if (error?.name === 'AbortError') {
+                registerNetworkFailure({ status: 0 });
                 throw makeRequestError(timeoutMessage, { code: 'request_timeout', url });
             }
             if (error instanceof TypeError) {
+                registerNetworkFailure({ status: 0 });
                 throw makeRequestError('Falha de rede/CORS ao comunicar com o backend.', {
                     code: 'network_error',
                     url,
                 });
             }
+            registerNetworkFailure({ status: 0 });
             throw makeRequestError(error?.message || 'Falha de comunicacao com o servidor.', {
                 code: 'request_error',
                 url,
@@ -595,12 +1363,14 @@
                 payload,
                 rawText,
             });
+            registerNetworkFailure(requestError);
             if (response.status === 401 || response.status === 403) {
                 await handleAuthExpired(message);
             }
             throw requestError;
         }
 
+        registerNetworkSuccess();
         return payload;
     };
 
@@ -655,12 +1425,13 @@
         const isClienteNovo = clienteId <= 0;
         const contatoStatus = String(item.contato_status_relacionamento || '').toLowerCase();
         const isLeadQualificado = isClienteNovo && contatoStatus === 'lead_qualificado';
-        const ultimaMensagemAt = parseDate(item.ultima_mensagem_em);
+        const ultimaMensagemAt = parseDate(conversaMovementAt(item));
         const diffMs = ultimaMensagemAt ? (Date.now() - ultimaMensagemAt.getTime()) : 0;
         const slaEstourado = unread > 0 && diffMs > (slaPrimeiraRespostaMin * 60 * 1000);
         const subtitle = [item.telefone, item.numero_os ? ('OS ' + item.numero_os) : null].filter(Boolean).join(' | ');
         const statusLabel = normalizeStatusLabel(item.status || 'aberta');
         const avatar = firstInitial(nome);
+        const hasDraft = readDraftForConversation(item.id).trim() !== '';
 
         const lastDirection = String(item.ultima_mensagem_direcao || '').toLowerCase();
         const lastBot = Number(item.ultima_mensagem_bot || 0) === 1;
@@ -677,11 +1448,12 @@
                 ? `[${item.ultima_mensagem_tipo}]`
                 : 'Sem mensagens');
         const ultimaMensagem = `<span class="cm-conversa-preview">${previewPrefix}${escapeHtml(ultimaMensagemBruta)}</span>`;
-        const ultimaData = formatDateTime(item.ultima_mensagem_em);
+        const ultimaData = formatDateTime(conversaMovementAt(item));
         const responsavel = item.responsavel_nome || 'Nao atribuido';
 
         const prioridadeBadge = `<span class="badge ${priorityBadgeClass(prioridade)}">${escapeHtml(prioridade)}</span>`;
         const flags = [
+            hasDraft ? '<span class="badge text-bg-warning text-dark">Rascunho</span>' : '',
             automacaoAtiva
                 ? '<span class="badge text-bg-success-subtle text-success-emphasis border">Bot ativo</span>'
                 : '<span class="badge text-bg-secondary">Bot off</span>',
@@ -698,7 +1470,7 @@
             : '';
 
         return `
-            <div class="cm-conversa-item ${isActive ? 'active' : ''}" data-id="${item.id}">
+            <div class="cm-conversa-item ${isActive ? 'active' : ''}" data-id="${item.id}" role="button" tabindex="0" aria-selected="${isActive ? 'true' : 'false'}" aria-label="Abrir conversa de ${escapeHtml(nome)}">
                 <div class="cm-conversa-head">
                     <div class="cm-conversa-main">
                         <div class="cm-conversa-avatar">${escapeHtml(avatar)}</div>
@@ -821,6 +1593,30 @@
     };
 
     const bindConversaListClicks = () => {
+        const focusConversaRelative = (element, delta) => {
+            const nodes = Array.from(listEl.querySelectorAll('.cm-conversa-item'));
+            const currentIndex = nodes.indexOf(element);
+            if (currentIndex < 0) {
+                return;
+            }
+            const nextIndex = Math.min(nodes.length - 1, Math.max(0, currentIndex + delta));
+            const next = nodes[nextIndex];
+            if (next && typeof next.focus === 'function') {
+                next.focus();
+            }
+        };
+
+        const openConversaFromElement = async (element) => {
+            await openConversa(Number(element.dataset.id), true);
+            if (window.bootstrap && window.matchMedia('(max-width: 991.98px)').matches) {
+                const canvas = document.getElementById('cmConversasCanvas');
+                if (canvas && canvas.classList.contains('show')) {
+                    const offcanvas = window.bootstrap.Offcanvas.getOrCreateInstance(canvas);
+                    offcanvas.hide();
+                }
+            }
+        };
+
         listEl.querySelectorAll('.cm-btn-cadastrar-contato').forEach((btn) => {
             if (btn.dataset.bound === '1') {
                 return;
@@ -838,13 +1634,23 @@
 
         listEl.querySelectorAll('.cm-conversa-item').forEach((el) => {
             el.addEventListener('click', async () => {
-                await openConversa(Number(el.dataset.id), true);
-                if (window.bootstrap && window.matchMedia('(max-width: 991.98px)').matches) {
-                    const canvas = document.getElementById('cmConversasCanvas');
-                    if (canvas && canvas.classList.contains('show')) {
-                        const offcanvas = window.bootstrap.Offcanvas.getOrCreateInstance(canvas);
-                        offcanvas.hide();
-                    }
+                await openConversaFromElement(el);
+            });
+
+            el.addEventListener('keydown', async (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    await openConversaFromElement(el);
+                    return;
+                }
+                if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    focusConversaRelative(el, 1);
+                    return;
+                }
+                if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    focusConversaRelative(el, -1);
                 }
             });
         });
@@ -876,12 +1682,7 @@
         const preserveScroll = listEl.scrollTop;
         updateFilterFeedback();
         if (!silent && (!Array.isArray(state.currentList) || state.currentList.length === 0)) {
-            listEl.innerHTML = `
-                <div class="cm-empty-state">
-                    <i class="bi bi-arrow-repeat"></i>
-                    <p class="mb-0">Carregando conversas...</p>
-                </div>
-            `;
+            renderListSkeleton(6);
         }
 
         const query = toQueryString(currentFilters());
@@ -897,10 +1698,11 @@
 
         state.currentList = items;
         state.listSignature = signature;
+        state.lastConversaListSyncAt = Date.now();
         if (shouldRender) {
             renderConversaList(items, preserveScroll);
         }
-        setRealtimeBadge(state.streamReady ? 'live' : 'polling');
+        setRealtimeBadge(state.streamReady ? 'live' : 'polling', new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
         return items;
     };
 
@@ -1056,7 +1858,7 @@
                 await safeLoadConversas(true);
             }
             if (payload.conversa && threadStatusBadge) {
-                applyThreadStatusBadge(payload.conversa.status || threadStatusBadge.textContent);
+                applyThreadStatusBadge(payload.conversa.status || threadStatusBadge.dataset.status || 'aberta');
             }
         });
 
@@ -1091,22 +1893,27 @@
         if (!threadStatusBadge) {
             return;
         }
-        const status = String(statusValue || 'aberta').toLowerCase();
-        threadStatusBadge.textContent = normalizeStatusLabel(status);
-        threadStatusBadge.classList.remove('bg-secondary', 'bg-success', 'bg-warning', 'text-dark', 'bg-primary', 'bg-danger');
+        const status = normalizeStatusValue(statusValue || 'aberta');
+        const statusLabel = normalizeStatusLabel(status);
+        const labelPrefix = String(threadStatusBadge.dataset.labelPrefix || '').trim();
+        const composedLabel = labelPrefix !== '' ? `${labelPrefix}: ${statusLabel}` : statusLabel;
+        threadStatusBadge.dataset.status = status;
+        if (threadStatusLabelEl) {
+            threadStatusLabelEl.textContent = composedLabel;
+        } else {
+            threadStatusBadge.textContent = composedLabel;
+        }
+        threadStatusBadge.classList.remove('is-status-aberta', 'is-status-aguardando', 'is-status-resolvida', 'is-status-arquivada');
         if (status === 'resolvida') {
-            threadStatusBadge.classList.add('bg-success');
-            return;
+            threadStatusBadge.classList.add('is-status-resolvida');
+        } else if (status === 'aguardando') {
+            threadStatusBadge.classList.add('is-status-aguardando');
+        } else if (status === 'arquivada') {
+            threadStatusBadge.classList.add('is-status-arquivada');
+        } else {
+            threadStatusBadge.classList.add('is-status-aberta');
         }
-        if (status === 'aguardando') {
-            threadStatusBadge.classList.add('bg-warning', 'text-dark');
-            return;
-        }
-        if (status === 'arquivada') {
-            threadStatusBadge.classList.add('bg-secondary');
-            return;
-        }
-        threadStatusBadge.classList.add('bg-primary');
+        updateHeaderMetaButtonsState();
     };
 
     const updateThreadHeader = (conversa) => {
@@ -1121,8 +1928,9 @@
         threadTitle.textContent = nome;
         threadSubtitle.textContent = [telefone, responsavel ? ('Responsavel: ' + responsavel) : 'Nao atribuida']
             .filter(Boolean)
-            .join(' • ');
+            .join(' | ');
         applyThreadStatusBadge(conversa?.status || 'aberta');
+        updateHeaderMetaButtonsState();
     };
 
     const unreadSeparatorIndex = () => {
@@ -1170,6 +1978,12 @@
     };
 
     const resolveOutboundDelivery = (msg) => {
+        if (msg?._optimistic) {
+            return { className: 'is-pending', icon: 'bi-clock-history', label: 'Enviando' };
+        }
+        if (msg?._sendFailed) {
+            return { className: 'is-failed', icon: 'bi-exclamation-circle', label: 'Falha no envio' };
+        }
         const status = String(msg?.status || '').toLowerCase();
         if (String(msg?.erro || '').trim() !== '' || status.includes('fail') || status.includes('erro')) {
             return { className: 'is-failed', icon: 'bi-exclamation-circle', label: 'Falha' };
@@ -1186,13 +2000,107 @@
         return { className: '', icon: 'bi-check2', label: 'Enviada' };
     };
 
+    const resolvePayloadText = (payload) => {
+        if (!payload || typeof payload !== 'object') {
+            return '';
+        }
+
+        const tryPaths = [
+            payload.message,
+            payload.mensagem,
+            payload.text,
+            payload.body,
+            payload.caption,
+            payload.description,
+            payload.content,
+            payload.content?.text,
+            payload.content?.message,
+            payload.data,
+            payload.data?.message,
+            payload.data?.mensagem,
+            payload.data?.text,
+            payload.data?.body,
+            payload.data?.caption,
+            payload.data?.description,
+            payload.data?.content,
+            payload.data?.content?.text,
+            payload.data?.content?.message,
+            payload.response,
+            payload.response?.message,
+            payload.response?.text,
+            payload.response?.body,
+            payload.response?.data,
+            payload.response?.data?.message,
+            payload.response?.data?.text,
+            payload.response?.data?.body,
+        ];
+
+        for (const candidate of tryPaths) {
+            if (typeof candidate === 'string' && candidate.trim() !== '') {
+                return candidate.trim();
+            }
+        }
+
+        return '';
+    };
+
+    const resolveReplyPayload = (msg) => {
+        const payload = messagePayload(msg);
+        if (!payload || typeof payload !== 'object') {
+            return { text: '', messageId: 0, author: '' };
+        }
+
+        const meta = payload.reply_to || payload.reply || payload.context?.reply || payload.context?.quoted || {};
+        const text = String(
+            meta?.text
+            || meta?.message
+            || meta?.conteudo
+            || payload.reply_text
+            || payload.reply_message
+            || ''
+        ).trim();
+        const messageId = Number(
+            meta?.id
+            || meta?.message_id
+            || payload.reply_to_message_id
+            || payload.reply_message_id
+            || 0
+        );
+        const author = String(
+            meta?.author
+            || meta?.from
+            || meta?.sender
+            || payload.reply_author
+            || ''
+        ).trim();
+
+        return {
+            text,
+            messageId: Number.isFinite(messageId) && messageId > 0 ? messageId : 0,
+            author,
+        };
+    };
+
     const messageBodyText = (msg) => {
-        const text = String(msg?.mensagem || '').trim();
+        const direct = String(msg?.mensagem || '').trim();
+        const payload = messagePayload(msg);
+        const payloadText = resolvePayloadText(payload);
+        const text = direct !== '' ? direct : payloadText;
+
         if (text !== '') {
             return escapeHtml(text).replace(/\n/g, '<br>');
         }
-        if (detectContentType(msg) !== 'texto') {
-            return '<span class="text-muted">[mensagem sem texto]</span>';
+        const mediaType = detectContentType(msg);
+        if (mediaType !== 'texto') {
+            const labelByType = {
+                imagem: 'imagem',
+                video: 'video',
+                audio: 'audio',
+                pdf: 'pdf',
+                arquivo: 'anexo'
+            };
+            const label = labelByType[mediaType] || 'midia';
+            return `<span class="text-muted">[${label}]</span>`;
         }
         return '<span class="text-muted">[mensagem vazia]</span>';
     };
@@ -1350,11 +2258,27 @@
             `;
         }
 
+        const type = detectContentType(msg);
         if (!arquivo) {
+            if (type !== 'texto') {
+                const statusByType = {
+                    imagem: 'Imagem recebida em sincronizacao.',
+                    video: 'Video recebido em sincronizacao.',
+                    audio: 'Audio recebido em sincronizacao.',
+                    pdf: 'PDF recebido em sincronizacao.',
+                    arquivo: 'Anexo recebido em sincronizacao.'
+                };
+                const statusText = statusByType[type] || 'Midia recebida em sincronizacao.';
+                return `
+                    <div class="alert alert-secondary py-2 px-3 mt-2 mb-0 small">
+                        <i class="bi bi-hourglass-split me-1"></i>
+                        ${statusText}
+                    </div>
+                `;
+            }
             return '';
         }
 
-        const type = detectContentType(msg);
         const url = resolveArquivoUrl(arquivo, msg.id || Date.now());
         const filename = escapeHtml(mediaCaptionLabel(msg));
         const mime = escapeHtml(String(msg?.mime_type || '').toLowerCase());
@@ -1442,9 +2366,20 @@
         const when = formatDateTime(msg?.created_at || msg?.enviada_em || msg?.recebida_em || '');
         const body = messageBodyText(msg);
         const media = renderMedia(msg, outbound);
-        const rawMsg = encodeURIComponent(String(msg?.mensagem || ''));
-        const replyButton = (!outbound && String(msg?.mensagem || '').trim() !== '')
-            ? `<button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 cm-reply-btn" data-reply="${rawMsg}">Responder</button>`
+        const replyMeta = resolveReplyPayload(msg);
+        const replyTextRaw = String(msg?.mensagem || resolvePayloadText(payload) || '').trim();
+        const rawMsg = encodeURIComponent(replyTextRaw);
+        const rawAuthor = encodeURIComponent(String(origemData.remetente || '').trim());
+        const replyButton = (!outbound && replyTextRaw !== '')
+            ? `<button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 cm-reply-btn" data-reply="${rawMsg}" data-reply-message-id="${Number(msg?.id || 0)}" data-reply-author="${rawAuthor}">Responder</button>`
+            : '';
+        const replyQuote = replyMeta.text !== ''
+            ? `
+                <div class="cm-reply-quote">
+                    <div class="fw-semibold small">${escapeHtml(replyMeta.author || 'Mensagem respondida')}</div>
+                    <div>${escapeHtml(replyMeta.text).replace(/\n/g, '<br>')}</div>
+                </div>
+            `
             : '';
 
         const unreadIdx = unreadSeparatorIndex();
@@ -1455,7 +2390,13 @@
         const dateSeparator = options.showDateSeparator
             ? `<div class="cm-day-separator"><span>${escapeHtml(formatDayLabel(options.dayKey || ''))}</span></div>`
             : '';
-        const rowClass = ['cm-msg-row', outbound ? 'outbound' : 'inbound', options.isNew ? 'cm-msg-row-new' : '']
+        const rowClass = [
+            'cm-msg-row',
+            outbound ? 'outbound' : 'inbound',
+            options.isNew ? 'cm-msg-row-new' : '',
+            msg?._optimistic ? 'is-optimistic' : '',
+            msg?._sendFailed ? 'is-send-failed' : '',
+        ]
             .filter(Boolean)
             .join(' ');
 
@@ -1469,6 +2410,7 @@
                         ${outbound ? `<span class="cm-msg-via badge ${origemData.viaClass}">${escapeHtml(origemData.labelVia)}</span>` : ''}
                         ${replyButton}
                     </div>
+                    ${replyQuote}
                     <div>${body}</div>
                     ${media}
                     <div class="cm-msg-meta">
@@ -1509,6 +2451,7 @@
         const forceBottom = !!opts.forceBottom;
         const keepBottom = forceBottom ? true : isNearBottom(threadMessages);
         const newMessageIds = new Set(Array.isArray(opts.newMessageIds) ? opts.newMessageIds.map((id) => Number(id || 0)) : []);
+        state.mensagens = mergeMensagens([], state.mensagens);
         state.imageItems = [];
 
         if (!Array.isArray(state.mensagens) || state.mensagens.length === 0) {
@@ -1573,8 +2516,11 @@
         }
 
         const keepBottom = isNearBottom(threadMessages);
-        const newIds = novas.map((m) => Number(m?.id || 0)).filter((id) => id > 0);
-        state.mensagens = state.mensagens.concat(novas);
+        const existingIds = new Set((Array.isArray(state.mensagens) ? state.mensagens : []).map((msg) => normalizeMessageId(msg?.id)).filter((id) => id > 0));
+        const newIds = novas
+            .map((m) => normalizeMessageId(m?.id))
+            .filter((id) => id > 0 && !existingIds.has(id));
+        state.mensagens = mergeMensagens(state.mensagens, novas);
         renderMensagens({ newMessageIds: newIds });
 
         if (keepBottom) {
@@ -1704,11 +2650,49 @@
         }
     };
 
-    const insertReplyQuote = (text) => {
-        const trecho = text.length > 160 ? (text.substring(0, 160) + '...') : text;
-        const quote = `Respondendo cliente: "${trecho}"\n`;
-        msgInput.value = msgInput.value ? (msgInput.value + '\n' + quote) : quote;
-        msgInput.focus();
+    const formatReplyPreviewText = (text) => {
+        const clean = String(text || '').replace(/\s+/g, ' ').trim();
+        if (clean === '') {
+            return 'Mensagem sem texto';
+        }
+        if (clean.length > 180) {
+            return clean.substring(0, 180) + '...';
+        }
+        return clean;
+    };
+
+    const clearReplyTarget = () => {
+        state.replyTarget = null;
+        if (replyPreviewEl) {
+            replyPreviewEl.classList.add('d-none');
+        }
+        if (replyPreviewTextEl) {
+            replyPreviewTextEl.textContent = '';
+        }
+    };
+
+    const setReplyTarget = (target) => {
+        const text = String(target?.text || '').trim();
+        if (text === '') {
+            clearReplyTarget();
+            return;
+        }
+
+        const author = String(target?.author || 'Cliente').trim();
+        const messageId = Number(target?.messageId || 0);
+        state.replyTarget = {
+            messageId: Number.isFinite(messageId) && messageId > 0 ? messageId : null,
+            author,
+            text,
+        };
+
+        if (replyPreviewTextEl) {
+            replyPreviewTextEl.textContent = `${author}: ${formatReplyPreviewText(text)}`;
+        }
+        if (replyPreviewEl) {
+            replyPreviewEl.classList.remove('d-none');
+        }
+        msgInput?.focus();
     };
 
     const bindThreadActions = () => {
@@ -1732,13 +2716,25 @@
             btn.dataset.bound = '1';
             btn.addEventListener('click', () => {
                 const raw = btn.getAttribute('data-reply') || '';
+                const rawAuthor = btn.getAttribute('data-reply-author') || '';
+                const messageId = Number(btn.getAttribute('data-reply-message-id') || 0);
                 let text = '';
+                let author = '';
                 try {
                     text = decodeURIComponent(raw);
                 } catch (error) {
                     text = raw;
                 }
-                insertReplyQuote(text);
+                try {
+                    author = decodeURIComponent(rawAuthor);
+                } catch (error) {
+                    author = rawAuthor;
+                }
+                setReplyTarget({
+                    text,
+                    author: author || 'Cliente',
+                    messageId,
+                });
             });
         });
     };
@@ -1810,6 +2806,7 @@
                 });
                 await swal({ icon: 'success', title: 'Atualizado', text: 'Contexto da conversa atualizado com sucesso.' });
                 msgInput.value = '';
+                autoResizeComposer();
                 documentoSelect.value = '';
                 if (composeMetaPanel) composeMetaPanel.classList.add('d-none');
                 state.selectedFile = null;
@@ -1865,6 +2862,244 @@
         await openConversa(state.currentConversaId, false);
         await safeLoadConversas(true);
         return true;
+    };
+
+    const openStatusModal = async () => {
+        if (!state.currentConversaId) {
+            await swal({
+                icon: 'warning',
+                title: 'Sem conversa ativa',
+                text: 'Abra uma conversa para alterar o status.',
+            });
+            return;
+        }
+        if (!window.Swal) {
+            await swal({
+                icon: 'warning',
+                title: 'Recurso indisponivel',
+                text: 'Nao foi possivel abrir o modal de status neste navegador.',
+            });
+            return;
+        }
+
+        const meta = getCurrentMetaSnapshot();
+        const statusOptions = (Array.isArray(meta.status_options) && meta.status_options.length)
+            ? meta.status_options
+            : ['aberta', 'aguardando', 'resolvida', 'arquivada'];
+        const currentStatus = normalizeStatusValue(meta.status || 'aberta');
+        const optionsHtml = statusOptions.map((status) => {
+            const normalized = normalizeStatusValue(status);
+            const selected = normalized === currentStatus ? 'selected' : '';
+            return `<option value="${normalized}" ${selected}>${escapeHtml(normalizeStatusLabel(normalized))}</option>`;
+        }).join('');
+
+        const result = await window.Swal.fire({
+            title: 'Status da conversa',
+            html: `
+                <div class="text-start">
+                    <label class="form-label small mb-1" for="swConversaStatus">Selecione o status</label>
+                    <select id="swConversaStatus" class="swal2-select">${optionsHtml}</select>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Salvar status',
+            cancelButtonText: 'Cancelar',
+            focusConfirm: false,
+            preConfirm: () => {
+                const value = String(document.getElementById('swConversaStatus')?.value || '').trim();
+                if (!value) {
+                    window.Swal.showValidationMessage('Selecione um status.');
+                    return false;
+                }
+                return normalizeStatusValue(value);
+            },
+        });
+
+        if (!result?.isConfirmed || !result?.value) {
+            return;
+        }
+
+        const nextStatus = normalizeStatusValue(result.value);
+        await quickUpdateMeta(
+            { status: nextStatus },
+            `Status atualizado para ${normalizeStatusLabel(nextStatus)}.`
+        );
+    };
+
+    const openAtribuicaoModal = async () => {
+        if (!state.currentConversaId) {
+            await swal({
+                icon: 'warning',
+                title: 'Sem conversa ativa',
+                text: 'Abra uma conversa para atribuir responsavel.',
+            });
+            return;
+        }
+        if (!window.Swal) {
+            await swal({
+                icon: 'warning',
+                title: 'Recurso indisponivel',
+                text: 'Nao foi possivel abrir o modal de atribuicao neste navegador.',
+            });
+            return;
+        }
+
+        const meta = getCurrentMetaSnapshot();
+        const responsaveis = Array.isArray(meta.responsaveis) ? meta.responsaveis : [];
+        if (!responsaveis.length) {
+            await swal({
+                icon: 'warning',
+                title: 'Sem responsaveis',
+                text: 'Nao ha usuarios ativos disponiveis para atribuicao.',
+            });
+            return;
+        }
+
+        const currentResponsavelId = Number(meta.responsavel_id || 0);
+        const optionsHtml = ['<option value="0">Nao atribuido</option>'].concat(
+            responsaveis.map((item) => {
+                const id = Number(item?.id || 0);
+                const selected = id === currentResponsavelId ? 'selected' : '';
+                const nome = String(item?.nome || `Usuario #${id}`);
+                return `<option value="${id}" ${selected}>${escapeHtml(nome)}</option>`;
+            })
+        ).join('');
+
+        const result = await window.Swal.fire({
+            title: 'Atribuir responsavel',
+            html: `
+                <div class="text-start">
+                    <label class="form-label small mb-1" for="swConversaResponsavel">Responsavel da conversa</label>
+                    <select id="swConversaResponsavel" class="swal2-select">${optionsHtml}</select>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Salvar atribuicao',
+            cancelButtonText: 'Cancelar',
+            focusConfirm: false,
+            preConfirm: () => {
+                const value = Number(document.getElementById('swConversaResponsavel')?.value || 0);
+                if (!Number.isFinite(value) || value < 0) {
+                    window.Swal.showValidationMessage('Selecione um responsavel valido.');
+                    return false;
+                }
+                return value;
+            },
+        });
+
+        if (!result?.isConfirmed || typeof result.value === 'undefined') {
+            return;
+        }
+
+        const selectedId = Number(result.value || 0);
+        const selected = responsaveis.find((item) => Number(item?.id || 0) === selectedId);
+        await quickUpdateMeta(
+            { responsavel_id: selectedId > 0 ? selectedId : '' },
+            selectedId > 0
+                ? `Conversa atribuida para ${selected?.nome || 'responsavel selecionado'}.`
+                : 'Conversa sem atribuicao de responsavel.'
+        );
+    };
+
+    const openPrioridadeModal = async () => {
+        if (!state.currentConversaId) {
+            await swal({
+                icon: 'warning',
+                title: 'Sem conversa ativa',
+                text: 'Abra uma conversa para definir a prioridade.',
+            });
+            return;
+        }
+        if (!window.Swal) {
+            await swal({
+                icon: 'warning',
+                title: 'Recurso indisponivel',
+                text: 'Nao foi possivel abrir o modal de prioridade neste navegador.',
+            });
+            return;
+        }
+
+        const meta = getCurrentMetaSnapshot();
+        const currentPriority = normalizePriorityValue(meta.prioridade || 'normal');
+        const options = ['baixa', 'normal', 'alta', 'urgente'];
+        const optionsHtml = options.map((priority) => {
+            const selected = priority === currentPriority ? 'selected' : '';
+            const label = priority.charAt(0).toUpperCase() + priority.slice(1);
+            return `<option value="${priority}" ${selected}>${escapeHtml(label)}</option>`;
+        }).join('');
+
+        const result = await window.Swal.fire({
+            title: 'Prioridade da conversa',
+            html: `
+                <div class="text-start">
+                    <label class="form-label small mb-1" for="swConversaPrioridade">Selecione a prioridade</label>
+                    <select id="swConversaPrioridade" class="swal2-select">${optionsHtml}</select>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Salvar prioridade',
+            cancelButtonText: 'Cancelar',
+            focusConfirm: false,
+            preConfirm: () => {
+                const value = String(document.getElementById('swConversaPrioridade')?.value || '').trim();
+                if (!value) {
+                    window.Swal.showValidationMessage('Selecione uma prioridade.');
+                    return false;
+                }
+                return normalizePriorityValue(value);
+            },
+        });
+
+        if (!result?.isConfirmed || !result?.value) {
+            return;
+        }
+
+        const nextPriority = normalizePriorityValue(result.value);
+        const label = nextPriority.charAt(0).toUpperCase() + nextPriority.slice(1);
+        await quickUpdateMeta(
+            { prioridade: nextPriority },
+            `Prioridade atualizada para ${label}.`
+        );
+    };
+
+    const applyAtendimentoMode = async (modeRaw) => {
+        const mode = String(modeRaw || '').toLowerCase().trim();
+        if (!state.currentConversaId) {
+            await swal({
+                icon: 'warning',
+                title: 'Sem conversa ativa',
+                text: 'Abra uma conversa para alterar o modo de atendimento.',
+            });
+            return;
+        }
+
+        let payload = {};
+        let successMessage = '';
+
+        if (mode === 'bot') {
+            payload = {
+                automacao_ativa: 1,
+                aguardando_humano: 0,
+                status: 'aberta',
+            };
+            successMessage = 'Modo alterado para Bot ativo.';
+        } else if (mode === 'human') {
+            payload = {
+                automacao_ativa: 0,
+                aguardando_humano: 1,
+                status: 'aguardando',
+            };
+            successMessage = 'Modo alterado para Aguardando atendimento humano.';
+        } else {
+            payload = {
+                automacao_ativa: 0,
+                aguardando_humano: 1,
+                status: 'aguardando',
+            };
+            successMessage = 'Modo alterado para Aguardando atendimento humano.';
+        }
+
+        await quickUpdateMeta(payload, successMessage);
     };
 
     const renderContexto = (ctx) => {
@@ -2052,6 +3287,7 @@
         `;
 
         bindContextActions();
+        updateHeaderMetaButtonsState();
     };
 
     const updateLatestMessageId = () => {
@@ -2070,27 +3306,31 @@
 
         closeMessageStream();
         state.currentConversaId = id;
+        clearReplyTarget();
         if (conversaIdInput) {
             conversaIdInput.value = String(id);
         }
         threadMessages.classList.add('is-live-updating');
-        threadMessages.innerHTML = `
-            <div class="cm-empty-state cm-empty-state-sm">
-                <i class="bi bi-arrow-repeat"></i>
-                <p class="mb-0">Carregando conversa...</p>
-            </div>
-        `;
+        renderThreadSkeleton();
 
         try {
             const data = await getJson(cfg.endpointConversaPrefix + '/' + id);
             const conversa = data.conversa || {};
             state.activeConversationUnread = Number(data.unread_before || conversa.nao_lidas || 0);
             updateThreadHeader(conversa);
-            state.mensagens = Array.isArray(data.mensagens) ? data.mensagens : [];
+            state.mensagens = mergeMensagens([], Array.isArray(data.mensagens) ? data.mensagens : []);
             updateLatestMessageId();
             renderMensagens({ forceBottom: true });
             state.currentContext = data.contexto || null;
             renderContexto(data.contexto || {});
+            updateHeaderMetaButtonsState();
+            if (msgInput) {
+                msgInput.value = readDraftForConversation(id);
+                msgInput.dispatchEvent(new Event('input'));
+                autoResizeComposer();
+                window.requestAnimationFrame(() => autoResizeComposer());
+            }
+            syncComposerAvailability();
             state.activeConversationUnread = 0;
             await safeLoadConversas(true);
             startMessageStream();
@@ -2103,6 +3343,7 @@
             threadTitle.textContent = 'Falha ao abrir conversa';
             threadSubtitle.textContent = '';
             applyThreadStatusBadge('arquivada');
+            updateHeaderMetaButtonsState();
             threadMessages.innerHTML = `
                 <div class="cm-empty-state cm-empty-state-sm">
                     <i class="bi bi-exclamation-triangle text-danger"></i>
@@ -2112,6 +3353,7 @@
             if (showErrors) {
                 await swal({ icon: 'error', title: 'Erro', text: error.message || 'Falha ao abrir conversa.' });
             }
+            syncComposerAvailability();
         } finally {
             threadMessages.classList.remove('is-live-updating');
         }
@@ -2131,7 +3373,7 @@
         const data = await getJson(url);
         const conversa = data.conversa || {};
         if (conversa && Object.keys(conversa).length > 0) {
-            applyThreadStatusBadge(conversa.status || threadStatusBadge?.textContent || 'aberta');
+            applyThreadStatusBadge(conversa.status || threadStatusBadge?.dataset?.status || 'aberta');
         }
         const novas = Array.isArray(data.mensagens) ? data.mensagens : [];
         if (novas.length > 0) {
@@ -2154,6 +3396,66 @@
         if (composeMetaPanel) {
             composeMetaPanel.classList.add('d-none');
         }
+        syncComposerAvailability();
+    };
+
+    const syncComposerAvailability = () => {
+        if (!sendButton) {
+            return;
+        }
+        const hasConversa = Number(state.currentConversaId || 0) > 0;
+        const hasText = String(msgInput?.value || '').trim() !== '';
+        const hasDoc = String(documentoSelect?.value || '').trim() !== '';
+        const hasFile = !!state.selectedFile;
+        sendButton.disabled = !hasConversa || state.sendingMessage || (!hasText && !hasDoc && !hasFile);
+    };
+
+    const removeMessageById = (messageId) => {
+        const numericId = Number(messageId || 0);
+        if (!numericId) {
+            return;
+        }
+        state.mensagens = (Array.isArray(state.mensagens) ? state.mensagens : [])
+            .filter((msg) => Number(msg?.id || 0) !== numericId);
+    };
+
+    const markOptimisticAsFailed = (messageId) => {
+        const numericId = Number(messageId || 0);
+        if (!numericId) {
+            return;
+        }
+        state.mensagens = (Array.isArray(state.mensagens) ? state.mensagens : []).map((msg) => {
+            if (Number(msg?.id || 0) !== numericId) {
+                return msg;
+            }
+            return {
+                ...msg,
+                _optimistic: false,
+                _sendFailed: true,
+                status: 'erro',
+                erro: 'Falha no envio',
+            };
+        });
+    };
+
+    const buildOptimisticMessage = (payload) => {
+        state.pendingMessageKey += 1;
+        const now = new Date();
+        const createdAt = now.toISOString().slice(0, 19).replace('T', ' ');
+        const tempId = -1 * (Number(now.getTime()) + Number(state.pendingMessageKey || 0));
+        return {
+            id: tempId,
+            direcao: 'outbound',
+            created_at: createdAt,
+            enviada_em: createdAt,
+            mensagem: String(payload?.mensagem || ''),
+            tipo_mensagem: String(payload?.tipo_mensagem || 'manual'),
+            usuario_nome: currentUserName || 'Sistema',
+            origem: 'sistema',
+            status: 'enviando',
+            _optimistic: true,
+            _sendFailed: false,
+        };
     };
 
     const renderAnexoSelection = (file) => {
@@ -2179,6 +3481,7 @@
         `;
         anexoPreview.classList.remove('d-none');
         document.getElementById('btnRemoveAnexo')?.addEventListener('click', clearAnexoSelection);
+        syncComposerAvailability();
     };
 
     const toggleAttachMenu = () => {
@@ -2259,6 +3562,10 @@
                 </div>
             </div>
         `;
+        const captureTitleEl = capturePanel.querySelector('h5');
+        if (captureTitleEl) {
+            captureTitleEl.textContent = `Gravando ${type === 'audio' ? 'Audio' : 'Video'}`;
+        }
         capturePanel.classList.remove('d-none');
         formEnviar?.classList.add('is-recording');
         hideAttachMenu();
@@ -2275,8 +3582,10 @@
             if (type === 'video') {
                 const videoEl = document.getElementById('cmRecordPreview');
                 if (videoEl) videoEl.srcObject = stream;
-            }            const mimeType = type === 'video' 
-                ? 'video/webm' 
+            }
+
+            const mimeType = type === 'video'
+                ? 'video/webm'
                 : (MediaRecorder.isTypeSupported('audio/ogg; codecs=opus') ? 'audio/ogg; codecs=opus' : 'audio/webm');
 
             const recorder = new MediaRecorder(stream, { mimeType });
@@ -2293,7 +3602,6 @@
                 state.recording.blob = blob;
                 renderCaptureReview();
             };
-;
 
             recorder.start();
             state.recording.timer = setInterval(updateRecordTimer, 1000);
@@ -2303,7 +3611,11 @@
 
         } catch (error) {
             cancelCapture();
-            swal({ icon: 'error', title: 'Acesso Negado', text: 'Não foi possível acessar a câmera ou microfone. Verifique as permissões do navegador.' });
+            return swal({
+                icon: 'error',
+                title: 'Acesso negado',
+                text: 'Nao foi possivel acessar a camera ou microfone. Verifique as permissoes do navegador.',
+            });
         }
     };
 
@@ -2360,6 +3672,11 @@
             </div>
         `;
         
+        const reviewTitleEl = capturePanel.querySelector('h5');
+        if (reviewTitleEl) {
+            reviewTitleEl.textContent = `Revisar ${type === 'audio' ? 'Audio' : 'Video'}`;
+        }
+
         document.getElementById('btnConfirmCapture')?.addEventListener('click', () => {
             const ext = (state.recording.mimeUsed || '').includes('ogg') ? 'ogg' : 'webm';
             const file = new File([blob], `gravacao_${Date.now()}.${ext}`, { type: blob.type });
@@ -2381,12 +3698,18 @@
             await swal({ icon: 'warning', title: 'Selecione uma conversa', text: 'Escolha uma conversa antes de enviar.' });
             return;
         }
+        if (state.sendingMessage) {
+            return;
+        }
 
         const payload = {
             conversa_id: state.currentConversaId,
             mensagem: (msgInput?.value || '').trim(),
             tipo_mensagem: tipoMensagemInput?.value || 'manual',
             documento_id: documentoSelect?.value || '',
+            reply_to_message_id: state.replyTarget?.messageId || '',
+            reply_to_text: state.replyTarget?.text || '',
+            reply_to_author: state.replyTarget?.author || '',
         };
 
         if (!payload.mensagem && !payload.documento_id && !state.selectedFile) {
@@ -2394,13 +3717,32 @@
             return;
         }
 
+        const optimisticPayload = {
+            ...payload,
+            mensagem: payload.mensagem
+                || (state.selectedFile ? `[anexo] ${state.selectedFile.name}` : (payload.documento_id ? '[PDF do sistema]' : '')),
+        };
+        const optimisticMessage = buildOptimisticMessage(optimisticPayload);
+        state.mensagens = mergeMensagens(state.mensagens, [optimisticMessage]);
+        renderMensagens({ newMessageIds: [optimisticMessage.id], forceBottom: true });
+
+        state.sendingMessage = true;
         setButtonLoading(sendButton, true, '<span class="spinner-border spinner-border-sm me-1"></span>Enviando...');
-        const sendTimeoutMs = 16000;
+        syncComposerAvailability();
+        const sendTimeoutMs = Math.max(25000, defaultRequestTimeoutMs);
         try {
             const response = await postForm(cfg.endpointEnviar, payload, state.selectedFile, sendTimeoutMs);
-            if (msgInput) msgInput.value = '';
+            removeMessageById(optimisticMessage.id);
+            renderMensagens({ forceBottom: true });
+            if (msgInput) {
+                msgInput.value = '';
+                autoResizeComposer();
+            }
+            clearDraftForConversation(state.currentConversaId);
             clearAnexoSelection();
+            clearReplyTarget();
             scrollThreadToBottom(true);
+            syncComposerAvailability();
 
             Promise.resolve().then(async () => {
                 const count = await pullNovasMensagens().catch(() => 0);
@@ -2417,38 +3759,99 @@
                 icon: 'error',
                 title: providerUnavailable ? 'Gateway indisponivel' : 'Falha no envio',
                 text: timeoutAbort
-                    ? 'O envio excedeu o tempo limite de 16s. Verifique o gateway e tente novamente.'
+                    ? `O envio excedeu o tempo limite de ${Math.round(sendTimeoutMs / 1000)}s. Verifique o gateway e tente novamente.`
                     : (error.message || 'Nao foi possivel enviar.'),
                 footer: providerUnavailable
                     ? 'Verifique Configuracoes > WhatsApp e confirme se o gateway esta em execucao.'
                     : undefined,
             });
+            markOptimisticAsFailed(optimisticMessage.id);
+            renderMensagens({ forceBottom: true });
+            updateJumpBottomVisibility();
         } finally {
+            state.sendingMessage = false;
             setButtonLoading(sendButton, false);
+            syncComposerAvailability();
         }
     };
 
-    const syncInbound = async () => {
-        if (!btnSyncInbound) {
-            return;
+    const syncInbound = async (options) => {
+        const opts = options || {};
+        const silent = !!opts.silent;
+        const trigger = String(opts.trigger || 'manual');
+
+        if (!cfg.endpointSyncInbound) {
+            return { ok: false, reason: 'missing_endpoint', count: 0 };
         }
-        setButtonLoading(btnSyncInbound, true, '<span class="spinner-border spinner-border-sm me-1"></span>Sincronizando...');
-        try {
-            const data = await postForm(cfg.endpointSyncInbound, {}, null);
-            await swal({
-                icon: 'success',
-                title: 'Sincronizado',
-                text: `Mensagens processadas: ${Number(data.count || 0)}.`,
-            });
-            await safeLoadConversas(true);
-            if (state.currentConversaId) {
-                await openConversa(state.currentConversaId, false);
+        if (state.inboundSyncRunning && state.inboundSyncPromise) {
+            return state.inboundSyncPromise;
+        }
+
+        const syncTask = (async () => {
+            state.inboundSyncRunning = true;
+            if (!silent) {
+                setButtonLoading(btnSyncInbound, true, '<span class="spinner-border spinner-border-sm me-1"></span>Sincronizando...');
+                setInboundBadge('syncing', 'manual');
+                setConnectionHealth('syncing', 'Sincronizando mensagens inbound...', { prominent: true });
             }
-        } catch (error) {
-            await swal({ icon: 'error', title: 'Falha na sincronizacao', text: error.message || 'Erro inesperado.' });
-        } finally {
-            setButtonLoading(btnSyncInbound, false);
-        }
+
+            try {
+                const data = await postForm(cfg.endpointSyncInbound, {}, null, 25000);
+                const count = Number(data?.count || 0);
+                state.lastInboundSyncAt = Date.now();
+                state.lastInboundSyncCount = count;
+
+                const shouldRefreshList = !silent || count > 0;
+                if (shouldRefreshList) {
+                    await safeLoadConversas(true);
+                }
+                if (state.currentConversaId && (!silent || count > 0)) {
+                    await pullNovasMensagens().catch(() => 0);
+                }
+
+                const detail = count > 0
+                    ? `+${count} agora`
+                    : new Date(state.lastInboundSyncAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                if (!silent) {
+                    setInboundBadge('ok', detail);
+                    setConnectionHealth('online', `Conectado | inbound ${count > 0 ? ('+' + count) : 'sem novidades'}`);
+                } else if (count > 0) {
+                    setInboundBadge('ok', detail);
+                }
+
+                if (!silent) {
+                    await swal({
+                        icon: 'success',
+                        title: 'Sincronizado',
+                        text: `Mensagens processadas: ${count}.`,
+                    });
+                }
+                return { ok: true, count };
+            } catch (error) {
+                if (!silent) {
+                    setInboundBadge('warn', 'manual');
+                    setConnectionHealth('warn', 'Falha ao sincronizar inbound');
+                    await swal({
+                        icon: 'error',
+                        title: 'Falha na sincronizacao',
+                        text: error?.message || 'Erro inesperado.',
+                    });
+                } else {
+                    setInboundBadge('warn', 'auto');
+                    console.warn('[CentralMensagens] sync inbound falhou em background:', error);
+                }
+                return { ok: false, error, count: 0 };
+            } finally {
+                state.inboundSyncRunning = false;
+                state.inboundSyncPromise = null;
+                if (!silent) {
+                    setButtonLoading(btnSyncInbound, false);
+                }
+            }
+        })();
+
+        state.inboundSyncPromise = syncTask;
+        return syncTask;
     };
 
     const createNewConversation = async () => {
@@ -2509,15 +3912,24 @@
             const streamIsLive = state.streamReady
                 && state.streamForConversaId === state.currentConversaId
                 && state.currentConversaId > 0;
+            const now = Date.now();
+            const listRefreshIntervalMs = state.currentConversaId
+                ? Math.max(7000, autoSyncIntervalMs)
+                : autoSyncIntervalMs;
+            const shouldRefreshList = (now - Number(state.lastConversaListSyncAt || 0)) >= listRefreshIntervalMs;
 
             if (state.currentConversaId && !streamIsLive) {
                 await pullNovasMensagens();
             }
-            await safeLoadConversas(true);
+            if (shouldRefreshList) {
+                await safeLoadConversas(true);
+                state.lastConversaListSyncAt = Date.now();
+            }
         } catch (error) {
             setRealtimeBadge('warn');
+            registerNetworkFailure(error);
             const now = Date.now();
-            if ((now - Number(state.lastPollErrorLogAt || 0)) > 15000) {
+            if ((now - Number(state.lastPollErrorLogAt || 0)) > 60000) {
                 state.lastPollErrorLogAt = now;
                 console.error('[CentralMensagens] falha no polling incremental', error);
             }
@@ -2537,17 +3949,41 @@
             }
             await pollTick();
             const hasOpen = !!state.currentConversaId;
-            const delay = hasOpen
+            let delay = hasOpen
                 ? Math.max(1500, Math.min(3000, Math.floor(autoSyncIntervalMs / 2)))
                 : autoSyncIntervalMs;
+            if (state.networkFailureStreak > 0) {
+                const factor = Math.min(8, state.networkFailureStreak + 1);
+                delay = Math.min(30000, delay * factor);
+            }
             state.pollTimer = setTimeout(tick, delay);
         };
         state.pollTimer = setTimeout(tick, autoSyncIntervalMs);
     };
 
+    const stopInboundAutoSync = () => {
+        if (state.inboundSyncTimer) {
+            clearTimeout(state.inboundSyncTimer);
+        }
+        state.inboundSyncTimer = null;
+    };
+
+    const startInboundAutoSync = () => {
+        stopInboundAutoSync();
+        const run = async () => {
+            if (!document.hidden) {
+                await syncInbound({ silent: true, trigger: 'auto' });
+            }
+            state.inboundSyncTimer = setTimeout(run, autoInboundSyncIntervalMs);
+        };
+        state.inboundSyncTimer = setTimeout(run, autoInboundSyncIntervalMs);
+    };
+
     const shutdownRuntime = () => {
         stopPollingLoop();
+        stopInboundAutoSync();
         closeMessageStream();
+        clearFilterDebounce();
     };
 
     const bindStaticEvents = () => {
@@ -2566,9 +4002,20 @@
             updateFilterFeedback();
             safeLoadConversas(true);
         });
+        quickFilterButtons.forEach((btn) => {
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+                applyQuickFilter(btn.getAttribute('data-cm-quick-filter') || 'all');
+            });
+        });
+        filtroQ?.addEventListener('input', () => {
+            scheduleFilterRefresh(280);
+        });
         filtroQ?.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
+                clearFilterDebounce();
+                updateFilterFeedback();
                 safeLoadConversas(true);
             }
         });
@@ -2579,18 +4026,60 @@
             });
         });
 
+        const isTypingContext = () => {
+            const active = document.activeElement;
+            if (!active) {
+                return false;
+            }
+            const tag = String(active.tagName || '').toUpperCase();
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) {
+                return true;
+            }
+            return active.getAttribute('contenteditable') === 'true';
+        };
+
+        document.addEventListener('keydown', (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+                event.preventDefault();
+                filtroQ?.focus();
+                filtroQ?.select?.();
+                return;
+            }
+
+            if (event.key === 'Escape') {
+                hideAttachMenu();
+                emojiMenu?.classList.add('d-none');
+                return;
+            }
+
+            if (event.key === '/' && !isTypingContext()) {
+                event.preventDefault();
+                filtroQ?.focus();
+                return;
+            }
+        });
+
         msgInput?.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault();
                 sendCurrentMessage();
             }
         });
+        msgInput?.addEventListener('input', () => {
+            autoResizeComposer();
+            persistDraftForCurrentConversation();
+            syncComposerAvailability();
+        });
+        documentoSelect?.addEventListener('change', () => {
+            syncComposerAvailability();
+        });
         formEnviar?.addEventListener('submit', (event) => {
             event.preventDefault();
             sendCurrentMessage();
         });
+        replyCancelBtn?.addEventListener('click', () => clearReplyTarget());
 
-        btnSyncInbound?.addEventListener('click', syncInbound);
+        btnSyncInbound?.addEventListener('click', () => syncInbound({ silent: false, trigger: 'manual' }));
         btnNovaConversa?.addEventListener('click', createNewConversation);
         btnAtualizarConversa?.addEventListener('click', async () => {
             if (!state.currentConversaId) {
@@ -2626,6 +4115,36 @@
                 });
             }
         });
+        threadStatusBadge?.addEventListener('click', async () => {
+            await openStatusModal();
+        });
+        btnPrioridadeConversa?.addEventListener('click', async () => {
+            await openPrioridadeModal();
+        });
+        btnModoAtendimento?.addEventListener('click', async () => {
+            try {
+                const currentMode = resolveAtendimentoMode(getCurrentMetaSnapshot());
+                await applyAtendimentoMode(currentMode === 'bot' ? 'human' : 'bot');
+            } catch (error) {
+                await swal({
+                    icon: 'error',
+                    title: 'Falha ao alterar bot',
+                    text: error?.message || 'Nao foi possivel atualizar o modo de atendimento.',
+                });
+            }
+        });
+        btnModoAguardandoHumano?.addEventListener('click', async () => {
+            try {
+                const currentMode = resolveAtendimentoMode(getCurrentMetaSnapshot());
+                await applyAtendimentoMode(currentMode === 'human' ? 'bot' : 'human');
+            } catch (error) {
+                await swal({
+                    icon: 'error',
+                    title: 'Falha ao alterar modo humano',
+                    text: error?.message || 'Nao foi possivel atualizar o modo de atendimento.',
+                });
+            }
+        });
         btnEncerrarConversa?.addEventListener('click', async () => {
             if (!state.currentConversaId) {
                 await swal({
@@ -2635,23 +4154,29 @@
                 });
                 return;
             }
-            const confirm = await swal({
+            const decision = await swal({
                 icon: 'question',
-                title: 'Encerrar conversa?',
-                text: 'O status sera atualizado para Resolvida.',
+                title: 'Encerrar conversa',
+                text: 'Deseja concluir como resolvida ou arquivar esta conversa?',
                 showCancelButton: true,
-                confirmButtonText: 'Encerrar',
+                showDenyButton: true,
+                confirmButtonText: 'Concluir',
+                denyButtonText: 'Arquivar',
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true,
             });
-            if (!confirm?.isConfirmed) {
+            if (!decision?.isConfirmed && !decision?.isDenied) {
                 return;
             }
             try {
+                const payload = decision.isDenied
+                    ? { status: 'arquivada', aguardando_humano: 0 }
+                    : { status: 'resolvida', aguardando_humano: 0 };
                 await quickUpdateMeta({
-                    status: 'resolvida',
-                    aguardando_humano: 0,
-                }, 'Conversa encerrada como resolvida.');
+                    ...payload,
+                }, decision.isDenied
+                    ? 'Conversa arquivada com sucesso.'
+                    : 'Conversa concluida como resolvida.');
             } catch (error) {
                 await swal({
                     icon: 'error',
@@ -2661,28 +4186,20 @@
             }
         });
         btnAtribuirConversa?.addEventListener('click', async () => {
-            if (!state.currentConversaId) {
-                await swal({
-                    icon: 'warning',
-                    title: 'Sem conversa ativa',
-                    text: 'Abra uma conversa para atribuir responsavel.',
-                });
-                return;
-            }
-            if (window.bootstrap && window.matchMedia('(max-width: 1199.98px)').matches) {
+            await openAtribuicaoModal();
+        });
+        btnToggleContextDock?.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (!isDesktopWide()) {
                 const canvas = document.getElementById('cmContextoCanvas');
-                if (canvas) {
+                if (canvas && window.bootstrap) {
                     const offcanvas = window.bootstrap.Offcanvas.getOrCreateInstance(canvas);
                     offcanvas.show();
                 }
+                return;
             }
-            setTimeout(() => {
-                document.getElementById('contextResponsavelSelect')?.focus();
-            }, 220);
+            toggleContextDockState();
         });
-        btnSyncInboundMobile?.addEventListener('click', () => syncInbound());
-        btnNovaConversaMobile?.addEventListener('click', () => createNewConversation());
-
         btnAnexarMidia?.addEventListener('click', (e) => {
             e.stopPropagation();
             toggleAttachMenu();
@@ -2725,6 +4242,7 @@
             const file = anexoInput.files && anexoInput.files.length ? anexoInput.files[0] : null;
             state.selectedFile = file;
             renderAnexoSelection(file);
+            syncComposerAvailability();
         });
 
         const handleInjectFile = (input) => {
@@ -2735,6 +4253,7 @@
                 dataTransfer.items.add(file);
                 if (anexoInput) anexoInput.files = dataTransfer.files;
                 renderAnexoSelection(file);
+                syncComposerAvailability();
             }
         };
 
@@ -2825,6 +4344,18 @@
                 }
             });
         });
+
+        window.addEventListener('resize', () => {
+            applyContextDockState(state.contextDockCollapsed, { skipPersist: true });
+            autoResizeComposer();
+        });
+
+        if (advancedFiltersEl) {
+            advancedFiltersEl.addEventListener('show.bs.collapse', updateAdvancedFiltersToggleState);
+            advancedFiltersEl.addEventListener('shown.bs.collapse', updateAdvancedFiltersToggleState);
+            advancedFiltersEl.addEventListener('hide.bs.collapse', updateAdvancedFiltersToggleState);
+            advancedFiltersEl.addEventListener('hidden.bs.collapse', updateAdvancedFiltersToggleState);
+        }
     };
 
     const bootstrapCentral = async () => {
@@ -2832,11 +4363,25 @@
         const initialQ = (urlParams.get('q') || '').trim();
         const initialConversaId = Number(urlParams.get('conversa_id') || 0);
 
+        applyContextDockState(readContextDockState(), { skipPersist: true });
+
         if (initialQ && filtroQ) {
             filtroQ.value = initialQ;
         }
+        if (advancedFiltersCollapse) {
+            advancedFiltersCollapse.hide();
+        } else if (advancedFiltersEl) {
+            advancedFiltersEl.classList.remove('show');
+        }
+        updateAdvancedFiltersToggleState();
         updateFilterFeedback();
         setRealtimeBadge('polling');
+        setInboundBadge('idle');
+        setConnectionHealth('online', 'Conectado ao servidor');
+        syncComposerAvailability();
+        updateHeaderMetaButtonsState();
+        autoResizeComposer();
+        window.requestAnimationFrame(() => autoResizeComposer());
 
         let items = [];
         try {
@@ -2858,13 +4403,17 @@
         }
         if (items.length > 0) {
             await openConversa(Number(items[0].id), false);
+            return;
         }
+        updateHeaderMetaButtonsState();
     };
 
     bindImageModalActions();
     bindStaticEvents();
+    initActionBarTooltips();
     bootstrapCentral();
     startPolling();
+    startInboundAutoSync();
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             closeMessageStream();
@@ -2872,6 +4421,7 @@
         }
         if (!document.hidden) {
             pollTick();
+            syncInbound({ silent: true, trigger: 'visibility' });
             if (state.currentConversaId && !state.streamSource) {
                 startMessageStream();
             }

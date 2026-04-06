@@ -882,7 +882,9 @@ window.addEventListener('DOMContentLoaded', function() {
                         grupos: 'Grupos',
                         configuracoes: 'Configurações',
                         vendas: 'Vendas',
-                        perfil: 'Perfil'
+                        perfil: 'Perfil',
+                        'atendimento-mobile': 'App Mobile/PWA',
+                        'atendimento-mobile-app': 'App Mobile/PWA'
                     };
                     const moduleKey = parts[0] || 'dashboard';
                     const moduleName = moduleMap[moduleKey] || moduleKey;

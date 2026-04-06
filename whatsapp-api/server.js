@@ -309,6 +309,58 @@ function extensionFromMime(mimeType = '') {
     return 'bin';
 }
 
+async function extractMessageMediaPayload(message, options = {}) {
+    const payload = {
+        mediaBase64: null,
+        mediaMime: null,
+        mediaFilename: null,
+        mediaSizeBytes: 0
+    };
+
+    if (!config.forwardInboundMediaEnabled || !message?.hasMedia) {
+        return payload;
+    }
+
+    const fallbackPrefix = String(options.fallbackPrefix || 'inbound').trim() || 'inbound';
+    const warnLabel = String(options.warnLabel || 'inbound').trim() || 'inbound';
+    const logContext = options.logContext && typeof options.logContext === 'object'
+        ? options.logContext
+        : {};
+
+    try {
+        const media = await message.downloadMedia();
+        if (!media || !media.data) {
+            return payload;
+        }
+
+        payload.mediaBase64 = String(media.data);
+        payload.mediaMime = String(media.mimetype || '').toLowerCase().trim() || null;
+        payload.mediaFilename = sanitizeFileName(
+            media.filename || `${fallbackPrefix}_${Date.now()}.${extensionFromMime(payload.mediaMime || '')}`
+        );
+        payload.mediaSizeBytes = Buffer.byteLength(payload.mediaBase64, 'base64');
+
+        if (payload.mediaSizeBytes > config.inboundMediaMaxBytes) {
+            writeLog('WARN', `Midia ${warnLabel} excede limite e sera ignorada.`, {
+                mediaSizeBytes: payload.mediaSizeBytes,
+                inboundMediaMaxBytes: config.inboundMediaMaxBytes,
+                ...logContext
+            });
+            payload.mediaBase64 = null;
+            payload.mediaMime = null;
+            payload.mediaFilename = null;
+            payload.mediaSizeBytes = 0;
+        }
+    } catch (mediaError) {
+        writeLog('WARN', `Falha ao baixar midia ${warnLabel}.`, {
+            detail: mediaError?.message || 'unknown',
+            ...logContext
+        });
+    }
+
+    return payload;
+}
+
 function updateState(patch = {}) {
     state = {
         ...state,
@@ -550,43 +602,18 @@ function bindClientEvents(instance) {
             return;
         }
 
-        let mediaBase64 = null;
-        let mediaMime = null;
-        let mediaFilename = null;
-        let mediaSizeBytes = 0;
-
-        if (config.forwardInboundMediaEnabled && message.hasMedia) {
-            try {
-                const media = await message.downloadMedia();
-                if (media && media.data) {
-                    mediaBase64 = String(media.data);
-                    mediaMime = String(media.mimetype || '').toLowerCase().trim() || null;
-                    mediaFilename = sanitizeFileName(
-                        media.filename || `outbound_${Date.now()}.${extensionFromMime(mediaMime || '')}`
-                    );
-                    mediaSizeBytes = Buffer.byteLength(mediaBase64, 'base64');
-
-                    if (mediaSizeBytes > config.inboundMediaMaxBytes) {
-                        writeLog('WARN', 'Midia outbound(fromMe) excede limite e sera ignorada.', {
-                            to: peer.peerId,
-                            mediaSizeBytes,
-                            inboundMediaMaxBytes: config.inboundMediaMaxBytes,
-                            source
-                        });
-                        mediaBase64 = null;
-                        mediaMime = null;
-                        mediaFilename = null;
-                        mediaSizeBytes = 0;
-                    }
-                }
-            } catch (mediaError) {
-                writeLog('WARN', 'Falha ao baixar midia outbound(fromMe).', {
-                    to: peer.peerId,
-                    detail: mediaError?.message || 'unknown',
-                    source
-                });
+        const mediaPayload = await extractMessageMediaPayload(message, {
+            fallbackPrefix: 'outbound',
+            warnLabel: 'outbound(fromMe)',
+            logContext: {
+                to: peer.peerId,
+                source
             }
-        }
+        });
+        const mediaBase64 = mediaPayload.mediaBase64;
+        const mediaMime = mediaPayload.mediaMime;
+        const mediaFilename = mediaPayload.mediaFilename;
+        const mediaSizeBytes = mediaPayload.mediaSizeBytes;
 
         const target = peer.peerNumber;
         const outboundPayload = {
@@ -745,41 +772,15 @@ function bindClientEvents(instance) {
                 return;
             }
 
-            let mediaBase64 = null;
-            let mediaMime = null;
-            let mediaFilename = null;
-            let mediaSizeBytes = 0;
-
-            if (config.forwardInboundMediaEnabled && message.hasMedia) {
-                try {
-                    const media = await message.downloadMedia();
-                    if (media && media.data) {
-                        mediaBase64 = String(media.data);
-                        mediaMime = String(media.mimetype || '').toLowerCase().trim() || null;
-                        mediaFilename = sanitizeFileName(
-                            media.filename || `inbound_${Date.now()}.${extensionFromMime(mediaMime || '')}`
-                        );
-                        mediaSizeBytes = Buffer.byteLength(mediaBase64, 'base64');
-
-                        if (mediaSizeBytes > config.inboundMediaMaxBytes) {
-                            writeLog('WARN', 'Midia inbound excede limite e sera ignorada.', {
-                                from,
-                                mediaSizeBytes,
-                                inboundMediaMaxBytes: config.inboundMediaMaxBytes
-                            });
-                            mediaBase64 = null;
-                            mediaMime = null;
-                            mediaFilename = null;
-                            mediaSizeBytes = 0;
-                        }
-                    }
-                } catch (mediaError) {
-                    writeLog('WARN', 'Falha ao baixar midia inbound.', {
-                        from,
-                        detail: mediaError?.message || 'unknown'
-                    });
-                }
-            }
+            const mediaPayload = await extractMessageMediaPayload(message, {
+                fallbackPrefix: 'inbound',
+                warnLabel: 'inbound',
+                logContext: { from }
+            });
+            const mediaBase64 = mediaPayload.mediaBase64;
+            const mediaMime = mediaPayload.mediaMime;
+            const mediaFilename = mediaPayload.mediaFilename;
+            const mediaSizeBytes = mediaPayload.mediaSizeBytes;
 
             const inboundPayload = {
                 from: fromNumber,
@@ -837,7 +838,7 @@ function bindClientEvents(instance) {
     });
 }
 
-function buildPayloadFromChatMessage(message, chatId, providerId) {
+async function buildPayloadFromChatMessage(message, chatId, providerId) {
     if (!message) {
         return null;
     }
@@ -864,6 +865,20 @@ function buildPayloadFromChatMessage(message, chatId, providerId) {
         ? new Date(rawTimestamp * 1000).toISOString()
         : new Date().toISOString();
 
+    const mediaPayload = await extractMessageMediaPayload(message, {
+        fallbackPrefix: message?.fromMe ? 'history_outbound' : 'history_inbound',
+        warnLabel: 'history',
+        logContext: {
+            chat_id: directChatId,
+            message_id: message?.id?._serialized || null
+        }
+    });
+    const mediaMimeFallback = String(message?.mimetype || message?._data?.mimetype || '').toLowerCase().trim() || null;
+    const mediaFilenameFallbackRaw = String(message?.filename || message?._data?.filename || '').trim();
+    const mediaFilenameFallback = mediaFilenameFallbackRaw !== '' ? sanitizeFileName(mediaFilenameFallbackRaw) : null;
+    const mediaMime = mediaPayload.mediaMime || mediaMimeFallback;
+    const mediaFilename = mediaPayload.mediaFilename || mediaFilenameFallback;
+
     return {
         from: number,
         sender: number,
@@ -878,10 +893,10 @@ function buildPayloadFromChatMessage(message, chatId, providerId) {
         timestamp,
         from_me: !!message?.fromMe,
         has_media: hasMedia,
-        media_mime_type: null,
-        media_filename: null,
-        media_base64: null,
-        media_size_bytes: 0,
+        media_mime_type: mediaMime,
+        media_filename: mediaFilename,
+        media_base64: mediaPayload.mediaBase64,
+        media_size_bytes: mediaPayload.mediaSizeBytes,
         provider: providerId
     };
 }
@@ -927,7 +942,7 @@ async function collectChatHistoryPayloads(options = {}) {
                     continue;
                 }
 
-                const payload = buildPayloadFromChatMessage(message, chatId, providerId);
+                const payload = await buildPayloadFromChatMessage(message, chatId, providerId);
                 if (!payload) {
                     continue;
                 }

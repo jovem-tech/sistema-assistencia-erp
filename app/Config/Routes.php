@@ -25,6 +25,62 @@ $routes->post('orcamento/recusar/(:any)', 'Orcamento::recusar/$1');
 $routes->post('webhooks/whatsapp', 'WhatsAppWebhook::receive');
 
 // =====================================================
+// API MOBILE/PWA (v1)
+// =====================================================
+$routes->group('api/v1', static function ($routes) {
+    $routes->post('auth/login', 'Api\\V1\\AuthController::login');
+
+    $routes->group('', ['filter' => 'apiToken'], static function ($routes) {
+        $routes->get('auth/me', 'Api\\V1\\AuthController::me');
+        $routes->post('auth/refresh', 'Api\\V1\\AuthController::refresh');
+        $routes->post('auth/logout', 'Api\\V1\\AuthController::logout');
+
+        $routes->get('users', 'Api\\V1\\UsersController::index');
+
+        $routes->get('clients', 'Api\\V1\\ClientsController::index');
+        $routes->get('clients/(:num)', 'Api\\V1\\ClientsController::show/$1');
+        $routes->post('clients', 'Api\\V1\\ClientsController::create');
+        $routes->put('clients/(:num)', 'Api\\V1\\ClientsController::update/$1');
+        $routes->patch('clients/(:num)', 'Api\\V1\\ClientsController::update/$1');
+
+        $routes->get('equipments/catalog', 'Api\\V1\\EquipmentsController::catalog');
+        $routes->post('equipments/brands', 'Api\\V1\\EquipmentsController::createBrand');
+        $routes->post('equipments/models', 'Api\\V1\\EquipmentsController::createModel');
+        $routes->get('equipments/(:num)', 'Api\\V1\\EquipmentsController::show/$1');
+        $routes->post('equipments', 'Api\\V1\\EquipmentsController::create');
+        $routes->post('equipments/(:num)', 'Api\\V1\\EquipmentsController::update/$1');
+        $routes->put('equipments/(:num)', 'Api\\V1\\EquipmentsController::update/$1');
+        $routes->patch('equipments/(:num)', 'Api\\V1\\EquipmentsController::update/$1');
+
+        $routes->get('orders', 'Api\\V1\\OrdersController::index');
+        $routes->get('orders/meta', 'Api\\V1\\OrdersController::meta');
+        $routes->get('orders/(:num)', 'Api\\V1\\OrdersController::show/$1');
+        $routes->post('orders', 'Api\\V1\\OrdersController::create');
+        $routes->put('orders/(:num)', 'Api\\V1\\OrdersController::update/$1');
+        $routes->patch('orders/(:num)', 'Api\\V1\\OrdersController::update/$1');
+
+        $routes->get('conversations', 'Api\\V1\\ConversationsController::index');
+        $routes->get('conversations/(:num)', 'Api\\V1\\ConversationsController::show/$1');
+
+        $routes->get('messages', 'Api\\V1\\MessagesController::index');
+        $routes->post('messages', 'Api\\V1\\MessagesController::create');
+
+        $routes->get('notifications', 'Api\\V1\\NotificationsController::index');
+        $routes->post('notifications', 'Api\\V1\\NotificationsController::create');
+        $routes->put('notifications/(:num)/read', 'Api\\V1\\NotificationsController::markAsRead/$1');
+        $routes->patch('notifications/(:num)/read', 'Api\\V1\\NotificationsController::markAsRead/$1');
+        $routes->put('notifications/read-all', 'Api\\V1\\NotificationsController::markAllRead');
+        $routes->patch('notifications/read-all', 'Api\\V1\\NotificationsController::markAllRead');
+
+        $routes->get('notifications/subscriptions', 'Api\\V1\\PushSubscriptionsController::index');
+        $routes->post('notifications/subscriptions', 'Api\\V1\\PushSubscriptionsController::create');
+        $routes->delete('notifications/subscriptions/(:num)', 'Api\\V1\\PushSubscriptionsController::delete/$1');
+
+        $routes->get('realtime/stream', 'Api\\V1\\RealtimeController::stream');
+    });
+});
+
+// =====================================================
 // ROTAS PROTEGIDAS (requer autenticação + permissão RBAC)
 // =====================================================
 $routes->group('', ['filter' => 'auth'], function ($routes) {
@@ -164,6 +220,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('crm/metricas-marketing/engajamento', 'Crm::salvarEngajamentoPeriodos', ['filter' => 'permission:clientes:editar']);
 
     // Central de Atendimento WhatsApp (rota canonica + alias legado)
+    $routes->get('atendimento-mobile',                      'AtendimentoMobile::index',                ['filter' => 'permission:clientes:visualizar']);
     $routes->get('atendimento-whatsapp',                    'CentralMensagens::index',                       ['filter' => 'permission:clientes:visualizar']);
     $routes->get('atendimento-whatsapp/conversas',          'CentralMensagens::conversas',                   ['filter' => 'permission:clientes:visualizar']);
     $routes->get('atendimento-whatsapp/conversa/(:num)',    'CentralMensagens::conversa/$1',                 ['filter' => 'permission:clientes:visualizar']);
@@ -238,11 +295,16 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->post('os/datatable',         'Os::datatable',          ['filter' => 'permission:os:visualizar']);
     $routes->get('os/fotos/(:num)',      'Os::photos/$1',          ['filter' => 'permission:os:visualizar']);
     $routes->get('os/nova',              'Os::create',             ['filter' => 'permission:os:criar']);
+    $routes->get('os/checklist-meta',    'Os::checklistMeta',      ['filter' => 'permission:os:visualizar']);
     $routes->post('os/salvar',            'Os::store',              ['filter' => 'permission:os:criar']);
     $routes->get('os/editar/(:num)',      'Os::edit/$1',            ['filter' => 'permission:os:editar']);
     $routes->post('os/atualizar/(:num)',  'Os::update/$1',          ['filter' => 'permission:os:editar']);
     $routes->get('os/visualizar/(:num)', 'Os::show/$1',            ['filter' => 'permission:os:visualizar']);
     $routes->get('os/status-meta/(:num)', 'Os::statusMeta/$1',      ['filter' => 'permission:os:visualizar']);
+    $routes->get('os/prazos-meta/(:num)', 'Os::datesMeta/$1',       ['filter' => 'permission:os:editar']);
+    $routes->post('os/prazos-ajax/(:num)', 'Os::updateDatesAjax/$1',['filter' => 'permission:os:editar']);
+    $routes->get('os/orcamento-meta/(:num)', 'Os::budgetMeta/$1',   ['filter' => 'permission:os:editar']);
+    $routes->post('os/orcamento-ajax/(:num)', 'Os::budgetAjax/$1',  ['filter' => 'permission:os:editar']);
     $routes->post('os/status-ajax/(:num)','Os::updateStatusAjax/$1',['filter' => 'permission:os:editar']);
     $routes->post('os/status/(:num)',    'Os::updateStatus/$1',    ['filter' => 'permission:os:editar']);
     $routes->get('os/imprimir/(:num)',   'Os::print/$1',           ['filter' => 'permission:os:visualizar']);
@@ -252,6 +314,13 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->get('os/item/excluir/(:num)','Os::removeItem/$1',     ['filter' => 'permission:os:editar']);
     $routes->get('osworkflow',            'OsWorkflow::index',      ['filter' => 'permission:os:editar']);
     $routes->post('osworkflow/salvar',    'OsWorkflow::save',       ['filter' => 'permission:os:editar']);
+    $routes->get('checklists/entrada',                        'Checklists::entrada',            ['filter' => 'permission:os:visualizar']);
+    $routes->post('checklists/entrada/salvar',                'Checklists::salvarEntrada',      ['filter' => 'permission:os:editar']);
+    $routes->post('checklists/entrada/item/salvar',           'Checklists::salvarItemEntrada',  ['filter' => 'permission:os:editar']);
+    $routes->post('checklists/entrada/item/remover/(:num)',   'Checklists::removerItemEntrada/$1', ['filter' => 'permission:os:editar']);
+    $routes->get('checklists/manutencao',                     'Checklists::manutencao',         ['filter' => 'permission:os:visualizar']);
+    $routes->get('checklists/controle-qualidade',             'Checklists::controleQualidade',  ['filter' => 'permission:os:visualizar']);
+    $routes->get('checklists/saida',                          'Checklists::saida',              ['filter' => 'permission:os:visualizar']);
 
     // -- Serviços ----------------------------------------------------------
     $routes->get('servicos',                  'Servicos::index',            ['filter' => 'permission:servicos:visualizar']);

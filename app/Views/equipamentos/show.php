@@ -1,8 +1,9 @@
-<?= $this->extend('layouts/main') ?>
+<?= $this->extend($layout ?? 'layouts/main') ?>
 <?= $this->section('content') ?>
 
 <div class="page-header d-flex justify-content-between align-items-center">
     <h2><i class="bi bi-display me-2"></i><?= esc($title) ?></h2>
+    <?php if (!($isEmbedded ?? false)): ?>
     <div class="d-flex gap-2">
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('equipamentos')" title="Ajuda sobre Equipamentos">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -10,6 +11,7 @@
         <a href="<?= base_url('equipamentos/editar/' . $equipamento['id']) ?>" class="btn btn-glow"><i class="bi bi-pencil me-1"></i>Editar</a>
         <a href="<?= base_url('equipamentos') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('equipamentos') ?>"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
     </div>
+    <?php endif; ?>
 </div>
 
 <div class="row g-4">

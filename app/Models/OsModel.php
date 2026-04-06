@@ -13,6 +13,7 @@ class OsModel extends Model
     protected $useSoftDeletes = false;
     protected $allowedFields = [
         'numero_os', 'cliente_id', 'equipamento_id', 'tecnico_id', 'status', 'estado_fluxo', 'status_atualizado_em',
+        'legacy_origem', 'legacy_id', 'numero_os_legado',
         'prioridade', 'relato_cliente', 'diagnostico_tecnico', 'solucao_aplicada',
         'data_abertura', 'data_entrada', 'data_previsao', 'data_conclusao', 'data_entrega',
         'valor_mao_obra', 'valor_pecas', 'valor_total', 'desconto', 'valor_final',

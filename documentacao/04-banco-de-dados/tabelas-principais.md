@@ -1,7 +1,7 @@
 # Tabelas Principais do Banco de Dados
 
 Base: `assistencia_tecnica`  
-Atualizado em 26/03/2026 (modulo WhatsApp unificado + CRM/Central + contatos + otimizacoes da listagem de OS + timeout configuravel de sessao + workflow configuravel de status)
+Atualizado em 05/04/2026 (modulo WhatsApp unificado + CRM/Central + contatos + otimizacoes da listagem de OS + timeout configuravel de sessao + workflow configuravel de status + migracao legada SQL + deduplicacao segura de clientes/equipamentos do legado + tolerancia a clientes sem telefone no legado + backfill completo de detalhes das OS legadas + base mobile/PWA v1 + infraestrutura de checklist configuravel)
 
 ## Nucleo operacional
 - `clientes`
@@ -15,6 +15,35 @@ Atualizado em 26/03/2026 (modulo WhatsApp unificado + CRM/Central + contatos + o
 - `fotos_acessorios`
 - `estado_fisico_equipamento`
 - `estado_fisico_fotos`
+- `checklist_tipos`
+- `checklist_modelos`
+- `checklist_itens`
+- `checklist_execucoes`
+- `checklist_respostas`
+- `checklist_fotos`
+
+Observacao sobre transicao de fluxo:
+- os dados legados de `estado_fisico_*` seguem preservados por compatibilidade historica;
+- o fluxo atual de OS usa `Checklist de Entrada` estruturado (execucoes/respostas/fotos) conforme tipo de equipamento.
+
+Campos legados de rastreabilidade:
+- `clientes.legacy_origem`
+- `clientes.legacy_id`
+- `equipamentos.legacy_origem`
+- `equipamentos.legacy_id`
+- `os.legacy_origem`
+- `os.legacy_id`
+- `os.numero_os_legado`
+- `os_itens.legacy_origem`
+- `os_itens.legacy_tabela`
+- `os_itens.legacy_id`
+- `os_itens.observacao` (tambem usado para registrar a origem do total sintetico legado, como `os.total_servicos`, `os.total_produtos` ou `os.subtotal`)
+- `os_status_historico.legacy_origem`
+- `os_status_historico.legacy_tabela`
+- `os_status_historico.legacy_id`
+- `os_defeitos.legacy_origem`
+- `os_defeitos.legacy_tabela`
+- `os_defeitos.legacy_id`
 
 Indices operacionais para listagem avancada de OS:
 - `idx_os_status` (`os.status`)
@@ -30,12 +59,19 @@ Indices operacionais para listagem avancada de OS:
 - `idx_os_cliente_data_abertura_id` (`os.cliente_id`, `os.data_abertura`, `os.id`)
 - `idx_os_equipamento_data_abertura_id` (`os.equipamento_id`, `os.data_abertura`, `os.id`)
 - `idx_os_relato_cliente_fulltext` (`FULLTEXT` em `os.relato_cliente`)
+- `idx_os_numero_legado` (`os.numero_os_legado`)
+- `ux_legacy_alias_source` (`legacy_import_aliases.source_name`, `legacy_import_aliases.source_entity`, `legacy_import_aliases.source_legacy_id`, `legacy_import_aliases.match_key_type`, `legacy_import_aliases.match_key_value`)
+- `idx_legacy_alias_match_key` (`legacy_import_aliases.source_name`, `legacy_import_aliases.source_entity`, `legacy_import_aliases.match_key_type`, `legacy_import_aliases.match_key_value`)
+- `idx_legacy_alias_target` (`legacy_import_aliases.target_entity`, `legacy_import_aliases.target_id`)
 - `idx_os_itens_os_tipo_descricao` (`os_itens.os_id`, `os_itens.tipo`, `os_itens.descricao`)
 - `idx_os_itens_tipo_descricao_os_id` (`os_itens.tipo`, `os_itens.descricao`, `os_itens.os_id`)
 - `idx_funcionarios_nome` (`funcionarios.nome`)
 - `idx_equipamentos_modelos_nome` (`equipamentos_modelos.nome`)
 - `idx_equipamentos_marca_id` (`equipamentos.marca_id`)
 - `idx_equipamentos_modelo_id` (`equipamentos.modelo_id`)
+- `ux_clientes_legacy_source` (`clientes.legacy_origem`, `clientes.legacy_id`)
+- `ux_equipamentos_legacy_source` (`equipamentos.legacy_origem`, `equipamentos.legacy_id`)
+- `ux_os_legacy_source` (`os.legacy_origem`, `os.legacy_id`)
 
 Objetivo dos compostos:
 - sustentar ordenacao por `data_abertura` com paginacao server-side
@@ -120,6 +156,32 @@ Regra de negocio:
 - contato pode existir sem cliente vinculado
 - vinculacao em `clientes` ocorre quando ha conversao operacional (ex.: abertura de OS)
 
+## Migracao legada SQL
+
+Tabelas de auditoria:
+- `legacy_import_aliases`
+- `legacy_import_runs`
+- `legacy_import_events`
+- `os_notas_legadas`
+
+Uso:
+- `legacy_import_aliases` registra aliases legados de clientes/equipamentos e a chave forte usada na consolidacao (`cpf_cnpj`, `numero_serie`, `imei`)
+- `legacy_import_runs` registra cada execucao de `preflight` ou `import`
+- `legacy_import_events` registra eventos por entidade (`clientes`, `equipamentos`, `os`, `os_itens`, `os_status_historico`, `os_defeitos`, `os_notas_legadas`) com severidade, acao e payload
+- `os_notas_legadas` preserva observacoes livres e anotacoes historicas do sistema antigo que nao entram em um campo estruturado da OS
+- `os_itens` tambem pode receber linhas sinteticas com `legacy_tabela`:
+  - `os_totais_servico`
+  - `os_totais_peca`
+  - `os_totais_consolidado`
+  para explicar valores de OS legadas que existiam apenas no cabecalho financeiro do ERP antigo
+
+Objetivo:
+- permitir reprocessamento auditavel
+- medir importados, atualizados, ignorados e erros
+- rastrear conflitos e bloqueios encontrados no legado
+- manter a carga resiliente quando o legado trouxer clientes sem telefone valido, gravando `clientes.telefone1 = ''` no destino quando necessario
+- preservar o maximo possivel do contexto operacional legado sem duplicar a ordem principal
+
 ## Mensageria WhatsApp
 
 ### `mensagens_whatsapp` (log principal)
@@ -156,6 +218,33 @@ Observacoes:
 - `whatsapp_mensagens` (legado)
 - `whatsapp_templates`
 - `whatsapp_inbound`
+
+## Extensao Mobile/PWA (v2.11.0)
+
+Tabelas complementares (sem duplicar `clientes`, `os`, `conversas_whatsapp` e `mensagens_whatsapp`):
+
+- `mobile_api_tokens`
+  - tokens Bearer hash para auth da API mobile (`token_hash`, `expira_em`, `revogado_em`, `ultimo_uso_em`).
+- `mobile_push_subscriptions`
+  - subscriptions de push por usuario/dispositivo (`endpoint_hash`, chaves `p256dh/auth`, `ativo`).
+- `mobile_notifications`
+  - inbox de notificacoes por usuario (`tipo_evento`, `titulo`, `corpo`, `rota_destino`, `payload_json`, `lida_em`).
+- `mobile_notification_targets`
+  - relaciona notificacao a alvos de dominio (`order`, `conversation`, `client`).
+- `mobile_event_outbox`
+  - fila de eventos para despacho assíncrono (`event_type`, `aggregate_type`, `status`, `tentativas`, `processado_em`).
+
+Indices operacionais novos:
+
+- `ux_mobile_api_tokens_hash`
+- `idx_mobile_api_tokens_usuario`
+- `ux_mobile_push_endpoint_hash`
+- `idx_mobile_push_usuario`
+- `idx_mobile_notif_usuario`
+- `idx_mobile_notif_lida`
+- `ux_mobile_outbox_event_key`
+- `idx_mobile_outbox_status`
+- `idx_mobile_outbox_disponivel`
 
 ### Regras dinamicas de automacao
 Tabela: `chatbot_regras_erp`
@@ -239,3 +328,6 @@ Tipos usados:
 - `2026-03-24-022500_AddOsLookupOrderingIndexes.php`
 - `2026-03-24-023500_DropRedundantEquipamentoMarcaSearchIndex.php`
 - `2026-03-24-024500_AddOsRelatoFulltextIndex.php`
+- `2026-03-28-030000_AddLegacyMigrationInfrastructure.php`
+- `2026-03-28-040000_AddLegacyImportAliases.php`
+- `2026-04-03-010000_CreateMobilePwaInfrastructure.php`

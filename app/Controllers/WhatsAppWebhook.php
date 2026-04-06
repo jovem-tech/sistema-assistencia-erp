@@ -7,6 +7,35 @@ use App\Services\CentralMensagensService;
 
 class WhatsAppWebhook extends BaseController
 {
+    /**
+     * @param array<string,mixed> $payload
+     * @param list<string> $paths
+     */
+    private function payloadPathString(array $payload, array $paths, string $default = ''): string
+    {
+        foreach ($paths as $path) {
+            $segments = explode('.', $path);
+            $cursor = $payload;
+            $resolved = true;
+
+            foreach ($segments as $segment) {
+                if (is_array($cursor) && array_key_exists($segment, $cursor)) {
+                    $cursor = $cursor[$segment];
+                    continue;
+                }
+
+                $resolved = false;
+                break;
+            }
+
+            if ($resolved && $cursor !== null && $cursor !== '' && is_scalar($cursor)) {
+                return trim((string) $cursor);
+            }
+        }
+
+        return $default;
+    }
+
     public function receive()
     {
         $tokenExpected = trim((string) get_config('whatsapp_webhook_token', ''));
@@ -45,12 +74,58 @@ class WhatsAppWebhook extends BaseController
             ]);
         }
 
-        $remetente = trim((string) ($payload['from'] ?? $payload['sender'] ?? $payload['number'] ?? ''));
-        $conteudo = trim((string) ($payload['message'] ?? $payload['text'] ?? $payload['body'] ?? ''));
-        $provedor = trim((string) (
-            $payload['provider']
-            ?? get_config('whatsapp_direct_provider', get_config('whatsapp_provider', 'menuia'))
-        ));
+        $remetente = $this->payloadPathString($payload, [
+            'from',
+            'sender',
+            'remetente',
+            'phone',
+            'telefone',
+            'number',
+            'author',
+            'chat_id',
+            'jid',
+            'contact.phone',
+            'contact.number',
+            'data.from',
+            'data.sender',
+            'data.remetente',
+            'data.phone',
+            'data.telefone',
+            'data.number',
+            'data.author',
+            'data.chat_id',
+            'data.jid',
+            'data.contact.phone',
+            'data.contact.number',
+        ]);
+        $conteudo = $this->payloadPathString($payload, [
+            'message',
+            'mensagem',
+            'text',
+            'body',
+            'conteudo',
+            'caption',
+            'description',
+            'content.text',
+            'content.message',
+            'data.message',
+            'data.mensagem',
+            'data.text',
+            'data.body',
+            'data.conteudo',
+            'data.caption',
+            'data.description',
+            'data.content.text',
+            'data.content.message',
+        ]);
+        $provedor = $this->payloadPathString($payload, [
+            'provider',
+            'source',
+            'gateway',
+            'data.provider',
+            'data.source',
+            'data.gateway',
+        ], trim((string) get_config('whatsapp_direct_provider', get_config('whatsapp_provider', 'menuia'))));
 
         $model = new WhatsappInboundModel();
         if (!$model->db->tableExists('whatsapp_inbound')) {

@@ -82,6 +82,164 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
 
 <?= $this->section('content') ?>
 
+<style>
+.os-equip-select-result {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+}
+
+.os-equip-select-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    border: 1px solid #dbe4f3;
+    background: #eef2ff;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+.os-equip-select-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.os-equip-select-fallback {
+    font-weight: 800;
+    font-size: 1rem;
+    color: #1e3a8a;
+}
+
+.os-equip-select-copy {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+}
+
+.os-equip-select-copy strong {
+    display: block;
+    font-size: 0.92rem;
+    line-height: 1.2;
+    color: #0f172a;
+}
+
+.os-equip-select-copy small {
+    display: block;
+    line-height: 1.2;
+    color: #64748b;
+}
+
+.select2-container--bootstrap-5 .select2-results__option .os-equip-select-result {
+    padding: 2px 0;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .os-equip-select-result {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 8px;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .os-equip-select-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .os-equip-select-copy strong {
+    font-size: 0.86rem;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .os-equip-select-copy small {
+    font-size: 0.72rem;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single {
+    min-height: 68px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    white-space: normal;
+    line-height: 1.2;
+    padding-left: 0;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.checklist-item-card {
+    border: 1px solid #dbe4f3;
+    border-radius: 12px;
+    background: #f8fbff;
+    padding: 0.85rem;
+}
+
+.checklist-item-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.65rem;
+}
+
+.checklist-item-title {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #0f172a;
+}
+
+.checklist-status-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.checklist-status-btn {
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.74rem;
+    line-height: 1.2;
+}
+
+.checklist-photo-thumb {
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    border: 1px solid #dbe4f3;
+    overflow: hidden;
+    position: relative;
+    background: #e2e8f0;
+}
+
+.checklist-photo-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.checklist-photo-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 2;
+}
+
+.checklist-entry-card {
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.84);
+    padding: 0.65rem;
+}
+</style>
+
 <div class="page-header d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center gap-3">
         <h2><i class="bi bi-<?= $isEdit ? 'pencil' : 'plus-lg' ?> me-2"></i><?= $title ?></h2>
@@ -215,9 +373,9 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Estado físico</span>
+                            <span class="text-muted">Checklist de entrada</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoEstadoFisico" class="os-summary-value">Não informado</span>
+                                <span id="resumoEstadoFisico" class="os-summary-value">Nao preenchido</span>
                                 <span id="statusEstadoFisico" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
@@ -406,11 +564,16 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                         <select name="equipamento_id" id="equipamentoSelect" class="form-select select2-equip" required>
                                             <option value="">Selecione o cliente primeiro...</option>
                                             <?php if ($isEdit && !empty($equipamentos)): foreach ($equipamentos as $eq): ?>
+                                            <?php
+                                                $eqFotoArquivo = str_replace('\\', '/', ltrim((string) ($eq['foto_principal_arquivo'] ?? ''), '/'));
+                                                $eqFotoUrl = $eqFotoArquivo !== '' ? base_url($eqFotoArquivo) : '';
+                                            ?>
                                             <option value="<?= $eq['id'] ?>"
                                                 data-tipo="<?= $eq['tipo_id'] ?? '' ?>"
                                                 data-marca="<?= esc($eq['marca_nome'] ?? $eq['marca'] ?? '') ?>"
                                                 data-modelo="<?= esc($eq['modelo_nome'] ?? $eq['modelo'] ?? '') ?>"
                                                 data-serie="<?= esc($eq['numero_serie'] ?? '') ?>"
+                                                data-imei="<?= esc($eq['imei'] ?? '') ?>"
                                                 data-cor="<?= esc($eq['cor'] ?? '') ?>"
                                                 data-cor_hex="<?= esc($eq['cor_hex'] ?? '') ?>"
                                                 data-tipo_nome="<?= esc($eq['tipo_nome'] ?? $eq['tipo'] ?? '') ?>"
@@ -420,6 +583,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                                 data-senha_acesso="<?= esc($eq['senha_acesso'] ?? '') ?>"
                                                 data-estado_fisico="<?= esc($eq['estado_fisico'] ?? '') ?>"
                                                 data-acessorios="<?= esc($eq['acessorios'] ?? '') ?>"
+                                                data-foto_url="<?= esc($eqFotoUrl) ?>"
                                                 <?= $os['equipamento_id'] == $eq['id'] ? 'selected' : '' ?>>
                                                 <?= esc(($eq['marca_nome'] ?? $eq['marca'] ?? '') . ' ' . ($eq['modelo_nome'] ?? $eq['modelo'] ?? '') . ' (' . ($eq['tipo_nome'] ?? $eq['tipo'] ?? '') . ')') ?>
                                             </option>
@@ -433,39 +597,23 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                 <div class="col-12 col-xxl-6">
                                     <div class="os-data-section mb-4 h-100">
                                         <div class="os-data-section-title">
-                                            <i class="bi bi-shield-exclamation me-1"></i>Estado fisico do equipamento
+                                            <i class="bi bi-ui-checks-grid me-1"></i>Checklist de entrada
                                         </div>
-                                        <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100">
-                                            <div class="d-flex flex-wrap gap-2 mb-2">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="tela_trincada">+ Tela trincada</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="arranhoes">+ Arranhoes</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="carcaca_quebrada">+ Carcaca quebrada</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="vidro_traseiro_quebrado">+ Vidro traseiro quebrado</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="amassado">+ Amassado</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="botao_quebrado">+ Botao quebrado</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="outro">+ Outro dano</button>
+                                        <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100 d-flex flex-column gap-2">
+                                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                                <button type="button" class="btn btn-outline-primary btn-sm" id="btnChecklistEntrada">
+                                                    <i class="bi bi-ui-checks-grid me-1"></i>Checklist
+                                                </button>
+                                                <span class="badge text-bg-secondary" id="checklistEntradaBadge">Checklist nao preenchido</span>
                                             </div>
-                                            <div class="form-check form-switch mb-3">
-                                                <input class="form-check-input" type="checkbox" id="estadoFisicoSemAvarias" value="1">
-                                                <label class="form-check-label" for="estadoFisicoSemAvarias">Sem avarias aparentes na entrada</label>
+                                            <div id="checklistEntradaInlineInfo" class="small text-muted">
+                                                Abra o checklist para registrar os itens de entrada com discrepancias e fotos.
                                             </div>
-                                            <div id="estadoFisicoQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <strong id="estadoFisicoQuickTitle"></strong>
-                                                    <button type="button" class="btn-close" id="estadoFisicoQuickClose"></button>
-                                                </div>
-                                                <div id="estadoFisicoQuickFields" class="row g-2"></div>
-                                                <div class="mt-3">
-                                                    <button type="button" class="btn btn-sm btn-primary" id="estadoFisicoQuickSave">Salvar item</button>
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="estadoFisicoQuickCancel">Cancelar</button>
-                                                </div>
-                                            </div>
-                                            <div id="estadoFisicoList" class="list-group"></div>
-                                            <small class="form-text text-muted mt-3">Registre danos observados na recepcao com foto para evidenciar o estado de entrada.</small>
+                                            <input type="hidden" name="checklist_entrada_data" id="checklistEntradaDataInput">
+                                            <input type="file" id="checklistEntradaPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
+                                            <div id="checklistEntradaFilesInputs" class="d-none"></div>
                                             <textarea name="estado_fisico" id="estadoFisicoInput" class="d-none"><?= $isEdit ? esc($os['estado_fisico'] ?? '') : old('estado_fisico') ?></textarea>
                                             <input type="hidden" name="estado_fisico_data" id="estadoFisicoDataInput">
-                                            <input type="file" id="estadoFisicoPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
-                                            <div id="estadoFisicoFilesInputs" class="d-none"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -1516,6 +1664,34 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
     </div>
 </div>
 
+<!-- ===== MODAL: CHECKLIST DE ENTRADA ===== -->
+<div class="modal fade" id="modalChecklistEntrada" tabindex="-1" aria-hidden="true" style="z-index: 2050;">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content glass-card shadow-lg">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title font-title">
+                    <i class="bi bi-ui-checks-grid text-primary me-2"></i>Checklist de Entrada
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <div id="checklistEntradaModalAlert" class="alert alert-warning d-none mb-3"></div>
+                <div id="checklistEntradaModalMeta" class="small text-muted mb-3"></div>
+                <div id="checklistEntradaModalList" class="d-grid gap-3"></div>
+            </div>
+            <div class="modal-footer border-top d-flex justify-content-between align-items-center">
+                <small id="checklistEntradaModalResumo" class="text-muted"></small>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-glow" id="btnChecklistEntradaSalvar">
+                        <i class="bi bi-check2-circle me-1"></i>Salvar checklist
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -1533,21 +1709,8 @@ var defeitosSelecionados = <?= json_encode(array_column($defeitosSelected, 'defe
 var defeitosSelecionados = [];
 <?php endif; ?>
 const existingFotosCount = <?= (int)(count($fotos_entrada ?? [])) ?>;
-const estadoFisicoEntriesServer = <?= json_encode(array_map(static function ($entry) {
-    $values = [];
-    if (!empty($entry['valores'])) {
-        $decoded = json_decode((string) $entry['valores'], true);
-        if (is_array($decoded)) {
-            $values = $decoded;
-        }
-    }
-    return [
-        'id' => 'est_srv_' . ($entry['id'] ?? uniqid()),
-        'text' => trim((string)($entry['descricao_dano'] ?? '')),
-        'key' => $entry['tipo'] ?? 'outro',
-        'values' => $values,
-    ];
-}, $estadoFisicoEntries ?? []), JSON_UNESCAPED_UNICODE) ?>;
+const checklistEntradaServer = <?= json_encode($checklistEntrada ?? null, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+const estadoFisicoEntriesServer = [];
 let pendingEquipId = null;
 let pendingDefeitos = null;
 const DRAFT_KEY = 'osDraft_v1';
@@ -1586,6 +1749,770 @@ const prioridadeLabels = {
     urgente: 'Urgente'
 };
 
+const osIdAtual = <?= (int) ($os['id'] ?? 0) ?>;
+const checklistMetaEndpoint = `${BASE_URL}os/checklist-meta`;
+const checklistEntradaBtn = document.getElementById('btnChecklistEntrada');
+const checklistEntradaBadge = document.getElementById('checklistEntradaBadge');
+const checklistEntradaInlineInfo = document.getElementById('checklistEntradaInlineInfo');
+const checklistEntradaDataInput = document.getElementById('checklistEntradaDataInput');
+const checklistEntradaFilesInputs = document.getElementById('checklistEntradaFilesInputs');
+const checklistEntradaPhotoInput = document.getElementById('checklistEntradaPhotoInput');
+const checklistEntradaModalEl = document.getElementById('modalChecklistEntrada');
+const checklistEntradaModalList = document.getElementById('checklistEntradaModalList');
+const checklistEntradaModalAlert = document.getElementById('checklistEntradaModalAlert');
+const checklistEntradaModalMeta = document.getElementById('checklistEntradaModalMeta');
+const checklistEntradaModalResumo = document.getElementById('checklistEntradaModalResumo');
+const btnChecklistEntradaSalvar = document.getElementById('btnChecklistEntradaSalvar');
+const checklistEntradaModal = checklistEntradaModalEl ? bootstrap.Modal.getOrCreateInstance(checklistEntradaModalEl) : null;
+const checklistEntradaStatusOptions = ['ok', 'discrepancia', 'nao_verificado'];
+let checklistEntradaCommitted = normalizeChecklistEntradaPayload(checklistEntradaServer);
+let checklistEntradaDraft = cloneChecklistEntradaState(checklistEntradaCommitted);
+let checklistEntradaCommittedFiles = {};
+let checklistEntradaDraftFiles = {};
+let checklistEntradaCropQueue = [];
+let checklistEntradaCropItemId = null;
+let checklistMetaLoadToken = 0;
+let pendingChecklistEntradaDraftPayload = null;
+let pendingChecklistEntradaDraftEquipId = '';
+
+function toInt(value) {
+    const parsed = Number.parseInt(String(value ?? ''), 10);
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function checklistBadgeVariant(variant) {
+    return ({
+        success: 'text-bg-success',
+        warning: 'text-bg-warning',
+        danger: 'text-bg-danger',
+        info: 'text-bg-info',
+        primary: 'text-bg-primary'
+    })[String(variant || '').toLowerCase()] || 'text-bg-secondary';
+}
+
+function cloneChecklistEntradaState(state) {
+    if (!state || typeof state !== 'object') {
+        return normalizeChecklistEntradaPayload(null);
+    }
+    return {
+        possuiModelo: Boolean(state.possuiModelo),
+        tipoCodigo: String(state.tipoCodigo || 'entrada'),
+        tipoNome: String(state.tipoNome || 'Checklist de Entrada'),
+        modeloNome: String(state.modeloNome || ''),
+        tipoEquipamentoNome: String(state.tipoEquipamentoNome || ''),
+        resumo: {
+            preenchido: Boolean(state.resumo?.preenchido),
+            total_discrepancias: Number(state.resumo?.total_discrepancias || 0),
+            label: String(state.resumo?.label || 'Checklist nao preenchido'),
+            variant: String(state.resumo?.variant || 'secondary')
+        },
+        itens: Array.isArray(state.itens)
+            ? state.itens.map((item) => ({
+                id: toInt(item.id),
+                descricao: String(item.descricao || ''),
+                ordem: toInt(item.ordem),
+                status: checklistEntradaStatusOptions.includes(String(item.status || ''))
+                    ? String(item.status)
+                    : 'nao_verificado',
+                observacao: String(item.observacao || ''),
+                retainedPhotoIds: Array.isArray(item.retainedPhotoIds)
+                    ? item.retainedPhotoIds.map((photoId) => toInt(photoId)).filter((photoId) => photoId > 0)
+                    : [],
+                deletedPhotoIds: Array.isArray(item.deletedPhotoIds)
+                    ? item.deletedPhotoIds.map((photoId) => toInt(photoId)).filter((photoId) => photoId > 0)
+                    : [],
+                existingPhotos: Array.isArray(item.existingPhotos)
+                    ? item.existingPhotos.map((photo) => ({
+                        id: toInt(photo.id),
+                        url: String(photo.url || ''),
+                        nome: String(photo.nome || '')
+                    }))
+                    : []
+            }))
+            : []
+    };
+}
+
+function cloneChecklistFilesMap(source) {
+    const next = {};
+    Object.entries(source || {}).forEach(([itemId, dt]) => {
+        if (!dt || !dt.files || !dt.files.length) {
+            return;
+        }
+        const cloned = new DataTransfer();
+        Array.from(dt.files).forEach((file) => cloned.items.add(file));
+        next[itemId] = cloned;
+    });
+    return next;
+}
+
+function normalizeChecklistEntradaPayload(payload, tipoEquipamentoNomeFallback = '') {
+    const normalized = {
+        possuiModelo: false,
+        tipoCodigo: 'entrada',
+        tipoNome: 'Checklist de Entrada',
+        modeloNome: '',
+        tipoEquipamentoNome: String(tipoEquipamentoNomeFallback || ''),
+        resumo: {
+            preenchido: false,
+            total_discrepancias: 0,
+            label: 'Checklist nao preenchido',
+            variant: 'secondary'
+        },
+        itens: []
+    };
+
+    if (!payload || typeof payload !== 'object') {
+        return normalized;
+    }
+
+    normalized.tipoCodigo = String(payload.tipo?.codigo || payload.tipoCodigo || 'entrada');
+    normalized.tipoNome = String(payload.tipo?.nome || payload.tipoNome || 'Checklist de Entrada');
+    normalized.modeloNome = String(payload.modelo?.nome || payload.modeloNome || '');
+    normalized.tipoEquipamentoNome = String(
+        payload.tipo_equipamento_nome
+        || payload.tipoEquipamentoNome
+        || tipoEquipamentoNomeFallback
+        || ''
+    );
+    normalized.possuiModelo = Boolean(payload.possui_modelo ?? payload.possuiModelo ?? normalized.modeloNome !== '');
+
+    if (Array.isArray(payload.itens)) {
+        normalized.itens = payload.itens.map((item) => {
+            const existingPhotos = Array.isArray(item.fotos)
+                ? item.fotos.map((foto) => ({
+                    id: toInt(foto.id),
+                    url: String(foto.url || ''),
+                    nome: String(foto.arquivo_original || foto.arquivo || '')
+                })).filter((foto) => foto.url !== '')
+                : [];
+            const retainedPhotoIds = existingPhotos.map((foto) => foto.id).filter((photoId) => photoId > 0);
+            return {
+                id: toInt(item.id),
+                descricao: String(item.descricao || ''),
+                ordem: toInt(item.ordem),
+                status: checklistEntradaStatusOptions.includes(String(item.status || ''))
+                    ? String(item.status)
+                    : 'nao_verificado',
+                observacao: String(item.observacao || ''),
+                retainedPhotoIds,
+                deletedPhotoIds: [],
+                existingPhotos
+            };
+        });
+    }
+
+    if (payload.resumo && typeof payload.resumo === 'object') {
+        normalized.resumo = {
+            preenchido: Boolean(payload.resumo.preenchido),
+            total_discrepancias: Number(payload.resumo.total_discrepancias || 0),
+            label: String(payload.resumo.label || 'Checklist nao preenchido'),
+            variant: String(payload.resumo.variant || 'secondary')
+        };
+    } else {
+        normalized.resumo = computeChecklistResumo(normalized);
+    }
+
+    return normalized;
+}
+
+function computeChecklistResumo(state) {
+    if (!state?.possuiModelo) {
+        return {
+            preenchido: false,
+            total_discrepancias: 0,
+            label: 'Sem modelo configurado',
+            variant: 'secondary'
+        };
+    }
+
+    const itens = Array.isArray(state.itens) ? state.itens : [];
+    const totalDiscrepancias = itens.filter((item) => item.status === 'discrepancia').length;
+    const todosPreenchidos = itens.length > 0 && itens.every((item) => item.status !== 'nao_verificado');
+
+    if (!todosPreenchidos) {
+        return {
+            preenchido: false,
+            total_discrepancias: totalDiscrepancias,
+            label: 'Checklist nao preenchido',
+            variant: 'secondary'
+        };
+    }
+
+    if (totalDiscrepancias <= 0) {
+        return {
+            preenchido: true,
+            total_discrepancias: 0,
+            label: '0 discrepancias',
+            variant: 'success'
+        };
+    }
+
+    return {
+        preenchido: true,
+        total_discrepancias: totalDiscrepancias,
+        label: totalDiscrepancias === 1 ? '1 item com discrepancia' : `${totalDiscrepancias} discrepancias registradas`,
+        variant: 'warning'
+    };
+}
+
+function getSelectedEquipamentoTipoNome(optionEl = null) {
+    const opt = optionEl || document.querySelector('#equipamentoSelect option:checked');
+    return String(opt?.dataset?.tipo_nome || '').trim();
+}
+
+function updateChecklistInlineSummary() {
+    checklistEntradaCommitted.resumo = computeChecklistResumo(checklistEntradaCommitted);
+    if (checklistEntradaBadge) {
+        checklistEntradaBadge.textContent = checklistEntradaCommitted.resumo.label;
+        checklistEntradaBadge.className = `badge ${checklistBadgeVariant(checklistEntradaCommitted.resumo.variant)}`;
+    }
+    if (checklistEntradaInlineInfo) {
+        if (!checklistEntradaCommitted.possuiModelo) {
+            checklistEntradaInlineInfo.textContent = 'Nenhum checklist configurado para este tipo de equipamento.';
+        } else if (!checklistEntradaCommitted.resumo.preenchido) {
+            checklistEntradaInlineInfo.textContent = 'Checklist pendente. Abra o modal e marque todos os itens.';
+        } else if (checklistEntradaCommitted.resumo.total_discrepancias > 0) {
+            checklistEntradaInlineInfo.textContent = 'Checklist preenchido com discrepancias. Reabra para revisar os itens.';
+        } else {
+            checklistEntradaInlineInfo.textContent = 'Checklist preenchido sem discrepancias.';
+        }
+    }
+}
+
+function buildChecklistPayloadForSubmit(state) {
+    if (!state?.possuiModelo) {
+        return null;
+    }
+
+    return {
+        tipo_equipamento_nome: state.tipoEquipamentoNome || getSelectedEquipamentoTipoNome(),
+        itens: (state.itens || []).map((item) => ({
+            item_id: item.id,
+            status: checklistEntradaStatusOptions.includes(String(item.status || ''))
+                ? String(item.status)
+                : 'nao_verificado',
+            observacao: String(item.observacao || '').trim(),
+            retained_photo_ids: Array.isArray(item.retainedPhotoIds) ? item.retainedPhotoIds : [],
+            deleted_photo_ids: Array.isArray(item.deletedPhotoIds) ? item.deletedPhotoIds : []
+        }))
+    };
+}
+
+function buildLegacyEstadoFisicoFromChecklist(state) {
+    if (!state?.possuiModelo) {
+        return '';
+    }
+    const discrepancias = (state.itens || []).filter((item) => item.status === 'discrepancia');
+    if (!discrepancias.length) {
+        return 'Sem avarias aparentes';
+    }
+    return discrepancias
+        .map((item) => item.descricao)
+        .filter((desc) => String(desc || '').trim() !== '')
+        .join('\n');
+}
+
+function syncChecklistEntradaFileInputs() {
+    if (!checklistEntradaFilesInputs) {
+        return;
+    }
+    checklistEntradaFilesInputs.innerHTML = '';
+
+    Object.entries(checklistEntradaCommittedFiles).forEach(([itemId, dt]) => {
+        if (!dt || !dt.files || !dt.files.length) {
+            return;
+        }
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.className = 'd-none';
+        input.name = `fotos_checklist_entrada[${itemId}][]`;
+        input.files = dt.files;
+        checklistEntradaFilesInputs.appendChild(input);
+    });
+}
+
+function syncChecklistEntradaInputs() {
+    const payload = buildChecklistPayloadForSubmit(checklistEntradaCommitted);
+    if (checklistEntradaDataInput) {
+        checklistEntradaDataInput.value = payload ? JSON.stringify(payload) : '';
+    }
+
+    const estadoFisicoInput = document.getElementById('estadoFisicoInput');
+    if (estadoFisicoInput) {
+        estadoFisicoInput.value = buildLegacyEstadoFisicoFromChecklist(checklistEntradaCommitted);
+    }
+
+    const estadoFisicoDataInput = document.getElementById('estadoFisicoDataInput');
+    if (estadoFisicoDataInput) {
+        const legacyLines = String(estadoFisicoInput?.value || '').trim();
+        estadoFisicoDataInput.value = legacyLines
+            ? JSON.stringify(legacyLines.split(/\r?\n/).map((text, index) => ({
+                id: `chk_${index + 1}`,
+                text,
+                key: 'checklist'
+            })))
+            : '';
+    }
+
+    syncChecklistEntradaFileInputs();
+}
+
+function parseChecklistDraftPayload(rawValue) {
+    if (!rawValue) {
+        return null;
+    }
+
+    if (typeof rawValue === 'object' && Array.isArray(rawValue.itens)) {
+        return rawValue;
+    }
+
+    const raw = String(rawValue || '').trim();
+    if (!raw) {
+        return null;
+    }
+
+    try {
+        const parsed = JSON.parse(raw);
+        return parsed && Array.isArray(parsed.itens) ? parsed : null;
+    } catch (error) {
+        console.error('[ChecklistEntrada] falha ao interpretar rascunho salvo', error);
+        return null;
+    }
+}
+
+function applyChecklistDraftPayloadToCommitted(payload) {
+    if (!payload || !Array.isArray(payload.itens) || !checklistEntradaCommitted?.possuiModelo) {
+        return false;
+    }
+
+    const payloadMap = new Map();
+    payload.itens.forEach((item) => {
+        const itemId = toInt(item?.item_id ?? item?.id);
+        if (itemId > 0) {
+            payloadMap.set(itemId, item);
+        }
+    });
+
+    if (!payloadMap.size || !Array.isArray(checklistEntradaCommitted.itens) || !checklistEntradaCommitted.itens.length) {
+        return false;
+    }
+
+    checklistEntradaCommitted.itens = checklistEntradaCommitted.itens.map((item) => {
+        const incoming = payloadMap.get(toInt(item.id));
+        if (!incoming) {
+            return item;
+        }
+
+        const status = checklistEntradaStatusOptions.includes(String(incoming.status || ''))
+            ? String(incoming.status)
+            : 'nao_verificado';
+        const observacao = String(incoming.observacao || '');
+        const existingPhotos = Array.isArray(item.existingPhotos) ? item.existingPhotos : [];
+
+        return {
+            ...item,
+            status,
+            observacao: status === 'ok' ? '' : observacao,
+            retainedPhotoIds: existingPhotos.map((photo) => toInt(photo.id)).filter((photoId) => photoId > 0),
+            deletedPhotoIds: []
+        };
+    });
+
+    checklistEntradaCommittedFiles = {};
+    checklistEntradaCommitted.resumo = computeChecklistResumo(checklistEntradaCommitted);
+    return true;
+}
+
+function getChecklistResumoState() {
+    const resumo = checklistEntradaCommitted?.resumo || computeChecklistResumo(checklistEntradaCommitted || {});
+    return {
+        ok: !checklistEntradaCommitted?.possuiModelo || Boolean(resumo.preenchido),
+        label: String(resumo.label || 'Checklist nao preenchido')
+    };
+}
+
+function isChecklistEntradaRequiredAndMissing() {
+    if (!checklistEntradaCommitted?.possuiModelo) {
+        return false;
+    }
+    const resumo = checklistEntradaCommitted?.resumo || computeChecklistResumo(checklistEntradaCommitted);
+    return !Boolean(resumo.preenchido);
+}
+
+function getTotalChecklistEntradaFotos() {
+    const existingCount = (checklistEntradaCommitted?.itens || []).reduce((total, item) => {
+        const retained = Array.isArray(item.retainedPhotoIds) ? item.retainedPhotoIds : [];
+        return total + retained.length;
+    }, 0);
+    const newCount = Object.values(checklistEntradaCommittedFiles).reduce((total, dt) => total + (dt?.files?.length || 0), 0);
+    return existingCount + newCount;
+}
+
+function ensureChecklistDraftItem(itemId) {
+    if (!checklistEntradaDraft?.itens?.length) {
+        return null;
+    }
+    return checklistEntradaDraft.itens.find((item) => toInt(item.id) === toInt(itemId)) || null;
+}
+
+function ensureChecklistDraftTransfer(itemId) {
+    const key = String(itemId);
+    if (!checklistEntradaDraftFiles[key]) {
+        checklistEntradaDraftFiles[key] = new DataTransfer();
+    }
+    return checklistEntradaDraftFiles[key];
+}
+
+function renderChecklistItemPhotos(item, container) {
+    if (!container) {
+        return;
+    }
+    container.innerHTML = '';
+
+    const retainedSet = new Set((item.retainedPhotoIds || []).map((photoId) => toInt(photoId)));
+    (item.existingPhotos || []).forEach((photo) => {
+        if (!retainedSet.has(toInt(photo.id))) {
+            return;
+        }
+        const thumb = document.createElement('div');
+        thumb.className = 'checklist-photo-thumb';
+        thumb.innerHTML = `
+            <a href="javascript:void(0)" class="d-block w-100 h-100 image-preview" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="${escapeEquipamentoHtml(photo.url)}">
+                <img src="${escapeEquipamentoHtml(photo.url)}" alt="">
+            </a>
+            <button type="button" class="btn btn-sm btn-outline-light checklist-photo-remove" data-checklist-remove-existing="${toInt(photo.id)}" title="Remover foto">
+                <i class="bi bi-x"></i>
+            </button>
+        `;
+        container.appendChild(thumb);
+    });
+
+    const transfer = checklistEntradaDraftFiles[String(item.id)];
+    if (!transfer || !transfer.files || !transfer.files.length) {
+        return;
+    }
+
+    Array.from(transfer.files).forEach((file, index) => {
+        const objectUrl = URL.createObjectURL(file);
+        const thumb = document.createElement('div');
+        thumb.className = 'checklist-photo-thumb';
+        thumb.innerHTML = `
+            <a href="javascript:void(0)" class="d-block w-100 h-100 image-preview" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="${escapeEquipamentoHtml(objectUrl)}">
+                <img src="${escapeEquipamentoHtml(objectUrl)}" alt="">
+            </a>
+            <button type="button" class="btn btn-sm btn-outline-light checklist-photo-remove" data-checklist-remove-new="${index}" title="Remover foto">
+                <i class="bi bi-x"></i>
+            </button>
+        `;
+        container.appendChild(thumb);
+    });
+}
+
+function renderChecklistEntradaModal() {
+    if (!checklistEntradaModalList || !checklistEntradaModalAlert || !checklistEntradaModalMeta) {
+        return;
+    }
+
+    checklistEntradaModalList.innerHTML = '';
+    checklistEntradaModalAlert.classList.add('d-none');
+    checklistEntradaModalAlert.textContent = '';
+
+    if (!checklistEntradaDraft?.possuiModelo) {
+        checklistEntradaModalAlert.classList.remove('d-none');
+        checklistEntradaModalAlert.classList.add('alert-warning');
+        checklistEntradaModalAlert.textContent = 'Nao existe checklist cadastrado para este tipo de equipamento.';
+        checklistEntradaModalMeta.textContent = '';
+        if (checklistEntradaModalResumo) {
+            checklistEntradaModalResumo.textContent = 'Sem modelo configurado';
+        }
+        return;
+    }
+
+    const tipoNome = checklistEntradaDraft.tipoEquipamentoNome || getSelectedEquipamentoTipoNome() || 'Equipamento';
+    checklistEntradaModalMeta.textContent = `Modelo: ${checklistEntradaDraft.modeloNome || 'Checklist de entrada'} | Tipo: ${tipoNome}`;
+
+    const itensOrdenados = [...(checklistEntradaDraft.itens || [])].sort((a, b) => Number(a.ordem || 0) - Number(b.ordem || 0));
+    itensOrdenados.forEach((item) => {
+        const card = document.createElement('article');
+        card.className = 'checklist-item-card';
+        card.dataset.checklistItem = String(item.id);
+
+        const status = checklistEntradaStatusOptions.includes(String(item.status || '')) ? String(item.status) : 'nao_verificado';
+        const precisaObs = status === 'discrepancia';
+        const fotosCount = (item.retainedPhotoIds?.length || 0) + (checklistEntradaDraftFiles[String(item.id)]?.files?.length || 0);
+
+        card.innerHTML = `
+            <div class="checklist-item-head">
+                <div>
+                    <p class="checklist-item-title">${escapeEquipamentoHtml(item.descricao || 'Item')}</p>
+                    <small class="text-muted">Fotos: ${fotosCount}</small>
+                </div>
+                <div class="checklist-status-actions">
+                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'ok' ? 'btn-success' : 'btn-outline-success'}" data-checklist-status="ok">OK</button>
+                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'discrepancia' ? 'btn-warning' : 'btn-outline-warning'}" data-checklist-status="discrepancia">Discrepancia</button>
+                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'nao_verificado' ? 'btn-secondary' : 'btn-outline-secondary'}" data-checklist-status="nao_verificado">Nao verificado</button>
+                </div>
+            </div>
+            <div class="mt-2 ${precisaObs ? '' : 'd-none'}" data-checklist-observacao-wrap>
+                <label class="form-label form-label-sm mb-1">Observacao da discrepancia</label>
+                <textarea class="form-control form-control-sm" rows="2" data-checklist-observacao placeholder="Descreva a divergencia encontrada...">${escapeEquipamentoHtml(item.observacao || '')}</textarea>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-checklist-action="galeria">
+                    <i class="bi bi-image me-1"></i>Galeria
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-checklist-action="camera">
+                    <i class="bi bi-camera me-1"></i>Camera
+                </button>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mt-2" data-checklist-photos></div>
+        `;
+
+        checklistEntradaModalList.appendChild(card);
+        const photosContainer = card.querySelector('[data-checklist-photos]');
+        renderChecklistItemPhotos(item, photosContainer);
+    });
+
+    const resumo = computeChecklistResumo(checklistEntradaDraft);
+    if (checklistEntradaModalResumo) {
+        checklistEntradaModalResumo.textContent = resumo.label;
+    }
+}
+
+function openChecklistEntradaModal() {
+    const equipamentoSelecionado = document.getElementById('equipamentoSelect')?.value || '';
+    if (!equipamentoSelecionado) {
+        showWarningDialog('Selecione o equipamento antes de preencher o checklist.', 'Checklist indisponivel');
+        return;
+    }
+
+    checklistEntradaDraft = cloneChecklistEntradaState(checklistEntradaCommitted);
+    checklistEntradaDraftFiles = cloneChecklistFilesMap(checklistEntradaCommittedFiles);
+    renderChecklistEntradaModal();
+    checklistEntradaModal?.show();
+}
+
+function saveChecklistEntradaModal() {
+    if (!checklistEntradaDraft?.possuiModelo) {
+        checklistEntradaModal?.hide();
+        return;
+    }
+
+    const resumo = computeChecklistResumo(checklistEntradaDraft);
+    if (!resumo.preenchido) {
+        showWarningDialog('Marque todos os itens do checklist antes de salvar.', 'Checklist incompleto');
+        return;
+    }
+
+    checklistEntradaCommitted = cloneChecklistEntradaState(checklistEntradaDraft);
+    checklistEntradaCommitted.resumo = resumo;
+    checklistEntradaCommittedFiles = cloneChecklistFilesMap(checklistEntradaDraftFiles);
+    updateChecklistInlineSummary();
+    syncChecklistEntradaInputs();
+    updateResumo();
+    scheduleDraftSave();
+    checklistEntradaModal?.hide();
+}
+
+async function loadChecklistEntradaMeta(equipamentoId, optionEl = null) {
+    const equipId = toInt(equipamentoId);
+    if (!equipId) {
+        checklistEntradaCommitted = normalizeChecklistEntradaPayload(null, getSelectedEquipamentoTipoNome(optionEl));
+        checklistEntradaCommittedFiles = {};
+        updateChecklistInlineSummary();
+        syncChecklistEntradaInputs();
+        updateResumo();
+        return;
+    }
+
+    const token = ++checklistMetaLoadToken;
+    if (checklistEntradaBtn) {
+        checklistEntradaBtn.disabled = true;
+    }
+
+    try {
+        const params = new URLSearchParams();
+        params.set('equipamento_id', String(equipId));
+        if (osIdAtual > 0) {
+            params.set('os_id', String(osIdAtual));
+        }
+
+        const response = await fetch(`${checklistMetaEndpoint}?${params.toString()}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const payload = await response.json();
+
+        if (token !== checklistMetaLoadToken) {
+            return;
+        }
+
+        if (!response.ok || !payload?.ok) {
+            throw new Error(payload?.message || 'Nao foi possivel carregar o checklist.');
+        }
+
+        checklistEntradaCommitted = normalizeChecklistEntradaPayload(payload.data || null, getSelectedEquipamentoTipoNome(optionEl));
+        checklistEntradaCommittedFiles = {};
+        const shouldApplyPendingDraft = Boolean(
+            pendingChecklistEntradaDraftPayload
+            && (
+                String(pendingChecklistEntradaDraftEquipId || '') === ''
+                || String(pendingChecklistEntradaDraftEquipId || '') === String(equipId)
+            )
+        );
+        if (shouldApplyPendingDraft && applyChecklistDraftPayloadToCommitted(pendingChecklistEntradaDraftPayload)) {
+            pendingChecklistEntradaDraftPayload = null;
+            pendingChecklistEntradaDraftEquipId = '';
+        }
+        updateChecklistInlineSummary();
+        syncChecklistEntradaInputs();
+        updateResumo();
+    } catch (error) {
+        console.error('[ChecklistEntrada] falha ao carregar metadados', error);
+        checklistEntradaCommitted = normalizeChecklistEntradaPayload(null, getSelectedEquipamentoTipoNome(optionEl));
+        checklistEntradaCommittedFiles = {};
+        updateChecklistInlineSummary();
+        syncChecklistEntradaInputs();
+        updateResumo();
+    } finally {
+        if (checklistEntradaBtn) {
+            checklistEntradaBtn.disabled = false;
+        }
+    }
+}
+
+function processNextChecklistEntradaCrop() {
+    if (!checklistEntradaCropItemId) {
+        return;
+    }
+    if (!checklistEntradaCropQueue.length) {
+        hideModalSafe(modalCrop, '#modalCropEquip');
+        return;
+    }
+
+    const nextFile = checklistEntradaCropQueue.shift();
+    readFileAsDataUrl(nextFile)
+        .then((source) => openCropper(source, { type: 'checklist_entrada' }))
+        .catch((error) => {
+            console.error('[ChecklistEntrada] falha no preparo da foto para crop', error);
+            processNextChecklistEntradaCrop();
+        });
+}
+
+if (checklistEntradaBtn) {
+    checklistEntradaBtn.addEventListener('click', openChecklistEntradaModal);
+}
+
+btnChecklistEntradaSalvar?.addEventListener('click', saveChecklistEntradaModal);
+
+checklistEntradaModalEl?.addEventListener('hidden.bs.modal', () => {
+    checklistEntradaDraft = cloneChecklistEntradaState(checklistEntradaCommitted);
+    checklistEntradaDraftFiles = cloneChecklistFilesMap(checklistEntradaCommittedFiles);
+});
+
+checklistEntradaModalList?.addEventListener('click', (event) => {
+    const target = event.target.closest('button');
+    if (!target) {
+        return;
+    }
+
+    const itemCard = target.closest('[data-checklist-item]');
+    const itemId = itemCard?.dataset?.checklistItem || '';
+    const item = ensureChecklistDraftItem(itemId);
+    if (!item) {
+        return;
+    }
+
+    const statusAction = target.dataset.checklistStatus;
+    if (statusAction) {
+        item.status = checklistEntradaStatusOptions.includes(statusAction) ? statusAction : 'nao_verificado';
+        if (item.status !== 'discrepancia') {
+            item.observacao = '';
+        }
+        renderChecklistEntradaModal();
+        return;
+    }
+
+    const action = target.dataset.checklistAction;
+    if (action === 'galeria') {
+        if (checklistEntradaPhotoInput) {
+            checklistEntradaPhotoInput.dataset.itemId = String(item.id);
+            checklistEntradaPhotoInput.removeAttribute('capture');
+            checklistEntradaPhotoInput.click();
+        }
+        return;
+    }
+
+    if (action === 'camera') {
+        checklistEntradaCropItemId = String(item.id);
+        checklistEntradaCropQueue = [];
+        openCameraCapture({ type: 'checklist_entrada', entryId: String(item.id) });
+        return;
+    }
+
+    if (target.dataset.checklistRemoveExisting) {
+        const photoId = toInt(target.dataset.checklistRemoveExisting);
+        item.retainedPhotoIds = (item.retainedPhotoIds || []).filter((id) => toInt(id) !== photoId);
+        if (!item.deletedPhotoIds.includes(photoId)) {
+            item.deletedPhotoIds.push(photoId);
+        }
+        renderChecklistEntradaModal();
+        return;
+    }
+
+    if (target.dataset.checklistRemoveNew !== undefined) {
+        const index = toInt(target.dataset.checklistRemoveNew);
+        const transfer = checklistEntradaDraftFiles[String(item.id)];
+        if (!transfer || !transfer.files || !transfer.files.length) {
+            return;
+        }
+        const nextTransfer = new DataTransfer();
+        Array.from(transfer.files).forEach((file, fileIndex) => {
+            if (fileIndex !== index) {
+                nextTransfer.items.add(file);
+            }
+        });
+        checklistEntradaDraftFiles[String(item.id)] = nextTransfer;
+        renderChecklistEntradaModal();
+    }
+});
+
+checklistEntradaModalList?.addEventListener('input', (event) => {
+    const textarea = event.target.closest('textarea[data-checklist-observacao]');
+    if (!textarea) {
+        return;
+    }
+    const itemCard = textarea.closest('[data-checklist-item]');
+    const item = ensureChecklistDraftItem(itemCard?.dataset?.checklistItem || '');
+    if (!item) {
+        return;
+    }
+    item.observacao = textarea.value || '';
+});
+
+checklistEntradaPhotoInput?.addEventListener('change', function handleChecklistPhotoChange() {
+    const itemId = this.dataset.itemId || checklistEntradaCropItemId || '';
+    if (!itemId) {
+        this.value = '';
+        return;
+    }
+
+    const files = Array.from(this.files || []).filter((file) => String(file.type || '').startsWith('image/'));
+    if (!files.length) {
+        this.value = '';
+        return;
+    }
+
+    checklistEntradaCropItemId = String(itemId);
+    checklistEntradaCropQueue = files.slice();
+    processNextChecklistEntradaCrop();
+    this.value = '';
+});
+
+updateChecklistInlineSummary();
+syncChecklistEntradaInputs();
+
 // --- Select2 ---
 if (typeof $.fn.select2 !== 'undefined') {
     $('#clienteOsSelect').select2({
@@ -1600,6 +2527,159 @@ if (typeof $.fn.select2 !== 'undefined') {
 
     // Se quiser botão de Add dentro do dropdown Select2, é complexo.
     // O botão '+ Novo' já resolve bem.
+}
+
+function escapeEquipamentoHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function normalizeEquipamentoSearch(value) {
+    return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+}
+
+function buildEquipamentoPrimary(meta) {
+    const tipo = String(meta.tipo_nome || meta.tipo || '').trim();
+    const marca = String(meta.marca_nome || meta.marca || '').trim();
+    const parts = [tipo, marca].filter(Boolean);
+    return parts.length ? parts.join(' - ') : 'Equipamento';
+}
+
+function buildEquipamentoSecondary(meta) {
+    const modelo = String(meta.modelo_nome || meta.modelo || '').trim();
+    const cor = String(meta.cor || '').trim();
+    const parts = [modelo, cor].filter(Boolean);
+    return parts.length ? parts.join(' - ') : 'Modelo ou cor não informados';
+}
+
+function buildEquipamentoIdentity(meta) {
+    const serie = String(meta.numero_serie || meta.serie || '').trim();
+    const imei = String(meta.imei || '').trim();
+    if (serie && imei) {
+        return `Nº série: ${serie} | IMEI: ${imei}`;
+    }
+    if (serie) {
+        return `Nº série: ${serie}`;
+    }
+    if (imei) {
+        return `IMEI: ${imei}`;
+    }
+    return 'Sem número de série ou IMEI';
+}
+
+function buildEquipamentoFallback(meta) {
+    const raw = String(meta.tipo_nome || meta.tipo || meta.marca_nome || meta.marca || meta.modelo_nome || meta.modelo || 'EQ').trim();
+    return raw ? raw.charAt(0).toUpperCase() : 'E';
+}
+
+function getEquipamentoOptionMeta(source) {
+    const element = source?.element || source;
+    const dataset = element?.dataset || {};
+    return {
+        id: String(source?.id || element?.value || ''),
+        tipo: String(dataset.tipo || ''),
+        tipo_nome: String(dataset.tipo_nome || ''),
+        marca: String(dataset.marca || ''),
+        marca_nome: String(dataset.marca || ''),
+        modelo: String(dataset.modelo || ''),
+        modelo_nome: String(dataset.modelo || ''),
+        cor: String(dataset.cor || ''),
+        numero_serie: String(dataset.serie || ''),
+        imei: String(dataset.imei || ''),
+        foto_url: String(dataset.foto_url || '')
+    };
+}
+
+function renderEquipamentoOptionTemplate(data) {
+    if (data.loading) return data.text;
+    if (!data.id) {
+        return `<span class="text-muted">${escapeEquipamentoHtml(data.text || 'Selecione o equipamento...')}</span>`;
+    }
+
+    const meta = getEquipamentoOptionMeta(data);
+    const thumbHtml = meta.foto_url
+        ? `<img src="${escapeEquipamentoHtml(meta.foto_url)}" alt="">`
+        : `<span class="os-equip-select-fallback">${escapeEquipamentoHtml(buildEquipamentoFallback(meta))}</span>`;
+
+    return `
+        <div class="os-equip-select-result">
+            <div class="os-equip-select-thumb">${thumbHtml}</div>
+            <div class="os-equip-select-copy">
+                <strong>${escapeEquipamentoHtml(buildEquipamentoPrimary(meta))}</strong>
+                <small>${escapeEquipamentoHtml(buildEquipamentoSecondary(meta))}</small>
+                <small>${escapeEquipamentoHtml(buildEquipamentoIdentity(meta))}</small>
+            </div>
+        </div>
+    `;
+}
+
+function equipamentoSelectMatcher(params, data) {
+    const term = String(params.term || '').trim();
+    if (!term) {
+        return data;
+    }
+
+    if (!data.id || !data.element) {
+        return null;
+    }
+
+    const meta = getEquipamentoOptionMeta(data);
+    const haystack = normalizeEquipamentoSearch([
+        buildEquipamentoPrimary(meta),
+        buildEquipamentoSecondary(meta),
+        buildEquipamentoIdentity(meta),
+        meta.tipo_nome,
+        meta.marca_nome,
+        meta.modelo_nome,
+        meta.cor,
+        meta.numero_serie,
+        meta.imei
+    ].join(' '));
+    const needle = normalizeEquipamentoSearch(term);
+
+    return haystack.includes(needle) ? data : null;
+}
+
+function initEquipamentoSelect2() {
+    if (typeof $.fn.select2 === 'undefined') {
+        return;
+    }
+
+    const $equipamentoSelect = $('#equipamentoSelect');
+    if (!$equipamentoSelect.length) {
+        return;
+    }
+
+    if ($equipamentoSelect.hasClass('select2-hidden-accessible')) {
+        try {
+            $equipamentoSelect.off('.osEquipSelect2');
+            $equipamentoSelect.select2('destroy');
+        } catch (e) {}
+    }
+
+    $equipamentoSelect.select2({
+        theme: 'bootstrap-5',
+        placeholder: 'Selecione o equipamento...',
+        allowClear: true,
+        width: '100%',
+        escapeMarkup: function (markup) { return markup; },
+        templateResult: renderEquipamentoOptionTemplate,
+        templateSelection: renderEquipamentoOptionTemplate,
+        matcher: equipamentoSelectMatcher
+    }).on('change.osEquipSelect2', function() {
+        _onEquipamentoChange(this.value, this.options[this.selectedIndex]);
+    });
+}
+
+if (typeof $.fn.select2 !== 'undefined') {
+    initEquipamentoSelect2();
 }
 
 // --- Modal: Cadastrar ou Editar Cliente ---
@@ -1938,6 +3018,17 @@ document.getElementById('btnSalvarNovoCliente')?.addEventListener('click', funct
         notifyParentClienteUpdated(clientePayload);
         modalClienteInstance?.hide();
         form.reset();
+        if (window.Swal && typeof window.Swal.fire === 'function') {
+            Swal.fire({
+                icon: 'success',
+                title: res.is_update ? 'Cliente atualizado' : 'Cliente cadastrado',
+                text: res.is_update
+                    ? 'Os dados do cliente foram salvos com sucesso.'
+                    : 'Cliente cadastrado com sucesso.',
+                timer: 1800,
+                showConfirmButton: false
+            });
+        }
         
     })
     .catch(() => {
@@ -2022,8 +3113,7 @@ function updateResumo() {
     const previsaoInp = document.querySelector('input[name="data_previsao"]');
     const relatoInp  = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
     const acessoriosInp = document.querySelector('textarea[name="acessorios"]');
-    const estadoFisicoInp = document.getElementById('estadoFisicoInput');
-    const estadoFisicoSemAvarias = document.getElementById('estadoFisicoSemAvarias');
+    const checklistResumo = getChecklistResumoState();
 
     const clienteText = _getSelectedText(clienteSel, 'Não selecionado');
     const equipText   = _getSelectedText(equipSel, 'Não selecionado');
@@ -2032,18 +3122,16 @@ function updateResumo() {
     const statusVal = statusSel?.value || 'triagem';
     const relatoVal = relatoInp?.value?.trim() || '';
     const acessoriosVal = acessoriosInp?.value?.trim() || '';
-    const estadoFisicoVal = estadoFisicoInp?.value?.trim() || '';
 
     document.getElementById('resumoCliente').textContent = clienteText;
     document.getElementById('resumoEquipamento').textContent = equipText;
     document.getElementById('resumoTecnico').textContent = tecnicoText;
     document.getElementById('resumoEntrada').textContent = _formatDateTime(entradaInp?.value);
     document.getElementById('resumoPrevisao').textContent = _formatDate(previsaoInp?.value);
-    const semAcessorios = acessoriosVal.toLowerCase() === 'sem acessórios';
-    const semAvarias = Boolean(estadoFisicoSemAvarias?.checked) || estadoFisicoVal.toLowerCase() === 'sem avarias aparentes';
+    const semAcessorios = acessoriosVal.toLowerCase() === 'sem acessorios';
     document.getElementById('resumoRelato').textContent = relatoVal ? 'Preenchido' : 'Vazio';
-    document.getElementById('resumoAcessorios').textContent = semAcessorios ? 'Sem acessórios' : (acessoriosVal ? 'Informado' : 'Não informado');
-    document.getElementById('resumoEstadoFisico').textContent = semAvarias ? 'Sem avarias' : (estadoFisicoVal ? 'Informado' : 'Não informado');
+    document.getElementById('resumoAcessorios').textContent = semAcessorios ? 'Sem acessorios' : (acessoriosVal ? 'Informado' : 'Nao informado');
+    document.getElementById('resumoEstadoFisico').textContent = checklistResumo.label;
 
     const prioridadeBadgeClass = {
         baixa: 'text-bg-secondary',
@@ -2074,7 +3162,7 @@ function updateResumo() {
     _setFieldStatus('statusPrevisao', Boolean(previsaoInp?.value));
     _setFieldStatus('statusRelato', Boolean(relatoVal));
     _setFieldStatus('statusAcessorios', semAcessorios || Boolean(acessoriosVal));
-    _setFieldStatus('statusEstadoFisico', semAvarias || Boolean(estadoFisicoVal));
+    _setFieldStatus('statusEstadoFisico', checklistResumo.ok);
     _setFieldStatus('statusFotos', totalFotos > 0);
     if (document.getElementById('statusDefeitos')) {
         _setFieldStatus('statusDefeitos', defeitosCount > 0);
@@ -3357,7 +4445,7 @@ function getTotalEstadoFisicoFotos() {
 function getTotalFotosEntradaResumo() {
     const fotosEntradaNovas = document.getElementById('fotosEntradaInput')?.files?.length || 0;
     const fotosEntradaExistentes = existingFotosCount || 0;
-    return fotosEntradaNovas + fotosEntradaExistentes + getTotalAcessoriosFotos() + getTotalEstadoFisicoFotos();
+    return fotosEntradaNovas + fotosEntradaExistentes + getTotalAcessoriosFotos() + getTotalChecklistEntradaFotos();
 }
 
 function _setResumoRascunho(text) {
@@ -3377,6 +4465,7 @@ function _collectDraft() {
     const acessoriosInp = document.querySelector('textarea[name="acessorios"]');
     const estadoFisicoInp = document.querySelector('textarea[name="estado_fisico"]');
     const formaPagamentoSel = document.querySelector('select[name="forma_pagamento"]');
+    const checklistEntradaData = checklistEntradaDataInput?.value || '';
 
     return {
         savedAt: new Date().toISOString(),
@@ -3390,6 +4479,7 @@ function _collectDraft() {
         relato_cliente: relatoInp?.value || '',
         acessorios: acessoriosInp?.value || '',
         acessorios_sem_itens: acessoriosSemItensCheckbox?.checked ? '1' : '0',
+        checklist_entrada_data: checklistEntradaData,
         estado_fisico: estadoFisicoInp?.value || '',
         estado_fisico_sem_avarias: estadoFisicoSemAvariasCheckbox?.checked ? '1' : '0',
         forma_pagamento: formaPagamentoSel?.value || '',
@@ -3407,6 +4497,7 @@ function _hasDraftData(data) {
         data.relato_cliente?.trim() ||
         data.acessorios?.trim() ||
         data.acessorios_sem_itens === '1' ||
+        data.checklist_entrada_data?.trim() ||
         data.estado_fisico?.trim() ||
         data.estado_fisico_sem_avarias === '1' ||
         data.forma_pagamento?.trim() ||
@@ -3465,6 +4556,8 @@ function _applyDraft(data) {
     const acessoriosInp = document.querySelector('textarea[name="acessorios"]');
     const estadoFisicoInp = document.querySelector('textarea[name="estado_fisico"]');
     const formaPagamentoSel = document.querySelector('select[name="forma_pagamento"]');
+    pendingChecklistEntradaDraftPayload = parseChecklistDraftPayload(data.checklist_entrada_data || '');
+    pendingChecklistEntradaDraftEquipId = String(data.equipamento_id || '');
 
     if (tecnicoSel) tecnicoSel.value = data.tecnico_id || '';
     if (prioridadeSel) prioridadeSel.value = data.prioridade || 'normal';
@@ -3696,10 +4789,10 @@ if (formOs) {
                 isMissing: () => !isAcessoriosSemItensChecked() && !((acessoriosInput?.value || '').trim())
             },
             {
-                selector: '#estadoFisicoSemAvarias',
-                label: 'Estado fisico',
+                selector: '#btnChecklistEntrada',
+                label: 'Checklist de Entrada',
                 tabBtnId: 'tab-equipamento-btn',
-                isMissing: () => !isEstadoFisicoSemAvariasChecked() && !((estadoFisicoInput?.value || '').trim())
+                isMissing: () => isChecklistEntradaRequiredAndMissing()
             },
             { selector: '#osFotosPreview', label: 'Fotos de Entrada', tabBtnId: 'tab-fotos-btn', isMissing: () => getTotalEntradaFotos() === 0 },
         ];
@@ -4002,8 +5095,11 @@ function _onClienteChange(clienteId) {
     hideSidebar();
 
     if (!clienteId) {
+        pendingChecklistEntradaDraftPayload = null;
+        pendingChecklistEntradaDraftEquipId = '';
         equipamentoSelect.innerHTML = '<option value="">Selecione o cliente primeiro...</option>';
         equipamentoSelect.disabled = false;
+        loadChecklistEntradaMeta('', null);
         if (typeof setEquipamentoEditButtonState === 'function') setEquipamentoEditButtonState();
         updateResumo();
         scheduleDraftSave();
@@ -4038,6 +5134,7 @@ function _onClienteChange(clienteId) {
                 opt.dataset.marca     = eq.marca_nome || '';
                 opt.dataset.modelo    = eq.modelo_nome || '';
                 opt.dataset.serie     = eq.numero_serie || '';
+                opt.dataset.imei      = eq.imei || '';
                 opt.dataset.cor       = eq.cor || '';
                 opt.dataset.cor_hex   = eq.cor_hex || '';
                 opt.dataset.tipo_nome = eq.tipo_nome || '';
@@ -4047,32 +5144,28 @@ function _onClienteChange(clienteId) {
                 opt.dataset.senha_acesso = eq.senha_acesso || '';
                 opt.dataset.estado_fisico = eq.estado_fisico || '';
                 opt.dataset.acessorios = eq.acessorios || '';
+                opt.dataset.foto_url = eq.foto_url || '';
                 equipamentoSelect.appendChild(opt);
             });
         }
         equipamentoSelect.disabled = false;
+        const targetId = pendingEquipId || autoSelectId;
         // Re-inicializa Select2 no equipamento
         if (typeof $.fn.select2 !== 'undefined') {
-            $('#equipamentoSelect').select2({
-                theme: 'bootstrap-5',
-                placeholder: 'Selecione o equipamento...',
-                allowClear: true,
-                width: '100%'
-            }).on('change', function() {
-                _onEquipamentoChange(this.value, this.options[this.selectedIndex]);
-            });
-            const targetId = pendingEquipId || autoSelectId;
+            initEquipamentoSelect2();
             if (targetId) {
                 $('#equipamentoSelect').val(String(targetId)).trigger('change');
                 pendingEquipId = null;
             }
         } else {
-            const targetId = pendingEquipId || autoSelectId;
             if (targetId) {
                 equipamentoSelect.value = String(targetId);
                 _onEquipamentoChange(equipamentoSelect.value, equipamentoSelect.options[equipamentoSelect.selectedIndex]);
                 pendingEquipId = null;
             }
+        }
+        if (!targetId) {
+            loadChecklistEntradaMeta('', null);
         }
         if (typeof setEquipamentoEditButtonState === 'function') setEquipamentoEditButtonState();
         updateResumo();
@@ -4081,6 +5174,7 @@ function _onClienteChange(clienteId) {
     .catch(() => {
         equipamentoSelect.innerHTML = '<option value="">Erro ao carregar.</option>';
         equipamentoSelect.disabled = false;
+        loadChecklistEntradaMeta('', null);
         if (typeof setEquipamentoEditButtonState === 'function') setEquipamentoEditButtonState();
     });
 }
@@ -4100,6 +5194,7 @@ if (typeof $.fn.select2 !== 'undefined') {
 function _onEquipamentoChange(id, opt) {
     const tipoId = opt ? opt.getAttribute('data-tipo') : null;
     carregarDefeitos(tipoId);
+    loadChecklistEntradaMeta(id, opt);
     if (id) {
         carregarFotosEquipamento(id, {
             marca:  opt?.dataset?.marca,
@@ -4130,18 +5225,7 @@ if (equipSelect) {
 // Na edição, carrega automaticamente
     if (isEdit && equipSelect.value) {
         const opt = equipSelect.options[equipSelect.selectedIndex];
-        const tipoId = opt ? opt.getAttribute('data-tipo') : null;
-        if (tipoId) carregarDefeitos(tipoId);
-        if (equipSelect.value) {
-            carregarFotosEquipamento(equipSelect.value, {
-                marca:  opt?.dataset.marca,
-                modelo: opt?.dataset.modelo,
-                serie:  opt?.dataset.serie,
-                tipo:   opt?.dataset.tipo_nome,
-                cor:    opt?.dataset.cor,
-                cor_hex: opt?.dataset.cor_hex
-            });
-        }
+        _onEquipamentoChange(equipSelect.value, opt);
     }
 }
 
@@ -4855,8 +5939,10 @@ function getSelectedEquipamentoData() {
         modelo_nome: opt.dataset.modelo || '',
         tipo_nome: opt.dataset.tipo_nome || '',
         numero_serie: opt.dataset.serie || '',
+        imei: opt.dataset.imei || '',
         cor: opt.dataset.cor || '',
         cor_hex: opt.dataset.cor_hex || '',
+        foto_url: opt.dataset.foto_url || '',
         senha_acesso: opt.dataset.senha_acesso || '',
         estado_fisico: opt.dataset.estado_fisico || '',
         acessorios: opt.dataset.acessorios || ''
@@ -5591,6 +6677,10 @@ modalCameraEl?.addEventListener('hidden.bs.modal', () => {
         estadoFisicoCropEntryId = null;
         estadoFisicoCropQueue = [];
     }
+    if (cameraCaptureContext.type === 'checklist_entrada' && cropContext.type !== 'checklist_entrada') {
+        checklistEntradaCropItemId = null;
+        checklistEntradaCropQueue = [];
+    }
     if (cameraCaptureContext.type === 'entrada' && cropContext.type !== 'entrada') {
         fotosEntradaCropQueue = [];
     }
@@ -5605,6 +6695,8 @@ function setCropContext(context = { type: 'equipamento' }) {
             modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto do Acessorio';
         } else if (cropContext.type === 'estado_fisico') {
             modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto do Estado Fisico';
+        } else if (cropContext.type === 'checklist_entrada') {
+            modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto da Discrepancia';
         } else if (cropContext.type === 'entrada') {
             modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto de Entrada da OS';
         } else {
@@ -5683,6 +6775,38 @@ function appendBlobToCurrentPhotoContext(blob, canvas) {
             processNextEstadoFisicoCrop();
         } else {
             estadoFisicoCropEntryId = null;
+            hideModalSafe(modalCrop, '#modalCropEquip');
+        }
+        return;
+    }
+
+    if (cropContext.type === 'checklist_entrada' && checklistEntradaCropItemId) {
+        const entryId = String(checklistEntradaCropItemId);
+        const checklistItem = ensureChecklistDraftItem(entryId);
+        if (!checklistItem) {
+            checklistEntradaCropItemId = null;
+            if (checklistEntradaCropQueue.length > 0) {
+                processNextChecklistEntradaCrop();
+            } else {
+                hideModalSafe(modalCrop, '#modalCropEquip');
+            }
+            return;
+        }
+
+        const dt = ensureChecklistDraftTransfer(entryId);
+        const fileName = `checklist_entrada_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+        const file = new File([blob], fileName, { type: 'image/jpeg' });
+        dt.items.add(file);
+        if (checklistItem.status === 'nao_verificado') {
+            checklistItem.status = 'discrepancia';
+        }
+        renderChecklistEntradaModal();
+        scheduleDraftSave();
+
+        if (checklistEntradaCropQueue.length > 0) {
+            processNextChecklistEntradaCrop();
+        } else {
+            checklistEntradaCropItemId = null;
             hideModalSafe(modalCrop, '#modalCropEquip');
         }
         return;
@@ -5860,6 +6984,10 @@ document.getElementById('modalCropEquip').addEventListener('hidden.bs.modal', ()
         estadoFisicoCropQueue = [];
         estadoFisicoCropEntryId = null;
     }
+    if (cropContext.type === 'checklist_entrada') {
+        checklistEntradaCropQueue = [];
+        checklistEntradaCropItemId = null;
+    }
     if (cropContext.type === 'entrada') {
         fotosEntradaCropQueue = [];
     }
@@ -5904,6 +7032,12 @@ btnCapturar?.addEventListener('click', () => {
         estadoFisicoCropEntryId = cameraCaptureContext.entryId;
         estadoFisicoCropQueue = [];
         openCropper(dataUrl, { type: 'estado_fisico' });
+        return;
+    }
+    if (cameraCaptureContext.type === 'checklist_entrada' && cameraCaptureContext.entryId) {
+        checklistEntradaCropItemId = String(cameraCaptureContext.entryId);
+        checklistEntradaCropQueue = [];
+        openCropper(dataUrl, { type: 'checklist_entrada' });
         return;
     }
     if (cameraCaptureContext.type === 'entrada') {
@@ -6382,6 +7516,7 @@ document.getElementById('btnSalvarNovoEquip')?.addEventListener('click', functio
         opt.dataset.marca = eq.marca_nome || '';
         opt.dataset.modelo = eq.modelo_nome || '';
         opt.dataset.serie = eq.numero_serie || '';
+        opt.dataset.imei = eq.imei || '';
         opt.dataset.cor = eq.cor || '';
         opt.dataset.cor_hex = eq.cor_hex || '';
         opt.dataset.tipo_nome = eq.tipo_nome || '';
@@ -6391,7 +7526,9 @@ document.getElementById('btnSalvarNovoEquip')?.addEventListener('click', functio
         opt.dataset.senha_acesso = eq.senha_acesso || '';
         opt.dataset.estado_fisico = eq.estado_fisico || '';
         opt.dataset.acessorios = eq.acessorios || '';
+        opt.dataset.foto_url = res.foto_url || eq.foto_url || '';
 
+        eq.foto_url = res.foto_url || eq.foto_url || '';
         osEquipamentosCache[eqId] = eq;
         const fotosAtualizadas = Array.isArray(res.fotos) ? res.fotos : null;
 

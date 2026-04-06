@@ -10,15 +10,19 @@ use App\Models\ConversaWhatsappModel;
 use App\Models\CrmMensagemModel;
 use App\Models\CrmTagModel;
 use App\Models\MensagemWhatsappModel;
+use App\Models\MobilePushSubscriptionModel;
 use App\Models\OsModel;
 use App\Models\UsuarioModel;
 use App\Models\WhatsappInboundModel;
 use App\Services\ChatbotService;
+use App\Services\Mobile\MobileNotificationService;
+use App\Services\Mobile\MobilePermissionService;
 use CodeIgniter\HTTP\Files\UploadedFile;
 
 class CentralMensagensService
 {
     private const MEDIA_BASE_DIR = 'uploads/central_mensagens';
+    private const OUTBOUND_DIRECTIONS = ['outbound', 'saida', 'sent', 'enviado', 'enviada'];
 
     private ConversaWhatsappModel $conversaModel;
     private ConversaOsModel $conversaOsModel;
@@ -32,6 +36,9 @@ class CentralMensagensService
     private UsuarioModel $usuarioModel;
     private OsModel $osModel;
     private CrmService $crmService;
+    private MobileNotificationService $mobileNotificationService;
+    private MobilePushSubscriptionModel $mobilePushSubscriptionModel;
+    private MobilePermissionService $mobilePermissionService;
 
     public function __construct()
     {
@@ -47,6 +54,9 @@ class CentralMensagensService
         $this->usuarioModel = new UsuarioModel();
         $this->osModel = new OsModel();
         $this->crmService = new CrmService();
+        $this->mobileNotificationService = new MobileNotificationService();
+        $this->mobilePushSubscriptionModel = new MobilePushSubscriptionModel();
+        $this->mobilePermissionService = new MobilePermissionService();
     }
 
     public function normalizePhone(string $phone): string
@@ -56,6 +66,116 @@ class CentralMensagensService
             return '';
         }
         return str_starts_with($digits, '55') ? $digits : ('55' . $digits);
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     * @param list<string> $paths
+     * @param mixed $default
+     * @return mixed
+     */
+    private function payloadPathValue(array $payload, array $paths, $default = null)
+    {
+        foreach ($paths as $path) {
+            $segments = explode('.', $path);
+            $cursor = $payload;
+            $resolved = true;
+
+            foreach ($segments as $segment) {
+                if (is_array($cursor) && array_key_exists($segment, $cursor)) {
+                    $cursor = $cursor[$segment];
+                    continue;
+                }
+
+                $resolved = false;
+                break;
+            }
+
+            if ($resolved && $cursor !== null && $cursor !== '') {
+                return $cursor;
+            }
+        }
+
+        return $default;
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     * @param list<string> $paths
+     */
+    private function payloadPathString(array $payload, array $paths, string $default = ''): string
+    {
+        $value = $this->payloadPathValue($payload, $paths, $default);
+        if (is_scalar($value)) {
+            return trim((string) $value);
+        }
+
+        return $default;
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     * @param list<string> $paths
+     */
+    private function payloadPathBool(array $payload, array $paths): ?bool
+    {
+        $value = $this->payloadPathValue($payload, $paths, null);
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_string($value)) {
+            $normalized = strtolower(trim($value));
+            if ($normalized === '') {
+                return null;
+            }
+            if (in_array($normalized, ['1', 'true', 'yes', 'sim', 'on'], true)) {
+                return true;
+            }
+            if (in_array($normalized, ['0', 'false', 'no', 'nao', 'off'], true)) {
+                return false;
+            }
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     */
+    private function inferOutboundFromPayload(array $payload): bool
+    {
+        $explicit = $this->payloadPathBool($payload, [
+            'from_me',
+            'fromMe',
+            'is_from_me',
+            'isFromMe',
+            'outbound',
+            'is_outbound',
+            'isOutbound',
+            'sent_by_me',
+            'sentByMe',
+            'self',
+            'data.from_me',
+            'data.fromMe',
+            'data.outbound',
+            'data.is_outbound',
+            'data.sent_by_me',
+            'data.self',
+        ]);
+        if ($explicit !== null) {
+            return $explicit;
+        }
+
+        $direction = strtolower($this->payloadPathString($payload, [
+            'direction',
+            'direcao',
+            'tipo_direcao',
+            'data.direction',
+            'data.direcao',
+        ]));
+
+        return in_array($direction, self::OUTBOUND_DIRECTIONS, true);
     }
 
     public function resolveConversationForOutgoing(
@@ -126,7 +246,6 @@ class CentralMensagensService
             $conversa = $this->conversaModel->find((int) $conversaId);
         } else {
             $update = [
-                'ultima_mensagem_em' => date('Y-m-d H:i:s'),
                 'origem_provider' => $provider,
             ];
             if ($nomeContato && empty($conversa['nome_contato'])) {
@@ -178,57 +297,143 @@ class CentralMensagensService
             return null;
         }
 
-        $fromMeRaw = $payload['from_me'] ?? $payload['fromMe'] ?? null;
-        $fromMe = filter_var($fromMeRaw, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-        $isOutbound = ($fromMe === true);
+        $isOutbound = $this->inferOutboundFromPayload($payload);
 
-        $from = (string) ($payload['from'] ?? $payload['sender'] ?? ($payload['data']['from'] ?? ''));
-        $to = (string) (
-            $payload['to']
-            ?? $payload['recipient']
-            ?? $payload['number']
-            ?? ($payload['data']['to'] ?? '')
-        );
+        $from = $this->payloadPathString($payload, [
+            'from',
+            'sender',
+            'remetente',
+            'phone',
+            'telefone',
+            'number',
+            'author',
+            'chat_id',
+            'jid',
+            'contact.phone',
+            'contact.number',
+            'contact.jid',
+            'data.from',
+            'data.sender',
+            'data.remetente',
+            'data.phone',
+            'data.telefone',
+            'data.number',
+            'data.author',
+            'data.chat_id',
+            'data.jid',
+            'data.contact.phone',
+            'data.contact.number',
+            'data.contact.jid',
+        ]);
+        $to = $this->payloadPathString($payload, [
+            'to',
+            'recipient',
+            'destinatario',
+            'phone_to',
+            'target',
+            'data.to',
+            'data.recipient',
+            'data.destinatario',
+            'data.phone_to',
+            'data.target',
+        ]);
 
         $phoneRef = $isOutbound ? $to : $from;
         if (trim($phoneRef) === '') {
-            $phoneRef = (string) (
-                $payload['chat_id']
-                ?? $payload['number']
-                ?? $payload['sender']
-                ?? $payload['recipient']
-                ?? $payload['from']
-                ?? ''
-            );
+            $phoneRef = $this->payloadPathString($payload, [
+                'chat_id',
+                'number',
+                'sender',
+                'recipient',
+                'from',
+                'telefone',
+                'phone',
+                'jid',
+                'contact.phone',
+                'contact.number',
+                'data.chat_id',
+                'data.number',
+                'data.sender',
+                'data.recipient',
+                'data.from',
+                'data.telefone',
+                'data.phone',
+                'data.jid',
+                'data.contact.phone',
+                'data.contact.number',
+            ]);
         }
 
-        $message = trim((string) (
-            $payload['message']
-            ?? $payload['text']
-            ?? $payload['body']
-            ?? ($payload['data']['message'] ?? '')
-        ));
-        $mimeType = trim((string) (
-            $payload['media_mime_type']
-            ?? $payload['mime_type']
-            ?? ''
-        ));
-        $mediaBase64 = trim((string) (
-            $payload['media_base64']
-            ?? $payload['file']
-            ?? ''
-        ));
-        $mediaFilename = trim((string) (
-            $payload['media_filename']
-            ?? $payload['filename']
-            ?? ''
-        ));
-        $tipoConteudoPayload = strtolower(trim((string) (
-            $payload['tipo_conteudo']
-            ?? $payload['type']
-            ?? ''
-        )));
-        $hasMedia = (bool) ($payload['has_media'] ?? false) || $mediaBase64 !== '' || $mimeType !== '';
+        $message = $this->payloadPathString($payload, [
+            'message',
+            'mensagem',
+            'text',
+            'body',
+            'conteudo',
+            'caption',
+            'description',
+            'content.text',
+            'content.message',
+            'data.message',
+            'data.mensagem',
+            'data.text',
+            'data.body',
+            'data.conteudo',
+            'data.caption',
+            'data.description',
+            'data.content.text',
+            'data.content.message',
+        ]);
+        $mimeType = strtolower($this->payloadPathString($payload, [
+            'media_mime_type',
+            'mime_type',
+            'mime',
+            'mimetype',
+            'data.media_mime_type',
+            'data.mime_type',
+            'data.mime',
+            'data.mimetype',
+        ]));
+        $mediaBase64 = $this->payloadPathString($payload, [
+            'media_base64',
+            'file',
+            'base64',
+            'media.base64',
+            'data.media_base64',
+            'data.file',
+            'data.base64',
+            'data.media.base64',
+        ]);
+        $mediaFilename = $this->payloadPathString($payload, [
+            'media_filename',
+            'filename',
+            'file_name',
+            'name',
+            'media.filename',
+            'data.media_filename',
+            'data.filename',
+            'data.file_name',
+            'data.name',
+            'data.media.filename',
+        ]);
+        $tipoConteudoPayload = strtolower($this->payloadPathString($payload, [
+            'tipo_conteudo',
+            'type',
+            'message_type',
+            'media_type',
+            'data.tipo_conteudo',
+            'data.type',
+            'data.message_type',
+            'data.media_type',
+        ]));
+        $hasMedia = $this->payloadPathBool($payload, [
+            'has_media',
+            'hasMedia',
+            'media',
+            'data.has_media',
+            'data.hasMedia',
+            'data.media',
+        ]) === true || $mediaBase64 !== '' || $mimeType !== '';
 
         if ($hasMedia && $message !== '') {
             $messageCompact = preg_replace('/\s+/', '', $message) ?? '';
@@ -246,13 +451,35 @@ class CentralMensagensService
             return null;
         }
 
-        $messageId = trim((string) ($payload['message_id'] ?? $payload['id'] ?? ''));
+        $messageId = $this->payloadPathString($payload, [
+            'message_id',
+            'messageId',
+            'id',
+            'msg_id',
+            'key.id',
+            'data.message_id',
+            'data.messageId',
+            'data.id',
+            'data.msg_id',
+            'data.key.id',
+        ]);
         if ($messageId !== '') {
             $existing = $this->mensagemModel
                 ->where('provider', $provider)
                 ->where('provider_message_id', $messageId)
                 ->orderBy('id', 'DESC')
                 ->first();
+
+            if (!$existing) {
+                $existing = $this->mensagemModel
+                    ->where('provider_message_id', $messageId)
+                    ->groupStart()
+                    ->where('telefone', $phone)
+                    ->orWhere('direcao', $isOutbound ? 'outbound' : 'inbound')
+                    ->groupEnd()
+                    ->orderBy('id', 'DESC')
+                    ->first();
+            }
 
             if ($existing) {
                 $updates = [
@@ -271,52 +498,90 @@ class CentralMensagensService
                 if ($phone !== '' && empty($existing['telefone'])) {
                     $updates['telefone'] = $phone;
                 }
+                if ($hasMedia) {
+                    $existingMime = strtolower(trim((string) ($existing['mime_type'] ?? '')));
+                    $existingArquivo = trim((string) ($existing['arquivo'] ?? $existing['anexo_path'] ?? ''));
+                    $existingTipo = strtolower(trim((string) ($existing['tipo_conteudo'] ?? '')));
+
+                    $resolvedTipo = $this->resolveInboundContentType(
+                        $tipoConteudoPayload,
+                        $mimeType !== '' ? $mimeType : ($existingMime !== '' ? $existingMime : null),
+                        $existingArquivo !== '' ? $existingArquivo : null
+                    );
+                    if ($resolvedTipo !== '' && $resolvedTipo !== $existingTipo) {
+                        $updates['tipo_conteudo'] = $resolvedTipo;
+                    }
+                    if ($mimeType !== '' && $existingMime === '') {
+                        $updates['mime_type'] = $mimeType;
+                    }
+
+                    $shouldHydrateMissingMedia = $mediaBase64 !== '' && (
+                        $existingArquivo === ''
+                        || in_array($existingTipo, ['texto', 'arquivo', 'ptt', 'voice', 'voice_note'], true)
+                    );
+
+                    if ($shouldHydrateMissingMedia) {
+                        $savedMedia = $this->saveInboundMedia($mediaBase64, $mimeType, $mediaFilename, $phone);
+                        if ($savedMedia) {
+                            $arquivoInbound = $savedMedia['arquivo'] ?? null;
+                            $mimeInbound = $savedMedia['mime_type'] ?? ($mimeType !== '' ? $mimeType : null);
+                            $tipoInbound = $this->resolveInboundContentType($tipoConteudoPayload, $mimeInbound, $arquivoInbound);
+
+                            if (!empty($arquivoInbound)) {
+                                $updates['arquivo'] = $arquivoInbound;
+                                $updates['anexo_path'] = $arquivoInbound;
+                            }
+                            if (!empty($mimeInbound)) {
+                                $updates['mime_type'] = $mimeInbound;
+                            }
+                            if ($tipoInbound !== '') {
+                                $updates['tipo_conteudo'] = $tipoInbound;
+                            }
+                        }
+                    }
+                }
                 if (!empty($updates)) {
                     $this->mensagemModel->update((int) $existing['id'], $updates);
-                }
-
-                $conversaIdExisting = (int) ($existing['conversa_id'] ?? 0);
-                if ($conversaIdExisting > 0) {
-                    $this->conversaModel->update($conversaIdExisting, [
-                        'ultima_mensagem_em' => date('Y-m-d H:i:s'),
-                    ]);
                 }
 
                 return (int) $existing['id'];
             }
 
             if ($isOutbound) {
-                $candidate = $this->mensagemModel
-                    ->where('provider', $provider)
-                    ->where('direcao', 'outbound')
-                    ->where('telefone', $phone)
-                    ->where('provider_message_id', null)
-                    ->orderBy('id', 'DESC')
-                    ->first();
-
-                if ($candidate) {
-                    $createdTs = !empty($candidate['created_at']) ? strtotime((string) $candidate['created_at']) : false;
-                    $isRecent = $createdTs !== false ? (time() - $createdTs) <= 180 : true;
-                    $messageMatches = ($message === '' || trim((string) ($candidate['mensagem'] ?? '')) === '' || trim((string) ($candidate['mensagem'] ?? '')) === $message);
-
-                    if ($isRecent && $messageMatches) {
-                        $this->mensagemModel->update((int) $candidate['id'], [
-                            'provider_message_id' => $messageId,
-                            'status' => 'enviada',
-                            'enviada_em' => date('Y-m-d H:i:s'),
-                            'payload' => json_encode($payload, JSON_UNESCAPED_UNICODE),
-                        ]);
-
-                        $conversaCandidate = (int) ($candidate['conversa_id'] ?? 0);
-                        if ($conversaCandidate > 0) {
-                            $this->conversaModel->update($conversaCandidate, [
-                                'ultima_mensagem_em' => date('Y-m-d H:i:s'),
-                            ]);
-                        }
-
-                        return (int) $candidate['id'];
+                $candidate = $this->findRecentOutboundCandidate($phone, $provider);
+                if ($candidate && $this->outboundCandidateMatches($candidate, $message, $hasMedia)) {
+                    $candidateProvider = trim((string) ($candidate['provider'] ?? ''));
+                    $updatePayload = [
+                        'provider_message_id' => $messageId,
+                        'status' => 'enviada',
+                        'enviada_em' => date('Y-m-d H:i:s'),
+                        'payload' => json_encode($payload, JSON_UNESCAPED_UNICODE),
+                    ];
+                    if ($candidateProvider === '') {
+                        $updatePayload['provider'] = $provider;
                     }
+                    $this->mensagemModel->update((int) $candidate['id'], $updatePayload);
+
+                    return (int) $candidate['id'];
                 }
+            }
+        }
+
+        if ($isOutbound && $messageId === '') {
+            $candidate = $this->findRecentOutboundCandidate($phone, $provider);
+            if ($candidate && $this->outboundCandidateMatches($candidate, $message, $hasMedia)) {
+                $candidateMensagem = trim((string) ($candidate['mensagem'] ?? ''));
+                $updatePayload = [
+                    'status' => 'enviada',
+                    'enviada_em' => date('Y-m-d H:i:s'),
+                    'payload' => json_encode($payload, JSON_UNESCAPED_UNICODE),
+                ];
+                if ($message !== '' && $candidateMensagem === '') {
+                    $updatePayload['mensagem'] = $message;
+                }
+                $this->mensagemModel->update((int) $candidate['id'], $updatePayload);
+
+                return (int) $candidate['id'];
             }
         }
 
@@ -356,18 +621,53 @@ class CentralMensagensService
             'enviada_por_usuario_id' => null,
         ];
 
+        if ($isOutbound) {
+            $duplicate = $this->findRecentOutboundDuplicate(
+                $conversaId,
+                $phone,
+                $message,
+                $tipoConteudo,
+                $mimeInbound,
+                $arquivoInbound
+            );
+            if ($duplicate) {
+                $updatePayload = [
+                    'payload' => json_encode($payload, JSON_UNESCAPED_UNICODE),
+                    'status' => 'enviada',
+                ];
+                if ($messageId !== '' && empty($duplicate['provider_message_id'])) {
+                    $updatePayload['provider_message_id'] = $messageId;
+                }
+                if (empty($duplicate['provider']) && $provider !== '') {
+                    $updatePayload['provider'] = $provider;
+                }
+                if (empty($duplicate['enviada_em'])) {
+                    $updatePayload['enviada_em'] = date('Y-m-d H:i:s');
+                }
+                $this->mensagemModel->update((int) $duplicate['id'], $updatePayload);
+
+                return (int) $duplicate['id'];
+            }
+        }
+
         $mensagemId = $this->mensagemModel->insert($insert, true);
         if (!$mensagemId) {
             return null;
         }
 
+        $reopenedByInbound = false;
         if ($conversaId) {
+            $statusAtualConversa = strtolower(trim((string) ($conversa['status'] ?? 'aberta')));
             $updateConversa = [
                 'ultima_mensagem_em' => date('Y-m-d H:i:s'),
                 'primeira_mensagem_em' => (empty($conversa['primeira_mensagem_em']) ? date('Y-m-d H:i:s') : $conversa['primeira_mensagem_em']),
             ];
             if (!$isOutbound) {
                 $updateConversa['nao_lidas'] = (int) ($conversa['nao_lidas'] ?? 0) + 1;
+                if ($statusAtualConversa === 'resolvida') {
+                    $updateConversa['status'] = 'aberta';
+                    $reopenedByInbound = true;
+                }
             }
             $this->conversaModel->update($conversaId, $updateConversa);
             $conversa = $this->conversaModel->find($conversaId);
@@ -417,6 +717,24 @@ class CentralMensagensService
                 'usuario_id' => $usuarioId,
             ]);
         } else {
+            if ($reopenedByInbound && $conversaId) {
+                $this->crmService->registerEvent([
+                    'cliente_id' => $clienteId,
+                    'os_id' => $osId,
+                    'conversa_id' => $conversaId,
+                    'tipo_evento' => 'conversa_reaberta_inbound',
+                    'titulo' => 'Conversa reaberta automaticamente',
+                    'descricao' => 'Nova mensagem inbound alterou o status de "resolvida" para "aberta".',
+                    'origem' => 'central_mensagens',
+                    'usuario_id' => $usuarioId,
+                    'data_evento' => date('Y-m-d H:i:s'),
+                    'payload_json' => [
+                        'before' => 'resolvida',
+                        'after' => 'aberta',
+                    ],
+                ]);
+            }
+
             $this->crmService->registerInteraction([
                 'cliente_id' => $clienteId,
                 'os_id' => $osId,
@@ -468,6 +786,18 @@ class CentralMensagensService
                     log_message('warning', 'Falha ao processar chatbot inbound: ' . $e->getMessage());
                 }
             }
+
+            $this->notifyMobileInbound(
+                $conversa,
+                (int) $mensagemId,
+                $message,
+                $tipoConteudo,
+                $mediaFilename,
+                $phone,
+                $clienteId,
+                $osId,
+                $usuarioId
+            );
         }
 
         return (int) $mensagemId;
@@ -808,8 +1138,24 @@ class CentralMensagensService
     public function syncInboundQueue(int $limit = 100, bool $forceGatewayHistory = false): int
     {
         $count = $this->syncGatewayHistoryIfNeeded($forceGatewayHistory);
+        $count += $this->processPendingInboundRows($limit);
+
+        return $count;
+    }
+
+    /**
+     * Processa apenas a fila local de inbound ja recebida pelo webhook, sem acionar sync de historico no gateway.
+     */
+    public function processInboundQueueOnly(int $limit = 100): int
+    {
+        return $this->processPendingInboundRows($limit);
+    }
+
+    private function processPendingInboundRows(int $limit = 100): int
+    {
+        $processed = 0;
         if (!$this->inboundModel->db->tableExists('whatsapp_inbound')) {
-            return $count;
+            return 0;
         }
         $rows = $this->inboundModel->where('processado', 0)->orderBy('id', 'ASC')->findAll($limit);
         foreach ($rows as $row) {
@@ -819,19 +1165,29 @@ class CentralMensagensService
             }
             if (!empty($row['remetente'])) {
                 $payload['from'] = $payload['from'] ?? $row['remetente'];
+                $payload['sender'] = $payload['sender'] ?? $row['remetente'];
+                $payload['remetente'] = $payload['remetente'] ?? $row['remetente'];
+                $payload['phone'] = $payload['phone'] ?? $row['remetente'];
+                $payload['number'] = $payload['number'] ?? $row['remetente'];
             }
             if (!empty($row['conteudo'])) {
                 $payload['message'] = $payload['message'] ?? $row['conteudo'];
+                $payload['text'] = $payload['text'] ?? $row['conteudo'];
+                $payload['body'] = $payload['body'] ?? $row['conteudo'];
+                $payload['conteudo'] = $payload['conteudo'] ?? $row['conteudo'];
+            }
+            if (!empty($row['provedor'])) {
+                $payload['provider'] = $payload['provider'] ?? $row['provedor'];
             }
 
             $ok = $this->registerInboundFromPayload($payload, (string) ($row['provedor'] ?? 'webhook'));
             if ($ok) {
                 $this->inboundModel->update((int) $row['id'], ['processado' => 1]);
-                $count++;
+                $processed++;
             }
         }
 
-        return $count;
+        return $processed;
     }
 
     private function syncGatewayHistoryIfNeeded(bool $force = false): int
@@ -880,7 +1236,15 @@ class CentralMensagensService
             return 0;
         }
 
-        $endpoint = rtrim($baseUrl, '/') . '/sync-chat-history?limit_chats=20&per_chat=20&max_total=300&since_seconds=172800';
+        $limitChats = $force ? 10 : 6;
+        $perChat = $force ? 10 : 6;
+        $maxTotal = $force ? 120 : 60;
+        $sinceSeconds = $force ? 86400 : 21600;
+        $endpoint = rtrim($baseUrl, '/') . '/sync-chat-history'
+            . '?limit_chats=' . $limitChats
+            . '&per_chat=' . $perChat
+            . '&max_total=' . $maxTotal
+            . '&since_seconds=' . $sinceSeconds;
         $headers = [
             'Accept: application/json',
             'Content-Type: application/json',
@@ -1070,6 +1434,12 @@ class CentralMensagensService
     private function extractProfileNameFromPayload(array $payload): ?string
     {
         $candidates = [
+            $payload['name'] ?? null,
+            $payload['nome'] ?? null,
+            $payload['notify_name'] ?? null,
+            $payload['notifyName'] ?? null,
+            $payload['display_name'] ?? null,
+            $payload['displayName'] ?? null,
             $payload['push_name'] ?? null,
             $payload['pushName'] ?? null,
             $payload['sender_name'] ?? null,
@@ -1078,6 +1448,15 @@ class CentralMensagensService
             $payload['contactName'] ?? null,
             $payload['profile_name'] ?? null,
             $payload['profileName'] ?? null,
+            $payload['contact']['name'] ?? null,
+            $payload['contact']['display_name'] ?? null,
+            $payload['contact']['profile_name'] ?? null,
+            $payload['data']['name'] ?? null,
+            $payload['data']['nome'] ?? null,
+            $payload['data']['notify_name'] ?? null,
+            $payload['data']['notifyName'] ?? null,
+            $payload['data']['display_name'] ?? null,
+            $payload['data']['displayName'] ?? null,
             $payload['data']['push_name'] ?? null,
             $payload['data']['pushName'] ?? null,
             $payload['data']['sender_name'] ?? null,
@@ -1086,6 +1465,9 @@ class CentralMensagensService
             $payload['data']['contactName'] ?? null,
             $payload['data']['profile_name'] ?? null,
             $payload['data']['profileName'] ?? null,
+            $payload['data']['contact']['name'] ?? null,
+            $payload['data']['contact']['display_name'] ?? null,
+            $payload['data']['contact']['profile_name'] ?? null,
         ];
 
         foreach ($candidates as $candidate) {
@@ -1131,21 +1513,25 @@ class CentralMensagensService
 
     private function resolveInboundContentType(string $payloadType, ?string $mimeType, ?string $arquivo): string
     {
-        if ($payloadType !== '' && $payloadType !== 'chat') {
-            if (str_contains($payloadType, 'image')) {
-                return 'imagem';
-            }
-            if (str_contains($payloadType, 'audio')) {
+        $type = strtolower(trim($payloadType));
+        if ($type !== '' && $type !== 'chat') {
+            if ($type === 'ptt' || str_contains($type, 'voice') || str_contains($type, 'audio')) {
                 return 'audio';
             }
-            if (str_contains($payloadType, 'video')) {
+            if (str_contains($type, 'image')) {
+                return 'imagem';
+            }
+            if (str_contains($type, 'video')) {
                 return 'video';
             }
-            if (str_contains($payloadType, 'document')) {
+            if (str_contains($type, 'document')) {
                 $mime = strtolower(trim((string) $mimeType));
                 return $mime === 'application/pdf' ? 'pdf' : 'arquivo';
             }
-            return $payloadType;
+            if ($type === 'text' || $type === 'chat') {
+                return 'texto';
+            }
+            return $type;
         }
 
         $mime = strtolower(trim((string) $mimeType));
@@ -1166,6 +1552,112 @@ class CentralMensagensService
         }
 
         return !empty($arquivo) ? 'arquivo' : 'texto';
+    }
+
+    private function findRecentOutboundCandidate(string $phone, string $provider = ''): ?array
+    {
+        $provider = trim($provider);
+        if ($provider !== '') {
+            $candidate = $this->mensagemModel
+                ->where('provider', $provider)
+                ->where('direcao', 'outbound')
+                ->where('telefone', $phone)
+                ->where('provider_message_id', null)
+                ->orderBy('id', 'DESC')
+                ->first();
+
+            if ($candidate) {
+                return $candidate;
+            }
+        }
+
+        return $this->mensagemModel
+            ->where('direcao', 'outbound')
+            ->where('telefone', $phone)
+            ->where('provider_message_id', null)
+            ->orderBy('id', 'DESC')
+            ->first();
+    }
+
+    private function outboundCandidateMatches(array $candidate, string $message, bool $hasMedia): bool
+    {
+        $referenceTs = !empty($candidate['created_at'])
+            ? strtotime((string) $candidate['created_at'])
+            : (!empty($candidate['updated_at']) ? strtotime((string) $candidate['updated_at']) : false);
+        $isRecent = $referenceTs !== false ? (time() - $referenceTs) <= 300 : true;
+        if (!$isRecent) {
+            return false;
+        }
+
+        $incomingMessage = trim($message);
+        $candidateMessage = trim((string) ($candidate['mensagem'] ?? ''));
+        if ($incomingMessage !== '' && $candidateMessage !== '' && $candidateMessage !== $incomingMessage) {
+            return false;
+        }
+
+        if ($hasMedia) {
+            $candidateArquivo = trim((string) ($candidate['arquivo'] ?? $candidate['anexo_path'] ?? ''));
+            $candidateTipo = strtolower(trim((string) ($candidate['tipo_conteudo'] ?? '')));
+            $candidateMime = strtolower(trim((string) ($candidate['mime_type'] ?? '')));
+            if (
+                $candidateArquivo === ''
+                && !in_array($candidateTipo, ['imagem', 'video', 'audio', 'pdf', 'arquivo'], true)
+                && $candidateMime === ''
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function findRecentOutboundDuplicate(
+        ?int $conversaId,
+        string $phone,
+        string $message,
+        string $tipoConteudo,
+        ?string $mimeType,
+        ?string $arquivo
+    ): ?array {
+        $builder = $this->mensagemModel
+            ->where('direcao', 'outbound')
+            ->where('telefone', $phone)
+            ->where('created_at >=', date('Y-m-d H:i:s', time() - 45))
+            ->orderBy('id', 'DESC');
+
+        if (!empty($conversaId)) {
+            $builder->where('conversa_id', (int) $conversaId);
+        }
+
+        $normalizedMessage = trim($message);
+        if ($normalizedMessage !== '') {
+            $builder->where('mensagem', $normalizedMessage);
+        } else {
+            $builder->groupStart()
+                ->where('mensagem', null)
+                ->orWhere('mensagem', '')
+                ->groupEnd();
+        }
+
+        $normalizedTipo = strtolower(trim($tipoConteudo));
+        if ($normalizedTipo !== '') {
+            $builder->where('tipo_conteudo', $normalizedTipo);
+        }
+
+        $normalizedArquivo = trim((string) $arquivo);
+        if ($normalizedArquivo !== '') {
+            $builder->groupStart()
+                ->where('arquivo', $normalizedArquivo)
+                ->orWhere('anexo_path', $normalizedArquivo)
+                ->groupEnd();
+        } elseif ($normalizedMessage === '') {
+            $normalizedMime = strtolower(trim((string) $mimeType));
+            if ($normalizedMime !== '') {
+                $builder->where('mime_type', $normalizedMime);
+            }
+        }
+
+        return $builder->first();
     }
 
     /**
@@ -1419,6 +1911,178 @@ class CentralMensagensService
             'video/quicktime' => 'mov',
             default => 'bin',
         };
+    }
+
+    private function notifyMobileInbound(
+        ?array $conversa,
+        int $mensagemId,
+        string $mensagem,
+        string $tipoConteudo,
+        string $mediaFilename,
+        string $phone,
+        ?int $clienteId,
+        ?int $osId,
+        ?int $originUserId = null
+    ): void {
+        $conversaId = (int) ($conversa['id'] ?? 0);
+        if ($conversaId <= 0 || $mensagemId <= 0) {
+            return;
+        }
+
+        $recipientIds = $this->resolveMobileNotificationRecipients($conversa, $originUserId);
+        if (empty($recipientIds)) {
+            return;
+        }
+
+        $nomeContato = trim((string) ($conversa['nome_contato'] ?? ''));
+        if ($nomeContato === '') {
+            $nomeContato = $phone;
+        }
+
+        $title = 'Nova mensagem de ' . $nomeContato;
+        $body = $this->buildMobileInboundPreview($mensagem, $tipoConteudo, $mediaFilename);
+        $route = '/conversas/' . $conversaId;
+
+        $payload = [
+            'conversa_id' => $conversaId,
+            'mensagem_id' => $mensagemId,
+            'cliente_id' => $clienteId ?: null,
+            'os_id' => $osId ?: null,
+            'tipo_conteudo' => $tipoConteudo !== '' ? $tipoConteudo : 'texto',
+        ];
+
+        $targets = [
+            ['tipo' => 'conversation', 'id' => $conversaId],
+        ];
+        if ((int) ($clienteId ?? 0) > 0) {
+            $targets[] = ['tipo' => 'client', 'id' => (int) $clienteId];
+        }
+        if ((int) ($osId ?? 0) > 0) {
+            $targets[] = ['tipo' => 'order', 'id' => (int) $osId];
+        }
+
+        $created = $this->mobileNotificationService->notifyUsers(
+            $recipientIds,
+            'message.inbound',
+            $title,
+            $body,
+            $payload,
+            $route,
+            $targets
+        );
+
+        if ($created <= 0) {
+            log_message(
+                'warning',
+                '[CentralMensagens] Falha ao criar notificacao mobile inbound. conversa_id=' . $conversaId
+            );
+        }
+    }
+
+    /**
+     * @param array<string,mixed>|null $conversa
+     * @return array<int,int>
+     */
+    private function resolveMobileNotificationRecipients(?array $conversa, ?int $originUserId = null): array
+    {
+        $subscriptionRows = $this->mobilePushSubscriptionModel
+            ->select('usuario_id')
+            ->where('ativo', 1)
+            ->groupBy('usuario_id')
+            ->findAll();
+
+        if (empty($subscriptionRows)) {
+            return [];
+        }
+
+        $usersWithDevice = array_values(array_unique(array_filter(array_map(
+            static fn (array $row): int => (int) ($row['usuario_id'] ?? 0),
+            $subscriptionRows
+        ), static fn (int $id): bool => $id > 0)));
+
+        if (empty($usersWithDevice)) {
+            return [];
+        }
+
+        $responsavelId = (int) ($conversa['responsavel_id'] ?? 0);
+        if ($responsavelId > 0 && in_array($responsavelId, $usersWithDevice, true)) {
+            if ($originUserId !== null && $originUserId > 0 && $originUserId === $responsavelId) {
+                return [];
+            }
+            return [$responsavelId];
+        }
+
+        $users = $this->usuarioModel
+            ->select('id, perfil, grupo_id, ativo')
+            ->whereIn('id', $usersWithDevice)
+            ->where('ativo', 1)
+            ->findAll();
+
+        $recipients = [];
+        foreach ($users as $user) {
+            $userId = (int) ($user['id'] ?? 0);
+            if ($userId <= 0) {
+                continue;
+            }
+            if ($originUserId !== null && $originUserId > 0 && $originUserId === $userId) {
+                continue;
+            }
+            if (!$this->mobilePermissionService->userCan($user, 'clientes', 'visualizar')) {
+                continue;
+            }
+            $recipients[] = $userId;
+            if (count($recipients) >= 20) {
+                break;
+            }
+        }
+
+        return array_values(array_unique($recipients));
+    }
+
+    private function buildMobileInboundPreview(string $mensagem, string $tipoConteudo, string $mediaFilename): string
+    {
+        $texto = trim($mensagem);
+        if ($texto !== '') {
+            return $this->truncateText($texto, 120);
+        }
+
+        $tipo = strtolower(trim($tipoConteudo));
+        $label = match ($tipo) {
+            'audio', 'ptt', 'voice', 'voice_note' => '[audio]',
+            'video' => '[video]',
+            'imagem', 'image', 'foto' => '[imagem]',
+            'pdf' => '[pdf]',
+            'arquivo', 'documento', 'file' => '[arquivo]',
+            default => 'Nova mensagem recebida',
+        };
+
+        $file = trim($mediaFilename);
+        if ($file !== '' && in_array($label, ['[audio]', '[video]', '[imagem]', '[pdf]', '[arquivo]'], true)) {
+            return $this->truncateText($label . ' ' . $file, 120);
+        }
+
+        return $label;
+    }
+
+    private function truncateText(string $text, int $limit): string
+    {
+        $value = trim($text);
+        if ($value === '' || $limit <= 0) {
+            return '';
+        }
+
+        if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+            if (mb_strlen($value, 'UTF-8') <= $limit) {
+                return $value;
+            }
+            return rtrim(mb_substr($value, 0, $limit - 1, 'UTF-8')) . '...';
+        }
+
+        if (strlen($value) <= $limit) {
+            return $value;
+        }
+
+        return rtrim(substr($value, 0, $limit - 1)) . '...';
     }
 
     private function registerCrmMensagem(array $payload): ?int

@@ -113,6 +113,8 @@ class Clientes extends BaseController
                 ->with('error', 'Cliente não encontrado.');
         }
 
+        $isEmbedded = $this->request->getGet('embed') === '1';
+
         $equipamentoModel = new EquipamentoModel();
         $osModel = new OsModel();
 
@@ -197,6 +199,8 @@ class Clientes extends BaseController
             'crmTimeline' => $crmTimeline,
             'crmResumo' => $crmResumo,
             'conversasCliente' => $conversasCliente,
+            'layout' => $isEmbedded ? 'layouts/embed' : 'layouts/main',
+            'isEmbedded' => $isEmbedded,
         ];
         return view('clientes/show', $data);
     }

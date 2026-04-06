@@ -10,5 +10,5 @@ class SystemRelease extends BaseConfig
      * Versao oficial exibida no rodape do ERP.
      * Atualize este valor em cada release.
      */
-    public string $version = '2.5.9';
+    public string $version = '2.11.5';
 }

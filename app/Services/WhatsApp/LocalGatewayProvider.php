@@ -15,7 +15,7 @@ class LocalGatewayProvider implements WhatsAppProviderInterface
         string $baseUrl,
         string $apiToken = '',
         string $erpOrigin = '',
-        int $timeout = 20,
+        int $timeout = 30,
         string $providerId = 'api_whats_local',
         string $providerLabel = 'gateway local'
     ) {

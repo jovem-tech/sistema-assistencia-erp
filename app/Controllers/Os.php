@@ -24,6 +24,7 @@ use App\Models\ConversaWhatsappModel;
 use App\Models\DefeitoRelatadoModel;
 use App\Models\OsStatusModel;
 use App\Models\OsStatusHistoricoModel;
+use App\Models\OsNotaLegadaModel;
 use App\Models\MensagemWhatsappModel;
 use App\Models\WhatsappMensagemModel;
 use App\Models\WhatsappEnvioModel;
@@ -33,6 +34,8 @@ use App\Services\WhatsAppService;
 use App\Services\OsPdfService;
 use App\Services\CrmService;
 use App\Services\CentralMensagensService;
+use App\Services\ChecklistService;
+use Config\Database;
 
 class Os extends BaseController
 {
@@ -222,6 +225,7 @@ class Os extends BaseController
         return [
             'q' => trim((string) ($read('q') ?? '')),
             'status' => $this->normalizeStringList($statusRaw),
+            'legado' => $this->normalizeToggleValue($read('legado')),
             'macrofase' => trim((string) ($read('macrofase') ?? '')),
             'estado_fluxo' => trim((string) ($read('estado_fluxo') ?? '')),
             'data_inicio' => $this->normalizeDateValue($read('data_inicio')),
@@ -242,6 +246,13 @@ class Os extends BaseController
 
         if (!empty($filters['status'])) {
             $builder->whereIn('os.status', $filters['status']);
+        }
+
+        if (!empty($filters['legado'])) {
+            $builder->groupStart()
+                ->where('os.legacy_origem IS NOT NULL', null, false)
+                ->orWhere("TRIM(COALESCE(os.numero_os_legado, '')) <> ''", null, false)
+            ->groupEnd();
         }
 
         if (!empty($filters['macrofase']) && $hasStatusTable) {
@@ -395,6 +406,9 @@ class Os extends BaseController
         $builder->select(
             'os.id,
             os.numero_os,
+            os.numero_os_legado,
+            os.legacy_origem,
+            os.cliente_id,
             os.equipamento_id,
             os.status,
             os.estado_fluxo,
@@ -493,10 +507,14 @@ class Os extends BaseController
             $digitsOnly = preg_replace('/\D+/', '', $query);
 
             $builder->groupStart()
-                ->like('os.numero_os', $normalizedOsNumber, 'after');
+                ->like('os.numero_os', $normalizedOsNumber, 'after')
+                ->orLike('os.numero_os_legado', $normalizedOsNumber, 'after');
 
             if ($digitsOnly !== '' && $digitsOnly !== $normalizedOsNumber) {
-                $builder->orLike('os.numero_os', $digitsOnly, 'after');
+                $builder->orGroupStart()
+                    ->like('os.numero_os', $digitsOnly, 'after')
+                    ->orLike('os.numero_os_legado', $digitsOnly, 'after')
+                ->groupEnd();
             }
 
             $builder->groupEnd();
@@ -816,21 +834,31 @@ class Os extends BaseController
         }
         $acoes .= '</div>';
 
+        $numeroOsHtml = '<span class="os-numero-cell"><strong>#' . esc($row['numero_os']) . '</strong>';
+        if (!empty($row['numero_os_legado'])) {
+            $numeroOsHtml .= '<small class="os-numero-meta">Legado: ' . esc((string) $row['numero_os_legado']) . '</small>';
+        }
+        if (!empty($row['legacy_origem'])) {
+            $numeroOsHtml .= '<small class="os-numero-meta">Origem: ' . esc((string) $row['legacy_origem']) . '</small>';
+        }
+        $numeroOsHtml .= '</span>';
+
         return [
             $this->formatOsPhotoCell($row, $photoContext),
-            '<span class="os-numero-cell"><strong>#' . esc($row['numero_os']) . '</strong></span>',
-            $this->formatOsClientCell((string) ($row['cliente_nome'] ?? '')),
+            '<a href="' . base_url('os/visualizar/' . $row['id']) . '" class="os-numero-link" title="Abrir visualizacao da OS">' . $numeroOsHtml . '</a>',
+            $this->formatOsClientCell($row),
             $this->formatOsEquipmentCell($row),
             $this->formatOsRelatoCell($row),
             $this->formatOsDatesCell($row),
             $this->formatOsStatusCell($row),
-            $valorFormatado,
+            $this->formatOsValueCell($row, $valorFormatado),
             $acoes,
         ];
     }
 
-    private function formatOsClientCell(string $clientName): string
+    private function formatOsClientCell(array $row): string
     {
+        $clientName = (string) ($row['cliente_nome'] ?? '');
         $clientName = trim($clientName);
         if ($clientName === '') {
             return '<div class="fw-semibold os-cliente-cell text-muted">-</div>';
@@ -843,15 +871,22 @@ class Os extends BaseController
             $firstLine = implode(' ', array_slice($parts, 0, 2));
             $secondLine = implode(' ', array_slice($parts, 2));
 
-            return implode('', [
-                '<div class="fw-semibold os-cliente-cell" title="' . esc($clientName) . '">',
+            $content = implode('', [
+                '<div class="fw-semibold os-cliente-cell">',
                 '<span class="os-cliente-line">' . esc($firstLine) . '</span>',
                 '<span class="os-cliente-line">' . esc($secondLine) . '</span>',
                 '</div>',
             ]);
+        } else {
+            $content = '<div class="fw-semibold os-cliente-cell"><span class="os-cliente-line">' . esc($clientName) . '</span></div>';
         }
 
-        return '<div class="fw-semibold os-cliente-cell" title="' . esc($clientName) . '"><span class="os-cliente-line">' . esc($clientName) . '</span></div>';
+        $clienteId = (int) ($row['cliente_id'] ?? 0);
+        if ($clienteId <= 0 || !can('clientes', 'visualizar')) {
+            return $content;
+        }
+
+        return '<button type="button" class="btn btn-link p-0 text-start os-cell-link os-cell-link-client" data-os-frame-modal-url="' . esc(base_url('clientes/visualizar/' . $clienteId . '?embed=1')) . '" data-os-frame-modal-title="' . esc('Cliente: ' . $clientName) . '" title="Abrir ficha completa e historico do cliente">' . $content . '</button>';
     }
 
     private function formatOsPhotoCell(array $row, array $photoContext = []): string
@@ -893,13 +928,25 @@ class Os extends BaseController
         $brand = trim((string) ($row['equip_marca'] ?? '')) ?: '-';
         $model = trim((string) ($row['equip_modelo'] ?? '')) ?: '-';
 
-        return implode('', [
+        $content = implode('', [
             '<div class="os-equipamento-cell">',
             '<div class="os-equipamento-line"><span class="os-equipamento-label">Tipo:</span><span class="os-equipamento-value">' . esc($type) . '</span></div>',
             '<div class="os-equipamento-line"><span class="os-equipamento-label">Marca:</span><span class="os-equipamento-value">' . esc($brand) . '</span></div>',
             '<div class="os-equipamento-line"><span class="os-equipamento-label">Modelo:</span><span class="os-equipamento-value">' . esc($model) . '</span></div>',
             '</div>',
         ]);
+
+        $equipamentoId = (int) ($row['equipamento_id'] ?? 0);
+        if ($equipamentoId <= 0 || !can('equipamentos', 'visualizar')) {
+            return $content;
+        }
+
+        $modalTitle = trim((string) (($row['equip_marca'] ?? '') . ' ' . ($row['equip_modelo'] ?? '')));
+        if ($modalTitle === '') {
+            $modalTitle = 'Equipamento';
+        }
+
+        return '<button type="button" class="btn btn-link p-0 text-start os-cell-link os-cell-link-equipment" data-os-frame-modal-url="' . esc(base_url('equipamentos/visualizar/' . $equipamentoId . '?embed=1')) . '" data-os-frame-modal-title="' . esc('Equipamento: ' . $modalTitle) . '" title="Abrir detalhes do equipamento">' . $content . '</button>';
     }
 
     private function formatOsRelatoCell(array $row): string
@@ -924,9 +971,8 @@ class Os extends BaseController
 
         if ($previsaoRaw !== '') {
             $prazoClass = $this->resolvePrazoClass($previsaoRaw, $entregaRaw);
-            $dias = $this->calculatePrazoDays($entradaRaw, $previsaoRaw);
-            $diasLabel = $dias !== null ? ($dias . ' dia' . ($dias === 1 ? '' : 's')) : 'Sem prazo';
-            $prazoLabel = '<span class="os-date-indicator ' . esc($prazoClass) . '">' . esc($diasLabel . ' - ' . date('d/m/Y', strtotime($previsaoRaw))) . '</span>';
+            $prazoText = $this->buildPrazoIndicatorText($entradaRaw, $previsaoRaw, $entregaRaw);
+            $prazoLabel = '<span class="os-date-indicator ' . esc($prazoClass) . '">' . esc($prazoText) . '</span>';
         }
 
         if ($entregaRaw !== '') {
@@ -936,13 +982,30 @@ class Os extends BaseController
             $entregaLabel = '<span class="os-date-indicator ' . esc($entregaClass) . '">' . esc(date('d/m/Y', strtotime($entregaRaw))) . '</span>';
         }
 
-        return implode('', [
+        $content = implode('', [
             '<div class="os-dates-cell">',
             '<div class="os-date-line"><span class="os-date-label">Entrada:</span><span class="os-date-value">' . esc($entrada) . '</span></div>',
             '<div class="os-date-line"><span class="os-date-label">Prazo:</span><span class="os-date-value">' . $prazoLabel . '</span></div>',
             '<div class="os-date-line"><span class="os-date-label">Entrega:</span><span class="os-date-value">' . $entregaLabel . '</span></div>',
             '</div>',
         ]);
+
+        if (!can('os', 'editar')) {
+            return $content;
+        }
+
+        return '<button type="button" class="btn btn-link p-0 text-start os-cell-link os-cell-link-dates" data-os-dates-action data-os-id="' . (int) ($row['id'] ?? 0) . '" title="Atualizar prazos da OS">' . $content . '</button>';
+    }
+
+    private function formatOsValueCell(array $row, string $valorFormatado): string
+    {
+        $content = '<span class="os-valor-cell">' . esc($valorFormatado) . '</span>';
+
+        if (!can('os', 'editar')) {
+            return $content;
+        }
+
+        return '<button type="button" class="btn btn-link p-0 text-start os-cell-link os-cell-link-value" data-os-budget-action data-os-id="' . (int) ($row['id'] ?? 0) . '" title="Gerar e enviar orcamento da OS">' . $content . '</button>';
     }
 
     private function formatOsStatusCell(array $row): string
@@ -1010,9 +1073,57 @@ class Os extends BaseController
         return max(0, (int) round(($previsaoBase - $entradaBase) / 86400));
     }
 
+    private function calculateElapsedDays(string $startRaw, string $endRaw): ?int
+    {
+        $start = trim($startRaw);
+        $end = trim($endRaw);
+        if ($start === '' || $end === '') {
+            return null;
+        }
+
+        $startBase = strtotime(date('Y-m-d', strtotime($start)));
+        $endBase = strtotime(date('Y-m-d', strtotime($end)));
+
+        if ($startBase === false || $endBase === false) {
+            return null;
+        }
+
+        return max(0, (int) round(($endBase - $startBase) / 86400));
+    }
+
+    private function buildPrazoIndicatorText(string $entradaRaw, string $previsaoRaw, string $entregaRaw): string
+    {
+        $previsaoLabel = date('d/m/Y', strtotime($previsaoRaw));
+        $prazoDays = $this->calculatePrazoDays($entradaRaw, $previsaoRaw);
+        $prazoBaseLabel = $prazoDays !== null
+            ? ($prazoDays . ' dia' . ($prazoDays === 1 ? '' : 's'))
+            : 'Sem prazo';
+
+        if ($entregaRaw !== '') {
+            $delayDays = $this->calculateElapsedDays($previsaoRaw, $entregaRaw);
+            if ($delayDays !== null && $delayDays > 0) {
+                return 'Atraso de ' . $delayDays . ' dia' . ($delayDays === 1 ? '' : 's') . ' - ' . $previsaoLabel;
+            }
+
+            return $prazoBaseLabel . ' - ' . $previsaoLabel;
+        }
+
+        $overdueDays = $this->calculateElapsedDays($previsaoRaw, date('Y-m-d'));
+        if ($overdueDays !== null && $overdueDays > 0) {
+            return 'Atrasado ha ' . $overdueDays . ' dia' . ($overdueDays === 1 ? '' : 's') . ' - ' . $previsaoLabel;
+        }
+
+        return $prazoBaseLabel . ' - ' . $previsaoLabel;
+    }
+
     public function statusMeta($id)
     {
-        $os = $this->model->find((int) $id);
+        $id = (int) $id;
+        $os = $this->model->getComplete($id);
+        if (!$os) {
+            $os = $this->model->find($id);
+        }
+
         if (!$os) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
@@ -1021,12 +1132,18 @@ class Os extends BaseController
         }
 
         $service = new OsStatusFlowService();
+        $statusGrouped = $service->getStatusGrouped();
         $allowed = $service->buildTransitionHints((string) ($os['status'] ?? ''));
         $grouped = [];
         foreach ($allowed as $status) {
             $macro = (string) ($status['grupo_macro'] ?? 'outros');
             $grouped[$macro][] = $status;
         }
+
+        $statusHistorico = ((new OsStatusHistoricoModel())->db->tableExists('os_status_historico'))
+            ? (new OsStatusHistoricoModel())->byOs($id)
+            : [];
+        $estadoFluxo = trim((string) ($os['estado_fluxo'] ?? ''));
 
         return $this->response->setJSON([
             'ok' => true,
@@ -1035,8 +1152,37 @@ class Os extends BaseController
                 'numero_os' => (string) ($os['numero_os'] ?? ''),
                 'status' => (string) ($os['status'] ?? ''),
                 'estado_fluxo' => (string) ($os['estado_fluxo'] ?? ''),
+                'status_nome' => $this->humanizeOsStatus((string) ($os['status'] ?? '')),
+                'prioridade' => (string) ($os['prioridade'] ?? 'normal'),
+                'cliente_nome' => (string) ($os['cliente_nome'] ?? ''),
+                'cliente_telefone' => (string) ($os['cliente_telefone'] ?? ''),
+                'cliente_email' => (string) ($os['cliente_email'] ?? ''),
+                'equipamento_nome' => trim((string) (($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))),
+                'equip_tipo' => (string) ($os['equip_tipo'] ?? ''),
+                'equip_tipo_label' => getEquipTipo((string) ($os['equip_tipo'] ?? '')),
+                'equip_marca' => (string) ($os['equip_marca'] ?? ''),
+                'equip_modelo' => (string) ($os['equip_modelo'] ?? ''),
+                'equip_serie' => (string) ($os['equip_serie'] ?? ''),
+                'statusBadgeHtml' => getStatusBadge((string) ($os['status'] ?? '')),
+                'flowBadgeHtml' => $estadoFluxo !== ''
+                    ? '<span class="badge bg-light text-dark border">' . esc(ucwords(str_replace('_', ' ', $estadoFluxo))) . '</span>'
+                    : '',
+                'priorityBadgeHtml' => getPriorityBadge((string) ($os['prioridade'] ?? 'normal')),
             ],
             'options' => $grouped,
+            'primaryNextStatus' => $this->resolvePrimaryNextStatus(
+                $service,
+                (string) ($os['status'] ?? ''),
+                $allowed
+            ),
+            'workflowTimeline' => $this->buildOsWorkflowTimeline(
+                $statusGrouped,
+                $statusHistorico,
+                (string) ($os['status'] ?? ''),
+                $allowed
+            ),
+            'workflowRecentHistory' => array_slice($statusHistorico, 0, 4),
+            'hasClientPhone' => trim((string) ($os['cliente_telefone'] ?? '')) !== '',
             'csrfHash' => csrf_hash(),
         ]);
     }
@@ -1054,6 +1200,8 @@ class Os extends BaseController
 
         $status = strtolower(trim((string) $this->request->getPost('status')));
         $observacao = trim((string) $this->request->getPost('observacao_status'));
+        $controlaComunicacaoCliente = !empty($this->request->getPost('controla_comunicacao_cliente'));
+        $comunicarCliente = $controlaComunicacaoCliente && !empty($this->request->getPost('comunicar_cliente'));
 
         if ($status === '') {
             return $this->response->setStatusCode(422)->setJSON([
@@ -1079,15 +1227,373 @@ class Os extends BaseController
             ]);
         }
 
-        $this->finalizeStatusSideEffects((int) $id, $os, $status);
+        $this->finalizeStatusSideEffects((int) $id, $os, $status, !$controlaComunicacaoCliente);
+
+        $warningMessage = null;
+        if ($comunicarCliente) {
+            $notifyResult = $this->sendStatusChangeNotification(
+                (int) $id,
+                $status,
+                $observacao !== '' ? $observacao : null,
+                session()->get('user_id') ?: null
+            );
+
+            if (empty($notifyResult['ok'])) {
+                $warningMessage = $notifyResult['message'] ?? 'O status foi atualizado, mas nao foi possivel comunicar o cliente.';
+            }
+        }
 
         LogModel::registrar('os_status', 'Status da OS ' . $os['numero_os'] . ' alterado para: ' . $status . ' via listagem.');
 
-        return $this->response->setJSON([
+        $response = [
             'ok' => true,
             'message' => 'Status atualizado com sucesso.',
             'csrfHash' => csrf_hash(),
+        ];
+
+        if ($warningMessage !== null) {
+            $response['warning'] = $warningMessage;
+        }
+
+        return $this->response->setJSON($response);
+    }
+
+    public function datesMeta($id)
+    {
+        $os = $this->model->getComplete((int) $id);
+        if (!$os) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'ok' => false,
+                'message' => 'OS nao encontrada.',
+                'csrfHash' => csrf_hash(),
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'ok' => true,
+            'os' => $this->buildListOsContextPayload($os),
+            'dates' => [
+                'data_entrada' => $this->formatDateTimeInputValue($os['data_entrada'] ?? $os['data_abertura'] ?? null),
+                'data_previsao' => $this->formatDateInputValue($os['data_previsao'] ?? null),
+                'data_entrega' => $this->formatDateInputValue($os['data_entrega'] ?? null),
+                'data_entrada_label' => $this->formatDateDisplay($os['data_entrada'] ?? $os['data_abertura'] ?? null, true),
+                'data_previsao_label' => $this->formatDateDisplay($os['data_previsao'] ?? null),
+                'data_entrega_label' => $this->formatDateDisplay($os['data_entrega'] ?? null),
+                'prazo_dias' => $this->calculatePrazoDays(
+                    (string) ($os['data_entrada'] ?? $os['data_abertura'] ?? ''),
+                    (string) ($os['data_previsao'] ?? '')
+                ),
+            ],
+            'csrfHash' => csrf_hash(),
         ]);
+    }
+
+    public function updateDatesAjax($id)
+    {
+        $osId = (int) $id;
+        $os = $this->model->find($osId);
+        if (!$os) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'ok' => false,
+                'message' => 'OS nao encontrada.',
+                'csrfHash' => csrf_hash(),
+            ]);
+        }
+
+        $dataEntradaInformada = trim((string) $this->request->getPost('data_entrada'));
+        $dataEntregaInformada = trim((string) $this->request->getPost('data_entrega'));
+        if ($dataEntradaInformada !== '' || $dataEntregaInformada !== '') {
+            return $this->response->setStatusCode(422)->setJSON([
+                'ok' => false,
+                'message' => 'Neste modal, apenas a previsao pode ser alterada. A entrada e a entrega seguem o fluxo operacional correto da OS.',
+                'csrfHash' => csrf_hash(),
+            ]);
+        }
+
+        try {
+            $previsao = $this->normalizeNullableDateInput((string) $this->request->getPost('data_previsao'));
+        } catch (\InvalidArgumentException $e) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'ok' => false,
+                'message' => $e->getMessage(),
+                'csrfHash' => csrf_hash(),
+            ]);
+        }
+
+        $entradaAtual = (string) ($os['data_entrada'] ?? $os['data_abertura'] ?? '');
+        $entradaComparacao = $this->extractDateOnly($entradaAtual);
+        if ($entradaComparacao !== null && $previsao !== null && strtotime($previsao) < strtotime($entradaComparacao)) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'ok' => false,
+                'message' => 'A previsao nao pode ser anterior a data de entrada.',
+                'csrfHash' => csrf_hash(),
+            ]);
+        }
+
+        $this->model->update($osId, [
+            'data_previsao' => $previsao,
+        ]);
+
+        LogModel::registrar(
+            'os_prazos_atualizados',
+            'Prazos da OS ' . ($os['numero_os'] ?? ('#' . $osId)) . ' atualizados via listagem.'
+        );
+
+        return $this->response->setJSON([
+            'ok' => true,
+            'message' => 'Prazos da OS atualizados com sucesso.',
+            'csrfHash' => csrf_hash(),
+        ]);
+    }
+
+    public function budgetMeta($id)
+    {
+        $os = $this->model->getComplete((int) $id);
+        if (!$os) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'ok' => false,
+                'message' => 'OS nao encontrada.',
+                'csrfHash' => csrf_hash(),
+            ]);
+        }
+
+        $documents = [];
+        $documentoModel = new OsDocumentoModel();
+        if ($documentoModel->db->tableExists('os_documentos')) {
+            $documents = array_map(function (array $doc): array {
+                return [
+                    'id' => (int) ($doc['id'] ?? 0),
+                    'tipo' => (string) ($doc['tipo_documento'] ?? ''),
+                    'versao' => (int) ($doc['versao'] ?? 1),
+                    'arquivo' => (string) ($doc['arquivo'] ?? ''),
+                    'url' => !empty($doc['arquivo']) ? base_url((string) $doc['arquivo']) : '',
+                    'created_at' => (string) ($doc['created_at'] ?? ''),
+                    'created_at_label' => $this->formatDateDisplay($doc['created_at'] ?? null, true),
+                ];
+            }, $documentoModel
+                ->where('os_id', (int) $id)
+                ->where('tipo_documento', 'orcamento')
+                ->orderBy('created_at', 'DESC')
+                ->findAll(10));
+        }
+
+        return $this->response->setJSON([
+            'ok' => true,
+            'os' => $this->buildListOsContextPayload($os),
+            'budget' => [
+                'telefone' => (string) ($os['cliente_telefone'] ?? ''),
+                'valor_mao_obra' => (float) ($os['valor_mao_obra'] ?? 0),
+                'valor_pecas' => (float) ($os['valor_pecas'] ?? 0),
+                'valor_total' => (float) ($os['valor_total'] ?? 0),
+                'desconto' => (float) ($os['desconto'] ?? 0),
+                'valor_final' => (float) ($os['valor_final'] ?? 0),
+                'valor_mao_obra_label' => 'R$ ' . number_format((float) ($os['valor_mao_obra'] ?? 0), 2, ',', '.'),
+                'valor_pecas_label' => 'R$ ' . number_format((float) ($os['valor_pecas'] ?? 0), 2, ',', '.'),
+                'valor_total_label' => 'R$ ' . number_format((float) ($os['valor_total'] ?? 0), 2, ',', '.'),
+                'desconto_label' => 'R$ ' . number_format((float) ($os['desconto'] ?? 0), 2, ',', '.'),
+                'valor_final_label' => 'R$ ' . number_format((float) ($os['valor_final'] ?? 0), 2, ',', '.'),
+                'can_send_whatsapp' => can('os', 'editar'),
+                'has_client_phone' => trim((string) ($os['cliente_telefone'] ?? '')) !== '',
+                'documents' => $documents,
+            ],
+            'csrfHash' => csrf_hash(),
+        ]);
+    }
+
+    public function budgetAjax($id)
+    {
+        $osId = (int) $id;
+        $os = $this->model->getComplete($osId);
+        if (!$os) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'ok' => false,
+                'message' => 'OS nao encontrada.',
+                'csrfHash' => csrf_hash(),
+            ]);
+        }
+
+        $pdfService = new OsPdfService();
+        $pdfResult = $pdfService->gerar($osId, 'orcamento', session()->get('user_id') ?: null);
+        if (empty($pdfResult['ok'])) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'ok' => false,
+                'message' => $pdfResult['message'] ?? 'Nao foi possivel gerar o PDF do orcamento.',
+                'csrfHash' => csrf_hash(),
+            ]);
+        }
+
+        $warningMessage = null;
+        $sendRequested = !empty($this->request->getPost('enviar_cliente'));
+        if ($sendRequested) {
+            if (!can('os', 'editar')) {
+                return $this->response->setStatusCode(403)->setJSON([
+                    'ok' => false,
+                    'message' => 'Sem permissao para enviar o orcamento ao cliente.',
+                    'csrfHash' => csrf_hash(),
+                ]);
+            }
+
+            $telefone = trim((string) ($this->request->getPost('telefone') ?: ($os['cliente_telefone'] ?? '')));
+            if ($telefone === '') {
+                $warningMessage = 'O PDF foi gerado, mas o cliente nao possui telefone cadastrado para envio.';
+            } else {
+                $mensagem = trim((string) $this->request->getPost('mensagem_manual'));
+                $os['cliente_telefone'] = $telefone;
+                $whatsService = new WhatsAppService();
+
+                if ($mensagem !== '') {
+                    $sendResult = $whatsService->sendRaw(
+                        $osId,
+                        (int) ($os['cliente_id'] ?? 0),
+                        $telefone,
+                        $mensagem,
+                        'orcamento_manual',
+                        null,
+                        session()->get('user_id') ?: null,
+                        [
+                            'arquivo_path' => (string) ($pdfResult['path'] ?? ''),
+                            'arquivo' => (string) ($pdfResult['relative'] ?? ''),
+                        ]
+                    );
+                } else {
+                    $sendResult = $whatsService->sendByTemplate(
+                        $os,
+                        'orcamento_enviado',
+                        session()->get('user_id') ?: null,
+                        [
+                            'pdf_url' => (string) ($pdfResult['url'] ?? ''),
+                            'arquivo_path' => (string) ($pdfResult['path'] ?? ''),
+                            'arquivo' => (string) ($pdfResult['relative'] ?? ''),
+                        ]
+                    );
+                }
+
+                if (empty($sendResult['ok'])) {
+                    $warningMessage = $sendResult['message'] ?? 'O PDF foi gerado, mas houve falha ao enviar para o cliente.';
+                }
+            }
+        }
+
+        LogModel::registrar(
+            'os_orcamento_pdf',
+            'Orcamento PDF da OS ' . ($os['numero_os'] ?? ('#' . $osId)) . ' gerado via listagem.'
+        );
+
+        return $this->response->setJSON([
+            'ok' => true,
+            'message' => $sendRequested
+                ? ($warningMessage === null ? 'Orcamento gerado e enviado com sucesso.' : 'Orcamento gerado com ressalvas.')
+                : 'Orcamento PDF gerado com sucesso.',
+            'warning' => $warningMessage,
+            'documentUrl' => (string) ($pdfResult['url'] ?? ''),
+            'csrfHash' => csrf_hash(),
+        ]);
+    }
+
+    private function buildListOsContextPayload(array $os): array
+    {
+        $estadoFluxo = trim((string) ($os['estado_fluxo'] ?? ''));
+
+        return [
+            'id' => (int) ($os['id'] ?? 0),
+            'numero_os' => (string) ($os['numero_os'] ?? ''),
+            'status' => (string) ($os['status'] ?? ''),
+            'estado_fluxo' => $estadoFluxo,
+            'prioridade' => (string) ($os['prioridade'] ?? 'normal'),
+            'cliente_id' => (int) ($os['cliente_id'] ?? 0),
+            'cliente_nome' => (string) ($os['cliente_nome'] ?? ''),
+            'cliente_telefone' => (string) ($os['cliente_telefone'] ?? ''),
+            'cliente_email' => (string) ($os['cliente_email'] ?? ''),
+            'equipamento_id' => (int) ($os['equipamento_id'] ?? 0),
+            'equipamento_nome' => trim((string) (($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))),
+            'equip_tipo' => (string) ($os['equip_tipo'] ?? ''),
+            'equip_tipo_label' => getEquipTipo((string) ($os['equip_tipo'] ?? '')),
+            'equip_marca' => (string) ($os['equip_marca'] ?? ''),
+            'equip_modelo' => (string) ($os['equip_modelo'] ?? ''),
+            'equip_serie' => (string) ($os['equip_serie'] ?? ''),
+            'statusBadgeHtml' => getStatusBadge((string) ($os['status'] ?? '')),
+            'flowBadgeHtml' => $estadoFluxo !== ''
+                ? '<span class="badge bg-light text-dark border">' . esc(ucwords(str_replace('_', ' ', $estadoFluxo))) . '</span>'
+                : '',
+            'priorityBadgeHtml' => getPriorityBadge((string) ($os['prioridade'] ?? 'normal')),
+        ];
+    }
+
+    private function formatDateTimeInputValue($value): string
+    {
+        $raw = trim((string) ($value ?? ''));
+        if ($raw === '') {
+            return '';
+        }
+
+        $timestamp = strtotime($raw);
+        return $timestamp ? date('Y-m-d\TH:i', $timestamp) : '';
+    }
+
+    private function formatDateInputValue($value): string
+    {
+        $raw = trim((string) ($value ?? ''));
+        if ($raw === '') {
+            return '';
+        }
+
+        $timestamp = strtotime($raw);
+        return $timestamp ? date('Y-m-d', $timestamp) : '';
+    }
+
+    private function formatDateDisplay($value, bool $withTime = false): string
+    {
+        $raw = trim((string) ($value ?? ''));
+        if ($raw === '') {
+            return '-';
+        }
+
+        $timestamp = strtotime($raw);
+        if (!$timestamp) {
+            return '-';
+        }
+
+        return $withTime ? date('d/m/Y H:i', $timestamp) : date('d/m/Y', $timestamp);
+    }
+
+    private function normalizeNullableDateTimeInput(string $value): ?string
+    {
+        $raw = trim($value);
+        if ($raw === '') {
+            return null;
+        }
+
+        $timestamp = strtotime($raw);
+        if (!$timestamp) {
+            throw new \InvalidArgumentException('Informe uma data de entrada valida.');
+        }
+
+        return date('Y-m-d H:i:s', $timestamp);
+    }
+
+    private function normalizeNullableDateInput(string $value): ?string
+    {
+        $raw = trim($value);
+        if ($raw === '') {
+            return null;
+        }
+
+        $timestamp = strtotime($raw);
+        if (!$timestamp) {
+            throw new \InvalidArgumentException('Informe uma data valida.');
+        }
+
+        return date('Y-m-d', $timestamp);
+    }
+
+    private function extractDateOnly(?string $value): ?string
+    {
+        $raw = trim((string) ($value ?? ''));
+        if ($raw === '') {
+            return null;
+        }
+
+        return substr($raw, 0, 10);
     }
 
     private function hasActiveListFilters(array $filters): bool
@@ -1193,6 +1699,12 @@ class Os extends BaseController
         return $value > 0 ? $value : null;
     }
 
+    private function normalizeToggleValue($raw): string
+    {
+        $value = strtolower(trim((string) ($raw ?? '')));
+        return in_array($value, ['1', 'true', 'sim', 'yes', 'on'], true) ? '1' : '';
+    }
+
     private function normalizeDecimalValue($raw): ?float
     {
         $value = trim((string) ($raw ?? ''));
@@ -1289,6 +1801,7 @@ class Os extends BaseController
             'clientePreSelecionado' => $clientePreSelecionado > 0 ? $clientePreSelecionado : null,
             'origemNomeHint' => $nomeHint,
             'origemTelefoneHint' => $telefoneHint,
+            'checklistEntrada' => null,
             'layout' => $isEmbedded ? 'layouts/embed' : 'layouts/main',
             'isEmbedded' => $isEmbedded,
         ];
@@ -1380,7 +1893,11 @@ class Os extends BaseController
         }
 
         $this->persistAccessoryData($osId, $dados['numero_os']);
-        $this->persistEstadoFisicoData($osId, $dados['numero_os']);
+        $this->persistChecklistEntradaData(
+            (int) $osId,
+            (string) ($dados['numero_os'] ?? ''),
+            (int) ($dados['equipamento_id'] ?? 0)
+        );
         $this->triggerAutomaticEventsOnStatus($osId, $novoStatus, session()->get('user_id') ?: null);
         $this->sincronizarOrigemWhatsappNaAbertura(
             $osId,
@@ -1430,42 +1947,68 @@ class Os extends BaseController
             $acessorio['fotos'] = array_values(array_filter($fotos));
         }
 
-        $estadoFisicoModel = new EstadoFisicoOsModel();
-        $fotoEstadoFisicoModel = new FotoEstadoFisicoModel();
-        $estadoFisicoFolder = 'uploads/estado_fisico/OS_' . $this->normalizeOsSlug($os['numero_os']) . '/';
-        $estadosFisicos = $estadoFisicoModel->where('os_id', $id)->orderBy('id', 'ASC')->findAll();
-        foreach ($estadosFisicos as &$estadoItem) {
-            $fotosEstado = $fotoEstadoFisicoModel->where('estado_fisico_id', $estadoItem['id'])->findAll();
-            foreach ($fotosEstado as &$fotoEstado) {
-                $fotoPath = FCPATH . $estadoFisicoFolder . $fotoEstado['arquivo'];
-                if (!file_exists($fotoPath)) {
-                    $fotoEstado = null;
-                    continue;
-                }
-                $fotoEstado['url'] = base_url($estadoFisicoFolder . $fotoEstado['arquivo']);
-            }
-            $estadoItem['fotos'] = array_values(array_filter($fotosEstado));
-        }
-
         $fotos_equip = $this->getEquipamentoFotosWithUrls((int) ($os['equipamento_id'] ?? 0));
         $fotos_entrada = $this->getOsEntradaFotosWithUrls((int) $id);
+        $checklistEntrada = $this->resolveChecklistEntradaPayloadForOs((int) $id, $os);
+        $statusFlowService = new OsStatusFlowService();
+        $statusGrouped = $statusFlowService->getStatusGrouped();
+        $statusOptions = $statusFlowService->buildTransitionHints((string) ($os['status'] ?? ''));
+        $statusHistorico = ((new OsStatusHistoricoModel())->db->tableExists('os_status_historico'))
+            ? (new OsStatusHistoricoModel())->byOs((int) $id)
+            : [];
+        $notasLegadas = ((new OsNotaLegadaModel())->db->tableExists('os_notas_legadas'))
+            ? (new OsNotaLegadaModel())
+                ->where('os_id', (int) $id)
+                ->orderBy('created_at', 'DESC')
+                ->orderBy('id', 'DESC')
+                ->findAll()
+            : [];
+
+        $itens = $itemModel->getByOs($id);
+        $legacyFinancialOrigins = array_values(array_filter(array_map(
+            static function (array $item): ?array {
+                $legacyTabela = trim((string) ($item['legacy_tabela'] ?? ''));
+                if (! in_array($legacyTabela, ['os_totais_servico', 'os_totais_peca', 'os_totais_consolidado'], true)) {
+                    return null;
+                }
+
+                return [
+                    'descricao' => trim((string) ($item['descricao'] ?? 'Valor legado importado')),
+                    'observacao' => trim((string) ($item['observacao'] ?? '')),
+                    'valor_total' => (float) ($item['valor_total'] ?? 0),
+                    'legacy_tabela' => $legacyTabela,
+                ];
+            },
+            $itens
+        )));
 
         $data = [
             'title'          => 'OS ' . $os['numero_os'],
             'os'             => $os,
-            'itens'          => $itemModel->getByOs($id),
+            'itens'          => $itens,
+            'legacyFinancialOrigins' => $legacyFinancialOrigins,
             'defeitos'       => $defeitos,
             'fotos_equip'    => $fotos_equip,
             'fotos_entrada'  => $fotos_entrada,
             'acessorios'     => $acessorios,
             'acessorios_folder' => $acessoriosFolder,
-            'estados_fisicos' => $estadosFisicos,
-            'estado_fisico_folder' => $estadoFisicoFolder,
-            'statusGrouped' => (new OsStatusFlowService())->getStatusGrouped(),
-            'statusOptions' => (new OsStatusFlowService())->buildTransitionHints((string) ($os['status'] ?? '')),
-            'statusHistorico' => ((new OsStatusHistoricoModel())->db->tableExists('os_status_historico'))
-                ? (new OsStatusHistoricoModel())->byOs((int) $id)
-                : [],
+            'checklist_entrada' => $checklistEntrada,
+            'statusGrouped' => $statusGrouped,
+            'statusOptions' => $statusOptions,
+            'statusHistorico' => $statusHistorico,
+            'notasLegadas' => $notasLegadas,
+            'workflowTimeline' => $this->buildOsWorkflowTimeline(
+                $statusGrouped,
+                $statusHistorico,
+                (string) ($os['status'] ?? ''),
+                $statusOptions
+            ),
+            'workflowRecentHistory' => array_slice($statusHistorico, 0, 4),
+            'primaryNextStatus' => $this->resolvePrimaryNextStatus(
+                $statusFlowService,
+                (string) ($os['status'] ?? ''),
+                $statusOptions
+            ),
             'whatsappTemplates' => (new WhatsAppService())->getTemplates(),
             'whatsappLogs' => ((new MensagemWhatsappModel())->db->tableExists('mensagens_whatsapp'))
                 ? (new MensagemWhatsappModel())->byOs((int) $id, 100)
@@ -1482,6 +2025,180 @@ class Os extends BaseController
             'isEmbedded' => $isEmbedded,
         ];
         return view('os/show', $data);
+    }
+
+    private function resolvePrimaryNextStatus(
+        OsStatusFlowService $statusFlowService,
+        string $currentStatus,
+        array $statusOptions
+    ): ?array {
+        $candidates = array_values(array_filter($statusOptions, static function (array $status) use ($currentStatus): bool {
+            $code = trim((string) ($status['codigo'] ?? ''));
+            return $code !== '' && $code !== $currentStatus && $code !== 'cancelado';
+        }));
+
+        if (empty($candidates)) {
+            return null;
+        }
+
+        $orderByCode = [];
+        foreach ($statusFlowService->getAllStatusesOrdered() as $status) {
+            $code = trim((string) ($status['codigo'] ?? ''));
+            if ($code === '') {
+                continue;
+            }
+            $orderByCode[$code] = (int) ($status['ordem_fluxo'] ?? 0);
+        }
+
+        $currentOrder = $orderByCode[$currentStatus] ?? null;
+
+        usort($candidates, static function (array $a, array $b) use ($orderByCode): int {
+            $codeA = trim((string) ($a['codigo'] ?? ''));
+            $codeB = trim((string) ($b['codigo'] ?? ''));
+            $orderA = $orderByCode[$codeA] ?? (int) ($a['ordem_fluxo'] ?? PHP_INT_MAX);
+            $orderB = $orderByCode[$codeB] ?? (int) ($b['ordem_fluxo'] ?? PHP_INT_MAX);
+
+            if ($orderA === $orderB) {
+                return strcmp(
+                    (string) ($a['nome'] ?? $codeA),
+                    (string) ($b['nome'] ?? $codeB)
+                );
+            }
+
+            return $orderA <=> $orderB;
+        });
+
+        if ($currentOrder !== null) {
+            foreach ($candidates as $candidate) {
+                $code = trim((string) ($candidate['codigo'] ?? ''));
+                $candidateOrder = $orderByCode[$code] ?? (int) ($candidate['ordem_fluxo'] ?? PHP_INT_MAX);
+                if ($candidateOrder > $currentOrder) {
+                    return $candidate;
+                }
+            }
+        }
+
+        return $candidates[0] ?? null;
+    }
+
+    private function buildOsWorkflowTimeline(
+        array $statusGrouped,
+        array $statusHistorico,
+        string $currentStatus,
+        array $statusOptions = []
+    ): array {
+        if (empty($statusGrouped)) {
+            return [];
+        }
+
+        $statusMetaByCode = [];
+        $statusMacroByCode = [];
+        $groupKeys = array_keys($statusGrouped);
+        $currentMacro = null;
+
+        foreach ($statusGrouped as $macro => $items) {
+            foreach ($items as $item) {
+                $code = trim((string) ($item['codigo'] ?? ''));
+                if ($code === '') {
+                    continue;
+                }
+
+                $statusMetaByCode[$code] = $item;
+                $statusMacroByCode[$code] = $macro;
+
+                if ($code === $currentStatus) {
+                    $currentMacro = $macro;
+                }
+            }
+        }
+
+        $visitedCodes = [];
+        $latestEventByMacro = [];
+
+        foreach ($statusHistorico as $entry) {
+            $code = trim((string) ($entry['status_novo'] ?? ''));
+            if ($code === '') {
+                continue;
+            }
+
+            $visitedCodes[$code] = true;
+            $macro = $statusMacroByCode[$code] ?? null;
+            if ($macro !== null && !isset($latestEventByMacro[$macro])) {
+                $latestEventByMacro[$macro] = $entry;
+            }
+        }
+
+        if ($currentStatus !== '') {
+            $visitedCodes[$currentStatus] = true;
+        }
+
+        $nextCodes = [];
+        foreach ($statusOptions as $statusOption) {
+            $code = trim((string) ($statusOption['codigo'] ?? ''));
+            if ($code !== '' && $code !== $currentStatus) {
+                $nextCodes[$code] = true;
+            }
+        }
+
+        $currentIndex = $currentMacro !== null ? array_search($currentMacro, $groupKeys, true) : false;
+        $timeline = [];
+
+        foreach ($statusGrouped as $macro => $items) {
+            $macroIndex = array_search($macro, $groupKeys, true);
+            $codes = [];
+            $nextStatusNames = [];
+            $containsCurrent = false;
+
+            foreach ($items as $item) {
+                $code = trim((string) ($item['codigo'] ?? ''));
+                if ($code === '') {
+                    continue;
+                }
+
+                $codes[] = $code;
+
+                if ($code === $currentStatus) {
+                    $containsCurrent = true;
+                }
+
+                if (isset($nextCodes[$code])) {
+                    $nextStatusNames[] = (string) ($item['nome'] ?? $code);
+                }
+            }
+
+            $visitedInGroup = array_values(array_filter($codes, static fn (string $code): bool => isset($visitedCodes[$code])));
+            $state = 'upcoming';
+
+            if ($containsCurrent) {
+                $state = 'current';
+            } elseif (!empty($visitedInGroup) && ($currentIndex === false || ($macroIndex !== false && $macroIndex < $currentIndex))) {
+                $state = 'completed';
+            } elseif (!empty($nextStatusNames)) {
+                $state = 'probable';
+            } elseif (!empty($visitedInGroup)) {
+                $state = 'completed';
+            }
+
+            $latestEntry = $latestEventByMacro[$macro] ?? null;
+            $currentMeta = $containsCurrent ? ($statusMetaByCode[$currentStatus] ?? null) : null;
+
+            $timeline[] = [
+                'key' => (string) $macro,
+                'label' => ucwords(str_replace('_', ' ', (string) $macro)),
+                'state' => $state,
+                'current_status_name' => $containsCurrent
+                    ? (string) ($currentMeta['nome'] ?? ucfirst(str_replace('_', ' ', $currentStatus)))
+                    : '',
+                'last_status_name' => $latestEntry
+                    ? (string) (($statusMetaByCode[$latestEntry['status_novo'] ?? '']['nome'] ?? null) ?: ucfirst(str_replace('_', ' ', (string) ($latestEntry['status_novo'] ?? ''))))
+                    : '',
+                'last_event_at' => $latestEntry['created_at'] ?? null,
+                'last_user_name' => $latestEntry['usuario_nome'] ?? null,
+                'next_status_names' => array_values(array_unique($nextStatusNames)),
+            ];
+        }
+
+        return $timeline;
     }
 
     public function edit($id)
@@ -1506,7 +2223,7 @@ class Os extends BaseController
             $f['url'] = $this->resolveOsEntradaFotoPublicUrl((string) ($f['arquivo'] ?? ''));
         }
 
-        $estadoFisicoEntries = (new EstadoFisicoOsModel())->where('os_id', $id)->orderBy('id', 'ASC')->findAll();
+        $checklistEntrada = $this->resolveChecklistEntradaPayloadForOs((int) $id, $os);
 
         $data = [
             'title'        => 'Editar OS ' . $os['numero_os'],
@@ -1518,7 +2235,7 @@ class Os extends BaseController
             'defeitosSelected' => (new DefeitoModel())->getByOs($id),
             'fotos_entrada'    => $fotos_entrada,
             'relatosRapidos'   => $defeitoRelatadoModel->getActiveGrouped(),
-            'estadoFisicoEntries' => $estadoFisicoEntries,
+            'checklistEntrada' => $checklistEntrada,
             'statusGrouped' => (new OsStatusFlowService())->getStatusGrouped(),
             'statusDefault' => (string) ($os['status'] ?? 'triagem'),
             'layout' => $isEmbedded ? 'layouts/embed' : 'layouts/main',
@@ -1595,7 +2312,11 @@ class Os extends BaseController
         $osRecord = $this->model->find($id);
         if ($osRecord) {
             $this->persistAccessoryData($id, $osRecord['numero_os'], true);
-            $this->persistEstadoFisicoData($id, $osRecord['numero_os'], true);
+            $this->persistChecklistEntradaData(
+                (int) $id,
+                (string) ($osRecord['numero_os'] ?? ''),
+                (int) ($osRecord['equipamento_id'] ?? 0)
+            );
         }
 
         LogModel::registrar('os_atualizada', 'OS atualizada ID: ' . $id);
@@ -1608,6 +2329,8 @@ class Os extends BaseController
     {
         $status = strtolower(trim((string) $this->request->getPost('status')));
         $observacao = trim((string) $this->request->getPost('observacao_status'));
+        $controlaComunicacaoCliente = (string) ($this->request->getPost('controla_comunicacao_cliente') ?? '') === '1';
+        $comunicarCliente = $controlaComunicacaoCliente && !empty($this->request->getPost('comunicar_cliente'));
         $os = $this->model->find($id);
 
         if (!$os) {
@@ -1627,15 +2350,35 @@ class Os extends BaseController
                 ->with('error', $result['message'] ?? 'Nao foi possivel atualizar o status.');
         }
 
-        $this->finalizeStatusSideEffects((int) $id, $os, $status);
+        $this->finalizeStatusSideEffects((int) $id, $os, $status, !$controlaComunicacaoCliente);
+
+        $warningMessage = null;
+        if ($comunicarCliente) {
+            $notifyResult = $this->sendStatusChangeNotification(
+                (int) $id,
+                $status,
+                $observacao !== '' ? $observacao : null,
+                session()->get('user_id') ?: null
+            );
+
+            if (empty($notifyResult['ok'])) {
+                $warningMessage = $notifyResult['message'] ?? 'O status foi atualizado, mas nao foi possivel comunicar o cliente.';
+            }
+        }
 
         LogModel::registrar('os_status', 'Status da OS ' . $os['numero_os'] . ' alterado para: ' . $status);
 
-        return redirect()->to($this->osViewUrl((int) $id))
+        $redirect = redirect()->to($this->osViewUrl((int) $id))
             ->with('success', 'Status atualizado com sucesso!');
+
+        if ($warningMessage !== null) {
+            $redirect = $redirect->with('warning', $warningMessage);
+        }
+
+        return $redirect;
     }
 
-    private function finalizeStatusSideEffects(int $id, array $os, string $status): void
+    private function finalizeStatusSideEffects(int $id, array $os, string $status, bool $allowTemplateCommunication = true): void
     {
         if (in_array($status, ['entregue_reparado', 'entregue_pagamento_pendente'], true)) {
             $osAtualizada = $this->model->find($id);
@@ -1666,7 +2409,65 @@ class Os extends BaseController
             ]);
         }
 
-        $this->triggerAutomaticEventsOnStatus($id, $status, session()->get('user_id') ?: null);
+        $this->triggerAutomaticEventsOnStatus(
+            $id,
+            $status,
+            session()->get('user_id') ?: null,
+            $allowTemplateCommunication
+        );
+    }
+
+    private function sendStatusChangeNotification(int $osId, string $statusCode, ?string $observacao = null, ?int $userId = null): array
+    {
+        $os = $this->model->getComplete($osId);
+        if (!$os) {
+            return [
+                'ok' => false,
+                'message' => 'A OS nao foi encontrada para envio da notificacao.',
+            ];
+        }
+
+        $telefone = trim((string) ($os['cliente_telefone'] ?? ''));
+        if ($telefone === '') {
+            return [
+                'ok' => false,
+                'message' => 'O status foi atualizado, mas o cliente nao possui telefone cadastrado para notificacao.',
+            ];
+        }
+
+        $statusNome = $this->humanizeOsStatus($statusCode);
+        $mensagem = $statusCode === 'cancelado'
+            ? 'Atualizacao da sua OS ' . ($os['numero_os'] ?? '') . ': o atendimento foi cancelado conforme solicitado.'
+            : 'Atualizacao da sua OS ' . ($os['numero_os'] ?? '') . ': novo status "' . $statusNome . '".';
+
+        if ($observacao !== null && trim($observacao) !== '') {
+            $mensagem .= "\nObservacoes: " . trim($observacao);
+        }
+
+        return (new WhatsAppService())->sendRaw(
+            $osId,
+            (int) ($os['cliente_id'] ?? 0),
+            $telefone,
+            $mensagem,
+            'status_manual',
+            null,
+            $userId
+        );
+    }
+
+    private function humanizeOsStatus(string $statusCode): string
+    {
+        $statusCode = strtolower(trim($statusCode));
+        if ($statusCode === '') {
+            return 'Status atualizado';
+        }
+
+        $status = (new OsStatusFlowService())->getStatusByCode($statusCode);
+        if (!empty($status['nome'])) {
+            return (string) $status['nome'];
+        }
+
+        return ucwords(str_replace('_', ' ', $statusCode));
     }
 
     public function sendWhatsApp($id)
@@ -1762,11 +2563,16 @@ class Os extends BaseController
         return redirect()->to($this->osViewUrl((int) $id))->with('success', 'PDF gerado com sucesso.');
     }
 
-    private function triggerAutomaticEventsOnStatus(int $osId, string $statusCode, ?int $userId = null): void
+    private function triggerAutomaticEventsOnStatus(
+        int $osId,
+        string $statusCode,
+        ?int $userId = null,
+        bool $allowTemplateCommunication = true
+    ): void
     {
         $statusCode = strtolower(trim($statusCode));
         try {
-            (new CrmService())->applyStatusAutomation($osId, $statusCode, $userId);
+            (new CrmService())->applyStatusAutomation($osId, $statusCode, $userId, $allowTemplateCommunication);
         } catch (\Throwable $e) {
             log_message('warning', 'Falha ao aplicar automacoes CRM para OS ' . $osId . ': ' . $e->getMessage());
         }
@@ -1981,6 +2787,75 @@ class Os extends BaseController
         }
     }
 
+    public function checklistMeta()
+    {
+        if (!$this->isChecklistInfraReady()) {
+            return $this->response->setJSON([
+                'ok' => true,
+                'data' => $this->buildChecklistEntradaUnavailablePayload(),
+            ]);
+        }
+
+        $equipamentoId = (int) ($this->request->getGet('equipamento_id') ?? 0);
+        $osId = (int) ($this->request->getGet('os_id') ?? 0);
+
+        if ($equipamentoId <= 0) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'ok' => false,
+                'message' => 'Selecione um equipamento valido para carregar o checklist.',
+            ]);
+        }
+
+        $equipamento = (new EquipamentoModel())
+            ->select('equipamentos.id, equipamentos.tipo_id, tipos.nome AS tipo_nome')
+            ->join('equipamentos_tipos tipos', 'tipos.id = equipamentos.tipo_id', 'left')
+            ->where('equipamentos.id', $equipamentoId)
+            ->first();
+
+        if (!$equipamento) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'ok' => false,
+                'message' => 'Equipamento nao encontrado.',
+            ]);
+        }
+
+        $tipoEquipamentoId = (int) ($equipamento['tipo_id'] ?? 0);
+        if ($tipoEquipamentoId <= 0) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'ok' => false,
+                'message' => 'Tipo de equipamento nao identificado para o checklist.',
+            ]);
+        }
+
+        $numeroOs = '';
+        if ($osId > 0) {
+            $os = $this->model->select('id, numero_os')->find($osId);
+            $numeroOs = (string) ($os['numero_os'] ?? '');
+        }
+
+        try {
+            $payload = (new ChecklistService())->getPayloadForOs(
+                $osId,
+                'entrada',
+                $tipoEquipamentoId,
+                $numeroOs
+            );
+
+            $payload['tipo_equipamento_nome'] = trim((string) ($equipamento['tipo_nome'] ?? ''));
+
+            return $this->response->setJSON([
+                'ok' => true,
+                'data' => $payload,
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', '[Checklist] falha no checklistMeta da OS: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'ok' => false,
+                'message' => 'Nao foi possivel carregar o checklist agora.',
+            ]);
+        }
+    }
+
     private function getAccessoryEntries(): array
     {
         $raw = $this->request->getPost('acessorios_data');
@@ -2021,6 +2896,182 @@ class Os extends BaseController
                     'name'     => $name,
                     'tmp_name' => $tmpName,
                 ];
+            }
+        }
+
+        return $mapped;
+    }
+
+    private function resolveChecklistEntradaPayloadForOs(int $osId, array $os): ?array
+    {
+        $equipamentoId = (int) ($os['equipamento_id'] ?? 0);
+        if ($equipamentoId <= 0) {
+            return null;
+        }
+
+        if (!$this->isChecklistInfraReady()) {
+            return null;
+        }
+
+        $equipamento = (new EquipamentoModel())
+            ->select('equipamentos.id, equipamentos.tipo_id, tipos.nome AS tipo_nome')
+            ->join('equipamentos_tipos tipos', 'tipos.id = equipamentos.tipo_id', 'left')
+            ->where('equipamentos.id', $equipamentoId)
+            ->first();
+
+        if (!$equipamento) {
+            return null;
+        }
+
+        $tipoEquipamentoId = (int) ($equipamento['tipo_id'] ?? 0);
+        if ($tipoEquipamentoId <= 0) {
+            return null;
+        }
+
+        try {
+            $payload = (new ChecklistService())->getPayloadForOs(
+                $osId,
+                'entrada',
+                $tipoEquipamentoId,
+                (string) ($os['numero_os'] ?? '')
+            );
+
+            $payload['tipo_equipamento_nome'] = trim((string) ($equipamento['tipo_nome'] ?? ''));
+            return $payload;
+        } catch (\Throwable $e) {
+            log_message('error', '[Checklist] Falha ao montar payload da OS ' . $osId . ': ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function persistChecklistEntradaData(int $osId, string $numeroOs, int $equipamentoId): void
+    {
+        if (!$this->isChecklistInfraReady()) {
+            return;
+        }
+
+        $rawPayload = trim((string) ($this->request->getPost('checklist_entrada_data') ?? ''));
+        $filesByItem = $this->collectChecklistFilesForOs();
+
+        if ($rawPayload === '' && empty($filesByItem)) {
+            return;
+        }
+
+        if ($equipamentoId <= 0) {
+            log_message('warning', '[Checklist] OS ' . $osId . ' sem equipamento valido para salvar checklist.');
+            return;
+        }
+
+        $equipamento = (new EquipamentoModel())
+            ->select('equipamentos.id, equipamentos.tipo_id, tipos.nome AS tipo_nome')
+            ->join('equipamentos_tipos tipos', 'tipos.id = equipamentos.tipo_id', 'left')
+            ->where('equipamentos.id', $equipamentoId)
+            ->first();
+
+        $tipoEquipamentoId = (int) ($equipamento['tipo_id'] ?? 0);
+        if ($tipoEquipamentoId <= 0) {
+            log_message('warning', '[Checklist] OS ' . $osId . ' com tipo de equipamento invalido.');
+            return;
+        }
+
+        $payload = [];
+        if ($rawPayload !== '') {
+            $decoded = json_decode($rawPayload, true);
+            if (is_array($decoded)) {
+                $payload = $decoded;
+            }
+        }
+        $payload['tipo_equipamento_nome'] = trim((string) ($equipamento['tipo_nome'] ?? ''));
+
+        try {
+            (new ChecklistService())->saveExecution(
+                $osId,
+                $numeroOs,
+                'entrada',
+                $tipoEquipamentoId,
+                $payload,
+                $filesByItem
+            );
+        } catch (\Throwable $e) {
+            log_message('error', '[Checklist] falha ao salvar checklist de entrada da OS ' . $osId . ': ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private function buildChecklistEntradaUnavailablePayload(): array
+    {
+        return [
+            'tipo' => [
+                'codigo' => 'entrada',
+                'nome' => 'Checklist de Entrada',
+            ],
+            'modelo' => null,
+            'numero_os' => '',
+            'possui_modelo' => false,
+            'execucao' => null,
+            'itens' => [],
+            'resumo' => [
+                'preenchido' => false,
+                'total_discrepancias' => 0,
+                'label' => 'Checklist indisponivel',
+                'variant' => 'secondary',
+            ],
+            'tipo_equipamento_nome' => '',
+        ];
+    }
+
+    private function isChecklistInfraReady(): bool
+    {
+        try {
+            $db = Database::connect();
+            foreach ([
+                'checklist_tipos',
+                'checklist_modelos',
+                'checklist_itens',
+                'checklist_execucoes',
+                'checklist_respostas',
+                'checklist_fotos',
+            ] as $table) {
+                if (!$db->tableExists($table)) {
+                    return false;
+                }
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            log_message('error', '[Checklist] Falha ao validar infraestrutura no modulo OS: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function collectChecklistFilesForOs(): array
+    {
+        $mapped = [];
+        if (empty($_FILES['fotos_checklist_entrada']['name'] ?? null)) {
+            return $mapped;
+        }
+
+        foreach ($_FILES['fotos_checklist_entrada']['name'] as $itemId => $files) {
+            foreach ((array) $files as $index => $name) {
+                $error = $_FILES['fotos_checklist_entrada']['error'][$itemId][$index] ?? UPLOAD_ERR_NO_FILE;
+                if ($error !== UPLOAD_ERR_OK) {
+                    continue;
+                }
+
+                $tmpName = $_FILES['fotos_checklist_entrada']['tmp_name'][$itemId][$index] ?? '';
+                if ($tmpName === '' || !is_uploaded_file($tmpName)) {
+                    continue;
+                }
+
+                $mapped[(string) $itemId][] = new \CodeIgniter\HTTP\Files\UploadedFile(
+                    $tmpName,
+                    (string) ($name ?: ('checklist_' . time() . '.jpg')),
+                    (string) ($_FILES['fotos_checklist_entrada']['type'][$itemId][$index] ?? null),
+                    (int) ($_FILES['fotos_checklist_entrada']['size'][$itemId][$index] ?? 0),
+                    $error
+                );
             }
         }
 

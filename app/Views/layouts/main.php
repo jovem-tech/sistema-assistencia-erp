@@ -30,6 +30,8 @@
     <link rel="stylesheet" href="<?= base_url('assets/vendor/select2-bootstrap-5-theme/css/select2-bootstrap-5-theme.min.css') ?>" />
     <link rel="stylesheet" href="<?= base_url('assets/vendor/sweetalert2/sweetalert2.min.css') ?>" />
 
+    <?= $this->renderSection('styles') ?>
+
     <!-- Custom CSS -->
     <link href="<?= base_url('assets/css/estilo.css') ?>" rel="stylesheet">
     <link href="<?= base_url('assets/css/design-system/index.css') ?>" rel="stylesheet">

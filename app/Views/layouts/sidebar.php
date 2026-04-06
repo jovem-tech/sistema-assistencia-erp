@@ -96,7 +96,8 @@
             <?php
             $isConhecimentoActive = str_starts_with(uri_string(), 'equipamentosdefeitos')
                 || str_starts_with(uri_string(), 'defeitosrelatados')
-                || str_starts_with(uri_string(), 'osworkflow');
+                || str_starts_with(uri_string(), 'osworkflow')
+                || str_starts_with(uri_string(), 'checklists');
             ?>
             <li class="nav-item">
                 <a class="nav-link <?= $isConhecimentoActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#conhecimentoSubmenu" role="button">
@@ -124,6 +125,26 @@
                         <li class="nav-item">
                             <a class="nav-link <?= str_starts_with(uri_string(), 'osworkflow') ? 'active' : '' ?>" href="<?= base_url('osworkflow') ?>">
                                 <i class="bi bi-diagram-3-fill"></i><span>Fluxo de Trabalho OS</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'checklists/entrada') ? 'active' : '' ?>" href="<?= base_url('checklists/entrada') ?>">
+                                <i class="bi bi-ui-checks-grid"></i><span>Checklist de Entrada</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'checklists/manutencao') ? 'active' : '' ?>" href="<?= base_url('checklists/manutencao') ?>">
+                                <i class="bi bi-tools"></i><span>Checklist de Manutencao</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'checklists/controle-qualidade') ? 'active' : '' ?>" href="<?= base_url('checklists/controle-qualidade') ?>">
+                                <i class="bi bi-clipboard2-check"></i><span>Checklist Controle da Qualidade</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'checklists/saida') ? 'active' : '' ?>" href="<?= base_url('checklists/saida') ?>">
+                                <i class="bi bi-box-arrow-right"></i><span>Checklist de Saida</span>
                             </a>
                         </li>
                         <?php endif; ?>

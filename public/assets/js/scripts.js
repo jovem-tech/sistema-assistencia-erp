@@ -479,10 +479,14 @@ $(document).ready(function () {
         rememberActive: String(sessionRememberMeta?.content || '0') === '1',
         timeoutMs: 0,
         heartbeatIntervalMs: 0,
+        heartbeatTimeoutMs: 10000,
         lastActivityAt: Date.now(),
         lastHeartbeatAt: Date.now(),
+        lastTransportActivityAt: 0,
         activityDirty: false,
         heartbeatInFlight: false,
+        heartbeatFailureCount: 0,
+        pendingSameOriginRequests: 0,
         expired: false,
         alertOpen: false,
         enabled: false
@@ -565,21 +569,91 @@ $(document).ready(function () {
         sessionMonitor.activityDirty = true;
     };
 
+    const resolveAbsoluteUrl = function (rawUrl) {
+        if (!rawUrl) {
+            return '';
+        }
+
+        try {
+            return new URL(rawUrl, window.location.origin).href;
+        } catch (error) {
+            return '';
+        }
+    };
+
+    const isSameOriginUrl = function (rawUrl) {
+        const absoluteUrl = resolveAbsoluteUrl(rawUrl);
+        if (!absoluteUrl) {
+            return false;
+        }
+
+        try {
+            return new URL(absoluteUrl).origin === window.location.origin;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    const isHeartbeatUrl = function (rawUrl) {
+        const absoluteUrl = resolveAbsoluteUrl(rawUrl);
+        const heartbeatUrl = resolveAbsoluteUrl(sessionMonitor.heartbeatUrl);
+
+        return absoluteUrl !== '' && heartbeatUrl !== '' && absoluteUrl === heartbeatUrl;
+    };
+
+    const noteTransportStart = function (rawUrl) {
+        if (!isSameOriginUrl(rawUrl) || isHeartbeatUrl(rawUrl)) {
+            return;
+        }
+
+        sessionMonitor.pendingSameOriginRequests += 1;
+        sessionMonitor.lastTransportActivityAt = Date.now();
+    };
+
+    const noteTransportEnd = function (rawUrl) {
+        if (!isSameOriginUrl(rawUrl) || isHeartbeatUrl(rawUrl)) {
+            return;
+        }
+
+        sessionMonitor.pendingSameOriginRequests = Math.max(0, sessionMonitor.pendingSameOriginRequests - 1);
+        sessionMonitor.lastTransportActivityAt = Date.now();
+    };
+
     const sendSessionHeartbeat = function () {
         if (!sessionMonitor.enabled || sessionMonitor.expired || sessionMonitor.heartbeatInFlight) {
             return;
         }
 
-        sessionMonitor.heartbeatInFlight = true;
+        if (sessionMonitor.pendingSameOriginRequests > 0) {
+            return;
+        }
 
-        fetch(sessionMonitor.heartbeatUrl, {
+        if (sessionMonitor.lastTransportActivityAt > 0 && (Date.now() - sessionMonitor.lastTransportActivityAt) < 5000) {
+            return;
+        }
+
+        sessionMonitor.heartbeatInFlight = true;
+        const heartbeatAbortController = typeof AbortController === 'function' ? new AbortController() : null;
+        const heartbeatTimeoutId = heartbeatAbortController
+            ? window.setTimeout(function () {
+                heartbeatAbortController.abort();
+            }, sessionMonitor.heartbeatTimeoutMs)
+            : null;
+
+        const heartbeatConfig = {
             method: 'GET',
             cache: 'no-store',
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             }
-        }).then(function (response) {
+        };
+
+        if (heartbeatAbortController) {
+            heartbeatConfig.signal = heartbeatAbortController.signal;
+        }
+
+        fetch(sessionMonitor.heartbeatUrl, heartbeatConfig).then(function (response) {
             if (!response.ok) {
                 if (response.status === 401) {
                     return null;
@@ -595,14 +669,27 @@ $(document).ready(function () {
             }
 
             sessionMonitor.lastHeartbeatAt = Date.now();
+            sessionMonitor.heartbeatFailureCount = 0;
             sessionMonitor.activityDirty = false;
         }).catch(function (error) {
             if (sessionMonitor.expired) {
                 return;
             }
 
+            sessionMonitor.lastHeartbeatAt = Date.now();
+            sessionMonitor.heartbeatFailureCount += 1;
+
+            if (error && error.name === 'AbortError') {
+                console.warn('[SessionMonitor] heartbeat abortado por timeout');
+                return;
+            }
+
             console.error('[SessionMonitor] falha no heartbeat', error);
         }).finally(function () {
+            if (heartbeatTimeoutId) {
+                window.clearTimeout(heartbeatTimeoutId);
+            }
+
             sessionMonitor.heartbeatInFlight = false;
         });
     };
@@ -700,6 +787,10 @@ $(document).ready(function () {
                     }
                 }
 
+                if (sameOrigin) {
+                    noteTransportStart(rawUrl);
+                }
+
                 return nativeFetch(input, nextInit).then(function (response) {
                     if (!sameOrigin || response.status !== 401) {
                         return response;
@@ -719,8 +810,25 @@ $(document).ready(function () {
                     }
 
                     return response;
+                }).finally(function () {
+                    if (sameOrigin) {
+                        noteTransportEnd(rawUrl);
+                    }
                 });
             };
+        }
+
+        if (window.jQuery && !window.__ERP_SESSION_JQUERY_PATCHED__) {
+            window.__ERP_SESSION_JQUERY_PATCHED__ = true;
+
+            $(document).ajaxSend(function (_event, jqXHR, settings) {
+                const requestUrl = settings?.url || window.location.href;
+                noteTransportStart(requestUrl);
+
+                jqXHR.always(function () {
+                    noteTransportEnd(requestUrl);
+                });
+            });
         }
 
         $(document).ajaxError(function (_event, jqXHR) {
@@ -901,6 +1009,9 @@ function openDocPage(page) {
         'usuarios': '02-manual-administrador/usuarios-e-permissoes.md',
         'grupos': '02-manual-administrador/usuarios-e-permissoes.md',
         'configuracoes': '02-manual-administrador/configuracao-do-sistema.md',
+        'migracao-legado-sql': '02-manual-administrador/migracao-legado-sql.md',
+        'legacy-migration': '02-manual-administrador/migracao-legado-sql.md',
+        'legacy-migration-architecture': '03-arquitetura-tecnica/migracao-legado-sql.md',
         'equipamentos-tipos': '06-modulos-do-sistema/equipamentos-tipos.md',
         'equipamentos-marcas': '06-modulos-do-sistema/equipamentos-marcas.md',
         'equipamentos-modelos': '06-modulos-do-sistema/equipamentos-modelos.md',
@@ -913,6 +1024,7 @@ function openDocPage(page) {
         'crm-clientes-inativos': '06-modulos-do-sistema/crm.md#clientes-inativos',
         'whatsapp': '06-modulos-do-sistema/whatsapp.md',
         'atendimento-whatsapp': '06-modulos-do-sistema/central-de-mensagens.md',
+        'atendimento-mobile': '12-app-mobile-pwa/README.md',
         'atendimento-whatsapp-chatbot': '06-modulos-do-sistema/central-de-mensagens.md#chatbot',
         'atendimento-whatsapp-metricas': '06-modulos-do-sistema/central-de-mensagens.md#metricas',
         'atendimento-whatsapp-filas': '06-modulos-do-sistema/central-de-mensagens.md#filas',
@@ -920,6 +1032,10 @@ function openDocPage(page) {
         'atendimento-whatsapp-fluxos': '06-modulos-do-sistema/central-de-mensagens.md#fluxos',
         'atendimento-whatsapp-respostas': '06-modulos-do-sistema/central-de-mensagens.md#respostas-rapidas',
         'atendimento-whatsapp-config': '06-modulos-do-sistema/central-de-mensagens.md#configuracoes',
+        'central-mobile': '12-app-mobile-pwa/README.md',
+        'app-mobile-pwa': '12-app-mobile-pwa/README.md',
+        'app-mobile-versionamento': '12-app-mobile-pwa/09-versionamento-e-releases/politica-de-versoes.md',
+        'app-mobile-design-system': '12-app-mobile-pwa/06-design-system/fundamentos.md',
         'central-mensagens': '06-modulos-do-sistema/central-de-mensagens.md',
         'central-mensagens-chatbot': '06-modulos-do-sistema/central-de-mensagens.md#chatbot',
         'central-mensagens-metricas': '06-modulos-do-sistema/central-de-mensagens.md#metricas',

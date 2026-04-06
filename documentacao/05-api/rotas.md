@@ -1,6 +1,84 @@
 # Rotas Internas (ERP + CRM + Mensageria)
 
-Atualizado em 26/03/2026.
+Atualizado em 03/04/2026 para a release `2.11.2`.
+
+## API Mobile/PWA (v1)
+
+Base: `/api/v1`
+
+Autenticacao:
+
+| Metodo | Rota | Objetivo | Auth |
+|---|---|---|---|
+| POST | `/api/v1/auth/login` | Login mobile por email/senha e emissao de token Bearer | publica |
+| GET | `/api/v1/auth/me` | Retornar usuario autenticado | `apiToken` |
+| POST | `/api/v1/auth/refresh` | Renovar token de acesso | `apiToken` |
+| POST | `/api/v1/auth/logout` | Revogar token atual | `apiToken` |
+
+Operacional:
+
+| Metodo | Rota | Objetivo | Auth |
+|---|---|---|---|
+| GET | `/api/v1/users` | Lista de usuarios ativos para operacao mobile | `apiToken` |
+| GET | `/api/v1/clients` | Lista paginada de clientes | `apiToken` |
+| GET | `/api/v1/clients/{id}` | Detalhe do cliente | `apiToken` |
+| GET | `/api/v1/orders` | Lista paginada de OS | `apiToken` |
+| GET | `/api/v1/orders/meta` | Metadados para abertura completa de OS no mobile (clientes, equipamentos, tecnicos, status, prioridades e defeitos por tipo) | `apiToken` |
+| GET | `/api/v1/orders/{id}` | Detalhe da OS | `apiToken` |
+| POST | `/api/v1/orders` | Criacao completa de OS (equivalente ao fluxo de abertura do ERP) | `apiToken` |
+| PUT/PATCH | `/api/v1/orders/{id}` | Atualizacao de status/prioridade da OS | `apiToken` |
+| GET | `/api/v1/conversations` | Lista de conversas para atendimento mobile | `apiToken` |
+| GET | `/api/v1/conversations/{id}` | Thread da conversa com contexto basico | `apiToken` |
+| GET | `/api/v1/messages?conversa_id=` | Lista ou delta de mensagens | `apiToken` |
+| POST | `/api/v1/messages` | Enviar mensagem pela infraestrutura WhatsApp existente | `apiToken` |
+| GET | `/api/v1/notifications` | Inbox de notificacoes do usuario | `apiToken` |
+| POST | `/api/v1/notifications` | Criacao de notificacao manual/sistema | `apiToken` |
+| PUT/PATCH | `/api/v1/notifications/{id}/read` | Marcar notificacao como lida | `apiToken` |
+| PUT/PATCH | `/api/v1/notifications/read-all` | Marcar todas como lidas | `apiToken` |
+| GET | `/api/v1/notifications/subscriptions` | Listar subscriptions push do dispositivo/usuario | `apiToken` |
+| POST | `/api/v1/notifications/subscriptions` | Registrar/atualizar subscription push | `apiToken` |
+| DELETE | `/api/v1/notifications/subscriptions/{id}` | Remover subscription push | `apiToken` |
+| GET | `/api/v1/realtime/stream` | Stream SSE para deltas de mensagens/notificacoes | `apiToken` |
+
+Observacoes de contrato:
+
+- envelope JSON padrao:
+  - `status`
+  - `data`
+  - `error`
+  - `meta.timestamp`
+  - `meta.request_id`
+- autenticacao API por `Authorization: Bearer <token>` e fallback `access_token` em query para SSE.
+- filtros e permissoes seguem RBAC existente do ERP.
+- `POST /api/v1/notifications` e eventos internos que criam notificacoes (`message.inbound`, `order.created`) disparam Web Push real para subscriptions ativas do usuario.
+- em falha por expiracao de endpoint, a subscription e marcada como inativa (`mobile_push_subscriptions.ativo = 0`).
+
+Parametros uteis em `GET /api/v1/orders/meta`:
+- `q`: busca textual de cliente (nome, telefone ou email)
+- `cliente_id`: carrega equipamentos do cliente selecionado
+- `equipamento_id`: resolve `tipo_id` para listar defeitos relacionados
+- `tipo_id`: forca listagem de defeitos por tipo
+- retorno pode incluir `checklist_entrada` quando houver modelo ativo para o tipo selecionado
+- se a infraestrutura de checklist ainda nao estiver migrada, o endpoint nao quebra: retorna `checklist_entrada = null`
+
+Payload util em `POST /api/v1/orders` (abertura completa mobile):
+- obrigatorios:
+  - `cliente_id`
+  - `equipamento_id`
+  - `relato_cliente`
+- operacionais/financeiros:
+  - `tecnico_id`, `prioridade`, `status`
+  - `data_entrada`, `data_previsao`, `data_conclusao`, `data_entrega`
+  - `diagnostico_tecnico`, `solucao_aplicada`
+  - `observacoes_cliente`, `observacoes_internas`
+  - `forma_pagamento`, `garantia_dias`, `garantia_validade`
+  - `valor_mao_obra`, `valor_pecas`, `desconto`, `valor_total`, `valor_final`
+- listas e anexos:
+  - `defeitos[]`
+  - `acessorios_data` (JSON)
+  - `checklist_entrada_data` (JSON)
+  - `fotos_checklist_entrada[item_id][]` (`multipart/form-data`, fotos por item discrepante)
+  - `fotos_entrada` (`multipart/form-data`, multiplo)
 
 ## ERP - Sessao
 
@@ -38,6 +116,10 @@ Query params suportados em `GET /admin/stats`:
 | POST | `/os/salvar` | Criar OS | `os:criar` |
 | GET | `/os/visualizar/{id}` | Detalhes da OS | `os:visualizar` |
 | GET | `/os/status-meta/{id}` | Metadados do modal de troca de status na listagem | `os:visualizar` |
+| GET | `/os/prazos-meta/{id}` | Metadados do modal rapido de prazos na listagem | `os:editar` |
+| POST | `/os/prazos-ajax/{id}` | Atualizar apenas a previsao via modal da listagem | `os:editar` |
+| GET | `/os/orcamento-meta/{id}` | Metadados do modal de orcamento da listagem | `os:editar` |
+| POST | `/os/orcamento-ajax/{id}` | Gerar PDF de orcamento e opcionalmente enviar ao cliente | `os:editar` |
 | POST | `/os/status-ajax/{id}` | Alterar status por AJAX na listagem | `os:editar` |
 | POST | `/os/status/{id}` | Alterar status | `os:editar` |
 | POST | `/os/whatsapp/{id}` | Envio WhatsApp (texto/PDF/template) | `os:editar` |
@@ -48,13 +130,24 @@ Query params suportados em `GET /admin/stats`:
 Notas da interface de OS:
 - `GET /os/nova` e `GET /os/visualizar/{id}` aceitam `?embed=1` para renderizacao em modal interno (sem sidebar/navbar).
 - Em modo embed, formularios e acoes internas preservam o contexto para manter o fluxo dentro do modal.
+- `GET /os/visualizar/{id}` usa um card de status com acoes rapidas (`Proxima etapa` e `Cancelar`) que submetem em `POST /os/status/{id}`.
+- A listagem `/os` usa o mesmo workflow da visualizacao: clicar em `N OS` abre `/os/visualizar/{id}` e clicar em `Status` abre um modal enriquecido com historico, progresso e acoes rapidas.
+- A listagem `/os` tambem aceita busca por `numero_os_legado` para localizar ordens migradas do sistema antigo.
+- A listagem `/os` aceita `legado=1` para restringir o resultado apenas a ordens importadas do sistema anterior.
+- A barra de busca global da navbar tambem passou a consultar `numero_os_legado`.
+- Na listagem `/os`, clicar em `Cliente` abre `GET /clientes/visualizar/{id}?embed=1` dentro de modal interno.
+- Na listagem `/os`, clicar em `Equipamento` abre `GET /equipamentos/visualizar/{id}?embed=1` dentro de modal interno.
+- Na listagem `/os`, clicar em `Datas` chama `GET /os/prazos-meta/{id}` e salva por `POST /os/prazos-ajax/{id}`.
+- Na listagem `/os`, clicar em `Valor Total` chama `GET /os/orcamento-meta/{id}` e gera/envia por `POST /os/orcamento-ajax/{id}`.
 
 Payload suportado em `POST /os/datatable`:
 - `q`: busca global com estrategia progressiva:
   - numero de OS por caminho otimizado quando o termo parece um codigo (`OS2026...` ou digitos equivalentes)
+  - numero de OS legado por caminho otimizado quando houver match em `os.numero_os_legado`
   - cliente, equipamento e tecnico via subconsultas indexadas
   - relato textual como fallback quando nao houver match estruturado, priorizando `FULLTEXT` em `os.relato_cliente`
 - `status`: lista multipla de status (`array` ou CSV em `status_list`).
+- `legado`: quando `1`, restringe a grade a registros com `legacy_origem` ou `numero_os_legado`.
 - `macrofase`: grupo macro do status (`os_status.grupo_macro`).
 - `estado_fluxo`: estado operacional (`em_atendimento`, `em_execucao`, `pausado`, `pronto`, `encerrado`, `cancelado`).
 - `data_inicio` / `data_fim`: intervalo index-friendly da data de abertura (`>= inicio do dia` e `< proximo dia`).
@@ -69,6 +162,9 @@ Notas de performance em `POST /os/datatable`:
 - O endpoint limita `length` a `100` linhas por chamada.
 - Filtros cronologicos e de faixa numerica evitam wrappers como `DATE()` e `COALESCE()` nas colunas indexadas.
 - O fallback textual do relato passou a usar `FULLTEXT` quando o indice dedicado esta disponivel no banco.
+- A celula `N OS` da resposta paginada pode incluir, abaixo do numero oficial, os metadados:
+  - `Legado: <numero_os_legado>`
+  - `Origem: <legacy_origem>`
 
 Resposta util em `GET /os/status-meta/{id}`:
 - `ok`
@@ -77,20 +173,138 @@ Resposta util em `GET /os/status-meta/{id}`:
   - `numero_os`
   - `status`
   - `estado_fluxo`
+  - `status_nome`
+  - `prioridade`
+  - `cliente_nome`
+  - `cliente_telefone`
+  - `cliente_email`
+  - `equipamento_nome`
+  - `equip_tipo`
+  - `equip_tipo_label`
+  - `equip_marca`
+  - `equip_modelo`
+  - `equip_serie`
+  - `statusBadgeHtml`
+  - `flowBadgeHtml`
+  - `priorityBadgeHtml`
 - `options`
   - grupos de status permitidos por macrofase, ja filtrados segundo o workflow ativo
+- `primaryNextStatus`
+  - destino principal sugerido para o fluxo normal
+- `workflowTimeline`
+  - macrofases com estado visual (`completed`, `current`, `probable`, `upcoming`)
+- `workflowRecentHistory`
+  - ultimas movimentacoes da OS para o modal rapido
+- `hasClientPhone`
+  - indica se a opcao de comunicar o cliente pode ser habilitada no frontend
 - `csrfHash`
+
+Resposta util em `GET /os/prazos-meta/{id}`:
+- `ok`
+- `os`
+  - `id`
+  - `numero_os`
+  - `status`
+  - `estado_fluxo`
+  - `prioridade`
+  - `cliente_nome`
+  - `equipamento_nome`
+  - badges renderizadas (`statusBadgeHtml`, `flowBadgeHtml`, `priorityBadgeHtml`)
+- `dates`
+  - `data_entrada`
+  - `data_previsao`
+  - `data_entrega`
+  - `data_entrada_label`
+  - `data_previsao_label`
+  - `data_entrega_label`
+  - `prazo_dias`
+- `csrfHash`
+
+Payload aceito em `POST /os/prazos-ajax/{id}`:
+- `data_previsao`
+- token CSRF
+
+Comportamento de `POST /os/prazos-ajax/{id}`:
+- rejeita tentativas de alterar `data_entrada` ou `data_entrega` por esse modal
+- valida consistencia cronologica entre a entrada ja registrada e a nova previsao
+- atualiza apenas `data_previsao` sem sair da listagem
+- registra log operacional da alteracao
+
+Resposta util em `GET /os/orcamento-meta/{id}`:
+- `ok`
+- `os`
+  - `id`
+  - `numero_os`
+  - `status`
+  - `estado_fluxo`
+  - `prioridade`
+  - `cliente_nome`
+  - `cliente_telefone`
+  - `cliente_email`
+  - `equipamento_nome`
+  - `equip_tipo`
+  - `equip_tipo_label`
+  - `equip_marca`
+  - `equip_modelo`
+  - `equip_serie`
+  - badges renderizadas (`statusBadgeHtml`, `flowBadgeHtml`, `priorityBadgeHtml`)
+- `budget`
+  - `telefone`
+  - `valor_mao_obra`
+  - `valor_pecas`
+  - `valor_total`
+  - `desconto`
+  - `valor_final`
+  - labels monetarias correspondentes
+  - `can_send_whatsapp`
+  - `has_client_phone`
+  - `documents[]`
+- `csrfHash`
+
+Payload aceito em `POST /os/orcamento-ajax/{id}`:
+- `telefone`
+- `mensagem_manual`
+- `enviar_cliente` (opcional)
+- token CSRF
+
+Comportamento de `POST /os/orcamento-ajax/{id}`:
+- gera uma nova versao do PDF de orcamento via `OsPdfService`
+- pode anexar o PDF e enviar ao cliente pelo WhatsApp sem sair da listagem
+- retorna `warning` quando o PDF e gerado com sucesso, mas a notificacao opcional falha
 
 Payload aceito em `POST /os/status-ajax/{id}`:
 - `status`
-- `observacao` (opcional)
+- `observacao_status` (opcional)
+- `controla_comunicacao_cliente` (opcional)
+- `comunicar_cliente` (opcional)
 - token CSRF
 
 Comportamento de `POST /os/status-ajax/{id}`:
 - valida permissao e existencia da OS
 - valida se o destino e permitido pelo fluxo
-- persiste historico e efeitos colaterais operacionais do mesmo modo que a troca classica de status
+- persiste historico e efeitos colaterais operacionais do mesmo modo que a troca classica de status da visualizacao da OS
+- aceita cancelamento direto quando o workflow permitir o destino `cancelado`
+- quando `controla_comunicacao_cliente=1`, o backend:
+  - mantem automacoes internas de ERP/CRM
+  - pode suprimir templates automaticos
+  - envia notificacao manual ao cliente apenas se `comunicar_cliente=1`
+- pode retornar `warning` quando o status for salvo, mas a notificacao opcional falhar
 - responde JSON para recarregar apenas o DataTable da listagem
+
+Payload aceito em `POST /os/status/{id}`:
+- `status`
+- `observacao_status` (opcional)
+- `controla_comunicacao_cliente` (opcional)
+- `comunicar_cliente` (opcional)
+- token CSRF
+
+Comportamento de `POST /os/status/{id}`:
+- atualiza o status conforme o workflow configurado
+- aceita `cancelado` como destino direto a partir de qualquer etapa
+- quando `controla_comunicacao_cliente=1`, o backend:
+  - continua executando os efeitos internos de CRM/ERP
+  - suprime templates automaticos de notificacao
+  - envia comunicacao manual ao cliente somente se `comunicar_cliente=1`
 
 Resposta util em `GET /os/fotos/{id}`:
 - `ok`
@@ -133,6 +347,11 @@ O campo `cliente` devolve os dados persistidos apos salvar para permitir sincron
 - card de resumo do cliente na OS
 - atualizacao AJAX da pagina pai em modo embed
 
+Rota embed utilizada pela listagem de OS:
+- `GET /clientes/visualizar/{id}?embed=1`
+  - renderiza a ficha do cliente sem sidebar/navbar
+  - usada no modal contextual da coluna `Cliente`
+
 ## ERP - Equipamentos (atalho AJAX da Nova OS)
 
 | Metodo | Rota | Objetivo | Permissao |
@@ -151,6 +370,46 @@ Regras do modal inline:
 Uso do `focus_tab`:
 - o frontend da OS usa esse valor para abrir automaticamente a aba pendente do modal de equipamento
 - o foco e reposicionado no campo visivel correspondente para o tecnico concluir a pendencia sem fechar o modal
+
+Rota embed utilizada pela listagem de OS:
+- `GET /equipamentos/visualizar/{id}?embed=1`
+  - renderiza a ficha do equipamento sem sidebar/navbar
+  - usada no modal contextual da coluna `Equipamento`
+
+## ERP - Migracao legada (CLI)
+
+Esses comandos nao sao rotas HTTP. Eles rodam no shell da aplicacao e dependem da conexao `database.legacy.*`.
+
+| Comando | Objetivo | Observacao |
+|---|---|---|
+| `php spark legacy:preflight` | Validar a origem legada antes da carga | retorna `exit code 1` quando houver bloqueios |
+| `php spark legacy:prepare-target` | Inspecionar ou limpar os dados operacionais ficticios da base atual | com `--execute`, apaga dados operacionais e uploads mapeados |
+| `php spark legacy:import --execute` | Importar clientes, equipamentos e OS do sistema antigo | roda um preflight antes da importacao |
+| `php spark legacy:import --execute --wipe-target` | Limpar a base operacional atual e depois importar o legado | usado na virada real para dados do banco `erp` |
+| `php spark legacy:report` | Consolidar o ultimo run salvo | aceita `--run_id=123` |
+
+Bloqueios tipicos do preflight:
+- status sem mapeamento explicito
+- relacionamentos orfaos
+- aliases obrigatorios ausentes nas queries-base
+- conexao legada invalida
+
+Avisos tipicos:
+- clientes sem telefone valido no legado
+- nesses casos, a carga segue com aviso e persiste `telefone1` vazio no destino para respeitar o schema do ERP
+
+Auditoria:
+- `legacy_import_aliases`
+- `legacy_import_runs`
+- `legacy_import_events`
+
+Notas da deduplicacao de equipamentos:
+- equipamentos derivados do banco `erp` continuam recebendo `legacy_id` no formato `os-{id_legado}`
+- clientes repetidos pelo mesmo `CPF/CNPJ` valido podem convergir para um cliente canonico
+- quando houver `numero_serie` ou `IMEI` valido, a importacao pode reaproveitar um equipamento canonico ja migrado
+- a relacao entre o alias legado e o equipamento destino fica registrada em `legacy_import_aliases`
+- a mesma tabela de aliases tambem registra consolidacoes seguras de clientes por `CPF/CNPJ`
+- sem identificador forte confiavel, o pipeline preserva o snapshot por OS e nao faz mesclagem automatica
 
 ## ERP - Pessoas (Contatos)
 
@@ -232,6 +491,8 @@ Notas de resposta:
   - `arquivo_original` e `anexo_path_original` quando a referencia legada existe, mas o arquivo fisico nao foi encontrado
   - quando `arquivo_disponivel=0`, os campos `arquivo` e `anexo_path` retornam `null` para evitar 404 no frontend
 - `GET /atendimento-whatsapp/conversa/{id}/novas` retorna apenas mensagens com `id > after_id`, sem recarregar toda a thread.
+- `GET /atendimento-whatsapp/conversas` e `GET /atendimento-whatsapp/conversa/{id}/novas` priorizam processamento rapido da fila local inbound (sem sync pesado de historico em toda chamada), para manter polling responsivo.
+- `GET /atendimento-whatsapp/conversa/{id}` segue o mesmo principio de resposta rapida, sem execucao de sync pesado no caminho critico.
 - `GET /atendimento-whatsapp/conversa/{id}/stream` suporta:
   - `probe=1` (pre-check em JSON)
   - `handshake=1` (validacao de `Content-Type: text/event-stream`)
@@ -246,6 +507,7 @@ Notas de resposta:
   - usa `422` apenas para erro corrigivel pelo usuario (conteudo vazio, conversa/telefone ausente, PDF/anexo invalido)
   - usa `503` com `code = CM_ENVIO_PROVIDER_UNAVAILABLE` quando o provider/gateway estiver inacessivel, indisponivel ou mal configurado
   - devolve mensagem operacional amigavel para a UI, mantendo o detalhe tecnico apenas no contexto de log
+  - libera lock de sessao antes da chamada ao provider para reduzir bloqueio concorrente com polling da mesma thread
 - `POST /atendimento-whatsapp/conversa/{id}/cadastrar-contato`:
   - body: `nome` (opcional)
   - sucesso: `CM_CONTATO_LINKED_OK`
@@ -337,11 +599,13 @@ Endpoints:
 | POST | `/restart` | Reiniciar inicializacao do client |
 | POST | `/logout` | Destruir sessao para novo vinculo |
 | POST | `/self-check-inbound` | Teste de encaminhamento inbound para o webhook ERP configurado no `.env` |
+| GET | `/sync-chat-history` | Coleta historico recente por chat para reconciliacao inbound/outbound |
 | POST | `/create-message` | Envio de texto, imagem ou PDF |
 
 Fluxo inbound local -> ERP:
 - com `FORWARD_INBOUND_ENABLED=1`, o gateway encaminha inbound para `ERP_WEBHOOK_URL`
 - com `FORWARD_INBOUND_MEDIA_ENABLED=1`, tenta anexar `media_base64` (respeitando `INBOUND_MEDIA_MAX_BYTES`)
+- em `GET /sync-chat-history`, quando `FORWARD_INBOUND_MEDIA_ENABLED=1`, o gateway tambem tenta baixar e incluir midia no payload historico
 - token opcional via header `X-Webhook-Token: ERP_WEBHOOK_TOKEN`
 - se houver falha de loopback local, o gateway tenta fallback automatico entre `localhost` e `127.0.0.1` para o webhook ERP.
 

@@ -14,7 +14,8 @@ class ClienteModel extends Model
     protected $allowedFields = [
         'tipo_pessoa', 'nome_razao', 'cpf_cnpj', 'rg_ie', 'email',
         'telefone1', 'telefone2', 'nome_contato', 'telefone_contato', 'cep', 'endereco', 'numero',
-        'complemento', 'bairro', 'cidade', 'uf', 'observacoes'
+        'complemento', 'bairro', 'cidade', 'uf', 'observacoes',
+        'legacy_origem', 'legacy_id',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

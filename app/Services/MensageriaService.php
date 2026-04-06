@@ -27,7 +27,7 @@ class MensageriaService
 
         if ($providerName === 'menuia') {
             return new MenuiaProvider(
-                (string) $this->cfg('whatsapp_menuia_url', $overrides, 'https://api.menuia.com/api'),
+                (string) $this->cfg('whatsapp_menuia_url', $overrides, 'https://chatbot.menuia.com/api'),
                 (string) $this->cfg('whatsapp_menuia_authkey', $overrides, ''),
                 (string) $this->cfg('whatsapp_menuia_appkey', $overrides, '')
             );
@@ -38,7 +38,7 @@ class MensageriaService
                 (string) $this->cfg('whatsapp_local_node_url', $overrides, 'http://127.0.0.1:3001'),
                 (string) $this->cfg('whatsapp_local_node_token', $overrides, ''),
                 (string) $this->cfg('whatsapp_local_node_origin', $overrides, base_url('/')),
-                (int) $this->cfg('whatsapp_local_node_timeout', $overrides, 20),
+                (int) $this->cfg('whatsapp_local_node_timeout', $overrides, 30),
                 'api_whats_local',
                 'gateway api local (windows)'
             );
@@ -49,7 +49,7 @@ class MensageriaService
                 (string) $this->cfg('whatsapp_linux_node_url', $overrides, 'http://127.0.0.1:3001'),
                 (string) $this->cfg('whatsapp_linux_node_token', $overrides, ''),
                 (string) $this->cfg('whatsapp_linux_node_origin', $overrides, base_url('/')),
-                (int) $this->cfg('whatsapp_linux_node_timeout', $overrides, 20),
+                (int) $this->cfg('whatsapp_linux_node_timeout', $overrides, 30),
                 'api_whats_linux',
                 'gateway api linux (vps)'
             );

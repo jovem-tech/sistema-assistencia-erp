@@ -11,6 +11,16 @@ O sistema utiliza um padrao inteligente para numeracao: **`OSYYMMSSSS`**
 
 Este numero e gerado automaticamente e a **sequencia reseta para 0001 no inicio de cada mes**, facilitando a organizacao e o controle de volume.
 
+### OS migradas de sistema antigo
+- Quando uma OS vier de migracao legada, o ERP continua exibindo `numero_os` como identificador principal.
+- O numero antigo fica salvo como referencia em `numero_os_legado`.
+- Na coluna `N OS` da listagem, ordens migradas exibem o numero oficial na primeira linha e, logo abaixo, `Legado: <numero antigo>` e `Origem: <sistema>` empilhados verticalmente para facilitar auditoria.
+- Na listagem `/os`, a busca global tambem aceita esse numero antigo para facilitar a transicao operacional.
+- A propria tela `/os` agora oferece o seletor `Origem das ordens`, com o atalho `Somente legado`, para auditoria rapida das ordens migradas.
+- A barra de busca superior do sistema tambem aceita `numero_os_legado`, entao o operador pode localizar a ordem antiga sem sair da navegacao global.
+- No filtro de contexto da busca da navbar, existe agora a opcao dedicada `OS Legado`, para restringir a pesquisa apenas a ordens migradas quando o operador estiver trabalhando com o numero antigo.
+- Na visualizacao da OS, o sistema mostra `Numero legado` e `Origem` logo abaixo do cabecalho quando houver importacao.
+
 ## Abertura de nova OS
 Caminho: `Ordens de Servico > + Nova OS`
 
@@ -25,8 +35,12 @@ Separacao atual do fluxo:
 - Aba `Cliente`
   - Select2 de cliente com acoes `Novo` e `Editar`
   - card inteligente com nome, telefone e endereco do cliente selecionado
+  - ao salvar a edicao rapida do cliente no modal da OS, o sistema exibe confirmacao visual com `SweetAlert2`
 - Aba `Equipamento`
-  - Select2 de equipamento (Cadastro: Cor e Foto de Perfil obrigatorios)
+  - Select2 de equipamento com card rico por opcao
+  - cada opcao exibe foto de perfil, `tipo - marca`, `modelo - cor` e `numero de serie/IMEI`
+  - a busca tambem considera esses identificadores, reduzindo erro quando o cliente possui varios equipamentos semelhantes
+  - cadastro rapido segue exigindo Cor e Foto de Perfil obrigatorios
   - estado fisico do equipamento
   - acessorios e componentes na entrada
 - Aba `Defeito`
@@ -68,6 +82,10 @@ Separacao atual do fluxo:
 | Relato do Cliente | Sim | Texto informado na recepcao |
 | Estado fisico na entrada | Nao | Danos visuais observados |
 | Acessorios na entrada | Nao | Itens recebidos com o equipamento |
+
+Observacao operacional:
+
+- quando o cliente possui mais de um equipamento parecido, a selecao do equipamento deve ser feita observando a foto de perfil e o identificador tecnico (`numero de serie` ou `IMEI`) exibidos na lista.
 
 ## Registro de acessorios
 O bloco `Acessorios e Componentes (na entrada)` usa botoes de insercao rapida.
@@ -127,6 +145,42 @@ Observacao tecnica de UX:
 ## Visualizacao da OS
 Caminho: `/os/visualizar/{id}`
 
+Hierarquia atual da tela:
+- coluna lateral fixa: `Fotos do Equipamento`
+- logo abaixo das fotos: `Historico e Progresso`
+- topo principal: resumo operacional (`Cliente`, `Equipamento`, `Tecnico`) + abas centrais
+- bloco seguinte: `Status`
+- linha operacional seguinte: `Documentos PDF` e `WhatsApp`
+- o card dedicado de `Valor Final` saiu do topo e os valores continuam na aba `Valores`
+
+Conteudo principal em abas:
+- `Informacoes`
+- `Itens / Servicos`
+- `Diagnostico`
+- `Fotos de Entrada`
+- `Valores`
+
+Em OS vindas do legado `erp`, a tela tambem pode exibir:
+- composicao importada de servicos e pecas
+- laudo/diagnostico tecnico migrado
+- solucao aplicada
+- observacoes internas da equipe
+- observacoes registradas para o cliente
+- notas operacionais antigas preservadas
+- aprovacao e forma de pagamento quando esses dados existirem no sistema legado
+
+Refino visual da aba `Informacoes`:
+- o nome do cliente e o nome do equipamento ficam concentrados apenas no resumo superior da OS;
+- os cards internos `Cliente` e `Equipamento` foram removidos da aba para evitar redundancia;
+- a aba passa a focar apenas nas informacoes complementares da OS, como relato e estado fisico na entrada.
+
+Leitura recomendada das abas em OS legadas:
+- `Informacoes`: contexto de abertura e estado fisico
+- `Itens / Servicos`: servicos executados, pecas trocadas e itens importados do legado
+- `Diagnostico`: laudo, solucao aplicada, observacoes internas, observacoes do cliente e notas legadas importadas
+- `Valores`: totais financeiros, datas principais, aprovacao do orcamento e forma de pagamento
+- `Valores`: em OS legadas com total consolidado, a tela tambem mostra `Origem do valor legado` para explicar se o montante veio de servicos, pecas ou subtotal importado do ERP antigo
+
 Agora a OS exibe o estado fisico em dois pontos:
 - `Informacoes > Estado fisico na entrada` (descricao + fotos por item)
 - `Fotos de Entrada > Fotos do Estado fisico`
@@ -134,17 +188,43 @@ Agora a OS exibe o estado fisico em dois pontos:
 Tambem exibe:
 - Fotos da entrada geral
 - Fotos de acessorios
+- Timeline vertical com a etapa atual, etapas ja percorridas e proximas etapas provaveis do fluxo
+- Historico recente consolidado dentro do card `Historico e Progresso`
+
+### Card de Status na visualizacao
+- O card `Status` virou a central de acao operacional da OS.
+- Alem da troca manual de status, agora existem dois atalhos:
+  - `Proxima etapa`: usa o fluxo normal configurado para a OS
+  - `Cancelar`: permite encerrar por desistência do cliente em qualquer etapa
+- Ambos abrem o mesmo modal, com:
+  - `Observacoes`
+  - opcao `Comunicar a mudanca de status para o cliente`
+- Se o cliente nao tiver telefone cadastrado, o sistema informa isso no modal e desabilita a comunicacao automatica.
 
 ## Listagem de OS responsiva
 Caminho: `/os`
 
 Melhorias aplicadas:
 - Barra de filtros horizontal premium com busca global, status detalhado e acoes rapidas de aplicar, limpar e abrir filtros avancados.
+- Barra de origem no topo da pagina com dois estados:
+  - `Todas as OS`
+  - `Somente legado`
 - Aplicacao em tempo real sem reload completo da pagina (DataTables server-side + AJAX).
 - Persistencia dos filtros na URL e no navegador (localStorage), mantendo contexto ao atualizar ou compartilhar o link.
 - Chips de filtros ativos com remocao individual e acao `Limpar todos`.
 - Contador de resultados atualizado dinamicamente acima da tabela.
 - Overlay de carregamento suave durante aplicacao dos filtros.
+- O numero exibido na coluna `N OS` abre diretamente a visualizacao completa da ordem.
+- Clicar em `Cliente` abre um modal com a ficha completa do cliente, incluindo dados cadastrais, equipamentos vinculados, historico de OS e bloco de relacionamento/CRM.
+- Clicar em `Equipamento` abre um modal com a ficha completa do equipamento, incluindo fotos, clientes vinculados, historico de ordens e demais dados tecnicos.
+- Clicar em `Datas` abre um modal de atualizacao rapida de prazos, mantendo a listagem no mesmo contexto.
+- Clicar em `Valor Total` abre um modal de orcamento para gerar uma nova versao do PDF e, opcionalmente, enviar o documento ao cliente.
+- A busca principal da tabela aceita:
+  - numero atual da OS
+  - numero legado da OS
+  - cliente
+  - equipamento
+- O menu de filtros da busca global da navbar foi revisado para remover caracteres corrompidos e exibir corretamente labels como `Servicos`, `Pecas`, `Usuario` e `Configuracoes`.
 
 ### Comportamento por faixa de tela
 
@@ -201,6 +281,15 @@ Melhorias aplicadas:
 - O botao aparece somente quando houver colunas escondidas para aquele breakpoint.
 - Ao expandir a linha, a interface mostra um painel interno com os campos ocultos, sem perder badges e acoes.
 - A coluna `N OS` permanece fixa em uma unica linha, sem quebrar o numero da ordem.
+- Clicar no numero da OS abre a visualizacao completa daquela ordem em `/os/visualizar/{id}`.
+- Clicar no nome do cliente abre a visualizacao embarcada do cliente em modal, sem sair da listagem.
+- Clicar no bloco do equipamento abre a visualizacao embarcada do equipamento em modal, sem sair da listagem.
+- Clicar no bloco `Datas` abre o modal `Atualizar prazos da OS`, com resumo atual de entrada, previsao, entrega e atalho de prazo.
+- Clicar no bloco `Valor Total` abre o modal `Orcamento da OS`, com resumo financeiro, historico de PDFs gerados e opcao de envio ao cliente.
+- No modal `Atualizar prazos da OS`, apenas a `Previsao` pode ser alterada.
+- `Data de entrada` aparece somente para consulta, porque ela e definida na abertura da OS.
+- `Entrega` aparece somente para consulta, porque ela depende do fluxo correto de status da OS.
+- O modal de prazos passou a usar rolagem interna real, mantendo o rodape e o botao `Salvar prazos` acessiveis em notebooks e telas menores.
 - A largura de `N OS` foi refinada para ocupar apenas o necessario ao codigo completo da ordem.
 - A coluna `Cliente` ganhou prioridade de largura.
 - Quando o nome do cliente tiver quatro palavras ou mais, a exibicao passa a quebrar em duas linhas a partir da segunda palavra para preservar leitura:
@@ -223,6 +312,8 @@ Melhorias aplicadas:
   - amarelo: faltam ate 2 dias
   - laranja: vence hoje
   - vermelho: prazo estourado
+- Quando o prazo estiver vencido, o badge passa a informar ha quantos dias a OS esta atrasada:
+  - exemplo: `Atrasado ha 8 dias - 20/03/2026`
 - O indicador de `Entrega` destaca se a conclusao ocorreu dentro ou fora do prazo:
   - verde: entregue no prazo
   - vermelho: entregue fora do prazo
@@ -235,6 +326,18 @@ Melhorias aplicadas:
 - Em tablet:
   - a coluna `Foto` pode migrar para o painel expansivel antes de forcar compressao horizontal da tabela.
 - O texto auxiliar `Alterar status` fica oculto nos perfis comprimidos, preservando a area util da coluna `Status`.
+- Ao clicar no badge/trigger de `Status`, a listagem abre um modal operacional com:
+  - resumo da OS selecionada;
+  - bloco `Cliente` com nome, telefone e email;
+  - bloco `Equipamento` com nome, tipo, marca, modelo e numero de serie;
+  - badges do status atual, estado do fluxo e prioridade;
+  - `Proxima etapa`;
+  - `Cancelar`;
+  - seletor manual de destino permitido;
+  - timeline de `Historico e Progresso`;
+  - ultimas movimentacoes da OS;
+  - chave para decidir se o cliente sera notificado ou nao.
+- Esse modal agora possui rolagem interna propria e rodape fixo, para que todas as opcoes e o botao de salvar permanecam acessiveis em notebook e telas menores.
 - As colunas `Status` e `Valor Total` foram compactadas para ocupar apenas a largura necessaria ao badge e ao valor monetario, devolvendo mais espaco util para `Cliente`.
 - As colunas `Acoes`, `Relato`, `Status`, `Datas` e `Equipamento` agora seguem regra binaria: ou aparecem inteiras na grade principal, ou sao movidas por completo para o expansor `+`, sem ficar cortadas na borda direita.
 - Quando houver falta de largura residual na grade, a prioridade de recolhimento passa a ser:
@@ -342,9 +445,13 @@ Caminho: `/os/visualizar/{id}`
 
 Melhorias aplicadas:
 - Estrutura principal convertida para split responsivo (painel de fotos + conteudo).
-- Cards de status/PDF/WhatsApp com reorganizacao 1-2-3 colunas por breakpoint.
+- Hierarquia visual reorganizada para priorizar primeiro os dados da OS, depois status/progresso e por fim operacao documental/comunicacao.
+- Card `Historico de Status` foi absorvido pelo bloco `Historico e Progresso`, que combina timeline vertical e ultimas movimentacoes.
+- O bloco `Historico e Progresso` foi reposicionado para a coluna lateral, imediatamente abaixo de `Fotos do Equipamento`.
+- Cards de status, progresso, PDF e WhatsApp com reorganizacao 1-2-3 colunas por breakpoint.
 - Formulario rapido de status com quebra inteligente (sem apertar select e botao).
 - Tabs de secoes com navegacao horizontal em telas menores.
+- `Valor Final` permanece em destaque no topo direito mesmo quando os demais blocos quebram para baixo.
 
 ## Edicao da OS
 Na edicao (`/os/editar/{id}`), os dados de abertura podem ser ajustados e os registros de estado fisico/acessorios sao persistidos novamente.
@@ -385,6 +492,7 @@ Regras:
 
 ## Comunicacao WhatsApp na OS
 Na tela de visualizacao (`/os/visualizar/{id}`):
+- Bloco `WhatsApp` fica abaixo da area de `Status` / `Historico e Progresso`, preservando a hierarquia operacional da OS.
 - Bloco `WhatsApp` para envio manual por template ou texto livre.
 - Opcao de selecionar um PDF ja gerado da OS para enviar junto como anexo.
 - Botao rapido de envio WhatsApp em cada documento da lista `Documentos PDF`.
@@ -393,6 +501,7 @@ Na tela de visualizacao (`/os/visualizar/{id}`):
 
 ## Documentos PDF da OS
 Na tela de visualizacao (`/os/visualizar/{id}`):
+- Bloco `Documentos PDF` fica abaixo da area principal de abas e logo antes do bloco `WhatsApp`.
 - Bloco `Documentos PDF` para gerar e listar versoes.
 - Tipos disponiveis:
   - abertura

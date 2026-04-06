@@ -41,6 +41,9 @@ $labelsMap = [
     'estado_fluxo' => $estadoFluxoOptions,
     'tecnicos' => $tecnicoLabels,
     'situacao' => $situacaoOptions,
+    'legado' => [
+        '1' => 'Somente OS legado',
+    ],
 ];
 ?>
 
@@ -76,9 +79,21 @@ $labelsMap = [
         </button>
     </div>
 
+    <div class="os-legacy-toolbar mb-3">
+        <div class="os-legacy-toolbar-copy">
+            <div class="os-legacy-toolbar-title">Origem das ordens</div>
+            <div class="os-legacy-toolbar-text">Alterne rapidamente entre a operacao completa e a conferencia exclusiva das OS migradas do legado.</div>
+        </div>
+        <div class="btn-group os-legacy-toggle" role="group" aria-label="Filtro de origem da OS">
+            <button type="button" class="btn btn-outline-secondary js-os-legacy-toggle" data-legacy-value="">Todas as OS</button>
+            <button type="button" class="btn btn-outline-secondary js-os-legacy-toggle" data-legacy-value="1">Somente legado</button>
+        </div>
+    </div>
+
     <div class="card glass-card os-filters-card mb-3 d-none d-md-block">
         <div class="card-body">
             <form id="osFiltersDesktopForm" data-os-filter-form="desktop" novalidate>
+                <input type="hidden" data-filter-field="legado" value="<?= esc((string) ($listFilters['legado'] ?? '')) ?>">
                 <div class="os-filters-inline">
                     <div class="os-filter-field">
                         <label class="form-label" for="osFilterQDesktop">Busca global</label>
@@ -89,7 +104,7 @@ $labelsMap = [
                                 class="form-control"
                                 id="osFilterQDesktop"
                                 data-filter-field="q"
-                                placeholder="Cliente, equipamento, numero da OS..."
+                                placeholder="Cliente, equipamento, numero da OS ou OS legado..."
                                 value="<?= esc((string) ($listFilters['q'] ?? '')) ?>"
                                 autocomplete="off"
                             >
@@ -239,6 +254,7 @@ $labelsMap = [
         </div>
         <div class="offcanvas-body">
             <form id="osFiltersMobileForm" data-os-filter-form="mobile" novalidate>
+                <input type="hidden" data-filter-field="legado" value="<?= esc((string) ($listFilters['legado'] ?? '')) ?>">
                 <div class="row g-3">
                     <div class="col-12">
                         <label class="form-label" for="osFilterQMobile">Busca global</label>
@@ -249,7 +265,7 @@ $labelsMap = [
                                 class="form-control"
                                 id="osFilterQMobile"
                                 data-filter-field="q"
-                                placeholder="Cliente, equipamento, numero da OS..."
+                                placeholder="Cliente, equipamento, numero da OS ou OS legado..."
                                 value="<?= esc((string) ($listFilters['q'] ?? '')) ?>"
                                 autocomplete="off"
                             >
@@ -442,6 +458,24 @@ $labelsMap = [
         </div>
     </div>
 
+    <div class="modal fade dashboard-os-modal" id="osDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl modal-fullscreen-md-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="osDetailsModalTitle">Detalhes</h5>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body p-0 position-relative">
+                    <div class="dashboard-os-modal-loading" id="osDetailsModalLoading">
+                        <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+                        <span>Carregando...</span>
+                    </div>
+                    <iframe id="osDetailsModalFrame" title="Detalhes" class="dashboard-os-modal-frame" src="about:blank"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="osPhotosModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl modal-fullscreen-md-down">
             <div class="modal-content">
@@ -511,29 +545,327 @@ $labelsMap = [
         </div>
     </div>
 
-    <div class="modal fade" id="osStatusModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+    <div class="modal fade" id="osDatesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-md-down">
             <div class="modal-content">
-                <form id="osStatusModalForm" novalidate>
+                <form id="osDatesModalForm" class="os-status-modal-form" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">Atualizar prazos da OS</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="os-status-modal-summary mb-4">
+                            <div class="small text-muted">OS selecionada</div>
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                                <div>
+                                    <div class="fw-semibold fs-4" id="osDatesModalNumero">-</div>
+                                    <div class="small text-muted mt-1">Atualize apenas a previsao sem sair da listagem. Entrada e entrega seguem o fluxo operacional correto.</div>
+                                </div>
+                                <div class="os-status-modal-badges" id="osDatesModalBadges"></div>
+                            </div>
+                            <div class="row g-3 mt-1">
+                                <div class="col-12 col-lg-6">
+                                    <div class="os-status-context-card">
+                                        <div class="os-status-context-title">Cliente</div>
+                                        <div class="os-status-context-name" id="osDatesModalClientName">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6">
+                                    <div class="os-status-context-card">
+                                        <div class="os-status-context-title">Equipamento</div>
+                                        <div class="os-status-context-name" id="osDatesModalEquipmentName">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-12 col-xl-7">
+                                <div class="os-status-modal-panel">
+                                    <div class="os-status-modal-section">
+                                        <label class="form-label" for="osDatesModalEntrada">Data de entrada</label>
+                                        <input type="text" class="form-control" id="osDatesModalEntrada" value="-" readonly disabled>
+                                        <div class="form-text">A data de entrada e definida no momento da abertura da OS.</div>
+                                    </div>
+
+                                    <div class="row g-3">
+                                        <div class="col-12 col-md-4">
+                                            <label class="form-label" for="osDatesModalPreset">Atalho de prazo</label>
+                                            <select class="form-select" id="osDatesModalPreset">
+                                                <option value="">Manual</option>
+                                                <option value="1">1 dia</option>
+                                                <option value="3">3 dias</option>
+                                                <option value="7">7 dias</option>
+                                                <option value="15">15 dias</option>
+                                                <option value="30">30 dias</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-12 col-md-8">
+                                            <label class="form-label" for="osDatesModalPrevisao">Previsao</label>
+                                            <input type="date" class="form-control" id="osDatesModalPrevisao" name="data_previsao">
+                                        </div>
+                                    </div>
+
+                                    <div class="os-status-modal-section">
+                                        <label class="form-label" for="osDatesModalEntrega">Entrega</label>
+                                        <input type="text" class="form-control" id="osDatesModalEntrega" value="-" readonly disabled>
+                                        <div class="form-text">A data de entrega e controlada automaticamente pela mudanca de status correta da OS.</div>
+                                    </div>
+
+                                    <div class="os-dates-status-note">
+                                        <i class="bi bi-info-circle"></i>
+                                        <span>Use este modal para ajustar o prazo previsto. Para concluir, devolver ou cancelar com entrega registrada, altere o status da OS.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-xl-5">
+                                <div class="os-status-modal-panel">
+                                    <div class="os-status-modal-section-title">Resumo atual</div>
+                                    <div class="os-inline-meta-list">
+                                        <div class="os-inline-meta-item">
+                                            <span class="os-inline-meta-label">Entrada atual</span>
+                                            <strong id="osDatesModalEntradaAtual">-</strong>
+                                        </div>
+                                        <div class="os-inline-meta-item">
+                                            <span class="os-inline-meta-label">Prazo atual</span>
+                                            <strong id="osDatesModalPrevisaoAtual">-</strong>
+                                        </div>
+                                        <div class="os-inline-meta-item">
+                                            <span class="os-inline-meta-label">Entrega atual</span>
+                                            <strong id="osDatesModalEntregaAtual">-</strong>
+                                        </div>
+                                        <div class="os-inline-meta-item">
+                                            <span class="os-inline-meta-label">Dias entre entrada e previsao</span>
+                                            <strong id="osDatesModalPrazoDias">-</strong>
+                                        </div>
+                                    </div>
+                                    <div class="form-text">A listagem sera atualizada automaticamente apos salvar.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-glow" id="osDatesModalSubmit">
+                            <i class="bi bi-calendar-check me-1"></i>Salvar prazos
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="osBudgetModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable modal-fullscreen-md-down">
+            <div class="modal-content">
+                <form id="osBudgetModalForm" class="os-status-modal-form" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">Orcamento da OS</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="os-status-modal-summary mb-4">
+                            <div class="small text-muted">OS selecionada</div>
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                                <div>
+                                    <div class="fw-semibold fs-4" id="osBudgetModalNumero">-</div>
+                                    <div class="small text-muted mt-1">Gere uma nova versao do PDF de orcamento e envie para o cliente sem sair da listagem.</div>
+                                </div>
+                                <div class="os-status-modal-badges" id="osBudgetModalBadges"></div>
+                            </div>
+                            <div class="row g-3 mt-1">
+                                <div class="col-12 col-lg-6">
+                                    <div class="os-status-context-card">
+                                        <div class="os-status-context-title">Cliente</div>
+                                        <div class="os-status-context-name" id="osBudgetModalClientName">-</div>
+                                        <div class="os-status-context-meta" id="osBudgetModalClientPhone">Telefone: -</div>
+                                        <div class="os-status-context-meta" id="osBudgetModalClientEmail">Email: -</div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6">
+                                    <div class="os-status-context-card">
+                                        <div class="os-status-context-title">Equipamento</div>
+                                        <div class="os-status-context-name" id="osBudgetModalEquipmentName">-</div>
+                                        <div class="os-status-context-meta" id="osBudgetModalEquipmentMeta">Tipo: -</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-12 col-xl-7">
+                                <div class="os-status-modal-panel">
+                                    <div class="os-status-modal-section">
+                                        <div class="os-status-modal-section-title">Resumo financeiro</div>
+                                        <div class="os-budget-metrics">
+                                            <div class="os-budget-metric-card">
+                                                <span class="os-budget-metric-label">Mao de obra</span>
+                                                <strong id="osBudgetModalMaoObra">R$ 0,00</strong>
+                                            </div>
+                                            <div class="os-budget-metric-card">
+                                                <span class="os-budget-metric-label">Pecas</span>
+                                                <strong id="osBudgetModalPecas">R$ 0,00</strong>
+                                            </div>
+                                            <div class="os-budget-metric-card">
+                                                <span class="os-budget-metric-label">Subtotal</span>
+                                                <strong id="osBudgetModalSubtotal">R$ 0,00</strong>
+                                            </div>
+                                            <div class="os-budget-metric-card">
+                                                <span class="os-budget-metric-label">Valor final</span>
+                                                <strong id="osBudgetModalValorFinal">R$ 0,00</strong>
+                                            </div>
+                                        </div>
+                                        <div class="small text-muted">Ao salvar, o sistema gera uma nova versao do PDF de orcamento desta OS.</div>
+                                    </div>
+
+                                    <div class="os-status-modal-section">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="osBudgetModalNotify" name="enviar_cliente" value="1">
+                                            <label class="form-check-label" for="osBudgetModalNotify">
+                                                Enviar o orcamento ao cliente apos gerar o PDF
+                                            </label>
+                                        </div>
+                                        <div class="form-text" id="osBudgetModalNotifyHelp">O envio utiliza o telefone cadastrado do cliente.</div>
+                                    </div>
+
+                                    <div class="os-status-modal-section">
+                                        <label class="form-label" for="osBudgetModalPhone">Telefone destino</label>
+                                        <input type="text" class="form-control" id="osBudgetModalPhone" name="telefone" placeholder="Telefone do cliente">
+                                    </div>
+
+                                    <div class="os-status-modal-section">
+                                        <label class="form-label" for="osBudgetModalMessage">Mensagem opcional</label>
+                                        <textarea id="osBudgetModalMessage" name="mensagem_manual" class="form-control" rows="4" placeholder="Se deixar em branco, o sistema usa o template padrao do orcamento."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-xl-5">
+                                <div class="os-status-modal-panel">
+                                    <div class="os-status-modal-section-title">PDFs de orcamento ja gerados</div>
+                                    <div id="osBudgetModalDocsList" class="os-budget-docs-list">
+                                        <p class="text-muted small mb-0">Nenhum orcamento PDF registrado para esta OS.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-glow" id="osBudgetModalSubmit">
+                            <i class="bi bi-file-earmark-pdf me-1"></i>Gerar PDF
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="osStatusModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <form id="osStatusModalForm" class="os-status-modal-form" novalidate>
+                    <input type="hidden" name="controla_comunicacao_cliente" value="1">
                     <div class="modal-header">
                         <h5 class="modal-title">Alterar status da OS</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="mb-3">
+                        <div class="os-status-modal-summary mb-4">
                             <div class="small text-muted">OS selecionada</div>
-                            <div class="fw-semibold" id="osStatusModalNumero">-</div>
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                                <div>
+                                    <div class="fw-semibold fs-4" id="osStatusModalNumero">-</div>
+                                    <div class="small text-muted mt-1" id="osStatusModalPrimaryHint">Carregando contexto da OS...</div>
+                                </div>
+                                <div class="os-status-modal-badges" id="osStatusModalCurrentBadges"></div>
+                            </div>
+                            <div class="row g-3 mt-1">
+                                <div class="col-12 col-lg-6">
+                                    <div class="os-status-context-card">
+                                        <div class="os-status-context-title">Cliente</div>
+                                        <div class="os-status-context-name" id="osStatusModalClientName">-</div>
+                                        <div class="os-status-context-meta" id="osStatusModalClientPhone">Telefone: -</div>
+                                        <div class="os-status-context-meta" id="osStatusModalClientEmail">Email: -</div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6">
+                                    <div class="os-status-context-card">
+                                        <div class="os-status-context-title">Equipamento</div>
+                                        <div class="os-status-context-name" id="osStatusModalEquipmentName">-</div>
+                                        <div class="os-status-context-meta" id="osStatusModalEquipmentMeta">Tipo: -</div>
+                                        <div class="os-status-context-meta" id="osStatusModalEquipmentSerial">N de serie: -</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="osStatusModalSelect">Novo status</label>
-                            <select id="osStatusModalSelect" name="status" class="form-select" required>
-                                <option value="">Selecione um status</option>
-                            </select>
-                            <div class="form-text">A lista respeita o fluxo de trabalho configurado para avancar ou retornar etapas.</div>
-                        </div>
-                        <div>
-                            <label class="form-label" for="osStatusModalObservacao">Observacao</label>
-                            <textarea id="osStatusModalObservacao" name="observacao_status" class="form-control" rows="3" placeholder="Opcional"></textarea>
+
+                        <div class="row g-4">
+                            <div class="col-12 col-xl-7">
+                                <div class="os-status-modal-panel">
+                                    <div class="os-status-modal-section">
+                                        <div class="os-status-modal-section-title">Acoes rapidas</div>
+                                        <div class="os-status-modal-quick-actions">
+                                            <button type="button" class="btn btn-glow" id="osStatusModalQuickNext" disabled>
+                                                <i class="bi bi-arrow-right-circle me-1"></i>Proxima etapa
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger" id="osStatusModalQuickCancel" disabled>
+                                                <i class="bi bi-x-circle me-1"></i>Cancelar
+                                            </button>
+                                        </div>
+                                        <div class="small text-muted mt-2" id="osStatusModalTargetHint">Selecione um destino no fluxo para continuar.</div>
+                                    </div>
+
+                                    <div class="os-status-modal-section">
+                                        <label class="form-label" for="osStatusModalSelect">Status de destino</label>
+                                        <select id="osStatusModalSelect" name="status" class="form-select" required>
+                                            <option value="">Selecione um status</option>
+                                        </select>
+                                        <div class="form-text">A lista respeita o fluxo de trabalho configurado para avancar, retornar etapas ou cancelar o atendimento.</div>
+                                    </div>
+
+                                    <div class="os-status-modal-section">
+                                        <label class="form-label" for="osStatusModalObservacao">Observacoes</label>
+                                        <textarea
+                                            id="osStatusModalObservacao"
+                                            name="observacao_status"
+                                            class="form-control"
+                                            rows="4"
+                                            placeholder="Registre contexto da mudanca, combinados com o cliente ou justificativa do cancelamento."
+                                        ></textarea>
+                                    </div>
+
+                                    <div class="os-status-modal-section">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="osStatusModalNotify" name="comunicar_cliente" value="1">
+                                            <label class="form-check-label" for="osStatusModalNotify">
+                                                Notificar o cliente sobre esta mudanca
+                                            </label>
+                                        </div>
+                                        <div class="form-text" id="osStatusModalNotifyHelp">O cliente sera comunicado apenas se voce mantiver esta opcao ativa.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-xl-5">
+                                <div class="os-status-modal-panel os-status-modal-workflow">
+                                    <div class="os-status-modal-section-title">Historico e progresso</div>
+                                    <p class="small text-muted mb-0">Etapas percorridas, etapa atual e provaveis proximos movimentos.</p>
+
+                                    <div id="osStatusModalTimeline" class="os-status-modal-timeline-wrap">
+                                        <p class="text-muted small mb-0">Carregando fluxo visual...</p>
+                                    </div>
+
+                                    <div class="os-status-modal-history-wrap" id="osStatusModalHistoryWrap">
+                                        <div class="os-status-modal-divider"></div>
+                                        <div class="os-status-modal-section-title">Ultimas movimentacoes</div>
+                                        <div id="osStatusModalHistoryList" class="os-status-modal-history-list">
+                                            <p class="text-muted small mb-0">Sem historico recente.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -555,6 +887,10 @@ window.osListConfig = {
     datatableUrl: '<?= base_url('os/datatable') ?>',
     photosUrlBase: '<?= base_url('os/fotos') ?>',
     statusMetaUrlBase: '<?= base_url('os/status-meta') ?>',
+    datesMetaUrlBase: '<?= base_url('os/prazos-meta') ?>',
+    datesUpdateUrlBase: '<?= base_url('os/prazos-ajax') ?>',
+    budgetMetaUrlBase: '<?= base_url('os/orcamento-meta') ?>',
+    budgetActionUrlBase: '<?= base_url('os/orcamento-ajax') ?>',
     statusUpdateUrlBase: '<?= base_url('os/status-ajax') ?>',
     languageUrl: '<?= base_url('assets/json/pt-BR.json') ?>',
     csrfTokenKey: '<?= csrf_token() ?>',
@@ -566,72 +902,96 @@ window.osListConfig = {
 <script src="<?= base_url('assets/js/os-list-filters.js') ?>"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const createModalElement = document.getElementById('osCreateModal');
-    if (!createModalElement || typeof bootstrap === 'undefined') {
+    if (typeof bootstrap === 'undefined') {
         return;
     }
 
-    const createModal = bootstrap.Modal.getOrCreateInstance(createModalElement);
-    const createModalFrame = document.getElementById('osCreateModalFrame');
-    const createModalLoading = document.getElementById('osCreateModalLoading');
-    const createModalTitle = document.getElementById('osCreateModalTitle');
-    let createModalLoadTimeout = null;
-
-    const setCreateModalLoading = (isLoading) => {
-        createModalLoading?.classList.toggle('d-none', !isLoading);
-    };
-
-    const clearCreateModalLoadTimeout = () => {
-        if (!createModalLoadTimeout) {
-            return;
-        }
-        window.clearTimeout(createModalLoadTimeout);
-        createModalLoadTimeout = null;
-    };
-
-    const openCreateModal = (url, title) => {
-        if (!url || !createModalFrame) {
+    const bindIframeModal = ({ modalId, frameId, loadingId, titleId, triggerSelector, defaultTitle }) => {
+        const modalElement = document.getElementById(modalId);
+        if (!modalElement) {
             return;
         }
 
-        clearCreateModalLoadTimeout();
-        setCreateModalLoading(true);
-        if (createModalTitle) {
-            createModalTitle.textContent = title || 'Nova Ordem de Servico';
-        }
-        createModalFrame.src = 'about:blank';
-        createModal.show();
-        createModalFrame.src = url;
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        const frame = document.getElementById(frameId);
+        const loading = document.getElementById(loadingId);
+        const title = document.getElementById(titleId);
+        let loadTimeout = null;
 
-        createModalLoadTimeout = window.setTimeout(() => {
-            setCreateModalLoading(false);
-        }, 12000);
+        const setLoading = (isLoading) => {
+            loading?.classList.toggle('d-none', !isLoading);
+        };
+
+        const clearLoadTimeout = () => {
+            if (!loadTimeout) {
+                return;
+            }
+            window.clearTimeout(loadTimeout);
+            loadTimeout = null;
+        };
+
+        const openModal = (url, modalTitle) => {
+            if (!url || !frame) {
+                return;
+            }
+
+            clearLoadTimeout();
+            setLoading(true);
+            if (title) {
+                title.textContent = modalTitle || defaultTitle;
+            }
+            frame.src = 'about:blank';
+            modal.show();
+            frame.src = url;
+
+            loadTimeout = window.setTimeout(() => {
+                setLoading(false);
+            }, 12000);
+        };
+
+        document.addEventListener('click', (event) => {
+            const trigger = event.target.closest(triggerSelector);
+            if (!trigger) {
+                return;
+            }
+
+            event.preventDefault();
+            openModal(
+                trigger.getAttribute('data-os-frame-modal-url') || trigger.getAttribute('data-os-modal-url'),
+                trigger.getAttribute('data-os-frame-modal-title') || trigger.getAttribute('data-os-modal-title')
+            );
+        });
+
+        frame?.addEventListener('load', () => {
+            clearLoadTimeout();
+            setLoading(false);
+        });
+
+        modalElement.addEventListener('hidden.bs.modal', () => {
+            clearLoadTimeout();
+            setLoading(false);
+            if (frame) {
+                frame.src = 'about:blank';
+            }
+        });
     };
 
-    document.addEventListener('click', (event) => {
-        const trigger = event.target.closest('[data-os-modal-role="create"][data-os-modal-url]');
-        if (!trigger) {
-            return;
-        }
-
-        event.preventDefault();
-        openCreateModal(
-            trigger.getAttribute('data-os-modal-url'),
-            trigger.getAttribute('data-os-modal-title')
-        );
+    bindIframeModal({
+        modalId: 'osCreateModal',
+        frameId: 'osCreateModalFrame',
+        loadingId: 'osCreateModalLoading',
+        titleId: 'osCreateModalTitle',
+        triggerSelector: '[data-os-modal-role="create"][data-os-modal-url]',
+        defaultTitle: 'Nova Ordem de Servico',
     });
 
-    createModalFrame?.addEventListener('load', () => {
-        clearCreateModalLoadTimeout();
-        setCreateModalLoading(false);
-    });
-
-    createModalElement.addEventListener('hidden.bs.modal', () => {
-        clearCreateModalLoadTimeout();
-        setCreateModalLoading(false);
-        if (createModalFrame) {
-            createModalFrame.src = 'about:blank';
-        }
+    bindIframeModal({
+        modalId: 'osDetailsModal',
+        frameId: 'osDetailsModalFrame',
+        loadingId: 'osDetailsModalLoading',
+        titleId: 'osDetailsModalTitle',
+        triggerSelector: '[data-os-frame-modal-url]',
+        defaultTitle: 'Detalhes',
     });
 });
 </script>

@@ -138,6 +138,8 @@ class Equipamentos extends BaseController
         $modeloModel  = new EquipamentoModeloModel();
 
         $fotoModel    = new EquipamentoFotoModel();
+        $isEmbedded = $this->request->getGet('embed') === '1';
+
         $this->normalizeEquipamentoFotosStorage((int) $id);
 
         $fotos = $fotoModel->where('equipamento_id', $id)->findAll();
@@ -289,6 +291,8 @@ class Equipamentos extends BaseController
             return redirect()->to('/equipamentos')->with('error', 'Equipamento n o encontrado.');
         }
 
+        $isEmbedded = $this->request->getGet('embed') === '1';
+
         $this->normalizeEquipamentoFotosStorage((int) $id);
         $fotoModel = new EquipamentoFotoModel();
         $osModel   = new OsModel();
@@ -304,6 +308,8 @@ class Equipamentos extends BaseController
             'ordens'       => $osModel->where('equipamento_id', $id)->orderBy('created_at', 'DESC')->findAll(),
             'vinculados'   => $equipamentoClienteModel->getClientesVinculados($id),
             'clientes_all' => $clienteModel->orderBy('nome_razao', 'ASC')->findAll(), // For modal dropdown
+            'layout' => $isEmbedded ? 'layouts/embed' : 'layouts/main',
+            'isEmbedded' => $isEmbedded,
         ];
 
         return view('equipamentos/show', $data);
@@ -311,7 +317,11 @@ class Equipamentos extends BaseController
 
     public function byClient($clienteId)
     {
-        $equipamentos = $this->model->getByCliente($clienteId);
+        $equipamentos = array_map(function (array $equipamento): array {
+            $fotoArquivo = trim((string) ($equipamento['foto_principal_arquivo'] ?? ''));
+            $equipamento['foto_url'] = $fotoArquivo !== '' ? $this->buildFotoPublicUrl($fotoArquivo) : '';
+            return $equipamento;
+        }, $this->model->getByCliente($clienteId));
         return $this->response->setJSON($equipamentos);
     }
 

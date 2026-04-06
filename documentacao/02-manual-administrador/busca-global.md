@@ -1,29 +1,32 @@
-# Manual do Administrador: Busca Global Inteligente
+# Manual do Administrador: Busca Global
 
-A **Busca Global** é uma ferramenta poderosa que centraliza o acesso a dados de diversos módulos. Como administrador, é importante entender como gerenciar e otimizar esta funcionalidade.
+## Escopo atual
 
-## ⚙️ Configurações e Gerenciamento
+A busca global varre:
 
-### 1. Permissões de Acesso (RBAC)
-A busca global respeita integralmente o sistema de permissões atual.
-- **Visualização**: Se um usuário não tem permissão de `visualizar` um módulo (ex: Financeiro), os resultados desse módulo **não aparecerão** para ele na busca global.
-- **Acesso direto**: Ao clicar em um resultado, o usuário é levado para a tela correspondente. Se a permissão for removida após o carregamento da busca, o sistema negará o acesso ao tentar abrir a página.
+- modulos e acoes do sistema
+- ordens de servico
+- ordens de servico legadas por `numero_os_legado`
+- clientes
+- equipamentos
+- mensagens WhatsApp
+- servicos
+- pecas
 
-### 2. Módulos Pesquisáveis
-A busca global atualmente varre:
-- Ordens de Serviço (OS)
-- Clientes e Contatos
-- Equipamentos e Aparelhos
-- Teclado de Mensagens WhatsApp
-- Estoque de Peças
-- Serviços cadastrados
-- Menus e Módulos do Sistema
+## Filtro de OS legado
 
-## 💡 Boas Práticas para o Administrador
+- O menu de contexto da busca possui a opcao `OS Legado (numero antigo)`.
+- Esse filtro e o caminho recomendado quando a equipe estiver trabalhando com numeracao herdada do ERP antigo.
+- O backend continua aceitando numero legado tambem na busca geral, mas o filtro dedicado melhora a precisao operacional.
 
-- **Padronização de Cadastros**: Incentive os usuários a cadastrarem CPFs, CNPJs e Números de Série corretamente. Isso aumenta drasticamente a precisão da busca global (que suporta pesquisas por estes campos).
-- **Atalhos Rápidos**: Treine a equipe para usar a busca global para navegar entre módulos (ex: digitar "estoque" em vez de procurar no menu lateral). Isso reduz o tempo de operação no ERP.
-- **Segurança**: Monitore os logs de sistema se notar comportamentos anômalos de pesquisa (embora a busca global tenha limites de resultados por grupo para evitar extração massiva de dados).
+## Padrao de compatibilidade visual
 
-## 🛠️ Manutenção Técnica
-Caso a busca global deixe de retornar resultados de um novo módulo criado futuramente, a classe `GlobalSearchService.php` deve ser estendida para incluir o novo model.
+- As labels do menu da navbar foram convertidas para representacao segura, evitando caracteres corrompidos em ambientes com encoding inconsistente.
+- Esse cuidado deve ser mantido em futuras alteracoes da navbar, especialmente em deploy manual para VPS.
+
+## Observacao tecnica
+
+Caso um novo modulo precise entrar na busca global, atualize:
+
+- `app/Libraries/GlobalSearchService.php`
+- `app/Views/layouts/navbar.php`

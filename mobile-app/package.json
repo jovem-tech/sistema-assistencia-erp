@@ -1,0 +1,27 @@
+{
+  "name": "sistema-assistencia-mobile-pwa",
+  "version": "0.4.8",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev-server.cjs",
+    "dev:recover": "powershell -ExecutionPolicy Bypass -File scripts/recover-dev.ps1",
+    "dev:recover:no-start": "powershell -ExecutionPolicy Bypass -File scripts/recover-dev.ps1 -NoStart",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "cropperjs": "^1.6.2",
+    "next": "14.2.15",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.16.10",
+    "@types/react": "18.3.11",
+    "@types/react-dom": "18.3.1",
+    "eslint": "8.57.1",
+    "eslint-config-next": "14.2.15",
+    "typescript": "5.6.3"
+  }
+}

@@ -11,13 +11,24 @@ if (!in_array($directProvider, ['menuia', 'api_whats_local', 'api_whats_linux', 
     $directProvider = 'api_whats_local';
 }
 
-$menuiaUrl = trim((string) ($configs['whatsapp_menuia_url'] ?? 'https://api.menuia.com/api'));
+$menuiaUrl = trim((string) ($configs['whatsapp_menuia_url'] ?? 'https://chatbot.menuia.com/api'));
 $menuiaAuth = trim((string) ($configs['whatsapp_menuia_authkey'] ?? ''));
 $menuiaApp = trim((string) ($configs['whatsapp_menuia_appkey'] ?? ''));
 $localNodeUrl = trim((string) ($configs['whatsapp_local_node_url'] ?? 'http://127.0.0.1:3001'));
 $localNodeToken = trim((string) ($configs['whatsapp_local_node_token'] ?? ''));
 $linuxNodeUrl = trim((string) ($configs['whatsapp_linux_node_url'] ?? 'http://127.0.0.1:3001'));
 $linuxNodeToken = trim((string) ($configs['whatsapp_linux_node_token'] ?? ''));
+$lastCheckProvider = trim((string) ($configs['whatsapp_last_check_provider'] ?? ''));
+$lastCheckStatus = trim((string) ($configs['whatsapp_last_check_status'] ?? ''));
+$lastCheckMessage = trim((string) ($configs['whatsapp_last_check_message'] ?? ''));
+$lastCheckAt = trim((string) ($configs['whatsapp_last_check_at'] ?? ''));
+$lastCheckSignature = trim((string) ($configs['whatsapp_last_check_signature'] ?? ''));
+$menuiaCredentialSignature = ($menuiaUrl !== '' && $menuiaApp !== '' && $menuiaAuth !== '')
+    ? strtolower($menuiaUrl) . '|' . $menuiaApp . '|' . $menuiaAuth
+    : '';
+$menuiaStatusMatchesCurrentCredentials = $menuiaCredentialSignature !== ''
+    && $lastCheckSignature !== ''
+    && hash_equals($lastCheckSignature, $menuiaCredentialSignature);
 
 $statusOk = false;
 if ($enabled && $directProvider === 'menuia') {
@@ -28,6 +39,42 @@ if ($enabled && $directProvider === 'api_whats_local') {
 }
 if ($enabled && $directProvider === 'api_whats_linux') {
     $statusOk = $linuxNodeUrl !== '' && $linuxNodeToken !== '';
+}
+
+$whatsConfigBadgeClass = $statusOk ? 'bg-success' : 'bg-danger';
+$whatsConfigBadgeText = $statusOk
+    ? ($directProvider === 'menuia' ? 'Credenciais OK' : 'Configuracao OK')
+    : 'Incompleto';
+
+$realtimeBadgeClass = 'bg-secondary';
+$realtimeBadgeText = 'Nao validado';
+$realtimeBadgeTitle = 'Ainda nao houve validacao de conectividade para o provider atual.';
+if (!$enabled) {
+    $realtimeBadgeClass = 'bg-secondary';
+    $realtimeBadgeText = 'Envio desabilitado';
+    $realtimeBadgeTitle = 'O envio de WhatsApp esta desabilitado nas configuracoes.';
+} elseif (in_array($directProvider, ['api_whats_local', 'api_whats_linux'], true)) {
+    $realtimeBadgeClass = 'bg-dark';
+    $realtimeBadgeText = 'Provider local';
+    $realtimeBadgeTitle = 'Clique para gerenciar o gateway local.';
+} elseif ($directProvider === 'menuia' && $lastCheckProvider === 'menuia' && $menuiaStatusMatchesCurrentCredentials) {
+    if ($lastCheckStatus === 'success') {
+        $realtimeBadgeClass = 'bg-success';
+        $realtimeBadgeText = 'Menuia conectada';
+        $realtimeBadgeTitle = trim('Ultima validacao: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
+    } elseif ($lastCheckStatus === 'error') {
+        $realtimeBadgeClass = 'bg-danger';
+        $realtimeBadgeText = 'Erro Menuia';
+        $realtimeBadgeTitle = trim('Ultima validacao: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
+    }
+} elseif ($directProvider === 'menuia' && $statusOk) {
+    $realtimeBadgeClass = 'bg-warning text-dark';
+    $realtimeBadgeText = 'Menuia nao validada';
+    $realtimeBadgeTitle = 'As credenciais estao preenchidas, mas a conexao ainda nao foi validada.';
+} elseif ($directProvider === 'webhook') {
+    $realtimeBadgeClass = 'bg-dark';
+    $realtimeBadgeText = 'Provider externo';
+    $realtimeBadgeTitle = 'Webhook externo selecionado.';
 }
 ?>
 
@@ -63,7 +110,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link d-flex align-items-center" id="integracoes-tab" data-bs-toggle="tab" data-bs-target="#tab-integracoes" type="button" role="tab">
-                        <i class="bi bi-whatsapp me-2"></i>Integrações
+                        <i class="bi bi-whatsapp me-2"></i>Integracoes
                         <span id="tabBadgeStatus" class="ms-2 badge bg-secondary" style="font-size: 0.65rem;">...</span>
                     </button>
                 </li>
@@ -72,7 +119,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             <div class="tab-content" id="configTabsContent">
                 <!-- Aba Aparencia -->
                 <div class="tab-pane fade show active" id="tab-aparencia" role="tabpanel">
-                    <h5 class="mb-3 border-bottom pb-2">Configurações Visuais</h5>
+                    <h5 class="mb-3 border-bottom pb-2">Configuracoes Visuais</h5>
                     <div class="row mb-4">
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-muted">Tema do Sistema <span class="text-danger">*</span></label>
@@ -104,7 +151,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
 
                 <!-- Aba Empresa -->
                 <div class="tab-pane fade" id="tab-empresa" role="tabpanel">
-                    <h5 class="mb-3 border-bottom pb-2">Informações Jurídicas e Contato</h5>
+                    <h5 class="mb-3 border-bottom pb-2">Informacoes Juridicas e Contato</h5>
                     <div class="row mb-4">
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-muted">Nome da Empresa</label>
@@ -167,11 +214,11 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                 <!-- Aba Integracoes -->
                 <div class="tab-pane fade" id="tab-integracoes" role="tabpanel">
                     <h5 class="mb-3 border-bottom pb-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <span>Configurações WhatsApp</span>
+                        <span>Configuracoes WhatsApp</span>
                         <div class="d-flex gap-2 align-items-center">
-                            <span id="whatsRealtimeStatus" class="badge bg-secondary" style="cursor: pointer;" title="Clique para gerenciar">Verificando gateway...</span>
-                            <span class="badge <?= $statusOk ? 'bg-success' : 'bg-danger' ?>" id="whatsConfigBadge">
-                                <?= $statusOk ? 'Configuracao OK' : 'Incompleto' ?>
+                            <span id="whatsRealtimeStatus" class="badge <?= esc($realtimeBadgeClass) ?>" style="cursor: pointer;" title="<?= esc($realtimeBadgeTitle) ?>"><?= esc($realtimeBadgeText) ?></span>
+                            <span class="badge <?= esc($whatsConfigBadgeClass) ?>" id="whatsConfigBadge">
+                                <?= esc($whatsConfigBadgeText) ?>
                             </span>
                         </div>
                     </h5>
@@ -414,10 +461,20 @@ if ($enabled && $directProvider === 'api_whats_linux') {
     const btnStart = document.getElementById('btnStartLocal');
     const btnRefresh = document.getElementById('btnRefreshLocal');
     const whatsRealtimeStatus = document.getElementById('whatsRealtimeStatus');
+    const whatsConfigBadge = document.getElementById('whatsConfigBadge');
+    const tabBadgeStatus = document.getElementById('tabBadgeStatus');
     const btnManageList = Array.from(document.querySelectorAll('.btn-gerenciar-gateway'));
     let currentGatewayProvider = 'api_whats_local';
     let pollInterval = null;
     let modalRef = null;
+    const providerState = {
+        enabled: <?= json_encode($enabled) ?>,
+        provider: <?= json_encode($lastCheckProvider) ?>,
+        status: <?= json_encode($lastCheckStatus) ?>,
+        message: <?= json_encode($lastCheckMessage) ?>,
+        checkedAt: <?= json_encode($lastCheckAt) ?>,
+        signature: <?= json_encode($lastCheckSignature) ?>,
+    };
 
     const fireSwal = (opts) => (window.Swal && typeof window.Swal.fire === 'function') ? window.Swal.fire(opts) : Promise.resolve(alert(opts?.text || opts?.title || 'Acao concluida.'));
     const getCsrf = () => ({ name: 'csrf_test_name', value: (document.cookie.match(/(?:^|;\s*)csrf_cookie_name=([^;]+)/)?.[1] || '') });
@@ -459,8 +516,130 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         document.querySelectorAll('.config-api_whats_local').forEach((el) => el.classList.toggle('d-none', provider !== 'api_whats_local'));
         document.querySelectorAll('.config-api_whats_linux').forEach((el) => el.classList.toggle('d-none', provider !== 'api_whats_linux'));
     };
-    selectProvider?.addEventListener('change', toggleProviders);
+    const setSimpleBadge = (element, cssClass, text, title = '') => {
+        if (!element) return;
+        element.className = 'badge ' + cssClass;
+        element.textContent = text;
+        if (title) {
+            element.setAttribute('title', title);
+        } else {
+            element.removeAttribute('title');
+        }
+    };
+
+    const normalizeMenuiaUrl = (rawUrl) => {
+        let normalized = String(rawUrl || '').trim().replace(/\/+$/, '');
+        if (!normalized) {
+            return 'https://chatbot.menuia.com/api';
+        }
+
+        try {
+            const parsed = new URL(normalized);
+            if (String(parsed.hostname || '').toLowerCase() === 'api.menuia.com') {
+                return 'https://chatbot.menuia.com/api';
+            }
+        } catch (error) {
+            // Mantem a tentativa original e deixa a validacao do provider apontar o erro.
+        }
+
+        if (!/\/api$/i.test(normalized)) {
+            normalized += '/api';
+        }
+
+        return normalized;
+    };
+
+    const buildMenuiaSignature = (rawUrl, rawAppKey, rawAuthKey) => {
+        const normalizedUrl = normalizeMenuiaUrl(rawUrl);
+        const appKey = String(rawAppKey || '').trim();
+        const authKey = String(rawAuthKey || '').trim();
+        if (!normalizedUrl || !appKey || !authKey) {
+            return '';
+        }
+
+        return [normalizedUrl.toLowerCase(), appKey, authKey].join('|');
+    };
+
+    const refreshExternalProviderBadges = () => {
+        const provider = selectProvider?.value || 'menuia';
+        const menuiaUrl = (document.getElementById('whatsapp_menuia_url')?.value || '').trim();
+        const menuiaApp = (document.getElementById('whatsapp_menuia_appkey')?.value || '').trim();
+        const menuiaAuth = (document.getElementById('whatsapp_menuia_authkey')?.value || '').trim();
+        const menuiaConfigOk = menuiaUrl !== '' && menuiaApp !== '' && menuiaAuth !== '';
+        const currentMenuiaSignature = buildMenuiaSignature(menuiaUrl, menuiaApp, menuiaAuth);
+        const menuiaValidatedForCurrentConfig = providerState.provider === 'menuia'
+            && providerState.signature !== ''
+            && currentMenuiaSignature !== ''
+            && providerState.signature === currentMenuiaSignature;
+        const localConfigOk = ((document.getElementById('whatsapp_local_node_url')?.value || '').trim() !== '')
+            && ((document.getElementById('whatsapp_local_node_token')?.value || '').trim() !== '');
+        const linuxConfigOk = ((document.getElementById('whatsapp_linux_node_url')?.value || '').trim() !== '')
+            && ((document.getElementById('whatsapp_linux_node_token')?.value || '').trim() !== '');
+        const webhookConfigOk = ((document.getElementById('whatsapp_webhook_url')?.value || '').trim() !== '');
+
+        if (provider === 'menuia') {
+            setSimpleBadge(whatsConfigBadge, menuiaConfigOk ? 'bg-success' : 'bg-danger', menuiaConfigOk ? 'Credenciais OK' : 'Incompleto');
+            if (!providerState.enabled) {
+                setSimpleBadge(whatsRealtimeStatus, 'bg-secondary', 'Envio desabilitado', 'O envio de WhatsApp esta desabilitado nas configuracoes.');
+                setSimpleBadge(tabBadgeStatus, 'bg-secondary', 'Envio desabilitado');
+                return;
+            }
+
+            if (menuiaValidatedForCurrentConfig && providerState.status === 'success') {
+                const title = [providerState.checkedAt ? `Ultima validacao: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
+                setSimpleBadge(whatsRealtimeStatus, 'bg-success', 'Menuia conectada', title);
+                setSimpleBadge(tabBadgeStatus, 'bg-success', 'Menuia conectada');
+                return;
+            }
+
+            if (menuiaValidatedForCurrentConfig && providerState.status === 'error') {
+                const title = [providerState.checkedAt ? `Ultima validacao: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
+                setSimpleBadge(whatsRealtimeStatus, 'bg-danger', 'Erro Menuia', title);
+                setSimpleBadge(tabBadgeStatus, 'bg-danger', 'Erro Menuia');
+                return;
+            }
+
+            setSimpleBadge(
+                whatsRealtimeStatus,
+                menuiaConfigOk ? 'bg-warning text-dark' : 'bg-secondary',
+                menuiaConfigOk ? 'Menuia nao validada' : 'Menuia incompleta',
+                menuiaConfigOk
+                    ? 'As credenciais estao preenchidas, mas a conexao ainda nao foi validada.'
+                    : 'Preencha URL, Appkey e Authkey para testar a conexao.'
+            );
+            setSimpleBadge(tabBadgeStatus, menuiaConfigOk ? 'bg-warning text-dark' : 'bg-secondary', menuiaConfigOk ? 'Nao validada' : 'Incompleta');
+            return;
+        }
+
+        if (provider === 'webhook') {
+            setSimpleBadge(whatsRealtimeStatus, 'bg-dark', 'Provider externo', 'Webhook externo selecionado.');
+            setSimpleBadge(tabBadgeStatus, 'bg-dark', 'Provider externo');
+            setSimpleBadge(whatsConfigBadge, webhookConfigOk ? 'bg-success' : 'bg-danger', webhookConfigOk ? 'Configuracao OK' : 'Incompleto');
+            return;
+        }
+
+        setSimpleBadge(whatsRealtimeStatus, 'bg-dark', 'Provider local', 'Clique para gerenciar o gateway local.');
+        setSimpleBadge(tabBadgeStatus, 'bg-dark', 'Provider local');
+        const currentLocalConfigOk = provider === 'api_whats_linux' ? linuxConfigOk : localConfigOk;
+        setSimpleBadge(whatsConfigBadge, currentLocalConfigOk ? 'bg-success' : 'bg-danger', currentLocalConfigOk ? 'Configuracao OK' : 'Incompleto');
+    };
+
+    selectProvider?.addEventListener('change', () => {
+        toggleProviders();
+        refreshExternalProviderBadges();
+    });
+    document.querySelectorAll('#whatsapp_enabled, #whatsapp_menuia_url, #whatsapp_menuia_appkey, #whatsapp_menuia_authkey, #whatsapp_local_node_url, #whatsapp_local_node_token, #whatsapp_linux_node_url, #whatsapp_linux_node_token, #whatsapp_webhook_url').forEach((element) => {
+        element?.addEventListener('input', () => {
+            providerState.enabled = (document.getElementsByName('whatsapp_enabled')[0]?.value || '0') === '1';
+            refreshExternalProviderBadges();
+        });
+        element?.addEventListener('change', () => {
+            providerState.enabled = (document.getElementsByName('whatsapp_enabled')[0]?.value || '0') === '1';
+            refreshExternalProviderBadges();
+        });
+    });
     toggleProviders();
+    refreshExternalProviderBadges();
 
     const providerPayload = () => ({
         provider: selectProvider?.value || 'menuia',
@@ -503,8 +682,28 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             btnTestConn.disabled = true;
             btnTestConn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Validando...';
             const data = await postJson('<?= base_url('configuracoes/whatsapp/testar-conexao') ?>', providerPayload());
+            providerState.provider = selectProvider?.value || 'menuia';
+            providerState.status = 'success';
+            providerState.message = data.message || 'Conexao validada com sucesso.';
+            providerState.checkedAt = new Date().toLocaleString('pt-BR');
+            providerState.signature = buildMenuiaSignature(
+                document.getElementById('whatsapp_menuia_url')?.value || '',
+                document.getElementById('whatsapp_menuia_appkey')?.value || '',
+                document.getElementById('whatsapp_menuia_authkey')?.value || ''
+            );
+            refreshExternalProviderBadges();
             await fireSwal({ icon: 'success', title: 'Conexao validada', text: data.message || 'OK' });
         } catch (error) {
+            providerState.provider = selectProvider?.value || 'menuia';
+            providerState.status = 'error';
+            providerState.message = error.message || 'Falha na validacao do provider.';
+            providerState.checkedAt = new Date().toLocaleString('pt-BR');
+            providerState.signature = buildMenuiaSignature(
+                document.getElementById('whatsapp_menuia_url')?.value || '',
+                document.getElementById('whatsapp_menuia_appkey')?.value || '',
+                document.getElementById('whatsapp_menuia_authkey')?.value || ''
+            );
+            refreshExternalProviderBadges();
             await fireSwal({ icon: 'error', title: 'Falha na conexao', text: error.message || 'Erro' });
         } finally {
             btnTestConn.disabled = false;
@@ -558,7 +757,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             const checks = data?.checks || {};
             const checkLine = (label, check) => {
                 const ok = !!check?.ok;
-                const icon = ok ? '✅' : '❌';
+                const icon = ok ? 'âœ…' : 'âŒ';
                 const msg = check?.message || '';
                 const detail = check?.detail || '';
                 const targetUrl = check?.target_url || check?.url || '';
@@ -587,7 +786,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             if (Object.keys(checks).length > 0) {
                 const checkLine = (label, check) => {
                     const ok = !!check?.ok;
-                    const icon = ok ? '✅' : '❌';
+                    const icon = ok ? 'âœ…' : 'âŒ';
                     const msg = check?.message || '';
                     const detail = check?.detail || '';
                     const targetUrl = check?.target_url || check?.url || '';
@@ -689,7 +888,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         setPanelState();
         setGatewayStatusBadge(status);
         
-        // Só mostramos erro se houver uma mensagem de erro real ou se a query falhou
+        // SÃ³ mostramos erro se houver uma mensagem de erro real ou se a query falhou
         let errorMsg = data?.last_error_message || '';
         if (!errorMsg && !success) {
             errorMsg = statusPayload?.message || 'Gateway inacessivel';
@@ -737,7 +936,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             }
         }
 
-        // Resetar estados de carregamento manuais se o status for estável
+        // Resetar estados de carregamento manuais se o status for estÃ¡vel
         const stableStatuses = ['connected', 'awaiting_qr', 'disconnected', 'gateway_unreachable', 'error', 'auth_failure'];
         if (stableStatuses.includes(status)) {
             if (btnRestart && btnRestart.disabled) {
@@ -807,11 +1006,6 @@ if ($enabled && $directProvider === 'api_whats_linux') {
     if (selectProvider?.value.includes('api_whats')) {
         currentGatewayProvider = selectProvider.value;
         fetchStatus();
-    } else {
-        if (whatsRealtimeStatus) {
-            whatsRealtimeStatus.className = 'badge bg-dark';
-            whatsRealtimeStatus.innerHTML = '<i class="bi bi-info-circle me-1"></i>Provider Externo';
-        }
     }
 
     btnManageList.forEach((btn) => {

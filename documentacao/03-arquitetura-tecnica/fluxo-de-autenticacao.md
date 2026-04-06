@@ -91,6 +91,19 @@ Dados armazenados na sessao de cada usuario:
 | `user_email` | Email de login |
 | `user_group_id` | ID do grupo de permissoes |
 
+### Heartbeat de sessao
+
+- O frontend protegido usa `public/assets/js/scripts.js` para monitorar inatividade.
+- O endpoint `GET /sessao/heartbeat` responde em JSON e agora fecha a sessao logo apos ler os dados necessarios, reduzindo contencao no driver de sessao por arquivo.
+- O `AuthFilter` reconhece o heartbeat e:
+  - atualiza `last_activity` de forma controlada;
+  - fecha a sessao imediatamente depois da validacao nesse fluxo;
+  - evita manter lock desnecessario durante a resposta.
+- O frontend tambem passou a:
+  - nao disparar heartbeat enquanto houver `fetch` ou `$.ajax` same-origin em andamento;
+  - aguardar 5 segundos apos trafego same-origin antes de enviar novo heartbeat;
+  - abortar o heartbeat em 10 segundos para evitar requests presos indefinidamente.
+
 ---
 
 ## Exibicao de versao na autenticacao

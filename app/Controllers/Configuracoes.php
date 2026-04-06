@@ -35,6 +35,9 @@ class Configuracoes extends BaseController
     {
         $model = new ConfiguracaoModel();
         $posts = $this->request->getPost();
+        $previousMenuiaUrl = $this->normalizeMenuiaUrl((string) get_config('whatsapp_menuia_url', 'https://chatbot.menuia.com/api'));
+        $previousMenuiaApp = trim((string) get_config('whatsapp_menuia_appkey', ''));
+        $previousMenuiaAuth = trim((string) get_config('whatsapp_menuia_authkey', ''));
 
         if (array_key_exists('sessao_inatividade_minutos', $posts)) {
             $timeoutMinutes = (int) $posts['sessao_inatividade_minutos'];
@@ -44,6 +47,20 @@ class Configuracoes extends BaseController
 
             $posts['sessao_inatividade_minutos'] = (string) min($timeoutMinutes, 1440);
         }
+
+        if (array_key_exists('whatsapp_menuia_url', $posts)) {
+            $posts['whatsapp_menuia_url'] = $this->normalizeMenuiaUrl((string) $posts['whatsapp_menuia_url']);
+        }
+
+        $nextMenuiaUrl = array_key_exists('whatsapp_menuia_url', $posts)
+            ? (string) $posts['whatsapp_menuia_url']
+            : $previousMenuiaUrl;
+        $nextMenuiaApp = array_key_exists('whatsapp_menuia_appkey', $posts)
+            ? trim((string) $posts['whatsapp_menuia_appkey'])
+            : $previousMenuiaApp;
+        $nextMenuiaAuth = array_key_exists('whatsapp_menuia_authkey', $posts)
+            ? trim((string) $posts['whatsapp_menuia_authkey'])
+            : $previousMenuiaAuth;
 
         foreach ($posts as $chave => $valor) {
             if ($chave !== 'csrf_test_name') {
@@ -86,6 +103,14 @@ class Configuracoes extends BaseController
             }
         }
 
+        if (
+            $previousMenuiaUrl !== $nextMenuiaUrl
+            || $previousMenuiaApp !== $nextMenuiaApp
+            || $previousMenuiaAuth !== $nextMenuiaAuth
+        ) {
+            $this->clearWhatsAppConnectionStatus();
+        }
+
         LogModel::registrar('configuracao', 'Configuracoes do sistema atualizadas');
 
         return redirect()->to('/configuracoes')->with('success', 'Configuracoes salvas com sucesso.');
@@ -104,11 +129,19 @@ class Configuracoes extends BaseController
         }
 
         $mensageria = new MensageriaService();
+        $overrides = $this->buildProviderOverrides();
         $result = $mensageria->testDirectConnection(
             $telefone !== '' ? $telefone : null,
             $providerType,
-            $this->buildProviderOverrides(),
+            $overrides,
             false
+        );
+
+        $this->persistWhatsAppConnectionStatus(
+            $providerType,
+            !empty($result['ok']),
+            (string) ($result['message'] ?? ''),
+            $overrides
         );
 
         if (!empty($result['ok'])) {
@@ -339,7 +372,7 @@ class Configuracoes extends BaseController
     private function buildProviderOverrides(): array
     {
         return [
-            'whatsapp_menuia_url' => trim((string) $this->request->getPost('url')),
+            'whatsapp_menuia_url' => $this->normalizeMenuiaUrl((string) $this->request->getPost('url')),
             'whatsapp_menuia_authkey' => trim((string) $this->request->getPost('authkey')),
             'whatsapp_menuia_appkey' => trim((string) $this->request->getPost('appkey')),
             'whatsapp_local_node_url' => trim((string) ($this->request->getPost('local_url') ?: get_config('whatsapp_local_node_url', 'http://127.0.0.1:3001'))),
@@ -355,6 +388,68 @@ class Configuracoes extends BaseController
             'whatsapp_webhook_headers' => (string) $this->request->getPost('webhook_headers'),
             'whatsapp_webhook_payload' => (string) $this->request->getPost('webhook_payload'),
         ];
+    }
+
+    private function normalizeMenuiaUrl(string $url): string
+    {
+        $normalized = trim(rtrim($url, '/'));
+        if ($normalized === '') {
+            return 'https://chatbot.menuia.com/api';
+        }
+
+        $parts = parse_url($normalized);
+        $host = strtolower((string) ($parts['host'] ?? ''));
+        if ($host === 'api.menuia.com') {
+            return 'https://chatbot.menuia.com/api';
+        }
+
+        if (!str_ends_with(strtolower($normalized), '/api')) {
+            $normalized .= '/api';
+        }
+
+        return $normalized;
+    }
+
+    private function persistWhatsAppConnectionStatus(string $provider, bool $success, string $message, array $overrides = []): void
+    {
+        $model = new ConfiguracaoModel();
+        $model->setConfig('whatsapp_last_check_provider', $provider);
+        $model->setConfig('whatsapp_last_check_status', $success ? 'success' : 'error');
+        $model->setConfig('whatsapp_last_check_message', trim($message));
+        $model->setConfig('whatsapp_last_check_at', date('Y-m-d H:i:s'));
+        $model->setConfig(
+            'whatsapp_last_check_signature',
+            $provider === 'menuia'
+                ? $this->buildMenuiaCredentialSignature(
+                    (string) ($overrides['whatsapp_menuia_url'] ?? get_config('whatsapp_menuia_url', 'https://chatbot.menuia.com/api')),
+                    (string) ($overrides['whatsapp_menuia_appkey'] ?? get_config('whatsapp_menuia_appkey', '')),
+                    (string) ($overrides['whatsapp_menuia_authkey'] ?? get_config('whatsapp_menuia_authkey', ''))
+                )
+                : ''
+        );
+    }
+
+    private function clearWhatsAppConnectionStatus(): void
+    {
+        $model = new ConfiguracaoModel();
+        $model->setConfig('whatsapp_last_check_provider', '');
+        $model->setConfig('whatsapp_last_check_status', '');
+        $model->setConfig('whatsapp_last_check_message', '');
+        $model->setConfig('whatsapp_last_check_at', '');
+        $model->setConfig('whatsapp_last_check_signature', '');
+    }
+
+    private function buildMenuiaCredentialSignature(string $url, string $appKey, string $authKey): string
+    {
+        $normalizedUrl = $this->normalizeMenuiaUrl($url);
+        $normalizedAppKey = trim($appKey);
+        $normalizedAuthKey = trim($authKey);
+
+        if ($normalizedUrl === '' || $normalizedAppKey === '' || $normalizedAuthKey === '') {
+            return '';
+        }
+
+        return strtolower($normalizedUrl) . '|' . $normalizedAppKey . '|' . $normalizedAuthKey;
     }
 
     private function callGateway(string $method, string $path, ?array $jsonBody = null, ?int $timeout = null, string $provider = ''): array

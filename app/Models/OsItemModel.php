@@ -12,7 +12,7 @@ class OsItemModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $allowedFields = [
-        'os_id', 'tipo', 'descricao', 'quantidade', 'valor_unitario', 'valor_total', 'peca_id'
+        'os_id', 'legacy_origem', 'legacy_tabela', 'legacy_id', 'tipo', 'descricao', 'observacao', 'quantidade', 'valor_unitario', 'valor_total', 'peca_id'
     ];
     protected $useTimestamps = false;
     protected $createdField = 'created_at';

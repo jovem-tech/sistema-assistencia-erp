@@ -1,9 +1,10 @@
-<?= $this->extend('layouts/main') ?>
+<?= $this->extend($layout ?? 'layouts/main') ?>
 
 <?= $this->section('content') ?>
 
 <div class="page-header">
     <h2><i class="bi bi-person me-2"></i><?= esc($cliente['nome_razao']) ?></h2>
+    <?php if (!($isEmbedded ?? false)): ?>
     <div class="d-flex gap-2">
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('clientes')" title="Ajuda sobre Clientes">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -17,6 +18,7 @@
             <i class="bi bi-arrow-left me-1"></i>Voltar
         </a>
     </div>
+    <?php endif; ?>
 </div>
 
 <div class="row g-4">

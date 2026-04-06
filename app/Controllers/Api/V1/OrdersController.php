@@ -866,7 +866,7 @@ class OrdersController extends BaseApiController
         $fotoModel = new FotoAcessorioModel();
         $slug = $this->normalizeOsSlug($numeroOs);
         $folder = $this->ensureAccessoryDirectory($slug);
-        $sequence = 1;
+        $sequenceByType = [];
 
         foreach ($entries as $entry) {
             $description = trim((string) ($entry['text'] ?? ''));
@@ -890,9 +890,21 @@ class OrdersController extends BaseApiController
             }
 
             $entryId = trim((string) ($entry['id'] ?? ''));
+            $entryTypeSlug = $this->normalizeAccessoryTypeSlug((string) ($entry['key'] ?? ''), $description);
+            if (!isset($sequenceByType[$entryTypeSlug])) {
+                $sequenceByType[$entryTypeSlug] = $this->nextAccessorySequence($folder, $entryTypeSlug);
+            }
+
             $entryFiles = $filesMap[$entryId] ?? [];
             foreach ($entryFiles as $file) {
-                $this->saveAccessoryPhoto($file, $folder, $slug, $sequence, $acessorioId, $fotoModel);
+                $this->saveAccessoryPhoto(
+                    $file,
+                    $folder,
+                    $entryTypeSlug,
+                    $sequenceByType[$entryTypeSlug],
+                    $acessorioId,
+                    $fotoModel
+                );
             }
         }
     }
@@ -936,7 +948,7 @@ class OrdersController extends BaseApiController
             @mkdir($base, 0775, true);
         }
 
-        $path = $base . 'OS_' . $slug . DIRECTORY_SEPARATOR;
+        $path = $base . $slug . DIRECTORY_SEPARATOR;
         if (!is_dir($path)) {
             @mkdir($path, 0775, true);
         }
@@ -951,7 +963,7 @@ class OrdersController extends BaseApiController
     /**
      * @param array{name:string,tmp_name:string} $file
      */
-    private function saveAccessoryPhoto(array $file, string $folder, string $slug, int &$sequence, int $acessorioId, FotoAcessorioModel $fotoModel): void
+    private function saveAccessoryPhoto(array $file, string $folder, string $typeSlug, int &$sequence, int $acessorioId, FotoAcessorioModel $fotoModel): void
     {
         try {
             $extension = strtolower((string) pathinfo($file['name'], PATHINFO_EXTENSION));
@@ -959,8 +971,18 @@ class OrdersController extends BaseApiController
                 $extension = 'jpg';
             }
 
-            $name = "acessorio_{$slug}_{$sequence}.{$extension}";
-            $destination = $folder . $name;
+            $name = '';
+            $destination = '';
+            while (true) {
+                $seq = str_pad((string) $sequence, 2, '0', STR_PAD_LEFT);
+                $name = "{$typeSlug}_{$seq}.{$extension}";
+                $destination = $folder . $name;
+                if (!is_file($destination)) {
+                    break;
+                }
+                $sequence++;
+            }
+
             if (!move_uploaded_file($file['tmp_name'], $destination)) {
                 throw new \RuntimeException('Falha ao mover foto de acessorio.');
             }
@@ -1022,6 +1044,10 @@ class OrdersController extends BaseApiController
             }
 
             $entry = ['text' => $text];
+            $id = trim((string) ($item['id'] ?? ''));
+            if ($id !== '') {
+                $entry['id'] = $id;
+            }
             $key = trim((string) ($item['key'] ?? $item['tipo'] ?? ''));
             if ($key !== '') {
                 $entry['key'] = $key;
@@ -1215,6 +1241,43 @@ class OrdersController extends BaseApiController
         }
 
         return $mapped;
+    }
+
+    private function normalizeAccessoryTypeSlug(string $entryKey, string $description = ''): string
+    {
+        $base = trim($entryKey);
+        if ($base === '' || strtolower($base) === 'outro') {
+            $base = trim($description);
+        }
+        if ($base === '') {
+            $base = 'acessorio';
+        }
+
+        $normalized = str_replace(['-', ' '], '_', $base);
+        if (function_exists('iconv')) {
+            $converted = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $normalized);
+            if (is_string($converted) && $converted !== '') {
+                $normalized = $converted;
+            }
+        }
+
+        $slug = strtolower($normalized);
+        $slug = preg_replace('/[^a-z0-9_]/', '', $slug) ?: '';
+        $slug = trim($slug, '_');
+        return $slug !== '' ? $slug : 'acessorio';
+    }
+
+    private function nextAccessorySequence(string $folder, string $typeSlug): int
+    {
+        $max = 0;
+        foreach (glob($folder . $typeSlug . '_*') as $file) {
+            $name = pathinfo($file, PATHINFO_FILENAME);
+            if (!preg_match('/^' . preg_quote($typeSlug, '/') . '_(\\d+)$/', $name, $matches)) {
+                continue;
+            }
+            $max = max($max, (int) ($matches[1] ?? 0));
+        }
+        return $max + 1;
     }
 
     private function normalizeOsSlug(string $numeroOs): string

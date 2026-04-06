@@ -21,6 +21,34 @@ Estado documental atual do app:
 
 ## Release ERP + App
 
+### 06/04/2026 - hotfix fotos de acessorios (sem bump de versao)
+- concluido o fluxo de fotos no formulario rapido de `Acessorios e Componentes (na entrada)` na OS web.
+- os botoes `Galeria` e `Camera` do card rapido agora abrem corretamente o fluxo de crop e preview antes do `Salvar item`.
+- o rascunho do acessorio passou a manter `entryId` estavel para vincular as fotos ao item correto no envio do formulario.
+- cancelamento de item rapido sem salvamento agora remove fotos temporarias do rascunho para evitar anexos orfaos.
+- backend mobile (`OrdersController`) passou a preservar `id` em `acessorios_data` decodificado, garantindo mapeamento correto de `fotos_acessorios[entryId][]`.
+
+### 06/04/2026 - hotfix de borda na aba Equipamento (sem bump de versao)
+- ajustado o layout dos paineis `Checklist de entrada` e `Acessorios e Componentes` em `/os/nova` e `/os/editar/{id}` para eliminar vazamento visual de borda.
+- criada classe estrutural dedicada (`os-equip-panels-row` + `os-equip-panel-card`) com trava de largura, controle de overflow e comportamento consistente de gutter.
+- removida a variacao de sombra externa nesses dois paineis especificos para manter o contorno dentro do limite do card pai.
+- reduzido o contraste da borda desses paineis para um visual mais discreto e harmonico no layout da aba `Equipamento`.
+- reforcado o contorno arredondado dos paineis internos (raio dedicado e `background-clip`) para evitar efeito de quina reta/aparencia cortada.
+- ajustado o respiro inferior do card interno para impedir que a borda de baixo fique colada visualmente ao limite do card externo.
+
+### 06/04/2026 - hotfix UX OS web (sem bump de versao)
+- adicionado botao inline `Editar` ao lado de `Novo` no campo `Equipamento *` da aba `Equipamento` na OS web.
+- o novo botao segue o design system atual (`btn-outline-info`, tamanho pequeno, icone + texto).
+- o botao `Editar` aparece apenas quando ha equipamento selecionado, reduzindo clique invalido.
+- o fluxo reaproveita o mesmo modal/funcoes de edicao de equipamento ja existentes, sem duplicar logica.
+
+### 06/04/2026 - hotfix stack de modais no checklist (sem bump de versao)
+- corrigido o empilhamento visual entre `Checklist`, `Camera` e `Cropper` na OS web.
+- padronizadas camadas de z-index para garantir abertura em cascata (`checklist < camera < crop`).
+- sincronizado o z-index do `modal-backdrop` com a camada ativa para evitar modais "por tras" do overlay.
+- removido alerta falso de "falha ao abrir checklist" que podia ocorrer por verificacao assincrona.
+- ajustado `SweetAlert2` da tela para camada acima dos modais tecnicos, impedindo confirmacoes/alertas de ficarem atras do modal de checklist.
+
 ### 05/04/2026 - hotfix tecnico checklist (sem bump de versao)
 - corrigido erro `500` em `GET /checklists/entrada` quando a infraestrutura de checklist ainda nao estava migrada no banco.
 - adicionadas validacoes defensivas de infraestrutura no fluxo de checklist para evitar erro fatal e devolver estado seguro.
@@ -451,6 +479,11 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 - A coluna `Cliente` passou a quebrar o nome em duas linhas a partir da segunda palavra quando o cadastro possui quatro palavras ou mais.
 - O ajuste devolve espaco util para leitura sem reintroduzir scroll horizontal como estrategia principal.
 
+### v2.5.1 - Checklist de entrada com fallback automatico + correcoes visuais de acessorios
+- Corrigido o fluxo do modal de checklist na OS para nao ficar sem verificacoes quando o tipo de equipamento ainda nao possuia modelo ativo.
+- `ChecklistService` passou a criar automaticamente modelo e itens padrao do `Checklist de Entrada` para tipos novos, mantendo o preenchimento imediato.
+- Ajustado o layout das cores rapidas dos acessorios para quebrar linha dentro do card, evitando estouro horizontal e cor fora das margens.
+
 ### v2.5.0 - Coluna de fotos e visualizador da listagem de OS
 - A listagem `/os` ganhou a coluna `Foto` no inicio da grade operacional, exibindo a miniatura principal do equipamento.
 - Clicar na miniatura abre um visualizador com duas abas: `Fotos do Equipamento` e `Fotos da Abertura`, sem sair da listagem.
@@ -536,6 +569,21 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 - O sistema agora redireciona automaticamente para a aba e campo pendentes (Info, Cor ou Foto) antes de permitir salvar o registro.
 - A cor inicial do cadastro foi resetada para "Nao selecionada" para forçar a identificacao visual correta pelo usuario.
 
+### v2.2.15 - Hotfix de empilhamento de alertas no Checklist da OS
+- O aviso `Checklist incompleto` e demais alertas de validacao passaram a calcular `z-index` dinamicamente com base na pilha ativa de `modals + backdrops`.
+- O SweetAlert2 agora abre acima do modal de checklist, sem ficar oculto durante o salvamento.
+- O ajuste foi aplicado no helper central de avisos da view de OS para manter consistencia em outros avisos tecnicos do mesmo fluxo.
+
+### v2.2.16 - Clareza de status do Checklist de Entrada (DS)
+- O bloco de checklist da aba `Equipamento` passou a mostrar um card de status com titulo e texto de apoio mais claros para o operador.
+- Estados padronizados: `Aguardando equipamento`, `Checklist pendente de preenchimento`, `Checklist concluido: tudo OK`, `Checklist concluido com discrepancias` e `Checklist indisponivel`.
+- O badge rapido foi simplificado para termos curtos (`Pendente`, `Tudo OK`, `N discrepancias`) mantendo consistencia visual com o design system.
+
+### v2.2.17 - Ajuste de bordas dos cards internos da aba Equipamento
+- Aplicado hardening de box-model nos wrappers internos (`border rounded-3/rounded`) para impedir extrapolacao de borda fora dos limites do card pai.
+- Checklist de entrada, acessorios/componentes e blocos similares passaram a respeitar largura maxima do container com overflow controlado.
+- O ajuste foi feito no CSS do design system da OS, mantendo o visual atual sem alterar regras de negocio.
+
 ### v2.2.12 - Reorganizacao de fluxo: Nova aba 'Defeito' na OS
 - Criada a nova aba `Defeito` posicionada logo apos a aba `Equipamento`.
 - O campo `Relato do cliente` e o seletor `Tecnico Responsavel` foram movidos da aba `Equipamento` para a nova aba `Defeito`.
@@ -576,6 +624,12 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 - As superficies editaveis da `Nova Ordem de Servico` foram ajustadas para a base `#f8fafc` com borda `#e2e8f0` e raio `16px`.
 - O estado ativo da secao foi mantido com foco visual suave, preservando a leitura premium da interface.
 - A mudanca foi exclusivamente visual no CSS do modulo.
+
+### v2.2.10 - Fotos de acessorios com fluxo unificado na Nova OS
+- O upload de fotos de acessorios da aba `Equipamento` passou a usar o fluxo padrao de `Galeria + Camera + corte` antes do anexo.
+- A persistencia no backend foi reforcada para ler arquivos por `UploadedFile` (CI4), mantendo mapeamento por item de acessorio.
+- O salvamento agora garante pasta por OS em `public/uploads/acessorios/<numero_os>/` e nome sequencial por tipo (`<tipo>_01`, `<tipo>_02`, ...).
+- O bloco legado do formulario foi isolado para evitar conflito de campos/IDs com o fluxo principal.
 
 ### v2.2.4 - Paleta amarelo suave na Nova OS
 - As superficies editaveis da tela `Nova Ordem de Servico` foram ajustadas da paleta clara neutra para amarelo suave.

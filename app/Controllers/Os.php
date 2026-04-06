@@ -1932,17 +1932,17 @@ class Os extends BaseController
 
         $acessorioModel = new AcessorioOsModel();
         $fotoAcessorioModel = new FotoAcessorioModel();
-        $acessoriosFolder = 'uploads/acessorios/OS_' . $this->normalizeOsSlug($os['numero_os']) . '/';
+        $acessoriosFolder = $this->resolvePrimaryAccessoryFolderForOs((string) ($os['numero_os'] ?? ''));
         $acessorios = $acessorioModel->where('os_id', $id)->orderBy('id', 'ASC')->findAll();
         foreach ($acessorios as &$acessorio) {
             $fotos = $fotoAcessorioModel->where('acessorio_id', $acessorio['id'])->findAll();
             foreach ($fotos as &$foto) {
-                $fotoPath = FCPATH . $acessoriosFolder . $foto['arquivo'];
-                if (!file_exists($fotoPath)) {
+                $fotoUrl = $this->resolveAccessoryPhotoUrl((string) ($os['numero_os'] ?? ''), (string) ($foto['arquivo'] ?? ''));
+                if ($fotoUrl === null) {
                     $foto = null;
                     continue;
                 }
-                $foto['url'] = base_url($acessoriosFolder . $foto['arquivo']);
+                $foto['url'] = $fotoUrl;
             }
             $acessorio['fotos'] = array_values(array_filter($fotos));
         }
@@ -2760,7 +2760,7 @@ class Os extends BaseController
         $fotoModel = new FotoAcessorioModel();
         $slug = $this->normalizeOsSlug($numeroOs);
         $folder = $this->ensureAccessoryDirectory($slug);
-        $sequence = 1;
+        $sequenceByType = [];
 
         foreach ($entries as $entry) {
             $description = trim($entry['text'] ?? '');
@@ -2780,9 +2780,25 @@ class Os extends BaseController
                 continue;
             }
 
-            $entryFiles = $filesMap[$entry['id']] ?? [];
+            $entryTypeSlug = $this->normalizeAccessoryTypeSlug((string) ($entry['key'] ?? ''), $description);
+            if (!isset($sequenceByType[$entryTypeSlug])) {
+                $sequenceByType[$entryTypeSlug] = $this->nextAccessorySequence($folder, $entryTypeSlug);
+            }
+
+            $entryId = (string) ($entry['id'] ?? '');
+            $entryFiles = [];
+            if ($entryId !== '' && isset($filesMap[$entryId])) {
+                $entryFiles = $filesMap[$entryId];
+            }
             foreach ($entryFiles as $file) {
-                $this->saveAccessoryPhoto($file, $folder, $slug, $sequence, $acessorioId, $fotoModel);
+                $this->saveAccessoryPhoto(
+                    $file,
+                    $folder,
+                    $entryTypeSlug,
+                    $sequenceByType[$entryTypeSlug],
+                    $acessorioId,
+                    $fotoModel
+                );
             }
         }
     }
@@ -2876,25 +2892,33 @@ class Os extends BaseController
     private function collectAccessoryFiles(): array
     {
         $mapped = [];
-        if (empty($_FILES['fotos_acessorios']['name'] ?? null)) {
-            return $mapped;
+        $files = $this->request->getFiles();
+        $source = $files['fotos_acessorios'] ?? null;
+        if (!is_array($source) || $source === []) {
+            return [];
         }
 
-        foreach ($_FILES['fotos_acessorios']['name'] as $entryId => $files) {
-            foreach ($files as $index => $name) {
-                $error = $_FILES['fotos_acessorios']['error'][$entryId][$index] ?? UPLOAD_ERR_NO_FILE;
-                if ($error !== UPLOAD_ERR_OK) {
+        foreach ($source as $entryId => $entryFiles) {
+            if ($entryFiles instanceof \CodeIgniter\HTTP\Files\UploadedFile) {
+                $entryFiles = [$entryFiles];
+            }
+
+            if (!is_array($entryFiles)) {
+                continue;
+            }
+
+            foreach ($entryFiles as $file) {
+                if (!$file instanceof \CodeIgniter\HTTP\Files\UploadedFile) {
                     continue;
                 }
 
-                $tmpName = $_FILES['fotos_acessorios']['tmp_name'][$entryId][$index];
-                if (!is_uploaded_file($tmpName)) {
+                if (!$file->isValid() || $file->hasMoved()) {
                     continue;
                 }
 
                 $mapped[$entryId][] = [
-                    'name'     => $name,
-                    'tmp_name' => $tmpName,
+                    'name'     => (string) ($file->getClientName() ?: ('acessorio_' . time() . '.jpg')),
+                    'uploaded' => $file,
                 ];
             }
         }
@@ -3092,7 +3116,7 @@ class Os extends BaseController
             mkdir($base, 0755, true);
         }
 
-        $path = $base . 'OS_' . $slug . '/';
+        $path = $base . $slug . '/';
         if (!is_dir($path)) {
             mkdir($path, 0755, true);
         }
@@ -3102,30 +3126,51 @@ class Os extends BaseController
     private function clearAccessoryFolder(string $numeroOs): void
     {
         $slug = $this->normalizeOsSlug($numeroOs);
-        $path = FCPATH . 'uploads/acessorios/OS_' . $slug . '/';
-        if (!is_dir($path)) {
-            return;
-        }
+        $paths = [
+            FCPATH . 'uploads/acessorios/' . $slug . '/',
+            FCPATH . 'uploads/acessorios/OS_' . $slug . '/',
+        ];
 
-        foreach (glob($path . '*') as $file) {
-            if (is_file($file)) {
-                @unlink($file);
+        foreach ($paths as $path) {
+            if (!is_dir($path)) {
+                continue;
+            }
+
+            foreach (glob($path . '*') as $file) {
+                if (is_file($file)) {
+                    @unlink($file);
+                }
             }
         }
     }
 
-    private function saveAccessoryPhoto(array $file, string $folder, string $slug, int &$sequence, int $acessorioId, FotoAcessorioModel $fotoModel): void
+    private function saveAccessoryPhoto(array $file, string $folder, string $typeSlug, int &$sequence, int $acessorioId, FotoAcessorioModel $fotoModel): void
     {
         try {
-            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $name = "acessorio_{$slug}_{$sequence}";
-            if ($extension) {
-                $name .= '.' . $extension;
+            $extension = strtolower((string) pathinfo($file['name'], PATHINFO_EXTENSION));
+            if ($extension === '') {
+                $extension = 'jpg';
             }
 
-            $destination = $folder . $name;
-            if (!move_uploaded_file($file['tmp_name'], $destination)) {
-                throw new \RuntimeException('Falha ao mover upload');
+            $name = '';
+            $destination = '';
+            while (true) {
+                $seq = str_pad((string) $sequence, 2, '0', STR_PAD_LEFT);
+                $name = "{$typeSlug}_{$seq}.{$extension}";
+                $destination = $folder . $name;
+                if (!is_file($destination)) {
+                    break;
+                }
+                $sequence++;
+            }
+            $uploaded = $file['uploaded'] ?? null;
+            if ($uploaded instanceof \CodeIgniter\HTTP\Files\UploadedFile) {
+                $uploaded->move($folder, $name);
+            } else {
+                $tmpName = (string) ($file['tmp_name'] ?? '');
+                if ($tmpName === '' || !move_uploaded_file($tmpName, $destination)) {
+                    throw new \RuntimeException('Falha ao mover upload');
+                }
             }
 
             $fotoModel->insert([
@@ -3136,6 +3181,84 @@ class Os extends BaseController
         } catch (\Throwable $e) {
             log_message('warning', 'Erro ao salvar foto de acessório: ' . $e->getMessage());
         }
+    }
+
+    private function normalizeAccessoryTypeSlug(string $entryKey, string $description = ''): string
+    {
+        $base = trim($entryKey);
+        if ($base === '' || strtolower($base) === 'outro') {
+            $base = trim($description);
+        }
+        if ($base === '') {
+            $base = 'acessorio';
+        }
+
+        $normalized = str_replace(['-', ' '], '_', $base);
+        if (function_exists('iconv')) {
+            $converted = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $normalized);
+            if (is_string($converted) && $converted !== '') {
+                $normalized = $converted;
+            }
+        }
+
+        $slug = strtolower($normalized);
+        $slug = preg_replace('/[^a-z0-9_]/', '', $slug) ?: '';
+        $slug = trim($slug, '_');
+        return $slug !== '' ? $slug : 'acessorio';
+    }
+
+    private function nextAccessorySequence(string $folder, string $typeSlug): int
+    {
+        $max = 0;
+        foreach (glob($folder . $typeSlug . '_*') as $file) {
+            $name = pathinfo($file, PATHINFO_FILENAME);
+            if (!preg_match('/^' . preg_quote($typeSlug, '/') . '_(\d+)$/', $name, $matches)) {
+                continue;
+            }
+            $max = max($max, (int) ($matches[1] ?? 0));
+        }
+        return $max + 1;
+    }
+
+    private function resolveAccessoryPhotoUrl(string $numeroOs, string $fileName): ?string
+    {
+        $cleanFileName = trim($fileName);
+        if ($cleanFileName === '') {
+            return null;
+        }
+
+        foreach ($this->buildAccessoryFolderCandidates($numeroOs) as $relativeFolder) {
+            $candidatePath = FCPATH . $relativeFolder . $cleanFileName;
+            if (!is_file($candidatePath)) {
+                continue;
+            }
+            return base_url($relativeFolder . $cleanFileName);
+        }
+
+        return null;
+    }
+
+    private function resolvePrimaryAccessoryFolderForOs(string $numeroOs): string
+    {
+        foreach ($this->buildAccessoryFolderCandidates($numeroOs) as $relativeFolder) {
+            if (is_dir(FCPATH . $relativeFolder)) {
+                return $relativeFolder;
+            }
+        }
+
+        return $this->buildAccessoryFolderCandidates($numeroOs)[0];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function buildAccessoryFolderCandidates(string $numeroOs): array
+    {
+        $slug = $this->normalizeOsSlug($numeroOs);
+        return [
+            'uploads/acessorios/' . $slug . '/',
+            'uploads/acessorios/OS_' . $slug . '/',
+        ];
     }
 
     private function persistEstadoFisicoData(int $osId, string $numeroOs, bool $replaceExisting = false): void

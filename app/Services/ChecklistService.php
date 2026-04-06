@@ -8,6 +8,7 @@ use App\Models\ChecklistItemModel;
 use App\Models\ChecklistModeloModel;
 use App\Models\ChecklistRespostaModel;
 use App\Models\ChecklistTipoModel;
+use App\Models\EquipamentoTipoModel;
 use CodeIgniter\Files\File;
 use CodeIgniter\HTTP\Files\UploadedFile;
 use Config\Database;
@@ -26,6 +27,7 @@ class ChecklistService
     private ChecklistExecucaoModel $execucaoModel;
     private ChecklistRespostaModel $respostaModel;
     private ChecklistFotoModel $fotoModel;
+    private EquipamentoTipoModel $equipamentoTipoModel;
 
     public function __construct()
     {
@@ -35,6 +37,7 @@ class ChecklistService
         $this->execucaoModel = new ChecklistExecucaoModel();
         $this->respostaModel = new ChecklistRespostaModel();
         $this->fotoModel = new ChecklistFotoModel();
+        $this->equipamentoTipoModel = new EquipamentoTipoModel();
     }
 
     public function getTipoByCodigo(string $codigo): ?array
@@ -48,7 +51,7 @@ class ChecklistService
     public function getPayloadForOs(int $osId, string $checklistCodigo, int $tipoEquipamentoId, string $numeroOs = ''): array
     {
         $tipo = $this->requireTipo($checklistCodigo);
-        $modelo = $this->modeloModel->findAtivoPorTipo((int) $tipo['id'], $tipoEquipamentoId);
+        $modelo = $this->resolveModelo((int) $tipo['id'], (string) ($tipo['codigo'] ?? ''), $tipoEquipamentoId);
         $execucao = $this->execucaoModel->findByOsAndTipo($osId, (int) $tipo['id']);
 
         if ($modelo === null) {
@@ -125,7 +128,7 @@ class ChecklistService
         array $filesByItem = []
     ): array {
         $tipo = $this->requireTipo($checklistCodigo);
-        $modelo = $this->modeloModel->findAtivoPorTipo((int) $tipo['id'], $tipoEquipamentoId);
+        $modelo = $this->resolveModelo((int) $tipo['id'], (string) ($tipo['codigo'] ?? ''), $tipoEquipamentoId);
         if ($modelo === null) {
             throw new RuntimeException('Nao existe checklist configurado para este tipo de equipamento.');
         }
@@ -456,5 +459,160 @@ class ChecklistService
         $normalized = strtolower(trim((string) $normalized));
         $normalized = preg_replace('/[^a-z0-9]+/', '_', $normalized) ?: 'item';
         return trim($normalized, '_') ?: 'item';
+    }
+
+    private function resolveModelo(int $checklistTipoId, string $checklistCodigo, int $tipoEquipamentoId): ?array
+    {
+        if ($tipoEquipamentoId <= 0) {
+            return null;
+        }
+
+        $modelo = $this->modeloModel->findAtivoPorTipo($checklistTipoId, $tipoEquipamentoId);
+        if ($modelo !== null) {
+            return $modelo;
+        }
+
+        if ($checklistCodigo !== 'entrada') {
+            return null;
+        }
+
+        $this->bootstrapEntradaModelo($checklistTipoId, $tipoEquipamentoId);
+
+        return $this->modeloModel->findAtivoPorTipo($checklistTipoId, $tipoEquipamentoId);
+    }
+
+    private function bootstrapEntradaModelo(int $checklistTipoId, int $tipoEquipamentoId): void
+    {
+        $tipoEquipamento = $this->equipamentoTipoModel->find($tipoEquipamentoId);
+        $tipoEquipamentoNome = trim((string) ($tipoEquipamento['nome'] ?? 'Equipamento'));
+        if ($tipoEquipamentoNome === '') {
+            $tipoEquipamentoNome = 'Equipamento';
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $modelo = $this->modeloModel
+            ->where('checklist_tipo_id', $checklistTipoId)
+            ->where('tipo_equipamento_id', $tipoEquipamentoId)
+            ->first();
+
+        $modeloId = (int) ($modelo['id'] ?? 0);
+        if ($modeloId > 0) {
+            if ((int) ($modelo['ativo'] ?? 0) !== 1) {
+                $this->modeloModel->update($modeloId, ['ativo' => 1, 'updated_at' => $now]);
+            }
+        } else {
+            $this->modeloModel->insert([
+                'checklist_tipo_id' => $checklistTipoId,
+                'tipo_equipamento_id' => $tipoEquipamentoId,
+                'nome' => 'Checklist de Entrada - ' . $tipoEquipamentoNome,
+                'descricao' => 'Modelo inicial gerado automaticamente para conferencia de entrada.',
+                'ordem' => 0,
+                'ativo' => 1,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+            $modeloId = (int) $this->modeloModel->getInsertID();
+        }
+
+        if ($modeloId <= 0) {
+            return;
+        }
+
+        $itensAtivos = $this->itemModel->findAtivosPorModelo($modeloId);
+        if (!empty($itensAtivos)) {
+            return;
+        }
+
+        $items = $this->defaultEntryItemsForType($tipoEquipamentoNome);
+        if (empty($items)) {
+            return;
+        }
+
+        $batch = [];
+        foreach ($items as $index => $descricao) {
+            $batch[] = [
+                'checklist_modelo_id' => $modeloId,
+                'descricao' => $descricao,
+                'ordem' => $index + 1,
+                'ativo' => 1,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        }
+
+        if (!empty($batch)) {
+            $this->itemModel->insertBatch($batch);
+        }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function defaultEntryItemsForType(string $tipoNome): array
+    {
+        $normalized = $this->normalizeKey($tipoNome);
+
+        if (str_contains($normalized, 'smartphone') || str_contains($normalized, 'celular')) {
+            return [
+                'Tela e display sem trincas aparentes',
+                'Carcaca e tampa traseira preservadas',
+                'Botoes laterais e conectores externos inteiros',
+                'Lentes, cameras e flash sem danos aparentes',
+                'Bandeja, chip e compartimentos externos conferidos',
+                'Selos e identificacao visual conferidos',
+            ];
+        }
+
+        if (str_contains($normalized, 'tablet')) {
+            return [
+                'Tela e vidro frontal sem trincas aparentes',
+                'Carcaca e tampa traseira preservadas',
+                'Botoes, conectores e portas sem danos aparentes',
+                'Cameras, sensores e alto-falantes conferidos',
+                'Apoios, cantos e molduras sem amassados aparentes',
+                'Selos e identificacao visual conferidos',
+            ];
+        }
+
+        if (str_contains($normalized, 'desktop') || str_contains($normalized, 'computador')) {
+            return [
+                'Gabinete e paineis externos preservados',
+                'Portas, conectores e cabos externos conferidos',
+                'Tampa, lacres e parafusos visuais conferidos',
+                'Perifericos aparentes e botoes externos conferidos',
+                'Etiqueta patrimonial e identificacao visual conferidas',
+                'Sinais aparentes de impacto ou oxidacao registrados',
+            ];
+        }
+
+        if (str_contains($normalized, 'notebook')) {
+            return [
+                'Tela, tampa e moldura sem trincas aparentes',
+                'Dobradicas, base e carcaca preservadas',
+                'Teclado, touchpad e botoes externos conferidos',
+                'Portas, conectores e fonte visualmente conferidos',
+                'Etiqueta, numero de serie e identificacao visual conferidos',
+                'Sinais aparentes de impacto ou oxidacao registrados',
+            ];
+        }
+
+        return [
+            'Estrutura externa e carcaca conferidas',
+            'Telas, paineis ou superficies visiveis conferidos',
+            'Conectores, portas e botoes externos conferidos',
+            'Lacres, etiquetas e identificacao visual conferidos',
+            'Sinais aparentes de impacto, quebra ou oxidacao registrados',
+            'Acessorios externos e complementos visiveis conferidos',
+        ];
+    }
+
+    private function normalizeKey(string $value): string
+    {
+        $normalized = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+        $normalized = $normalized !== false ? $normalized : $value;
+        $normalized = strtolower($normalized);
+        $normalized = preg_replace('/[^a-z0-9]+/', '_', $normalized) ?? '';
+
+        return trim($normalized, '_');
     }
 }

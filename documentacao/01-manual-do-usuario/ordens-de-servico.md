@@ -40,6 +40,7 @@ Separacao atual do fluxo:
   - Select2 de equipamento com card rico por opcao
   - cada opcao exibe foto de perfil, `tipo - marca`, `modelo - cor` e `numero de serie/IMEI`
   - a busca tambem considera esses identificadores, reduzindo erro quando o cliente possui varios equipamentos semelhantes
+  - acoes inline no rotulo `Equipamento *` com botoes `Novo` e `Editar` (este ultimo aparece somente apos selecionar um equipamento)
   - cadastro rapido segue exigindo Cor e Foto de Perfil obrigatorios
   - estado fisico do equipamento
   - acessorios e componentes na entrada
@@ -100,8 +101,33 @@ Fluxo:
 Regras:
 - Opcao `Equipamento recebido sem acessorios` marca a entrada sem itens.
 - Fotos por acessorio usam crop/preview antes de salvar.
+- O formulario rapido de acessorio agora permite anexar fotos **antes** de clicar em `Salvar item` (botoes `Galeria` e `Camera` dentro do proprio card rapido).
+- As fotos anexadas no formulario rapido ficam vinculadas ao rascunho do item e sao preservadas quando o item e salvo.
+- Se o formulario rapido for cancelado sem salvar o item, as fotos temporarias desse rascunho sao limpas automaticamente para evitar envio indevido.
+- No formulario rapido de cor dos acessorios, os chips de cores agora quebram em varias linhas dentro do card, sem ultrapassar margens da tela.
+- Os cards internos da aba `Equipamento` (ex.: Checklist e Acessorios) agora possuem trava de caixa/largura para impedir vazamento de borda fora do container.
+- A linha estrutural dos paines de `Checklist` e `Acessorios` foi endurecida para eliminar overflow lateral de borda em resolucoes amplas (desktop/notebook), mantendo largura 100% dentro do card pai.
+- O contorno desses dois paines foi suavizado (borda mais discreta) para reduzir excesso visual sem perder separacao de blocos.
+- O contorno arredondado desses paines foi reforcado para manter raio visual limpo e consistente com o design system, mesmo com conteudo dinamico.
+- O card interno desses paines agora mantem respiro inferior fixo, evitando que a borda de baixo fique visualmente "grudada" no limite do card principal.
 - Se o editor visual nao abrir corretamente, o sistema usa fallback automatico e adiciona a foto sem corte para nao travar a tela.
 - Imagens ficam em `uploads/acessorios/OS_<numero_os>/`.
+
+## Checklist de entrada por tipo
+- Ao abrir o modal `Checklist`, o ERP busca o modelo ativo pelo tipo do equipamento selecionado.
+- Se ainda nao existir modelo para aquele tipo, o sistema gera automaticamente um modelo inicial com itens padrao de conferencia e ja libera o preenchimento no mesmo fluxo.
+- O comportamento evita modal vazio para tipos novos e mantem o checklist operacional sem depender de configuracao manual imediata.
+- O card de status do checklist ficou explicito, com estados visuais claros no padrao do design system:
+  - `Aguardando equipamento`: nenhum equipamento selecionado.
+  - `Checklist pendente de preenchimento`: ainda faltam itens para marcar.
+  - `Checklist concluido: tudo OK`: todos os itens foram conferidos sem discrepancias.
+  - `Checklist concluido com discrepancias`: checklist salvo com divergencias registradas.
+  - `Checklist indisponivel`: nao existe modelo para o tipo do equipamento.
+- Camadas de modal padronizadas no fluxo de foto:
+  - `Checklist` na camada base.
+  - `Camera` acima do checklist.
+  - `Cropper` acima da camera.
+  - backdrop sincronizado com a camada ativa para evitar sobreposicao incorreta.
 
 ## Registro de estado fisico
 O bloco `Estado fisico do equipamento` usa a mesma logica de item dinamico dos acessorios.
@@ -512,6 +538,12 @@ Na tela de visualizacao (`/os/visualizar/{id}`):
 
 Os arquivos ficam em:
 - `public/uploads/os_documentos/OS_<numero_os>/`
+
+## Fotos de acessorios na entrada
+- O bloco `Acessorios e Componentes (na entrada)` permite anexar fotos por item com `Galeria` e `Camera`.
+- Antes da adicao final, a imagem passa pelo mesmo modal de corte padrao da OS.
+- As miniaturas ficam visiveis no proprio item e podem ser removidas antes de salvar.
+- No salvamento da OS, as fotos dos acessorios sao persistidas em `public/uploads/acessorios/<numero_os>/`.
 
 ## Qualidade visual de textos
 - A interface da Nova OS e da edicao da OS teve normalizacao de acentuacao em alertas, labels e textos auxiliares.

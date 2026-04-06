@@ -238,6 +238,11 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
     background: rgba(255, 255, 255, 0.84);
     padding: 0.65rem;
 }
+
+/* SweetAlert2 deve sempre ficar acima dos modais tecnicos da OS (checklist/camera/crop). */
+.swal2-container {
+    z-index: 2600 !important;
+}
 </style>
 
 <div class="page-header d-flex justify-content-between align-items-center">
@@ -559,6 +564,11 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                                     <i class="bi bi-plus-lg"></i><span>Novo</span>
                                                 </button>
                                                 <?php endif; ?>
+                                                <?php if (can('equipamentos', 'editar')): ?>
+                                                <button class="btn btn-outline-info btn-sm os-inline-action-btn d-none" type="button" id="btnEditarEquipamentoInline" title="Editar equipamento selecionado">
+                                                    <i class="bi bi-pencil-square"></i><span>Editar</span>
+                                                </button>
+                                                <?php endif; ?>
                                             </span>
                                         </div>
                                         <select name="equipamento_id" id="equipamentoSelect" class="form-select select2-equip" required>
@@ -593,21 +603,29 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                 </div>
                             </div>
 
-                            <div class="row g-3">
+                            <div class="row g-3 os-equip-panels-row">
                                 <div class="col-12 col-xxl-6">
-                                    <div class="os-data-section mb-4 h-100">
+                                    <div class="os-data-section os-equip-checklist-section mb-4 h-100">
                                         <div class="os-data-section-title">
                                             <i class="bi bi-ui-checks-grid me-1"></i>Checklist de entrada
                                         </div>
-                                        <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100 d-flex flex-column gap-2">
+                                        <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100 d-flex flex-column gap-2 os-equip-panel-card">
                                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                                                 <button type="button" class="btn btn-outline-primary btn-sm" id="btnChecklistEntrada">
                                                     <i class="bi bi-ui-checks-grid me-1"></i>Checklist
                                                 </button>
-                                                <span class="badge text-bg-secondary" id="checklistEntradaBadge">Checklist nao preenchido</span>
+                                                <span class="badge text-bg-secondary" id="checklistEntradaBadge">Pendente</span>
                                             </div>
-                                            <div id="checklistEntradaInlineInfo" class="small text-muted">
-                                                Abra o checklist para registrar os itens de entrada com discrepancias e fotos.
+                                            <div class="os-checklist-status-card os-checklist-status-pending" id="checklistEntradaStatusCard">
+                                                <div class="os-checklist-status-icon" id="checklistEntradaStatusIcon">
+                                                    <i class="bi bi-hourglass-split"></i>
+                                                </div>
+                                                <div class="os-checklist-status-body">
+                                                    <div class="os-checklist-status-title" id="checklistEntradaStatusTitle">Checklist pendente de preenchimento</div>
+                                                    <div id="checklistEntradaInlineInfo" class="os-checklist-status-helper">
+                                                        Abra o checklist e marque todos os itens para concluir a entrada.
+                                                    </div>
+                                                </div>
                                             </div>
                                             <input type="hidden" name="checklist_entrada_data" id="checklistEntradaDataInput">
                                             <input type="file" id="checklistEntradaPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
@@ -619,11 +637,11 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                 </div>
 
                                 <div class="col-12 col-xxl-6">
-                                    <div class="os-data-section mb-4 h-100">
+                                    <div class="os-data-section os-equip-acessorios-section mb-4 h-100">
                                         <div class="os-data-section-title">
                                             <i class="bi bi-box-seam me-1"></i>Acessorios e Componentes (na entrada)
                                         </div>
-                                        <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100">
+                                        <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100 os-equip-panel-card">
                                             <div class="d-flex flex-wrap gap-2 mb-2">
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="chip">+ Chip</button>
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="capinha">+ Capinha celular</button>
@@ -644,6 +662,19 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                                     <button type="button" class="btn-close" id="acessoriosQuickClose"></button>
                                                 </div>
                                                 <div id="acessoriosQuickFields" class="row g-2"></div>
+                                                <div id="acessoriosQuickPhotosBlock" class="mt-3 border rounded p-2 bg-white">
+                                                    <div class="small fw-semibold text-uppercase text-muted mb-2">Fotos do acessorio</div>
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        <button type="button" class="btn btn-sm btn-outline-info" id="acessoriosQuickAddFoto">
+                                                            <i class="bi bi-images me-1"></i>Galeria
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary" id="acessoriosQuickAddFotoCamera">
+                                                            <i class="bi bi-camera-fill me-1"></i>Camera
+                                                        </button>
+                                                    </div>
+                                                    <div id="acessoriosQuickPhotosHint" class="small text-muted mt-2">Adicione fotos antes de salvar o item.</div>
+                                                    <div id="acessoriosQuickPhotosPreview" class="d-flex gap-2 flex-wrap mt-2"></div>
+                                                </div>
                                                 <div class="mt-3">
                                                     <button type="button" class="btn btn-sm btn-primary" id="acessoriosQuickSave">Salvar item</button>
                                                     <button type="button" class="btn btn-sm btn-outline-secondary" id="acessoriosQuickCancel">Cancelar</button>
@@ -1001,26 +1032,26 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="outro">+ Outro dano</button>
                             </div>
                             <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="estadoFisicoSemAvarias" value="1">
-                                <label class="form-check-label" for="estadoFisicoSemAvarias">Sem avarias aparentes na entrada</label>
+                                <input class="form-check-input" type="checkbox" id="estadoFisicoSemAvariasLegacy" value="1">
+                                <label class="form-check-label" for="estadoFisicoSemAvariasLegacy">Sem avarias aparentes na entrada</label>
                             </div>
-                            <div id="estadoFisicoQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
+                            <div id="estadoFisicoQuickFormLegacy" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <strong id="estadoFisicoQuickTitle"></strong>
-                                    <button type="button" class="btn-close" id="estadoFisicoQuickClose"></button>
+                                    <strong id="estadoFisicoQuickTitleLegacy"></strong>
+                                    <button type="button" class="btn-close" id="estadoFisicoQuickCloseLegacy"></button>
                                 </div>
-                                <div id="estadoFisicoQuickFields" class="row g-2"></div>
+                                <div id="estadoFisicoQuickFieldsLegacy" class="row g-2"></div>
                                 <div class="mt-3">
-                                    <button type="button" class="btn btn-sm btn-primary" id="estadoFisicoQuickSave">Salvar item</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="estadoFisicoQuickCancel">Cancelar</button>
+                                    <button type="button" class="btn btn-sm btn-primary" id="estadoFisicoQuickSaveLegacy">Salvar item</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="estadoFisicoQuickCancelLegacy">Cancelar</button>
                                 </div>
                             </div>
-                            <div id="estadoFisicoList" class="list-group"></div>
+                            <div id="estadoFisicoListLegacy" class="list-group"></div>
                             <small class="form-text text-muted mt-3">Registre danos observados na recepcao com foto para evidenciar o estado de entrada.</small>
-                            <textarea name="estado_fisico" id="estadoFisicoInput" class="d-none"><?= $isEdit ? esc($os['estado_fisico'] ?? '') : old('estado_fisico') ?></textarea>
-                            <input type="hidden" name="estado_fisico_data" id="estadoFisicoDataInput">
-                            <input type="file" id="estadoFisicoPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
-                            <div id="estadoFisicoFilesInputs" class="d-none"></div>
+                            <textarea name="estado_fisico_legacy" id="estadoFisicoInputLegacy" class="d-none"><?= $isEdit ? esc($os['estado_fisico'] ?? '') : old('estado_fisico') ?></textarea>
+                            <input type="hidden" name="estado_fisico_data_legacy" id="estadoFisicoDataInputLegacy">
+                            <input type="file" id="estadoFisicoPhotoInputLegacy" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
+                            <div id="estadoFisicoFilesInputsLegacy" class="d-none"></div>
                         </div>
                     </div>
 
@@ -1040,26 +1071,26 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acessório</button>
                                 </div>
                                 <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" id="acessoriosSemItens" name="acessorios_sem_itens" value="1" <?= old('acessorios_sem_itens') ? 'checked' : '' ?>>
+                                    <input class="form-check-input" type="checkbox" id="acessoriosSemItensLegacy" name="acessorios_sem_itens_legacy" value="1" <?= old('acessorios_sem_itens_legacy') ? 'checked' : '' ?>>
                                     <label class="form-check-label" for="acessoriosSemItens">Equipamento recebido sem acessórios</label>
                                 </div>
-                                <div id="acessoriosQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
+                                <div id="acessoriosQuickFormLegacy" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <strong id="acessoriosQuickTitle"></strong>
-                                        <button type="button" class="btn-close" id="acessoriosQuickClose"></button>
+                                        <strong id="acessoriosQuickTitleLegacy"></strong>
+                                        <button type="button" class="btn-close" id="acessoriosQuickCloseLegacy"></button>
                                     </div>
-                                    <div id="acessoriosQuickFields" class="row g-2"></div>
+                                    <div id="acessoriosQuickFieldsLegacy" class="row g-2"></div>
                                     <div class="mt-3">
-                                        <button type="button" class="btn btn-sm btn-primary" id="acessoriosQuickSave">Salvar item</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="acessoriosQuickCancel">Cancelar</button>
+                                        <button type="button" class="btn btn-sm btn-primary" id="acessoriosQuickSaveLegacy">Salvar item</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="acessoriosQuickCancelLegacy">Cancelar</button>
                                     </div>
                                 </div>
-                                <div id="acessoriosList" class="list-group"></div>
+                                <div id="acessoriosListLegacy" class="list-group"></div>
                                 <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acessórios comuns.</small>
-                                <textarea name="acessorios" id="acessoriosInput" class="d-none"><?= $isEdit ? esc($os['acessorios'] ?? '') : old('acessorios') ?></textarea>
-                                <input type="hidden" name="acessorios_data" id="acessoriosDataInput">
-                                <input type="file" id="acessoriosPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
-                                <div id="acessoriosFilesInputs" class="d-none"></div>
+                                <textarea name="acessorios_legacy" id="acessoriosInputLegacy" class="d-none"><?= $isEdit ? esc($os['acessorios'] ?? '') : old('acessorios') ?></textarea>
+                                <input type="hidden" name="acessorios_data_legacy" id="acessoriosDataInputLegacy">
+                                <input type="file" id="acessoriosPhotoInputLegacy" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
+                                <div id="acessoriosFilesInputsLegacy" class="d-none"></div>
                             </div>
                     </div>
 
@@ -1620,7 +1651,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
 
 
 <!-- ===== MODAL: CÂMERA (AUXILIAR) ===== -->
-<div class="modal fade" id="modalCamera" tabindex="-1" style="z-index: 2000;">
+<div class="modal fade" id="modalCamera" tabindex="-1" style="z-index: 2250;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-card border-0 shadow-lg">
             <div class="modal-header border-bottom border-light">
@@ -1641,7 +1672,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
 </div>
 
 <!-- ===== MODAL: EDITOR DE IMAGEM (CROP) ===== -->
-<div class="modal fade" id="modalCropEquip" tabindex="-1" style="z-index: 2100;">
+<div class="modal fade" id="modalCropEquip" tabindex="-1" style="z-index: 2350;">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content glass-card shadow-lg">
             <div class="modal-header border-bottom">
@@ -1665,7 +1696,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
 </div>
 
 <!-- ===== MODAL: CHECKLIST DE ENTRADA ===== -->
-<div class="modal fade" id="modalChecklistEntrada" tabindex="-1" aria-hidden="true" style="z-index: 2050;">
+<div class="modal fade" id="modalChecklistEntrada" tabindex="-1" aria-hidden="true" style="z-index: 2150;">
     <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content glass-card shadow-lg">
             <div class="modal-header border-bottom">
@@ -1750,9 +1781,22 @@ const prioridadeLabels = {
 };
 
 const osIdAtual = <?= (int) ($os['id'] ?? 0) ?>;
+if (typeof window.elevateLatestBackdrop !== 'function') {
+    window.elevateLatestBackdrop = function(zIndex) {
+        const backdrops = Array.from(document.querySelectorAll('.modal-backdrop'));
+        const lastBackdrop = backdrops[backdrops.length - 1] || null;
+        if (lastBackdrop && Number.isFinite(Number(zIndex))) {
+            lastBackdrop.style.zIndex = String(zIndex);
+        }
+    };
+}
+var elevateLatestBackdrop = window.elevateLatestBackdrop;
 const checklistMetaEndpoint = `${BASE_URL}os/checklist-meta`;
 const checklistEntradaBtn = document.getElementById('btnChecklistEntrada');
 const checklistEntradaBadge = document.getElementById('checklistEntradaBadge');
+const checklistEntradaStatusCard = document.getElementById('checklistEntradaStatusCard');
+const checklistEntradaStatusIcon = document.getElementById('checklistEntradaStatusIcon');
+const checklistEntradaStatusTitle = document.getElementById('checklistEntradaStatusTitle');
 const checklistEntradaInlineInfo = document.getElementById('checklistEntradaInlineInfo');
 const checklistEntradaDataInput = document.getElementById('checklistEntradaDataInput');
 const checklistEntradaFilesInputs = document.getElementById('checklistEntradaFilesInputs');
@@ -1763,7 +1807,7 @@ const checklistEntradaModalAlert = document.getElementById('checklistEntradaModa
 const checklistEntradaModalMeta = document.getElementById('checklistEntradaModalMeta');
 const checklistEntradaModalResumo = document.getElementById('checklistEntradaModalResumo');
 const btnChecklistEntradaSalvar = document.getElementById('btnChecklistEntradaSalvar');
-const checklistEntradaModal = checklistEntradaModalEl ? bootstrap.Modal.getOrCreateInstance(checklistEntradaModalEl) : null;
+let checklistEntradaModal = null;
 const checklistEntradaStatusOptions = ['ok', 'discrepancia', 'nao_verificado'];
 let checklistEntradaCommitted = normalizeChecklistEntradaPayload(checklistEntradaServer);
 let checklistEntradaDraft = cloneChecklistEntradaState(checklistEntradaCommitted);
@@ -1921,7 +1965,7 @@ function computeChecklistResumo(state) {
         return {
             preenchido: false,
             total_discrepancias: 0,
-            label: 'Sem modelo configurado',
+            label: 'Sem modelo',
             variant: 'secondary'
         };
     }
@@ -1934,8 +1978,8 @@ function computeChecklistResumo(state) {
         return {
             preenchido: false,
             total_discrepancias: totalDiscrepancias,
-            label: 'Checklist nao preenchido',
-            variant: 'secondary'
+            label: 'Pendente',
+            variant: 'warning'
         };
     }
 
@@ -1943,7 +1987,7 @@ function computeChecklistResumo(state) {
         return {
             preenchido: true,
             total_discrepancias: 0,
-            label: '0 discrepancias',
+            label: 'Tudo OK',
             variant: 'success'
         };
     }
@@ -1951,7 +1995,7 @@ function computeChecklistResumo(state) {
     return {
         preenchido: true,
         total_discrepancias: totalDiscrepancias,
-        label: totalDiscrepancias === 1 ? '1 item com discrepancia' : `${totalDiscrepancias} discrepancias registradas`,
+        label: totalDiscrepancias === 1 ? '1 discrepancia' : `${totalDiscrepancias} discrepancias`,
         variant: 'warning'
     };
 }
@@ -1963,20 +2007,70 @@ function getSelectedEquipamentoTipoNome(optionEl = null) {
 
 function updateChecklistInlineSummary() {
     checklistEntradaCommitted.resumo = computeChecklistResumo(checklistEntradaCommitted);
+    const equipamentoSelecionado = String(document.getElementById('equipamentoSelect')?.value || '').trim();
+    const hasEquipamentoSelecionado = equipamentoSelecionado !== '';
+    const itens = Array.isArray(checklistEntradaCommitted?.itens) ? checklistEntradaCommitted.itens : [];
+    const totalItens = itens.length;
+    const totalPendentes = itens.filter((item) => item.status === 'nao_verificado').length;
+    const totalDiscrepancias = Number(checklistEntradaCommitted?.resumo?.total_discrepancias || 0);
+
+    let statusVariantClass = 'os-checklist-status-pending';
+    let statusIcon = 'bi-hourglass-split';
+    let statusTitle = 'Checklist pendente de preenchimento';
+    let statusInfo = totalItens > 0
+        ? `Faltam ${totalPendentes} de ${totalItens} item(ns) para concluir o checklist.`
+        : 'Abra o checklist e marque todos os itens para concluir a entrada.';
+
+    if (!hasEquipamentoSelecionado) {
+        statusVariantClass = 'os-checklist-status-unavailable';
+        statusIcon = 'bi-phone';
+        statusTitle = 'Selecione um equipamento para liberar o checklist';
+        statusInfo = 'Depois de selecionar o equipamento, o modelo de checklist sera carregado automaticamente.';
+    } else if (!checklistEntradaCommitted?.possuiModelo) {
+        statusVariantClass = 'os-checklist-status-unavailable';
+        statusIcon = 'bi-slash-circle';
+        statusTitle = 'Checklist indisponivel para este tipo de equipamento';
+        statusInfo = 'Nao ha modelo configurado para este equipamento em Gestao de Conhecimento.';
+    } else if (checklistEntradaCommitted.resumo.preenchido && totalDiscrepancias <= 0) {
+        statusVariantClass = 'os-checklist-status-success';
+        statusIcon = 'bi-check-circle-fill';
+        statusTitle = 'Checklist concluido: tudo OK';
+        statusInfo = 'Todos os itens foram verificados sem discrepancias.';
+    } else if (checklistEntradaCommitted.resumo.preenchido && totalDiscrepancias > 0) {
+        statusVariantClass = 'os-checklist-status-warning';
+        statusIcon = 'bi-exclamation-triangle-fill';
+        statusTitle = 'Checklist concluido com discrepancias';
+        statusInfo = totalDiscrepancias === 1
+            ? '1 item foi marcado com discrepancia. Reabra o checklist para revisar.'
+            : `${totalDiscrepancias} itens foram marcados com discrepancia. Reabra o checklist para revisar.`;
+    }
+
     if (checklistEntradaBadge) {
-        checklistEntradaBadge.textContent = checklistEntradaCommitted.resumo.label;
-        checklistEntradaBadge.className = `badge ${checklistBadgeVariant(checklistEntradaCommitted.resumo.variant)}`;
+        if (!hasEquipamentoSelecionado) {
+            checklistEntradaBadge.textContent = 'Aguardando equipamento';
+            checklistEntradaBadge.className = `badge ${checklistBadgeVariant('secondary')}`;
+        } else {
+            checklistEntradaBadge.textContent = checklistEntradaCommitted.resumo.label;
+            checklistEntradaBadge.className = `badge ${checklistBadgeVariant(checklistEntradaCommitted.resumo.variant)}`;
+        }
+    }
+    if (checklistEntradaStatusCard) {
+        checklistEntradaStatusCard.classList.remove(
+            'os-checklist-status-pending',
+            'os-checklist-status-success',
+            'os-checklist-status-warning',
+            'os-checklist-status-unavailable'
+        );
+        checklistEntradaStatusCard.classList.add(statusVariantClass);
+    }
+    if (checklistEntradaStatusIcon) {
+        checklistEntradaStatusIcon.innerHTML = `<i class="bi ${statusIcon}"></i>`;
+    }
+    if (checklistEntradaStatusTitle) {
+        checklistEntradaStatusTitle.textContent = statusTitle;
     }
     if (checklistEntradaInlineInfo) {
-        if (!checklistEntradaCommitted.possuiModelo) {
-            checklistEntradaInlineInfo.textContent = 'Nenhum checklist configurado para este tipo de equipamento.';
-        } else if (!checklistEntradaCommitted.resumo.preenchido) {
-            checklistEntradaInlineInfo.textContent = 'Checklist pendente. Abra o modal e marque todos os itens.';
-        } else if (checklistEntradaCommitted.resumo.total_discrepancias > 0) {
-            checklistEntradaInlineInfo.textContent = 'Checklist preenchido com discrepancias. Reabra para revisar os itens.';
-        } else {
-            checklistEntradaInlineInfo.textContent = 'Checklist preenchido sem discrepancias.';
-        }
+        checklistEntradaInlineInfo.textContent = statusInfo;
     }
 }
 
@@ -2291,6 +2385,20 @@ function openChecklistEntradaModal() {
     checklistEntradaDraft = cloneChecklistEntradaState(checklistEntradaCommitted);
     checklistEntradaDraftFiles = cloneChecklistFilesMap(checklistEntradaCommittedFiles);
     renderChecklistEntradaModal();
+    closeImageModalIfOpen();
+    hoistModalToBody(checklistEntradaModalEl, CHECKLIST_MODAL_Z_INDEX);
+    cleanupStuckModalArtifacts();
+    resetModalNodeState(checklistEntradaModalEl);
+
+    try {
+        bootstrap.Modal.getInstance(checklistEntradaModalEl)?.dispose();
+    } catch (error) {
+        console.error('[ChecklistEntrada] falha ao descartar instancia anterior do modal', error);
+    }
+
+    checklistEntradaModal = checklistEntradaModalEl
+        ? new bootstrap.Modal(checklistEntradaModalEl, { backdrop: true, focus: true, keyboard: true })
+        : null;
     checklistEntradaModal?.show();
 }
 
@@ -2406,9 +2514,17 @@ if (checklistEntradaBtn) {
 
 btnChecklistEntradaSalvar?.addEventListener('click', saveChecklistEntradaModal);
 
+checklistEntradaModalEl?.addEventListener('shown.bs.modal', () => {
+    window.elevateLatestBackdrop(CHECKLIST_MODAL_Z_INDEX - 10);
+    if (checklistEntradaModalEl) {
+        checklistEntradaModalEl.style.zIndex = String(CHECKLIST_MODAL_Z_INDEX);
+    }
+});
+
 checklistEntradaModalEl?.addEventListener('hidden.bs.modal', () => {
     checklistEntradaDraft = cloneChecklistEntradaState(checklistEntradaCommitted);
     checklistEntradaDraftFiles = cloneChecklistFilesMap(checklistEntradaCommittedFiles);
+    scheduleModalCleanup();
 });
 
 checklistEntradaModalList?.addEventListener('click', (event) => {
@@ -3378,13 +3494,19 @@ const acessoriosQuickFields = document.getElementById('acessoriosQuickFields');
 const acessoriosQuickSave = document.getElementById('acessoriosQuickSave');
 const acessoriosQuickCancel = document.getElementById('acessoriosQuickCancel');
 const acessoriosQuickClose = document.getElementById('acessoriosQuickClose');
+const acessoriosQuickAddFoto = document.getElementById('acessoriosQuickAddFoto');
+const acessoriosQuickAddFotoCamera = document.getElementById('acessoriosQuickAddFotoCamera');
+const acessoriosQuickPhotosPreview = document.getElementById('acessoriosQuickPhotosPreview');
+const acessoriosQuickPhotosHint = document.getElementById('acessoriosQuickPhotosHint');
 const acessoriosPhotoInput = document.getElementById('acessoriosPhotoInput');
 const acessoriosFilesInputs = document.getElementById('acessoriosFilesInputs');
+document.querySelector('#acessoriosSemItensLegacy + label')?.setAttribute('for', 'acessoriosSemItensLegacy');
 const acessoriosPhotos = {};
 const acessoriosFileInputs = {};
 let acessoriosEntries = [];
 let acessoriosEditing = null;
 let acessoriosCurrentKey = null;
+let acessoriosQuickEntryId = null;
 let acessoriosPhotoTarget = null;
 let acessorioCropQueue = [];
 let acessorioCropEntryId = null;
@@ -3410,6 +3532,10 @@ function isAcessoriosSemItensChecked() {
 
 function clearAllAcessorios() {
     acessoriosEntries.forEach(entry => removeAcessorioFileInput(entry.id));
+    if (acessoriosQuickEntryId && !acessoriosEntries.some(entry => entry.id === acessoriosQuickEntryId)) {
+        removeAcessorioFileInput(acessoriosQuickEntryId);
+    }
+    acessoriosQuickEntryId = null;
     acessoriosEntries = [];
 }
 
@@ -3475,6 +3601,43 @@ function removeAcessorioFileInput(entryId) {
         delete acessoriosFileInputs[entryId];
     }
     delete acessoriosPhotos[entryId];
+}
+
+function getCurrentAcessorioEntryId() {
+    if (acessoriosEditing !== null && acessoriosEntries[acessoriosEditing]?.id) {
+        return acessoriosEntries[acessoriosEditing].id;
+    }
+    if (acessoriosQuickEntryId) {
+        return acessoriosQuickEntryId;
+    }
+    acessoriosQuickEntryId = generateEntryId();
+    return acessoriosQuickEntryId;
+}
+
+function updateAcessoriosQuickPhotosHint(entryId = null) {
+    if (!acessoriosQuickPhotosHint) return;
+    const currentId = entryId || acessoriosQuickEntryId;
+    if (!currentId) {
+        acessoriosQuickPhotosHint.textContent = 'Adicione fotos antes de salvar o item.';
+        return;
+    }
+    const total = acessoriosPhotos[currentId]?.files?.length || 0;
+    acessoriosQuickPhotosHint.textContent = total > 0
+        ? `${total} foto(s) pronta(s) para salvar neste acessorio.`
+        : 'Adicione fotos antes de salvar o item.';
+}
+
+function renderAcessoriosQuickPhotos() {
+    if (!acessoriosQuickPhotosPreview) return;
+    acessoriosQuickPhotosPreview.innerHTML = '';
+    const entryId = acessoriosQuickEntryId;
+    if (!entryId) {
+        updateAcessoriosQuickPhotosHint();
+        return;
+    }
+    ensureAcessorioFileInput(entryId);
+    renderAcessoriosPhotos(entryId, acessoriosQuickPhotosPreview);
+    updateAcessoriosQuickPhotosHint(entryId);
 }
 
 function renderAcessoriosPhotos(entryId, container) {
@@ -3553,9 +3716,18 @@ function renderAcessoriosList() {
 }
 
 function closeAcessoriosForm() {
+    if (
+        acessoriosEditing === null &&
+        acessoriosQuickEntryId &&
+        !acessoriosEntries.some(entry => entry.id === acessoriosQuickEntryId)
+    ) {
+        removeAcessorioFileInput(acessoriosQuickEntryId);
+    }
     acessoriosQuickForm?.classList.add('d-none');
     acessoriosQuickFields.innerHTML = '';
     acessoriosEditing = null;
+    acessoriosQuickEntryId = null;
+    renderAcessoriosQuickPhotos();
 }
 
 function openAcessoriosForm(key, index = null) {
@@ -3654,11 +3826,11 @@ function openAcessoriosForm(key, index = null) {
             };
 
             const quickColorsDesktop = document.createElement('div');
-            quickColorsDesktop.className = 'd-none d-md-flex flex-nowrap gap-1 mt-2 w-100';
+            quickColorsDesktop.className = 'd-none d-md-flex flex-wrap gap-1 mt-2 w-100 os-acessorio-quick-colors';
             COMMON_ACCESSORY_COLORS.forEach(color => {
                 const quickBtn = document.createElement('button');
                 quickBtn.type = 'button';
-                quickBtn.className = 'btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 text-nowrap px-2 py-1';
+                quickBtn.className = 'btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 px-2 py-1 os-acessorio-quick-color-btn';
                 quickBtn.style.fontSize = '0.82rem';
                 quickBtn.innerHTML = `
                     <span class="rounded-circle border" style="width:12px;height:12px;background:${color.hex};"></span>
@@ -3710,6 +3882,7 @@ function openAcessoriosForm(key, index = null) {
     });
     if (index !== null) {
         acessoriosEditing = index;
+        acessoriosQuickEntryId = acessoriosEntries[index]?.id || null;
         const values = acessoriosEntries[index].values || {};
         config.fields.forEach(field => {
             const el = acessoriosQuickFields.querySelector(`[name="${field.name}"]`);
@@ -3746,7 +3919,11 @@ function openAcessoriosForm(key, index = null) {
                 }
             }
         });
+    } else {
+        acessoriosEditing = null;
+        acessoriosQuickEntryId = generateEntryId();
     }
+    renderAcessoriosQuickPhotos();
     acessoriosQuickForm?.classList.remove('d-none');
 }
 
@@ -3772,6 +3949,7 @@ function handleAcessoriosSave() {
     const config = acessoriosConfig[key];
     if (!config) return;
     const values = collectFormValues();
+    const entryId = getCurrentAcessorioEntryId();
     (config.fields || []).forEach(field => {
         if (field.type === 'select_with_other') {
             const otherName = field.otherName || `${field.name}_outro`;
@@ -3792,7 +3970,7 @@ function handleAcessoriosSave() {
     if (acessoriosEditing !== null) {
         acessoriosEntries[acessoriosEditing] = { ...acessoriosEntries[acessoriosEditing], text, values, key };
     } else {
-        acessoriosEntries.push({ id: generateEntryId(), text, values, key });
+        acessoriosEntries.push({ id: entryId, text, values, key });
     }
     renderAcessoriosList();
     syncAcessoriosInput();
@@ -3890,6 +4068,10 @@ function handleRemovePhoto(event) {
         ensureAcessorioFileInput(entryId);
     }
     renderAcessoriosList();
+    if (entryId === acessoriosQuickEntryId) {
+        renderAcessoriosQuickPhotos();
+    }
+    updateAcessoriosQuickPhotosHint(entryId);
 }
 
 document.querySelectorAll('[data-acessorio-key]').forEach(btn => {
@@ -3950,6 +4132,16 @@ acessoriosSemItensCheckbox?.addEventListener('change', () => {
 acessoriosQuickSave?.addEventListener('click', handleAcessoriosSave);
 acessoriosQuickCancel?.addEventListener('click', handleAcessoriosCancel);
 acessoriosQuickClose?.addEventListener('click', handleAcessoriosCancel);
+acessoriosQuickAddFoto?.addEventListener('click', () => {
+    if (isAcessoriosSemItensChecked()) return;
+    const entryId = getCurrentAcessorioEntryId();
+    openAcessorioPhotoInput(entryId);
+});
+acessoriosQuickAddFotoCamera?.addEventListener('click', () => {
+    if (isAcessoriosSemItensChecked()) return;
+    const entryId = getCurrentAcessorioEntryId();
+    openAcessorioCameraCapture(entryId);
+});
 document.addEventListener('click', event => {
     const removeBtn = event.target.closest('.btn-remove-acessorio');
     if (removeBtn) handleRemoveAcessorio({ currentTarget: removeBtn });
@@ -5427,6 +5619,7 @@ updatePhotoState();
 const osEquipamentosCache = window._osEquipamentosCache || (window._osEquipamentosCache = {});
 const btnNovoEquip = document.getElementById('btnNovoEquipamento');
 const btnEditarEquip = document.getElementById('btnEditarEquipamento');
+const btnEditarEquipInline = document.getElementById('btnEditarEquipamentoInline');
 const modalNovoEquipamentoEl = document.getElementById('modalNovoEquipamento');
 const modalNovoEquipamento = modalNovoEquipamentoEl ? new bootstrap.Modal(modalNovoEquipamentoEl) : null;
 const formNovoEquipAjax = document.getElementById('formNovoEquipAjax');
@@ -5450,14 +5643,35 @@ function bumpModalEquipFotosVersion() {
     modalEquipFotosVersion = Date.now();
 }
 
+function getTopModalStackZIndex(defaultZ = 2600) {
+    const modalEls = Array.from(document.querySelectorAll('.modal.show'));
+    const backdropEls = Array.from(document.querySelectorAll('.modal-backdrop.show, .modal-backdrop'));
+    const zIndexValues = [...modalEls, ...backdropEls].map((el) => {
+        const styleValue = window.getComputedStyle(el)?.zIndex || el.style?.zIndex || '';
+        const parsed = Number.parseInt(String(styleValue), 10);
+        return Number.isFinite(parsed) ? parsed : 0;
+    });
+    const maxActive = zIndexValues.length ? Math.max(...zIndexValues) : 0;
+    return Math.max(defaultZ, maxActive + 40);
+}
+
 function showWarningDialog(message, title = 'Atenção') {
     if (window.Swal && typeof window.Swal.fire === 'function') {
+        const dynamicZIndex = getTopModalStackZIndex(2600);
         Swal.fire({
             icon: 'warning',
             title,
             text: message,
             confirmButtonText: 'OK',
-            customClass: { popup: 'glass-card' }
+            customClass: { popup: 'glass-card' },
+            zIndex: dynamicZIndex,
+            didOpen: () => {
+                const containers = Array.from(document.querySelectorAll('.swal2-container'));
+                const container = containers[containers.length - 1] || null;
+                if (container) {
+                    container.style.zIndex = String(dynamicZIndex);
+                }
+            }
         });
         return;
     }
@@ -5487,10 +5701,11 @@ function ensureNovoEquipClienteInput(clienteId) {
 }
 
 function setEquipamentoEditButtonState() {
-    if (!btnEditarEquip) return;
     const equipId = document.getElementById('equipamentoSelect')?.value || '';
     const hasEquipamento = Boolean(String(equipId).trim());
-    btnEditarEquip.classList.toggle('d-none', !hasEquipamento);
+    const shouldHide = !hasEquipamento;
+    if (btnEditarEquip) btnEditarEquip.classList.toggle('d-none', shouldHide);
+    if (btnEditarEquipInline) btnEditarEquipInline.classList.toggle('d-none', shouldHide);
 }
 
 function syncNovoEquipFotosInput() {
@@ -5986,6 +6201,7 @@ btnNovoEquip?.addEventListener('click', function(event) {
     openNovoEquipamentoModal();
 });
 btnEditarEquip?.addEventListener('click', openEditarEquipamentoModal);
+btnEditarEquipInline?.addEventListener('click', openEditarEquipamentoModal);
 modalNovoEquipamentoEl?.addEventListener('hidden.bs.modal', () => {
     setNovoEquipModalMode('create');
     resetNovoEquipModalForm();
@@ -6490,6 +6706,9 @@ $('#btnAcceptColorOS').click(function() {
 // --- Lógica de Câmera, Galeria e Cropper ---
 const modalCameraEl  = document.getElementById('modalCamera');
 const modalCropEl    = document.getElementById('modalCropEquip');
+const CHECKLIST_MODAL_Z_INDEX = 2150;
+const CAMERA_MODAL_Z_INDEX = 2250;
+const CROP_MODAL_Z_INDEX = 2350;
 
 function hoistModalToBody(modalEl, zIndex = null) {
     if (!modalEl) return null;
@@ -6502,11 +6721,15 @@ function hoistModalToBody(modalEl, zIndex = null) {
     return modalEl;
 }
 
-hoistModalToBody(modalCameraEl, 2000);
-hoistModalToBody(modalCropEl, 2100);
+hoistModalToBody(modalCameraEl, CAMERA_MODAL_Z_INDEX);
+hoistModalToBody(modalCropEl, CROP_MODAL_Z_INDEX);
+hoistModalToBody(checklistEntradaModalEl, CHECKLIST_MODAL_Z_INDEX);
 
 const modalCamera    = modalCameraEl ? bootstrap.Modal.getOrCreateInstance(modalCameraEl) : null;
 const modalCrop      = modalCropEl ? bootstrap.Modal.getOrCreateInstance(modalCropEl) : null;
+if (checklistEntradaModalEl) {
+    checklistEntradaModal = bootstrap.Modal.getOrCreateInstance(checklistEntradaModalEl);
+}
 const modalCropTitle = document.getElementById('modalCropTitle');
 const videoCamera    = document.getElementById('videoCamera');
 const canvasCamera   = document.getElementById('canvasCamera');
@@ -6624,6 +6847,10 @@ async function openCameraCapture(context = { type: 'equipamento', entryId: null 
             }
         }
 
+        hoistModalToBody(modalCameraEl, CAMERA_MODAL_Z_INDEX);
+        if (modalCameraEl) {
+            modalCameraEl.style.zIndex = String(CAMERA_MODAL_Z_INDEX);
+        }
         resetModalNodeState(modalCameraEl);
         try {
             bootstrap.Modal.getInstance(modalCameraEl)?.dispose();
@@ -6633,6 +6860,7 @@ async function openCameraCapture(context = { type: 'equipamento', entryId: null 
 
         const cameraModalInstance = modalCameraEl ? new bootstrap.Modal(modalCameraEl) : null;
         cameraModalInstance?.show();
+        window.setTimeout(() => elevateLatestBackdrop(CAMERA_MODAL_Z_INDEX - 10), 80);
 
         window.setTimeout(() => {
             if (!modalCameraEl) return;
@@ -6658,6 +6886,10 @@ document.getElementById('btnAbrirCamera')?.addEventListener('click', async () =>
 });
 
 modalCameraEl?.addEventListener('shown.bs.modal', () => {
+    if (modalCameraEl) {
+        modalCameraEl.style.zIndex = String(CAMERA_MODAL_Z_INDEX);
+    }
+    elevateLatestBackdrop(CAMERA_MODAL_Z_INDEX - 10);
     console.info('[OS Nova] modal da camera exibido com sucesso');
 });
 
@@ -6748,6 +6980,9 @@ function appendBlobToCurrentPhotoContext(blob, canvas) {
         acessoriosPhotos[entryId] = dt;
         ensureAcessorioFileInput(entryId);
         renderAcessoriosList();
+        if (entryId === acessoriosQuickEntryId) {
+            renderAcessoriosQuickPhotos();
+        }
         scheduleDraftSave();
 
         if (acessorioCropQueue.length > 0) {
@@ -6922,8 +7157,13 @@ function openCropper(source, context = { type: 'equipamento' }) {
     imgToCrop.src = source;
     imgToCrop.dataset.cropToken = String(cropToken);
 
+    hoistModalToBody(modalCropEl, CROP_MODAL_Z_INDEX);
+    if (modalCropEl) {
+        modalCropEl.style.zIndex = String(CROP_MODAL_Z_INDEX);
+    }
     const cropModalInstance = bootstrap.Modal.getOrCreateInstance(modalCropEl);
     cropModalInstance.show();
+    window.setTimeout(() => elevateLatestBackdrop(CROP_MODAL_Z_INDEX - 10), 80);
 
     window.setTimeout(() => {
         if (cropToken !== activeCropToken) return;
@@ -6940,6 +7180,10 @@ function openCropper(source, context = { type: 'equipamento' }) {
 }
 
 document.getElementById('modalCropEquip').addEventListener('shown.bs.modal', () => {
+    if (modalCropEl) {
+        modalCropEl.style.zIndex = String(CROP_MODAL_Z_INDEX);
+    }
+    elevateLatestBackdrop(CROP_MODAL_Z_INDEX - 10);
     if (typeof window.Cropper === 'undefined') {
         return;
     }
@@ -7067,6 +7311,9 @@ document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
             acessoriosPhotos[entryId] = dt;
             ensureAcessorioFileInput(entryId);
             renderAcessoriosList();
+            if (entryId === acessoriosQuickEntryId) {
+                renderAcessoriosQuickPhotos();
+            }
             scheduleDraftSave();
 
             if (acessorioCropQueue.length > 0) {

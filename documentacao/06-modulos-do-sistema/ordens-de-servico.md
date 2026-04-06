@@ -145,6 +145,10 @@ Implementacao no ERP web:
   - `tipo - marca`
   - `modelo - cor`
   - `numero de serie` ou `IMEI`
+- no header inline do campo `Equipamento *`, o ERP agora exibe:
+  - botao `Novo` para cadastro rapido
+  - botao `Editar` seguindo design system (`btn-outline-info`) e visivel apenas quando existe equipamento selecionado
+- ambos reutilizam o mesmo modal padrao de equipamento da OS, sem fluxo paralelo
 
 Implementacao no app mobile/PWA:
 
@@ -166,6 +170,24 @@ Campos adicionais expostos para esse fluxo:
 - `cor`
 - `numero_serie`
 - `imei`
+
+## Checklist de entrada e acessorios (robustez visual e funcional)
+
+Checklist de entrada:
+- Servico `ChecklistService` agora resolve modelo com fallback automatico para `entrada`.
+- Quando nao existe modelo ativo para o tipo de equipamento da OS, o sistema cria um modelo inicial e seus itens padrao automaticamente.
+- Abertura de checklist deixa de depender 100% de cadastro manual previo para tipos novos.
+
+Acessorios (formulario rapido de cor):
+- A grade de cores rapidas foi ajustada para `flex-wrap`.
+- Os chips de cor agora respeitam largura do container e quebram linha sem vazamento visual.
+- O card rapido de acessorio passou a aceitar fotos no proprio formulario (`Galeria` e `Camera`) antes do `Salvar item`.
+- O frontend passou a manter um `entryId` de rascunho para vincular fotos temporarias ao item ainda nao salvo e reutilizar o mesmo vinculo no `POST`.
+- Cancelamento do formulario rapido remove automaticamente uploads temporarios sem item salvo, evitando lixo visual e envio acidental.
+- A linha de layout `os-equip-panels-row` recebeu hardening de gutter e caixa para impedir que as bordas internas de `Checklist` e `Acessorios` avancem alem do limite visual do painel.
+- O contraste das bordas desses paines foi reduzido para manter leitura limpa no design system, com menor destaque de contorno.
+- O raio dos cards internos foi reforcado (`border-radius` dedicado + `background-clip`) para preservar o contorno arredondado sem recorte lateral.
+- O card interno dos dois paines passou a ter margem inferior dedicada para preservar separacao visual da borda base do container principal.
 
 ## Visualizacao operacional (`/os/visualizar/{id}`)
 
@@ -507,7 +529,12 @@ Distribuicao:
 - o campo textual `estado_fisico_data` foi substituido pelo fluxo de `Checklist de Entrada` estruturado.
 - o formulario da OS exibe:
   - botao `Checklist`;
-  - indicador de resumo (`nao preenchido`, `0 discrepancias`, `N discrepancias`).
+  - indicador de resumo em linguagem operacional:
+    - `Aguardando equipamento`
+    - `Pendente`
+    - `Tudo OK`
+    - `N discrepancias`
+  - card de contexto com titulo e helper explicativos para cada estado.
 - ao abrir o checklist:
   - o sistema resolve o modelo pelo tipo de equipamento;
   - permite marcar `ok`/`discrepancia`, observacao e fotos por item;
@@ -515,6 +542,12 @@ Distribuicao:
 - as fotos de discrepancia seguem o padrao:
   - `public/uploads/checklist/{numero_os}/{tipo_checklist}/`
   - nome: `checklist_entrada_{tipo_checklist}_{numero_os}_{ordem}.jpg`
+- empilhamento de modais no fluxo de checklist/foto:
+  - checklist abre na camada base do fluxo tecnico;
+  - modal de camera sobe acima do checklist;
+  - modal de crop sobe acima da camera;
+  - backdrop acompanha a camada ativa para impedir sobreposicao invertida.
+  - avisos/alertas via SweetAlert2 calculam o `z-index` dinamicamente a partir da pilha ativa (`modal + backdrop`) para nunca ficar atras do modal de checklist.
 - resiliencia operacional:
   - se a infraestrutura de checklist nao estiver migrada, o sistema evita erro fatal e retorna estado indisponivel com orientacao de migracao.
 
@@ -537,8 +570,20 @@ Objetivo da refatoracao:
 - O estado ativo da secao e controlado por `:focus-within`, com fundo diferenciado e borda azul suave na area em edicao.
 - Inputs, selects, textareas e Select2 ficam com fundo branco para preservar contraste e leitura dentro dessas superficies.
 - O alinhamento com o design system cobre tambem os cards da sidebar, a shell principal do formulario, o painel de fotos e os atalhos de relato da tela.
+- Os wrappers internos com `border rounded-3/rounded` na aba `Equipamento` passaram por hardening de box-model (`box-sizing`, largura maxima e overflow controlado) para eliminar extrapolacao visual de bordas.
 - Os relatos rapidos do campo de entrada ficam agrupados em dropdowns por categoria, preservando a mesma acao de inserir texto no textarea.
 - A camada de view/JS da OS tambem passou por normalizacao de acentuacao em labels, avisos, atalhos e textos auxiliares para eliminar mojibake na interface.
+
+## Fotos de acessorios na OS
+- O card `Acessorios e Componentes (na entrada)` utiliza o mesmo fluxo padrao de foto da OS:
+  - selecao por `Galeria`;
+  - captura por `Camera`;
+  - corte/ajuste no modal de crop antes de anexar.
+- As miniaturas aparecem em tempo real no item do acessorio, com opcao de remocao antes do salvamento da OS.
+- No backend, os arquivos sao mapeados por item (`fotos_acessorios[entry_id][]`) e persistidos com `UploadedFile` em:
+  - `public/uploads/acessorios/<numero_os>/`
+  - nome sequencial por tipo (`<tipo>_01`, `<tipo>_02`, ...).
+- A leitura das fotos existentes considera fallback de pasta legada (`OS_<numero_os>`) para compatibilidade com registros anteriores.
 
 ## Integracao com CRM e inbox
 - Alteracao de status dispara `CrmService` para registrar eventos/follow-ups no CRM.

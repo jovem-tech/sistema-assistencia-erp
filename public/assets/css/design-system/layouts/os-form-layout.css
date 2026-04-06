@@ -155,6 +155,73 @@
     transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
+/* Hardening de caixa para evitar vazamento de bordas na aba Equipamento. */
+.os-form-page .os-data-section > .border.rounded-3,
+.os-form-page .os-data-section > .border.rounded {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.os-form-page .os-data-section > .border.rounded-3 .d-flex.flex-wrap,
+.os-form-page .os-data-section > .border.rounded .d-flex.flex-wrap {
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* Fix definitivo de overflow dos paineis de Checklist/Acessorios na aba Equipamento. */
+.os-form-page .os-equip-panels-row {
+    --bs-gutter-x: 1rem;
+    margin-left: calc(var(--bs-gutter-x) * -0.5);
+    margin-right: calc(var(--bs-gutter-x) * -0.5);
+}
+
+.os-form-page .os-equip-panels-row > [class*='col-'] {
+    min-width: 0;
+}
+
+.os-form-page .os-equip-checklist-section,
+.os-form-page .os-equip-acessorios-section {
+    overflow: hidden;
+    border-color: #e8edf6 !important;
+    box-shadow: none;
+    border-radius: 16px;
+}
+
+.os-form-page .os-equip-panel-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    box-shadow: none;
+    border: 1px solid #e6edf7 !important;
+    border-radius: 14px !important;
+    background-clip: padding-box;
+}
+
+.os-form-page .os-equip-checklist-section .os-equip-panel-card,
+.os-form-page .os-equip-acessorios-section .os-equip-panel-card {
+    height: auto !important;
+    margin-bottom: 0.45rem;
+}
+
+.os-form-page .os-equip-panel-card .d-flex.flex-wrap {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.os-form-page .os-equip-panel-card .btn {
+    max-width: 100%;
+}
+
+.os-form-page .os-equip-acessorios-section .os-acessorio-quick-colors {
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+}
+
 .os-form-page .card.glass-card:hover,
 .os-form-page .os-data-section:hover,
 .os-form-page .os-client-card:hover,
@@ -205,6 +272,84 @@
     letter-spacing: 0.08rem;
     text-transform: uppercase;
     color: var(--os-title-text);
+}
+
+.os-form-page .os-checklist-status-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    border: 1px solid var(--os-field-border);
+    border-radius: 12px;
+    padding: 0.65rem 0.75rem;
+    background: #f8fafc;
+}
+
+.os-form-page .os-checklist-status-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.96rem;
+    flex: 0 0 auto;
+}
+
+.os-form-page .os-checklist-status-body {
+    min-width: 0;
+}
+
+.os-form-page .os-checklist-status-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.os-form-page .os-checklist-status-helper {
+    margin-top: 0.15rem;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: #64748b;
+}
+
+.os-form-page .os-checklist-status-pending {
+    border-color: #fde68a;
+    background: #fffbeb;
+}
+
+.os-form-page .os-checklist-status-pending .os-checklist-status-icon {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.os-form-page .os-checklist-status-success {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+}
+
+.os-form-page .os-checklist-status-success .os-checklist-status-icon {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.os-form-page .os-checklist-status-warning {
+    border-color: #fde68a;
+    background: #fffbeb;
+}
+
+.os-form-page .os-checklist-status-warning .os-checklist-status-icon {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.os-form-page .os-checklist-status-unavailable {
+    border-color: #e2e8f0;
+    background: #f8fafc;
+}
+
+.os-form-page .os-checklist-status-unavailable .os-checklist-status-icon {
+    background: #e2e8f0;
+    color: #64748b;
 }
 
 .os-form-page .os-tab-stack {
@@ -564,6 +709,28 @@
     padding: 0.8rem;
     background: #ffffff;
     border-color: var(--os-field-border);
+}
+
+.os-form-page .os-acessorio-quick-colors {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+    row-gap: 0.35rem;
+    column-gap: 0.35rem;
+    overflow: hidden;
+}
+
+.os-form-page .os-acessorio-quick-color-btn {
+    max-width: 100%;
+    min-width: 0;
+    white-space: normal;
+    text-align: left;
+    line-height: 1.15;
+}
+
+.os-form-page .os-acessorio-quick-color-btn span:last-child {
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 @media (max-width: 1199.98px) {

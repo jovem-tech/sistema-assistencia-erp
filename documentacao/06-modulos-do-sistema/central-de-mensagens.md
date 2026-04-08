@@ -1,6 +1,6 @@
 # Modulo: Central de Mensagens (Central de Atendimento Inteligente 24h)
 
-Atualizado em 02/04/2026 (v2.10.17).
+Atualizado em 08/04/2026 (integracao Orcamentos fase 3).
 
 ## Objetivo
 Transformar o WhatsApp operacional em uma central unica de atendimento integrada ao ERP + CRM, com:
@@ -9,6 +9,22 @@ Transformar o WhatsApp operacional em uma central unica de atendimento integrada
 - automacao de resposta por intencao (chatbot)
 - fila de atendimento humano
 - metricas operacionais de atendimento
+
+## Integracao com Orcamentos (08/04/2026 - fase 3)
+
+A Central passou a suportar orcamento rapido dentro da conversa ativa, sem sair da tela:
+
+- novo botao `Gerar e enviar orcamento` no contexto da conversa;
+- fluxo em modal (descricao, valor, validade, mensagem e opcao de anexar PDF);
+- criacao do orcamento vinculada a `conversa_id` e tentativa de `cliente_id/os_id` quando disponiveis;
+- envio imediato por WhatsApp usando a trilha do modulo de orcamentos;
+- secao `Orcamentos relacionados` no painel de contexto para acompanhamento rapido.
+
+Arquivos tecnicos impactados:
+
+- `app/Controllers/CentralMensagens.php`
+- `app/Views/central_mensagens/index.php`
+- `public/assets/js/central-mensagens.js`
 
 ## Extensao mobile paralela (03/04/2026 - v2.11.0)
 

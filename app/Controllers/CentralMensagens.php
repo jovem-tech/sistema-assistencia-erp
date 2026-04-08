@@ -16,6 +16,7 @@ use App\Models\CrmTagModel;
 use App\Models\CrmFollowupModel;
 use App\Models\LogModel;
 use App\Models\MensagemWhatsappModel;
+use App\Models\OrcamentoModel;
 use App\Models\OsDocumentoModel;
 use App\Models\OsModel;
 use App\Models\RespostaRapidaWhatsappModel;
@@ -1854,6 +1855,45 @@ class CentralMensagens extends BaseController
                 ->findAll(20);
         }
 
+        $orcamentos = [];
+        $orcamentoStatusLabels = [];
+        $orcamentoModel = new OrcamentoModel();
+        if ($orcamentoModel->db->tableExists('orcamentos')) {
+            $builder = $orcamentoModel
+                ->select('id, numero, status, total, validade_data, os_id, created_at')
+                ->orderBy('id', 'DESC');
+
+            $hasScope = false;
+            $builder->groupStart();
+            if ((int) ($conversa['id'] ?? 0) > 0) {
+                $builder->where('conversa_id', (int) $conversa['id']);
+                $hasScope = true;
+            }
+            if ($clienteId > 0) {
+                if ($hasScope) {
+                    $builder->orWhere('cliente_id', $clienteId);
+                } else {
+                    $builder->where('cliente_id', $clienteId);
+                    $hasScope = true;
+                }
+            }
+            if ($osPrincipalId > 0) {
+                if ($hasScope) {
+                    $builder->orWhere('os_id', $osPrincipalId);
+                } else {
+                    $builder->where('os_id', $osPrincipalId);
+                    $hasScope = true;
+                }
+            }
+            $builder->groupEnd();
+
+            if ($hasScope) {
+                $orcamentos = $builder->findAll(12);
+            }
+
+            $orcamentoStatusLabels = $orcamentoModel->statusLabels();
+        }
+
         $service = new CentralMensagensService();
 
         return [
@@ -1865,6 +1905,8 @@ class CentralMensagens extends BaseController
             'os_vinculadas' => $osVinculadas,
             'documentos' => $docs,
             'followups' => $followups,
+            'orcamentos' => $orcamentos,
+            'orcamento_status_labels' => $orcamentoStatusLabels,
             'meta' => [
                 'status' => (string) ($conversa['status'] ?? 'aberta'),
                 'status_options' => ['aberta', 'aguardando', 'resolvida', 'arquivada'],

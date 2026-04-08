@@ -2769,11 +2769,151 @@
         };
     };
 
+    const openQuickOrcamentoModal = async () => {
+        if (!state.currentConversaId) {
+            await swal({
+                icon: 'warning',
+                title: 'Sem conversa ativa',
+                text: 'Abra uma conversa antes de gerar o orcamento rapido.',
+            });
+            return;
+        }
+
+        if (!cfg.endpointOrcamentoGerarEnviar || !cfg.canCreateOrcamento) {
+            await swal({
+                icon: 'warning',
+                title: 'Permissao insuficiente',
+                text: 'Seu usuario nao possui acesso para criar/enviar orcamentos.',
+            });
+            return;
+        }
+
+        if (!window.Swal) {
+            await swal({
+                icon: 'warning',
+                title: 'Recurso indisponivel',
+                text: 'Nao foi possivel abrir o formulario rapido de orcamento.',
+            });
+            return;
+        }
+
+        const ctx = state.currentContext || {};
+        const cliente = ctx.cliente || {};
+        const contato = ctx.contato || {};
+        const osVinculadas = Array.isArray(ctx.os_vinculadas) ? ctx.os_vinculadas : [];
+        const osLista = Array.isArray(ctx.os) ? ctx.os : [];
+        const osId = Number((osVinculadas[0] && osVinculadas[0].os_id) || (osLista[0] && osLista[0].id) || 0);
+        const osNumero = String((osVinculadas[0] && osVinculadas[0].numero_os) || (osLista[0] && osLista[0].numero_os) || '').trim();
+        const clienteNome = String(
+            cliente.nome_razao
+            || contato.nome
+            || contato.whatsapp_nome_perfil
+            || contato.nome_contato
+            || ''
+        ).trim();
+        const telefone = String(contato.telefone_normalizado || contato.telefone || '').replace(/\D+/g, '');
+        const tituloDefault = osId > 0
+            ? ('Orcamento rapido da OS ' + (osNumero || ('#' + osId)))
+            : 'Orcamento rapido via conversa';
+
+        const result = await window.Swal.fire({
+            title: 'Gerar e enviar orcamento rapido',
+            html: `
+                <div class="text-start">
+                    <label class="form-label small mb-1" for="swOrcTitulo">Titulo</label>
+                    <input id="swOrcTitulo" class="swal2-input" value="${escapeHtml(tituloDefault)}" placeholder="Titulo do orcamento">
+                    <label class="form-label small mb-1 mt-1" for="swOrcItemDescricao">Descricao do item</label>
+                    <input id="swOrcItemDescricao" class="swal2-input" value="Servico tecnico" placeholder="Ex.: Troca de tela original">
+                    <label class="form-label small mb-1 mt-1" for="swOrcItemValor">Valor (R$)</label>
+                    <input id="swOrcItemValor" class="swal2-input" value="0,00" placeholder="Ex.: 350,00">
+                    <label class="form-label small mb-1 mt-1" for="swOrcValidadeDias">Validade (dias)</label>
+                    <input id="swOrcValidadeDias" type="number" min="1" max="60" class="swal2-input" value="7">
+                    <label class="form-label small mb-1 mt-1" for="swOrcMensagem">Mensagem WhatsApp (opcional)</label>
+                    <textarea id="swOrcMensagem" class="swal2-textarea" placeholder="Mensagem personalizada para o cliente"></textarea>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" id="swOrcPdf" checked>
+                        <label class="form-check-label small" for="swOrcPdf">Anexar PDF automaticamente</label>
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Gerar e enviar',
+            cancelButtonText: 'Cancelar',
+            focusConfirm: false,
+            preConfirm: () => {
+                const titulo = String(document.getElementById('swOrcTitulo')?.value || '').trim();
+                const descricao = String(document.getElementById('swOrcItemDescricao')?.value || '').trim();
+                const valorRaw = String(document.getElementById('swOrcItemValor')?.value || '').trim();
+                const validadeDias = Number(document.getElementById('swOrcValidadeDias')?.value || 7);
+                const mensagem = String(document.getElementById('swOrcMensagem')?.value || '').trim();
+                const incluirPdf = document.getElementById('swOrcPdf')?.checked ? 1 : 0;
+
+                const valor = Number(String(valorRaw).replace(/\./g, '').replace(',', '.'));
+                if (!descricao) {
+                    window.Swal.showValidationMessage('Informe a descricao do item.');
+                    return false;
+                }
+                if (!Number.isFinite(valor) || valor <= 0) {
+                    window.Swal.showValidationMessage('Informe um valor valido maior que zero.');
+                    return false;
+                }
+                if (!Number.isFinite(validadeDias) || validadeDias < 1 || validadeDias > 60) {
+                    window.Swal.showValidationMessage('Validade deve estar entre 1 e 60 dias.');
+                    return false;
+                }
+
+                return {
+                    titulo,
+                    item_descricao: descricao,
+                    item_valor: valor.toFixed(2),
+                    validade_dias: validadeDias,
+                    mensagem_whatsapp: mensagem,
+                    incluir_pdf: incluirPdf,
+                };
+            },
+        });
+
+        if (!result?.isConfirmed || !result?.value) {
+            return;
+        }
+
+        const payload = {
+            conversa_id: state.currentConversaId,
+            cliente_id: Number(cliente.id || 0) > 0 ? Number(cliente.id || 0) : '',
+            os_id: osId > 0 ? osId : '',
+            cliente_nome_avulso: clienteNome || '',
+            telefone_contato: telefone || '',
+            ...result.value,
+        };
+
+        try {
+            const response = await postForm(cfg.endpointOrcamentoGerarEnviar, payload);
+            await swal({
+                icon: 'success',
+                title: 'Orcamento enviado',
+                text: response?.message || 'Orcamento rapido gerado e enviado com sucesso.',
+            });
+            await openConversa(state.currentConversaId, false);
+            await safeLoadConversas(true);
+        } catch (error) {
+            await swal({
+                icon: 'error',
+                title: 'Falha ao gerar/enviar',
+                text: error?.message || 'Nao foi possivel gerar e enviar o orcamento rapido.',
+            });
+        }
+    };
+
     const bindContextActions = () => {
         const btnVincular = document.getElementById('btnVincularOs');
         const btnSalvarMeta = document.getElementById('btnSalvarMetaConversa');
+        const btnGerarOrcamentoRapido = document.getElementById('btnGerarOrcamentoRapidoConversa');
         const checkBot = document.getElementById('contextAutomacaoAtiva');
         const checkHumano = document.getElementById('contextAguardandoHumano');
+
+        btnGerarOrcamentoRapido?.addEventListener('click', async () => {
+            await openQuickOrcamentoModal();
+        });
 
         btnVincular?.addEventListener('click', async () => {
             const osId = Number(document.getElementById('contextOsSelect')?.value || 0);
@@ -3108,6 +3248,10 @@
         const osList = Array.isArray(ctx?.os) ? ctx.os : [];
         const docs = Array.isArray(ctx?.documentos) ? ctx.documentos : [];
         const followups = Array.isArray(ctx?.followups) ? ctx.followups : [];
+        const orcamentos = Array.isArray(ctx?.orcamentos) ? ctx.orcamentos : [];
+        const orcamentoStatusLabels = (ctx?.orcamento_status_labels && typeof ctx.orcamento_status_labels === 'object')
+            ? ctx.orcamento_status_labels
+            : {};
         const osVinculadas = Array.isArray(ctx?.os_vinculadas) ? ctx.os_vinculadas : [];
         const meta = ctx?.meta || {};
         const statusAtual = String(meta.status || 'aberta');
@@ -3157,9 +3301,59 @@
             ? followups.map((f) => `<li>${escapeHtml(f.titulo || '-')}: ${escapeHtml(formatDateTime(f.data_prevista || ''))}</li>`).join('')
             : '<li class="text-muted">Sem follow-ups pendentes.</li>';
 
+        const orcamentosHtml = orcamentos.length
+            ? orcamentos.map((o) => {
+                const id = Number(o.id || 0);
+                const status = String(o.status || 'rascunho');
+                const statusLabel = String(orcamentoStatusLabels[status] || status);
+                const badgeClass = ({
+                    rascunho: 'text-bg-secondary',
+                    enviado: 'text-bg-primary',
+                    aguardando_resposta: 'text-bg-info',
+                    aprovado: 'text-bg-success',
+                    pendente_abertura_os: 'text-bg-warning text-dark',
+                    rejeitado: 'text-bg-danger',
+                    vencido: 'text-bg-warning text-dark',
+                    cancelado: 'text-bg-dark',
+                    convertido: 'text-bg-success',
+                })[status] || 'text-bg-secondary';
+                const numero = String(o.numero || ('ORC #' + id));
+                const total = Number(o.total || 0).toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                    minimumFractionDigits: 2,
+                });
+                const validade = o.validade_data ? formatDateTime(o.validade_data) : '-';
+                let url = '#';
+                if (id > 0) {
+                    try {
+                        url = new URL((cfg.basePath || '/') + 'orcamentos/visualizar/' + id, window.location.origin).toString();
+                    } catch (error) {
+                        url = window.location.origin + '/orcamentos/visualizar/' + id;
+                    }
+                }
+                return `
+                    <li>
+                        <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                            <a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(numero)}</a>
+                            <span class="badge ${badgeClass}">${escapeHtml(statusLabel)}</span>
+                        </div>
+                        <div class="small text-muted">Total: ${escapeHtml(total)} | Validade: ${escapeHtml(validade)}</div>
+                    </li>
+                `;
+            }).join('')
+            : '<li class="text-muted">Sem orcamentos relacionados.</li>';
+
         const clienteUrl = cliente?.id ? (cfg.urlClienteVisualizarPrefix + '/' + cliente.id) : '';
         const osPrincipalId = Number((osVinculadas[0] && osVinculadas[0].os_id) || (osList[0] && osList[0].id) || 0);
         const osUrl = osPrincipalId > 0 ? (cfg.urlOsVisualizarPrefix + '/' + osPrincipalId) : '';
+        const painelOrcamentosUrl = (() => {
+            try {
+                return new URL((cfg.basePath || '/') + 'orcamentos', window.location.origin).toString();
+            } catch (error) {
+                return window.location.origin + '/orcamentos';
+            }
+        })();
         const novaOsUrl = (() => {
             const raw = String(cfg.urlOsNova || '').trim();
             if (!raw) {
@@ -3177,6 +3371,38 @@
                 const clienteId = Number(cliente?.id || 0);
                 if (clienteId > 0) {
                     target.searchParams.set('cliente_id', String(clienteId));
+                }
+                const telefone = String(contato?.telefone_normalizado || contato?.telefone || '').replace(/\D+/g, '');
+                if (telefone) {
+                    target.searchParams.set('telefone', telefone);
+                }
+                const nomeHint = String(contato?.nome || contato?.whatsapp_nome_perfil || '').trim();
+                if (nomeHint) {
+                    target.searchParams.set('nome_hint', nomeHint);
+                }
+                return target.toString();
+            } catch (error) {
+                return raw;
+            }
+        })();
+        const novoOrcamentoUrl = (() => {
+            const raw = String(cfg.urlOrcamentoNovo || '').trim();
+            if (!raw) {
+                return '';
+            }
+            try {
+                const target = new URL(raw, window.location.origin);
+                if (state.currentConversaId) {
+                    target.searchParams.set('origem', 'conversa');
+                    target.searchParams.set('conversa_id', String(state.currentConversaId));
+                }
+                const clienteId = Number(cliente?.id || 0);
+                if (clienteId > 0) {
+                    target.searchParams.set('cliente_id', String(clienteId));
+                }
+                const osId = Number((osVinculadas[0] && osVinculadas[0].os_id) || (osList[0] && osList[0].id) || 0);
+                if (osId > 0) {
+                    target.searchParams.set('os_id', String(osId));
                 }
                 const telefone = String(contato?.telefone_normalizado || contato?.telefone || '').replace(/\D+/g, '');
                 if (telefone) {
@@ -3279,10 +3505,19 @@
                 <div class="cm-context-section-title">Follow-ups pendentes</div>
                 <ul class="cm-context-list">${followupsHtml}</ul>
             </div>
+            <div class="cm-context-section">
+                <div class="cm-context-section-title">Orcamentos relacionados</div>
+                <ul class="cm-context-list">${orcamentosHtml}</ul>
+            </div>
             <div class="cm-context-actions mt-2">
                 ${clienteUrl ? `<a class="btn btn-sm btn-outline-primary" href="${clienteUrl}" target="_blank" rel="noopener">Abrir cliente</a>` : ''}
                 ${osUrl ? `<a class="btn btn-sm btn-outline-secondary" href="${osUrl}" target="_blank" rel="noopener">Abrir OS</a>` : ''}
                 <a class="btn btn-sm btn-outline-success" href="${escapeHtml(novaOsUrl)}" target="_blank" rel="noopener">Nova OS</a>
+                <a class="btn btn-sm btn-outline-dark" href="${escapeHtml(painelOrcamentosUrl)}" target="_blank" rel="noopener">Painel orcamentos</a>
+                ${(cfg.canCreateOrcamento && cfg.endpointOrcamentoGerarEnviar)
+                    ? '<button type="button" class="btn btn-sm btn-warning" id="btnGerarOrcamentoRapidoConversa">Gerar e enviar orcamento</button>'
+                    : ''}
+                ${(cfg.canCreateOrcamento && novoOrcamentoUrl) ? `<a class="btn btn-sm btn-outline-warning" href="${escapeHtml(novoOrcamentoUrl)}" target="_blank" rel="noopener">Novo orcamento</a>` : ''}
             </div>
         `;
 

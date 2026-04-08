@@ -1,7 +1,7 @@
 # Historico de Versoes do Sistema
 
-Atualizado em: 05/04/2026  
-Versao atual oficial: `2.11.5`
+Atualizado em: 08/04/2026  
+Versao atual oficial: `2.12.0`
 
 ## Observacao sobre o App Mobile/PWA
 
@@ -20,6 +20,40 @@ Estado documental atual do app:
 - documentacao exclusiva aprofundada em 04/04/2026
 
 ## Release ERP + App
+
+### 08/04/2026 - v2.12.0 / app 0.4.2
+- release oficial do ERP para o novo modulo profissional de orcamentos, consolidando as fases 1, 2 e 3 do projeto;
+- habilitado fluxo completo de orcamento avulso e orcamento vinculado a OS, incluindo painel dedicado no sidebar;
+- envio operacional por WhatsApp, e-mail e PDF com trilha de envios completa e rastreavel;
+- liberada conversao de orcamento aprovado para OS ou venda manual, com status dedicado para `pendente_abertura_os` quando for avulso;
+- adicionada automacao de vencimento e follow-up comercial (`php spark orcamentos:lifecycle` e acao web `Executar automacao`);
+- central de mensagens agora permite `Gerar e enviar orcamento` no contexto da conversa do cliente;
+- app mobile/PWA permanece na versao `0.4.2` com ERP minimo compativel mantido em `2.11.5`.
+
+### 08/04/2026 - fase 3 do modulo de orcamentos (compoe a release v2.12.0)
+- entregue conversao de orcamento aprovado para `OS` ou `venda manual`, com fechamento em status `convertido`;
+- aprovacoes publicas de orcamento sem OS agora entram em `pendente_abertura_os`;
+- adicionada automacao de vencimento/follow-up de orcamentos no ERP (`Executar automacao`) e no CLI (`php spark orcamentos:lifecycle`);
+- central de mensagens recebeu botao inline `Gerar e enviar orcamento` no contexto da conversa;
+- contexto da conversa passou a exibir `Orcamentos relacionados` para acompanhamento rapido;
+- sidebar comercial de orcamentos evoluiu para submenu de gestao (painel, aguardando resposta, pendentes de OS, novo orcamento);
+- criado indice de performance para deduplicacao de follow-ups (`crm_followups.origem_evento`).
+
+### 07/04/2026 - fase 2 do modulo de orcamentos (compoe a release v2.12.0)
+- habilitado envio direto na tela de orcamento por `WhatsApp`, `e-mail` e `PDF`;
+- criado service de PDF do modulo (`OrcamentoPdfService`) com versao de arquivo por orcamento;
+- criado service de e-mail do modulo (`OrcamentoMailService`) com SMTP do ERP;
+- adicionadas rotas de envio e arquivo: `POST /orcamentos/pdf/{id}/gerar`, `GET /orcamentos/pdf/{id}`, `POST /orcamentos/whatsapp/{id}/enviar`, `POST /orcamentos/email/{id}/enviar`;
+- adicionada trilha completa de envio por tentativa em `orcamento_envios` com status, provedor, referencia externa e erro;
+- visualizacao do orcamento ganhou painel de envio rapido com confirmacao via SweetAlert2 e rastreabilidade detalhada em tela.
+
+### 07/04/2026 - fase 1 do modulo de orcamentos (compoe a release v2.12.0)
+- criado modulo dedicado `Orcamentos` no sidebar com CRUD completo no ERP web;
+- adicionadas tabelas dedicadas para cabecalho, itens, historico de status, envios e aprovacoes externas;
+- habilitado fluxo de criacao com prefill por OS e por Central de Mensagens (conversa/cliente);
+- adicionado link publico por token para aprovacao/rejeicao do cliente;
+- adicionado provisionamento de permissao `orcamentos` no RBAC via migration;
+- documentacao funcional/tecnica do modulo publicada nas secoes de usuario, administrador, arquitetura, banco, rotas e roadmap.
 
 ### 06/04/2026 - hotfix fotos de acessorios (sem bump de versao)
 - concluido o fluxo de fotos no formulario rapido de `Acessorios e Componentes (na entrada)` na OS web.
@@ -89,6 +123,12 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 ## Linha do tempo oficial (consolidada)
 
 > Observacao: releases antigas foram consolidadas retroativamente com base no historico tecnico e documental do projeto.
+
+### v2.12.0 - Orcamentos profissional (sidebar + envio multicanal + aprovacao publica + conversao + automacao)
+- Novo modulo `Orcamentos` com painel dedicado no sidebar e operacao completa de cotacao avulsa e cotacao vinculada a OS.
+- Envio operacional por `WhatsApp`, `e-mail` e `PDF` com trilha de tentativas/erros e reenvio auditavel.
+- Fluxo de aprovacao/rejeicao por link publico com token e status `pendente_abertura_os` para aprovados avulsos.
+- Conversao de aprovado para `OS` ou `venda manual` e automacao de vencimento/follow-up no CRM.
 
 ### v2.11.3 - PWA: hardening do Service Worker (fallback de Response)
 - Corrigido o erro de runtime no Service Worker `Failed to convert value to 'Response'` em cenarios de falha de rede sem item correspondente no cache.

@@ -1006,6 +1006,7 @@ function openDocPage(page) {
         'fornecedores': '01-manual-do-usuario/fornecedores.md',
         'funcionarios': '01-manual-do-usuario/funcionarios.md',
         'servicos': '01-manual-do-usuario/servicos.md',
+        'orcamentos': '01-manual-do-usuario/orcamentos.md',
         'usuarios': '02-manual-administrador/usuarios-e-permissoes.md',
         'grupos': '02-manual-administrador/usuarios-e-permissoes.md',
         'configuracoes': '02-manual-administrador/configuracao-do-sistema.md',

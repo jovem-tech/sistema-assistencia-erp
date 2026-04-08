@@ -463,11 +463,14 @@ window.CM_CFG = {
     urlClienteVisualizarPrefix: '<?= parse_url(base_url('clientes/visualizar'), PHP_URL_PATH) ?: '/clientes/visualizar' ?>',
     urlOsVisualizarPrefix: '<?= parse_url(base_url('os/visualizar'), PHP_URL_PATH) ?: '/os/visualizar' ?>',
     urlOsNova: '<?= parse_url(base_url('os/nova'), PHP_URL_PATH) ?: '/os/nova' ?>',
+    urlOrcamentoNovo: '<?= parse_url(base_url('orcamentos/novo'), PHP_URL_PATH) ?: '/orcamentos/novo' ?>',
+    endpointOrcamentoGerarEnviar: '<?= parse_url(base_url('orcamentos/central-mensagens/gerar-enviar'), PHP_URL_PATH) ?: '/orcamentos/central-mensagens/gerar-enviar' ?>',
     gatewayAccountNumber: '<?= esc($gatewayAccountNumber ?? '') ?>',
     empresaEndereco: '<?= esc(get_config('empresa_endereco', '')) ?>',
     currentUserId: <?= (int) ($currentUserId ?? 0) ?>,
     currentUserName: '<?= esc($currentUserName ?? '') ?>',
     canCreateContato: <?= !empty($canCreateContato) ? 'true' : 'false' ?>,
+    canCreateOrcamento: <?= can('orcamentos', 'criar') ? 'true' : 'false' ?>,
     enableSse: <?= !empty($enableSse) ? 'true' : 'false' ?>
 };
 </script>

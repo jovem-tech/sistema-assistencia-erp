@@ -1,6 +1,6 @@
 # Documentacao - Sistema de Assistencia Tecnica
 
-> Jovem Tech - Atualizado em 04/04/2026
+> Jovem Tech - Atualizado em 08/04/2026
 
 ## Estrutura
 
@@ -24,10 +24,14 @@
 - Operacao de OS: `01-manual-do-usuario/ordens-de-servico.md`
 - Workflow administrativo de OS: `02-manual-administrador/fluxo-de-trabalho-os.md`
 - Operacao de Contatos: `01-manual-do-usuario/contatos.md`
+- Operacao de Orcamentos: `01-manual-do-usuario/orcamentos.md`
 - Configuracao pre-CRM: `02-manual-administrador/configuracao-do-sistema.md`
+- Admin de Orcamentos e RBAC: `02-manual-administrador/orcamentos-e-permissoes.md`
 - Migracao legada SQL (operacao): `02-manual-administrador/migracao-legado-sql.md`
 - Fluxo tecnico pre-CRM: `06-modulos-do-sistema/ordens-de-servico.md`
+- Modulo Orcamentos (tecnico): `06-modulos-do-sistema/orcamentos.md`
 - Migracao legada SQL (arquitetura): `03-arquitetura-tecnica/migracao-legado-sql.md`
+- Arquitetura do modulo Orcamentos: `03-arquitetura-tecnica/modulo-orcamentos.md`
 - Modulo WhatsApp: `06-modulos-do-sistema/whatsapp.md`
 - Modulo CRM: `06-modulos-do-sistema/crm.md`
 - Modulo Contatos (tecnico): `06-modulos-do-sistema/contatos.md`
@@ -43,11 +47,14 @@
 - Central - Filas: `06-modulos-do-sistema/central-de-mensagens.md#filas`
 - Central - FAQ: `06-modulos-do-sistema/central-de-mensagens.md#faq`
 - Banco pre-CRM: `04-banco-de-dados/tabelas-principais.md`
+- Banco do modulo Orcamentos: `04-banco-de-dados/orcamentos.md`
 - Rotas pre-CRM: `05-api/rotas.md`
+- Rotas web do modulo Orcamentos: `05-api/orcamentos-web.md`
 - Correcao Central (erros + observabilidade + clientes novos + funil): `08-correcoes/2026-03-20-central-mensagens-codigos-erro-observabilidade-clientes-novos.md`
 - Correcao CRM/Contatos (engajamento temporal configuravel): `08-correcoes/2026-03-20-engajamento-temporal-contatos-crm.md`
 - Correcao Dashboard (responsividade, modais de OS e graficos): `08-correcoes/2026-03-22-dashboard-refactor-responsivo-modal-os.md`
 - Correcao Dashboard (alinhamento do "Ver ..." no rodape dos 4 cards): `08-correcoes/2026-03-23-dashboard-alinhamento-footer-cards.md`
+- Correcao Dashboard (navbar fixa + origem oficial do faturamento do mes): `08-correcoes/2026-04-06-dashboard-navbar-fixa-e-origem-faturamento.md`
 - Correcao OS (botao `+ Nova OS` abrindo modal sem redirecionamento): `08-correcoes/2026-03-23-os-nova-os-modal-sem-redirecionamento.md`
 - Correcao OS (filtros avancados premium com AJAX, chips, persistencia e drawer mobile): `08-correcoes/2026-03-23-os-filtros-avancados-premium-ajax.md`
 - Correcao padrao global de responsividade ultra compatibilidade: `08-correcoes/2026-03-22-padrao-global-responsividade-ultra-compatibilidade.md`
@@ -55,7 +62,11 @@
 - Entrega pre-CRM base: `07-novas-implementacoes/2026-03-pre-crm-foundation-os-whatsapp-pdf.md`
 - Entrega CRM + Central: `07-novas-implementacoes/2026-03-crm-central-mensagens-integrados.md`
 - Evolucao faseada da Central de Atendimento: `07-novas-implementacoes/2026-03-central-atendimento-inteligente-faseada.md`
-- Historico oficial de versoes (1.0.0 -> 2.11.5): `07-novas-implementacoes/historico-de-versoes.md`
+- Historico oficial de versoes (1.0.0 -> 2.12.0): `07-novas-implementacoes/historico-de-versoes.md`
+- Release 2.12.0 (modulo profissional de Orcamentos com envio, aprovacao publica, conversao e automacao): `07-novas-implementacoes/2026-04-08-release-v2.12.0-modulo-orcamentos-profissional.md`
+- Entrega da fase 2 de Orcamentos (envio WhatsApp/e-mail/PDF): `07-novas-implementacoes/2026-04-07-fase-2-envio-orcamentos-whatsapp-email-pdf.md`
+- Entrega da fase 1 de Orcamentos: `07-novas-implementacoes/2026-04-07-fase-1-modulo-orcamentos.md`
+- Entrega da fase 3 de Orcamentos (conversao OS/venda + automacao + Central): `07-novas-implementacoes/2026-04-08-fase-3-conversao-automacao-orcamentos.md`
 - Release 2.11.5 (selecao rica de equipamentos na OS web e no app mobile/PWA): `07-novas-implementacoes/2026-04-04-release-v2.11.5-selecao-rica-equipamentos-os-web-mobile.md`
 - Release 2.11.4 (consolidacao oficial do app mobile/PWA, governanca e deploy seguro sem dados de teste): `07-novas-implementacoes/2026-04-04-release-v2.11.4-app-mobile-pwa-consolidacao.md`
 - Release 2.11.3 (hardening do Service Worker para fallback de Response no PWA): `07-novas-implementacoes/2026-04-03-release-v2.11.3-mobile-pwa-sw-response-hardening.md`
@@ -138,3 +149,4 @@
 - Script oficial de automacao de deploy: `10-deploy/scripts/install_erp.sh`
 - Politica operacional do agente autonomo DevOps + Engenharia Fullstack: `10-deploy/agente-autonomo-devops-engenharia-fullstack.md`
 - Roadmap: `09-roadmap/funcionalidades-planejadas.md`
+- Roadmap do modulo Orcamentos: `09-roadmap/orcamentos-roadmap.md`

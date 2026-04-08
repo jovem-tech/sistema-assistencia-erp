@@ -156,7 +156,7 @@
 
             <!-- COMERCIAL -->
             <?php 
-            $showComercial = canModule('clientes') || canModule('fornecedores') || canModule('funcionarios') || canModule('vendas');
+            $showComercial = canModule('clientes') || canModule('fornecedores') || canModule('funcionarios') || canModule('orcamentos') || canModule('vendas');
             ?>
             <?php if ($showComercial): ?>
             <li class="nav-section">COMERCIAL</li>
@@ -275,6 +275,47 @@
                         <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/faq' || uri_string() === 'central-mensagens/faq') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/faq') ?>"><i class="bi bi-question-circle"></i><span>FAQ / Base de Conhecimento</span></a></li>
                         <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/filas' || uri_string() === 'central-mensagens/filas') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/filas') ?>"><i class="bi bi-people"></i><span>Filas e Responsaveis</span></a></li>
                         <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/configuracoes' || uri_string() === 'central-mensagens/configuracoes') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/configuracoes') ?>"><i class="bi bi-sliders"></i><span>Configuracoes</span></a></li>
+                    </ul>
+                </div>
+            </li>
+            <?php endif; ?>
+
+            <?php if (canModule('orcamentos')): ?>
+            <?php
+            $isOrcamentosActive = str_starts_with(uri_string(), 'orcamentos');
+            ?>
+            <li class="nav-item">
+                <a class="nav-link <?= $isOrcamentosActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#orcamentosSubmenu" role="button">
+                    <i class="bi bi-receipt-cutoff"></i>
+                    <span class="d-flex justify-content-between w-100 align-items-center">
+                        Orcamentos
+                        <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
+                    </span>
+                </a>
+                <div class="collapse <?= $isOrcamentosActive ? 'show' : '' ?>" id="orcamentosSubmenu">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link <?= uri_string() === 'orcamentos' ? 'active' : '' ?>" href="<?= base_url('orcamentos') ?>">
+                                <i class="bi bi-speedometer2"></i><span>Painel de Orcamentos</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('orcamentos?status=aguardando_resposta') ?>">
+                                <i class="bi bi-hourglass-split"></i><span>Aguardando Resposta</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('orcamentos?status=pendente_abertura_os') ?>">
+                                <i class="bi bi-clipboard-plus"></i><span>Pendentes de OS</span>
+                            </a>
+                        </li>
+                        <?php if (can('orcamentos', 'criar')): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('orcamentos/novo') ?>">
+                                <i class="bi bi-plus-lg"></i><span>Novo Orcamento</span>
+                            </a>
+                        </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </li>

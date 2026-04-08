@@ -334,6 +334,23 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->get('servicos/modelo-csv',       'Servicos::downloadCsvTemplate',['filter' => 'permission:servicos:importar']);
     $routes->post('servicos/importar',        'Servicos::importCsv',        ['filter' => 'permission:servicos:importar']);
 
+    // -- Orcamentos --------------------------------------------------------
+    $routes->get('orcamentos',                         'Orcamentos::index',        ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('orcamentos/novo',                    'Orcamentos::create',       ['filter' => 'permission:orcamentos:criar']);
+    $routes->post('orcamentos/salvar',                 'Orcamentos::store',        ['filter' => 'permission:orcamentos:criar']);
+    $routes->get('orcamentos/visualizar/(:num)',       'Orcamentos::show/$1',      ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('orcamentos/editar/(:num)',           'Orcamentos::edit/$1',      ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('orcamentos/atualizar/(:num)',       'Orcamentos::update/$1',    ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('orcamentos/status/(:num)',          'Orcamentos::updateStatus/$1', ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('orcamentos/converter/(:num)',       'Orcamentos::convert/$1', ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('orcamentos/automacao/executar',     'Orcamentos::runAutomation', ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('orcamentos/pdf/(:num)/gerar',       'Orcamentos::generatePdf/$1', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('orcamentos/pdf/(:num)',              'Orcamentos::downloadPdf/$1', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->post('orcamentos/whatsapp/(:num)/enviar', 'Orcamentos::sendWhatsApp/$1', ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('orcamentos/email/(:num)/enviar',    'Orcamentos::sendEmail/$1', ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('orcamentos/central-mensagens/gerar-enviar', 'Orcamentos::quickCreateAndSendFromConversa', ['filter' => 'permission:orcamentos:criar']);
+    $routes->get('orcamentos/excluir/(:num)',          'Orcamentos::delete/$1',    ['filter' => 'permission:orcamentos:excluir']);
+
     // -- Vendas ------------------------------------------------------------
     $routes->get('vendas',                    'Vendas::index',              ['filter' => 'permission:vendas:visualizar']);
 

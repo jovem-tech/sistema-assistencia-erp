@@ -22,6 +22,14 @@ $legacyFinancialOrigins = is_array($legacyFinancialOrigins ?? null) ? $legacyFin
 $observacoesInternas = trim((string) ($os['observacoes_internas'] ?? ''));
 $observacoesCliente = trim((string) ($os['observacoes_cliente'] ?? ''));
 $formaPagamento = trim((string) ($os['forma_pagamento'] ?? ''));
+$orcamentoQuickUrl = base_url('orcamentos/novo?' . http_build_query([
+    'origem' => 'os',
+    'os_id' => (int) ($os['id'] ?? 0),
+    'cliente_id' => (int) ($os['cliente_id'] ?? 0),
+    'equipamento_id' => (int) ($os['equipamento_id'] ?? 0),
+    'telefone' => (string) ($os['cliente_telefone'] ?? ''),
+    'email' => (string) ($os['cliente_email'] ?? ''),
+]));
 ?>
 <?= $this->extend($layout ?? 'layouts/main') ?>
 
@@ -50,6 +58,11 @@ $formaPagamento = trim((string) ($os['forma_pagamento'] ?? ''));
             <?php if (can('os', 'editar')): ?>
             <a href="<?= base_url('os/editar/' . $os['id']) ?><?= $embedQuery ?>" class="btn btn-outline-secondary">
                 <i class="bi bi-pencil me-1"></i>Editar
+            </a>
+            <?php endif; ?>
+            <?php if (can('orcamentos', 'criar')): ?>
+            <a href="<?= esc($orcamentoQuickUrl) ?>" class="btn btn-outline-warning">
+                <i class="bi bi-receipt-cutoff me-1"></i>Gerar orcamento
             </a>
             <?php endif; ?>
             <a href="<?= base_url('os/imprimir/' . $os['id']) ?>" class="btn btn-outline-secondary" target="_blank">

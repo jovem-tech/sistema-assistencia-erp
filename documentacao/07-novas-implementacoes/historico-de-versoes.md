@@ -1,7 +1,7 @@
 # Historico de Versoes do Sistema
 
 Atualizado em: 08/04/2026  
-Versao atual oficial: `2.12.0`
+Versao atual oficial: `2.12.1`
 
 ## Observacao sobre o App Mobile/PWA
 
@@ -20,6 +20,12 @@ Estado documental atual do app:
 - documentacao exclusiva aprofundada em 04/04/2026
 
 ## Release ERP + App
+
+### 08/04/2026 - v2.12.1 / app 0.4.2 (hotfix navbar fixa)
+- corrigida a navegacao web para manter a navbar superior fixa no topo da aplicacao durante o scroll;
+- aplicado ajuste estrutural de compensacao de layout em `.main-content` para evitar sobreposicao de conteudo;
+- sincronizado o offset lateral da navbar com o estado da sidebar (aberta, recolhida e mobile);
+- deploy publicado sem sincronizacao de dados de teste (`public/uploads/`, `.env` e `writable/` preservados).
 
 ### 08/04/2026 - v2.12.0 / app 0.4.2
 - release oficial do ERP para o novo modulo profissional de orcamentos, consolidando as fases 1, 2 e 3 do projeto;
@@ -123,6 +129,11 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 ## Linha do tempo oficial (consolidada)
 
 > Observacao: releases antigas foram consolidadas retroativamente com base no historico tecnico e documental do projeto.
+
+### v2.12.1 - Hotfix de layout: navbar superior fixa
+- `.top-navbar` consolidada como elemento fixo (`position: fixed`) em desktop.
+- Compensacao vertical da area principal via `padding-top: var(--navbar-height)` para evitar sobreposicao.
+- Offset lateral sincronizado com sidebar aberta/recolhida e ajuste dedicado para mobile (`left: 0`).
 
 ### v2.12.0 - Orcamentos profissional (sidebar + envio multicanal + aprovacao publica + conversao + automacao)
 - Novo modulo `Orcamentos` com painel dedicado no sidebar e operacao completa de cotacao avulsa e cotacao vinculada a OS.

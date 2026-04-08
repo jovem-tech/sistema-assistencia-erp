@@ -62,7 +62,8 @@
 - Entrega pre-CRM base: `07-novas-implementacoes/2026-03-pre-crm-foundation-os-whatsapp-pdf.md`
 - Entrega CRM + Central: `07-novas-implementacoes/2026-03-crm-central-mensagens-integrados.md`
 - Evolucao faseada da Central de Atendimento: `07-novas-implementacoes/2026-03-central-atendimento-inteligente-faseada.md`
-- Historico oficial de versoes (1.0.0 -> 2.12.0): `07-novas-implementacoes/historico-de-versoes.md`
+- Historico oficial de versoes (1.0.0 -> 2.12.1): `07-novas-implementacoes/historico-de-versoes.md`
+- Release 2.12.1 (hotfix de navbar fixa no ERP web): `07-novas-implementacoes/2026-04-08-release-v2.12.1-hotfix-navbar-fixa.md`
 - Release 2.12.0 (modulo profissional de Orcamentos com envio, aprovacao publica, conversao e automacao): `07-novas-implementacoes/2026-04-08-release-v2.12.0-modulo-orcamentos-profissional.md`
 - Entrega da fase 2 de Orcamentos (envio WhatsApp/e-mail/PDF): `07-novas-implementacoes/2026-04-07-fase-2-envio-orcamentos-whatsapp-email-pdf.md`
 - Entrega da fase 1 de Orcamentos: `07-novas-implementacoes/2026-04-07-fase-1-modulo-orcamentos.md`

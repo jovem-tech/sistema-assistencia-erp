@@ -40,7 +40,7 @@
                         <input type="text" class="form-control" name="titulo" required>
                     </div>
                     <div class="mb-2">
-                        <label class="form-label">Descricao</label>
+                        <label class="form-label">Descrição</label>
                         <textarea class="form-control" name="descricao" rows="3"></textarea>
                     </div>
                     <div class="mb-3">
@@ -78,7 +78,7 @@
                                 <div>
                                     <div class="fw-semibold"><?= esc($f['titulo'] ?? '-') ?></div>
                                     <div class="small text-muted">
-                                        <?= esc($f['cliente_nome'] ?? 'Cliente nao vinculado') ?>
+                                        <?= esc($f['cliente_nome'] ?? 'Cliente não vinculado') ?>
                                         <?php if (!empty($f['numero_os'])): ?> | OS <?= esc($f['numero_os']) ?><?php endif; ?>
                                     </div>
                                 </div>
@@ -120,4 +120,5 @@
     </div>
 </div>
 <?= $this->endSection() ?>
+
 

@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\ServicoModel;
 use App\Models\LogModel;
+use App\Models\EquipamentoTipoModel;
 
 class Servicos extends BaseController
 {
@@ -18,7 +19,7 @@ class Servicos extends BaseController
     public function index()
     {
         $data = [
-            'title'    => 'Serviços',
+            'title'    => 'Servicos',
             'servicos' => $this->model->orderBy('nome', 'ASC')->findAll(),
         ];
         return view('servicos/index', $data);
@@ -27,7 +28,8 @@ class Servicos extends BaseController
     public function create()
     {
         $data = [
-            'title' => 'Novo Serviço',
+            'title' => 'Novo Servico',
+            'tiposEquipamento' => $this->loadTiposEquipamentoOptions(),
         ];
         return view('servicos/form', $data);
     }
@@ -39,31 +41,41 @@ class Servicos extends BaseController
             'valor' => 'required',
         ];
 
-        if (!$this->validate($rules)) {
+        if (! $this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
         $dados = $this->request->getPost();
-        // Limpar valor para formato decimal (ex: 1.250,50 -> 1250.50)
         $dados['valor'] = str_replace(',', '.', str_replace('.', '', $dados['valor'] ?? '0'));
+        $dados['tempo_padrao_horas'] = $this->normalizeDecimalInput($dados['tempo_padrao_horas'] ?? '1');
+        if ($dados['tempo_padrao_horas'] <= 0) {
+            $dados['tempo_padrao_horas'] = 1.0;
+        }
+        $dados['custo_direto_padrao'] = max(0.0, $this->normalizeDecimalInput($dados['custo_direto_padrao'] ?? '0'));
+        $dados['tipo_equipamento'] = trim((string) ($dados['tipo_equipamento'] ?? ''));
+        if ($dados['tipo_equipamento'] === '') {
+            $dados['tipo_equipamento'] = null;
+        }
+        $dados['status'] = trim((string) ($dados['status'] ?? 'ativo')) ?: 'ativo';
 
         $this->model->insert($dados);
 
-        LogModel::registrar('servico_criado', 'Serviço cadastrado: ' . $dados['nome']);
+        LogModel::registrar('servico_criado', 'Servico cadastrado: ' . ($dados['nome'] ?? '')); 
 
-        return redirect()->to('/servicos')->with('success', 'Serviço cadastrado com sucesso!');
+        return redirect()->to('/servicos')->with('success', 'Servico cadastrado com sucesso!');
     }
 
     public function edit($id)
     {
         $servico = $this->model->find($id);
-        if (!$servico) {
-            return redirect()->to('/servicos')->with('error', 'Serviço não encontrado.');
+        if (! $servico) {
+            return redirect()->to('/servicos')->with('error', 'Servico nao encontrado.');
         }
 
         $data = [
-            'title'   => 'Editar Serviço',
+            'title'   => 'Editar Servico',
             'servico' => $servico,
+            'tiposEquipamento' => $this->loadTiposEquipamentoOptions(),
         ];
         return view('servicos/form', $data);
     }
@@ -75,18 +87,27 @@ class Servicos extends BaseController
             'valor' => 'required',
         ];
 
-        if (!$this->validate($rules)) {
+        if (! $this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
         $dados = $this->request->getPost();
         $dados['valor'] = str_replace(',', '.', str_replace('.', '', $dados['valor'] ?? '0'));
-        
+        $dados['tempo_padrao_horas'] = $this->normalizeDecimalInput($dados['tempo_padrao_horas'] ?? '1');
+        if ($dados['tempo_padrao_horas'] <= 0) {
+            $dados['tempo_padrao_horas'] = 1.0;
+        }
+        $dados['custo_direto_padrao'] = max(0.0, $this->normalizeDecimalInput($dados['custo_direto_padrao'] ?? '0'));
+        $dados['tipo_equipamento'] = trim((string) ($dados['tipo_equipamento'] ?? ''));
+        if ($dados['tipo_equipamento'] === '') {
+            $dados['tipo_equipamento'] = null;
+        }
+
         $this->model->update($id, $dados);
 
-        LogModel::registrar('servico_atualizado', 'Serviço atualizado ID: ' . $id);
+        LogModel::registrar('servico_atualizado', 'Servico atualizado ID: ' . $id);
 
-        return redirect()->to('/servicos')->with('success', 'Serviço atualizado com sucesso!');
+        return redirect()->to('/servicos')->with('success', 'Servico atualizado com sucesso!');
     }
 
     public function delete($id)
@@ -94,27 +115,27 @@ class Servicos extends BaseController
         $servico = $this->model->find($id);
         if ($servico) {
             $this->model->delete($id);
-            LogModel::registrar('servico_excluido', 'Serviço excluído: ' . $servico['nome']);
+            LogModel::registrar('servico_excluido', 'Servico excluido: ' . ($servico['nome'] ?? ''));
         }
 
-        return redirect()->to('/servicos')->with('success', 'Serviço excluído com sucesso!');
+        return redirect()->to('/servicos')->with('success', 'Servico excluido com sucesso!');
     }
 
     public function encerrar($id)
     {
         $servico = $this->model->find($id);
-        if (!$servico) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Serviço não encontrado.']);
+        if (! $servico) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Servico nao encontrado.']);
         }
 
         $this->model->update($id, [
             'status'       => 'encerrado',
-            'encerrado_em' => date('Y-m-d H:i:s')
+            'encerrado_em' => date('Y-m-d H:i:s'),
         ]);
 
-        LogModel::registrar('servico_encerrado', 'Serviço encerrado: ' . $servico['nome']);
+        LogModel::registrar('servico_encerrado', 'Servico encerrado: ' . ($servico['nome'] ?? ''));
 
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Serviço encerrado com sucesso!']);
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Servico encerrado com sucesso!']);
     }
 
     public function exportCsv()
@@ -128,18 +149,20 @@ class Servicos extends BaseController
         header('Content-Disposition: attachment; filename="' . $filename . '";');
 
         $f = fopen('php://output', 'w');
-        fputs($f, "\xEF\xBB\xBF"); // BOM for Excel
+        fputs($f, "\xEF\xBB\xBF");
 
-        // Headers
-        fputcsv($f, ['ID', 'Nome', 'Descrição', 'Valor Padrão', 'Status'], ';');
+        fputcsv($f, ['ID', 'Nome', 'Descricao', 'Tipo Equipamento', 'Valor Padrao', 'Tempo Padrao (h)', 'Custo Direto Padrao', 'Status'], ';');
 
         foreach ($servicos as $s) {
             fputcsv($f, [
-                $s['id'],
-                $s['nome'],
-                $s['descricao'],
-                number_format($s['valor'], 2, ',', '.'),
-                $s['status']
+                $s['id'] ?? '',
+                $s['nome'] ?? '',
+                $s['descricao'] ?? '',
+                $s['tipo_equipamento'] ?? '',
+                number_format((float) ($s['valor'] ?? 0), 2, ',', '.'),
+                number_format((float) ($s['tempo_padrao_horas'] ?? 1), 2, ',', '.'),
+                number_format((float) ($s['custo_direto_padrao'] ?? 0), 2, ',', '.'),
+                $s['status'] ?? '',
             ], ';');
         }
 
@@ -158,9 +181,9 @@ class Servicos extends BaseController
         $f = fopen('php://output', 'w');
         fputs($f, "\xEF\xBB\xBF");
 
-        fputcsv($f, ['nome', 'descricao', 'valor'], ';');
-        fputcsv($f, ['Troca de Tela', 'Substituição completa do display frontal', '450,00'], ';');
-        fputcsv($f, ['Limpeza Interna', 'Desmontagem e higienização de componentes', '120,50'], ';');
+        fputcsv($f, ['nome', 'descricao', 'tipo_equipamento', 'valor', 'tempo_padrao_horas', 'custo_direto_padrao'], ';');
+        fputcsv($f, ['Troca de Tela', 'Substituicao completa do display frontal', 'Smartphone', '450,00', '1,00', '20,00'], ';');
+        fputcsv($f, ['Limpeza Interna', 'Desmontagem e higienizacao de componentes', 'Notebook', '120,50', '0,80', '8,00'], ';');
 
         fclose($f);
         exit;
@@ -171,8 +194,8 @@ class Servicos extends BaseController
         requirePermission('servicos', 'importar');
 
         $file = $this->request->getFile('arquivo_csv');
-        if (!$file || !$file->isValid() || $file->getExtension() !== 'csv') {
-            return redirect()->to('/servicos')->with('error', 'Arquivo inválido. Por favor, envie um arquivo .csv');
+        if (! $file || ! $file->isValid() || $file->getExtension() !== 'csv') {
+            return redirect()->to('/servicos')->with('error', 'Arquivo invalido. Envie um arquivo CSV.');
         }
 
         $filepath = $file->getTempName();
@@ -184,13 +207,15 @@ class Servicos extends BaseController
         }
 
         $headerLine = fgets($fileStream);
-        $delimiter = strpos($headerLine, ';') !== false ? ';' : ',';
+        $delimiter = strpos((string) $headerLine, ';') !== false ? ';' : ',';
         rewind($fileStream);
-        if ($bom === "\xEF\xBB\xBF") fread($fileStream, 3);
+        if ($bom === "\xEF\xBB\xBF") {
+            fread($fileStream, 3);
+        }
 
         $headers = fgetcsv($fileStream, 1000, $delimiter);
-        if (!$headers) {
-            return redirect()->to('/servicos')->with('error', 'CSV vazio ou inválido.');
+        if (! $headers) {
+            return redirect()->to('/servicos')->with('error', 'CSV vazio ou invalido.');
         }
         $headers = array_map('trim', $headers);
 
@@ -203,24 +228,32 @@ class Servicos extends BaseController
                 $data[$h] = trim($row[$i] ?? '');
             }
 
-            $nome = $data['nome'] ?? '';
+            $nome = trim((string) ($data['nome'] ?? ''));
             $valor = $data['valor'] ?? '0,00';
             $descricao = $data['descricao'] ?? '';
+            $tipoEquipamento = trim((string) ($data['tipo_equipamento'] ?? ($data['tipo equipamento'] ?? '')));
+            $tempoPadrao = $this->normalizeDecimalInput($data['tempo_padrao_horas'] ?? ($data['tempo padrao (h)'] ?? '1'));
+            if ($tempoPadrao <= 0) {
+                $tempoPadrao = 1.0;
+            }
+            $custoDiretoPadrao = max(0.0, $this->normalizeDecimalInput($data['custo_direto_padrao'] ?? '0'));
 
-            if (empty($nome)) {
+            if ($nome === '') {
                 $errorCount++;
                 continue;
             }
 
-            // Normaliza valor para decimal
-            $valorNormalizado = str_replace(',', '.', str_replace('.', '', $valor));
+            $valorNormalizado = str_replace(',', '.', str_replace('.', '', (string) $valor));
 
             try {
                 $this->model->insert([
                     'nome'      => $nome,
                     'descricao' => $descricao,
-                    'valor'     => (float)$valorNormalizado,
-                    'status'    => 'ativo'
+                    'tipo_equipamento' => $tipoEquipamento !== '' ? $tipoEquipamento : null,
+                    'valor'     => (float) $valorNormalizado,
+                    'tempo_padrao_horas' => $tempoPadrao,
+                    'custo_direto_padrao' => $custoDiretoPadrao,
+                    'status'    => 'ativo',
                 ]);
                 $importedCount++;
             } catch (\Exception $e) {
@@ -230,11 +263,46 @@ class Servicos extends BaseController
 
         fclose($fileStream);
 
-        LogModel::registrar('servicos_importacao', "Importação CSV de serviços: $importedCount cadastrados, $errorCount falhas.");
+        LogModel::registrar('servicos_importacao', "Importacao CSV de servicos: $importedCount cadastrados, $errorCount falhas.");
 
-        $msg = "Importação concluída: $importedCount serviço(s) cadastrado(s).";
-        if ($errorCount > 0) $msg .= " $errorCount registros falharam por falta de nome ou erro de formato.";
+        $msg = "Importacao concluida: $importedCount servico(s) cadastrado(s).";
+        if ($errorCount > 0) {
+            $msg .= " $errorCount registros falharam por falta de nome ou erro de formato.";
+        }
 
         return redirect()->to('/servicos')->with('success', $msg);
+    }
+
+    private function loadTiposEquipamentoOptions(): array
+    {
+        try {
+            return array_values(array_filter(array_map(
+                static fn (array $row): string => trim((string) ($row['nome'] ?? '')),
+                (new EquipamentoTipoModel())
+                    ->where('ativo', 1)
+                    ->orderBy('nome', 'ASC')
+                    ->findAll()
+            )));
+        } catch (\Throwable $e) {
+            log_message('warning', '[Servicos] Falha ao carregar tipos de equipamento: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    private function normalizeDecimalInput($value): float
+    {
+        $raw = trim((string) $value);
+        if ($raw === '') {
+            return 0.0;
+        }
+        if (str_contains($raw, ',') && str_contains($raw, '.')) {
+            $raw = str_replace('.', '', $raw);
+        }
+        $raw = str_replace(',', '.', $raw);
+        if (!is_numeric($raw)) {
+            return 0.0;
+        }
+
+        return (float) $raw;
     }
 }

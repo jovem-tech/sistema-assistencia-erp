@@ -13,7 +13,8 @@ class OsModel extends Model
     protected $useSoftDeletes = false;
     protected $allowedFields = [
         'numero_os', 'cliente_id', 'equipamento_id', 'tecnico_id', 'status', 'estado_fluxo', 'status_atualizado_em',
-        'prioridade', 'relato_cliente', 'diagnostico_tecnico', 'solucao_aplicada',
+        'legacy_origem', 'legacy_id', 'numero_os_legado',
+        'prioridade', 'relato_cliente', 'diagnostico_tecnico', 'solucao_aplicada', 'procedimentos_executados',
         'data_abertura', 'data_entrada', 'data_previsao', 'data_conclusao', 'data_entrega',
         'valor_mao_obra', 'valor_pecas', 'valor_total', 'desconto', 'valor_final',
         'orcamento_aprovado', 'data_aprovacao', 'orcamento_pdf',
@@ -64,6 +65,33 @@ class OsModel extends Model
         }
 
         return $builder->orderBy('os.created_at', 'DESC')->findAll();
+    }
+
+    public function getCompleteByNumeroOs(string $numeroOs)
+    {
+        $numeroOs = trim($numeroOs);
+        if ($numeroOs === '') {
+            return null;
+        }
+
+        return $this->select(
+                'os.*,
+                clientes.nome_razao as cliente_nome, clientes.telefone1 as cliente_telefone, clientes.email as cliente_email,
+                et.nome as equip_tipo, em.nome as equip_marca, emod.nome as equip_modelo,
+                equipamentos.numero_serie as equip_serie, equipamentos.imei as equip_imei,
+                funcionarios.nome as tecnico_nome'
+            )
+            ->join('clientes', 'clientes.id = os.cliente_id')
+            ->join('equipamentos', 'equipamentos.id = os.equipamento_id')
+            ->join('equipamentos_tipos et', 'et.id = equipamentos.tipo_id', 'left')
+            ->join('equipamentos_marcas em', 'em.id = equipamentos.marca_id', 'left')
+            ->join('equipamentos_modelos emod', 'emod.id = equipamentos.modelo_id', 'left')
+            ->join('funcionarios', 'funcionarios.id = os.tecnico_id', 'left')
+            ->groupStart()
+                ->where('os.numero_os', $numeroOs)
+                ->orWhere('os.numero_os_legado', $numeroOs)
+            ->groupEnd()
+            ->first();
     }
 
     public function getByStatus($status)
@@ -151,6 +179,81 @@ class OsModel extends Model
                                         ->where('YEAR(data_entrega)', date('Y'))
                                         ->get()->getRow()->valor_final ?? 0),
         ];
+    }
+
+    public function getDashboardYears(): array
+    {
+        $db = \Config\Database::connect();
+        $dateColumns = [];
+
+        if ($db->fieldExists('data_abertura', 'os')) {
+            $dateColumns[] = 'data_abertura';
+        }
+        if ($db->fieldExists('created_at', 'os')) {
+            $dateColumns[] = 'created_at';
+        }
+        if ($db->fieldExists('data_entrada', 'os')) {
+            $dateColumns[] = 'data_entrada';
+        }
+        if ($db->fieldExists('data_entrega', 'os')) {
+            $dateColumns[] = 'data_entrega';
+        }
+
+        if (empty($dateColumns)) {
+            return [(int) date('Y')];
+        }
+
+        $selectParts = [];
+        foreach ($dateColumns as $column) {
+            $selectParts[] = "SELECT YEAR($column) AS ano FROM os WHERE $column IS NOT NULL";
+        }
+
+        $sql = sprintf(
+            'SELECT DISTINCT ano FROM (%s) anos WHERE ano IS NOT NULL ORDER BY ano DESC',
+            implode(' UNION ALL ', $selectParts)
+        );
+
+        $rows = $db->query($sql)->getResultArray();
+        if (empty($rows)) {
+            return [(int) date('Y')];
+        }
+
+        return array_map(
+            static fn(array $row): int => (int) ($row['ano'] ?? date('Y')),
+            $rows
+        );
+    }
+
+    public function getDashboardDateExpression(): ?string
+    {
+        $db = \Config\Database::connect();
+
+        $hasDataAbertura = $db->fieldExists('data_abertura', 'os');
+        $hasCreatedAt = $db->fieldExists('created_at', 'os');
+        $hasDataEntrada = $db->fieldExists('data_entrada', 'os');
+        $hasDataEntrega = $db->fieldExists('data_entrega', 'os');
+
+        if ($hasDataAbertura && $hasCreatedAt) {
+            return 'COALESCE(data_abertura, created_at)';
+        }
+
+        if ($hasDataAbertura) {
+            return 'data_abertura';
+        }
+
+        if ($hasCreatedAt) {
+            return 'created_at';
+        }
+
+        if ($hasDataEntrada) {
+            return 'data_entrada';
+        }
+
+        if ($hasDataEntrega) {
+            return 'data_entrega';
+        }
+
+        return null;
     }
 
     public function getRecentes($limit = 10)

@@ -5,6 +5,8 @@ namespace App\Controllers;
 use App\Models\PecaModel;
 use App\Models\MovimentacaoModel;
 use App\Models\LogModel;
+use App\Models\EquipamentoTipoModel;
+use App\Models\PrecificacaoCategoriaModel;
 
 class Estoque extends BaseController
 {
@@ -19,7 +21,7 @@ class Estoque extends BaseController
     public function index()
     {
         $data = [
-            'title' => 'Estoque de Peças',
+            'title' => 'Estoque de Pecas',
             'pecas' => $this->model->where('ativo', 1)->orderBy('nome', 'ASC')->findAll(),
         ];
         return view('estoque/index', $data);
@@ -28,8 +30,10 @@ class Estoque extends BaseController
     public function create()
     {
         $data = [
-            'title'  => 'Nova Peça',
+            'title'  => 'Nova Peca',
             'codigo' => $this->model->generateCodigo(),
+            'tiposEquipamento' => $this->loadTiposEquipamentoOptions(),
+            'categoriasPeca' => $this->loadCategoriasPecaOptions(),
         ];
         return view('estoque/form', $data);
     }
@@ -42,7 +46,7 @@ class Estoque extends BaseController
             'preco_venda' => 'required',
         ];
 
-        if (!$this->validate($rules)) {
+        if (! $this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
@@ -51,24 +55,29 @@ class Estoque extends BaseController
             $dados['codigo'] = $this->model->generateCodigo();
         }
 
-        $this->model->insert($dados);
-        LogModel::registrar('peca_criada', 'Peça cadastrada: ' . $dados['nome']);
+        $dados['tipo_equipamento'] = trim((string) ($dados['tipo_equipamento'] ?? ''));
+        if ($dados['tipo_equipamento'] === '') {
+            $dados['tipo_equipamento'] = null;
+        }
 
-        return redirect()->to('/estoque')
-            ->with('success', 'Peça cadastrada com sucesso!');
+        $this->model->insert($dados);
+        LogModel::registrar('peca_criada', 'Peca cadastrada: ' . ($dados['nome'] ?? ''));
+
+        return redirect()->to('/estoque')->with('success', 'Peca cadastrada com sucesso!');
     }
 
     public function edit($id)
     {
         $peca = $this->model->find($id);
-        if (!$peca) {
-            return redirect()->to('/estoque')
-                ->with('error', 'Peça não encontrada.');
+        if (! $peca) {
+            return redirect()->to('/estoque')->with('error', 'Peca nao encontrada.');
         }
 
         $data = [
-            'title' => 'Editar Peça',
+            'title' => 'Editar Peca',
             'peca'  => $peca,
+            'tiposEquipamento' => $this->loadTiposEquipamentoOptions(),
+            'categoriasPeca' => $this->loadCategoriasPecaOptions((string) ($peca['categoria'] ?? '')),
         ];
         return view('estoque/form', $data);
     }
@@ -76,20 +85,23 @@ class Estoque extends BaseController
     public function update($id)
     {
         $dados = $this->request->getPost();
-        $this->model->update($id, $dados);
-        LogModel::registrar('peca_atualizada', 'Peça atualizada ID: ' . $id);
+        $dados['tipo_equipamento'] = trim((string) ($dados['tipo_equipamento'] ?? ''));
+        if ($dados['tipo_equipamento'] === '') {
+            $dados['tipo_equipamento'] = null;
+        }
 
-        return redirect()->to('/estoque')
-            ->with('success', 'Peça atualizada com sucesso!');
+        $this->model->update($id, $dados);
+        LogModel::registrar('peca_atualizada', 'Peca atualizada ID: ' . $id);
+
+        return redirect()->to('/estoque')->with('success', 'Peca atualizada com sucesso!');
     }
 
     public function delete($id)
     {
         $this->model->update($id, ['ativo' => 0]);
-        LogModel::registrar('peca_desativada', 'Peça desativada ID: ' . $id);
+        LogModel::registrar('peca_desativada', 'Peca desativada ID: ' . $id);
 
-        return redirect()->to('/estoque')
-            ->with('success', 'Peça removida com sucesso!');
+        return redirect()->to('/estoque')->with('success', 'Peca removida com sucesso!');
     }
 
     public function movement()
@@ -98,8 +110,8 @@ class Estoque extends BaseController
         $dados = $this->request->getPost();
 
         $peca = $this->model->find($dados['peca_id']);
-        if (!$peca) {
-            return redirect()->back()->with('error', 'Peça não encontrada.');
+        if (! $peca) {
+            return redirect()->back()->with('error', 'Peca nao encontrada.');
         }
 
         $movModel->insert([
@@ -110,22 +122,20 @@ class Estoque extends BaseController
             'responsavel_id' => session()->get('user_id'),
         ]);
 
-        // Update quantity
-        $novaQtd = $peca['quantidade_atual'];
-        if ($dados['tipo'] === 'entrada') {
-            $novaQtd += $dados['quantidade'];
-        } elseif ($dados['tipo'] === 'saida') {
-            $novaQtd -= $dados['quantidade'];
+        $novaQtd = (int) ($peca['quantidade_atual'] ?? 0);
+        if (($dados['tipo'] ?? '') === 'entrada') {
+            $novaQtd += (int) ($dados['quantidade'] ?? 0);
+        } elseif (($dados['tipo'] ?? '') === 'saida') {
+            $novaQtd -= (int) ($dados['quantidade'] ?? 0);
         } else {
-            $novaQtd = $dados['quantidade']; // ajuste
+            $novaQtd = (int) ($dados['quantidade'] ?? 0);
         }
 
         $this->model->update($dados['peca_id'], ['quantidade_atual' => max(0, $novaQtd)]);
 
-        LogModel::registrar('estoque_movimentacao', ucfirst($dados['tipo']) . ' de ' . $dados['quantidade'] . ' unid. - ' . $peca['nome']);
+        LogModel::registrar('estoque_movimentacao', ucfirst((string) ($dados['tipo'] ?? '')) . ' de ' . (int) ($dados['quantidade'] ?? 0) . ' unid. - ' . ($peca['nome'] ?? ''));
 
-        return redirect()->to('/estoque')
-            ->with('success', 'Movimentação registrada com sucesso!');
+        return redirect()->to('/estoque')->with('success', 'Movimentacao registrada com sucesso!');
     }
 
     public function movements($id)
@@ -134,7 +144,7 @@ class Estoque extends BaseController
         $peca = $this->model->find($id);
 
         $data = [
-            'title'         => 'Movimentações - ' . ($peca['nome'] ?? ''),
+            'title'         => 'Movimentacoes - ' . ($peca['nome'] ?? ''),
             'peca'          => $peca,
             'movimentacoes' => $movModel->getByPeca($id),
         ];
@@ -159,25 +169,25 @@ class Estoque extends BaseController
         header('Content-Disposition: attachment; filename="' . $filename . '";');
 
         $f = fopen('php://output', 'w');
-        fputs($f, "\xEF\xBB\xBF"); // BOM for Excel
+        fputs($f, "\xEF\xBB\xBF");
 
-        // Headers
-        fputcsv($f, ['Código', 'Cód. Fabricante', 'Nome', 'Categoria', 'Modelos Compatíveis', 'Fornecedor', 'Localização', 'Custo', 'Venda', 'Qtd Atual', 'Mínimo', 'Observações'], ';');
+        fputcsv($f, ['Codigo', 'Cod. Fabricante', 'Nome', 'Categoria', 'Tipo Equipamento', 'Modelos Compativeis', 'Fornecedor', 'Localizacao', 'Custo', 'Venda', 'Qtd Atual', 'Minimo', 'Observacoes'], ';');
 
         foreach ($pecas as $p) {
             fputcsv($f, [
-                $p['codigo'],
-                $p['codigo_fabricante'],
-                $p['nome'],
-                $p['categoria'],
-                $p['modelos_compativeis'],
-                $p['fornecedor'],
-                $p['localizacao'],
-                number_format($p['preco_custo'], 2, ',', '.'),
-                number_format($p['preco_venda'], 2, ',', '.'),
-                $p['quantidade_atual'],
-                $p['estoque_minimo'],
-                $p['observacoes']
+                $p['codigo'] ?? '',
+                $p['codigo_fabricante'] ?? '',
+                $p['nome'] ?? '',
+                $p['categoria'] ?? '',
+                $p['tipo_equipamento'] ?? '',
+                $p['modelos_compativeis'] ?? '',
+                $p['fornecedor'] ?? '',
+                $p['localizacao'] ?? '',
+                number_format((float) ($p['preco_custo'] ?? 0), 2, ',', '.'),
+                number_format((float) ($p['preco_venda'] ?? 0), 2, ',', '.'),
+                (int) ($p['quantidade_atual'] ?? 0),
+                (int) ($p['estoque_minimo'] ?? 0),
+                $p['observacoes'] ?? '',
             ], ';');
         }
 
@@ -196,9 +206,9 @@ class Estoque extends BaseController
         $f = fopen('php://output', 'w');
         fputs($f, "\xEF\xBB\xBF");
 
-        fputcsv($f, ['codigo', 'codigo_fabricante', 'nome', 'categoria', 'modelos_compativeis', 'fornecedor', 'localizacao', 'preco_custo', 'preco_venda', 'quantidade_atual', 'estoque_minimo', 'observacoes'], ';');
-        fputcsv($f, ['PC00001', 'SN123456', 'Tela iPhone 13 OLED', 'Telas', 'iPhone 13, iPhone 13 Pro', 'Apple Parts', 'Gaveta A1', '850,00', '1400,00', '5', '2', 'Peça importada classe AAA'], ';');
-        fputcsv($f, ['PC00002', 'BAT-SAM-G990', 'Bateria Samsung S21', 'Baterias', 'Galaxy S21 (G990)', 'Distribuidora X', 'Gaveta B4', '120,00', '350,00', '10', '3', ''], ';');
+        fputcsv($f, ['codigo', 'codigo_fabricante', 'nome', 'categoria', 'tipo_equipamento', 'modelos_compativeis', 'fornecedor', 'localizacao', 'preco_custo', 'preco_venda', 'quantidade_atual', 'estoque_minimo', 'observacoes'], ';');
+        fputcsv($f, ['PC00001', 'SN123456', 'Tela iPhone 13 OLED', 'Telas', 'Smartphone', 'iPhone 13, iPhone 13 Pro', 'Apple Parts', 'Gaveta A1', '850,00', '1400,00', '5', '2', 'Peca importada classe AAA'], ';');
+        fputcsv($f, ['PC00002', 'BAT-SAM-G990', 'Bateria Samsung S21', 'Baterias', 'Smartphone', 'Galaxy S21 (G990)', 'Distribuidora X', 'Gaveta B4', '120,00', '350,00', '10', '3', ''], ';');
 
         fclose($f);
         exit;
@@ -209,8 +219,8 @@ class Estoque extends BaseController
         requirePermission('estoque', 'importar');
 
         $file = $this->request->getFile('arquivo_csv');
-        if (!$file || !$file->isValid() || $file->getExtension() !== 'csv') {
-            return redirect()->to('/estoque')->with('error', 'Arquivo inválido. Por favor, envie um arquivo .csv');
+        if (! $file || ! $file->isValid() || $file->getExtension() !== 'csv') {
+            return redirect()->to('/estoque')->with('error', 'Arquivo invalido. Envie um arquivo CSV.');
         }
 
         $filepath = $file->getTempName();
@@ -222,13 +232,15 @@ class Estoque extends BaseController
         }
 
         $headerLine = fgets($fileStream);
-        $delimiter = strpos($headerLine, ';') !== false ? ';' : ',';
+        $delimiter = strpos((string) $headerLine, ';') !== false ? ';' : ',';
         rewind($fileStream);
-        if ($bom === "\xEF\xBB\xBF") fread($fileStream, 3);
+        if ($bom === "\xEF\xBB\xBF") {
+            fread($fileStream, 3);
+        }
 
         $headers = fgetcsv($fileStream, 1000, $delimiter);
-        if (!$headers) {
-            return redirect()->to('/estoque')->with('error', 'CSV vazio ou inválido.');
+        if (! $headers) {
+            return redirect()->to('/estoque')->with('error', 'CSV vazio ou invalido.');
         }
         $headers = array_map('trim', $headers);
 
@@ -248,24 +260,25 @@ class Estoque extends BaseController
                 continue;
             }
 
-            // Normaliza valores numéricos
-            $custo = str_replace(',', '.', str_replace('.', '', $data['preco_custo'] ?? '0'));
-            $venda = str_replace(',', '.', str_replace('.', '', $data['preco_venda'] ?? '0'));
-            
+            $custo = str_replace(',', '.', str_replace('.', '', (string) ($data['preco_custo'] ?? '0')));
+            $venda = str_replace(',', '.', str_replace('.', '', (string) ($data['preco_venda'] ?? '0')));
+            $tipoEquipamento = trim((string) ($data['tipo_equipamento'] ?? ($data['tipo equipamento'] ?? '')));
+
             $pecaData = [
                 'codigo'              => $data['codigo'] ?? $this->model->generateCodigo(),
                 'codigo_fabricante'   => $data['codigo_fabricante'] ?? '',
                 'nome'                => $data['nome'],
                 'categoria'           => $data['categoria'] ?? '',
+                'tipo_equipamento'    => $tipoEquipamento !== '' ? $tipoEquipamento : null,
                 'modelos_compativeis' => $data['modelos_compativeis'] ?? '',
                 'fornecedor'          => $data['fornecedor'] ?? '',
                 'localizacao'         => $data['localizacao'] ?? '',
-                'preco_custo'         => (float)$custo,
-                'preco_venda'         => (float)$venda,
-                'quantidade_atual'    => (int)($data['quantidade_atual'] ?? 0),
-                'estoque_minimo'      => (int)($data['estoque_minimo'] ?? 0),
+                'preco_custo'         => (float) $custo,
+                'preco_venda'         => (float) $venda,
+                'quantidade_atual'    => (int) ($data['quantidade_atual'] ?? 0),
+                'estoque_minimo'      => (int) ($data['estoque_minimo'] ?? 0),
                 'observacoes'         => $data['observacoes'] ?? '',
-                'ativo'               => 1
+                'ativo'               => 1,
             ];
 
             try {
@@ -278,11 +291,73 @@ class Estoque extends BaseController
 
         fclose($fileStream);
 
-        LogModel::registrar('estoque_importacao', "Importação CSV de estoque: $importedCount cadastrados, $errorCount falhas.");
+        LogModel::registrar('estoque_importacao', "Importacao CSV de estoque: $importedCount cadastrados, $errorCount falhas.");
 
-        $msg = "Importação concluída: $importedCount peça(s) cadastrada(s).";
-        if ($errorCount > 0) $msg .= " $errorCount registros falharam por falta de nome ou erro de formato.";
+        $msg = "Importacao concluida: $importedCount peca(s) cadastrada(s).";
+        if ($errorCount > 0) {
+            $msg .= " $errorCount registros falharam por falta de nome ou erro de formato.";
+        }
 
         return redirect()->to('/estoque')->with('success', $msg);
+    }
+
+    private function loadTiposEquipamentoOptions(): array
+    {
+        try {
+            return array_values(array_filter(array_map(
+                static fn (array $row): string => trim((string) ($row['nome'] ?? '')),
+                (new EquipamentoTipoModel())
+                    ->where('ativo', 1)
+                    ->orderBy('nome', 'ASC')
+                    ->findAll()
+            )));
+        } catch (\Throwable $e) {
+            log_message('warning', '[Estoque] Falha ao carregar tipos de equipamento: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    private function loadCategoriasPecaOptions(?string $categoriaAtual = null): array
+    {
+        $options = [];
+        $push = static function (array &$bucket, string $value): void {
+            $normalized = trim($value);
+            if ($normalized === '') {
+                return;
+            }
+
+            $key = function_exists('mb_strtolower')
+                ? mb_strtolower($normalized)
+                : strtolower($normalized);
+
+            if (! array_key_exists($key, $bucket)) {
+                $bucket[$key] = $normalized;
+            }
+        };
+
+        foreach ($this->model->getCategoriasAtivas() as $categoria) {
+            $push($options, (string) $categoria);
+        }
+
+        try {
+            $precificacaoCategoriaModel = new PrecificacaoCategoriaModel();
+            if ($precificacaoCategoriaModel->isTableReady()) {
+                foreach ($precificacaoCategoriaModel->getAtivosPorTipo('peca') as $row) {
+                    $push($options, (string) ($row['categoria_nome'] ?? ''));
+                }
+            }
+        } catch (\Throwable $e) {
+            log_message('debug', '[Estoque] Nao foi possivel carregar categorias da precificacao: ' . $e->getMessage());
+        }
+
+        $push($options, (string) ($categoriaAtual ?? ''));
+
+        $values = array_values($options);
+        usort($values, static fn (string $a, string $b): int => strcasecmp($a, $b));
+
+        return $values;
     }
 }

@@ -92,6 +92,9 @@ class WhatsAppService
         $enviadaPorUsuarioId = isset($options['enviada_por_usuario_id'])
             ? (int) $options['enviada_por_usuario_id']
             : ($enviadaPorBot ? 0 : (int) ($userId ?? 0));
+        $replyToMessageId = (int) ($options['reply_to_message_id'] ?? 0);
+        $replyToText = trim((string) ($options['reply_to_text'] ?? ''));
+        $replyToAuthor = trim((string) ($options['reply_to_author'] ?? ''));
         $hasFile = $filePath !== '';
 
         $tipoConteudo = 'texto';
@@ -123,6 +126,29 @@ class WhatsAppService
         $conversaId = (int)($conversa['id'] ?? 0) ?: null;
         if ($conversaId && $osId > 0) {
             $this->centralMensagensService->bindOsToConversa($conversaId, $osId, true);
+        }
+
+        $recentDuplicate = $this->findRecentOutboundSendDuplicate(
+            $conversaId ?: null,
+            $telefone,
+            $conteudo,
+            $fileRelative,
+            $tipoEvento ?: 'manual'
+        );
+        if ($recentDuplicate) {
+            return [
+                'ok' => true,
+                'duplicate' => true,
+                'provider' => $providerName,
+                'status_code' => 202,
+                'message' => 'Envio ignorado para evitar duplicidade por clique duplo.',
+                'response' => ['dedup' => true, 'message_id' => $recentDuplicate['provider_message_id'] ?? null],
+                'message_id' => $recentDuplicate['provider_message_id'] ?? null,
+                'log_id' => null,
+                'envio_id' => null,
+                'mensagem_whatsapp_id' => (int) ($recentDuplicate['id'] ?? 0) ?: null,
+                'conversa_id' => $conversaId ?: null,
+            ];
         }
 
         $envioId = null;
@@ -162,6 +188,15 @@ class WhatsAppService
                     'template_codigo' => $templateCode !== '' ? $templateCode : null,
                     'file_name' => $arquivoNomeOption !== '' ? $arquivoNomeOption : null,
                     'file_size' => $arquivoTamanhoOption > 0 ? $arquivoTamanhoOption : null,
+                    'reply_to' => (
+                        $replyToMessageId > 0 || $replyToText !== ''
+                        ? [
+                            'id' => $replyToMessageId > 0 ? $replyToMessageId : null,
+                            'text' => $replyToText !== '' ? $replyToText : null,
+                            'author' => $replyToAuthor !== '' ? $replyToAuthor : null,
+                        ]
+                        : null
+                    ),
                 ], JSON_UNESCAPED_UNICODE),
                 'usuario_id' => $userId,
                 'mime_type' => $hasFile ? ($mimeOutbound !== '' ? $mimeOutbound : null) : null,
@@ -253,6 +288,9 @@ class WhatsAppService
                 'arquivo_tamanho' => $arquivoTamanhoOption > 0 ? $arquivoTamanhoOption : null,
                 'enviada_por_bot' => $enviadaPorBot ? 1 : 0,
                 'enviada_por_usuario_id' => $enviadaPorUsuarioId > 0 ? $enviadaPorUsuarioId : null,
+                'reply_to_message_id' => $replyToMessageId > 0 ? $replyToMessageId : null,
+                'reply_to_text' => $replyToText !== '' ? $replyToText : null,
+                'reply_to_author' => $replyToAuthor !== '' ? $replyToAuthor : null,
             ]
         );
         return $result;
@@ -317,6 +355,63 @@ class WhatsAppService
         }
 
         return $message;
+    }
+
+    private function findRecentOutboundSendDuplicate(
+        ?int $conversaId,
+        string $telefone,
+        string $mensagem,
+        string $arquivo,
+        string $tipoMensagem
+    ): ?array {
+        if ($this->mensagensWhatsappModel === null) {
+            return null;
+        }
+
+        $builder = $this->mensagensWhatsappModel
+            ->where('direcao', 'outbound')
+            ->where('telefone', $telefone)
+            ->where('created_at >=', date('Y-m-d H:i:s', time() - 3))
+            ->whereIn('status', ['pendente', 'enviado', 'enviada'])
+            ->orderBy('id', 'DESC');
+
+        if (!empty($conversaId)) {
+            $builder->where('conversa_id', (int) $conversaId);
+        }
+
+        $safeTipo = trim($tipoMensagem);
+        if ($safeTipo !== '') {
+            $builder->where('tipo_mensagem', $safeTipo);
+        }
+
+        $safeMensagem = trim($mensagem);
+        if ($safeMensagem !== '') {
+            $builder->where('mensagem', $safeMensagem);
+        } else {
+            $builder->groupStart()
+                ->where('mensagem', null)
+                ->orWhere('mensagem', '')
+                ->groupEnd();
+        }
+
+        $safeArquivo = trim($arquivo);
+        if ($safeArquivo !== '') {
+            $builder->groupStart()
+                ->where('arquivo', $safeArquivo)
+                ->orWhere('anexo_path', $safeArquivo)
+                ->groupEnd();
+        } else {
+            $builder->groupStart()
+                ->where('arquivo', null)
+                ->orWhere('arquivo', '')
+                ->groupEnd()
+                ->groupStart()
+                ->where('anexo_path', null)
+                ->orWhere('anexo_path', '')
+                ->groupEnd();
+        }
+
+        return $builder->first();
     }
 
     private function resolveMimeByPath(string $filePath): string

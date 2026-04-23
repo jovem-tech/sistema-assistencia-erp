@@ -90,7 +90,7 @@ $supportsEngajamento = !empty($supportsEngajamento);
                         <th>Engajamento</th>
                         <?php endif; ?>
                         <th>Ultimo contato</th>
-                        <th>Acoes</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>

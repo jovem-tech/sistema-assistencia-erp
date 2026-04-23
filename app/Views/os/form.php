@@ -76,11 +76,320 @@ foreach ($clientes as $clienteItem) {
 
 $isEmbedded = (bool) ($isEmbedded ?? false);
 $embedQuery = $isEmbedded ? '?embed=1' : '';
+$resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
+    $arquivo = str_replace('\\', '/', ltrim(trim((string) $rawPath), '/'));
+    if ($arquivo === '') {
+        return '';
+    }
+
+    if (preg_match('/^https?:\/\//i', $arquivo)) {
+        return $arquivo;
+    }
+
+    $basename = basename($arquivo);
+    $candidates = [
+        'uploads/equipamentos_perfil/' . $arquivo,
+        'uploads/equipamentos_perfil/' . $basename,
+        'uploads/equipamentos/' . $basename,
+        $arquivo,
+    ];
+
+    foreach ($candidates as $candidate) {
+        $publicPath = ltrim($candidate, '/');
+        $absolutePath = FCPATH . str_replace('/', DIRECTORY_SEPARATOR, $publicPath);
+        if (is_file($absolutePath)) {
+            return base_url($publicPath) . '?v=' . filemtime($absolutePath);
+        }
+    }
+
+    return '';
+};
 ?>
 
 <?= $this->extend($layout ?? 'layouts/main') ?>
 
 <?= $this->section('content') ?>
+
+<style>
+.os-equip-select-result {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+}
+
+.os-equip-select-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    border: 1px solid #dbe4f3;
+    background: #eef2ff;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+.os-equip-select-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.os-equip-select-fallback {
+    font-weight: 800;
+    font-size: 1rem;
+    color: #1e3a8a;
+}
+
+.os-equip-select-copy {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+}
+
+.os-equip-select-copy strong {
+    display: block;
+    font-size: 0.92rem;
+    line-height: 1.2;
+    color: #0f172a;
+}
+
+.os-equip-select-copy small {
+    display: block;
+    line-height: 1.2;
+    color: #64748b;
+}
+
+.select2-container--bootstrap-5 .select2-results__option .os-equip-select-result {
+    padding: 2px 0;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .os-equip-select-result {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 8px;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .os-equip-select-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .os-equip-select-copy strong {
+    font-size: 0.86rem;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .os-equip-select-copy small {
+    font-size: 0.72rem;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single {
+    min-height: 68px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    white-space: normal;
+    line-height: 1.2;
+    padding-left: 0;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.checklist-item-card {
+    border: 1px solid #dbe4f3;
+    border-radius: 12px;
+    background: #f8fbff;
+    padding: 0.85rem;
+}
+
+.checklist-item-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.65rem;
+}
+
+.checklist-item-title {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #0f172a;
+}
+
+.checklist-status-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.checklist-status-btn {
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.74rem;
+    line-height: 1.2;
+}
+
+.checklist-photo-thumb {
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    border: 1px solid #dbe4f3;
+    overflow: hidden;
+    position: relative;
+    background: #e2e8f0;
+}
+
+.checklist-photo-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.checklist-photo-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 2;
+}
+
+.checklist-entry-card {
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.84);
+    padding: 0.65rem;
+}
+
+.os-defeitos-selected-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.os-defeitos-empty {
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+    background: rgba(248, 250, 252, 0.8);
+    color: #64748b;
+    font-size: 0.84rem;
+    padding: 0.75rem;
+}
+
+.os-defeito-item {
+    border: 1px solid #dbe4f3;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 0.6rem 0.7rem;
+}
+
+.os-defeito-item__title {
+    margin: 0;
+    color: #0f172a;
+    font-size: 0.87rem;
+    font-weight: 600;
+}
+
+.os-defeito-item__desc {
+    margin: 0.15rem 0 0;
+    color: #64748b;
+    font-size: 0.78rem;
+    line-height: 1.3;
+}
+
+.os-defeito-item__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.os-defeitos-modal-group {
+    border: 1px solid #dbe4f3;
+    border-radius: 12px;
+    background: #f8fbff;
+    padding: 0.75rem;
+}
+
+.os-cliente-tecnico-grid .os-inline-label {
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+}
+
+.os-cliente-tecnico-grid .os-inline-actions {
+    margin-left: auto;
+}
+
+.os-cliente-tech-helper {
+    min-height: 1.25rem;
+}
+
+.os-operational-card {
+    border: 1px solid #dbe4f3;
+    border-radius: 14px;
+    background: #f8fbff;
+}
+
+.procedimento-executado-item {
+    border: 1px solid #dbe4f3;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 0.6rem 0.7rem;
+    font-size: 0.88rem;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+@media (max-width: 430px) {
+    .procedimento-executado-toolbar .btn {
+        width: 100%;
+    }
+
+    .os-cliente-tecnico-grid .os-inline-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 390px) {
+    .procedimento-executado-item {
+        font-size: 0.83rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .procedimento-executado-toolbar {
+        gap: 0.45rem !important;
+    }
+}
+
+@media (max-width: 320px) {
+    .procedimento-executado-item {
+        padding: 0.55rem 0.55rem;
+    }
+}
+
+@media (max-width: 1199.98px) {
+    .os-cliente-tecnico-grid .os-inline-label {
+        min-height: auto;
+    }
+
+    .os-cliente-tech-helper {
+        min-height: auto;
+    }
+}
+
+/* SweetAlert2 deve sempre ficar acima dos modais tecnicos da OS (checklist/camera/crop). */
+.swal2-container {
+    z-index: 2600 !important;
+}
+</style>
 
 <div class="page-header d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center gap-3">
@@ -96,10 +405,10 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
 
 <!-- LAYOUT PRINCIPAL: SIDEBAR (foto) + CONTEÚDO -->
 <div class="os-form-page">
-<div class="row g-4 ds-split-layout">
+<div class="row g-4 ds-split-layout align-items-start" style="align-items: flex-start;">
 
     <!-- SIDEBAR: Painel da foto do equipamento -->
-    <div class="col-12 col-xl-4 col-xxl-3 ds-split-sidebar" id="sidebarEquipamento">
+    <div class="col-12 col-xl-4 col-xxl-3 ds-split-sidebar align-self-start" id="sidebarEquipamento" style="align-self: flex-start;">
         <div class="d-flex flex-column gap-3 ds-sticky-panel">
             <div class="card glass-card os-sidebar-card">
                 <div class="card-body p-3">
@@ -215,9 +524,9 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Estado físico</span>
+                            <span class="text-muted">Checklist de entrada</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoEstadoFisico" class="os-summary-value">Não informado</span>
+                                <span id="resumoEstadoFisico" class="os-summary-value">Nao preenchido</span>
                                 <span id="statusEstadoFisico" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
@@ -248,11 +557,11 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
     </div>
 
     <!-- ÁREA PRINCIPAL DO FORMULÁRIO -->
-    <div class="col-12 col-xl-8 col-xxl-9 ds-split-main" id="formCol">
-        <div class="card glass-card os-form-shell">
-            <div class="card-body">
+    <div class="col-12 col-xl-8 col-xxl-9 ds-split-main align-self-start" id="formCol" style="align-self: flex-start;">
+        <div class="card glass-card os-form-shell h-auto" style="height: auto;">
+            <div class="card-body" style="height: auto;">
                 <form action="<?= $isEdit ? base_url('os/atualizar/' . $os['id']) : base_url('os/salvar') ?><?= $embedQuery ?>"
-                      method="POST" enctype="multipart/form-data" id="formOs" novalidate>
+                      method="POST" enctype="multipart/form-data" id="formOs" class="h-auto" style="height: auto;" novalidate>
                     <?= csrf_field() ?>
                     <div id="osSubmitLoading" class="os-form-loading" aria-hidden="true">
                         <div class="os-form-loading-inner" role="status" aria-live="polite">
@@ -305,6 +614,11 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                         <li class="nav-item" role="presentation">
                             <button class="nav-link fw-bold" id="tab-relato-btn" data-bs-toggle="tab" data-bs-target="#tab-relato" type="button" role="tab" aria-controls="tab-relato" aria-selected="false">Dados Operacionais</button>
                         </li>
+                        <?php if ($isEdit): ?>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold" id="tab-solucao-btn" data-bs-toggle="tab" data-bs-target="#tab-solucao" type="button" role="tab" aria-controls="tab-solucao" aria-selected="false">Solução</button>
+                        </li>
+                        <?php endif; ?>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link fw-bold" id="tab-fotos-btn" data-bs-toggle="tab" data-bs-target="#tab-fotos" type="button" role="tab" aria-controls="tab-fotos" aria-selected="false">Fotos</button>
                         </li>
@@ -324,8 +638,8 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                 <div class="os-tab-helper">
                                     Defina quem trouxe o equipamento e visualize rapidamente os dados de contato para atendimento.
                                 </div>
-                                <div class="row g-3 align-items-start">
-                                    <div class="col-12">
+                                <div class="row g-3 align-items-start os-cliente-tecnico-grid">
+                                    <div class="col-12 col-xl-8 os-cliente-tech-col os-cliente-tech-col--cliente">
                                         <div class="os-inline-label">
                                             <label for="clienteOsSelect" class="form-label mb-0">
                                                 <span>Cliente *</span>
@@ -361,6 +675,22 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                             Este contato ainda nao esta vinculado ao cadastro de clientes. Selecione o cliente para abrir a OS.
                                         </div>
                                         <?php endif; ?>
+                                    </div>
+                                    <div class="col-12 col-xl-4 os-cliente-tech-col os-cliente-tech-col--tecnico">
+                                        <div class="os-inline-label">
+                                            <label for="tecnicoResponsavelSelect" class="form-label mb-0">
+                                                <span>Tecnico Responsavel</span>
+                                            </label>
+                                        </div>
+                                        <select name="tecnico_id" id="tecnicoResponsavelSelect" class="form-select">
+                                            <option value="">Nao atribuido</option>
+                                            <?php foreach ($tecnicos as $t): ?>
+                                            <option value="<?= $t['id'] ?>" <?= ($isEdit && ($os['tecnico_id'] ?? '') == $t['id']) ? 'selected' : '' ?>><?= esc($t['nome']) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <small class="text-muted d-block mt-2 os-cliente-tech-helper">
+                                            Defina o tecnico responsavel pela OS.
+                                        </small>
                                     </div>
                                 </div>
                             </div>
@@ -401,16 +731,25 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                                     <i class="bi bi-plus-lg"></i><span>Novo</span>
                                                 </button>
                                                 <?php endif; ?>
+                                                <?php if (can('equipamentos', 'editar')): ?>
+                                                <button class="btn btn-outline-info btn-sm os-inline-action-btn d-none" type="button" id="btnEditarEquipamentoInline" title="Editar equipamento selecionado">
+                                                    <i class="bi bi-pencil-square"></i><span>Editar</span>
+                                                </button>
+                                                <?php endif; ?>
                                             </span>
                                         </div>
                                         <select name="equipamento_id" id="equipamentoSelect" class="form-select select2-equip" required>
                                             <option value="">Selecione o cliente primeiro...</option>
                                             <?php if ($isEdit && !empty($equipamentos)): foreach ($equipamentos as $eq): ?>
+                                            <?php
+                                                $eqFotoUrl = $resolveEquipamentoFotoOptionUrl($eq['foto_principal_arquivo'] ?? '');
+                                            ?>
                                             <option value="<?= $eq['id'] ?>"
                                                 data-tipo="<?= $eq['tipo_id'] ?? '' ?>"
                                                 data-marca="<?= esc($eq['marca_nome'] ?? $eq['marca'] ?? '') ?>"
                                                 data-modelo="<?= esc($eq['modelo_nome'] ?? $eq['modelo'] ?? '') ?>"
                                                 data-serie="<?= esc($eq['numero_serie'] ?? '') ?>"
+                                                data-imei="<?= esc($eq['imei'] ?? '') ?>"
                                                 data-cor="<?= esc($eq['cor'] ?? '') ?>"
                                                 data-cor_hex="<?= esc($eq['cor_hex'] ?? '') ?>"
                                                 data-tipo_nome="<?= esc($eq['tipo_nome'] ?? $eq['tipo'] ?? '') ?>"
@@ -420,6 +759,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                                 data-senha_acesso="<?= esc($eq['senha_acesso'] ?? '') ?>"
                                                 data-estado_fisico="<?= esc($eq['estado_fisico'] ?? '') ?>"
                                                 data-acessorios="<?= esc($eq['acessorios'] ?? '') ?>"
+                                                data-foto_url="<?= esc($eqFotoUrl) ?>"
                                                 <?= $os['equipamento_id'] == $eq['id'] ? 'selected' : '' ?>>
                                                 <?= esc(($eq['marca_nome'] ?? $eq['marca'] ?? '') . ' ' . ($eq['modelo_nome'] ?? $eq['modelo'] ?? '') . ' (' . ($eq['tipo_nome'] ?? $eq['tipo'] ?? '') . ')') ?>
                                             </option>
@@ -429,53 +769,45 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                 </div>
                             </div>
 
-                            <div class="row g-3">
+                            <div class="row g-3 os-equip-panels-row">
                                 <div class="col-12 col-xxl-6">
-                                    <div class="os-data-section mb-4 h-100">
+                                    <div class="os-data-section os-equip-checklist-section mb-4 h-100">
                                         <div class="os-data-section-title">
-                                            <i class="bi bi-shield-exclamation me-1"></i>Estado fisico do equipamento
+                                            <i class="bi bi-ui-checks-grid me-1"></i>Checklist de entrada
                                         </div>
-                                        <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100">
-                                            <div class="d-flex flex-wrap gap-2 mb-2">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="tela_trincada">+ Tela trincada</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="arranhoes">+ Arranhoes</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="carcaca_quebrada">+ Carcaca quebrada</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="vidro_traseiro_quebrado">+ Vidro traseiro quebrado</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="amassado">+ Amassado</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="botao_quebrado">+ Botao quebrado</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="outro">+ Outro dano</button>
+                                        <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100 d-flex flex-column gap-2 os-equip-panel-card">
+                                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                                <button type="button" class="btn btn-outline-primary btn-sm" id="btnChecklistEntrada">
+                                                    <i class="bi bi-ui-checks-grid me-1"></i>Checklist
+                                                </button>
+                                                <span class="badge text-bg-secondary" id="checklistEntradaBadge">Pendente</span>
                                             </div>
-                                            <div class="form-check form-switch mb-3">
-                                                <input class="form-check-input" type="checkbox" id="estadoFisicoSemAvarias" value="1">
-                                                <label class="form-check-label" for="estadoFisicoSemAvarias">Sem avarias aparentes na entrada</label>
-                                            </div>
-                                            <div id="estadoFisicoQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <strong id="estadoFisicoQuickTitle"></strong>
-                                                    <button type="button" class="btn-close" id="estadoFisicoQuickClose"></button>
+                                            <div class="os-checklist-status-card os-checklist-status-pending" id="checklistEntradaStatusCard">
+                                                <div class="os-checklist-status-icon" id="checklistEntradaStatusIcon">
+                                                    <i class="bi bi-hourglass-split"></i>
                                                 </div>
-                                                <div id="estadoFisicoQuickFields" class="row g-2"></div>
-                                                <div class="mt-3">
-                                                    <button type="button" class="btn btn-sm btn-primary" id="estadoFisicoQuickSave">Salvar item</button>
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="estadoFisicoQuickCancel">Cancelar</button>
+                                                <div class="os-checklist-status-body">
+                                                    <div class="os-checklist-status-title" id="checklistEntradaStatusTitle">Checklist pendente de preenchimento</div>
+                                                    <div id="checklistEntradaInlineInfo" class="os-checklist-status-helper">
+                                                        Abra o checklist e marque todos os itens para concluir a entrada.
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div id="estadoFisicoList" class="list-group"></div>
-                                            <small class="form-text text-muted mt-3">Registre danos observados na recepcao com foto para evidenciar o estado de entrada.</small>
+                                            <input type="hidden" name="checklist_entrada_data" id="checklistEntradaDataInput">
+                                            <input type="file" id="checklistEntradaPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
+                                            <div id="checklistEntradaFilesInputs" class="d-none"></div>
                                             <textarea name="estado_fisico" id="estadoFisicoInput" class="d-none"><?= $isEdit ? esc($os['estado_fisico'] ?? '') : old('estado_fisico') ?></textarea>
                                             <input type="hidden" name="estado_fisico_data" id="estadoFisicoDataInput">
-                                            <input type="file" id="estadoFisicoPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
-                                            <div id="estadoFisicoFilesInputs" class="d-none"></div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-xxl-6">
-                                    <div class="os-data-section mb-4 h-100">
+                                    <div class="os-data-section os-equip-acessorios-section mb-4 h-100">
                                         <div class="os-data-section-title">
                                             <i class="bi bi-box-seam me-1"></i>Acessorios e Componentes (na entrada)
                                         </div>
-                                        <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100">
+                                        <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100 os-equip-panel-card">
                                             <div class="d-flex flex-wrap gap-2 mb-2">
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="chip">+ Chip</button>
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="capinha">+ Capinha celular</button>
@@ -496,6 +828,19 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                                     <button type="button" class="btn-close" id="acessoriosQuickClose"></button>
                                                 </div>
                                                 <div id="acessoriosQuickFields" class="row g-2"></div>
+                                                <div id="acessoriosQuickPhotosBlock" class="mt-3 border rounded p-2 bg-white">
+                                                    <div class="small fw-semibold text-uppercase text-muted mb-2">Fotos do acessorio</div>
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        <button type="button" class="btn btn-sm btn-outline-info" id="acessoriosQuickAddFoto">
+                                                            <i class="bi bi-images me-1"></i>Galeria
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary" id="acessoriosQuickAddFotoCamera">
+                                                            <i class="bi bi-camera-fill me-1"></i>Camera
+                                                        </button>
+                                                    </div>
+                                                    <div id="acessoriosQuickPhotosHint" class="small text-muted mt-2">Adicione fotos antes de salvar o item.</div>
+                                                    <div id="acessoriosQuickPhotosPreview" class="d-flex gap-2 flex-wrap mt-2"></div>
+                                                </div>
                                                 <div class="mt-3">
                                                     <button type="button" class="btn btn-sm btn-primary" id="acessoriosQuickSave">Salvar item</button>
                                                     <button type="button" class="btn btn-sm btn-outline-secondary" id="acessoriosQuickCancel">Cancelar</button>
@@ -572,35 +917,46 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                 <?php endif; ?>
                             </div>
 
-                            <div class="os-data-section mb-4">
-                                <div class="os-data-section-title">
-                                    <i class="bi bi-person-workspace me-1"></i>Tecnico responsavel
-                                </div>
-                                <div class="os-tab-helper">
-                                    Defina o tecnico apos concluir o contexto do equipamento e dos itens recebidos.
-                                </div>
-                                <div class="row g-3">
-                                    <div class="col-12 col-xl-6">
-                                        <label class="form-label">Tecnico Responsavel</label>
-                                        <select name="tecnico_id" class="form-select">
-                                            <option value="">Nao atribuido</option>
-                                            <?php foreach ($tecnicos as $t): ?>
-                                            <option value="<?= $t['id'] ?>" <?= ($isEdit && ($os['tecnico_id'] ?? '') == $t['id']) ? 'selected' : '' ?>><?= esc($t['nome']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
                             <?php if ($isEdit): ?>
                             <div class="os-data-section mb-4" id="defeitosSection" style="display:none;">
                                 <div class="os-data-section-title">
                                     <i class="bi bi-bug me-1"></i>Defeitos comuns do tipo de equipamento
                                 </div>
                                 <div class="border rounded-3 p-3 bg-white bg-opacity-10">
-                                    <div class="small text-muted mb-3">Selecione os defeitos que se aplicam ao diagnostico atual.</div>
-                                    <div id="defeitosContainer">
+                                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                                        <div class="small text-muted" id="defeitosHelperText">
+                                            Selecione os defeitos que se aplicam ao diagnostico atual.
+                                        </div>
+                                        <button type="button" class="btn btn-outline-primary btn-sm" id="btnAdicionarDefeitosComuns" disabled>
+                                            <i class="bi bi-plus-circle me-1"></i>Adicionar defeitos comuns
+                                        </button>
+                                    </div>
+                                    <div id="defeitosContainer" class="os-defeitos-selected-list">
                                         <span class="text-muted small">Selecione o equipamento para carregar os defeitos...</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal fade" id="modalDefeitosComuns" tabindex="-1" aria-hidden="true" style="z-index: 2100;">
+                                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                                    <div class="modal-content glass-card">
+                                        <div class="modal-header border-bottom">
+                                            <h5 class="modal-title">
+                                                <i class="bi bi-bug me-2 text-warning"></i>Defeitos comuns do equipamento
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p class="small text-muted mb-3" id="modalDefeitosHint">
+                                                Selecione os defeitos para adicionar ao card da OS.
+                                            </p>
+                                            <div id="modalDefeitosComunsBody">
+                                                <span class="text-muted small">Selecione o equipamento para carregar os defeitos.</span>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -677,6 +1033,58 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                 </div>
                             </div>
                         </div>
+                        <?php if ($isEdit): ?>
+                        <div class="tab-pane fade" id="tab-solucao" role="tabpanel" aria-labelledby="tab-solucao-btn" tabindex="0">
+                            <div class="os-data-section mb-4">
+                                <div class="os-data-section-title">
+                                    <i class="bi bi-activity me-1"></i>Solução e Diagnóstico
+                                </div>
+                                <div class="os-tab-helper">
+                                    Registre os procedimentos executados e consolide a solução aplicada e o diagnóstico técnico da OS.
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="card os-operational-card h-100">
+                                            <div class="card-body p-3">
+                                                <label class="form-label fw-semibold mb-2">Procedimentos executados</label>
+                                                <div class="procedimento-executado-toolbar d-flex flex-column flex-md-row gap-2 mb-2">
+                                                    <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        id="procedimentoExecutadoTextoInput"
+                                                        placeholder="Ex.: feito testes no processador">
+                                                    <button type="button" class="btn btn-outline-primary" id="btnInserirProcedimentoExecutado">
+                                                        + Inserir novo procedimento
+                                                    </button>
+                                                </div>
+                                                <textarea name="procedimentos_executados" id="procedimentosExecutadosInput" class="d-none"><?= esc($os['procedimentos_executados'] ?? '') ?></textarea>
+                                                <div id="procedimentosExecutadosLista" class="d-flex flex-column gap-2"></div>
+                                                <small class="text-muted d-block mt-2">
+                                                    Cada inserção registra automaticamente data/hora e técnico selecionado.
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-xl-6">
+                                        <div class="card os-operational-card h-100">
+                                            <div class="card-body p-3">
+                                                <label class="form-label fw-semibold">Solução aplicada</label>
+                                                <textarea name="solucao_aplicada" id="solucaoAplicadaInput" class="form-control" rows="5"><?= esc($os['solucao_aplicada'] ?? '') ?></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-xl-6">
+                                        <div class="card os-operational-card h-100">
+                                            <div class="card-body p-3">
+                                                <label class="form-label fw-semibold">Diagnóstico</label>
+                                                <textarea name="diagnostico_tecnico" id="diagnosticoTecnicoInput" class="form-control" rows="5"><?= esc($os['diagnostico_tecnico'] ?? '') ?></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                         <?php if (false): ?>
                     <div class="os-data-section mb-4">
                         <div class="os-data-section-title">
@@ -853,26 +1261,26 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-estado-key="outro">+ Outro dano</button>
                             </div>
                             <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="estadoFisicoSemAvarias" value="1">
-                                <label class="form-check-label" for="estadoFisicoSemAvarias">Sem avarias aparentes na entrada</label>
+                                <input class="form-check-input" type="checkbox" id="estadoFisicoSemAvariasLegacy" value="1">
+                                <label class="form-check-label" for="estadoFisicoSemAvariasLegacy">Sem avarias aparentes na entrada</label>
                             </div>
-                            <div id="estadoFisicoQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
+                            <div id="estadoFisicoQuickFormLegacy" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <strong id="estadoFisicoQuickTitle"></strong>
-                                    <button type="button" class="btn-close" id="estadoFisicoQuickClose"></button>
+                                    <strong id="estadoFisicoQuickTitleLegacy"></strong>
+                                    <button type="button" class="btn-close" id="estadoFisicoQuickCloseLegacy"></button>
                                 </div>
-                                <div id="estadoFisicoQuickFields" class="row g-2"></div>
+                                <div id="estadoFisicoQuickFieldsLegacy" class="row g-2"></div>
                                 <div class="mt-3">
-                                    <button type="button" class="btn btn-sm btn-primary" id="estadoFisicoQuickSave">Salvar item</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="estadoFisicoQuickCancel">Cancelar</button>
+                                    <button type="button" class="btn btn-sm btn-primary" id="estadoFisicoQuickSaveLegacy">Salvar item</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="estadoFisicoQuickCancelLegacy">Cancelar</button>
                                 </div>
                             </div>
-                            <div id="estadoFisicoList" class="list-group"></div>
+                            <div id="estadoFisicoListLegacy" class="list-group"></div>
                             <small class="form-text text-muted mt-3">Registre danos observados na recepcao com foto para evidenciar o estado de entrada.</small>
-                            <textarea name="estado_fisico" id="estadoFisicoInput" class="d-none"><?= $isEdit ? esc($os['estado_fisico'] ?? '') : old('estado_fisico') ?></textarea>
-                            <input type="hidden" name="estado_fisico_data" id="estadoFisicoDataInput">
-                            <input type="file" id="estadoFisicoPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
-                            <div id="estadoFisicoFilesInputs" class="d-none"></div>
+                            <textarea name="estado_fisico_legacy" id="estadoFisicoInputLegacy" class="d-none"><?= $isEdit ? esc($os['estado_fisico'] ?? '') : old('estado_fisico') ?></textarea>
+                            <input type="hidden" name="estado_fisico_data_legacy" id="estadoFisicoDataInputLegacy">
+                            <input type="file" id="estadoFisicoPhotoInputLegacy" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
+                            <div id="estadoFisicoFilesInputsLegacy" class="d-none"></div>
                         </div>
                     </div>
 
@@ -892,26 +1300,26 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acessório</button>
                                 </div>
                                 <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" id="acessoriosSemItens" name="acessorios_sem_itens" value="1" <?= old('acessorios_sem_itens') ? 'checked' : '' ?>>
+                                    <input class="form-check-input" type="checkbox" id="acessoriosSemItensLegacy" name="acessorios_sem_itens_legacy" value="1" <?= old('acessorios_sem_itens_legacy') ? 'checked' : '' ?>>
                                     <label class="form-check-label" for="acessoriosSemItens">Equipamento recebido sem acessórios</label>
                                 </div>
-                                <div id="acessoriosQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
+                                <div id="acessoriosQuickFormLegacy" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <strong id="acessoriosQuickTitle"></strong>
-                                        <button type="button" class="btn-close" id="acessoriosQuickClose"></button>
+                                        <strong id="acessoriosQuickTitleLegacy"></strong>
+                                        <button type="button" class="btn-close" id="acessoriosQuickCloseLegacy"></button>
                                     </div>
-                                    <div id="acessoriosQuickFields" class="row g-2"></div>
+                                    <div id="acessoriosQuickFieldsLegacy" class="row g-2"></div>
                                     <div class="mt-3">
-                                        <button type="button" class="btn btn-sm btn-primary" id="acessoriosQuickSave">Salvar item</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="acessoriosQuickCancel">Cancelar</button>
+                                        <button type="button" class="btn btn-sm btn-primary" id="acessoriosQuickSaveLegacy">Salvar item</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="acessoriosQuickCancelLegacy">Cancelar</button>
                                     </div>
                                 </div>
-                                <div id="acessoriosList" class="list-group"></div>
+                                <div id="acessoriosListLegacy" class="list-group"></div>
                                 <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acessórios comuns.</small>
-                                <textarea name="acessorios" id="acessoriosInput" class="d-none"><?= $isEdit ? esc($os['acessorios'] ?? '') : old('acessorios') ?></textarea>
-                                <input type="hidden" name="acessorios_data" id="acessoriosDataInput">
-                                <input type="file" id="acessoriosPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
-                                <div id="acessoriosFilesInputs" class="d-none"></div>
+                                <textarea name="acessorios_legacy" id="acessoriosInputLegacy" class="d-none"><?= $isEdit ? esc($os['acessorios'] ?? '') : old('acessorios') ?></textarea>
+                                <input type="hidden" name="acessorios_data_legacy" id="acessoriosDataInputLegacy">
+                                <input type="file" id="acessoriosPhotoInputLegacy" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
+                                <div id="acessoriosFilesInputsLegacy" class="d-none"></div>
                             </div>
                     </div>
 
@@ -974,7 +1382,6 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                     <?php endif; ?>
 
                         <?php endif; ?>
-                        </div>
                         <div class="tab-pane fade" id="tab-fotos" role="tabpanel" aria-labelledby="tab-fotos-btn" tabindex="0">
                     <!-- FOTOS DE ENTRADA DO EQUIPAMENTO -->
                     <div class="row g-3 mb-4">
@@ -1064,18 +1471,6 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                         </div>
                     </div>
 
-                    <!-- Diagnóstico -->
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label">Diagnóstico Técnico</label>
-                            <textarea name="diagnostico_tecnico" class="form-control" rows="3"><?= esc($os['diagnostico_tecnico'] ?? '') ?></textarea>
-                        </div>
-                        <div class="col-md-6">
-                                <label class="form-label">Solução Aplicada</label>
-                            <textarea name="solucao_aplicada" class="form-control" rows="3"><?= esc($os['solucao_aplicada'] ?? '') ?></textarea>
-                        </div>
-                    </div>
-
                     <!-- Valores -->
                     <h6 class="text-uppercase text-muted mb-3"><i class="bi bi-currency-dollar me-1"></i>Valores</h6>
                     <div class="row g-3 mb-4">
@@ -1109,11 +1504,11 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                         </div>
                     </div>
                         </div>
-                    </div>
                     <?php endif; ?>
+                    </div>
 
-                    <div class="os-form-actions">
-                        <button type="submit" class="btn btn-glow" id="btnSubmitOs" data-loading-text="<?= esc($isEdit ? 'Atualizando OS...' : 'Abrindo OS...') ?>">
+                    <div class="os-form-actions" id="osFormActions">
+                        <button type="submit" form="formOs" class="btn btn-glow" id="btnSubmitOs" data-loading-text="<?= esc($isEdit ? 'Atualizando OS...' : 'Abrindo OS...') ?>">
                             <i class="bi bi-check-lg me-1"></i><?= $isEdit ? 'Atualizar' : 'Abrir OS' ?>
                         </button>
                         <?php if (!$isEmbedded): ?>
@@ -1356,7 +1751,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
                                             <span id="colorPreviewNameOS" class="mt-1" style="font-size: 0.7rem; color: rgba(255,255,255,0.8);">Preto</span>
                                         </div>
                                         <div class="d-flex gap-2 mb-2">
-                                            <input type="color" id="corHexPickerOS" class="form-control form-control-color p-1" value="" style="width: 40px; height: 32px;">
+                                            <input type="color" id="corHexPickerOS" class="form-control form-control-color p-1" value="#1A1A1A" style="width: 40px; height: 32px;">
                                             <input type="text" id="corNomeInputOS" class="form-control form-control-sm" placeholder="Nome" value="">
                                         </div>
                                         <div id="coresProximasGridOS" class="d-flex flex-wrap gap-1 mb-2"></div>
@@ -1472,7 +1867,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
 
 
 <!-- ===== MODAL: CÂMERA (AUXILIAR) ===== -->
-<div class="modal fade" id="modalCamera" tabindex="-1" style="z-index: 2000;">
+<div class="modal fade" id="modalCamera" tabindex="-1" style="z-index: 2250;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-card border-0 shadow-lg">
             <div class="modal-header border-bottom border-light">
@@ -1493,7 +1888,7 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
 </div>
 
 <!-- ===== MODAL: EDITOR DE IMAGEM (CROP) ===== -->
-<div class="modal fade" id="modalCropEquip" tabindex="-1" style="z-index: 2100;">
+<div class="modal fade" id="modalCropEquip" tabindex="-1" style="z-index: 2350;">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content glass-card shadow-lg">
             <div class="modal-header border-bottom">
@@ -1516,6 +1911,34 @@ $embedQuery = $isEmbedded ? '?embed=1' : '';
     </div>
 </div>
 
+<!-- ===== MODAL: CHECKLIST DE ENTRADA ===== -->
+<div class="modal fade" id="modalChecklistEntrada" tabindex="-1" aria-hidden="true" style="z-index: 2150;">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content glass-card shadow-lg">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title font-title">
+                    <i class="bi bi-ui-checks-grid text-primary me-2"></i>Checklist de Entrada
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <div id="checklistEntradaModalAlert" class="alert alert-warning d-none mb-3"></div>
+                <div id="checklistEntradaModalMeta" class="small text-muted mb-3"></div>
+                <div id="checklistEntradaModalList" class="d-grid gap-3"></div>
+            </div>
+            <div class="modal-footer border-top d-flex justify-content-between align-items-center">
+                <small id="checklistEntradaModalResumo" class="text-muted"></small>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-glow" id="btnChecklistEntradaSalvar">
+                        <i class="bi bi-check2-circle me-1"></i>Salvar checklist
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -1533,21 +1956,8 @@ var defeitosSelecionados = <?= json_encode(array_column($defeitosSelected, 'defe
 var defeitosSelecionados = [];
 <?php endif; ?>
 const existingFotosCount = <?= (int)(count($fotos_entrada ?? [])) ?>;
-const estadoFisicoEntriesServer = <?= json_encode(array_map(static function ($entry) {
-    $values = [];
-    if (!empty($entry['valores'])) {
-        $decoded = json_decode((string) $entry['valores'], true);
-        if (is_array($decoded)) {
-            $values = $decoded;
-        }
-    }
-    return [
-        'id' => 'est_srv_' . ($entry['id'] ?? uniqid()),
-        'text' => trim((string)($entry['descricao_dano'] ?? '')),
-        'key' => $entry['tipo'] ?? 'outro',
-        'values' => $values,
-    ];
-}, $estadoFisicoEntries ?? []), JSON_UNESCAPED_UNICODE) ?>;
+const checklistEntradaServer = <?= json_encode($checklistEntrada ?? null, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+const estadoFisicoEntriesServer = [];
 let pendingEquipId = null;
 let pendingDefeitos = null;
 const DRAFT_KEY = 'osDraft_v1';
@@ -1586,6 +1996,859 @@ const prioridadeLabels = {
     urgente: 'Urgente'
 };
 
+const osIdAtual = <?= (int) ($os['id'] ?? 0) ?>;
+if (typeof window.elevateLatestBackdrop !== 'function') {
+    window.elevateLatestBackdrop = function(zIndex) {
+        const backdrops = Array.from(document.querySelectorAll('.modal-backdrop'));
+        const lastBackdrop = backdrops[backdrops.length - 1] || null;
+        if (lastBackdrop && Number.isFinite(Number(zIndex))) {
+            lastBackdrop.style.zIndex = String(zIndex);
+        }
+    };
+}
+var elevateLatestBackdrop = window.elevateLatestBackdrop;
+const checklistMetaEndpoint = `${BASE_URL}os/checklist-meta`;
+const checklistEntradaBtn = document.getElementById('btnChecklistEntrada');
+const checklistEntradaBadge = document.getElementById('checklistEntradaBadge');
+const checklistEntradaStatusCard = document.getElementById('checklistEntradaStatusCard');
+const checklistEntradaStatusIcon = document.getElementById('checklistEntradaStatusIcon');
+const checklistEntradaStatusTitle = document.getElementById('checklistEntradaStatusTitle');
+const checklistEntradaInlineInfo = document.getElementById('checklistEntradaInlineInfo');
+const checklistEntradaDataInput = document.getElementById('checklistEntradaDataInput');
+const checklistEntradaFilesInputs = document.getElementById('checklistEntradaFilesInputs');
+const checklistEntradaPhotoInput = document.getElementById('checklistEntradaPhotoInput');
+const checklistEntradaModalEl = document.getElementById('modalChecklistEntrada');
+const checklistEntradaModalList = document.getElementById('checklistEntradaModalList');
+const checklistEntradaModalAlert = document.getElementById('checklistEntradaModalAlert');
+const checklistEntradaModalMeta = document.getElementById('checklistEntradaModalMeta');
+const checklistEntradaModalResumo = document.getElementById('checklistEntradaModalResumo');
+const btnChecklistEntradaSalvar = document.getElementById('btnChecklistEntradaSalvar');
+let checklistEntradaModal = null;
+const checklistEntradaStatusOptions = ['ok', 'discrepancia', 'nao_verificado'];
+let checklistEntradaCommitted = normalizeChecklistEntradaPayload(checklistEntradaServer);
+let checklistEntradaDraft = cloneChecklistEntradaState(checklistEntradaCommitted);
+let checklistEntradaCommittedFiles = {};
+let checklistEntradaDraftFiles = {};
+let checklistEntradaCropQueue = [];
+let checklistEntradaCropItemId = null;
+let checklistMetaLoadToken = 0;
+let pendingChecklistEntradaDraftPayload = null;
+let pendingChecklistEntradaDraftEquipId = '';
+const procedimentosExecutadosInput = document.getElementById('procedimentosExecutadosInput');
+const procedimentosExecutadosLista = document.getElementById('procedimentosExecutadosLista');
+const procedimentoExecutadoTextoInput = document.getElementById('procedimentoExecutadoTextoInput');
+const btnInserirProcedimentoExecutado = document.getElementById('btnInserirProcedimentoExecutado');
+
+function toInt(value) {
+    const parsed = Number.parseInt(String(value ?? ''), 10);
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function checklistBadgeVariant(variant) {
+    return ({
+        success: 'text-bg-success',
+        warning: 'text-bg-warning',
+        danger: 'text-bg-danger',
+        info: 'text-bg-info',
+        primary: 'text-bg-primary'
+    })[String(variant || '').toLowerCase()] || 'text-bg-secondary';
+}
+
+function cloneChecklistEntradaState(state) {
+    if (!state || typeof state !== 'object') {
+        return normalizeChecklistEntradaPayload(null);
+    }
+    return {
+        possuiModelo: Boolean(state.possuiModelo),
+        tipoCodigo: String(state.tipoCodigo || 'entrada'),
+        tipoNome: String(state.tipoNome || 'Checklist de Entrada'),
+        modeloNome: String(state.modeloNome || ''),
+        tipoEquipamentoNome: String(state.tipoEquipamentoNome || ''),
+        resumo: {
+            preenchido: Boolean(state.resumo?.preenchido),
+            total_discrepancias: Number(state.resumo?.total_discrepancias || 0),
+            label: String(state.resumo?.label || 'Checklist nao preenchido'),
+            variant: String(state.resumo?.variant || 'secondary')
+        },
+        itens: Array.isArray(state.itens)
+            ? state.itens.map((item) => ({
+                id: toInt(item.id),
+                descricao: String(item.descricao || ''),
+                ordem: toInt(item.ordem),
+                status: checklistEntradaStatusOptions.includes(String(item.status || ''))
+                    ? String(item.status)
+                    : 'nao_verificado',
+                observacao: String(item.observacao || ''),
+                retainedPhotoIds: Array.isArray(item.retainedPhotoIds)
+                    ? item.retainedPhotoIds.map((photoId) => toInt(photoId)).filter((photoId) => photoId > 0)
+                    : [],
+                deletedPhotoIds: Array.isArray(item.deletedPhotoIds)
+                    ? item.deletedPhotoIds.map((photoId) => toInt(photoId)).filter((photoId) => photoId > 0)
+                    : [],
+                existingPhotos: Array.isArray(item.existingPhotos)
+                    ? item.existingPhotos.map((photo) => ({
+                        id: toInt(photo.id),
+                        url: String(photo.url || ''),
+                        nome: String(photo.nome || '')
+                    }))
+                    : []
+            }))
+            : []
+    };
+}
+
+function cloneChecklistFilesMap(source) {
+    const next = {};
+    Object.entries(source || {}).forEach(([itemId, dt]) => {
+        if (!dt || !dt.files || !dt.files.length) {
+            return;
+        }
+        const cloned = new DataTransfer();
+        Array.from(dt.files).forEach((file) => cloned.items.add(file));
+        next[itemId] = cloned;
+    });
+    return next;
+}
+
+function normalizeChecklistEntradaPayload(payload, tipoEquipamentoNomeFallback = '') {
+    const normalized = {
+        possuiModelo: false,
+        tipoCodigo: 'entrada',
+        tipoNome: 'Checklist de Entrada',
+        modeloNome: '',
+        tipoEquipamentoNome: String(tipoEquipamentoNomeFallback || ''),
+        resumo: {
+            preenchido: false,
+            total_discrepancias: 0,
+            label: 'Checklist nao preenchido',
+            variant: 'secondary'
+        },
+        itens: []
+    };
+
+    if (!payload || typeof payload !== 'object') {
+        return normalized;
+    }
+
+    normalized.tipoCodigo = String(payload.tipo?.codigo || payload.tipoCodigo || 'entrada');
+    normalized.tipoNome = String(payload.tipo?.nome || payload.tipoNome || 'Checklist de Entrada');
+    normalized.modeloNome = String(payload.modelo?.nome || payload.modeloNome || '');
+    normalized.tipoEquipamentoNome = String(
+        payload.tipo_equipamento_nome
+        || payload.tipoEquipamentoNome
+        || tipoEquipamentoNomeFallback
+        || ''
+    );
+    normalized.possuiModelo = Boolean(payload.possui_modelo ?? payload.possuiModelo ?? normalized.modeloNome !== '');
+
+    if (Array.isArray(payload.itens)) {
+        normalized.itens = payload.itens.map((item) => {
+            const existingPhotos = Array.isArray(item.fotos)
+                ? item.fotos.map((foto) => ({
+                    id: toInt(foto.id),
+                    url: String(foto.url || ''),
+                    nome: String(foto.arquivo_original || foto.arquivo || '')
+                })).filter((foto) => foto.url !== '')
+                : [];
+            const retainedPhotoIds = existingPhotos.map((foto) => foto.id).filter((photoId) => photoId > 0);
+            return {
+                id: toInt(item.id),
+                descricao: String(item.descricao || ''),
+                ordem: toInt(item.ordem),
+                status: checklistEntradaStatusOptions.includes(String(item.status || ''))
+                    ? String(item.status)
+                    : 'nao_verificado',
+                observacao: String(item.observacao || ''),
+                retainedPhotoIds,
+                deletedPhotoIds: [],
+                existingPhotos
+            };
+        });
+    }
+
+    if (payload.resumo && typeof payload.resumo === 'object') {
+        normalized.resumo = {
+            preenchido: Boolean(payload.resumo.preenchido),
+            total_discrepancias: Number(payload.resumo.total_discrepancias || 0),
+            label: String(payload.resumo.label || 'Checklist nao preenchido'),
+            variant: String(payload.resumo.variant || 'secondary')
+        };
+    } else {
+        normalized.resumo = computeChecklistResumo(normalized);
+    }
+
+    return normalized;
+}
+
+function computeChecklistResumo(state) {
+    if (!state?.possuiModelo) {
+        return {
+            preenchido: false,
+            total_discrepancias: 0,
+            label: 'Sem modelo',
+            variant: 'secondary'
+        };
+    }
+
+    const itens = Array.isArray(state.itens) ? state.itens : [];
+    const totalDiscrepancias = itens.filter((item) => item.status === 'discrepancia').length;
+    const todosPreenchidos = itens.length > 0 && itens.every((item) => item.status !== 'nao_verificado');
+
+    if (!todosPreenchidos) {
+        return {
+            preenchido: false,
+            total_discrepancias: totalDiscrepancias,
+            label: 'Pendente',
+            variant: 'warning'
+        };
+    }
+
+    if (totalDiscrepancias <= 0) {
+        return {
+            preenchido: true,
+            total_discrepancias: 0,
+            label: 'Tudo OK',
+            variant: 'success'
+        };
+    }
+
+    return {
+        preenchido: true,
+        total_discrepancias: totalDiscrepancias,
+        label: totalDiscrepancias === 1 ? '1 discrepancia' : `${totalDiscrepancias} discrepancias`,
+        variant: 'warning'
+    };
+}
+
+function getSelectedEquipamentoTipoNome(optionEl = null) {
+    const opt = optionEl || document.querySelector('#equipamentoSelect option:checked');
+    return String(opt?.dataset?.tipo_nome || '').trim();
+}
+
+function updateChecklistInlineSummary() {
+    checklistEntradaCommitted.resumo = computeChecklistResumo(checklistEntradaCommitted);
+    const equipamentoSelecionado = String(document.getElementById('equipamentoSelect')?.value || '').trim();
+    const hasEquipamentoSelecionado = equipamentoSelecionado !== '';
+    const itens = Array.isArray(checklistEntradaCommitted?.itens) ? checklistEntradaCommitted.itens : [];
+    const totalItens = itens.length;
+    const totalPendentes = itens.filter((item) => item.status === 'nao_verificado').length;
+    const totalDiscrepancias = Number(checklistEntradaCommitted?.resumo?.total_discrepancias || 0);
+
+    let statusVariantClass = 'os-checklist-status-pending';
+    let statusIcon = 'bi-hourglass-split';
+    let statusTitle = 'Checklist pendente de preenchimento';
+    let statusInfo = totalItens > 0
+        ? `Faltam ${totalPendentes} de ${totalItens} item(ns) para concluir o checklist.`
+        : 'Abra o checklist e marque todos os itens para concluir a entrada.';
+
+    if (!hasEquipamentoSelecionado) {
+        statusVariantClass = 'os-checklist-status-unavailable';
+        statusIcon = 'bi-phone';
+        statusTitle = 'Selecione um equipamento para liberar o checklist';
+        statusInfo = 'Depois de selecionar o equipamento, o modelo de checklist sera carregado automaticamente.';
+    } else if (!checklistEntradaCommitted?.possuiModelo) {
+        statusVariantClass = 'os-checklist-status-unavailable';
+        statusIcon = 'bi-slash-circle';
+        statusTitle = 'Checklist indisponivel para este tipo de equipamento';
+        statusInfo = 'Nao ha modelo configurado para este equipamento em Gestao de Conhecimento.';
+    } else if (checklistEntradaCommitted.resumo.preenchido && totalDiscrepancias <= 0) {
+        statusVariantClass = 'os-checklist-status-success';
+        statusIcon = 'bi-check-circle-fill';
+        statusTitle = 'Checklist concluido: tudo OK';
+        statusInfo = 'Todos os itens foram verificados sem discrepancias.';
+    } else if (checklistEntradaCommitted.resumo.preenchido && totalDiscrepancias > 0) {
+        statusVariantClass = 'os-checklist-status-warning';
+        statusIcon = 'bi-exclamation-triangle-fill';
+        statusTitle = 'Checklist concluido com discrepancias';
+        statusInfo = totalDiscrepancias === 1
+            ? '1 item foi marcado com discrepancia. Reabra o checklist para revisar.'
+            : `${totalDiscrepancias} itens foram marcados com discrepancia. Reabra o checklist para revisar.`;
+    }
+
+    if (checklistEntradaBadge) {
+        if (!hasEquipamentoSelecionado) {
+            checklistEntradaBadge.textContent = 'Aguardando equipamento';
+            checklistEntradaBadge.className = `badge ${checklistBadgeVariant('secondary')}`;
+        } else {
+            checklistEntradaBadge.textContent = checklistEntradaCommitted.resumo.label;
+            checklistEntradaBadge.className = `badge ${checklistBadgeVariant(checklistEntradaCommitted.resumo.variant)}`;
+        }
+    }
+    if (checklistEntradaStatusCard) {
+        checklistEntradaStatusCard.classList.remove(
+            'os-checklist-status-pending',
+            'os-checklist-status-success',
+            'os-checklist-status-warning',
+            'os-checklist-status-unavailable'
+        );
+        checklistEntradaStatusCard.classList.add(statusVariantClass);
+    }
+    if (checklistEntradaStatusIcon) {
+        checklistEntradaStatusIcon.innerHTML = `<i class="bi ${statusIcon}"></i>`;
+    }
+    if (checklistEntradaStatusTitle) {
+        checklistEntradaStatusTitle.textContent = statusTitle;
+    }
+    if (checklistEntradaInlineInfo) {
+        checklistEntradaInlineInfo.textContent = statusInfo;
+    }
+}
+
+function buildChecklistPayloadForSubmit(state) {
+    if (!state?.possuiModelo) {
+        return null;
+    }
+
+    return {
+        tipo_equipamento_nome: state.tipoEquipamentoNome || getSelectedEquipamentoTipoNome(),
+        itens: (state.itens || []).map((item) => ({
+            item_id: item.id,
+            status: checklistEntradaStatusOptions.includes(String(item.status || ''))
+                ? String(item.status)
+                : 'nao_verificado',
+            observacao: String(item.observacao || '').trim(),
+            retained_photo_ids: Array.isArray(item.retainedPhotoIds) ? item.retainedPhotoIds : [],
+            deleted_photo_ids: Array.isArray(item.deletedPhotoIds) ? item.deletedPhotoIds : []
+        }))
+    };
+}
+
+function buildLegacyEstadoFisicoFromChecklist(state) {
+    if (!state?.possuiModelo) {
+        return '';
+    }
+    const discrepancias = (state.itens || []).filter((item) => item.status === 'discrepancia');
+    if (!discrepancias.length) {
+        return 'Sem avarias aparentes';
+    }
+    return discrepancias
+        .map((item) => item.descricao)
+        .filter((desc) => String(desc || '').trim() !== '')
+        .join('\n');
+}
+
+function syncChecklistEntradaFileInputs() {
+    if (!checklistEntradaFilesInputs) {
+        return;
+    }
+    checklistEntradaFilesInputs.innerHTML = '';
+
+    Object.entries(checklistEntradaCommittedFiles).forEach(([itemId, dt]) => {
+        if (!dt || !dt.files || !dt.files.length) {
+            return;
+        }
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.className = 'd-none';
+        input.name = `fotos_checklist_entrada[${itemId}][]`;
+        input.files = dt.files;
+        checklistEntradaFilesInputs.appendChild(input);
+    });
+}
+
+function syncChecklistEntradaInputs() {
+    const payload = buildChecklistPayloadForSubmit(checklistEntradaCommitted);
+    if (checklistEntradaDataInput) {
+        checklistEntradaDataInput.value = payload ? JSON.stringify(payload) : '';
+    }
+
+    const estadoFisicoInput = document.getElementById('estadoFisicoInput');
+    if (estadoFisicoInput) {
+        estadoFisicoInput.value = buildLegacyEstadoFisicoFromChecklist(checklistEntradaCommitted);
+    }
+
+    const estadoFisicoDataInput = document.getElementById('estadoFisicoDataInput');
+    if (estadoFisicoDataInput) {
+        const legacyLines = String(estadoFisicoInput?.value || '').trim();
+        estadoFisicoDataInput.value = legacyLines
+            ? JSON.stringify(legacyLines.split(/\r?\n/).map((text, index) => ({
+                id: `chk_${index + 1}`,
+                text,
+                key: 'checklist'
+            })))
+            : '';
+    }
+
+    syncChecklistEntradaFileInputs();
+}
+
+function parseChecklistDraftPayload(rawValue) {
+    if (!rawValue) {
+        return null;
+    }
+
+    if (typeof rawValue === 'object' && Array.isArray(rawValue.itens)) {
+        return rawValue;
+    }
+
+    const raw = String(rawValue || '').trim();
+    if (!raw) {
+        return null;
+    }
+
+    try {
+        const parsed = JSON.parse(raw);
+        return parsed && Array.isArray(parsed.itens) ? parsed : null;
+    } catch (error) {
+        console.error('[ChecklistEntrada] falha ao interpretar rascunho salvo', error);
+        return null;
+    }
+}
+
+function applyChecklistDraftPayloadToCommitted(payload) {
+    if (!payload || !Array.isArray(payload.itens) || !checklistEntradaCommitted?.possuiModelo) {
+        return false;
+    }
+
+    const payloadMap = new Map();
+    payload.itens.forEach((item) => {
+        const itemId = toInt(item?.item_id ?? item?.id);
+        if (itemId > 0) {
+            payloadMap.set(itemId, item);
+        }
+    });
+
+    if (!payloadMap.size || !Array.isArray(checklistEntradaCommitted.itens) || !checklistEntradaCommitted.itens.length) {
+        return false;
+    }
+
+    checklistEntradaCommitted.itens = checklistEntradaCommitted.itens.map((item) => {
+        const incoming = payloadMap.get(toInt(item.id));
+        if (!incoming) {
+            return item;
+        }
+
+        const status = checklistEntradaStatusOptions.includes(String(incoming.status || ''))
+            ? String(incoming.status)
+            : 'nao_verificado';
+        const observacao = String(incoming.observacao || '');
+        const existingPhotos = Array.isArray(item.existingPhotos) ? item.existingPhotos : [];
+
+        return {
+            ...item,
+            status,
+            observacao: status === 'ok' ? '' : observacao,
+            retainedPhotoIds: existingPhotos.map((photo) => toInt(photo.id)).filter((photoId) => photoId > 0),
+            deletedPhotoIds: []
+        };
+    });
+
+    checklistEntradaCommittedFiles = {};
+    checklistEntradaCommitted.resumo = computeChecklistResumo(checklistEntradaCommitted);
+    return true;
+}
+
+function getChecklistResumoState() {
+    const resumo = checklistEntradaCommitted?.resumo || computeChecklistResumo(checklistEntradaCommitted || {});
+    return {
+        ok: !checklistEntradaCommitted?.possuiModelo || Boolean(resumo.preenchido),
+        label: String(resumo.label || 'Checklist nao preenchido')
+    };
+}
+
+function isChecklistEntradaRequiredAndMissing() {
+    if (!checklistEntradaCommitted?.possuiModelo) {
+        return false;
+    }
+    const resumo = checklistEntradaCommitted?.resumo || computeChecklistResumo(checklistEntradaCommitted);
+    return !Boolean(resumo.preenchido);
+}
+
+function getTotalChecklistEntradaFotos() {
+    const existingCount = (checklistEntradaCommitted?.itens || []).reduce((total, item) => {
+        const retained = Array.isArray(item.retainedPhotoIds) ? item.retainedPhotoIds : [];
+        return total + retained.length;
+    }, 0);
+    const newCount = Object.values(checklistEntradaCommittedFiles).reduce((total, dt) => total + (dt?.files?.length || 0), 0);
+    return existingCount + newCount;
+}
+
+function ensureChecklistDraftItem(itemId) {
+    if (!checklistEntradaDraft?.itens?.length) {
+        return null;
+    }
+    return checklistEntradaDraft.itens.find((item) => toInt(item.id) === toInt(itemId)) || null;
+}
+
+function ensureChecklistDraftTransfer(itemId) {
+    const key = String(itemId);
+    if (!checklistEntradaDraftFiles[key]) {
+        checklistEntradaDraftFiles[key] = new DataTransfer();
+    }
+    return checklistEntradaDraftFiles[key];
+}
+
+function renderChecklistItemPhotos(item, container) {
+    if (!container) {
+        return;
+    }
+    container.innerHTML = '';
+
+    const retainedSet = new Set((item.retainedPhotoIds || []).map((photoId) => toInt(photoId)));
+    (item.existingPhotos || []).forEach((photo) => {
+        if (!retainedSet.has(toInt(photo.id))) {
+            return;
+        }
+        const thumb = document.createElement('div');
+        thumb.className = 'checklist-photo-thumb';
+        thumb.innerHTML = `
+            <a href="javascript:void(0)" class="d-block w-100 h-100 image-preview" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="${escapeEquipamentoHtml(photo.url)}">
+                <img src="${escapeEquipamentoHtml(photo.url)}" alt="">
+            </a>
+            <button type="button" class="btn btn-sm btn-outline-light checklist-photo-remove" data-checklist-remove-existing="${toInt(photo.id)}" title="Remover foto">
+                <i class="bi bi-x"></i>
+            </button>
+        `;
+        container.appendChild(thumb);
+    });
+
+    const transfer = checklistEntradaDraftFiles[String(item.id)];
+    if (!transfer || !transfer.files || !transfer.files.length) {
+        return;
+    }
+
+    Array.from(transfer.files).forEach((file, index) => {
+        const objectUrl = URL.createObjectURL(file);
+        const thumb = document.createElement('div');
+        thumb.className = 'checklist-photo-thumb';
+        thumb.innerHTML = `
+            <a href="javascript:void(0)" class="d-block w-100 h-100 image-preview" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="${escapeEquipamentoHtml(objectUrl)}">
+                <img src="${escapeEquipamentoHtml(objectUrl)}" alt="">
+            </a>
+            <button type="button" class="btn btn-sm btn-outline-light checklist-photo-remove" data-checklist-remove-new="${index}" title="Remover foto">
+                <i class="bi bi-x"></i>
+            </button>
+        `;
+        container.appendChild(thumb);
+    });
+}
+
+function renderChecklistEntradaModal() {
+    if (!checklistEntradaModalList || !checklistEntradaModalAlert || !checklistEntradaModalMeta) {
+        return;
+    }
+
+    checklistEntradaModalList.innerHTML = '';
+    checklistEntradaModalAlert.classList.add('d-none');
+    checklistEntradaModalAlert.textContent = '';
+
+    if (!checklistEntradaDraft?.possuiModelo) {
+        checklistEntradaModalAlert.classList.remove('d-none');
+        checklistEntradaModalAlert.classList.add('alert-warning');
+        checklistEntradaModalAlert.textContent = 'Nao existe checklist cadastrado para este tipo de equipamento.';
+        checklistEntradaModalMeta.textContent = '';
+        if (checklistEntradaModalResumo) {
+            checklistEntradaModalResumo.textContent = 'Sem modelo configurado';
+        }
+        return;
+    }
+
+    const tipoNome = checklistEntradaDraft.tipoEquipamentoNome || getSelectedEquipamentoTipoNome() || 'Equipamento';
+    checklistEntradaModalMeta.textContent = `Modelo: ${checklistEntradaDraft.modeloNome || 'Checklist de entrada'} | Tipo: ${tipoNome}`;
+
+    const itensOrdenados = [...(checklistEntradaDraft.itens || [])].sort((a, b) => Number(a.ordem || 0) - Number(b.ordem || 0));
+    itensOrdenados.forEach((item) => {
+        const card = document.createElement('article');
+        card.className = 'checklist-item-card';
+        card.dataset.checklistItem = String(item.id);
+
+        const status = checklistEntradaStatusOptions.includes(String(item.status || '')) ? String(item.status) : 'nao_verificado';
+        const precisaObs = status === 'discrepancia';
+        const fotosCount = (item.retainedPhotoIds?.length || 0) + (checklistEntradaDraftFiles[String(item.id)]?.files?.length || 0);
+
+        card.innerHTML = `
+            <div class="checklist-item-head">
+                <div>
+                    <p class="checklist-item-title">${escapeEquipamentoHtml(item.descricao || 'Item')}</p>
+                    <small class="text-muted">Fotos: ${fotosCount}</small>
+                </div>
+                <div class="checklist-status-actions">
+                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'ok' ? 'btn-success' : 'btn-outline-success'}" data-checklist-status="ok">OK</button>
+                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'discrepancia' ? 'btn-warning' : 'btn-outline-warning'}" data-checklist-status="discrepancia">Discrepancia</button>
+                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'nao_verificado' ? 'btn-secondary' : 'btn-outline-secondary'}" data-checklist-status="nao_verificado">Nao verificado</button>
+                </div>
+            </div>
+            <div class="mt-2 ${precisaObs ? '' : 'd-none'}" data-checklist-observacao-wrap>
+                <label class="form-label form-label-sm mb-1">Observacao da discrepancia</label>
+                <textarea class="form-control form-control-sm" rows="2" data-checklist-observacao placeholder="Descreva a divergencia encontrada...">${escapeEquipamentoHtml(item.observacao || '')}</textarea>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-checklist-action="galeria">
+                    <i class="bi bi-image me-1"></i>Galeria
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-checklist-action="camera">
+                    <i class="bi bi-camera me-1"></i>Camera
+                </button>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mt-2" data-checklist-photos></div>
+        `;
+
+        checklistEntradaModalList.appendChild(card);
+        const photosContainer = card.querySelector('[data-checklist-photos]');
+        renderChecklistItemPhotos(item, photosContainer);
+    });
+
+    const resumo = computeChecklistResumo(checklistEntradaDraft);
+    if (checklistEntradaModalResumo) {
+        checklistEntradaModalResumo.textContent = resumo.label;
+    }
+}
+
+function openChecklistEntradaModal() {
+    const equipamentoSelecionado = document.getElementById('equipamentoSelect')?.value || '';
+    if (!equipamentoSelecionado) {
+        showWarningDialog('Selecione o equipamento antes de preencher o checklist.', 'Checklist indisponivel');
+        return;
+    }
+
+    checklistEntradaDraft = cloneChecklistEntradaState(checklistEntradaCommitted);
+    checklistEntradaDraftFiles = cloneChecklistFilesMap(checklistEntradaCommittedFiles);
+    renderChecklistEntradaModal();
+    closeImageModalIfOpen();
+    hoistModalToBody(checklistEntradaModalEl, CHECKLIST_MODAL_Z_INDEX);
+    cleanupStuckModalArtifacts();
+    resetModalNodeState(checklistEntradaModalEl);
+
+    try {
+        bootstrap.Modal.getInstance(checklistEntradaModalEl)?.dispose();
+    } catch (error) {
+        console.error('[ChecklistEntrada] falha ao descartar instancia anterior do modal', error);
+    }
+
+    checklistEntradaModal = checklistEntradaModalEl
+        ? new bootstrap.Modal(checklistEntradaModalEl, { backdrop: true, focus: true, keyboard: true })
+        : null;
+    checklistEntradaModal?.show();
+}
+
+function saveChecklistEntradaModal() {
+    if (!checklistEntradaDraft?.possuiModelo) {
+        checklistEntradaModal?.hide();
+        return;
+    }
+
+    const resumo = computeChecklistResumo(checklistEntradaDraft);
+    if (!resumo.preenchido) {
+        showWarningDialog('Marque todos os itens do checklist antes de salvar.', 'Checklist incompleto');
+        return;
+    }
+
+    checklistEntradaCommitted = cloneChecklistEntradaState(checklistEntradaDraft);
+    checklistEntradaCommitted.resumo = resumo;
+    checklistEntradaCommittedFiles = cloneChecklistFilesMap(checklistEntradaDraftFiles);
+    updateChecklistInlineSummary();
+    syncChecklistEntradaInputs();
+    updateResumo();
+    scheduleDraftSave();
+    checklistEntradaModal?.hide();
+}
+
+async function loadChecklistEntradaMeta(equipamentoId, optionEl = null) {
+    const equipId = toInt(equipamentoId);
+    if (!equipId) {
+        checklistEntradaCommitted = normalizeChecklistEntradaPayload(null, getSelectedEquipamentoTipoNome(optionEl));
+        checklistEntradaCommittedFiles = {};
+        updateChecklistInlineSummary();
+        syncChecklistEntradaInputs();
+        updateResumo();
+        return;
+    }
+
+    const token = ++checklistMetaLoadToken;
+    if (checklistEntradaBtn) {
+        checklistEntradaBtn.disabled = true;
+    }
+
+    try {
+        const params = new URLSearchParams();
+        params.set('equipamento_id', String(equipId));
+        if (osIdAtual > 0) {
+            params.set('os_id', String(osIdAtual));
+        }
+
+        const response = await fetch(`${checklistMetaEndpoint}?${params.toString()}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const payload = await response.json();
+
+        if (token !== checklistMetaLoadToken) {
+            return;
+        }
+
+        if (!response.ok || !payload?.ok) {
+            throw new Error(payload?.message || 'Nao foi possivel carregar o checklist.');
+        }
+
+        checklistEntradaCommitted = normalizeChecklistEntradaPayload(payload.data || null, getSelectedEquipamentoTipoNome(optionEl));
+        checklistEntradaCommittedFiles = {};
+        const shouldApplyPendingDraft = Boolean(
+            pendingChecklistEntradaDraftPayload
+            && (
+                String(pendingChecklistEntradaDraftEquipId || '') === ''
+                || String(pendingChecklistEntradaDraftEquipId || '') === String(equipId)
+            )
+        );
+        if (shouldApplyPendingDraft && applyChecklistDraftPayloadToCommitted(pendingChecklistEntradaDraftPayload)) {
+            pendingChecklistEntradaDraftPayload = null;
+            pendingChecklistEntradaDraftEquipId = '';
+        }
+        updateChecklistInlineSummary();
+        syncChecklistEntradaInputs();
+        updateResumo();
+    } catch (error) {
+        console.error('[ChecklistEntrada] falha ao carregar metadados', error);
+        checklistEntradaCommitted = normalizeChecklistEntradaPayload(null, getSelectedEquipamentoTipoNome(optionEl));
+        checklistEntradaCommittedFiles = {};
+        updateChecklistInlineSummary();
+        syncChecklistEntradaInputs();
+        updateResumo();
+    } finally {
+        if (checklistEntradaBtn) {
+            checklistEntradaBtn.disabled = false;
+        }
+    }
+}
+
+function processNextChecklistEntradaCrop() {
+    if (!checklistEntradaCropItemId) {
+        return;
+    }
+    if (!checklistEntradaCropQueue.length) {
+        hideModalSafe(modalCrop, '#modalCropEquip');
+        return;
+    }
+
+    const nextFile = checklistEntradaCropQueue.shift();
+    readFileAsDataUrl(nextFile)
+        .then((source) => openCropper(source, { type: 'checklist_entrada' }))
+        .catch((error) => {
+            console.error('[ChecklistEntrada] falha no preparo da foto para crop', error);
+            processNextChecklistEntradaCrop();
+        });
+}
+
+if (checklistEntradaBtn) {
+    checklistEntradaBtn.addEventListener('click', openChecklistEntradaModal);
+}
+
+btnChecklistEntradaSalvar?.addEventListener('click', saveChecklistEntradaModal);
+
+checklistEntradaModalEl?.addEventListener('shown.bs.modal', () => {
+    window.elevateLatestBackdrop(CHECKLIST_MODAL_Z_INDEX - 10);
+    if (checklistEntradaModalEl) {
+        checklistEntradaModalEl.style.zIndex = String(CHECKLIST_MODAL_Z_INDEX);
+    }
+});
+
+checklistEntradaModalEl?.addEventListener('hidden.bs.modal', () => {
+    checklistEntradaDraft = cloneChecklistEntradaState(checklistEntradaCommitted);
+    checklistEntradaDraftFiles = cloneChecklistFilesMap(checklistEntradaCommittedFiles);
+    scheduleModalCleanup();
+});
+
+checklistEntradaModalList?.addEventListener('click', (event) => {
+    const target = event.target.closest('button');
+    if (!target) {
+        return;
+    }
+
+    const itemCard = target.closest('[data-checklist-item]');
+    const itemId = itemCard?.dataset?.checklistItem || '';
+    const item = ensureChecklistDraftItem(itemId);
+    if (!item) {
+        return;
+    }
+
+    const statusAction = target.dataset.checklistStatus;
+    if (statusAction) {
+        item.status = checklistEntradaStatusOptions.includes(statusAction) ? statusAction : 'nao_verificado';
+        if (item.status !== 'discrepancia') {
+            item.observacao = '';
+        }
+        renderChecklistEntradaModal();
+        return;
+    }
+
+    const action = target.dataset.checklistAction;
+    if (action === 'galeria') {
+        if (checklistEntradaPhotoInput) {
+            checklistEntradaPhotoInput.dataset.itemId = String(item.id);
+            checklistEntradaPhotoInput.removeAttribute('capture');
+            checklistEntradaPhotoInput.click();
+        }
+        return;
+    }
+
+    if (action === 'camera') {
+        checklistEntradaCropItemId = String(item.id);
+        checklistEntradaCropQueue = [];
+        openCameraCapture({ type: 'checklist_entrada', entryId: String(item.id) });
+        return;
+    }
+
+    if (target.dataset.checklistRemoveExisting) {
+        const photoId = toInt(target.dataset.checklistRemoveExisting);
+        item.retainedPhotoIds = (item.retainedPhotoIds || []).filter((id) => toInt(id) !== photoId);
+        if (!item.deletedPhotoIds.includes(photoId)) {
+            item.deletedPhotoIds.push(photoId);
+        }
+        renderChecklistEntradaModal();
+        return;
+    }
+
+    if (target.dataset.checklistRemoveNew !== undefined) {
+        const index = toInt(target.dataset.checklistRemoveNew);
+        const transfer = checklistEntradaDraftFiles[String(item.id)];
+        if (!transfer || !transfer.files || !transfer.files.length) {
+            return;
+        }
+        const nextTransfer = new DataTransfer();
+        Array.from(transfer.files).forEach((file, fileIndex) => {
+            if (fileIndex !== index) {
+                nextTransfer.items.add(file);
+            }
+        });
+        checklistEntradaDraftFiles[String(item.id)] = nextTransfer;
+        renderChecklistEntradaModal();
+    }
+});
+
+checklistEntradaModalList?.addEventListener('input', (event) => {
+    const textarea = event.target.closest('textarea[data-checklist-observacao]');
+    if (!textarea) {
+        return;
+    }
+    const itemCard = textarea.closest('[data-checklist-item]');
+    const item = ensureChecklistDraftItem(itemCard?.dataset?.checklistItem || '');
+    if (!item) {
+        return;
+    }
+    item.observacao = textarea.value || '';
+});
+
+checklistEntradaPhotoInput?.addEventListener('change', function handleChecklistPhotoChange() {
+    const itemId = this.dataset.itemId || checklistEntradaCropItemId || '';
+    if (!itemId) {
+        this.value = '';
+        return;
+    }
+
+    const files = Array.from(this.files || []).filter((file) => String(file.type || '').startsWith('image/'));
+    if (!files.length) {
+        this.value = '';
+        return;
+    }
+
+    checklistEntradaCropItemId = String(itemId);
+    checklistEntradaCropQueue = files.slice();
+    processNextChecklistEntradaCrop();
+    this.value = '';
+});
+
+updateChecklistInlineSummary();
+syncChecklistEntradaInputs();
+
 // --- Select2 ---
 if (typeof $.fn.select2 !== 'undefined') {
     $('#clienteOsSelect').select2({
@@ -1600,6 +2863,159 @@ if (typeof $.fn.select2 !== 'undefined') {
 
     // Se quiser botão de Add dentro do dropdown Select2, é complexo.
     // O botão '+ Novo' já resolve bem.
+}
+
+function escapeEquipamentoHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function normalizeEquipamentoSearch(value) {
+    return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+}
+
+function buildEquipamentoPrimary(meta) {
+    const tipo = String(meta.tipo_nome || meta.tipo || '').trim();
+    const marca = String(meta.marca_nome || meta.marca || '').trim();
+    const parts = [tipo, marca].filter(Boolean);
+    return parts.length ? parts.join(' - ') : 'Equipamento';
+}
+
+function buildEquipamentoSecondary(meta) {
+    const modelo = String(meta.modelo_nome || meta.modelo || '').trim();
+    const cor = String(meta.cor || '').trim();
+    const parts = [modelo, cor].filter(Boolean);
+    return parts.length ? parts.join(' - ') : 'Modelo ou cor não informados';
+}
+
+function buildEquipamentoIdentity(meta) {
+    const serie = String(meta.numero_serie || meta.serie || '').trim();
+    const imei = String(meta.imei || '').trim();
+    if (serie && imei) {
+        return `Nº série: ${serie} | IMEI: ${imei}`;
+    }
+    if (serie) {
+        return `Nº série: ${serie}`;
+    }
+    if (imei) {
+        return `IMEI: ${imei}`;
+    }
+    return 'Sem número de série ou IMEI';
+}
+
+function buildEquipamentoFallback(meta) {
+    const raw = String(meta.tipo_nome || meta.tipo || meta.marca_nome || meta.marca || meta.modelo_nome || meta.modelo || 'EQ').trim();
+    return raw ? raw.charAt(0).toUpperCase() : 'E';
+}
+
+function getEquipamentoOptionMeta(source) {
+    const element = source?.element || source;
+    const dataset = element?.dataset || {};
+    return {
+        id: String(source?.id || element?.value || ''),
+        tipo: String(dataset.tipo || ''),
+        tipo_nome: String(dataset.tipo_nome || ''),
+        marca: String(dataset.marca || ''),
+        marca_nome: String(dataset.marca || ''),
+        modelo: String(dataset.modelo || ''),
+        modelo_nome: String(dataset.modelo || ''),
+        cor: String(dataset.cor || ''),
+        numero_serie: String(dataset.serie || ''),
+        imei: String(dataset.imei || ''),
+        foto_url: String(dataset.foto_url || '')
+    };
+}
+
+function renderEquipamentoOptionTemplate(data) {
+    if (data.loading) return data.text;
+    if (!data.id) {
+        return `<span class="text-muted">${escapeEquipamentoHtml(data.text || 'Selecione o equipamento...')}</span>`;
+    }
+
+    const meta = getEquipamentoOptionMeta(data);
+    const thumbHtml = meta.foto_url
+        ? `<img src="${escapeEquipamentoHtml(meta.foto_url)}" alt="">`
+        : `<span class="os-equip-select-fallback">${escapeEquipamentoHtml(buildEquipamentoFallback(meta))}</span>`;
+
+    return `
+        <div class="os-equip-select-result">
+            <div class="os-equip-select-thumb">${thumbHtml}</div>
+            <div class="os-equip-select-copy">
+                <strong>${escapeEquipamentoHtml(buildEquipamentoPrimary(meta))}</strong>
+                <small>${escapeEquipamentoHtml(buildEquipamentoSecondary(meta))}</small>
+                <small>${escapeEquipamentoHtml(buildEquipamentoIdentity(meta))}</small>
+            </div>
+        </div>
+    `;
+}
+
+function equipamentoSelectMatcher(params, data) {
+    const term = String(params.term || '').trim();
+    if (!term) {
+        return data;
+    }
+
+    if (!data.id || !data.element) {
+        return null;
+    }
+
+    const meta = getEquipamentoOptionMeta(data);
+    const haystack = normalizeEquipamentoSearch([
+        buildEquipamentoPrimary(meta),
+        buildEquipamentoSecondary(meta),
+        buildEquipamentoIdentity(meta),
+        meta.tipo_nome,
+        meta.marca_nome,
+        meta.modelo_nome,
+        meta.cor,
+        meta.numero_serie,
+        meta.imei
+    ].join(' '));
+    const needle = normalizeEquipamentoSearch(term);
+
+    return haystack.includes(needle) ? data : null;
+}
+
+function initEquipamentoSelect2() {
+    if (typeof $.fn.select2 === 'undefined') {
+        return;
+    }
+
+    const $equipamentoSelect = $('#equipamentoSelect');
+    if (!$equipamentoSelect.length) {
+        return;
+    }
+
+    if ($equipamentoSelect.hasClass('select2-hidden-accessible')) {
+        try {
+            $equipamentoSelect.off('.osEquipSelect2');
+            $equipamentoSelect.select2('destroy');
+        } catch (e) {}
+    }
+
+    $equipamentoSelect.select2({
+        theme: 'bootstrap-5',
+        placeholder: 'Selecione o equipamento...',
+        allowClear: true,
+        width: '100%',
+        escapeMarkup: function (markup) { return markup; },
+        templateResult: renderEquipamentoOptionTemplate,
+        templateSelection: renderEquipamentoOptionTemplate,
+        matcher: equipamentoSelectMatcher
+    }).on('change.osEquipSelect2', function() {
+        _onEquipamentoChange(this.value, this.options[this.selectedIndex]);
+    });
+}
+
+if (typeof $.fn.select2 !== 'undefined') {
+    initEquipamentoSelect2();
 }
 
 // --- Modal: Cadastrar ou Editar Cliente ---
@@ -1938,6 +3354,17 @@ document.getElementById('btnSalvarNovoCliente')?.addEventListener('click', funct
         notifyParentClienteUpdated(clientePayload);
         modalClienteInstance?.hide();
         form.reset();
+        if (window.Swal && typeof window.Swal.fire === 'function') {
+            Swal.fire({
+                icon: 'success',
+                title: res.is_update ? 'Cliente atualizado' : 'Cliente cadastrado',
+                text: res.is_update
+                    ? 'Os dados do cliente foram salvos com sucesso.'
+                    : 'Cliente cadastrado com sucesso.',
+                timer: 1800,
+                showConfirmButton: false
+            });
+        }
         
     })
     .catch(() => {
@@ -2022,8 +3449,7 @@ function updateResumo() {
     const previsaoInp = document.querySelector('input[name="data_previsao"]');
     const relatoInp  = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
     const acessoriosInp = document.querySelector('textarea[name="acessorios"]');
-    const estadoFisicoInp = document.getElementById('estadoFisicoInput');
-    const estadoFisicoSemAvarias = document.getElementById('estadoFisicoSemAvarias');
+    const checklistResumo = getChecklistResumoState();
 
     const clienteText = _getSelectedText(clienteSel, 'Não selecionado');
     const equipText   = _getSelectedText(equipSel, 'Não selecionado');
@@ -2032,18 +3458,16 @@ function updateResumo() {
     const statusVal = statusSel?.value || 'triagem';
     const relatoVal = relatoInp?.value?.trim() || '';
     const acessoriosVal = acessoriosInp?.value?.trim() || '';
-    const estadoFisicoVal = estadoFisicoInp?.value?.trim() || '';
 
     document.getElementById('resumoCliente').textContent = clienteText;
     document.getElementById('resumoEquipamento').textContent = equipText;
     document.getElementById('resumoTecnico').textContent = tecnicoText;
     document.getElementById('resumoEntrada').textContent = _formatDateTime(entradaInp?.value);
     document.getElementById('resumoPrevisao').textContent = _formatDate(previsaoInp?.value);
-    const semAcessorios = acessoriosVal.toLowerCase() === 'sem acessórios';
-    const semAvarias = Boolean(estadoFisicoSemAvarias?.checked) || estadoFisicoVal.toLowerCase() === 'sem avarias aparentes';
+    const semAcessorios = acessoriosVal.toLowerCase() === 'sem acessorios';
     document.getElementById('resumoRelato').textContent = relatoVal ? 'Preenchido' : 'Vazio';
-    document.getElementById('resumoAcessorios').textContent = semAcessorios ? 'Sem acessórios' : (acessoriosVal ? 'Informado' : 'Não informado');
-    document.getElementById('resumoEstadoFisico').textContent = semAvarias ? 'Sem avarias' : (estadoFisicoVal ? 'Informado' : 'Não informado');
+    document.getElementById('resumoAcessorios').textContent = semAcessorios ? 'Sem acessorios' : (acessoriosVal ? 'Informado' : 'Nao informado');
+    document.getElementById('resumoEstadoFisico').textContent = checklistResumo.label;
 
     const prioridadeBadgeClass = {
         baixa: 'text-bg-secondary',
@@ -2074,7 +3498,7 @@ function updateResumo() {
     _setFieldStatus('statusPrevisao', Boolean(previsaoInp?.value));
     _setFieldStatus('statusRelato', Boolean(relatoVal));
     _setFieldStatus('statusAcessorios', semAcessorios || Boolean(acessoriosVal));
-    _setFieldStatus('statusEstadoFisico', semAvarias || Boolean(estadoFisicoVal));
+    _setFieldStatus('statusEstadoFisico', checklistResumo.ok);
     _setFieldStatus('statusFotos', totalFotos > 0);
     if (document.getElementById('statusDefeitos')) {
         _setFieldStatus('statusDefeitos', defeitosCount > 0);
@@ -2113,6 +3537,128 @@ function initRelatoRapidoModule() {
 }
 
 initRelatoRapidoModule();
+
+function parseProcedimentosExecutados(value) {
+    const raw = String(value || '');
+    if (!raw.trim()) return [];
+    return raw
+        .split(/\r?\n/)
+        .map(item => item.trim())
+        .filter(item => item !== '');
+}
+
+function formatProcedimentoTimestamp(date = new Date()) {
+    const dt = (date instanceof Date) ? date : new Date();
+    if (Number.isNaN(dt.getTime())) {
+        return '';
+    }
+
+    const dd = String(dt.getDate()).padStart(2, '0');
+    const mm = String(dt.getMonth() + 1).padStart(2, '0');
+    const yy = String(dt.getFullYear()).slice(-2);
+    const hh = String(dt.getHours()).padStart(2, '0');
+    const min = String(dt.getMinutes()).padStart(2, '0');
+    return `${dd}/${mm}/${yy}-${hh}:${min}`;
+}
+
+function getTecnicoLabelForProcedimento() {
+    const tecnicoSel = document.querySelector('select[name="tecnico_id"]');
+    if (!tecnicoSel || !tecnicoSel.value) {
+        return 'Nao atribuido';
+    }
+
+    const selected = tecnicoSel.options[tecnicoSel.selectedIndex];
+    const label = String(selected?.textContent || '').trim();
+    return label || 'Nao atribuido';
+}
+
+function renderProcedimentosExecutadosList(items) {
+    if (!procedimentosExecutadosLista) {
+        return;
+    }
+
+    procedimentosExecutadosLista.innerHTML = '';
+
+    if (!items.length) {
+        const empty = document.createElement('div');
+        empty.className = 'text-muted small';
+        empty.textContent = 'Nenhum procedimento inserido.';
+        procedimentosExecutadosLista.appendChild(empty);
+        return;
+    }
+
+    items.forEach((item) => {
+        const line = document.createElement('div');
+        line.className = 'procedimento-executado-item';
+        line.textContent = item;
+        procedimentosExecutadosLista.appendChild(line);
+    });
+}
+
+function syncProcedimentosExecutadosList(items) {
+    if (procedimentosExecutadosInput) {
+        procedimentosExecutadosInput.value = items.join('\n');
+    }
+    renderProcedimentosExecutadosList(items);
+}
+
+function inserirProcedimentoExecutado() {
+    if (!procedimentosExecutadosInput || !procedimentoExecutadoTextoInput) {
+        return;
+    }
+
+    const procedimentoBase = String(procedimentoExecutadoTextoInput.value || '').trim();
+    if (!procedimentoBase) {
+        showWarningDialog('Informe o procedimento antes de inserir.', 'Procedimento vazio');
+        procedimentoExecutadoTextoInput.focus();
+        return;
+    }
+
+    const tecnicoNome = getTecnicoLabelForProcedimento();
+    const stamp = formatProcedimentoTimestamp(new Date());
+    const linha = `[${procedimentoBase} - ${stamp} - tecnico: ${tecnicoNome}]`;
+    const items = parseProcedimentosExecutados(procedimentosExecutadosInput.value);
+    items.push(linha);
+    syncProcedimentosExecutadosList(items);
+
+    procedimentoExecutadoTextoInput.value = '';
+    procedimentoExecutadoTextoInput.focus();
+    updateResumo();
+    scheduleDraftSave();
+}
+
+function initProcedimentosExecutadosEditor() {
+    if (!procedimentosExecutadosInput || !procedimentosExecutadosLista) {
+        return;
+    }
+
+    const items = parseProcedimentosExecutados(procedimentosExecutadosInput.value);
+    syncProcedimentosExecutadosList(items);
+
+    btnInserirProcedimentoExecutado?.addEventListener('click', inserirProcedimentoExecutado);
+    procedimentoExecutadoTextoInput?.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter') {
+            return;
+        }
+        event.preventDefault();
+        inserirProcedimentoExecutado();
+    });
+
+    procedimentosExecutadosInput.addEventListener('input', () => {
+        renderProcedimentosExecutadosList(parseProcedimentosExecutados(procedimentosExecutadosInput.value));
+    });
+
+    document.querySelector('textarea[name="diagnostico_tecnico"]')?.addEventListener('input', () => {
+        updateResumo();
+        scheduleDraftSave();
+    });
+    document.querySelector('textarea[name="solucao_aplicada"]')?.addEventListener('input', () => {
+        updateResumo();
+        scheduleDraftSave();
+    });
+}
+
+initProcedimentosExecutadosEditor();
 
 const COMMON_ACCESSORY_COLORS = [
     { hex: '#000000', name: 'Preto' },
@@ -2290,13 +3836,19 @@ const acessoriosQuickFields = document.getElementById('acessoriosQuickFields');
 const acessoriosQuickSave = document.getElementById('acessoriosQuickSave');
 const acessoriosQuickCancel = document.getElementById('acessoriosQuickCancel');
 const acessoriosQuickClose = document.getElementById('acessoriosQuickClose');
+const acessoriosQuickAddFoto = document.getElementById('acessoriosQuickAddFoto');
+const acessoriosQuickAddFotoCamera = document.getElementById('acessoriosQuickAddFotoCamera');
+const acessoriosQuickPhotosPreview = document.getElementById('acessoriosQuickPhotosPreview');
+const acessoriosQuickPhotosHint = document.getElementById('acessoriosQuickPhotosHint');
 const acessoriosPhotoInput = document.getElementById('acessoriosPhotoInput');
 const acessoriosFilesInputs = document.getElementById('acessoriosFilesInputs');
+document.querySelector('#acessoriosSemItensLegacy + label')?.setAttribute('for', 'acessoriosSemItensLegacy');
 const acessoriosPhotos = {};
 const acessoriosFileInputs = {};
 let acessoriosEntries = [];
 let acessoriosEditing = null;
 let acessoriosCurrentKey = null;
+let acessoriosQuickEntryId = null;
 let acessoriosPhotoTarget = null;
 let acessorioCropQueue = [];
 let acessorioCropEntryId = null;
@@ -2322,6 +3874,10 @@ function isAcessoriosSemItensChecked() {
 
 function clearAllAcessorios() {
     acessoriosEntries.forEach(entry => removeAcessorioFileInput(entry.id));
+    if (acessoriosQuickEntryId && !acessoriosEntries.some(entry => entry.id === acessoriosQuickEntryId)) {
+        removeAcessorioFileInput(acessoriosQuickEntryId);
+    }
+    acessoriosQuickEntryId = null;
     acessoriosEntries = [];
 }
 
@@ -2387,6 +3943,43 @@ function removeAcessorioFileInput(entryId) {
         delete acessoriosFileInputs[entryId];
     }
     delete acessoriosPhotos[entryId];
+}
+
+function getCurrentAcessorioEntryId() {
+    if (acessoriosEditing !== null && acessoriosEntries[acessoriosEditing]?.id) {
+        return acessoriosEntries[acessoriosEditing].id;
+    }
+    if (acessoriosQuickEntryId) {
+        return acessoriosQuickEntryId;
+    }
+    acessoriosQuickEntryId = generateEntryId();
+    return acessoriosQuickEntryId;
+}
+
+function updateAcessoriosQuickPhotosHint(entryId = null) {
+    if (!acessoriosQuickPhotosHint) return;
+    const currentId = entryId || acessoriosQuickEntryId;
+    if (!currentId) {
+        acessoriosQuickPhotosHint.textContent = 'Adicione fotos antes de salvar o item.';
+        return;
+    }
+    const total = acessoriosPhotos[currentId]?.files?.length || 0;
+    acessoriosQuickPhotosHint.textContent = total > 0
+        ? `${total} foto(s) pronta(s) para salvar neste acessorio.`
+        : 'Adicione fotos antes de salvar o item.';
+}
+
+function renderAcessoriosQuickPhotos() {
+    if (!acessoriosQuickPhotosPreview) return;
+    acessoriosQuickPhotosPreview.innerHTML = '';
+    const entryId = acessoriosQuickEntryId;
+    if (!entryId) {
+        updateAcessoriosQuickPhotosHint();
+        return;
+    }
+    ensureAcessorioFileInput(entryId);
+    renderAcessoriosPhotos(entryId, acessoriosQuickPhotosPreview);
+    updateAcessoriosQuickPhotosHint(entryId);
 }
 
 function renderAcessoriosPhotos(entryId, container) {
@@ -2465,9 +4058,18 @@ function renderAcessoriosList() {
 }
 
 function closeAcessoriosForm() {
+    if (
+        acessoriosEditing === null &&
+        acessoriosQuickEntryId &&
+        !acessoriosEntries.some(entry => entry.id === acessoriosQuickEntryId)
+    ) {
+        removeAcessorioFileInput(acessoriosQuickEntryId);
+    }
     acessoriosQuickForm?.classList.add('d-none');
     acessoriosQuickFields.innerHTML = '';
     acessoriosEditing = null;
+    acessoriosQuickEntryId = null;
+    renderAcessoriosQuickPhotos();
 }
 
 function openAcessoriosForm(key, index = null) {
@@ -2566,11 +4168,11 @@ function openAcessoriosForm(key, index = null) {
             };
 
             const quickColorsDesktop = document.createElement('div');
-            quickColorsDesktop.className = 'd-none d-md-flex flex-nowrap gap-1 mt-2 w-100';
+            quickColorsDesktop.className = 'd-none d-md-flex flex-wrap gap-1 mt-2 w-100 os-acessorio-quick-colors';
             COMMON_ACCESSORY_COLORS.forEach(color => {
                 const quickBtn = document.createElement('button');
                 quickBtn.type = 'button';
-                quickBtn.className = 'btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 text-nowrap px-2 py-1';
+                quickBtn.className = 'btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 px-2 py-1 os-acessorio-quick-color-btn';
                 quickBtn.style.fontSize = '0.82rem';
                 quickBtn.innerHTML = `
                     <span class="rounded-circle border" style="width:12px;height:12px;background:${color.hex};"></span>
@@ -2622,6 +4224,7 @@ function openAcessoriosForm(key, index = null) {
     });
     if (index !== null) {
         acessoriosEditing = index;
+        acessoriosQuickEntryId = acessoriosEntries[index]?.id || null;
         const values = acessoriosEntries[index].values || {};
         config.fields.forEach(field => {
             const el = acessoriosQuickFields.querySelector(`[name="${field.name}"]`);
@@ -2658,7 +4261,11 @@ function openAcessoriosForm(key, index = null) {
                 }
             }
         });
+    } else {
+        acessoriosEditing = null;
+        acessoriosQuickEntryId = generateEntryId();
     }
+    renderAcessoriosQuickPhotos();
     acessoriosQuickForm?.classList.remove('d-none');
 }
 
@@ -2684,6 +4291,7 @@ function handleAcessoriosSave() {
     const config = acessoriosConfig[key];
     if (!config) return;
     const values = collectFormValues();
+    const entryId = getCurrentAcessorioEntryId();
     (config.fields || []).forEach(field => {
         if (field.type === 'select_with_other') {
             const otherName = field.otherName || `${field.name}_outro`;
@@ -2704,7 +4312,7 @@ function handleAcessoriosSave() {
     if (acessoriosEditing !== null) {
         acessoriosEntries[acessoriosEditing] = { ...acessoriosEntries[acessoriosEditing], text, values, key };
     } else {
-        acessoriosEntries.push({ id: generateEntryId(), text, values, key });
+        acessoriosEntries.push({ id: entryId, text, values, key });
     }
     renderAcessoriosList();
     syncAcessoriosInput();
@@ -2802,6 +4410,10 @@ function handleRemovePhoto(event) {
         ensureAcessorioFileInput(entryId);
     }
     renderAcessoriosList();
+    if (entryId === acessoriosQuickEntryId) {
+        renderAcessoriosQuickPhotos();
+    }
+    updateAcessoriosQuickPhotosHint(entryId);
 }
 
 document.querySelectorAll('[data-acessorio-key]').forEach(btn => {
@@ -2862,6 +4474,16 @@ acessoriosSemItensCheckbox?.addEventListener('change', () => {
 acessoriosQuickSave?.addEventListener('click', handleAcessoriosSave);
 acessoriosQuickCancel?.addEventListener('click', handleAcessoriosCancel);
 acessoriosQuickClose?.addEventListener('click', handleAcessoriosCancel);
+acessoriosQuickAddFoto?.addEventListener('click', () => {
+    if (isAcessoriosSemItensChecked()) return;
+    const entryId = getCurrentAcessorioEntryId();
+    openAcessorioPhotoInput(entryId);
+});
+acessoriosQuickAddFotoCamera?.addEventListener('click', () => {
+    if (isAcessoriosSemItensChecked()) return;
+    const entryId = getCurrentAcessorioEntryId();
+    openAcessorioCameraCapture(entryId);
+});
 document.addEventListener('click', event => {
     const removeBtn = event.target.closest('.btn-remove-acessorio');
     if (removeBtn) handleRemoveAcessorio({ currentTarget: removeBtn });
@@ -3357,7 +4979,7 @@ function getTotalEstadoFisicoFotos() {
 function getTotalFotosEntradaResumo() {
     const fotosEntradaNovas = document.getElementById('fotosEntradaInput')?.files?.length || 0;
     const fotosEntradaExistentes = existingFotosCount || 0;
-    return fotosEntradaNovas + fotosEntradaExistentes + getTotalAcessoriosFotos() + getTotalEstadoFisicoFotos();
+    return fotosEntradaNovas + fotosEntradaExistentes + getTotalAcessoriosFotos() + getTotalChecklistEntradaFotos();
 }
 
 function _setResumoRascunho(text) {
@@ -3377,6 +4999,7 @@ function _collectDraft() {
     const acessoriosInp = document.querySelector('textarea[name="acessorios"]');
     const estadoFisicoInp = document.querySelector('textarea[name="estado_fisico"]');
     const formaPagamentoSel = document.querySelector('select[name="forma_pagamento"]');
+    const checklistEntradaData = checklistEntradaDataInput?.value || '';
 
     return {
         savedAt: new Date().toISOString(),
@@ -3390,6 +5013,7 @@ function _collectDraft() {
         relato_cliente: relatoInp?.value || '',
         acessorios: acessoriosInp?.value || '',
         acessorios_sem_itens: acessoriosSemItensCheckbox?.checked ? '1' : '0',
+        checklist_entrada_data: checklistEntradaData,
         estado_fisico: estadoFisicoInp?.value || '',
         estado_fisico_sem_avarias: estadoFisicoSemAvariasCheckbox?.checked ? '1' : '0',
         forma_pagamento: formaPagamentoSel?.value || '',
@@ -3407,6 +5031,7 @@ function _hasDraftData(data) {
         data.relato_cliente?.trim() ||
         data.acessorios?.trim() ||
         data.acessorios_sem_itens === '1' ||
+        data.checklist_entrada_data?.trim() ||
         data.estado_fisico?.trim() ||
         data.estado_fisico_sem_avarias === '1' ||
         data.forma_pagamento?.trim() ||
@@ -3465,6 +5090,8 @@ function _applyDraft(data) {
     const acessoriosInp = document.querySelector('textarea[name="acessorios"]');
     const estadoFisicoInp = document.querySelector('textarea[name="estado_fisico"]');
     const formaPagamentoSel = document.querySelector('select[name="forma_pagamento"]');
+    pendingChecklistEntradaDraftPayload = parseChecklistDraftPayload(data.checklist_entrada_data || '');
+    pendingChecklistEntradaDraftEquipId = String(data.equipamento_id || '');
 
     if (tecnicoSel) tecnicoSel.value = data.tecnico_id || '';
     if (prioridadeSel) prioridadeSel.value = data.prioridade || 'normal';
@@ -3535,6 +5162,9 @@ function _applyPendingDefeitos() {
         if (chk) chk.checked = true;
     });
     pendingDefeitos = null;
+    if (typeof renderDefeitosSelecionadosCard === 'function') {
+        renderDefeitosSelecionadosCard();
+    }
 }
 
 // Rascunho automático para nova OS
@@ -3597,7 +5227,25 @@ const formOs = document.getElementById('formOs');
 if (formOs) {
     const btnSubmitOs = document.getElementById('btnSubmitOs');
     const osSubmitLoading = document.getElementById('osSubmitLoading');
-    const osActionControls = Array.from(formOs.querySelectorAll('.os-form-actions .btn, .os-form-actions a'));
+    const osTabsContent = document.getElementById('osTabsContent');
+    const osFormActions = document.getElementById('osFormActions');
+
+    // Defesa estrutural: garante que o rodape de acoes fique fora do tab-content e dentro do form.
+    if (osFormActions) {
+        const actionsInsideTabs = Boolean(osTabsContent && osTabsContent.contains(osFormActions));
+        const actionsOutsideForm = !formOs.contains(osFormActions);
+        const actionsParentIsForm = osFormActions.parentElement === formOs;
+
+        if (actionsInsideTabs || actionsOutsideForm || !actionsParentIsForm) {
+            if (osTabsContent && osTabsContent.parentElement === formOs) {
+                osTabsContent.insertAdjacentElement('afterend', osFormActions);
+            } else {
+                formOs.appendChild(osFormActions);
+            }
+        }
+    }
+
+    const osActionControls = Array.from(document.querySelectorAll('#osFormActions .btn, #osFormActions a'));
     const defaultSubmitButtonHtml = btnSubmitOs ? btnSubmitOs.innerHTML : '';
     const submitLoadingText = btnSubmitOs?.dataset.loadingText || 'Salvando...';
 
@@ -3682,7 +5330,7 @@ if (formOs) {
         const requiredFields = [
             { selector: '#clienteOsSelect', label: 'Cliente', tabBtnId: 'tab-cliente-btn' },
             { selector: '#equipamentoSelect', label: 'Equipamento', tabBtnId: 'tab-equipamento-btn' },
-            { selector: 'select[name="tecnico_id"]', label: 'Tecnico', tabBtnId: 'tab-defeito-btn' },
+            { selector: 'select[name="tecnico_id"]', label: 'Tecnico', tabBtnId: 'tab-cliente-btn' },
             { selector: 'input[name="data_entrada"]', label: 'Data de Entrada', tabBtnId: 'tab-relato-btn' },
             { selector: '#relatoClienteInput', label: 'Relato do Cliente', tabBtnId: 'tab-defeito-btn' },
         ];
@@ -3696,10 +5344,10 @@ if (formOs) {
                 isMissing: () => !isAcessoriosSemItensChecked() && !((acessoriosInput?.value || '').trim())
             },
             {
-                selector: '#estadoFisicoSemAvarias',
-                label: 'Estado fisico',
+                selector: '#btnChecklistEntrada',
+                label: 'Checklist de Entrada',
                 tabBtnId: 'tab-equipamento-btn',
-                isMissing: () => !isEstadoFisicoSemAvariasChecked() && !((estadoFisicoInput?.value || '').trim())
+                isMissing: () => isChecklistEntradaRequiredAndMissing()
             },
             { selector: '#osFotosPreview', label: 'Fotos de Entrada', tabBtnId: 'tab-fotos-btn', isMissing: () => getTotalEntradaFotos() === 0 },
         ];
@@ -4002,8 +5650,11 @@ function _onClienteChange(clienteId) {
     hideSidebar();
 
     if (!clienteId) {
+        pendingChecklistEntradaDraftPayload = null;
+        pendingChecklistEntradaDraftEquipId = '';
         equipamentoSelect.innerHTML = '<option value="">Selecione o cliente primeiro...</option>';
         equipamentoSelect.disabled = false;
+        loadChecklistEntradaMeta('', null);
         if (typeof setEquipamentoEditButtonState === 'function') setEquipamentoEditButtonState();
         updateResumo();
         scheduleDraftSave();
@@ -4038,6 +5689,7 @@ function _onClienteChange(clienteId) {
                 opt.dataset.marca     = eq.marca_nome || '';
                 opt.dataset.modelo    = eq.modelo_nome || '';
                 opt.dataset.serie     = eq.numero_serie || '';
+                opt.dataset.imei      = eq.imei || '';
                 opt.dataset.cor       = eq.cor || '';
                 opt.dataset.cor_hex   = eq.cor_hex || '';
                 opt.dataset.tipo_nome = eq.tipo_nome || '';
@@ -4047,32 +5699,28 @@ function _onClienteChange(clienteId) {
                 opt.dataset.senha_acesso = eq.senha_acesso || '';
                 opt.dataset.estado_fisico = eq.estado_fisico || '';
                 opt.dataset.acessorios = eq.acessorios || '';
+                opt.dataset.foto_url = eq.foto_url || '';
                 equipamentoSelect.appendChild(opt);
             });
         }
         equipamentoSelect.disabled = false;
+        const targetId = pendingEquipId || autoSelectId;
         // Re-inicializa Select2 no equipamento
         if (typeof $.fn.select2 !== 'undefined') {
-            $('#equipamentoSelect').select2({
-                theme: 'bootstrap-5',
-                placeholder: 'Selecione o equipamento...',
-                allowClear: true,
-                width: '100%'
-            }).on('change', function() {
-                _onEquipamentoChange(this.value, this.options[this.selectedIndex]);
-            });
-            const targetId = pendingEquipId || autoSelectId;
+            initEquipamentoSelect2();
             if (targetId) {
                 $('#equipamentoSelect').val(String(targetId)).trigger('change');
                 pendingEquipId = null;
             }
         } else {
-            const targetId = pendingEquipId || autoSelectId;
             if (targetId) {
                 equipamentoSelect.value = String(targetId);
                 _onEquipamentoChange(equipamentoSelect.value, equipamentoSelect.options[equipamentoSelect.selectedIndex]);
                 pendingEquipId = null;
             }
+        }
+        if (!targetId) {
+            loadChecklistEntradaMeta('', null);
         }
         if (typeof setEquipamentoEditButtonState === 'function') setEquipamentoEditButtonState();
         updateResumo();
@@ -4081,6 +5729,7 @@ function _onClienteChange(clienteId) {
     .catch(() => {
         equipamentoSelect.innerHTML = '<option value="">Erro ao carregar.</option>';
         equipamentoSelect.disabled = false;
+        loadChecklistEntradaMeta('', null);
         if (typeof setEquipamentoEditButtonState === 'function') setEquipamentoEditButtonState();
     });
 }
@@ -4100,6 +5749,7 @@ if (typeof $.fn.select2 !== 'undefined') {
 function _onEquipamentoChange(id, opt) {
     const tipoId = opt ? opt.getAttribute('data-tipo') : null;
     carregarDefeitos(tipoId);
+    loadChecklistEntradaMeta(id, opt);
     if (id) {
         carregarFotosEquipamento(id, {
             marca:  opt?.dataset?.marca,
@@ -4130,18 +5780,7 @@ if (equipSelect) {
 // Na edição, carrega automaticamente
     if (isEdit && equipSelect.value) {
         const opt = equipSelect.options[equipSelect.selectedIndex];
-        const tipoId = opt ? opt.getAttribute('data-tipo') : null;
-        if (tipoId) carregarDefeitos(tipoId);
-        if (equipSelect.value) {
-            carregarFotosEquipamento(equipSelect.value, {
-                marca:  opt?.dataset.marca,
-                modelo: opt?.dataset.modelo,
-                serie:  opt?.dataset.serie,
-                tipo:   opt?.dataset.tipo_nome,
-                cor:    opt?.dataset.cor,
-                cor_hex: opt?.dataset.cor_hex
-            });
-        }
+        _onEquipamentoChange(equipSelect.value, opt);
     }
 }
 
@@ -4342,7 +5981,8 @@ updatePhotoState();
 // --- Modal: Cadastrar Novo Equipamento ---
 const osEquipamentosCache = window._osEquipamentosCache || (window._osEquipamentosCache = {});
 const btnNovoEquip = document.getElementById('btnNovoEquipamento');
-const btnEditarEquip = document.getElementById('btnEditarEquipamento');
+var btnEditarEquip = document.getElementById('btnEditarEquipamento');
+var btnEditarEquipInline = document.getElementById('btnEditarEquipamentoInline');
 const modalNovoEquipamentoEl = document.getElementById('modalNovoEquipamento');
 const modalNovoEquipamento = modalNovoEquipamentoEl ? new bootstrap.Modal(modalNovoEquipamentoEl) : null;
 const formNovoEquipAjax = document.getElementById('formNovoEquipAjax');
@@ -4366,14 +6006,35 @@ function bumpModalEquipFotosVersion() {
     modalEquipFotosVersion = Date.now();
 }
 
+function getTopModalStackZIndex(defaultZ = 2600) {
+    const modalEls = Array.from(document.querySelectorAll('.modal.show'));
+    const backdropEls = Array.from(document.querySelectorAll('.modal-backdrop.show, .modal-backdrop'));
+    const zIndexValues = [...modalEls, ...backdropEls].map((el) => {
+        const styleValue = window.getComputedStyle(el)?.zIndex || el.style?.zIndex || '';
+        const parsed = Number.parseInt(String(styleValue), 10);
+        return Number.isFinite(parsed) ? parsed : 0;
+    });
+    const maxActive = zIndexValues.length ? Math.max(...zIndexValues) : 0;
+    return Math.max(defaultZ, maxActive + 40);
+}
+
 function showWarningDialog(message, title = 'Atenção') {
     if (window.Swal && typeof window.Swal.fire === 'function') {
+        const dynamicZIndex = getTopModalStackZIndex(2600);
         Swal.fire({
             icon: 'warning',
             title,
             text: message,
             confirmButtonText: 'OK',
-            customClass: { popup: 'glass-card' }
+            customClass: { popup: 'glass-card' },
+            zIndex: dynamicZIndex,
+            didOpen: () => {
+                const containers = Array.from(document.querySelectorAll('.swal2-container'));
+                const container = containers[containers.length - 1] || null;
+                if (container) {
+                    container.style.zIndex = String(dynamicZIndex);
+                }
+            }
         });
         return;
     }
@@ -4403,10 +6064,11 @@ function ensureNovoEquipClienteInput(clienteId) {
 }
 
 function setEquipamentoEditButtonState() {
-    if (!btnEditarEquip) return;
     const equipId = document.getElementById('equipamentoSelect')?.value || '';
     const hasEquipamento = Boolean(String(equipId).trim());
-    btnEditarEquip.classList.toggle('d-none', !hasEquipamento);
+    const shouldHide = !hasEquipamento;
+    if (btnEditarEquip) btnEditarEquip.classList.toggle('d-none', shouldHide);
+    if (btnEditarEquipInline) btnEditarEquipInline.classList.toggle('d-none', shouldHide);
 }
 
 function syncNovoEquipFotosInput() {
@@ -4855,8 +6517,10 @@ function getSelectedEquipamentoData() {
         modelo_nome: opt.dataset.modelo || '',
         tipo_nome: opt.dataset.tipo_nome || '',
         numero_serie: opt.dataset.serie || '',
+        imei: opt.dataset.imei || '',
         cor: opt.dataset.cor || '',
         cor_hex: opt.dataset.cor_hex || '',
+        foto_url: opt.dataset.foto_url || '',
         senha_acesso: opt.dataset.senha_acesso || '',
         estado_fisico: opt.dataset.estado_fisico || '',
         acessorios: opt.dataset.acessorios || ''
@@ -4900,6 +6564,7 @@ btnNovoEquip?.addEventListener('click', function(event) {
     openNovoEquipamentoModal();
 });
 btnEditarEquip?.addEventListener('click', openEditarEquipamentoModal);
+btnEditarEquipInline?.addEventListener('click', openEditarEquipamentoModal);
 modalNovoEquipamentoEl?.addEventListener('hidden.bs.modal', () => {
     setNovoEquipModalMode('create');
     resetNovoEquipModalForm();
@@ -5155,20 +6820,26 @@ function getTextColorOS(hex) {
     return lum > 0.6 ? '#1a1a1a' : '#ffffff';
 }
 
+function normalizeHexColorOS(hex) {
+    const value = String(hex || '').trim().toUpperCase();
+    return /^#[0-9A-F]{6}$/.test(value) ? value : '';
+}
+
 window.updateColorUIOS = function(hex, name) {
-    const isEmpty = !hex || hex === '';
-    const safeHex = isEmpty ? '#e9ecef' : hex;
-    const safeName = isEmpty ? 'Cor não selecionada' : name;
+    const normalizedHex = normalizeHexColorOS(hex);
+    const isEmpty = normalizedHex === '';
+    const safeHex = isEmpty ? '#E9ECEF' : normalizedHex;
+    const safeName = isEmpty ? 'Cor n?o selecionada' : name;
     
     const rgb = hexToRgbOS(safeHex);
     const rgbStr = rgb ? `${rgb.r},${rgb.g},${rgb.b}` : '';
     const textColor = isEmpty ? '#6c757d' : getTextColorOS(safeHex);
 
-    $('#corHexRealOS').val(hex || '');
-    $('#corRgbRealOS').val(hex ? rgbStr : '');
+    $('#corHexRealOS').val(normalizedHex);
+    $('#corRgbRealOS').val(normalizedHex ? rgbStr : '');
     $('#corNomeRealOS').val(name || '');
 
-    $('#corHexPickerOS').val(isEmpty ? '#ffffff' : safeHex);
+    $('#corHexPickerOS').val(isEmpty ? '#FFFFFF' : normalizedHex);
     $('#corNomeInputOS').val(name || '');
 
     const preview = document.getElementById('colorPreviewBoxOS');
@@ -5404,6 +7075,10 @@ $('#btnAcceptColorOS').click(function() {
 // --- Lógica de Câmera, Galeria e Cropper ---
 const modalCameraEl  = document.getElementById('modalCamera');
 const modalCropEl    = document.getElementById('modalCropEquip');
+const CHECKLIST_MODAL_Z_INDEX = 2150;
+const CAMERA_MODAL_Z_INDEX = 2250;
+const CROP_MODAL_Z_INDEX = 2350;
+const DEFEITOS_MODAL_BASE_Z_INDEX = 2100;
 
 function hoistModalToBody(modalEl, zIndex = null) {
     if (!modalEl) return null;
@@ -5416,11 +7091,15 @@ function hoistModalToBody(modalEl, zIndex = null) {
     return modalEl;
 }
 
-hoistModalToBody(modalCameraEl, 2000);
-hoistModalToBody(modalCropEl, 2100);
+hoistModalToBody(modalCameraEl, CAMERA_MODAL_Z_INDEX);
+hoistModalToBody(modalCropEl, CROP_MODAL_Z_INDEX);
+hoistModalToBody(checklistEntradaModalEl, CHECKLIST_MODAL_Z_INDEX);
 
 const modalCamera    = modalCameraEl ? bootstrap.Modal.getOrCreateInstance(modalCameraEl) : null;
 const modalCrop      = modalCropEl ? bootstrap.Modal.getOrCreateInstance(modalCropEl) : null;
+if (checklistEntradaModalEl) {
+    checklistEntradaModal = bootstrap.Modal.getOrCreateInstance(checklistEntradaModalEl);
+}
 const modalCropTitle = document.getElementById('modalCropTitle');
 const videoCamera    = document.getElementById('videoCamera');
 const canvasCamera   = document.getElementById('canvasCamera');
@@ -5538,6 +7217,10 @@ async function openCameraCapture(context = { type: 'equipamento', entryId: null 
             }
         }
 
+        hoistModalToBody(modalCameraEl, CAMERA_MODAL_Z_INDEX);
+        if (modalCameraEl) {
+            modalCameraEl.style.zIndex = String(CAMERA_MODAL_Z_INDEX);
+        }
         resetModalNodeState(modalCameraEl);
         try {
             bootstrap.Modal.getInstance(modalCameraEl)?.dispose();
@@ -5547,6 +7230,7 @@ async function openCameraCapture(context = { type: 'equipamento', entryId: null 
 
         const cameraModalInstance = modalCameraEl ? new bootstrap.Modal(modalCameraEl) : null;
         cameraModalInstance?.show();
+        window.setTimeout(() => elevateLatestBackdrop(CAMERA_MODAL_Z_INDEX - 10), 80);
 
         window.setTimeout(() => {
             if (!modalCameraEl) return;
@@ -5572,6 +7256,10 @@ document.getElementById('btnAbrirCamera')?.addEventListener('click', async () =>
 });
 
 modalCameraEl?.addEventListener('shown.bs.modal', () => {
+    if (modalCameraEl) {
+        modalCameraEl.style.zIndex = String(CAMERA_MODAL_Z_INDEX);
+    }
+    elevateLatestBackdrop(CAMERA_MODAL_Z_INDEX - 10);
     console.info('[OS Nova] modal da camera exibido com sucesso');
 });
 
@@ -5591,6 +7279,10 @@ modalCameraEl?.addEventListener('hidden.bs.modal', () => {
         estadoFisicoCropEntryId = null;
         estadoFisicoCropQueue = [];
     }
+    if (cameraCaptureContext.type === 'checklist_entrada' && cropContext.type !== 'checklist_entrada') {
+        checklistEntradaCropItemId = null;
+        checklistEntradaCropQueue = [];
+    }
     if (cameraCaptureContext.type === 'entrada' && cropContext.type !== 'entrada') {
         fotosEntradaCropQueue = [];
     }
@@ -5605,6 +7297,8 @@ function setCropContext(context = { type: 'equipamento' }) {
             modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto do Acessorio';
         } else if (cropContext.type === 'estado_fisico') {
             modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto do Estado Fisico';
+        } else if (cropContext.type === 'checklist_entrada') {
+            modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto da Discrepancia';
         } else if (cropContext.type === 'entrada') {
             modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto de Entrada da OS';
         } else {
@@ -5656,6 +7350,9 @@ function appendBlobToCurrentPhotoContext(blob, canvas) {
         acessoriosPhotos[entryId] = dt;
         ensureAcessorioFileInput(entryId);
         renderAcessoriosList();
+        if (entryId === acessoriosQuickEntryId) {
+            renderAcessoriosQuickPhotos();
+        }
         scheduleDraftSave();
 
         if (acessorioCropQueue.length > 0) {
@@ -5683,6 +7380,38 @@ function appendBlobToCurrentPhotoContext(blob, canvas) {
             processNextEstadoFisicoCrop();
         } else {
             estadoFisicoCropEntryId = null;
+            hideModalSafe(modalCrop, '#modalCropEquip');
+        }
+        return;
+    }
+
+    if (cropContext.type === 'checklist_entrada' && checklistEntradaCropItemId) {
+        const entryId = String(checklistEntradaCropItemId);
+        const checklistItem = ensureChecklistDraftItem(entryId);
+        if (!checklistItem) {
+            checklistEntradaCropItemId = null;
+            if (checklistEntradaCropQueue.length > 0) {
+                processNextChecklistEntradaCrop();
+            } else {
+                hideModalSafe(modalCrop, '#modalCropEquip');
+            }
+            return;
+        }
+
+        const dt = ensureChecklistDraftTransfer(entryId);
+        const fileName = `checklist_entrada_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.jpg`;
+        const file = new File([blob], fileName, { type: 'image/jpeg' });
+        dt.items.add(file);
+        if (checklistItem.status === 'nao_verificado') {
+            checklistItem.status = 'discrepancia';
+        }
+        renderChecklistEntradaModal();
+        scheduleDraftSave();
+
+        if (checklistEntradaCropQueue.length > 0) {
+            processNextChecklistEntradaCrop();
+        } else {
+            checklistEntradaCropItemId = null;
             hideModalSafe(modalCrop, '#modalCropEquip');
         }
         return;
@@ -5798,8 +7527,13 @@ function openCropper(source, context = { type: 'equipamento' }) {
     imgToCrop.src = source;
     imgToCrop.dataset.cropToken = String(cropToken);
 
+    hoistModalToBody(modalCropEl, CROP_MODAL_Z_INDEX);
+    if (modalCropEl) {
+        modalCropEl.style.zIndex = String(CROP_MODAL_Z_INDEX);
+    }
     const cropModalInstance = bootstrap.Modal.getOrCreateInstance(modalCropEl);
     cropModalInstance.show();
+    window.setTimeout(() => elevateLatestBackdrop(CROP_MODAL_Z_INDEX - 10), 80);
 
     window.setTimeout(() => {
         if (cropToken !== activeCropToken) return;
@@ -5816,6 +7550,10 @@ function openCropper(source, context = { type: 'equipamento' }) {
 }
 
 document.getElementById('modalCropEquip').addEventListener('shown.bs.modal', () => {
+    if (modalCropEl) {
+        modalCropEl.style.zIndex = String(CROP_MODAL_Z_INDEX);
+    }
+    elevateLatestBackdrop(CROP_MODAL_Z_INDEX - 10);
     if (typeof window.Cropper === 'undefined') {
         return;
     }
@@ -5859,6 +7597,10 @@ document.getElementById('modalCropEquip').addEventListener('hidden.bs.modal', ()
     if (cropContext.type === 'estado_fisico') {
         estadoFisicoCropQueue = [];
         estadoFisicoCropEntryId = null;
+    }
+    if (cropContext.type === 'checklist_entrada') {
+        checklistEntradaCropQueue = [];
+        checklistEntradaCropItemId = null;
     }
     if (cropContext.type === 'entrada') {
         fotosEntradaCropQueue = [];
@@ -5906,6 +7648,12 @@ btnCapturar?.addEventListener('click', () => {
         openCropper(dataUrl, { type: 'estado_fisico' });
         return;
     }
+    if (cameraCaptureContext.type === 'checklist_entrada' && cameraCaptureContext.entryId) {
+        checklistEntradaCropItemId = String(cameraCaptureContext.entryId);
+        checklistEntradaCropQueue = [];
+        openCropper(dataUrl, { type: 'checklist_entrada' });
+        return;
+    }
     if (cameraCaptureContext.type === 'entrada') {
         openCropper(dataUrl, { type: 'entrada' });
         return;
@@ -5933,6 +7681,9 @@ document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
             acessoriosPhotos[entryId] = dt;
             ensureAcessorioFileInput(entryId);
             renderAcessoriosList();
+            if (entryId === acessoriosQuickEntryId) {
+                renderAcessoriosQuickPhotos();
+            }
             scheduleDraftSave();
 
             if (acessorioCropQueue.length > 0) {
@@ -6382,6 +8133,7 @@ document.getElementById('btnSalvarNovoEquip')?.addEventListener('click', functio
         opt.dataset.marca = eq.marca_nome || '';
         opt.dataset.modelo = eq.modelo_nome || '';
         opt.dataset.serie = eq.numero_serie || '';
+        opt.dataset.imei = eq.imei || '';
         opt.dataset.cor = eq.cor || '';
         opt.dataset.cor_hex = eq.cor_hex || '';
         opt.dataset.tipo_nome = eq.tipo_nome || '';
@@ -6391,7 +8143,9 @@ document.getElementById('btnSalvarNovoEquip')?.addEventListener('click', functio
         opt.dataset.senha_acesso = eq.senha_acesso || '';
         opt.dataset.estado_fisico = eq.estado_fisico || '';
         opt.dataset.acessorios = eq.acessorios || '';
+        opt.dataset.foto_url = res.foto_url || eq.foto_url || '';
 
+        eq.foto_url = res.foto_url || eq.foto_url || '';
         osEquipamentosCache[eqId] = eq;
         const fotosAtualizadas = Array.isArray(res.fotos) ? res.fotos : null;
 
@@ -6439,15 +8193,280 @@ document.getElementById('btnSalvarNovoEquip')?.addEventListener('click', functio
     });
 });
 
+// --- Defeitos comuns (card + modal) ---
+var btnAdicionarDefeitosComuns = document.getElementById('btnAdicionarDefeitosComuns');
+var modalDefeitosComunsEl = document.getElementById('modalDefeitosComuns');
+var modalDefeitosComunsBody = document.getElementById('modalDefeitosComunsBody');
+var modalDefeitosHint = document.getElementById('modalDefeitosHint');
+var defeitosHelperText = document.getElementById('defeitosHelperText');
+
+function syncDefeitosModalStack() {
+    if (!modalDefeitosComunsEl) return;
+    const modalZ = getTopModalStackZIndex(DEFEITOS_MODAL_BASE_Z_INDEX);
+    modalDefeitosComunsEl.style.zIndex = String(modalZ);
+
+    window.setTimeout(() => {
+        const backdrops = Array.from(document.querySelectorAll('.modal-backdrop'));
+        const latestBackdrop = backdrops[backdrops.length - 1];
+        if (latestBackdrop) {
+            latestBackdrop.style.zIndex = String(modalZ - 10);
+        }
+    }, 0);
+}
+
+if (modalDefeitosComunsEl) {
+    hoistModalToBody(modalDefeitosComunsEl, DEFEITOS_MODAL_BASE_Z_INDEX);
+    modalDefeitosComunsEl.addEventListener('show.bs.modal', syncDefeitosModalStack);
+    modalDefeitosComunsEl.addEventListener('shown.bs.modal', syncDefeitosModalStack);
+}
+
+if (btnAdicionarDefeitosComuns && modalDefeitosComunsEl) {
+    btnAdicionarDefeitosComuns.addEventListener('click', () => {
+        syncDefeitosModalStack();
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalDefeitosComunsEl);
+        modalInstance.show();
+    });
+}
+
+function _escapeHtmlDefeito(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function _escapeRegExp(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function _syncRelatoComDefeito(checkbox) {
+    const relato = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
+    if (!relato || !checkbox) return;
+
+    const nome = checkbox.getAttribute('data-nome') || '';
+    const desc = checkbox.getAttribute('data-desc') || '';
+    const tag = `[DEFEITO: ${nome}]${desc ? ' - ' + desc : ''}`;
+
+    if (checkbox.checked) {
+        if (!relato.value.includes(tag)) {
+            relato.value = relato.value.trim() ? `${relato.value.trimEnd()}\n${tag}` : tag;
+        }
+        return;
+    }
+
+    const regex = new RegExp(`(^|\\n)${_escapeRegExp(tag)}(?=\\n|$)`, 'g');
+    relato.value = relato.value
+        .replace(regex, '')
+        .replace(/\n{2,}/g, '\n')
+        .replace(/^\n+|\n+$/g, '');
+}
+
+function renderDefeitosSelecionadosCard() {
+    const container = document.getElementById('defeitosContainer');
+    if (!container) return;
+
+    const checks = Array.from((modalDefeitosComunsBody || document).querySelectorAll('.chk-defeito-comum:checked'));
+    const totalCatalogados = Array.from((modalDefeitosComunsBody || document).querySelectorAll('.chk-defeito-comum')).length;
+
+    defeitosSelecionados = checks.map((chk) => parseInt(chk.value, 10)).filter((id) => Number.isInteger(id));
+
+    if (!totalCatalogados) {
+        container.innerHTML = '<span class="text-muted small">Selecione o equipamento para carregar os defeitos...</span>';
+        if (defeitosHelperText) {
+            defeitosHelperText.textContent = 'Selecione os defeitos que se aplicam ao diagnostico atual.';
+        }
+        return;
+    }
+
+    if (!checks.length) {
+        container.innerHTML = '<div class="os-defeitos-empty">Nenhum defeito comum adicionado.</div>';
+        if (defeitosHelperText) {
+            defeitosHelperText.textContent = 'Nenhum defeito comum foi selecionado ate o momento.';
+        }
+        return;
+    }
+
+    container.innerHTML = checks.map((chk) => {
+        const id = parseInt(chk.value, 10);
+        const nomeRaw = chk.getAttribute('data-nome') || '';
+        const descRaw = chk.getAttribute('data-desc') || '';
+        const nome = _escapeHtmlDefeito(nomeRaw);
+        const desc = _escapeHtmlDefeito(descRaw);
+
+        return `
+            <div class="os-defeito-item d-flex justify-content-between align-items-start gap-2" data-defeito-id="${id}">
+                <div class="flex-grow-1">
+                    <p class="os-defeito-item__title">${nome}</p>
+                    ${descRaw ? `<p class="os-defeito-item__desc">${desc}</p>` : ''}
+                </div>
+                <span class="os-defeito-item__actions">
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-link p-0 text-warning btn-ver-procedimentos-os"
+                        data-id="${id}"
+                        data-nome="${nome}"
+                        title="Ver Procedimentos">
+                        <i class="bi bi-info-circle"></i>
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-link p-0 text-danger btn-remover-defeito-comum"
+                        data-id="${id}"
+                        title="Remover defeito">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                </span>
+            </div>
+        `;
+    }).join('');
+
+    if (defeitosHelperText) {
+        const qtd = checks.length;
+        defeitosHelperText.textContent = qtd === 1
+            ? '1 defeito comum selecionado.'
+            : `${qtd} defeitos comuns selecionados.`;
+    }
+}
+
+const defeitosContainerEl = document.getElementById('defeitosContainer');
+if (defeitosContainerEl && !defeitosContainerEl.dataset.boundDefeitosEvents) {
+    defeitosContainerEl.dataset.boundDefeitosEvents = '1';
+    defeitosContainerEl.addEventListener('click', (event) => {
+        const removeBtn = event.target.closest('.btn-remover-defeito-comum');
+        if (removeBtn) {
+            event.preventDefault();
+            const id = parseInt(removeBtn.dataset.id || '', 10);
+            if (!Number.isInteger(id)) return;
+            const targetChk = document.getElementById(`def_${id}`);
+            if (!targetChk) return;
+            targetChk.checked = false;
+            _syncRelatoComDefeito(targetChk);
+            renderDefeitosSelecionadosCard();
+            updateResumo();
+            scheduleDraftSave();
+            return;
+        }
+
+        const procBtn = event.target.closest('.btn-ver-procedimentos-os');
+        if (procBtn) {
+            event.preventDefault();
+            abrirProcedimentosViewOnly(procBtn.dataset.id, procBtn.dataset.nome);
+        }
+    });
+}
+
+if (modalDefeitosComunsBody && !modalDefeitosComunsBody.dataset.boundDefeitosEvents) {
+    modalDefeitosComunsBody.dataset.boundDefeitosEvents = '1';
+    modalDefeitosComunsBody.addEventListener('change', (event) => {
+        const checkbox = event.target.closest('.chk-defeito-comum');
+        if (!checkbox) return;
+        _syncRelatoComDefeito(checkbox);
+        renderDefeitosSelecionadosCard();
+        updateResumo();
+        scheduleDraftSave();
+    });
+
+    modalDefeitosComunsBody.addEventListener('click', (event) => {
+        const procBtn = event.target.closest('.btn-ver-procedimentos-os');
+        if (!procBtn) return;
+        event.preventDefault();
+        abrirProcedimentosViewOnly(procBtn.dataset.id, procBtn.dataset.nome);
+    });
+}
+
+function _renderDefeitosModalList(defeitos, preSelecionadosIds) {
+    if (!modalDefeitosComunsBody) return;
+
+    const hw = defeitos.filter(d => String(d.classificacao || '').toLowerCase() === 'hardware');
+    const sw = defeitos.filter(d => String(d.classificacao || '').toLowerCase() === 'software');
+    const outros = defeitos.filter(d => !['hardware', 'software'].includes(String(d.classificacao || '').toLowerCase()));
+
+    const grupos = [
+        { list: hw, cls: 'text-danger', icon: 'bi-cpu', label: 'HARDWARE' },
+        { list: sw, cls: 'text-primary', icon: 'bi-code-slash', label: 'SOFTWARE' },
+        { list: outros, cls: 'text-secondary', icon: 'bi-grid', label: 'OUTROS' },
+    ].filter(group => group.list.length);
+
+    const selectedSet = new Set((preSelecionadosIds || []).map((id) => parseInt(id, 10)));
+
+    let html = '<div class="row g-3">';
+    grupos.forEach(({ list, cls, icon, label }) => {
+        html += `
+            <div class="col-12 col-xl-6">
+                <div class="os-defeitos-modal-group h-100">
+                    <p class="${cls} fw-bold mb-2 small"><i class="bi ${icon} me-1"></i>${label}</p>
+        `;
+
+        list.forEach((d) => {
+            const id = parseInt(d.id, 10);
+            const nome = _escapeHtmlDefeito(d.nome || '');
+            const desc = _escapeHtmlDefeito(d.descricao || '');
+            const checked = selectedSet.has(id) ? 'checked' : '';
+
+            html += `
+                <div class="form-check mb-2">
+                    <input
+                        class="form-check-input chk-defeito-comum"
+                        type="checkbox"
+                        name="defeitos[]"
+                        value="${id}"
+                        id="def_${id}"
+                        ${checked}
+                        data-nome="${nome}"
+                        data-desc="${desc}">
+                    <label class="form-check-label d-flex align-items-center" for="def_${id}">
+                        <div class="flex-grow-1">
+                            <strong style="font-size:0.85rem;">${nome}</strong>
+                            ${desc ? `<br><small class="text-muted">${desc}</small>` : ''}
+                        </div>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-link p-0 text-warning ms-2 btn-ver-procedimentos-os"
+                            data-id="${id}"
+                            data-nome="${nome}"
+                            title="Ver Procedimentos">
+                            <i class="bi bi-info-circle"></i>
+                        </button>
+                    </label>
+                </div>
+            `;
+        });
+
+        html += `
+                </div>
+            </div>
+        `;
+    });
+    html += '</div>';
+
+    modalDefeitosComunsBody.innerHTML = html;
+}
+
 // --- carregarDefeitos ---
 function carregarDefeitos(tipoId) {
-    const section   = document.getElementById('defeitosSection');
+    const section = document.getElementById('defeitosSection');
     const container = document.getElementById('defeitosContainer');
     if (!section || !container) return;
-    if (!tipoId) { section.style.display = 'none'; return; }
 
-    container.innerHTML = '<div class="text-muted small"><i class="bi bi-hourglass-split me-1"></i>Carregando defeitos...</div>';
+    if (!tipoId) {
+        section.style.display = 'none';
+        if (btnAdicionarDefeitosComuns) btnAdicionarDefeitosComuns.disabled = true;
+        if (modalDefeitosComunsBody) {
+            modalDefeitosComunsBody.innerHTML = '<span class="text-muted small">Selecione o equipamento para carregar os defeitos.</span>';
+        }
+        container.innerHTML = '<span class="text-muted small">Selecione o equipamento para carregar os defeitos...</span>';
+        if (defeitosHelperText) {
+            defeitosHelperText.textContent = 'Selecione os defeitos que se aplicam ao diagnostico atual.';
+        }
+        updateResumo();
+        return;
+    }
+
     section.style.display = '';
+    container.innerHTML = '<div class="text-muted small"><i class="bi bi-hourglass-split me-1"></i>Carregando defeitos...</div>';
+    if (btnAdicionarDefeitosComuns) btnAdicionarDefeitosComuns.disabled = true;
 
     const fd = new FormData();
     fd.append('tipo_id', tipoId);
@@ -6456,76 +8475,48 @@ function carregarDefeitos(tipoId) {
     fetch(BASE_URL + 'equipamentosdefeitos/por-tipo', { method: 'POST', body: fd })
     .then(r => r.json())
     .then(defeitos => {
-        if (defeitos.length === 0) {
+        if (!Array.isArray(defeitos) || defeitos.length === 0) {
             container.innerHTML = `<span class="text-muted small"><i class="bi bi-info-circle me-1"></i>Nenhum defeito comum cadastrado para este tipo. <a href="${BASE_URL}equipamentosdefeitos" target="_blank">Cadastrar defeitos</a></span>`;
+            if (modalDefeitosComunsBody) {
+                modalDefeitosComunsBody.innerHTML = `<span class="text-muted small">Nenhum defeito comum cadastrado para este tipo. <a href="${BASE_URL}equipamentosdefeitos" target="_blank">Cadastrar defeitos</a></span>`;
+            }
+            if (modalDefeitosHint) {
+                modalDefeitosHint.textContent = 'Nao existem defeitos comuns cadastrados para o tipo selecionado.';
+            }
+            if (btnAdicionarDefeitosComuns) btnAdicionarDefeitosComuns.disabled = true;
+            updateResumo();
             return;
         }
-        const hw = defeitos.filter(d => d.classificacao === 'hardware');
-        const sw = defeitos.filter(d => d.classificacao === 'software');
-        let html = '<div class="row g-2">';
 
-        [{ list: hw, cls: 'text-danger', icon: 'bi-cpu', label: 'HARDWARE' },
-         { list: sw, cls: 'text-primary', icon: 'bi-code-slash', label: 'SOFTWARE' }].forEach(({ list, cls, icon, label }) => {
-            if (!list.length) return;
-            html += `<div class="col-md-6"><p class="${cls} fw-bold mb-2 small"><i class="bi ${icon} me-1"></i>${label}</p>`;
-            list.forEach(d => {
-                const chk = defeitosSelecionados.includes(parseInt(d.id)) ? 'checked' : '';
-                html += `<div class="form-check mb-1">
-                    <input class="form-check-input chk-defeito-comum" type="checkbox" name="defeitos[]"
-                           value="${d.id}" id="def_${d.id}" ${chk}
-                           data-nome="${d.nome.replace(/"/g,'&quot;')}"
-                           data-desc="${(d.descricao||'').replace(/"/g,'&quot;')}">
-                    <label class="form-check-label d-flex align-items-center" for="def_${d.id}">
-                        <div class="flex-grow-1">
-                            <strong style="font-size:0.85rem;">${d.nome}</strong>
-                            ${d.descricao ? `<br><small class="text-muted">${d.descricao}</small>` : ''}
-                        </div>
-                        <button type="button" class="btn btn-sm btn-link p-0 text-warning ms-2 btn-ver-procedimentos-os"
-                                data-id="${d.id}" data-nome="${d.nome.replace(/"/g,'&quot;')}" title="Ver Procedimentos">
-                            <i class="bi bi-info-circle"></i>
-                        </button>
-                    </label>
-                </div>`;
-            });
-            html += '</div>';
-        });
-        html += '</div>';
-        container.innerHTML = html;
+        const currentCheckedIds = Array.from((modalDefeitosComunsBody || document).querySelectorAll('.chk-defeito-comum:checked'))
+            .map((chk) => parseInt(chk.value, 10))
+            .filter((id) => Number.isInteger(id));
+        const preSelecionados = Array.from(new Set([
+            ...(Array.isArray(defeitosSelecionados) ? defeitosSelecionados : []),
+            ...currentCheckedIds,
+        ]));
 
-        // Auto-fill relato
-        container.querySelectorAll('.chk-defeito-comum').forEach(chk => {
-            chk.addEventListener('change', function() {
-                const relato = document.getElementById('relatoClienteInput') || document.querySelector('textarea[name="relato_cliente"]');
-                if (!relato) return;
-                const nome   = this.getAttribute('data-nome');
-                const desc   = this.getAttribute('data-desc');
-                const tag    = `[DEFEITO: ${nome}]${desc ? ' - ' + desc : ''}`;
-                if (this.checked) {
-                    if (relato.value.trim()) relato.value += '\n';
-                    relato.value += tag;
-                } else {
-                    relato.value = relato.value.replace(tag, '').replace(/\n\n/g, '\n').trim();
-                }
-                updateResumo();
-                scheduleDraftSave();
-            });
-        });
+        _renderDefeitosModalList(defeitos, preSelecionados);
+        if (btnAdicionarDefeitosComuns) btnAdicionarDefeitosComuns.disabled = false;
+        if (modalDefeitosHint) {
+            modalDefeitosHint.textContent = 'Marque os defeitos que devem aparecer no card da OS.';
+        }
 
-        // Botão de procedimentos
-        container.querySelectorAll('.btn-ver-procedimentos-os').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                abrirProcedimentosViewOnly(this.dataset.id, this.dataset.nome);
-            });
-        });
         _applyPendingDefeitos();
+        renderDefeitosSelecionadosCard();
         updateResumo();
         scheduleDraftSave();
     })
-    .catch(() => { container.innerHTML = '<span class="text-danger small">Erro ao carregar defeitos.</span>'; });
+    .catch(() => {
+        container.innerHTML = '<span class="text-danger small">Erro ao carregar defeitos.</span>';
+        if (modalDefeitosComunsBody) {
+            modalDefeitosComunsBody.innerHTML = '<span class="text-danger small">Erro ao carregar defeitos.</span>';
+        }
+        if (btnAdicionarDefeitosComuns) btnAdicionarDefeitosComuns.disabled = true;
+    });
 }
 
-// --- Modal de visualização de procedimentos ---
+// --- Modal de visualizacao de procedimentos ---
 function abrirProcedimentosViewOnly(defeitoId, nome) {
     const modalHtml = `
     <div class="modal fade" id="modalViewProcedimentos" tabindex="-1">
@@ -6552,10 +8543,22 @@ function abrirProcedimentosViewOnly(defeitoId, nome) {
         modalEl.querySelector('.modal-title').innerHTML = `<i class="bi bi-journal-text text-warning me-2"></i>Procedimentos: ${nome}`;
     }
 
+    hoistModalToBody(modalEl, null);
+
     const listDiv = modalEl.querySelector('#listProcOS');
     listDiv.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-warning spinner-border-sm"></div></div>';
 
-    new bootstrap.Modal(modalEl).show();
+    const modalZ = getTopModalStackZIndex(DEFEITOS_MODAL_BASE_Z_INDEX + 40);
+    modalEl.style.zIndex = String(modalZ);
+    const procedimentosModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    procedimentosModal.show();
+    window.setTimeout(() => {
+        const backdrops = Array.from(document.querySelectorAll('.modal-backdrop'));
+        const latestBackdrop = backdrops[backdrops.length - 1];
+        if (latestBackdrop) {
+            latestBackdrop.style.zIndex = String(modalZ - 10);
+        }
+    }, 0);
 
     fetch(BASE_URL + 'equipamentosdefeitos/procedimentos/' + defeitoId)
     .then(r => r.json())
@@ -6637,3 +8640,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?= $this->endSection() ?>
+

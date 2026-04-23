@@ -11,13 +11,24 @@ if (!in_array($directProvider, ['menuia', 'api_whats_local', 'api_whats_linux', 
     $directProvider = 'api_whats_local';
 }
 
-$menuiaUrl = trim((string) ($configs['whatsapp_menuia_url'] ?? 'https://api.menuia.com/api'));
+$menuiaUrl = trim((string) ($configs['whatsapp_menuia_url'] ?? 'https://chatbot.menuia.com/api'));
 $menuiaAuth = trim((string) ($configs['whatsapp_menuia_authkey'] ?? ''));
 $menuiaApp = trim((string) ($configs['whatsapp_menuia_appkey'] ?? ''));
 $localNodeUrl = trim((string) ($configs['whatsapp_local_node_url'] ?? 'http://127.0.0.1:3001'));
 $localNodeToken = trim((string) ($configs['whatsapp_local_node_token'] ?? ''));
 $linuxNodeUrl = trim((string) ($configs['whatsapp_linux_node_url'] ?? 'http://127.0.0.1:3001'));
 $linuxNodeToken = trim((string) ($configs['whatsapp_linux_node_token'] ?? ''));
+$lastCheckProvider = trim((string) ($configs['whatsapp_last_check_provider'] ?? ''));
+$lastCheckStatus = trim((string) ($configs['whatsapp_last_check_status'] ?? ''));
+$lastCheckMessage = trim((string) ($configs['whatsapp_last_check_message'] ?? ''));
+$lastCheckAt = trim((string) ($configs['whatsapp_last_check_at'] ?? ''));
+$lastCheckSignature = trim((string) ($configs['whatsapp_last_check_signature'] ?? ''));
+$menuiaCredentialSignature = ($menuiaUrl !== '' && $menuiaApp !== '' && $menuiaAuth !== '')
+    ? strtolower($menuiaUrl) . '|' . $menuiaApp . '|' . $menuiaAuth
+    : '';
+$menuiaStatusMatchesCurrentCredentials = $menuiaCredentialSignature !== ''
+    && $lastCheckSignature !== ''
+    && hash_equals($lastCheckSignature, $menuiaCredentialSignature);
 
 $statusOk = false;
 if ($enabled && $directProvider === 'menuia') {
@@ -29,11 +40,55 @@ if ($enabled && $directProvider === 'api_whats_local') {
 if ($enabled && $directProvider === 'api_whats_linux') {
     $statusOk = $linuxNodeUrl !== '' && $linuxNodeToken !== '';
 }
+
+$whatsConfigBadgeClass = $statusOk ? 'bg-success' : 'bg-danger';
+$whatsConfigBadgeText = $statusOk
+    ? ($directProvider === 'menuia' ? 'Credenciais OK' : 'Configuração OK')
+    : 'Incompleto';
+
+$realtimeBadgeClass = 'bg-secondary';
+$realtimeBadgeText = 'Não validado';
+$realtimeBadgeTitle = 'Ainda não houve validação de conectividade para o provider atual.';
+if (!$enabled) {
+    $realtimeBadgeClass = 'bg-secondary';
+    $realtimeBadgeText = 'Envio desabilitado';
+    $realtimeBadgeTitle = 'O envio de WhatsApp está desabilitado nas configurações.';
+} elseif (in_array($directProvider, ['api_whats_local', 'api_whats_linux'], true)) {
+    $realtimeBadgeClass = 'bg-dark';
+    $realtimeBadgeText = 'Provider local';
+    $realtimeBadgeTitle = 'Clique para gerenciar o gateway local.';
+} elseif ($directProvider === 'menuia' && $lastCheckProvider === 'menuia' && $menuiaStatusMatchesCurrentCredentials) {
+    if ($lastCheckStatus === 'success') {
+        $realtimeBadgeClass = 'bg-success';
+        $realtimeBadgeText = 'Menuia conectada';
+        $realtimeBadgeTitle = trim('Última validação: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
+    } elseif ($lastCheckStatus === 'error') {
+        $realtimeBadgeClass = 'bg-danger';
+        $realtimeBadgeText = 'Erro Menuia';
+        $realtimeBadgeTitle = trim('Última validação: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
+    }
+} elseif ($directProvider === 'menuia' && $statusOk) {
+    $realtimeBadgeClass = 'bg-warning text-dark';
+    $realtimeBadgeText = 'Menuia não validada';
+    $realtimeBadgeTitle = 'As credenciais estão preenchidas, mas a conexão ainda não foi validada.';
+} elseif ($directProvider === 'webhook') {
+    $realtimeBadgeClass = 'bg-dark';
+    $realtimeBadgeText = 'Provider externo';
+    $realtimeBadgeTitle = 'Webhook externo selecionado.';
+}
+
+$precificacaoEncargos = (string) ($configs['precificacao_peca_encargos_percentual'] ?? '15');
+$precificacaoMargem = (string) ($configs['precificacao_peca_margem_percentual'] ?? '45');
+$precificacaoBase = strtolower(trim((string) ($configs['precificacao_peca_base'] ?? 'custo')));
+if (!in_array($precificacaoBase, ['custo', 'venda'], true)) {
+    $precificacaoBase = 'custo';
+}
+$precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_preco_venda'] ?? '1') !== '0';
 ?>
 
 <div class="row mb-4">
     <div class="col-12 d-flex justify-content-between align-items-center">
-        <h1 class="h3 mb-0">Configuracoes</h1>
+        <h1 class="h3 mb-0">Configurações</h1>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('configuracoes')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
@@ -48,7 +103,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             <ul class="nav nav-tabs mb-4" id="configTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="aparencia-tab" data-bs-toggle="tab" data-bs-target="#tab-aparencia" type="button" role="tab">
-                        <i class="bi bi-palette me-2"></i>Aparencia
+                        <i class="bi bi-palette me-2"></i>Aparência
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -58,7 +113,12 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="sessao-tab" data-bs-toggle="tab" data-bs-target="#tab-sessao" type="button" role="tab">
-                        <i class="bi bi-shield-lock me-2"></i>Sessao e Seguranca
+                        <i class="bi bi-shield-lock me-2"></i>Sessão e Segurança
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="precificacao-tab" data-bs-toggle="tab" data-bs-target="#tab-precificacao" type="button" role="tab">
+                        <i class="bi bi-calculator me-2"></i>Precificação
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -70,7 +130,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             </ul>
 
             <div class="tab-content" id="configTabsContent">
-                <!-- Aba Aparencia -->
+                <!-- Aba Aparência -->
                 <div class="tab-pane fade show active" id="tab-aparencia" role="tabpanel">
                     <h5 class="mb-3 border-bottom pb-2">Configurações Visuais</h5>
                     <div class="row mb-4">
@@ -93,10 +153,27 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                             <?php endif; ?>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Icone da Aba do Navegador (Favicon)</label>
+                            <label class="form-label text-muted">Logo de Fundo dos Documentos PDF</label>
+                            <input type="file" class="form-control" name="pdf_logo_fundo" accept="image/png">
+                            <small class="text-muted d-block mt-1">
+                                Use PNG sem fundo. O arquivo será salvo em <code>public/uploads/sistema</code> e usado como marca d'água em todos os PDFs.
+                            </small>
+                            <?php if (!empty($configs['pdf_logo_fundo'])): ?>
+                                <small class="text-muted d-block mt-1">Logo PDF atual: <?= esc($configs['pdf_logo_fundo']) ?></small>
+                                <div class="mt-2 p-2 border rounded bg-light d-inline-flex align-items-center justify-content-center" style="min-height: 90px; min-width: 180px;">
+                                    <img
+                                        src="<?= base_url('uploads/sistema/' . $configs['pdf_logo_fundo']) ?>"
+                                        alt="Preview da logo de fundo PDF"
+                                        style="max-height: 72px; max-width: 160px; object-fit: contain;"
+                                    >
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Ícone da Aba do Navegador (Favicon)</label>
                             <input type="file" class="form-control" name="sistema_icone" accept="image/png, image/jpeg, image/ico, image/x-icon">
                             <?php if (!empty($configs['sistema_icone'])): ?>
-                                <small class="text-muted d-block mt-1">Icone atual: <?= esc($configs['sistema_icone']) ?></small>
+                                <small class="text-muted d-block mt-1">Ícone atual: <?= esc($configs['sistema_icone']) ?></small>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -123,18 +200,18 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                             <input type="email" class="form-control" name="empresa_email" value="<?= esc($configs['empresa_email'] ?? '') ?>">
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label text-muted">Endereco</label>
+                            <label class="form-label text-muted">Endereço</label>
                             <input type="text" class="form-control" name="empresa_endereco" value="<?= esc($configs['empresa_endereco'] ?? '') ?>">
                         </div>
                     </div>
                 </div>
 
-                <!-- Aba Sessao -->
+                <!-- Aba Sessão -->
                 <div class="tab-pane fade" id="tab-sessao" role="tabpanel">
-                    <h5 class="mb-3 border-bottom pb-2">Sessao e Seguranca Operacional</h5>
+                    <h5 class="mb-3 border-bottom pb-2">Sessão e Segurança Operacional</h5>
                     <div class="row mb-4">
                         <div class="col-lg-5 col-md-6 mb-3">
-                            <label class="form-label text-muted">Tempo maximo de inatividade (minutos)</label>
+                            <label class="form-label text-muted">Tempo máximo de inatividade (minutos)</label>
                             <input
                                 type="number"
                                 class="form-control"
@@ -145,7 +222,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                                 value="<?= esc($configs['sessao_inatividade_minutos'] ?? '30') ?>"
                             >
                             <small class="text-muted d-block mt-2">
-                                Apos esse periodo sem atividade real, a sessao e encerrada e o sistema avisa claramente antes de o usuario perder tempo tentando salvar formularios.
+                                Após esse período sem atividade real, a sessão é encerrada e o sistema avisa claramente antes de o usuário perder tempo tentando salvar formulários.
                             </small>
                         </div>
                         <div class="col-lg-7 mb-3">
@@ -154,24 +231,88 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                                     <i class="bi bi-info-circle me-1"></i>Como o aviso funciona
                                 </div>
                                 <ul class="mb-0 ps-3">
-                                    <li>O frontend acompanha digitacao, cliques, foco e interacao com a tela.</li>
-                                    <li>Enquanto houver atividade, um heartbeat discreto mantem a sessao coerente com o timeout configurado.</li>
-                                    <li>Quando a sessao expira, um SweetAlert2 explica o motivo e redireciona para o login.</li>
-                                    <li>Se o usuario entrou com "Lembrar-me", a expiracao por inatividade continua ignorada, como no fluxo atual.</li>
+                                    <li>O frontend acompanha digitação, cliques, foco e interação com a tela.</li>
+                                    <li>Enquanto houver atividade, um heartbeat discreto mantém a sessão coerente com o timeout configurado.</li>
+                                    <li>Quando a sessão expira, um SweetAlert2 explica o motivo e redireciona para o login.</li>
+                                    <li>Se o usuário entrou com "Lembrar-me", a expiração por inatividade continua ignorada, como no fluxo atual.</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Aba Integracoes -->
+                <div class="tab-pane fade" id="tab-precificacao" role="tabpanel">
+                    <h5 class="mb-3 border-bottom pb-2">Precificação de Peça Instalada</h5>
+                    <div class="row mb-4">
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <label class="form-label text-muted">Encargos operacionais (%)</label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="precificacao_peca_encargos_percentual"
+                                min="0"
+                                max="300"
+                                step="0.01"
+                                value="<?= esc($precificacaoEncargos) ?>"
+                            >
+                            <small class="text-muted d-block mt-2">
+                                Ex.: mão de obra indireta, risco de garantia, testes e estrutura.
+                            </small>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <label class="form-label text-muted">Margem alvo (%)</label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="precificacao_peca_margem_percentual"
+                                min="0"
+                                max="300"
+                                step="0.01"
+                                value="<?= esc($precificacaoMargem) ?>"
+                            >
+                            <small class="text-muted d-block mt-2">
+                                Margem comercial aplicada após os encargos.
+                            </small>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <label class="form-label text-muted">Base de cálculo</label>
+                            <select class="form-select" name="precificacao_peca_base">
+                                <option value="custo" <?= $precificacaoBase === 'custo' ? 'selected' : '' ?>>Preço de custo da peça</option>
+                                <option value="venda" <?= $precificacaoBase === 'venda' ? 'selected' : '' ?>>Preço de venda cadastrado</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <label class="form-label text-muted">Piso mínimo pelo preço de venda</label>
+                            <select class="form-select" name="precificacao_peca_respeitar_preco_venda">
+                                <option value="1" <?= $precificacaoRespeitarVenda ? 'selected' : '' ?>>Sim, nunca abaixo do preço de venda</option>
+                                <option value="0" <?= !$precificacaoRespeitarVenda ? 'selected' : '' ?>>Não, usar somente a fórmula</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <div class="alert alert-info mb-0">
+                                <div class="fw-semibold mb-2"><i class="bi bi-info-circle me-1"></i>Fórmula aplicada nos itens de peça</div>
+                                <p class="mb-2">
+                                    Valor recomendado = <strong>base</strong> + encargos + margem.
+                                </p>
+                                <p class="mb-2">
+                                    Exemplo didático: base R$ 100, encargos 15% e margem 45% gera R$ 160,00.
+                                </p>
+                                <p class="mb-0">
+                                    No salvamento de orçamento e OS, o ERP aplica esse valor como piso mínimo da peça instalada e registra os metadados para análise real de mix e margem.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aba Integrações -->
                 <div class="tab-pane fade" id="tab-integracoes" role="tabpanel">
                     <h5 class="mb-3 border-bottom pb-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <span>Configurações WhatsApp</span>
                         <div class="d-flex gap-2 align-items-center">
-                            <span id="whatsRealtimeStatus" class="badge bg-secondary" style="cursor: pointer;" title="Clique para gerenciar">Verificando gateway...</span>
-                            <span class="badge <?= $statusOk ? 'bg-success' : 'bg-danger' ?>" id="whatsConfigBadge">
-                                <?= $statusOk ? 'Configuracao OK' : 'Incompleto' ?>
+                            <span id="whatsRealtimeStatus" class="badge <?= esc($realtimeBadgeClass) ?>" style="cursor: pointer;" title="<?= esc($realtimeBadgeTitle) ?>"><?= esc($realtimeBadgeText) ?></span>
+                            <span class="badge <?= esc($whatsConfigBadgeClass) ?>" id="whatsConfigBadge">
+                                <?= esc($whatsConfigBadgeText) ?>
                             </span>
                         </div>
                     </h5>
@@ -183,7 +324,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                                 <option value="menuia" <?= $directProvider === 'menuia' ? 'selected' : '' ?>>Menuia</option>
                                 <option value="api_whats_local" <?= $directProvider === 'api_whats_local' ? 'selected' : '' ?>>API Local (Windows)</option>
                                 <option value="api_whats_linux" <?= $directProvider === 'api_whats_linux' ? 'selected' : '' ?>>API Linux (VPS)</option>
-                                <option value="webhook" <?= $directProvider === 'webhook' ? 'selected' : '' ?>>Webhook Generico</option>
+                                <option value="webhook" <?= $directProvider === 'webhook' ? 'selected' : '' ?>>Webhook Genérico</option>
                             </select>
                         </div>
                         <div class="col-md-3 mb-3">
@@ -196,7 +337,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                             <label class="form-label text-muted">Envio habilitado</label>
                             <select class="form-select" name="whatsapp_enabled">
                                 <option value="1" <?= ($configs['whatsapp_enabled'] ?? '0') === '1' ? 'selected' : '' ?>>Sim</option>
-                                <option value="0" <?= ($configs['whatsapp_enabled'] ?? '0') !== '1' ? 'selected' : '' ?>>Nao</option>
+                                <option value="0" <?= ($configs['whatsapp_enabled'] ?? '0') !== '1' ? 'selected' : '' ?>>Não</option>
                             </select>
                         </div>
                         <div class="col-md-3 mb-3">
@@ -274,7 +415,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                             <input type="text" class="form-control" name="whatsapp_webhook_url" id="whatsapp_webhook_url" value="<?= esc($configs['whatsapp_webhook_url'] ?? '') ?>">
                         </div>
                         <div class="col-md-4 mb-3 config-webhook d-none">
-                            <label class="form-label text-muted">Metodo</label>
+                            <label class="form-label text-muted">Método</label>
                             <select class="form-select" name="whatsapp_webhook_method" id="whatsapp_webhook_method">
                                 <option value="POST" <?= ($configs['whatsapp_webhook_method'] ?? 'POST') === 'POST' ? 'selected' : '' ?>>POST</option>
                                 <option value="GET" <?= ($configs['whatsapp_webhook_method'] ?? 'POST') === 'GET' ? 'selected' : '' ?>>GET</option>
@@ -291,15 +432,85 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                         </div>
 
                         <div class="col-12 d-flex flex-wrap gap-2">
-                            <button type="button" class="btn btn-outline-primary" id="btnTestarConexaoWhats">Testar conexao</button>
+                            <button type="button" class="btn btn-outline-primary" id="btnTestarConexaoWhats">Testar conexão</button>
                             <button type="button" class="btn btn-outline-success" id="btnEnviarTesteWhats">Enviar mensagem de teste</button>
-                            <button type="button" class="btn btn-outline-warning" id="btnSelfCheckInboundWhats" title="Valida automaticamente status do gateway, token do webhook, URL inbound e alinhamento de origem ERP."><i class="bi bi-shield-check me-1"></i>Self-check inbound</button>
+                            <button type="button" class="btn btn-outline-warning" id="btnSelfCheckInboundWhats" title="Válida automaticamente status do gateway, token do webhook, URL inbound e alinhamento de origem ERP."><i class="bi bi-shield-check me-1"></i>Self-check inbound</button>
                         </div>
                         <div class="col-12">
                             <small class="text-muted d-block mt-1">
                                 <i class="bi bi-info-circle me-1"></i>
                                 O self-check inbound testa automaticamente a rota de entrada do WhatsApp (gateway -> webhook ERP), token e host/origem, sem usar console.
                             </small>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h5 class="mb-3 border-bottom pb-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <span>Configurações de E-mail (SMTP)</span>
+                        <span class="badge bg-secondary">Orçamentos + Recuperação de Senha</span>
+                    </h5>
+
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted">Host SMTP</label>
+                            <input type="text" class="form-control" name="smtp_host" id="smtp_host" value="<?= esc($configs['smtp_host'] ?? '') ?>" placeholder="smtp.seudominio.com">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label text-muted">Porta</label>
+                            <input type="number" min="1" max="65535" class="form-control" name="smtp_port" id="smtp_port" value="<?= esc($configs['smtp_port'] ?? '587') ?>" placeholder="587">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label text-muted">Criptografia</label>
+                            <select class="form-select" name="smtp_crypto" id="smtp_crypto">
+                                <?php $smtpCrypto = strtolower((string) ($configs['smtp_crypto'] ?? 'auto')); ?>
+                                <option value="auto" <?= $smtpCrypto === 'auto' ? 'selected' : '' ?>>Auto (porta)</option>
+                                <option value="tls" <?= $smtpCrypto === 'tls' ? 'selected' : '' ?>>TLS / STARTTLS</option>
+                                <option value="ssl" <?= $smtpCrypto === 'ssl' ? 'selected' : '' ?>>SSL</option>
+                                <option value="none" <?= $smtpCrypto === 'none' ? 'selected' : '' ?>>Nenhuma</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label text-muted">Timeout (s)</label>
+                            <input type="number" min="5" max="120" class="form-control" name="smtp_timeout" id="smtp_timeout" value="<?= esc($configs['smtp_timeout'] ?? '20') ?>">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Usuário SMTP</label>
+                            <input type="text" class="form-control" name="smtp_user" id="smtp_user" value="<?= esc($configs['smtp_user'] ?? '') ?>" placeholder="usuario@dominio.com">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Senha SMTP</label>
+                            <input type="password" class="form-control" name="smtp_pass" id="smtp_pass" value="<?= esc($configs['smtp_pass'] ?? '') ?>" placeholder="Senha ou token do provedor">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">E-mail remetente</label>
+                            <input type="email" class="form-control" name="smtp_from_email" id="smtp_from_email" value="<?= esc($configs['smtp_from_email'] ?? '') ?>" placeholder="orcamentos@dominio.com">
+                            <small class="text-muted d-block mt-1">Opcional. Se ficar vazio, o ERP tenta usar `Empresa -> Email` e depois `Usuário SMTP`.</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Nome do remetente</label>
+                            <input type="text" class="form-control" name="smtp_from_name" id="smtp_from_name" value="<?= esc($configs['smtp_from_name'] ?? '') ?>" placeholder="Assistência Técnica">
+                            <small class="text-muted d-block mt-1">Opcional. Se ficar vazio, o ERP usa `Empresa -> Nome da Empresa`.</small>
+                        </div>
+
+                        <div class="col-lg-7 mb-3">
+                            <div class="alert alert-info mb-0 h-100">
+                                <div class="fw-semibold mb-2"><i class="bi bi-envelope-check me-1"></i>Como o ERP usa este canal</div>
+                                <ul class="mb-0 ps-3">
+                                    <li>Envio do orçamento por e-mail direto na tela do orçamento.</li>
+                                    <li>Recuperação de senha para usuários do sistema.</li>
+                                    <li>Teste manual para validar host, porta, criptografia e remetente antes de operar.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 mb-3">
+                            <label class="form-label text-muted">E-mail para teste</label>
+                            <input type="email" class="form-control mb-2" id="smtp_test_email" value="<?= esc($configs['empresa_email'] ?? '') ?>" placeholder="destino@dominio.com">
+                            <button type="button" class="btn btn-outline-primary w-100" id="btnEnviarTesteEmail">
+                                <i class="bi bi-send me-1"></i>Enviar e-mail de teste
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -336,17 +547,17 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                             <span class="small text-muted">Status:</span>
                             <span id="gatewayStatusBadge" class="badge text-bg-secondary">-</span>
                         </div>
-                        <small class="text-muted">Ultima verificacao: <span id="gatewayLastCheck">-</span></small>
+                        <small class="text-muted">Última verificação: <span id="gatewayLastCheck">-</span></small>
                     </div>
 
                     <div class="row g-3 align-items-start">
                         <div class="col-lg-5 text-center">
-                            <p class="small text-muted mb-2">QR Code para autenticacao</p>
+                            <p class="small text-muted mb-2">QR Code para autenticação</p>
                             <div class="bg-light p-3 rounded border mx-auto" style="width:256px;height:256px;display:flex;align-items:center;justify-content:center;">
                                 <img id="localQrImage" src="" alt="QR" class="img-fluid d-none">
                                 <div id="localQrPlaceholder" class="text-muted small px-2">Aguardando QR Code...</div>
                             </div>
-                            <small id="gatewayQrHint" class="text-muted d-block mt-2">Escaneie o QR no WhatsApp para manter sessao ativa.</small>
+                            <small id="gatewayQrHint" class="text-muted d-block mt-2">Escaneie o QR no WhatsApp para manter sessão ativa.</small>
                         </div>
                         <div class="col-lg-7">
                             <div class="border rounded p-3 bg-light-subtle small">
@@ -355,7 +566,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                                     <strong id="gatewayAccountName">-</strong>
                                 </div>
                                 <div class="d-flex justify-content-between mt-1">
-                                    <span class="text-muted">Numero:</span>
+                                    <span class="text-muted">Número:</span>
                                     <span id="gatewayAccountNumber">-</span>
                                 </div>
                                 <div class="d-flex justify-content-between mt-1">
@@ -364,15 +575,15 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                                 </div>
                                 <hr class="my-2">
                                 <div class="d-flex justify-content-between mt-1">
-                                    <span class="text-muted">Ultimo ready:</span>
+                                    <span class="text-muted">Último ready:</span>
                                     <span id="gatewayLastReady">-</span>
                                 </div>
                                 <div class="d-flex justify-content-between mt-1">
-                                    <span class="text-muted">Ultimo erro:</span>
+                                    <span class="text-muted">Último erro:</span>
                                     <span id="gatewayLastError">-</span>
                                 </div>
                                 <div class="d-flex justify-content-between mt-1">
-                                    <span class="text-muted">Sessao:</span>
+                                    <span class="text-muted">Sessão:</span>
                                     <span id="gatewaySessionPath">-</span>
                                 </div>
                             </div>
@@ -386,13 +597,13 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                     <i class="bi bi-arrow-repeat me-1"></i>Atualizar status
                 </button>
                 <button type="button" class="btn btn-outline-danger d-none" id="btnLogoutLocal">
-                    <i class="bi bi-person-x me-1"></i>Desconectar / Trocar Numero
+                    <i class="bi bi-person-x me-1"></i>Desconectar / Trocar Número
                 </button>
                 <button type="button" class="btn btn-success d-none" id="btnStartLocal">
                     <i class="bi bi-play-fill me-1"></i>Iniciar Servidor
                 </button>
                 <button type="button" class="btn btn-outline-warning" id="btnRestartLocal">
-                    <i class="bi bi-bootstrap-reboot me-1"></i>Reiniciar Inicializacao
+                    <i class="bi bi-bootstrap-reboot me-1"></i>Reiniciar Inicialização
                 </button>
                 <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Fechar</button>
             </div>
@@ -408,18 +619,31 @@ if ($enabled && $directProvider === 'api_whats_linux') {
     const btnTestConn = document.getElementById('btnTestarConexaoWhats');
     const btnSendTest = document.getElementById('btnEnviarTesteWhats');
     const btnSelfCheckInbound = document.getElementById('btnSelfCheckInboundWhats');
+    const btnSendEmailTest = document.getElementById('btnEnviarTesteEmail');
+    const smtpTestEmailInput = document.getElementById('smtp_test_email');
     const modalEl = document.getElementById('modalLocalGateway');
     const btnRestart = document.getElementById('btnRestartLocal');
     const btnLogout = document.getElementById('btnLogoutLocal');
     const btnStart = document.getElementById('btnStartLocal');
     const btnRefresh = document.getElementById('btnRefreshLocal');
     const whatsRealtimeStatus = document.getElementById('whatsRealtimeStatus');
+    const whatsConfigBadge = document.getElementById('whatsConfigBadge');
+    const tabBadgeStatus = document.getElementById('tabBadgeStatus');
     const btnManageList = Array.from(document.querySelectorAll('.btn-gerenciar-gateway'));
     let currentGatewayProvider = 'api_whats_local';
     let pollInterval = null;
     let modalRef = null;
+    const providerState = {
+        enabled: <?= json_encode($enabled) ?>,
+        provider: <?= json_encode($lastCheckProvider) ?>,
+        status: <?= json_encode($lastCheckStatus) ?>,
+        message: <?= json_encode($lastCheckMessage) ?>,
+        checkedAt: <?= json_encode($lastCheckAt) ?>,
+        signature: <?= json_encode($lastCheckSignature) ?>,
+    };
+    const emailTestUrl = '<?= base_url('configuracoes/email/enviar-teste') ?>';
 
-    const fireSwal = (opts) => (window.Swal && typeof window.Swal.fire === 'function') ? window.Swal.fire(opts) : Promise.resolve(alert(opts?.text || opts?.title || 'Acao concluida.'));
+    const fireSwal = (opts) => window.DSFeedback.fire(opts || {});
     const getCsrf = () => ({ name: 'csrf_test_name', value: (document.cookie.match(/(?:^|;\s*)csrf_cookie_name=([^;]+)/)?.[1] || '') });
     const byId = (id) => document.getElementById(id);
 
@@ -459,8 +683,130 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         document.querySelectorAll('.config-api_whats_local').forEach((el) => el.classList.toggle('d-none', provider !== 'api_whats_local'));
         document.querySelectorAll('.config-api_whats_linux').forEach((el) => el.classList.toggle('d-none', provider !== 'api_whats_linux'));
     };
-    selectProvider?.addEventListener('change', toggleProviders);
+    const setSimpleBadge = (element, cssClass, text, title = '') => {
+        if (!element) return;
+        element.className = 'badge ' + cssClass;
+        element.textContent = text;
+        if (title) {
+            element.setAttribute('title', title);
+        } else {
+            element.removeAttribute('title');
+        }
+    };
+
+    const normalizeMenuiaUrl = (rawUrl) => {
+        let normalized = String(rawUrl || '').trim().replace(/\/+$/, '');
+        if (!normalized) {
+            return 'https://chatbot.menuia.com/api';
+        }
+
+        try {
+            const parsed = new URL(normalized);
+            if (String(parsed.hostname || '').toLowerCase() === 'api.menuia.com') {
+                return 'https://chatbot.menuia.com/api';
+            }
+        } catch (error) {
+            // Mantém a tentativa original e deixa a validação do provider apontar o erro.
+        }
+
+        if (!/\/api$/i.test(normalized)) {
+            normalized += '/api';
+        }
+
+        return normalized;
+    };
+
+    const buildMenuiaSignature = (rawUrl, rawAppKey, rawAuthKey) => {
+        const normalizedUrl = normalizeMenuiaUrl(rawUrl);
+        const appKey = String(rawAppKey || '').trim();
+        const authKey = String(rawAuthKey || '').trim();
+        if (!normalizedUrl || !appKey || !authKey) {
+            return '';
+        }
+
+        return [normalizedUrl.toLowerCase(), appKey, authKey].join('|');
+    };
+
+    const refreshExternalProviderBadges = () => {
+        const provider = selectProvider?.value || 'menuia';
+        const menuiaUrl = (document.getElementById('whatsapp_menuia_url')?.value || '').trim();
+        const menuiaApp = (document.getElementById('whatsapp_menuia_appkey')?.value || '').trim();
+        const menuiaAuth = (document.getElementById('whatsapp_menuia_authkey')?.value || '').trim();
+        const menuiaConfigOk = menuiaUrl !== '' && menuiaApp !== '' && menuiaAuth !== '';
+        const currentMenuiaSignature = buildMenuiaSignature(menuiaUrl, menuiaApp, menuiaAuth);
+        const menuiaValidatedForCurrentConfig = providerState.provider === 'menuia'
+            && providerState.signature !== ''
+            && currentMenuiaSignature !== ''
+            && providerState.signature === currentMenuiaSignature;
+        const localConfigOk = ((document.getElementById('whatsapp_local_node_url')?.value || '').trim() !== '')
+            && ((document.getElementById('whatsapp_local_node_token')?.value || '').trim() !== '');
+        const linuxConfigOk = ((document.getElementById('whatsapp_linux_node_url')?.value || '').trim() !== '')
+            && ((document.getElementById('whatsapp_linux_node_token')?.value || '').trim() !== '');
+        const webhookConfigOk = ((document.getElementById('whatsapp_webhook_url')?.value || '').trim() !== '');
+
+        if (provider === 'menuia') {
+            setSimpleBadge(whatsConfigBadge, menuiaConfigOk ? 'bg-success' : 'bg-danger', menuiaConfigOk ? 'Credenciais OK' : 'Incompleto');
+            if (!providerState.enabled) {
+                setSimpleBadge(whatsRealtimeStatus, 'bg-secondary', 'Envio desabilitado', 'O envio de WhatsApp está desabilitado nas configurações.');
+                setSimpleBadge(tabBadgeStatus, 'bg-secondary', 'Envio desabilitado');
+                return;
+            }
+
+            if (menuiaValidatedForCurrentConfig && providerState.status === 'success') {
+                const title = [providerState.checkedAt ? `Última validação: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
+                setSimpleBadge(whatsRealtimeStatus, 'bg-success', 'Menuia conectada', title);
+                setSimpleBadge(tabBadgeStatus, 'bg-success', 'Menuia conectada');
+                return;
+            }
+
+            if (menuiaValidatedForCurrentConfig && providerState.status === 'error') {
+                const title = [providerState.checkedAt ? `Última validação: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
+                setSimpleBadge(whatsRealtimeStatus, 'bg-danger', 'Erro Menuia', title);
+                setSimpleBadge(tabBadgeStatus, 'bg-danger', 'Erro Menuia');
+                return;
+            }
+
+            setSimpleBadge(
+                whatsRealtimeStatus,
+                menuiaConfigOk ? 'bg-warning text-dark' : 'bg-secondary',
+                menuiaConfigOk ? 'Menuia não validada' : 'Menuia incompleta',
+                menuiaConfigOk
+                    ? 'As credenciais estão preenchidas, mas a conexão ainda não foi validada.'
+                    : 'Preencha URL, Appkey e Authkey para testar a conexão.'
+            );
+            setSimpleBadge(tabBadgeStatus, menuiaConfigOk ? 'bg-warning text-dark' : 'bg-secondary', menuiaConfigOk ? 'Não validada' : 'Incompleta');
+            return;
+        }
+
+        if (provider === 'webhook') {
+            setSimpleBadge(whatsRealtimeStatus, 'bg-dark', 'Provider externo', 'Webhook externo selecionado.');
+            setSimpleBadge(tabBadgeStatus, 'bg-dark', 'Provider externo');
+            setSimpleBadge(whatsConfigBadge, webhookConfigOk ? 'bg-success' : 'bg-danger', webhookConfigOk ? 'Configuração OK' : 'Incompleto');
+            return;
+        }
+
+        setSimpleBadge(whatsRealtimeStatus, 'bg-dark', 'Provider local', 'Clique para gerenciar o gateway local.');
+        setSimpleBadge(tabBadgeStatus, 'bg-dark', 'Provider local');
+        const currentLocalConfigOk = provider === 'api_whats_linux' ? linuxConfigOk : localConfigOk;
+        setSimpleBadge(whatsConfigBadge, currentLocalConfigOk ? 'bg-success' : 'bg-danger', currentLocalConfigOk ? 'Configuração OK' : 'Incompleto');
+    };
+
+    selectProvider?.addEventListener('change', () => {
+        toggleProviders();
+        refreshExternalProviderBadges();
+    });
+    document.querySelectorAll('#whatsapp_enabled, #whatsapp_menuia_url, #whatsapp_menuia_appkey, #whatsapp_menuia_authkey, #whatsapp_local_node_url, #whatsapp_local_node_token, #whatsapp_linux_node_url, #whatsapp_linux_node_token, #whatsapp_webhook_url').forEach((element) => {
+        element?.addEventListener('input', () => {
+            providerState.enabled = (document.getElementsByName('whatsapp_enabled')[0]?.value || '0') === '1';
+            refreshExternalProviderBadges();
+        });
+        element?.addEventListener('change', () => {
+            providerState.enabled = (document.getElementsByName('whatsapp_enabled')[0]?.value || '0') === '1';
+            refreshExternalProviderBadges();
+        });
+    });
     toggleProviders();
+    refreshExternalProviderBadges();
 
     const providerPayload = () => ({
         provider: selectProvider?.value || 'menuia',
@@ -497,15 +843,82 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         return data;
     };
 
+    btnSendEmailTest?.addEventListener('click', async () => {
+        const emailDestino = (smtpTestEmailInput?.value || '').trim();
+        if (!emailDestino) {
+            await fireSwal({
+                icon: 'warning',
+                title: 'E-mail de teste obrigatório',
+                text: 'Informe um e-mail de destino para validar o canal SMTP.',
+            });
+            smtpTestEmailInput?.focus();
+            return;
+        }
+
+        const originalHtml = btnSendEmailTest.innerHTML;
+        try {
+            btnSendEmailTest.disabled = true;
+            btnSendEmailTest.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando teste...';
+
+            const data = await postJson(emailTestUrl, {
+                email: emailDestino,
+                smtp_host: document.getElementById('smtp_host')?.value || '',
+                smtp_port: document.getElementById('smtp_port')?.value || '',
+                smtp_user: document.getElementById('smtp_user')?.value || '',
+                smtp_pass: document.getElementById('smtp_pass')?.value || '',
+                smtp_crypto: document.getElementById('smtp_crypto')?.value || 'auto',
+                smtp_timeout: document.getElementById('smtp_timeout')?.value || '20',
+                smtp_from_email: document.getElementById('smtp_from_email')?.value || '',
+                smtp_from_name: document.getElementById('smtp_from_name')?.value || '',
+            });
+
+            await fireSwal({
+                icon: 'success',
+                title: 'E-mail de teste enviado',
+                text: data.message || 'O ERP conseguiu processar o envio de teste.',
+            });
+        } catch (error) {
+            const detalhe = error?.payload?.error ? ` Detalhe técnico: ${error.payload.error}` : '';
+            await fireSwal({
+                icon: 'error',
+                title: 'Falha no e-mail de teste',
+                text: `${error.message || 'Não foi possível enviar o e-mail de teste.'}${detalhe}`,
+            });
+        } finally {
+            btnSendEmailTest.disabled = false;
+            btnSendEmailTest.innerHTML = originalHtml;
+        }
+    });
+
     btnTestConn?.addEventListener('click', async () => {
         const originalHtml = btnTestConn.innerHTML;
         try {
             btnTestConn.disabled = true;
             btnTestConn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Validando...';
             const data = await postJson('<?= base_url('configuracoes/whatsapp/testar-conexao') ?>', providerPayload());
-            await fireSwal({ icon: 'success', title: 'Conexao validada', text: data.message || 'OK' });
+            providerState.provider = selectProvider?.value || 'menuia';
+            providerState.status = 'success';
+            providerState.message = data.message || 'Conexão validada com sucesso.';
+            providerState.checkedAt = new Date().toLocaleString('pt-BR');
+            providerState.signature = buildMenuiaSignature(
+                document.getElementById('whatsapp_menuia_url')?.value || '',
+                document.getElementById('whatsapp_menuia_appkey')?.value || '',
+                document.getElementById('whatsapp_menuia_authkey')?.value || ''
+            );
+            refreshExternalProviderBadges();
+            await fireSwal({ icon: 'success', title: 'Conexão validada', text: data.message || 'OK' });
         } catch (error) {
-            await fireSwal({ icon: 'error', title: 'Falha na conexao', text: error.message || 'Erro' });
+            providerState.provider = selectProvider?.value || 'menuia';
+            providerState.status = 'error';
+            providerState.message = error.message || 'Falha na validação do provider.';
+            providerState.checkedAt = new Date().toLocaleString('pt-BR');
+            providerState.signature = buildMenuiaSignature(
+                document.getElementById('whatsapp_menuia_url')?.value || '',
+                document.getElementById('whatsapp_menuia_appkey')?.value || '',
+                document.getElementById('whatsapp_menuia_authkey')?.value || ''
+            );
+            refreshExternalProviderBadges();
+            await fireSwal({ icon: 'error', title: 'Falha na conexão', text: error.message || 'Erro' });
         } finally {
             btnTestConn.disabled = false;
             btnTestConn.innerHTML = originalHtml;
@@ -515,12 +928,12 @@ if ($enabled && $directProvider === 'api_whats_linux') {
     btnSendTest?.addEventListener('click', async () => {
         const phone = (byId('whatsapp_test_phone')?.value || '').trim();
         if (!phone) {
-            await fireSwal({ icon: 'warning', title: 'Telefone obrigatorio', text: 'Informe o telefone de teste.' });
+            await fireSwal({ icon: 'warning', title: 'Telefone obrigatório', text: 'Informe o telefone de teste.' });
             return;
         }
         const dataPrompt = (window.Swal && typeof window.Swal.fire === 'function')
-            ? await window.Swal.fire({ title: 'Mensagem de teste', input: 'textarea', showCancelButton: true, confirmButtonText: 'Enviar', cancelButtonText: 'Cancelar', inputValue: '[Teste de integracao] Mensagem de teste enviada pelo ERP.' })
-            : { isConfirmed: true, value: '[Teste de integracao] Mensagem de teste enviada pelo ERP.' };
+            ? await window.Swal.fire({ title: 'Mensagem de teste', input: 'textarea', showCancelButton: true, confirmButtonText: 'Enviar', cancelButtonText: 'Cancelar', inputValue: '[Teste de integração] Mensagem de teste enviada pelo ERP.' })
+            : { isConfirmed: true, value: '[Teste de integração] Mensagem de teste enviada pelo ERP.' };
         
         if (!dataPrompt?.isConfirmed) return;
 
@@ -543,7 +956,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         if (!['api_whats_local', 'api_whats_linux'].includes(provider)) {
             await fireSwal({
                 icon: 'warning',
-                title: 'Provider nao compativel',
+                title: 'Provider não compativel',
                 text: 'O self-check inbound exige API Local (Windows) ou API Linux (VPS).',
             });
             return;
@@ -558,7 +971,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             const checks = data?.checks || {};
             const checkLine = (label, check) => {
                 const ok = !!check?.ok;
-                const icon = ok ? '✅' : '❌';
+                const icon = ok ? '\u2705' : '\u274C';
                 const msg = check?.message || '';
                 const detail = check?.detail || '';
                 const targetUrl = check?.target_url || check?.url || '';
@@ -587,7 +1000,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             if (Object.keys(checks).length > 0) {
                 const checkLine = (label, check) => {
                     const ok = !!check?.ok;
-                    const icon = ok ? '✅' : '❌';
+                    const icon = ok ? '\u2705' : '\u274C';
                     const msg = check?.message || '';
                     const detail = check?.detail || '';
                     const targetUrl = check?.target_url || check?.url || '';
@@ -608,7 +1021,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             await fireSwal({
                 icon: 'error',
                 title: 'Self-check inbound falhou',
-                html: `<div>${error.message || 'Falha na validacao inbound.'}</div>${detailsHtml}`,
+                html: `<div>${error.message || 'Falha na validação inbound.'}</div>${detailsHtml}`,
             });
         } finally {
             btnSelfCheckInbound.disabled = false;
@@ -641,8 +1054,8 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             disconnected: { cls: 'text-bg-secondary', label: 'Desconectado', icon: 'bi-x-circle' },
             restarting: { cls: 'text-bg-primary', label: 'Reiniciando', icon: 'bi-arrow-repeat spin' },
             starting: { cls: 'text-bg-primary', label: 'Inicializando', icon: 'bi-hourglass-split' },
-            auth_failure: { cls: 'text-bg-danger', label: 'Falha Auth', icon: 'bi-exclamation-triangle' },
-            gateway_unreachable: { cls: 'text-bg-danger', label: 'Offline / Inacessivel', icon: 'bi-plug' },
+            auth_failure: { cls: 'text-bg-danger', label: 'Falha de autenticação', icon: 'bi-exclamation-triangle' },
+            gateway_unreachable: { cls: 'text-bg-danger', label: 'Offline / Inacessível', icon: 'bi-plug' },
             error: { cls: 'text-bg-danger', label: 'Erro', icon: 'bi-bug' },
         };
         const cfg = map[key] || { cls: 'text-bg-dark', label: status || 'desconhecido', icon: 'bi-question-circle' };
@@ -692,7 +1105,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         // Só mostramos erro se houver uma mensagem de erro real ou se a query falhou
         let errorMsg = data?.last_error_message || '';
         if (!errorMsg && !success) {
-            errorMsg = statusPayload?.message || 'Gateway inacessivel';
+            errorMsg = statusPayload?.message || 'Gateway inacessível';
         }
         setGatewayError(errorMsg, !success || !!data?.last_error_message);
 
@@ -717,13 +1130,13 @@ if ($enabled && $directProvider === 'api_whats_linux') {
 
         if (status === 'connected') {
             btnLogout?.classList.remove('d-none');
-            clearQr('Conectado. QR nao necessario.');
+            clearQr('Conectado. QR não necessário.');
             if (localQrImage) {
                 localQrImage.src = '<?= base_url('assets/img/sistema/whatsapp_connected_success.png') ?>';
                 localQrImage.classList.remove('d-none');
             }
             if (localQrPlaceholder) localQrPlaceholder.classList.add('d-none');
-            if (gatewayQrHint) gatewayQrHint.textContent = 'Sessao ativa e pronta para envio.';
+            if (gatewayQrHint) gatewayQrHint.textContent = 'Sessão ativa e pronta para envio.';
         } else {
             btnLogout?.classList.add('d-none');
             if (hasQr && localQrImage && localQrPlaceholder) {
@@ -732,8 +1145,8 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                 localQrPlaceholder.classList.add('d-none');
                 if (gatewayQrHint) gatewayQrHint.textContent = 'Escaneie o QR Code para autenticar o WhatsApp.';
             } else {
-                clearQr('QR indisponivel no momento. Aguarde ou reinicie.');
-                if (gatewayQrHint) gatewayQrHint.textContent = 'Se o QR demorar, use Reiniciar Inicializacao.';
+                clearQr('QR indisponível no momento. Aguarde ou reinicie.');
+                if (gatewayQrHint) gatewayQrHint.textContent = 'Se o QR demorar, use Reiniciar Inicialização.';
             }
         }
 
@@ -742,11 +1155,11 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         if (stableStatuses.includes(status)) {
             if (btnRestart && btnRestart.disabled) {
                 btnRestart.disabled = false;
-                btnRestart.innerHTML = '<i class="bi bi-bootstrap-reboot me-1"></i>Reiniciar Inicializacao';
+                btnRestart.innerHTML = '<i class="bi bi-bootstrap-reboot me-1"></i>Reiniciar Inicialização';
             }
             if (btnLogout && btnLogout.disabled) {
                 btnLogout.disabled = false;
-                btnLogout.innerHTML = '<i class="bi bi-person-x me-1"></i>Desconectar / Trocar Numero';
+                btnLogout.innerHTML = '<i class="bi bi-person-x me-1"></i>Desconectar / Trocar Número';
             }
             if (btnStart && btnStart.disabled) {
                 btnStart.disabled = false;
@@ -766,7 +1179,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                 setPanelState();
                 setGatewayStatusBadge(statusPayload?.status || 'gateway_unreachable');
                 setGatewayError(statusPayload?.message || 'Falha ao consultar status do gateway.');
-                clearQr('Servidor inacessivel.');
+                clearQr('Servidor inacessível.');
                 if (gatewayQrHint) gatewayQrHint.textContent = 'Verifique URL/token/origem do gateway.';
                 updateButtons('gateway_unreachable');
                 return;
@@ -779,16 +1192,16 @@ if ($enabled && $directProvider === 'api_whats_linux') {
                 if (q.ok && qrPayload?.success) {
                     setGatewayError('');
                 } else if (statusPayload?.status === 'awaiting_qr') {
-                    setGatewayError(qrPayload?.message || statusPayload?.message || 'QR ainda nao gerado.');
+                    setGatewayError(qrPayload?.message || statusPayload?.message || 'QR ainda não gerado.');
                 }
             }
             applyGatewayData(statusPayload, qrPayload);
         } catch (e) {
             setPanelState();
             setGatewayStatusBadge('gateway_unreachable');
-            setGatewayError(e?.message || 'Servidor do gateway inacessivel.');
-            clearQr('Servidor inacessivel.');
-            if (gatewayQrHint) gatewayQrHint.textContent = 'Confirme processo Node em execucao e token correto.';
+            setGatewayError(e?.message || 'Servidor do gateway inacessível.');
+            clearQr('Servidor inacessível.');
+            if (gatewayQrHint) gatewayQrHint.textContent = 'Confirme processo Node em execução e token correto.';
             updateButtons('gateway_unreachable');
             setGatewayStatusBadge('gateway_unreachable', true);
         }
@@ -807,11 +1220,6 @@ if ($enabled && $directProvider === 'api_whats_linux') {
     if (selectProvider?.value.includes('api_whats')) {
         currentGatewayProvider = selectProvider.value;
         fetchStatus();
-    } else {
-        if (whatsRealtimeStatus) {
-            whatsRealtimeStatus.className = 'badge bg-dark';
-            whatsRealtimeStatus.innerHTML = '<i class="bi bi-info-circle me-1"></i>Provider Externo';
-        }
     }
 
     btnManageList.forEach((btn) => {
@@ -848,7 +1256,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
     btnRestart?.addEventListener('click', async () => {
         const conf = await fireSwal({
             title: 'Reiniciar Gateway?',
-            text: 'Deseja apenas reiniciar o processo ou tambem zerar os arquivos de sessao (limpeza profunda)? Zerar a sessao exigira uma nova leitura de QR Code.',
+            text: 'Deseja apenas reiniciar o processo ou também zerar os arquivos de sessão (limpeza profunda)? Zerar a sessão exigirá uma nova leitura de QR Code.',
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Limpeza Profunda (Zerar)',
@@ -867,7 +1275,7 @@ if ($enabled && $directProvider === 'api_whats_linux') {
         // Re-adjusting for clarity:
         
         let cleanParam = false;
-        if (conf.isConfirmed) cleanParam = true;  // Limpeeza profunda
+        if (conf.isConfirmed) cleanParam = true;  // Limpeza profunda
         else if (conf.isDismissed && conf.dismiss === 'cancel') cleanParam = false; // Apenas reiniciar
         else return; // Fechou o modal sem escolher
 
@@ -880,14 +1288,14 @@ if ($enabled && $directProvider === 'api_whats_linux') {
             setGatewayError('');
             setTimeout(fetchStatus, 3000);
         } catch (error) {
-            await fireSwal({ icon: 'error', title: 'Falha no reinicio', text: error.message || 'Erro ao reiniciar' });
+            await fireSwal({ icon: 'error', title: 'Falha no reinício', text: error.message || 'Erro ao reiniciar' });
             btnRestart.disabled = false;
             btnRestart.innerHTML = originalHtml;
         }
     });
 
     btnLogout?.addEventListener('click', async () => {
-        const conf = await fireSwal({ title: 'Desconectar WhatsApp?', text: 'Isso ira encerrar a sessao atual e gerar um novo QR Code para vincular outro numero. Tem certeza?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim, desconectar', cancelButtonText: 'Nao' });
+        const conf = await fireSwal({ title: 'Desconectar WhatsApp?', text: 'Isso irá encerrar a sessão atual e gerar um novo QR Code para vincular outro número. Tem certeza?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim, desconectar', cancelButtonText: 'Não' });
         if (!conf.isConfirmed) return;
         
         const originalHtml = btnLogout.innerHTML;
@@ -923,3 +1331,4 @@ if ($enabled && $directProvider === 'api_whats_linux') {
 })();
 </script>
 <?= $this->endSection() ?>
+

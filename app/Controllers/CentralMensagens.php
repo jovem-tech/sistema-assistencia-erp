@@ -16,6 +16,7 @@ use App\Models\CrmTagModel;
 use App\Models\CrmFollowupModel;
 use App\Models\LogModel;
 use App\Models\MensagemWhatsappModel;
+use App\Models\OrcamentoModel;
 use App\Models\OsDocumentoModel;
 use App\Models\OsModel;
 use App\Models\RespostaRapidaWhatsappModel;
@@ -639,8 +640,7 @@ class CentralMensagens extends BaseController
         $endpoint = 'conversas';
 
         try {
-            $service = new CentralMensagensService();
-            $service->syncInboundQueue(80, true);
+            $this->releaseSessionLock();
 
             $q = trim((string) $this->request->getGet('q'));
             $status = trim((string) $this->request->getGet('status'));
@@ -670,6 +670,10 @@ class CentralMensagens extends BaseController
                     NULL as contato_perfil_nome,
                     NULL as contato_cliente_id,
                     NULL as contato_status_relacionamento';
+            $ultimaMovimentacaoSelect = $mensagensTableExists
+                ? '(SELECT COALESCE(mw.recebida_em, mw.enviada_em, mw.created_at) FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_movimentacao_em'
+                : 'NULL as ultima_movimentacao_em';
+
             $builder = $model
                 ->select(
                     'conversas_whatsapp.*, clientes.nome_razao as cliente_nome, os.numero_os, os.estado_fluxo, usuarios.nome as responsavel_nome,
@@ -681,7 +685,14 @@ class CentralMensagens extends BaseController
                     (SELECT mw.direcao FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_direcao,
                     (SELECT mw.tipo_mensagem FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_tipo_mensagem,
                     (SELECT mw.enviada_por_bot FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_bot' : ',
-                    0 as ultima_mensagem_id')
+                    0 as ultima_mensagem_id,
+                    NULL as ultima_mensagem_texto,
+                    NULL as ultima_mensagem_tipo,
+                    NULL as ultima_mensagem_direcao,
+                    NULL as ultima_mensagem_tipo_mensagem,
+                    NULL as ultima_mensagem_bot')
+                    . ',
+                    ' . $ultimaMovimentacaoSelect
                 )
                 ->join('clientes', 'clientes.id = conversas_whatsapp.cliente_id', 'left')
                 ->join('os', 'os.id = conversas_whatsapp.os_id_principal', 'left')
@@ -729,10 +740,23 @@ class CentralMensagens extends BaseController
             }
 
             $items = $builder
-                ->orderBy('conversas_whatsapp.ultima_mensagem_em', 'DESC')
+                ->orderBy('COALESCE(ultima_movimentacao_em, conversas_whatsapp.ultima_mensagem_em, conversas_whatsapp.updated_at, conversas_whatsapp.created_at)', 'DESC', false)
                 ->orderBy('ultima_mensagem_id', 'DESC')
                 ->orderBy('conversas_whatsapp.id', 'DESC')
                 ->findAll($limit);
+
+            foreach ($items as &$item) {
+                $ultimaMovimentacao = trim((string) ($item['ultima_movimentacao_em'] ?? ''));
+                if ($ultimaMovimentacao !== '') {
+                    $item['ultima_mensagem_em'] = $ultimaMovimentacao;
+                    continue;
+                }
+
+                if (empty($item['ultima_mensagem_em'])) {
+                    $item['ultima_mensagem_em'] = $item['updated_at'] ?? ($item['created_at'] ?? null);
+                }
+            }
+            unset($item);
 
             return $this->apiSuccess('CM_CONVERSAS_LIST_OK', [
                 'items' => $items,
@@ -780,8 +804,8 @@ class CentralMensagens extends BaseController
         }
 
         try {
+            $this->releaseSessionLock();
             $service = new CentralMensagensService();
-            $service->syncInboundQueue(80);
 
             $conversaModel = new ConversaWhatsappModel();
             $conversa = $conversaModel->find($id);
@@ -828,8 +852,8 @@ class CentralMensagens extends BaseController
         $endpoint = 'conversa_novas';
 
         try {
+            $this->releaseSessionLock();
             $service = new CentralMensagensService();
-            $service->syncInboundQueue(40);
 
             $conversaModel = new ConversaWhatsappModel();
             $conversa = $conversaModel->find($id);
@@ -850,12 +874,6 @@ class CentralMensagens extends BaseController
 
             $mensagemModel = new MensagemWhatsappModel();
             $mensagens = $mensagemModel->afterId($id, $afterId, $limit);
-            if (empty($mensagens) && $afterId > 0) {
-                // Reconciliacao defensiva: quando o webhook falha de forma intermitente,
-                // forca uma sincronizacao curta com o gateway para captar respostas externas.
-                $service->syncInboundQueue(120, true);
-                $mensagens = $mensagemModel->afterId($id, $afterId, $limit);
-            }
 
             if (!empty($mensagens)) {
                 $service->markConversationRead($id);
@@ -1047,12 +1065,18 @@ class CentralMensagens extends BaseController
         $endpoint = 'enviar';
 
         try {
+            $sessionUserId = session()->get('user_id') ?: null;
+            $this->releaseSessionLock();
+
             $conversaId = (int) ($this->request->getPost('conversa_id') ?? 0);
             $phone = trim((string) $this->request->getPost('telefone'));
             $mensagem = trim((string) $this->request->getPost('mensagem'));
             $tipoMensagem = trim((string) ($this->request->getPost('tipo_mensagem') ?: 'manual'));
             $osId = (int) ($this->request->getPost('os_id') ?? 0);
             $documentoId = (int) ($this->request->getPost('documento_id') ?? 0);
+            $replyToMessageId = (int) ($this->request->getPost('reply_to_message_id') ?? 0);
+            $replyToText = trim((string) ($this->request->getPost('reply_to_text') ?? ''));
+            $replyToAuthor = trim((string) ($this->request->getPost('reply_to_author') ?? ''));
             $anexo = $this->request->getFile('anexo');
             $hasUpload = $anexo && $anexo->isValid() && !$anexo->hasMoved();
 
@@ -1192,7 +1216,7 @@ class CentralMensagens extends BaseController
                 $mensagem,
                 $tipoMensagem,
                 null,
-                session()->get('user_id') ?: null,
+                $sessionUserId,
                 [
                     'arquivo_path' => $arquivoPath,
                     'arquivo' => $arquivoRelative,
@@ -1202,7 +1226,10 @@ class CentralMensagens extends BaseController
                     'arquivo_tamanho' => $arquivoBytes > 0 ? $arquivoBytes : null,
                     'conversa_id' => $conversaId,
                     'enviada_por_bot' => false,
-                    'enviada_por_usuario_id' => session()->get('user_id') ?: null,
+                    'enviada_por_usuario_id' => $sessionUserId,
+                    'reply_to_message_id' => $replyToMessageId > 0 ? $replyToMessageId : null,
+                    'reply_to_text' => $replyToText !== '' ? $replyToText : null,
+                    'reply_to_author' => $replyToAuthor !== '' ? $replyToAuthor : null,
                 ]
             );
 
@@ -1303,6 +1330,7 @@ class CentralMensagens extends BaseController
         $endpoint = 'sync_inbound';
 
         try {
+            $this->releaseSessionLock();
             $count = (new CentralMensagensService())->syncInboundQueue(300, true);
             return $this->apiSuccess('CM_SYNC_INBOUND_OK', [
                 'message' => 'Sincronizacao concluida.',
@@ -1827,6 +1855,45 @@ class CentralMensagens extends BaseController
                 ->findAll(20);
         }
 
+        $orcamentos = [];
+        $orcamentoStatusLabels = [];
+        $orcamentoModel = new OrcamentoModel();
+        if ($orcamentoModel->db->tableExists('orcamentos')) {
+            $builder = $orcamentoModel
+                ->select('id, numero, status, total, validade_data, os_id, created_at')
+                ->orderBy('id', 'DESC');
+
+            $hasScope = false;
+            $builder->groupStart();
+            if ((int) ($conversa['id'] ?? 0) > 0) {
+                $builder->where('conversa_id', (int) $conversa['id']);
+                $hasScope = true;
+            }
+            if ($clienteId > 0) {
+                if ($hasScope) {
+                    $builder->orWhere('cliente_id', $clienteId);
+                } else {
+                    $builder->where('cliente_id', $clienteId);
+                    $hasScope = true;
+                }
+            }
+            if ($osPrincipalId > 0) {
+                if ($hasScope) {
+                    $builder->orWhere('os_id', $osPrincipalId);
+                } else {
+                    $builder->where('os_id', $osPrincipalId);
+                    $hasScope = true;
+                }
+            }
+            $builder->groupEnd();
+
+            if ($hasScope) {
+                $orcamentos = $builder->findAll(12);
+            }
+
+            $orcamentoStatusLabels = $orcamentoModel->statusLabels();
+        }
+
         $service = new CentralMensagensService();
 
         return [
@@ -1838,6 +1905,8 @@ class CentralMensagens extends BaseController
             'os_vinculadas' => $osVinculadas,
             'documentos' => $docs,
             'followups' => $followups,
+            'orcamentos' => $orcamentos,
+            'orcamento_status_labels' => $orcamentoStatusLabels,
             'meta' => [
                 'status' => (string) ($conversa['status'] ?? 'aberta'),
                 'status_options' => ['aberta', 'aguardando', 'resolvida', 'arquivada'],
@@ -1868,6 +1937,19 @@ class CentralMensagens extends BaseController
             'central_mensagens_dias_uteis' => '1,2,3,4,5,6',
             'central_mensagens_bot_fallback_message' => 'Recebi sua mensagem e vou encaminhar para um atendente humano continuar o atendimento.',
         ];
+    }
+
+    private function releaseSessionLock(): void
+    {
+        if (!function_exists('session')) {
+            return;
+        }
+
+        try {
+            session()->close();
+        } catch (\Throwable $e) {
+            // segue sem interromper o endpoint quando nao for possivel liberar lock da sessao.
+        }
     }
 
     private function syncInboundSafe(): void

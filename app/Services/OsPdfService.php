@@ -13,12 +13,14 @@ class OsPdfService
     private OsModel $osModel;
     private OsItemModel $itemModel;
     private OsDocumentoModel $documentoModel;
+    private PdfBrandingService $pdfBrandingService;
 
     public function __construct()
     {
         $this->osModel = new OsModel();
         $this->itemModel = new OsItemModel();
         $this->documentoModel = new OsDocumentoModel();
+        $this->pdfBrandingService = new PdfBrandingService();
     }
 
     public function tiposDisponiveis(): array
@@ -27,6 +29,7 @@ class OsPdfService
             'abertura' => 'Comprovante de Abertura',
             'orcamento' => 'Orcamento',
             'laudo' => 'Laudo Tecnico',
+            'cobranca_manutencao' => 'Cobranca / Manutencao',
             'entrega' => 'Comprovante de Entrega',
             'devolucao_sem_reparo' => 'Devolucao Sem Reparo',
         ];
@@ -55,6 +58,7 @@ class OsPdfService
         $html = view('os/pdf/' . $tipo, [
             'os' => $os,
             'payload' => $payload,
+            'branding' => $this->pdfBrandingService->getContext(),
             'tituloDocumento' => $tipos[$tipo],
             'geradoEm' => date('d/m/Y H:i:s'),
         ]);
@@ -95,6 +99,7 @@ class OsPdfService
 
     private function buildPayload(int $osId): array
     {
+        $os = $this->osModel->getComplete($osId);
         $itens = $this->itemModel->getByOs($osId);
         $acessorios = (new AcessorioOsModel())->where('os_id', $osId)->orderBy('id', 'ASC')->findAll();
         $estadoFisico = (new EstadoFisicoOsModel())->where('os_id', $osId)->orderBy('id', 'ASC')->findAll();
@@ -103,22 +108,90 @@ class OsPdfService
             'servicos' => 0.0,
             'pecas' => 0.0,
         ];
+        $servicos = [];
+        $pecas = [];
 
         foreach ($itens as $item) {
             $valor = (float)($item['valor_total'] ?? 0);
             if (($item['tipo'] ?? '') === 'peca') {
                 $totais['pecas'] += $valor;
+                $pecas[] = $item;
             } else {
                 $totais['servicos'] += $valor;
+                $servicos[] = $item;
             }
         }
 
+        $procedimentosExecutados = $this->extractTextList((string) ($os['procedimentos_executados'] ?? ''));
+        $garantiaDias = (int) ($os['garantia_dias'] ?? 0);
+        $garantiaValidade = trim((string) ($os['garantia_validade'] ?? ''));
+        $formaPagamento = trim((string) ($os['forma_pagamento'] ?? ''));
+        $statusAtual = trim((string) ($os['status'] ?? ''));
+
         return [
             'itens' => $itens,
+            'servicos' => $servicos,
+            'pecas' => $pecas,
             'acessorios' => $acessorios,
             'estado_fisico' => $estadoFisico,
             'totais' => $totais,
+            'procedimentos_executados' => $procedimentosExecutados,
+            'resumo_cobranca' => [
+                'valor_mao_obra' => (float) ($os['valor_mao_obra'] ?? $totais['servicos']),
+                'valor_mao_obra_label' => formatMoney((float) ($os['valor_mao_obra'] ?? $totais['servicos'])),
+                'valor_pecas' => (float) ($os['valor_pecas'] ?? $totais['pecas']),
+                'valor_pecas_label' => formatMoney((float) ($os['valor_pecas'] ?? $totais['pecas'])),
+                'valor_total' => (float) ($os['valor_total'] ?? ($totais['servicos'] + $totais['pecas'])),
+                'valor_total_label' => formatMoney((float) ($os['valor_total'] ?? ($totais['servicos'] + $totais['pecas']))),
+                'desconto' => (float) ($os['desconto'] ?? 0),
+                'desconto_label' => formatMoney((float) ($os['desconto'] ?? 0)),
+                'valor_final' => (float) ($os['valor_final'] ?? 0),
+                'valor_final_label' => formatMoney((float) ($os['valor_final'] ?? 0)),
+                'forma_pagamento' => $formaPagamento !== '' ? $formaPagamento : 'A combinar',
+                'status_atual' => $statusAtual !== '' ? ucwords(str_replace('_', ' ', $statusAtual)) : '-',
+                'garantia_label' => $this->buildGarantiaLabel($garantiaDias, $garantiaValidade),
+                'data_entrega_label' => $this->formatDateTimeLabel((string) ($os['data_entrega'] ?? '')),
+                'prazo_label' => $this->formatDateTimeLabel((string) ($os['data_previsao'] ?? '')),
+            ],
         ];
+    }
+
+    private function extractTextList(string $value): array
+    {
+        $parts = preg_split('/\r\n|\r|\n/', $value) ?: [];
+        $parts = array_map(static fn (string $item): string => trim($item), $parts);
+        $parts = array_values(array_filter($parts, static fn (string $item): bool => $item !== ''));
+
+        return $parts;
+    }
+
+    private function buildGarantiaLabel(int $garantiaDias, string $garantiaValidade): string
+    {
+        $parts = [];
+        if ($garantiaDias > 0) {
+            $parts[] = $garantiaDias . ' dias';
+        }
+
+        if ($garantiaValidade !== '') {
+            $parts[] = 'ate ' . $this->formatDateTimeLabel($garantiaValidade, false);
+        }
+
+        return !empty($parts) ? implode(' | ', $parts) : 'Nao informada';
+    }
+
+    private function formatDateTimeLabel(string $value, bool $withTime = true): string
+    {
+        $raw = trim($value);
+        if ($raw === '') {
+            return '-';
+        }
+
+        $timestamp = strtotime($raw);
+        if (!$timestamp) {
+            return '-';
+        }
+
+        return $withTime ? date('d/m/Y H:i', $timestamp) : date('d/m/Y', $timestamp);
     }
 
     private function ensureFolder(string $numeroOs): array

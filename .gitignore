@@ -130,14 +130,26 @@ _modules/*
 #-------------------------
 public/uploads/*
 !public/uploads/index.html
+public/mobile-app/
 whatsapp-api/node_modules/
 whatsapp-api/.env
 whatsapp-api/tokens/
 whatsapp-api/dist/
 whatsapp-api/.wwebjs_auth/
 whatsapp-api/.wwebjs_cache/
+mobile-app/node_modules/
+mobile-app/.next/
+mobile-app/.turbo/
 .agents/
 .codex_keys/
 *.log
 error_log
 .gemini/
+
+#-------------------------
+# Backup / Temporary Recovery Files
+#-------------------------
+.env.bak.*
+*.utf8bak
+*.pre_*
+*.codex.bak_

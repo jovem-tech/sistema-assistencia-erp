@@ -94,7 +94,7 @@
                             <?php foreach ($permissoes as $p): ?>
                             <td class="text-center align-middle">
                                 <input class="form-check-input check-all-col" type="checkbox"
-                                       data-permissao="<?= $p['slug'] ?>"
+                                       data-permissão="<?= $p['slug'] ?>"
                                        style="width:18px; height:18px; cursor:pointer; opacity:.7;"
                                        title="Marcar '<?= esc($p['nome']) ?>'' para todos os módulos">
                             </td>
@@ -129,7 +129,7 @@ document.querySelectorAll('.check-all-row').forEach(rowChk => {
 // Marcar/desmarcar toda a coluna (permissão)
 document.querySelectorAll('.check-all-col').forEach(colChk => {
     colChk.addEventListener('change', function() {
-        const permSlug = this.dataset.permissao;
+        const permSlug = this.dataset.permissão;
         document.querySelectorAll(`.perm-check[data-perm="${permSlug}"]`)
                 .forEach(cb => cb.checked = this.checked);
         syncRowCheckboxes();

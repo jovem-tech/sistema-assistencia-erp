@@ -62,6 +62,38 @@ class EquipamentosMarcas extends BaseController
         return $this->response->setJSON(['success' => true, 'id' => $id, 'nome' => $nome]);
     }
 
+    public function atualizar_ajax($id)
+    {
+        $marcaId = (int) $id;
+        $marca = $this->model->find($marcaId);
+        if (!$marca) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Marca nao encontrada']);
+        }
+
+        $nome = trim((string) $this->request->getPost('nome'));
+        $nomeLength = function_exists('mb_strlen') ? mb_strlen($nome, 'UTF-8') : strlen($nome);
+        if ($nome === '' || $nomeLength > 100) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Nome invalido para a marca']);
+        }
+
+        $duplicada = $this->model
+            ->where('id !=', $marcaId)
+            ->where('nome', $nome)
+            ->first();
+        if ($duplicada) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Ja existe outra marca com esse nome']);
+        }
+
+        $this->model->update($marcaId, ['nome' => $nome]);
+        LogModel::registrar('equipamento_marca_atualizada_ajax', 'Marca atualizada via ajax: ' . $nome . ' (ID ' . $marcaId . ')');
+
+        return $this->response->setJSON([
+            'success' => true,
+            'id' => $marcaId,
+            'nome' => $nome,
+        ]);
+    }
+
     public function delete($id)
     {
         $marca = $this->model->find($id);

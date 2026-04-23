@@ -1,44 +1,36 @@
-# Manual do Usuário: Busca Global na Navbar
+# Manual do Usuario: Busca Global na Navbar
 
-A **Busca Global** é a maneira mais rápida de encontrar e navegar por qualquer informação no seu ERP. Ela está sempre visível no topo da tela, na barra de navegação principal.
+A busca global e a forma mais rapida de localizar telas, clientes, equipamentos, mensagens e ordens de servico dentro do ERP.
 
-## Como Usar
+## Como usar
 
-1. **Filtros de Categoria (Multi-seleção)**: Clique no ícone de funil/seletor à esquerda da barra de busca. Você pode marcar **mais de uma categoria** simultaneamente (ex: OS + Clientes). Ao marcar "Tudo", as outras opções são desmarcadas automaticamente e vice-versa. O rótulo do botão mostrará "Tudo", o nome da categoria única ou a quantidade de filtros ativos.
-2. **Digite o termo**: Você pode pesquisar por:
-   - **Número de OS**: Digite "260001" ou o número completo.
-   - **Nome do Cliente**: Digite o primeiro nome ou sobrenome (ex: "Marcondes").
-   - **CPF ou CNPJ**: Pesquisa direta por documentos (ex: "000.000.000-00").
-   - **Marca ou Modelo**: Procure por equipamentos (ex: "Samsung", "S22").
-   - **WhatsApp/Mensagens**: Pesquise palavras dentro de conversas do WhatsApp.
-   - **Estoque**: Localize peças e peças por nome ou código.
-   - **Módulos**: Digite "Configurações", "Estoque" ou "Financeiro" para ir direto para a tela desejada.
+1. Clique no seletor de contexto a esquerda do campo de busca.
+2. Escolha uma ou mais categorias.
+3. Digite pelo menos 2 caracteres.
+4. Clique no resultado desejado ou use as setas do teclado e `Enter`.
 
-3. **Navegação Inteligente**:
-   - Use as setas `↑` e `↓` do teclado para navegar entre os resultados sugeridos.
-   - Pressione `Enter` para abrir o resultado selecionado.
-   - Pressione `Esc` para fechar o painel de busca sem navegar.
+## Categorias disponiveis
 
-## Resultados Agrupados
+- `Tudo`
+- `OS`
+- `OS Legado (numero antigo)`
+- `Clientes`
+- `WhatsApp`
+- `Equipamentos`
+- `Servicos`
+- `Pecas`
 
-Os resultados são organizados por categorias selecionadas para facilitar a visualização:
+## Busca por OS legado
 
-- **Módulos/Ações**: Atalhos rápidos para telas do sistema.
-- **Ordens de Serviço**: Lista as OS encontradas com status atual.
-- **Clientes**: Cadastro rápido de clientes.
-- **Equipamentos**: Dispositivos vinculados a clientes.
-- **WhatsApp**: Últimas mensagens que contêm o termo pesquisado.
-- **Estoque / Peças**: Peças com saldo e preço de venda.
+- Quando voce tiver apenas o numero antigo da ordem, use o filtro `OS Legado (numero antigo)`.
+- A busca tambem funciona em `Tudo`, mas o filtro dedicado reduz ruido e acelera a localizacao.
+- O resultado leva direto para a visualizacao da OS migrada no novo sistema.
 
-### Resultado de WhatsApp
+## Dicas operacionais
 
-- ao clicar em um resultado da categoria `WhatsApp`, o sistema abre a `Central de Mensagens` com a conversa ja selecionada
-- a navegacao correta usa a tela principal da central com `?conversa_id={id}`, e nao a rota JSON interna da thread
-- isso evita exibir dados brutos da conversa no navegador
-
-## Dicas Sugeridas
-
-- A busca aguarda **2 caracteres** para começar a sugerir resultados.
-- Ela é **instantânea** (atualiza conforme você digita as combinações de filtros).
-- A barra de resultados possui **rolagem própria** caso existam muitos itens.
-- Em dispositivos móveis, o campo se expande para facilitar a visualização.
+- A barra respeita as permissoes do usuario logado.
+- Em mobile, o campo continua funcional com o mesmo filtro de contexto.
+- Nos filtros `Servicos` e `Pecas`, a busca mostra apenas catalogo operacional ativo:
+  - servicos com `status = ativo` e sem encerramento;
+  - pecas com `ativo = 1`.
+- Labels do menu foram normalizadas em ASCII/entidades HTML para evitar caracteres corrompidos em navegadores e ambientes de deploy diferentes.

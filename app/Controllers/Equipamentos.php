@@ -15,6 +15,7 @@ use App\Models\OsModel;
 class Equipamentos extends BaseController
 {
     private const MAX_FOTOS_POR_EQUIPAMENTO = 4;
+    private const RELATION_TABLE = 'equipamentos_catalogo_relacoes';
 
     protected $model;
 
@@ -138,6 +139,8 @@ class Equipamentos extends BaseController
         $modeloModel  = new EquipamentoModeloModel();
 
         $fotoModel    = new EquipamentoFotoModel();
+        $isEmbedded = $this->request->getGet('embed') === '1';
+
         $this->normalizeEquipamentoFotosStorage((int) $id);
 
         $fotos = $fotoModel->where('equipamento_id', $id)->findAll();
@@ -289,6 +292,8 @@ class Equipamentos extends BaseController
             return redirect()->to('/equipamentos')->with('error', 'Equipamento n o encontrado.');
         }
 
+        $isEmbedded = $this->request->getGet('embed') === '1';
+
         $this->normalizeEquipamentoFotosStorage((int) $id);
         $fotoModel = new EquipamentoFotoModel();
         $osModel   = new OsModel();
@@ -304,6 +309,8 @@ class Equipamentos extends BaseController
             'ordens'       => $osModel->where('equipamento_id', $id)->orderBy('created_at', 'DESC')->findAll(),
             'vinculados'   => $equipamentoClienteModel->getClientesVinculados($id),
             'clientes_all' => $clienteModel->orderBy('nome_razao', 'ASC')->findAll(), // For modal dropdown
+            'layout' => $isEmbedded ? 'layouts/embed' : 'layouts/main',
+            'isEmbedded' => $isEmbedded,
         ];
 
         return view('equipamentos/show', $data);
@@ -311,7 +318,11 @@ class Equipamentos extends BaseController
 
     public function byClient($clienteId)
     {
-        $equipamentos = $this->model->getByCliente($clienteId);
+        $equipamentos = array_map(function (array $equipamento): array {
+            $fotoArquivo = trim((string) ($equipamento['foto_principal_arquivo'] ?? ''));
+            $equipamento['foto_url'] = $fotoArquivo !== '' ? $this->buildFotoPublicUrl($fotoArquivo) : '';
+            return $equipamento;
+        }, $this->model->getByCliente($clienteId));
         return $this->response->setJSON($equipamentos);
     }
 
@@ -1122,6 +1133,30 @@ class Equipamentos extends BaseController
             $dados['modelo_id'] = $modeloModel->getInsertID();
         }
 
+        $this->syncCatalogoRelacaoFromPayload($dados);
         return $dados;
+    }
+
+    private function syncCatalogoRelacaoFromPayload(array $dados): void
+    {
+        $tipoId = (int) ($dados['tipo_id'] ?? 0);
+        $marcaId = (int) ($dados['marca_id'] ?? 0);
+        $modeloId = (int) ($dados['modelo_id'] ?? 0);
+        if ($tipoId <= 0 || $marcaId <= 0 || $modeloId <= 0) {
+            return;
+        }
+
+        try {
+            if (!$this->model->db->tableExists(self::RELATION_TABLE)) {
+                return;
+            }
+
+            $this->model->db->query(
+                'INSERT IGNORE INTO ' . self::RELATION_TABLE . ' (tipo_id, marca_id, modelo_id, ativo, created_at, updated_at) VALUES (?, ?, ?, 1, NOW(), NOW())',
+                [$tipoId, $marcaId, $modeloId]
+            );
+        } catch (\Throwable $e) {
+            log_message('warning', '[Equipamentos] Falha ao sincronizar relacao tipo+marca+modelo: ' . $e->getMessage());
+        }
     }
 }

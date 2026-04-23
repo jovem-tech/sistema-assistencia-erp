@@ -1,8 +1,9 @@
-<?= $this->extend('layouts/main') ?>
+<?= $this->extend($layout ?? 'layouts/main') ?>
 <?= $this->section('content') ?>
 
 <div class="page-header d-flex justify-content-between align-items-center">
     <h2><i class="bi bi-display me-2"></i><?= esc($title) ?></h2>
+    <?php if (!($isEmbedded ?? false)): ?>
     <div class="d-flex gap-2">
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('equipamentos')" title="Ajuda sobre Equipamentos">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -10,6 +11,7 @@
         <a href="<?= base_url('equipamentos/editar/' . $equipamento['id']) ?>" class="btn btn-glow"><i class="bi bi-pencil me-1"></i>Editar</a>
         <a href="<?= base_url('equipamentos') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('equipamentos') ?>"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
     </div>
+    <?php endif; ?>
 </div>
 
 <div class="row g-4">
@@ -133,7 +135,7 @@
                                                     <a href="<?= base_url('clientes/visualizar/' . $vinc['id']) ?>" class="text-decoration-none text-body"><?= esc($vinc['nome_razao']) ?></a>
                                                 </div>
                                                 <?php if(can('equipamentos', 'editar')): ?>
-                                                    <a href="<?= base_url('equipamentos/desvincular-cliente/' . $equipamento['id'] . '/' . $vinc['id']) ?>" class="btn btn-sm btn-link text-danger p-0" title="Desvincular Cliente" onclick="return confirm('Tem certeza que deseja desvincular este cliente do equipamento?');"><i class="bi bi-x-circle"></i></a>
+                                                    <a href="<?= base_url('equipamentos/desvincular-cliente/' . $equipamento['id'] . '/' . $vinc['id']) ?>" class="btn btn-sm btn-link text-danger p-0 js-desvincular-cliente" title="Desvincular Cliente"><i class="bi bi-x-circle"></i></a>
                                                 <?php endif; ?>
                                             </li>
                                         <?php endforeach; ?>
@@ -301,6 +303,25 @@
                 theme: 'bootstrap-5'
             });
         }
+
+        document.addEventListener('click', async function (event) {
+            const trigger = event.target.closest('.js-desvincular-cliente');
+            if (!trigger) return;
+
+            event.preventDefault();
+            const confirmed = await window.DSFeedback.confirm({
+                icon: 'warning',
+                title: 'Desvincular cliente?',
+                text: 'Tem certeza que deseja desvincular este cliente do equipamento?',
+                confirmButtonText: 'Sim, desvincular',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            });
+
+            if (confirmed) {
+                window.location.href = trigger.getAttribute('href');
+            }
+        });
     });
 </script>
 <?= $this->endSection() ?>

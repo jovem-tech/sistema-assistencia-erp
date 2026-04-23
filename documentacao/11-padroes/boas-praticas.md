@@ -10,6 +10,12 @@
 - Registre acoes importantes com `LogModel::registrar()`.
 - Verifique permissao com `requirePermission()` no `__construct()`.
 - Use `can()` antes de renderizar botoes/links de acao.
+- Em buscas de catalogo (pecas/servicos), retorne apenas registros operacionais ativos:
+  - `pecas`: `ativo = 1`;
+  - `servicos`: `status = 'ativo'` e `encerrado_em IS NULL`.
+- Em consultas com `like` + `orLike`, agrupe as condicoes de texto antes do filtro de ativo para evitar vazamento de registros inativos.
+- No fluxo de `os_itens`, saneie `peca_id`/`servico_id` para inteiro antes do insert para evitar violacao de FK.
+- Permita incluir peca sem estoque no item da OS, mas registre status pendente e nao baixe estoque ate a reserva real.
 
 ### Nao faca
 - Nao confiar em dados do POST sem validacao.
@@ -34,6 +40,9 @@
 - Preserve contexto de modal, iframe embed, filtros, pagina atual e scroll util sempre que tecnicamente possivel.
 - Sincronize componentes enriquecidos (`Select2`, `DataTables`, cards, badges, chips, galerias e resumos`) tanto no dado interno quanto no valor renderizado.
 - Prefira AJAX, eventos customizados, callbacks e `postMessage` a recarga total da pagina.
+- No lancamento de `Itens / Servicos` da OS, use Select2 com busca assincrona no catalogo para peca/servico em vez de campo textual simples.
+- Configure Select2 de itens da OS com `minimumInputLength = 0` para exibir top 10 itens mais usados sem digitacao inicial.
+- No template do Select2 de itens da OS, exiba metadados operacionais (estoque e valor) para acelerar decisao do tecnico.
 
 ### Nao faca
 - Evite style inline fora de casos pontuais.

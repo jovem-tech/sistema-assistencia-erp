@@ -161,6 +161,7 @@ Representam os produtos vendidos e componentes consumidos usados na Assistência
 | `relato_cliente`| TEXT | NOT NULL | O que o cliente declarou como queixa, sintoma ou pedido inicial de serviço. |
 | `diagnostico_tecnico`| TEXT| NULL | Conclusão oficial do profissional perante a análise. |
 | `solucao_aplicada`| TEXT | NULL | Procedimento técnico que foi adotado ou será prestado. |
+| `procedimentos_executados`| TEXT | NULL | Lista textual incremental dos procedimentos executados no formato operacional (`[descricao - dd/mm/aa-HH:mm - tecnico: nome]`). |
 | `data_abertura`| DATETIME | DEFAULT CURRENT_TIMESTAMP | Quando a OS foi formulada no sistema. |
 | `data_previsao`| DATE | NULL | Data promessa dada para o cliente sobre entrega do reparo ou diagnóstico. |
 | `data_conclusao`| DATETIME | NULL | O momento exato em que a OS recebe status de 'pronto'. |

@@ -6,6 +6,45 @@
 function getStatusBadge($status)
 {
     static $dynamicCache = null;
+    $normalizeStatusLabel = static function (string $label): string {
+        $from = [
+            'Execucao',
+            'execucao',
+            'Servico',
+            'servico',
+            'Orcamento',
+            'orcamento',
+            'Aprovacao',
+            'aprovacao',
+            'Analise',
+            'analise',
+            'Peca',
+            'peca',
+            'Tecnico',
+            'tecnico',
+            'Pendencia',
+            'pendencia',
+        ];
+        $to = [
+            'Execução',
+            'execução',
+            'Serviço',
+            'serviço',
+            'Orçamento',
+            'orçamento',
+            'Aprovação',
+            'aprovação',
+            'Análise',
+            'análise',
+            'Peça',
+            'peça',
+            'Técnico',
+            'técnico',
+            'Pendência',
+            'pendência',
+        ];
+        return str_replace($from, $to, $label);
+    };
 
     if ($dynamicCache === null) {
         $dynamicCache = [];
@@ -46,23 +85,23 @@ function getStatusBadge($status)
         $icon = trim((string) ($row['icone'] ?? ''));
         $iconHtml = $icon !== '' ? '<i class="bi ' . esc($icon) . ' me-1"></i>' : '';
         $colorClass = str_starts_with($color, 'bg-') ? $color : ('bg-' . $color);
-        return '<span class="badge ' . esc($colorClass) . '">' . $iconHtml . esc($row['nome'] ?? $status) . '</span>';
+        return '<span class="badge ' . esc($colorClass) . '">' . $iconHtml . esc($normalizeStatusLabel((string) ($row['nome'] ?? $status))) . '</span>';
     }
 
     $legacy = [
-        'aguardando_analise' => 'Aguard. Analise',
-        'aguardando_orcamento' => 'Aguard. Orcamento',
-        'aguardando_aprovacao' => 'Aguard. Aprovacao',
+        'aguardando_analise' => 'Aguard. Análise',
+        'aguardando_orcamento' => 'Aguard. Orçamento',
+        'aguardando_aprovacao' => 'Aguard. Aprovação',
         'aprovado' => 'Aprovado',
         'reprovado' => 'Reprovado',
         'em_reparo' => 'Em Reparo',
-        'aguardando_peca' => 'Aguard. Peca',
+        'aguardando_peca' => 'Aguard. Peça',
         'pronto' => 'Pronto',
         'entregue' => 'Entregue',
         'cancelado' => 'Cancelado',
     ];
 
-    $label = $legacy[$status] ?? ucfirst(str_replace('_', ' ', (string) $status));
+    $label = $normalizeStatusLabel($legacy[$status] ?? ucfirst(str_replace('_', ' ', (string) $status)));
     return '<span class="badge bg-secondary">' . esc($label) . '</span>';
 }
 
@@ -119,7 +158,7 @@ function getEquipTipo($tipo)
 }
 
 /**
- * Obter valor de configuracao
+ * Obter valor de configuração
  */
 function get_config($chave, $default = null)
 {
@@ -137,7 +176,7 @@ function get_config($chave, $default = null)
 }
 
 /**
- * Retorna a versao de release do sistema com fallback seguro.
+ * Retorna a versão de release do sistema com fallback seguro.
  */
 function get_system_version(): string
 {
@@ -164,7 +203,7 @@ function get_theme()
 }
 
 /**
- * Retorna o tempo maximo de inatividade da sessao em minutos.
+ * Retorna o tempo máximo de inatividade da sessão em minutos.
  */
 function get_session_inactivity_minutes(int $default = 30): int
 {
@@ -178,7 +217,7 @@ function get_session_inactivity_minutes(int $default = 30): int
 }
 
 /**
- * Retorna o tempo maximo de inatividade da sessao em segundos.
+ * Retorna o tempo máximo de inatividade da sessão em segundos.
  */
 function get_session_inactivity_seconds(int $defaultMinutes = 30): int
 {
@@ -186,7 +225,7 @@ function get_session_inactivity_seconds(int $defaultMinutes = 30): int
 }
 
 /**
- * Carrega e cacheia no session o mapa de permissoes do usuario logado.
+ * Carrega e cacheia no session o mapa de permissões do usuário logado.
  * Estrutura: ['clientes' => ['visualizar', 'criar', 'editar'], ...]
  */
 function loadUserPermissions(): array
@@ -255,12 +294,12 @@ function refreshPermissions(): void
 }
 
 /**
- * Aborta a requisicao com erro 403 se o usuario nao tiver a permissao.
+ * Aborta a requisição com erro 403 se o usuário não tiver a permissão.
  */
 function requirePermission(string $modulo, string $acao = 'visualizar'): void
 {
     if (!can($modulo, $acao)) {
-        session()->setFlashdata('error', 'Acesso negado. Voce nao tem permissao para esta acao.');
+        session()->setFlashdata('error', 'Acesso negado. Você não tem permissão para esta ação.');
         header('Location: ' . base_url('dashboard'));
         exit;
     }

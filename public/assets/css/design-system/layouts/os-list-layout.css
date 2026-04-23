@@ -17,6 +17,57 @@
     flex: 0 0 auto;
 }
 
+.os-list-page .os-legacy-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.9rem 1rem;
+    padding: 0.95rem 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.96) 100%);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.04);
+}
+
+.os-list-page .os-legacy-toolbar-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.22rem;
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+.os-list-page .os-legacy-toolbar-title {
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.os-list-page .os-legacy-toolbar-text {
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+}
+
+.os-list-page .os-legacy-toggle {
+    flex: 0 0 auto;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+}
+
+.os-list-page .os-legacy-toggle .btn {
+    min-height: 42px;
+    border-radius: 999px !important;
+    padding-inline: 1rem;
+    font-weight: 700;
+}
+
+.os-list-page .os-legacy-toggle .btn.active {
+    box-shadow: 0 12px 22px rgba(99, 91, 255, 0.18);
+}
+
 .os-list-page .os-filters-card .card-body {
     padding: 1rem;
     min-width: 0;
@@ -300,11 +351,69 @@
 }
 
 .os-list-page #osTable .os-numero-cell {
-    display: inline-flex;
-    align-items: center;
-    min-width: max-content;
-    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.18rem;
+    min-width: 0;
+    white-space: normal;
     word-break: keep-all;
+}
+
+.os-list-page #osTable .os-numero-link {
+    display: inline-flex;
+    align-items: flex-start;
+    color: inherit;
+    text-decoration: none;
+}
+
+.os-list-page #osTable .os-numero-meta {
+    display: block;
+    font-size: 0.78rem;
+    line-height: 1.22;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.os-list-page #osTable .os-numero-link:hover {
+    color: var(--bs-primary);
+    text-decoration: none;
+}
+
+.os-list-page #osTable .os-cell-link {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-decoration: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+.os-list-page #osTable .os-cell-link:hover {
+    color: var(--bs-primary);
+    text-decoration: none;
+}
+
+.os-list-page #osTable .os-cell-link:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.16);
+    border-radius: 12px;
+}
+
+.os-list-page #osTable .os-cell-link .os-equipamento-cell,
+.os-list-page #osTable .os-cell-link .os-dates-cell,
+.os-list-page #osTable .os-cell-link .os-cliente-cell {
+    width: 100%;
+}
+
+.os-list-page #osTable .os-valor-cell {
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
 .os-list-page #osTable th:nth-child(4),
@@ -466,6 +575,371 @@
     align-items: center;
     margin-top: 0.35rem;
     font-size: 0.74rem;
+    color: var(--text-muted);
+}
+
+.os-list-page #osStatusModal .modal-content {
+    border-radius: 22px;
+    overflow: hidden;
+}
+
+.os-list-page #osStatusModal .modal-dialog {
+    max-width: min(1140px, calc(100vw - 2rem));
+}
+
+.os-list-page #osDatesModal .modal-dialog,
+.os-list-page #osBudgetModal .modal-dialog,
+.os-list-page #osStatusModal .modal-dialog {
+    height: calc(100% - 1.5rem);
+}
+
+.os-list-page #osDatesModal .modal-content,
+.os-list-page #osBudgetModal .modal-content,
+.os-list-page #osStatusModal .modal-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.os-list-page #osDatesModal .modal-dialog-scrollable .modal-content,
+.os-list-page #osBudgetModal .modal-dialog-scrollable .modal-content,
+.os-list-page #osStatusModal .modal-dialog-scrollable .modal-content {
+    max-height: calc(100vh - 2.5rem);
+}
+
+.os-list-page #osDatesModal .os-status-modal-form,
+.os-list-page #osBudgetModal .os-status-modal-form,
+.os-list-page #osStatusModal .os-status-modal-form {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+}
+
+.os-list-page #osDatesModal .modal-body,
+.os-list-page #osBudgetModal .modal-body,
+.os-list-page #osStatusModal .modal-body {
+    padding-top: 1.35rem;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.os-list-page #osDatesModal .modal-footer,
+.os-list-page #osBudgetModal .modal-footer,
+.os-list-page #osStatusModal .modal-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    background: #fff;
+}
+
+.os-list-page .os-dates-status-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.85rem 0.95rem;
+    border-radius: 16px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e3a8a;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.os-list-page .os-dates-status-note i {
+    flex: 0 0 auto;
+    margin-top: 0.1rem;
+}
+
+.os-list-page .os-status-modal-summary {
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #fbfdff 0%, #f5f8fe 100%);
+    border: 1px solid #dbe5f1;
+}
+
+.os-list-page .os-status-context-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    min-height: 100%;
+    padding: 0.9rem 0.95rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid #dbe5f1;
+}
+
+.os-list-page .os-status-context-title {
+    font-size: 0.74rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+}
+
+.os-list-page .os-status-context-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.35;
+}
+
+.os-list-page .os-status-context-meta {
+    font-size: 0.84rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+.os-list-page .os-status-modal-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.os-list-page .os-status-modal-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 100%;
+    padding: 1rem 1.05rem;
+    border-radius: 18px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.os-list-page .os-status-modal-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.os-list-page .os-status-modal-section-title {
+    font-size: 0.79rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+}
+
+.os-list-page .os-status-modal-quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.os-list-page .os-status-modal-quick-actions .btn.active {
+    box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.16);
+}
+
+.os-list-page .os-status-modal-divider {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(148, 163, 184, 0.24), rgba(148, 163, 184, 0.04));
+}
+
+.os-list-page .os-status-modal-history-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.os-list-page .os-status-modal-history-wrap.is-empty .os-status-modal-divider {
+    display: none;
+}
+
+.os-list-page .os-status-modal-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.os-list-page .os-inline-meta-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.os-list-page .os-inline-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    padding: 0.8rem 0.9rem;
+    border-radius: 14px;
+    background: #ffffff;
+    border: 1px solid #dbe5f1;
+}
+
+.os-list-page .os-inline-meta-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.os-list-page .os-budget-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.os-list-page .os-budget-metric-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.9rem 1rem;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid #dbe5f1;
+}
+
+.os-list-page .os-budget-metric-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.os-list-page .os-budget-metric-card strong {
+    font-size: 1.08rem;
+    color: var(--text-primary);
+}
+
+.os-list-page .os-budget-docs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.os-list-page .os-budget-doc-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.8rem 0.9rem;
+    border-radius: 14px;
+    background: #ffffff;
+    border: 1px solid #dbe5f1;
+}
+
+.os-list-page .os-budget-doc-item > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    min-width: 0;
+}
+
+.os-list-page .os-budget-doc-item span {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+}
+
+.os-list-page #osStatusModal .os-workflow-timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-left: 0.2rem;
+}
+
+.os-list-page #osStatusModal .os-workflow-step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    gap: 0.75rem;
+}
+
+.os-list-page #osStatusModal .os-workflow-step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 22px;
+    bottom: -16px;
+    width: 2px;
+    background: #dbe3ee;
+}
+
+.os-list-page #osStatusModal .os-workflow-step-marker {
+    position: relative;
+    width: 18px;
+    min-height: 18px;
+}
+
+.os-list-page #osStatusModal .os-workflow-step-marker::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 1px;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: #cbd5e1;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 1px #cbd5e1;
+}
+
+.os-list-page #osStatusModal .os-workflow-step.is-completed .os-workflow-step-marker::before {
+    background: #16a34a;
+    box-shadow: 0 0 0 1px #16a34a;
+}
+
+.os-list-page #osStatusModal .os-workflow-step.is-current .os-workflow-step-marker::before {
+    background: #4f46e5;
+    box-shadow: 0 0 0 1px #4f46e5, 0 0 0 6px rgba(79, 70, 229, 0.12);
+}
+
+.os-list-page #osStatusModal .os-workflow-step.is-probable .os-workflow-step-marker::before {
+    background: #f59e0b;
+    box-shadow: 0 0 0 1px #f59e0b;
+}
+
+.os-list-page #osStatusModal .os-workflow-step-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+}
+
+.os-list-page #osStatusModal .os-workflow-step-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.os-list-page #osStatusModal .os-workflow-step-title {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.os-list-page #osStatusModal .os-workflow-step-text {
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+}
+
+.os-list-page #osStatusModal .os-workflow-step-meta {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.os-list-page #osStatusModal .os-workflow-history-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.7rem 0.8rem;
+    border-radius: 14px;
+    background: #ffffff;
+    border: 1px solid #dbe5f1;
+}
+
+.os-list-page #osStatusModal .os-workflow-history-item span,
+.os-list-page #osStatusModal .os-workflow-history-item small {
     color: var(--text-muted);
 }
 
@@ -960,6 +1434,18 @@
         grid-column: 1 / -1;
     }
 
+    .os-list-page .os-legacy-toolbar {
+        align-items: stretch;
+    }
+
+    .os-list-page .os-legacy-toggle {
+        width: 100%;
+    }
+
+    .os-list-page .os-legacy-toggle .btn {
+        flex: 1 1 calc(50% - 0.3rem);
+    }
+
     .os-list-page .os-table-header {
         flex-direction: column;
         align-items: flex-start;
@@ -1001,6 +1487,50 @@
 }
 
 @media (max-width: 767.98px) {
+    .os-list-page #osStatusModal .modal-dialog {
+        max-width: calc(100vw - 1rem);
+        margin: 0.5rem auto;
+    }
+
+    .os-list-page #osStatusModal .modal-dialog-scrollable .modal-content {
+        max-height: calc(100vh - 1rem);
+    }
+
+    .os-list-page #osStatusModal .modal-body {
+        padding: 1rem;
+    }
+
+    .os-list-page .os-status-modal-summary,
+    .os-list-page .os-status-modal-panel {
+        padding: 0.9rem;
+        border-radius: 16px;
+    }
+
+    .os-list-page .os-status-context-card {
+        padding: 0.8rem 0.85rem;
+    }
+
+    .os-list-page .os-status-modal-badges {
+        justify-content: flex-start;
+    }
+
+    .os-list-page .os-status-modal-quick-actions {
+        flex-direction: column;
+    }
+
+    .os-list-page .os-budget-metrics {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .os-list-page .os-status-modal-quick-actions .btn {
+        width: 100%;
+    }
+
+    .os-list-page #osStatusModal .os-workflow-step-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
     .os-list-page .page-header {
         align-items: stretch;
     }
@@ -1016,6 +1546,26 @@
 
     .os-list-page .os-page-create-btn,
     .os-list-page .os-mobile-filter-btn {
+        width: 100%;
+    }
+
+    .os-list-page .os-legacy-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0.9rem;
+    }
+
+    .os-list-page .os-legacy-toolbar-text {
+        font-size: 0.88rem;
+    }
+
+    .os-list-page .os-legacy-toggle {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .os-list-page .os-legacy-toggle .btn {
         width: 100%;
     }
 
@@ -1277,6 +1827,29 @@
 }
 
 @media (max-width: 575.98px) {
+    .os-list-page #osStatusModal .modal-dialog {
+        max-width: calc(100vw - 0.5rem);
+        margin: 0.25rem auto;
+    }
+
+    .os-list-page #osStatusModal .modal-dialog-scrollable .modal-content {
+        max-height: calc(100vh - 0.5rem);
+    }
+
+    .os-list-page #osStatusModal .modal-header,
+    .os-list-page #osStatusModal .modal-footer {
+        padding-inline: 1rem;
+    }
+
+    .os-list-page #osStatusModal .os-workflow-step {
+        grid-template-columns: 16px minmax(0, 1fr);
+        gap: 0.65rem;
+    }
+
+    .os-list-page #osStatusModal .os-workflow-step:not(:last-child)::after {
+        left: 7px;
+    }
+
     .os-list-page .page-header h2 {
         font-size: 1.08rem;
     }
@@ -1284,6 +1857,15 @@
     .os-list-page .os-table-wrap .card-body,
     .os-list-page .os-filters-card .card-body {
         padding: 0.85rem;
+    }
+
+    .os-list-page .os-legacy-toolbar {
+        padding: 0.82rem;
+        border-radius: 18px;
+    }
+
+    .os-list-page .os-legacy-toggle {
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .os-list-page #osTable.os-mobile-cards tbody tr {

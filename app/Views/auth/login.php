@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="base-url" content="<?= base_url() ?>">
-    <title>Login - <?= esc(get_config('sistema_nome', 'Assistencia Tecnica')) ?></title>
+    <title>Login - <?= esc(get_config('sistema_nome', 'Assistencia Técnica')) ?></title>
 
     <?php $favicon = get_config('sistema_icone'); if($favicon && file_exists('uploads/sistema/'.$favicon)): ?>
     <link rel="icon" href="<?= base_url('uploads/sistema/'.$favicon) ?>">
@@ -36,8 +36,8 @@
                         <?php endif; ?>
                     </div>
                     <h1 class="login-title h3 font-weight-bold mb-1"><?= esc(get_config('sistema_nome', 'AssistTech')) ?></h1>
-                    <p class="login-subtitle text-muted mb-1">Sistema de Assistencia Tecnica</p>
-                    <p class="login-version mb-0">Versao <?= esc(get_system_version()) ?></p>
+                    <p class="login-subtitle text-muted mb-1">Sistema de Assistencia Técnica</p>
+                <p class="login-version mb-0">Versão <?= esc(get_system_version()) ?></p>
                 </div>
 
                 <?php if (session()->getFlashdata('error')): ?>

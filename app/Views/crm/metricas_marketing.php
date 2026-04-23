@@ -330,7 +330,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
 
 <div class="page-header d-flex justify-content-between align-items-center mb-3">
     <div class="d-flex align-items-center gap-3">
-        <h2 class="mb-0"><i class="bi bi-bar-chart-line me-2"></i>CRM - Metricas Marketing</h2>
+        <h2 class="mb-0"><i class="bi bi-bar-chart-line me-2"></i>CRM - Métricas Marketing</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('crm-metricas-marketing')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
@@ -576,7 +576,7 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
                                                 <div class="d-flex align-items-center gap-2">
                                                     <span class="crm-rank-chip"><?= (int) $rankingIndex + 1 ?></span>
                                                     <div>
-                                                        <div class="fw-semibold"><?= esc($rankingRow['responsavel_nome'] ?? 'Nao atribuido') ?></div>
+                                                        <div class="fw-semibold"><?= esc($rankingRow['responsavel_nome'] ?? 'Não atribuído') ?></div>
                                                         <div class="small text-muted">Pendencias abertas: <?= $totalPendencias ?></div>
                                                     </div>
                                                 </div>
@@ -736,13 +736,13 @@ $deltaBadge = static function (?float $delta, bool $asPercentage = true): array 
     <div class="card">
         <div class="card-body">
             <details>
-                <summary class="fw-semibold">Configuracao de janelas de engajamento</summary>
+                <summary class="fw-semibold">Configuração de janelas de engajamento</summary>
                 <p class="small text-muted mt-2 mb-2">
                     O lifecycle (lead_novo, lead_qualificado, cliente_convertido) continua igual.
                     Este bloco controla apenas o engajamento temporal.
                 </p>
                 <?php if (!$supportsEngajamento): ?>
-                    <div class="alert alert-warning py-2 small mb-2">Estrutura de engajamento ainda nao migrada.</div>
+                    <div class="alert alert-warning py-2 small mb-2">Estrutura de engajamento ainda não migrada.</div>
                 <?php endif; ?>
                 <form method="post" action="<?= base_url('crm/metricas-marketing/engajamento') ?>" class="row g-2 align-items-end">
                     <?= csrf_field() ?>

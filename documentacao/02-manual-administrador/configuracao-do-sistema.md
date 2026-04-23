@@ -1,6 +1,6 @@
 # Manual do Administrador - Configuracao do Sistema
 
-Atualizado em 27/03/2026.
+Atualizado em 31/03/2026 para a release `2.9.6`.
 
 ## 1. Dados da empresa
 Caminho: `Configuracoes`
@@ -35,6 +35,9 @@ Regras:
 - valor maximo: `1440` minutos
 - o timeout de inatividade do filtro de autenticacao passa a usar essa chave como fonte unica
 - o frontend protegido recebe esse valor por meta tags para monitorar expiracao e manter heartbeat discreto enquanto houver atividade real
+- o heartbeat agora respeita requests same-origin em andamento, evitando competir com salvamentos AJAX e modais operacionais
+- o endpoint `sessao/heartbeat` fecha a sessao logo apos a leitura dos metadados, reduzindo risco de lock no driver de sessao por arquivo
+- o heartbeat do navegador aborta em `10` segundos quando a conexao nao responde, evitando fila indefinida de requests presos
 - se o usuario estiver com `Lembrar-me` ativo, a expiracao por inatividade continua ignorada no fluxo atual
 
 ### Comuns
@@ -49,6 +52,15 @@ Regras:
 - `whatsapp_menuia_url`
 - `whatsapp_menuia_appkey`
 - `whatsapp_menuia_authkey`
+
+Regras operacionais:
+- a URL canonica deve ser `https://chatbot.menuia.com/api`
+- se o operador informar `https://api.menuia.com/api`, o sistema normaliza automaticamente para a URL canonica antes de salvar
+- sempre que `URL`, `Appkey` ou `Authkey` da Menuia mudarem, o ultimo status validado e invalidado para evitar badge verde antigo com credencial trocada
+- o botao `Testar conexao` usa um envio real e unico para o telefone de teste, evitando falso negativo por duplicidade de mensagem
+- quando a validacao passar, a interface mostra `Menuia conectada`
+- quando a validacao falhar, a interface mostra `Erro Menuia`
+- se as credenciais estiverem preenchidas, mas ainda nao testadas com o conjunto atual, a interface mostra `Menuia nao validada`
 
 ### API Local (Windows)
 - `whatsapp_local_node_url`
@@ -67,6 +79,43 @@ Regras:
 - `whatsapp_webhook_method`
 - `whatsapp_webhook_headers`
 - `whatsapp_webhook_payload`
+
+## 3.1 Migracao legada via banco SQL
+
+A migracao do sistema antigo para o ERP novo usa uma conexao secundaria e nao depende da tela de configuracoes.
+
+Configuracoes em `.env`:
+- `database.legacy.hostname`
+- `database.legacy.database`
+- `database.legacy.username`
+- `database.legacy.password`
+- `database.legacy.DBDriver`
+- `database.legacy.DBPrefix`
+- `database.legacy.port`
+- `database.legacy.charset`
+- `database.legacy.DBCollat`
+
+Configuracoes operacionais da carga:
+- `legacyImport.sourceName`
+- `legacyImport.batchSize`
+- `legacyImport.allowCatalogAutoCreate`
+- `legacyImport.writeInitialStatusHistory`
+
+Regras:
+- `sourceName` identifica a origem que sera gravada em `legacy_origem`
+- `batchSize` controla a leitura em lotes do pipeline
+- `allowCatalogAutoCreate` permite criar `tipo`, `marca` e `modelo` ausentes
+- `writeInitialStatusHistory` grava a primeira linha de historico da OS migrada
+
+Observacao operacional atual:
+- no ambiente local, o banco legado real esta em `database.legacy.database = erp`
+- para o legado `erp`, o importador deriva o snapshot de equipamento a partir da tabela `os`, porque nao existe entidade compativel de equipamento por cliente no schema antigo
+- quando houver `numero_serie` ou `IMEI` valido, o importador tenta consolidar snapshots repetidos em um equipamento canonico sem perder a rastreabilidade legada
+- essa consolidacao nao usa nome ou semelhanca textual; a relacao fica auditada em `legacy_import_aliases`
+- a carga atual tambem le detalhes complementares da OS em `orcamentos`, `orcamento_itens`, `servicos_orc`, `produtos_orc`, `historico_status_os`, `os_historico`, `os_defeitos` e `os_historicos`
+
+Referencia operacional:
+- `documentacao/02-manual-administrador/migracao-legado-sql.md`
 
 ## 4. Testes no painel
 
@@ -108,6 +157,7 @@ Metadados:
 2. validar o valor de `sessao_inatividade_minutos` em `Configuracoes -> Sessao e Seguranca`
 3. deixar a tela ociosa acima do limite e confirmar o aviso claro de sessao expirada
 4. manter um formulario aberto com digitacao/atividade e confirmar que o heartbeat evita expiracao indevida
+5. abrir um modal com salvamento AJAX (ex.: cliente/equipamento via OS) e confirmar que o heartbeat nao gera timeout concorrente
 5. salvar provider direto correto
 6. testar conexao
 7. testar envio de texto
@@ -151,3 +201,26 @@ Uso recomendado:
 - revisar a ordem dos status antes de liberar novos fluxos operacionais
 - configurar explicitamente os retornos permitidos quando o time trabalha com reabertura ou retrocesso de etapa
 - testar a troca de status diretamente na listagem `/os` depois de qualquer alteracao estrutural
+
+## 9. Operacao da migracao legada
+
+Comandos disponiveis:
+- `php spark legacy:preflight`
+- `php spark legacy:prepare-target`
+- `php spark legacy:import --execute`
+- `php spark legacy:report`
+
+Uso recomendado:
+1. configurar `database.legacy.*` e revisar `app/Config/LegacyImport.php`
+2. rodar `php spark legacy:preflight`
+3. revisar os avisos de telefone e corrigir bloqueios reais de status, orfaos e catalogos
+4. vistoriar a limpeza com `php spark legacy:prepare-target`
+5. executar a limpeza controlada em homologacao com `php spark legacy:prepare-target --execute` ou `php spark legacy:import --execute --wipe-target`
+6. executar a carga em homologacao limpa com `php spark legacy:import --execute`
+7. validar contagens, amostras e busca por `numero_os_legado`
+
+Observacoes:
+- o numero oficial do novo ERP continua em `numero_os`
+- o numero antigo fica preservado em `numero_os_legado`
+- a importacao e idempotente por `legacy_origem + legacy_id`
+- a visualizacao da OS passa a refletir laudos, observacoes, itens, pecas, historico importado e notas legadas preservadas

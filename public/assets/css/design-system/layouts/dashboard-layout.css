@@ -77,6 +77,16 @@
     padding-top: 12px;
 }
 
+.ds-dashboard-layout .ds-dashboard-year-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ds-dashboard-layout .ds-dashboard-year-filter .form-select {
+    min-width: 120px;
+}
+
 .ds-dashboard-layout .ds-chart-wrap {
     position: relative;
     width: 100%;
@@ -271,6 +281,16 @@
 
     .ds-dashboard-layout .stat-card .stat-card-footer {
         padding: 0.55rem 0.85rem;
+    }
+
+    .ds-dashboard-layout .ds-dashboard-year-filter {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .ds-dashboard-layout .ds-dashboard-year-filter .form-select {
+        min-width: 0;
+        width: 140px;
     }
 
     .ds-dashboard-layout .stat-metric-item {

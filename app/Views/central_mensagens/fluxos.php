@@ -1,4 +1,4 @@
-﻿<?= $this->extend('layouts/main') ?>
+<?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
 <div class="page-header">
@@ -28,7 +28,7 @@
                         <input type="text" name="tipo_fluxo" class="form-control form-control-sm" placeholder="operacional" required>
                     </div>
                     <div class="col-12">
-                        <label class="form-label form-label-sm">Descricao</label>
+                        <label class="form-label form-label-sm">Descrição</label>
                         <textarea name="descricao" class="form-control form-control-sm" rows="2"></textarea>
                     </div>
                     <div class="col-12">
@@ -96,5 +96,6 @@
     </div>
 </div>
 <?= $this->endSection() ?>
+
 
 

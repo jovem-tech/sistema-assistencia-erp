@@ -1,6 +1,6 @@
-?# Modulo: Central de Mensagens (Central de Atendimento Inteligente 24h)
+# Modulo: Central de Mensagens (Central de Atendimento Inteligente 24h)
 
-Atualizado em 20/03/2026.
+Atualizado em 08/04/2026 (integracao Orcamentos fase 3).
 
 ## Objetivo
 Transformar o WhatsApp operacional em uma central unica de atendimento integrada ao ERP + CRM, com:
@@ -9,6 +9,344 @@ Transformar o WhatsApp operacional em uma central unica de atendimento integrada
 - automacao de resposta por intencao (chatbot)
 - fila de atendimento humano
 - metricas operacionais de atendimento
+
+## Integracao com Orcamentos (08/04/2026 - fase 3)
+
+A Central passou a suportar orcamento rapido dentro da conversa ativa, sem sair da tela:
+
+- novo botao `Gerar e enviar orcamento` no contexto da conversa;
+- fluxo em modal (descricao, valor, validade, mensagem e opcao de anexar PDF);
+- botao `Novo orcamento` alterado para abrir formulario completo em modal inline (iframe) em modo tela cheia, mantendo o atendente focado na conversa sem abrir nova aba;
+- criacao do orcamento vinculada a `conversa_id` e tentativa de `cliente_id/os_id` quando disponiveis;
+- envio imediato por WhatsApp usando a trilha do modulo de orcamentos;
+- secao `Orcamentos relacionados` no painel de contexto para acompanhamento rapido.
+
+Arquivos tecnicos impactados:
+
+- `app/Controllers/CentralMensagens.php`
+- `app/Views/central_mensagens/index.php`
+- `public/assets/js/central-mensagens.js`
+
+## Extensao mobile paralela (03/04/2026 - v2.11.0)
+
+A Central web continua sendo o nucleo operacional principal. A release `2.11.0` adiciona um modulo paralelo mobile/PWA que reutiliza o mesmo backend e banco:
+
+- API interna versionada em `/api/v1` para auth, conversas, mensagens, OS e notificacoes;
+- frontend separado em `mobile-app/` (Next.js), sem substituir a tela web atual;
+- persistencia complementar de notificacoes/push em tabelas `mobile_*`, sem duplicar `conversas_whatsapp` e `mensagens_whatsapp`.
+
+Documento tecnico dedicado:
+
+- `documentacao/06-modulos-do-sistema/central-mobile-pwa.md`
+
+## Modo Bot/Humano movido para o menu hamburguer (02/04/2026 - v2.10.17)
+
+Ajuste de layout operacional no cabecalho da thread para reduzir ruido visual mantendo a acao de modo de atendimento no menu de contexto da conversa.
+
+O que mudou:
+
+- os botoes `Bot ativo/Bot desativado` e `Aguardando atendimento humano` sairam do cabecalho visivel;
+- os dois controles passaram a ficar dentro do menu hamburguer (`Mais acoes da conversa`);
+- `Status` e `Prioridade` continuam explicitos no cabecalho da coluna central;
+- o botao `Ocultar/Mostrar contexto` permanece ao lado do menu hamburguer.
+
+Arquivos tecnicos impactados:
+
+- `app/Views/central_mensagens/index.php`
+- `public/assets/js/central-mensagens.js`
+- `public/assets/css/design-system/layouts/central-mensagens.css`
+
+## Header operacional explicito + modo binario Bot/Humano (02/04/2026 - v2.10.16)
+
+Ajuste de usabilidade no cabecalho da thread para recuperar leitura imediata dos estados criticos e remover acoes sem efeito.
+
+O que mudou:
+
+- `Status` voltou a ficar visivel no cabecalho (fora do menu) e continua clicavel para abrir modal de alteracao;
+- `Prioridade` voltou a ficar explicita no cabecalho (fora do menu), com leitura direta do estado atual;
+- modo de atendimento ficou binario e inverso no topo:
+  - `Bot ativo` (chip verde) quando automacao esta ligada;
+  - `Bot desativado` (chip vermelho) quando automacao esta desligada;
+  - `Aguardando atendimento humano` passa a refletir o estado oposto do bot;
+- o botao `Ocultar/Mostrar contexto` retornou ao cabecalho, posicionado ao lado do menu hamburguer;
+- o item `Acoes avancadas` foi removido do dropdown por nao possuir funcionalidade efetiva;
+- o menu hamburguer ficou focado em acoes operacionais e de fila (`Assumir`, `Atribuir`, `Encerrar`, `Nova conversa`, `Sincronizar inbound`, `Atualizar conversa`);
+- os controles do cabecalho foram reforcados para permanecer lado a lado em linha unica, com overflow horizontal quando necessario.
+
+Arquivos tecnicos impactados:
+
+- `app/Views/central_mensagens/index.php`
+- `public/assets/css/design-system/layouts/central-mensagens.css`
+- `public/assets/js/central-mensagens.js`
+
+## Menu hamburguer de acoes no cabecalho da thread (02/04/2026 - v2.10.15)
+
+Refino estrutural aplicado para impedir que os controles da conversa fiquem ocultos ou avancem sobre a area de mensagens.
+
+O que mudou:
+
+- a barra de acoes horizontal foi removida da area abaixo do cabecalho da thread;
+- as acoes foram consolidadas em menu hamburguer no `cm-thread-header-top` da coluna central;
+- o menu passou a conter:
+  - status da conversa;
+  - modo de atendimento (`Sem nenhum ativado`, `Bot ativo`, `Aguardando atendimento humano`);
+  - assumir, atribuir, prioridade e encerrar;
+  - nova conversa, sincronizar inbound, atualizar conversa;
+  - acoes avancadas (incluindo `Ocultar contexto`).
+
+Impacto de UX:
+
+- elimina sobreposicao de botoes sobre o chat;
+- libera espaco vertical da thread;
+- preserva todas as operacoes em um ponto unico de acesso no cabecalho.
+
+Arquivos tecnicos impactados:
+
+- `app/Views/central_mensagens/index.php`
+- `public/assets/css/design-system/layouts/central-mensagens.css`
+- `public/assets/js/central-mensagens.js`
+
+## Hotfix tooltip/dropdown + resiliencia de envio (02/04/2026 - v2.10.14)
+
+Correcao aplicada para eliminar warnings repetidos do Bootstrap na action bar e reduzir falha de envio por timeout de provider.
+
+O que mudou:
+
+- inicializacao de tooltip na Central agora ignora elementos com `data-bs-toggle` diferente de `tooltip` (ex.: `dropdown`);
+- botoes de dropdown da action bar (`modo de atendimento` e `mais acoes`) nao recebem instancia Bootstrap Tooltip;
+- timeout padrao do gateway local em `MensageriaService` foi ampliado:
+  - `whatsapp_local_node_timeout`: `30s` (default);
+  - `whatsapp_linux_node_timeout`: `30s` (default).
+
+Impacto esperado:
+
+- elimina erro de console `Bootstrap doesn't allow more than one instance per element`;
+- reduz incidencia de `503 Service Unavailable` quando o envio falha apenas por latencia/timing do gateway.
+
+Arquivos tecnicos impactados:
+
+- `public/assets/js/central-mensagens.js`
+- `app/Services/MensageriaService.php`
+- `app/Services/WhatsApp/LocalGatewayProvider.php`
+
+## Modo unico de atendimento + acesso avancado de contexto (02/04/2026 - v2.10.13)
+
+Refino da action bar para reduzir ambiguidade operacional e prevenir cliques acidentais em acoes sensiveis.
+
+O que mudou:
+
+- os controles `Bot ativo` e `Aguardando humano` foram unificados em um dropdown unico de modo:
+  - `Sem nenhum ativado`
+  - `Bot ativo`
+  - `Aguardando atendimento humano`
+- o menu `+` passou a agrupar `Ocultar contexto` dentro de `Acoes avancadas` (com clique adicional), diminuindo acesso imediato;
+- a action bar foi fixada em linha unica em todos os breakpoints, com overflow horizontal quando necessario.
+
+Arquivos tecnicos impactados:
+
+- `app/Views/central_mensagens/index.php`
+- `public/assets/css/design-system/layouts/central-mensagens.css`
+- `public/assets/js/central-mensagens.js`
+
+## Action bar SaaS premium em 3 grupos (02/04/2026 - v2.10.12)
+
+Reformulacao completa da barra de acoes no topo da conversa para padrao SaaS moderno (hierarquia visual, clareza operacional e responsividade agressiva).
+
+Estrutura aplicada:
+
+- esquerda (`chat-actions-left`): `Status`, `Bot ativo`, `Aguardando humano`;
+- centro (`chat-actions-center`): `Assumir`, `Atribuir`, `Prioridade`;
+- direita (`chat-actions-right`): `Encerrar` + menu `+` para acoes extras.
+
+Padrao visual:
+
+- componentes padronizados:
+  - `StatusBadge`
+  - `ToggleChip`
+  - `ActionButton`
+- barra com altura operacional estavel (`56px` a `64px`);
+- fundo claro (`#f9fafb`) e borda suave (`#e5e7eb`);
+- hover com elevacao leve, estados `active/disabled` e tooltips em toda a action bar.
+
+Mobile (`<= 767.98px`):
+
+- texto ocultado nos controles da action bar (somente icones);
+- grupo central com scroll horizontal;
+- grupo direito permanece fixo, mantendo `Encerrar` sempre visivel.
+
+Arquivos tecnicos impactados:
+
+- `app/Views/central_mensagens/index.php`
+- `public/assets/css/design-system/layouts/central-mensagens.css`
+- `public/assets/js/central-mensagens.js`
+
+## Timeout resiliente entre polling e envio (02/04/2026 - v2.10.11)
+
+Correcao aplicada para eliminar contencao entre envio de mensagem e polling incremental da mesma conversa, reduzindo erro recorrente de timeout em cascata.
+
+O que mudou:
+
+- `conversas`, `conversa/{id}` e `conversa/{id}/novas` deixaram de executar processamento auxiliar de fila no caminho critico;
+- `enviar` passou a liberar lock de sessao antes de chamar provider, evitando serializacao indesejada entre requests concorrentes do mesmo operador;
+- timeout base de request no frontend subiu para `30s`;
+- timeout do envio passou a ser dinamico (`max(25s, timeout global)`), reduzindo falso negativo em rede lenta/gateway sob carga.
+
+Arquivos tecnicos impactados:
+
+- `app/Controllers/CentralMensagens.php`
+- `public/assets/js/central-mensagens.js`
+
+## Polling incremental resiliente sem timeout em cascata (02/04/2026 - v2.10.10)
+
+Correcao de performance aplicada para eliminar repeticao de erro `Tempo limite excedido (20s)` durante polling da thread.
+
+O que mudou:
+
+- endpoints de polling rapido deixaram de executar sync pesado de historico do gateway em toda requisicao;
+- foi criada separacao entre:
+  - processamento local da fila inbound (rapido),
+  - sincronizacao de historico no gateway (pesada, sob demanda/rotina dedicada);
+- os endpoints AJAX principais da Central passaram a liberar lock de sessao antes do processamento, evitando bloqueio entre requests simultaneas do mesmo operador;
+- o frontend passou a:
+  - reduzir frequencia de refresh da lista enquanto uma conversa esta aberta;
+  - aplicar backoff progressivo quando houver falhas repetidas de rede;
+  - reduzir spam de logs de erro no console.
+
+Arquivos tecnicos impactados:
+
+- `app/Controllers/CentralMensagens.php`
+- `app/Services/CentralMensagensService.php`
+- `public/assets/js/central-mensagens.js`
+
+## Inbound multimidia com hidratacao de anexos (02/04/2026 - v2.10.9)
+
+Correcao fullstack para mensagens inbound de audio/video/imagem que estavam chegando como `[mensagem sem texto]`.
+
+O que mudou:
+
+- o gateway Node passou a baixar e incluir midia tambem na sincronizacao de historico (`/sync-chat-history`), nao apenas no evento realtime;
+- o payload de historico agora pode carregar `media_base64`, `media_mime_type` e `media_filename`;
+- o parser da Central passou a classificar `ptt`/`voice` como `audio`;
+- quando uma mensagem ja existe por `provider_message_id`, o backend agora atualiza o registro com o anexo (arquivo + mime + tipo) assim que um payload posterior trouxer a midia;
+- no frontend, mensagens de midia sem arquivo local imediato exibem estado de sincronizacao de anexo, evitando ambiguidade visual.
+
+Arquivos tecnicos impactados:
+
+- `whatsapp-api/server.js`
+- `app/Services/CentralMensagensService.php`
+- `public/assets/js/central-mensagens.js`
+
+## Controles operacionais por modal + sync sem flicker (02/04/2026 - v2.10.8)
+
+Refino funcional aplicado no cabecalho da thread para reduzir atrito operacional e eliminar efeito visual de "sumir/reaparecer" durante sincronizacao automatica.
+
+O que mudou:
+
+- badge de `Status` no topo da conversa agora e clicavel e abre modal com opcoes de status;
+- botao `Atribuir` agora abre modal de atribuicao de responsavel (sem deslocar para o painel lateral);
+- botao `Encerrar` passou a decidir entre:
+  - `Concluir` (status `resolvida`);
+  - `Arquivar` (status `arquivada`);
+- filtro rapido `Arquivadas` foi adicionado na fila de atendimento;
+- novos atalhos no cabecalho:
+  - `Prioridade` (baixa/normal/alta/urgente);
+  - `Bot ativo`;
+  - `Aguard. humano`;
+- sync inbound em background agora:
+  - nao reabre a thread ativa automaticamente;
+  - nao força refresh da fila quando `count = 0`, reduzindo flicker visual;
+- backend passa conversa de `resolvida` para `aberta` automaticamente quando chega novo inbound.
+
+Arquivos tecnicos impactados:
+
+- `app/Views/central_mensagens/index.php`
+- `public/assets/css/design-system/layouts/central-mensagens.css`
+- `public/assets/js/central-mensagens.js`
+- `app/Services/CentralMensagensService.php`
+
+## Composer com altura compacta forcada e alinhada ao envio (02/04/2026 - v2.10.6)
+
+Correcao de ergonomia reforcada para impedir que o `textarea` do composer continue "alto demais" mesmo apos restauracao de rascunho, troca de conversa ou recarga parcial da tela.
+
+O que mudou:
+
+- a altura compacta do `textarea` passou a ser aplicada com prioridade alta no CSS, mantendo o campo visualmente alinhado ao botao de envio;
+- o estado vazio agora regride de forma agressiva para a altura base, limpando sobras de `height` inline deixadas por ciclos anteriores;
+- a tela reaplica o resize do composer apos abrir conversa e apos o bootstrap inicial, reduzindo risco de o campo permanecer "preso" em altura antiga;
+- a autoexpansao segue ativa, mas so cresce quando o conteudo realmente exige multiplas linhas.
+
+Arquivos tecnicos impactados:
+
+- `app/Views/central_mensagens/index.php`
+- `public/assets/css/design-system/layouts/central-mensagens.css`
+- `public/assets/js/central-mensagens.js`
+
+## Sincronizacao inbound silenciosa e nao intrusiva (02/04/2026 - v2.10.7)
+
+Refino de usabilidade aplicado para impedir que a sincronizacao automatica interrompa visualmente a leitura e a digitacao no chat.
+
+O que mudou:
+
+- o `auto sync` em background deixou de acionar a faixa visual azul dentro da thread;
+- a barra `cm-connection-strip` passa a ficar oculta no estado online normal e aparece apenas em sincronizacao manual ou quando houver alerta/offline real;
+- o feedback da sincronizacao automatica fica restrito ao badge de inbound no topo, sem ocupar espaco na area principal da conversa;
+- a sincronizacao manual continua com feedback explicito, preservando transparencia operacional quando o operador aciona a rotina por conta propria.
+
+Arquivos tecnicos impactados:
+
+- `public/assets/css/design-system/layouts/central-mensagens.css`
+- `public/assets/js/central-mensagens.js`
+
+## Ordenacao cronologica por movimentacao real (02/04/2026 - v2.10.4)
+
+Correcao estrutural aplicada para impedir reordenacao aleatoria na fila quando o sincronismo inbound reencontra mensagens historicas.
+
+O que mudou:
+
+- endpoint `GET /atendimento-whatsapp/conversas` passou a calcular `ultima_movimentacao_em` pela mensagem mais recente da conversa (`mensagens_whatsapp`), usando:
+  - `recebida_em`
+  - `enviada_em`
+  - `created_at`
+- ordenacao backend agora usa `COALESCE(ultima_movimentacao_em, conversas_whatsapp.ultima_mensagem_em, updated_at, created_at) DESC`, com desempate deterministico por `ultima_mensagem_id` e `conversa_id`;
+- a resposta do endpoint normaliza `ultima_mensagem_em` para refletir a movimentacao real quando `ultima_movimentacao_em` estiver disponivel;
+- frontend passou a priorizar `ultima_movimentacao_em` para assinatura da lista, exibicao de horario e ordenacao local;
+- `CentralMensagensService` deixou de atualizar `conversas_whatsapp.ultima_mensagem_em` com `now()` em reconciliacoes de mensagens duplicadas/historicas, evitando "empate artificial" de recencia.
+
+Arquivos tecnicos impactados:
+
+- `app/Controllers/CentralMensagens.php`
+- `app/Services/CentralMensagensService.php`
+- `public/assets/js/central-mensagens.js`
+
+## Filtros recolhidos + fila cronologica estavel + composer compacto (01/04/2026 - v2.10.3)
+
+Ajustes de produtividade aplicados na coluna de fila e no composer da thread:
+
+- filtros avancados da fila agora iniciam recolhidos por padrao e ficam acessiveis por um botao dedicado (`Filtros avancados`);
+- permanecem visiveis continuamente apenas os filtros rapidos:
+  - `Todas`
+  - `Nao lidas`
+  - `Abertas`
+  - `Com OS`
+- ordenacao da fila reforcada para comportamento cronologico estavel pela ultima interacao (envio/recebimento), removendo efeitos de "reembaralhar" entre ciclos de sincronizacao quando nao houve mudanca real de recencia;
+- campo de digitacao do composer reduzido para altura mais compacta e proporcional ao botao de envio, mantendo autoexpansao apenas quando necessario.
+
+Arquivos tecnicos impactados:
+- `app/Views/central_mensagens/index.php`
+- `public/assets/js/central-mensagens.js`
+- `public/assets/css/design-system/layouts/central-mensagens.css`
+
+## Ajuste de ergonomia e rolagem (01/04/2026 - v2.10.2)
+
+Melhorias aplicadas para operacao continua da tela `/atendimento-whatsapp`:
+
+- sidebar global agora entra recolhida automaticamente ao abrir a Central (modo foco de atendimento), seguindo o mesmo comportamento de auto-expandir ao hover no desktop;
+- colunas de Conversas, Thread e Contexto passam a manter barras de rolagem dedicadas e visiveis, com trilho/polegar customizados para facilitar navegacao em listas longas;
+- estrutura dos paines laterais (`offcanvas-body`) foi reforcada com altura/flex completos para evitar perda de scroll em breakpoints intermediarios.
+
+Arquivos tecnicos impactados:
+- `app/Views/central_mensagens/index.php`
+- `public/assets/css/design-system/layouts/central-mensagens.css`
 
 Rota principal: `/atendimento-whatsapp`
 Alias de compatibilidade: `/central-mensagens`
@@ -25,8 +363,8 @@ Principais evolucoes aplicadas em `/atendimento-whatsapp`:
 - cabecalho do chat com acoes de operador:
   - atualizar conversa
   - assumir conversa (atribui para usuario logado)
-  - atribuir (foco no painel de contexto)
-  - encerrar (status `resolvida`)
+  - atribuir (modal de opcoes de responsavel)
+  - encerrar (escolha entre `resolvida` e `arquivada`)
 - bolhas de mensagem com:
   - separador por data (`Hoje`, `Ontem`, data completa)
   - status outbound (`Enviada`, `Entregue`, `Lida`, `Falha`)
@@ -65,6 +403,106 @@ Padrao aplicado para reduzir erros de sessao/rede e evitar loops:
   - `beforeunload` e `pagehide` finalizam polling + stream
   - quando a aba fica oculta, o stream SSE e fechado e reaberto no retorno
 - throttle de log no polling incremental para evitar flood no console quando houver indisponibilidade prolongada
+
+## Deduplicacao visual de mensagens outbound (31/03/2026)
+
+Correcao aplicada na thread da Central para evitar bolhas duplicadas quando a mesma mensagem retorna por mais de um canal de atualizacao em tempo real.
+
+Situacao tratada:
+- uma mensagem outbound podia chegar primeiro pelo stream SSE e depois novamente pelo polling incremental;
+- como o frontend apenas concatenava `novas` em `state.mensagens`, a mesma mensagem podia aparecer duas vezes na UI mesmo existindo uma unica linha em `mensagens_whatsapp`.
+
+Protecao implementada em `public/assets/js/central-mensagens.js`:
+- as mensagens agora sao mescladas por identidade estavel antes de renderizar;
+- quando houver `id`, ele passa a ser a chave primaria da deduplicacao;
+- quando ainda nao houver `id`, o frontend usa uma fingerprint defensiva com direcao, provider, `provider_message_id`, timestamps, tipo, anexo e texto;
+- ao receber uma mensagem repetida, a UI atualiza o registro existente em vez de empilhar outro.
+
+Pontos cobertos:
+- abertura inicial da conversa;
+- append incremental via polling (`/conversa/{id}/novas`);
+- append incremental via SSE (`/conversa/{id}/stream`).
+
+## Hardening premium de UX e operacao (01/04/2026)
+
+Evolucoes aplicadas na interface principal para aproximar a experiencia de mensageria enterprise:
+
+- carregamento com skeletons reais na lista de conversas e na thread ativa (sem blocos "vazios" durante fetch);
+- navegacao por teclado na inbox:
+  - `Enter`/`Space` abre a conversa focada;
+  - `ArrowUp`/`ArrowDown` troca o foco entre conversas;
+  - `Ctrl+K` (ou `Cmd+K`) foca a busca da fila;
+  - `/` tambem foca busca quando o operador nao esta digitando em campo de formulario;
+  - `Esc` fecha menus flutuantes de anexo/emoji;
+- reforco de acessibilidade:
+  - cada item da inbox agora tem `role="button"`, `tabindex="0"` e `aria-selected`;
+  - estado de foco visivel dedicado para uso intensivo por teclado;
+- indicador de tempo real com contexto temporal:
+  - badge passa a exibir o estado (`Tempo real`, `Polling`, `Instavel`) + horario da ultima atualizacao visual;
+- hardening anti-duplo-envio no composer:
+  - envio concorrente bloqueado por lock de runtime (`state.sendingMessage`);
+  - evita duplicacao por clique repetido ou enter sequencial durante request em andamento;
+- resiliencia extra no backend para outbound:
+  - antes de inserir outbound novo, o servico tenta reconciliar duplicata recente por fingerprint operacional (telefone, direcao, conversa, conteudo/tipo e janela curta de tempo);
+  - se encontrar equivalente recente, atualiza payload/status e reutiliza a mesma mensagem ao inves de criar segunda linha.
+
+Arquivos tecnicos impactados nesta rodada:
+- `public/assets/js/central-mensagens.js`
+- `public/assets/css/design-system/layouts/central-mensagens.css`
+- `app/Services/CentralMensagensService.php`
+
+## Foco operacional e anti-duplicacao reforcado (01/04/2026 - v2.9.9)
+
+Nova rodada de refinamento premium para uso intensivo em atendimento:
+
+- painel contextual com modo foco no desktop:
+  - novo botao `Contexto` no cabecalho da conversa;
+  - operador pode recolher/mostrar a coluna da direita sem perder thread ativa;
+  - estado persistido em `localStorage` para manter preferencia entre recargas;
+- busca da fila com debounce:
+  - digitacao em `Buscar cliente, telefone, OS...` passa a filtrar sem precisar `Enter`;
+  - reduz requisicoes em excesso e melhora sensacao de fluidez;
+- hardening de envio outbound no backend:
+  - `WhatsAppService` agora bloqueia envios duplicados recentes (janela curta de 3 segundos) por fingerprint de conversa/telefone/conteudo/anexo/tipo;
+  - evita dupla postagem por clique repetido/reenvio acidental antes de novo feedback visual;
+- refinamentos de codigo do composer:
+  - limpeza de trechos residuais no fluxo de captura de audio/video;
+  - organizacao de transicoes visuais da grade ao ocultar/mostrar contexto.
+
+Arquivos tecnicos impactados nesta rodada:
+- `app/Views/central_mensagens/index.php`
+- `public/assets/css/design-system/layouts/central-mensagens.css`
+- `public/assets/js/central-mensagens.js`
+- `app/Services/WhatsAppService.php`
+
+## Produtividade de fila e inbound assistido (01/04/2026 - v2.10.0)
+
+Nova rodada de refinamento operacional para aproximar a experiencia da Central de um mensageiro enterprise em uso continuo:
+
+- barra de filtros rapidos na coluna de conversas:
+  - `Todas`
+  - `Nao lidas`
+  - `Abertas`
+  - `Com OS`
+  - `Clientes novos`
+- os filtros rapidos sao sincronizados com os filtros estruturados (busca/status/checkboxes), mantendo feedback unico em `Filtros ativos`.
+- badge dedicada de sincronizacao inbound no topo da tela:
+  - `Inbound ocioso`
+  - `Sincronizando`
+  - `Inbound ok`
+  - `Falha inbound`
+- sincronizacao inbound agora suporta:
+  - modo manual (com feedback completo para operador);
+  - modo silencioso (background) para manter inbox e thread atualizadas sem interromper a operacao.
+- loop automatico de sincronizacao inbound em segundo plano:
+  - reduz janela de atraso para mensagens recebidas fora do fluxo de stream imediato;
+  - ao voltar para a aba visivel, dispara sincronizacao silenciosa para convergencia rapida.
+- responsividade adicional da barra de filtros rapidos para breakpoints pequenos (`<=575`, `<=430`, `<=360`), sem estourar layout.
+
+Arquivos tecnicos impactados nesta rodada:
+- `app/Views/central_mensagens/index.php`
+- `public/assets/css/design-system/layouts/central-mensagens.css`
+- `public/assets/js/central-mensagens.js`
 
 ## Padronizacao de erro + observabilidade operacional (fase 20/03/2026)
 
@@ -528,4 +966,25 @@ Para garantir visao completa da conversa, a Central agora registra tambem mensag
   - gateway local offline: orientar inicio/reinicio do servico
   - provider externo indisponivel: orientar nova tentativa apos estabilizacao
 - O detalhe tecnico bruto continua apenas em log/contexto, evitando expor erro de baixo nivel ao operador final.
+
+## Evolucao premium de continuidade (01/04/2026 - v2.10.1)
+
+### 1) Barra de conexao operacional no painel da conversa
+- A conversa ativa passou a exibir uma barra de saude de conexao (`Conectado`, `Sincronizando`, `Instavel`, `Offline`) com atualizacao em tempo real.
+- O indicador reage a falhas de rede/timeout no frontend e sinaliza reconexao automatica sem bloquear o operador.
+
+### 2) Envio otimista no composer (sensacao de app moderno)
+- Ao enviar, a bolha outbound aparece imediatamente com estado `Enviando`, antes do retorno final da API.
+- Se o envio confirmar, a bolha temporaria e reconciliada com a mensagem definitiva.
+- Se falhar, a bolha permanece marcada como `Falha no envio`, reduzindo perda de contexto operacional.
+
+### 3) Rascunho automatico por conversa
+- O texto digitado no composer passa a ser salvo automaticamente por conversa no navegador.
+- Ao trocar de thread e voltar, o rascunho da conversa e restaurado.
+- Conversas com rascunho exibem badge visual na lista, melhorando continuidade de atendimento.
+
+### 4) Composer com disponibilidade inteligente
+- O botao de enviar agora respeita estado real da conversa e do conteudo.
+- Ele so habilita quando existe conversa ativa e algum conteudo valido (texto, PDF selecionado ou anexo).
+- O estado tambem sincroniza durante envio, anexos e restauracao de rascunho.
 

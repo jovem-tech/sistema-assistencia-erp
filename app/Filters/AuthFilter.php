@@ -11,11 +11,16 @@ class AuthFilter implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         $session = session();
+        $isHeartbeatRequest = $this->isHeartbeatRequest($request);
 
         helper(['cookie', 'sistema']);
 
         if (!$session->get('logged_in')) {
             if ($this->restoreRememberedSession($session)) {
+                if ($isHeartbeatRequest) {
+                    $this->closeSessionSafely();
+                }
+
                 return;
             }
 
@@ -26,7 +31,12 @@ class AuthFilter implements FilterInterface
         }
 
         if (get_cookie('remember_login')) {
-            $session->set('last_activity', time());
+            $this->touchLastActivity($session, $isHeartbeatRequest);
+
+            if ($isHeartbeatRequest) {
+                $this->closeSessionSafely();
+            }
+
             return;
         }
 
@@ -42,7 +52,11 @@ class AuthFilter implements FilterInterface
             );
         }
 
-        $session->set('last_activity', time());
+        $this->touchLastActivity($session, $isHeartbeatRequest);
+
+        if ($isHeartbeatRequest) {
+            $this->closeSessionSafely();
+        }
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
@@ -137,5 +151,40 @@ class AuthFilter implements FilterInterface
                 'message' => $message,
                 'redirect_url' => base_url('login'),
             ]);
+    }
+
+    private function isHeartbeatRequest(RequestInterface $request): bool
+    {
+        return trim($request->getUri()->getPath(), '/') === 'sessao/heartbeat';
+    }
+
+    private function touchLastActivity($session, bool $isHeartbeatRequest): void
+    {
+        $currentLastActivity = (int) $session->get('last_activity');
+        $now = time();
+
+        if (
+            $isHeartbeatRequest
+            && $currentLastActivity > 0
+            && ($now - $currentLastActivity) < 15
+        ) {
+            return;
+        }
+
+        $session->set('last_activity', $now);
+    }
+
+    private function closeSessionSafely(): void
+    {
+        try {
+            session()->close();
+            return;
+        } catch (\Throwable $e) {
+            // segue para o fallback abaixo
+        }
+
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            @session_write_close();
+        }
     }
 }

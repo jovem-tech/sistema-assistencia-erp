@@ -13,7 +13,8 @@ class EquipamentoModel extends Model
     protected $useSoftDeletes = false;
     protected $allowedFields = [
         'cliente_id', 'tipo_id', 'marca_id', 'modelo_id', 'cor', 'cor_hex', 'cor_rgb', 'numero_serie',
-        'imei', 'senha_acesso', 'estado_fisico', 'acessorios', 'observacoes'
+        'imei', 'senha_acesso', 'estado_fisico', 'acessorios', 'observacoes',
+        'legacy_origem', 'legacy_id',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
@@ -28,7 +29,7 @@ class EquipamentoModel extends Model
 
     public function getByCliente($clienteId)
     {
-        return $this->select('equipamentos.*, tipos.nome as tipo_nome, marcas.nome as marca_nome, modelos.nome as modelo_nome')
+        return $this->select("equipamentos.*, tipos.nome as tipo_nome, marcas.nome as marca_nome, modelos.nome as modelo_nome, (SELECT ef.arquivo FROM equipamentos_fotos ef WHERE ef.equipamento_id = equipamentos.id ORDER BY ef.is_principal DESC, ef.id ASC LIMIT 1) AS foto_principal_arquivo")
                     ->join('equipamentos_tipos tipos', 'tipos.id = equipamentos.tipo_id', 'left')
                     ->join('equipamentos_marcas marcas', 'marcas.id = equipamentos.marca_id', 'left')
                     ->join('equipamentos_modelos modelos', 'modelos.id = equipamentos.modelo_id', 'left')
@@ -44,7 +45,7 @@ class EquipamentoModel extends Model
 
     public function getWithCliente($id = null)
     {
-        $builder = $this->select('equipamentos.*, clientes.nome_razao as cliente_nome, tipos.nome as tipo_nome, marcas.nome as marca_nome, modelos.nome as modelo_nome')
+        $builder = $this->select("equipamentos.*, clientes.nome_razao as cliente_nome, tipos.nome as tipo_nome, marcas.nome as marca_nome, modelos.nome as modelo_nome, (SELECT ef.arquivo FROM equipamentos_fotos ef WHERE ef.equipamento_id = equipamentos.id ORDER BY ef.is_principal DESC, ef.id ASC LIMIT 1) AS foto_principal_arquivo")
                         ->join('clientes', 'clientes.id = equipamentos.cliente_id', 'left')
                         ->join('equipamentos_tipos tipos', 'tipos.id = equipamentos.tipo_id', 'left')
                         ->join('equipamentos_marcas marcas', 'marcas.id = equipamentos.marca_id', 'left')

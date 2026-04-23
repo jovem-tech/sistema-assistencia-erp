@@ -27,7 +27,7 @@
                                 <a href="<?= base_url('os/visualizar/' . (int) $item['os_id']) ?>" class="text-decoration-none">
                                     <div class="border rounded p-2 mb-2 bg-white">
                                         <div class="fw-semibold">#<?= esc($item['numero_os'] ?? ('OS ' . $item['os_id'])) ?></div>
-                                        <div class="small text-muted"><?= esc($item['cliente_nome'] ?? 'Cliente nao vinculado') ?></div>
+                                        <div class="small text-muted"><?= esc($item['cliente_nome'] ?? 'Cliente não vinculado') ?></div>
                                         <div class="small mt-1"><?= getStatusBadge((string) ($item['os_status'] ?? '')) ?></div>
                                     </div>
                                 </a>

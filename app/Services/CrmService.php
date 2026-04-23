@@ -168,7 +168,12 @@ class CrmService
         $this->pipelineModel->insert($payload);
     }
 
-    public function applyStatusAutomation(int $osId, string $statusCode, ?int $usuarioId = null): void
+    public function applyStatusAutomation(
+        int $osId,
+        string $statusCode,
+        ?int $usuarioId = null,
+        bool $allowTemplateCommunication = true
+    ): void
     {
         $os = $this->osModel->getComplete($osId);
         if (!$os) {
@@ -218,10 +223,11 @@ class CrmService
                 'grupo_macro' => $grupoMacro,
                 'estado_fluxo' => $estadoFluxo,
             ],
-            $usuarioId
+            $usuarioId,
+            $allowTemplateCommunication
         );
 
-        if (empty($ruleResult['template_sent'])) {
+        if ($allowTemplateCommunication && empty($ruleResult['template_sent'])) {
             $this->sendLegacyTemplateByStatus($os, $statusCode, $usuarioId);
         }
 
@@ -235,7 +241,13 @@ class CrmService
      * @param array<string,mixed> $context
      * @return array{matched:int,executed:int,template_sent:bool,followup_created:bool}
      */
-    private function runErpRules(string $eventoOrigem, array $os, array $context, ?int $usuarioId = null): array
+    private function runErpRules(
+        string $eventoOrigem,
+        array $os,
+        array $context,
+        ?int $usuarioId = null,
+        bool $allowTemplateCommunication = true
+    ): array
     {
         if (!$this->regraErpModel->db->tableExists('chatbot_regras_erp')) {
             return [
@@ -271,7 +283,14 @@ class CrmService
             $summary['matched']++;
 
             $action = $this->decodeJson((string) ($rule['acao_json'] ?? ''), []);
-            $result = $this->executeRuleAction($rule, $action, $os, $context, $usuarioId);
+            $result = $this->executeRuleAction(
+                $rule,
+                $action,
+                $os,
+                $context,
+                $usuarioId,
+                $allowTemplateCommunication
+            );
 
             if (!empty($result['executed'])) {
                 $summary['executed']++;
@@ -294,7 +313,14 @@ class CrmService
      * @param array<string,mixed> $context
      * @return array{executed:bool,template_sent:bool,followup_created:bool}
      */
-    private function executeRuleAction(array $rule, array $action, array $os, array $context, ?int $usuarioId = null): array
+    private function executeRuleAction(
+        array $rule,
+        array $action,
+        array $os,
+        array $context,
+        ?int $usuarioId = null,
+        bool $allowTemplateCommunication = true
+    ): array
     {
         $result = [
             'executed' => false,
@@ -351,6 +377,10 @@ class CrmService
                 ]);
 
                 $result['executed'] = !empty($eventId);
+                return $result;
+            }
+
+            if (!$allowTemplateCommunication) {
                 return $result;
             }
 

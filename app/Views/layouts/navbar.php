@@ -45,6 +45,16 @@ $isOsListPage = $currentModule === 'os' && empty($currentSubroute);
                         </a>
                     </li>
                     <li>
+                        <a class="dropdown-item" href="javascript:void(0)" data-filter="os_legado">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="os_legado" id="filter-os-legado">
+                                <label class="form-check-label w-100 cursor-pointer" for="filter-os-legado">
+                                    <i class="bi bi-clock-history me-2"></i>OS Legado (número antigo)
+                                </label>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
                         <a class="dropdown-item" href="javascript:void(0)" data-filter="clientes">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="clientes" id="filter-clientes">
@@ -79,7 +89,7 @@ $isOsListPage = $currentModule === 'os' && empty($currentSubroute);
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="servicos" id="filter-servicos">
                                 <label class="form-check-label w-100 cursor-pointer" for="filter-servicos">
-                                    <i class="bi bi-tools me-2"></i>Serviços
+                                    <i class="bi bi-tools me-2"></i>Servi&ccedil;os
                                 </label>
                             </div>
                         </a>
@@ -89,7 +99,7 @@ $isOsListPage = $currentModule === 'os' && empty($currentSubroute);
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="pecas" id="filter-pecas">
                                 <label class="form-check-label w-100 cursor-pointer" for="filter-pecas">
-                                    <i class="bi bi-box-seam me-2"></i>Peças
+                                    <i class="bi bi-box-seam me-2"></i>Pe&ccedil;as
                                 </label>
                             </div>
                         </a>
@@ -97,7 +107,7 @@ $isOsListPage = $currentModule === 'os' && empty($currentSubroute);
                 </ul>
             </div>
             <i class="bi bi-search search-icon ms-2"></i>
-            <input type="text" class="search-input" placeholder="O que você procura?" autocomplete="off">
+            <input type="text" class="search-input" placeholder="O que você procura? (inclui OS legado)" autocomplete="off">
             <div class="search-results-container shadow-lg">
                 <div class="search-loading-state d-none">
                     <div class="spinner-border text-primary" role="status">
@@ -146,7 +156,7 @@ $isOsListPage = $currentModule === 'os' && empty($currentSubroute);
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="<?= base_url('perfil') ?>"><i class="bi bi-person me-2"></i>Meu Perfil</a></li>
                 <?php if (can('configuracoes', 'visualizar')): ?>
-                <li><a class="dropdown-item" href="<?= base_url('configuracoes') ?>"><i class="bi bi-gear me-2"></i>Configurações</a></li>
+                <li><a class="dropdown-item" href="<?= base_url('configuracoes') ?>"><i class="bi bi-gear me-2"></i>Configura&ccedil;&otilde;es</a></li>
                 <?php endif; ?>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item text-danger" href="<?= base_url('logout') ?>"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
@@ -155,3 +165,4 @@ $isOsListPage = $currentModule === 'os' && empty($currentSubroute);
         </div>
     </div>
 </nav>
+

@@ -1,44 +1,37 @@
-# Manual do Usuário — Serviços
+﻿# Manual do Usuario - Servicos
 
-## 📋 Visão Geral
+## Visao geral
+O modulo `Servicos` centraliza o catalogo de mao de obra usado em OS e orcamentos.
 
-O módulo de Serviços mantém um catálogo padronizado de reparos, facilitando orçamento e lançamento de itens na OS.
+Caminho: `Operacional > Servicos`
 
----
+## Cadastro e edicao
+Campos principais:
+- `Nome` (obrigatorio)
+- `Descricao` (opcional)
+- `Tipo Equipamento` (categoria tecnica do servico)
+- `Valor Padrao` (obrigatorio)
+- `Status` (`ativo` ou inativo/encerrado)
 
-## 🧭 Navegação
-**Caminho:** OPERACIONAL → Serviços
+Regra operacional:
+- servicos encerrados/inativos nao aparecem no Select2 de itens da OS;
+- no lancamento de itens da OS, a busca retorna apenas servicos `status = ativo` e `encerrado_em IS NULL`.
 
----
+## Listagem
+A grade de `Servicos` passou a exibir a coluna:
+- `Tipo Equipamento`
 
-## ➕ Cadastrar Serviço
+Uso recomendado:
+- preencha `Tipo Equipamento` com o tipo principal (ex.: `Smartphone`, `Notebook`, `Desktop`);
+- use `Diverso` quando o servico puder ser aplicado em mais de um tipo.
 
-Campos obrigatórios:
-- **Nome do Serviço**
-- **Valor Padrão (R$)**
+## Importacao e exportacao CSV
+- `Exportar CSV`: inclui `tipo_equipamento`.
+- `Baixar Modelo CSV`: inclui `nome;descricao;tipo_equipamento;valor`.
+- `Importar Lote`: aceita `tipo_equipamento` e `tipo equipamento` como cabecalho.
 
-Campos opcionais:
-- Descrição técnica
-- Status (ativo/inativo)
-
----
-
-## 📥 Importação CSV
-Use **Importar Lote** para subir múltiplos serviços de uma vez a partir do modelo CSV.
-
----
-
-## 📤 Exportação CSV
-Use **Exportar CSV** para baixar o catálogo atual.
-
----
-
-## 🔒 Encerrar / Inativar
-Serviços podem ser inativados sem apagar histórico.
-
----
-
-## Qualidade visual de textos
-
-- A listagem e o modal de importação do módulo tiveram normalização de acentuação.
-- Cabeçalhos e ações como `Descrição`, `Ações`, `Importação CSV` e `Iniciar Importação` passaram a ser exibidos corretamente.
+## Integracao com OS
+Na aba `Itens / Servicos` da OS:
+- o Select2 pode filtrar por `Tipo Equipamento` do aparelho da OS;
+- os 10 servicos mais usados sao exibidos sem digitar;
+- ao digitar, a busca continua por nome/descricao mantendo os filtros operacionais.

@@ -11,6 +11,9 @@ class OsStatusHistoricoModel extends Model
     protected $returnType = 'array';
     protected $allowedFields = [
         'os_id',
+        'legacy_origem',
+        'legacy_tabela',
+        'legacy_id',
         'status_anterior',
         'status_novo',
         'estado_fluxo',

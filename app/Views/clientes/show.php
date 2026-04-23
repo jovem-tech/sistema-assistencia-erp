@@ -1,9 +1,10 @@
-<?= $this->extend('layouts/main') ?>
+<?= $this->extend($layout ?? 'layouts/main') ?>
 
 <?= $this->section('content') ?>
 
 <div class="page-header">
     <h2><i class="bi bi-person me-2"></i><?= esc($cliente['nome_razao']) ?></h2>
+    <?php if (!($isEmbedded ?? false)): ?>
     <div class="d-flex gap-2">
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('clientes')" title="Ajuda sobre Clientes">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -17,6 +18,7 @@
             <i class="bi bi-arrow-left me-1"></i>Voltar
         </a>
     </div>
+    <?php endif; ?>
 </div>
 
 <div class="row g-4">
@@ -167,7 +169,7 @@
                         <i class="bi bi-clock-history me-1"></i>Timeline
                     </a>
                     <a href="<?= base_url('crm/interacoes?cliente_id=' . $cliente['id']) ?>" class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-chat-left-text me-1"></i>Interacoes
+                        <i class="bi bi-chat-left-text me-1"></i>Interações
                     </a>
                 </div>
             </div>
@@ -181,7 +183,7 @@
                     </div>
                     <div class="col-12 col-md-4">
                         <div class="border rounded p-2 h-100">
-                            <div class="small text-muted">Interacoes CRM</div>
+                    <div class="small text-muted">Interações CRM</div>
                             <div class="fs-5 fw-bold"><?= (int) ($crmResumo['interacoes'] ?? 0) ?></div>
                         </div>
                     </div>
@@ -247,8 +249,8 @@
                                     <tr>
                                         <th>Telefone</th>
                                         <th>Status</th>
-                                        <th>Nao lidas</th>
-                                        <th>Ultima msg</th>
+                            <th>Não lidas</th>
+                            <th>Última msg</th>
                                         <th></th>
                                     </tr>
                                 </thead>

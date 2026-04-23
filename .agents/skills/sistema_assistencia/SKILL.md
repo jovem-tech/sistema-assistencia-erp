@@ -26,6 +26,36 @@ description: "Padroes, arquitetura e convencoes do Sistema de Assistencia Tecnic
 3. Evitar duplicacao de CSS e JS por pagina quando o comportamento for global.
 4. Respeitar padrao de permissao (`can`, `canModule`, `requirePermission`).
 5. Atualizar documentacao em `documentacao/` em toda mudanca de codigo.
+6. Toda alteracao de UI que criar, editar, remover ou reordenar dados deve refletir imediatamente na interface sem exigir refresh manual da pagina.
+7. Sempre que a alteracao acontecer dentro de modal, iframe embed, drawer, aba ou fluxo AJAX, preservar o contexto atual do usuario e atualizar apenas os componentes afetados.
+8. Select2, DataTables, cards-resumo, badges, listas, galerias, comboboxes dependentes e contadores devem ser sincronizados logo apos sucesso de operacoes CRUD.
+9. Evitar redirecionamento ou reload completo como mecanismo principal de sincronizacao quando houver fluxo reativo viavel com AJAX, evento, callback ou `postMessage`.
+10. Em novas implementacoes, padronizar esse comportamento como regra global do sistema, nao como excecao de modulo.
+11. Toda busca de catalogo de pecas e servicos (autocomplete, Select2, busca global e endpoints AJAX) deve retornar apenas registros operacionais ativos:
+   - `pecas`: `ativo = 1`;
+   - `servicos`: `status = 'ativo'` e `encerrado_em IS NULL`.
+12. Em consultas com `OR` (`like`/`orLike`), agrupar condicoes de texto antes do filtro de ativo para evitar vazamento de itens inativos/encerrados.
+13. Em lancamento de itens de OS (`Itens / Servicos`), o campo de busca de peca/servico deve usar Select2 com pesquisa assincrona no catalogo (sem lista estatica fixa) e preencher descricao/valor automaticamente quando houver item catalogado.
+14. O Select2 de `Itens / Servicos` deve abrir com sugestoes iniciais (top 10 mais usados) mesmo sem termo digitado (`minimumInputLength = 0`), para acelerar o lancamento operacional.
+15. A busca de catalogo na OS deve suportar filtros contextuais:
+   - `pecas`: `categoria`, `tipo_equipamento` e opcao de incluir `diverso`;
+   - `servicos`: `tipo_equipamento` e opcao de incluir `diverso`.
+16. Quando uma peca sem estoque for adicionada na OS, o fluxo deve:
+   - permitir inclusao do item sem falhar FK;
+   - marcar status pendente de aquisicao na linha;
+   - oferecer acao de resolver pendencia (entrada, reserva e despesa opcional) sem interromper a montagem do orcamento/OS.
+
+## Regra global de reatividade de interface (obrigatorio)
+
+Esse padrao vale para todo o sistema e para qualquer nova implementacao.
+
+Checklist obrigatorio:
+1. Salvou, editou, excluiu ou vinculou dados: a tela deve refletir o novo estado imediatamente.
+2. Nao depender de `F5`, recarga manual ou reabertura de modal para exibir o dado correto.
+3. Manter modal pai, filtros, pagina atual da tabela, scroll util e contexto de preenchimento sempre que tecnicamente possivel.
+4. Se houver componente enriquecido (`Select2`, `DataTables`, galerias, chips, resumo lateral, badges), sincronizar tanto o dado interno quanto o texto renderizado.
+5. Quando existir iframe embed, notificar a janela pai com evento dedicado (`postMessage`) para atualizar apenas o necessario.
+6. Em falha de sincronizacao reativa, registrar `console.error` com contexto suficiente para diagnostico.
 
 ## Padrao de responsividade ultra compatibilidade (obrigatorio)
 

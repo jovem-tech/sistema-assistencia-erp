@@ -103,9 +103,8 @@ $formatCategoria = static function (string $value) use ($categoriaLabelMap): str
                                     <?php endif; ?>
                                     <?php if (can('defeitos', 'excluir')): ?>
                                     <a href="<?= base_url('defeitosrelatados/excluir/' . $relato['id']) ?>"
-                                       class="btn btn-outline-danger"
-                                       title="Excluir"
-                                       onclick="return confirm('Confirma excluir este relato?');">
+                                       class="btn btn-outline-danger js-relato-delete"
+                                       title="Excluir">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                     <?php endif; ?>
@@ -120,4 +119,27 @@ $formatCategoria = static function (string $value) use ($categoriaLabelMap): str
     </div>
 </div>
 
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+document.addEventListener('click', async function (event) {
+    const trigger = event.target.closest('.js-relato-delete');
+    if (!trigger) return;
+
+    event.preventDefault();
+    const confirmed = await window.DSFeedback.confirm({
+        icon: 'warning',
+        title: 'Excluir relato?',
+        text: 'Confirma excluir este relato?',
+        confirmButtonText: 'Sim, excluir',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+    });
+
+    if (confirmed) {
+        window.location.href = trigger.getAttribute('href');
+    }
+});
+</script>
 <?= $this->endSection() ?>

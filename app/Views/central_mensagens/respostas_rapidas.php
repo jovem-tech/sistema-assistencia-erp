@@ -479,7 +479,7 @@
     }
 
     /**
-     * Funcao auxiliar para inserir tags no cursor do textarea
+     * Função auxiliar para inserir tags no cursor do textarea
      */
     function insertAtCursor(myField, myValue) {
         if (!myField) return;

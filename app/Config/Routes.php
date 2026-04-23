@@ -7,7 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 // =====================================================
-// ROTAS PÚBLICAS (sem autenticação)
+// ROTAS PUBLICAS (sem autenticacao)
 // =====================================================
 $routes->get('/', 'Auth::login');
 $routes->get('login', 'Auth::login');
@@ -18,27 +18,90 @@ $routes->post('esqueci-senha', 'Auth::sendResetLink');
 $routes->get('redefinir-senha/(:any)', 'Auth::resetPassword/$1');
 $routes->post('redefinir-senha/(:any)', 'Auth::updatePassword/$1');
 
-// Aprovação de orçamento (link público)
+// Aprovacao de orcamento (link publico)
 $routes->get('orcamento/(:any)', 'Orcamento::visualizar/$1');
 $routes->post('orcamento/aprovar/(:any)', 'Orcamento::aprovar/$1');
 $routes->post('orcamento/recusar/(:any)', 'Orcamento::recusar/$1');
+// Compatibilidade legado: links antigos de pacote nao escrevem mais no fluxo antigo.
+$routes->get('orcamento/pacote/(:any)', 'Orcamento::visualizarPacote/$1');
+$routes->post('orcamento/pacote/escolher/(:any)', 'Orcamento::escolherPacote/$1');
+// Fluxo oficial atual: oferta dinamica de pacote.
+$routes->get('pacote/oferta/(:any)', 'Orcamento::visualizarOfertaPacote/$1');
+$routes->post('pacote/oferta/escolher/(:any)', 'Orcamento::escolherOfertaPacote/$1');
 $routes->post('webhooks/whatsapp', 'WhatsAppWebhook::receive');
+$routes->get('api/public/warranty/(:segment)', 'Api\\V1\\OrdersController::showWarrantyPublic/$1');
 
 // =====================================================
-// ROTAS PROTEGIDAS (requer autenticação + permissão RBAC)
+// API MOBILE/PWA (v1)
+// =====================================================
+$routes->group('api/v1', static function ($routes) {
+    $routes->post('auth/login', 'Api\\V1\\AuthController::login');
+    $routes->post('agents/bootstrap-from-warranty', 'Api\\V1\\AgentsController::bootstrapFromWarranty');
+
+    $routes->group('', ['filter' => 'apiToken'], static function ($routes) {
+        $routes->get('auth/me', 'Api\\V1\\AuthController::me');
+        $routes->post('auth/refresh', 'Api\\V1\\AuthController::refresh');
+        $routes->post('auth/logout', 'Api\\V1\\AuthController::logout');
+        $routes->post('agents/check-in', 'Api\\V1\\AgentsController::checkIn');
+
+        $routes->get('users', 'Api\\V1\\UsersController::index');
+
+        $routes->get('clients', 'Api\\V1\\ClientsController::index');
+        $routes->get('clients/(:num)', 'Api\\V1\\ClientsController::show/$1');
+        $routes->post('clients', 'Api\\V1\\ClientsController::create');
+        $routes->put('clients/(:num)', 'Api\\V1\\ClientsController::update/$1');
+        $routes->patch('clients/(:num)', 'Api\\V1\\ClientsController::update/$1');
+
+        $routes->get('equipments/catalog', 'Api\\V1\\EquipmentsController::catalog');
+        $routes->post('equipments/brands', 'Api\\V1\\EquipmentsController::createBrand');
+        $routes->post('equipments/models', 'Api\\V1\\EquipmentsController::createModel');
+        $routes->get('equipments/(:num)', 'Api\\V1\\EquipmentsController::show/$1');
+        $routes->post('equipments', 'Api\\V1\\EquipmentsController::create');
+        $routes->post('equipments/(:num)', 'Api\\V1\\EquipmentsController::update/$1');
+        $routes->put('equipments/(:num)', 'Api\\V1\\EquipmentsController::update/$1');
+        $routes->patch('equipments/(:num)', 'Api\\V1\\EquipmentsController::update/$1');
+
+        $routes->get('orders', 'Api\\V1\\OrdersController::index');
+        $routes->get('orders/meta', 'Api\\V1\\OrdersController::meta');
+        $routes->get('orders/(:num)', 'Api\\V1\\OrdersController::show/$1');
+        $routes->get('orders/by-number/(:segment)', 'Api\\V1\\OrdersController::showByNumber/$1');
+        $routes->post('orders', 'Api\\V1\\OrdersController::create');
+        $routes->put('orders/(:num)', 'Api\\V1\\OrdersController::update/$1');
+        $routes->patch('orders/(:num)', 'Api\\V1\\OrdersController::update/$1');
+
+        $routes->get('conversations', 'Api\\V1\\ConversationsController::index');
+        $routes->get('conversations/(:num)', 'Api\\V1\\ConversationsController::show/$1');
+
+        $routes->get('messages', 'Api\\V1\\MessagesController::index');
+        $routes->post('messages', 'Api\\V1\\MessagesController::create');
+
+        $routes->get('notifications', 'Api\\V1\\NotificationsController::index');
+        $routes->post('notifications', 'Api\\V1\\NotificationsController::create');
+        $routes->put('notifications/(:num)/read', 'Api\\V1\\NotificationsController::markAsRead/$1');
+        $routes->patch('notifications/(:num)/read', 'Api\\V1\\NotificationsController::markAsRead/$1');
+        $routes->put('notifications/read-all', 'Api\\V1\\NotificationsController::markAllRead');
+        $routes->patch('notifications/read-all', 'Api\\V1\\NotificationsController::markAllRead');
+
+        $routes->get('notifications/subscriptions', 'Api\\V1\\PushSubscriptionsController::index');
+        $routes->post('notifications/subscriptions', 'Api\\V1\\PushSubscriptionsController::create');
+        $routes->delete('notifications/subscriptions/(:num)', 'Api\\V1\\PushSubscriptionsController::delete/$1');
+
+        $routes->get('realtime/stream', 'Api\\V1\\RealtimeController::stream');
+    });
+});
+
+// =====================================================
+// ROTAS PROTEGIDAS (requer autenticacao + permissao RBAC)
 // =====================================================
 $routes->group('', ['filter' => 'auth'], function ($routes) {
-
-// ── Dashboard (todos os autenticados) ──────────────────────────────
+// -- Dashboard (todos os autenticados) -----------------------------------
     $routes->get('sessao/heartbeat', 'Sessao::heartbeat');
     $routes->get('dashboard',   'Admin::index', ['filter' => 'permission:dashboard:visualizar']);
     $routes->get('admin/stats', 'Admin::stats', ['filter' => 'permission:dashboard:visualizar']);
-
-    // ── Perfil (próprio usuário) ──────────────────────────────────────────
+    // -- Perfil (proprio usuario) -----------------------------------------
     $routes->get('perfil',          'Perfil::index');
     $routes->post('perfil/salvar',  'Perfil::salvar');
-
-    // ── Grupos de Acesso ──────────────────────────────────────────────────
+    // -- Grupos de Acesso --------------------------------------------------
     $routes->get('grupos',                             'Grupos::index',            ['filter' => 'permission:grupos:visualizar']);
     $routes->get('grupos/novo',                        'Grupos::create',           ['filter' => 'permission:grupos:criar']);
     $routes->post('grupos/salvar',                     'Grupos::store',            ['filter' => 'permission:grupos:criar']);
@@ -58,6 +121,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('clientes/excluir/(:num)',   'Clientes::delete/$1',        ['filter' => 'permission:clientes:excluir']);
     $routes->get('clientes/visualizar/(:num)','Clientes::show/$1',          ['filter' => 'permission:clientes:visualizar']);
     $routes->get('clientes/buscar',           'Clientes::search',           ['filter' => 'permission:clientes:visualizar']);
+    $routes->get('clientes/consultar-cnpj',   'Clientes::consultarCnpj',    ['filter' => 'permission:clientes:visualizar']);
     $routes->get('clientes/json/(:num)',      'Clientes::getJson/$1',       ['filter' => 'permission:clientes:visualizar']);
     $routes->post('clientes/importar',        'Clientes::importCsv',        ['filter' => 'permission:clientes:importar']);
     $routes->get('clientes/modelo-csv',       'Clientes::downloadCsvTemplate', ['filter' => 'permission:clientes:importar']);
@@ -112,6 +176,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('equipamentosmarcas',              'EquipamentosMarcas::index',  ['filter' => 'permission:equipamentos:visualizar']);
     $routes->post('equipamentosmarcas/salvar',      'EquipamentosMarcas::store',  ['filter' => 'permission:equipamentos:criar']);
     $routes->post('equipamentosmarcas/salvar_ajax', 'EquipamentosMarcas::salvar_ajax',  ['filter' => 'permission:equipamentos:criar']);
+    $routes->post('equipamentosmarcas/atualizar_ajax/(:num)', 'EquipamentosMarcas::atualizar_ajax/$1', ['filter' => 'permission:equipamentos:editar']);
     $routes->get('equipamentosmarcas/excluir/(:num)','EquipamentosMarcas::delete/$1',['filter' => 'permission:equipamentos:excluir']);
     $routes->post('equipamentosmarcas/importar',    'EquipamentosMarcas::importCsv',['filter' => 'permission:equipamentos:importar']);
 
@@ -119,8 +184,10 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('equipamentosmodelos',              'EquipamentosModelos::index',  ['filter' => 'permission:equipamentos:visualizar']);
     $routes->post('equipamentosmodelos/salvar',      'EquipamentosModelos::store',  ['filter' => 'permission:equipamentos:criar']);
     $routes->post('equipamentosmodelos/salvar_ajax', 'EquipamentosModelos::salvar_ajax',  ['filter' => 'permission:equipamentos:criar']);
+    $routes->post('equipamentosmodelos/atualizar_ajax/(:num)', 'EquipamentosModelos::atualizar_ajax/$1', ['filter' => 'permission:equipamentos:editar']);
     $routes->get('equipamentosmodelos/excluir/(:num)','EquipamentosModelos::delete/$1',['filter' => 'permission:equipamentos:excluir']);
     $routes->post('equipamentosmodelos/importar',    'EquipamentosModelos::importCsv',['filter' => 'permission:equipamentos:importar']);
+    $routes->get('equipamentosmodelos/por-marca',    'EquipamentosModelos::porMarca', ['filter' => 'permission:equipamentos:visualizar']);
     $routes->post('equipamentosmodelos/por-marca',   'EquipamentosModelos::porMarca', ['filter' => 'permission:equipamentos:visualizar']);
     $routes->get('api/modelos/buscar',               'ModeloBridge::buscar', ['filter' => 'permission:equipamentos:visualizar']);
 
@@ -164,6 +231,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('crm/metricas-marketing/engajamento', 'Crm::salvarEngajamentoPeriodos', ['filter' => 'permission:clientes:editar']);
 
     // Central de Atendimento WhatsApp (rota canonica + alias legado)
+    $routes->get('atendimento-mobile',                      'AtendimentoMobile::index',                ['filter' => 'permission:clientes:visualizar']);
     $routes->get('atendimento-whatsapp',                    'CentralMensagens::index',                       ['filter' => 'permission:clientes:visualizar']);
     $routes->get('atendimento-whatsapp/conversas',          'CentralMensagens::conversas',                   ['filter' => 'permission:clientes:visualizar']);
     $routes->get('atendimento-whatsapp/conversa/(:num)',    'CentralMensagens::conversa/$1',                 ['filter' => 'permission:clientes:visualizar']);
@@ -238,20 +306,34 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->post('os/datatable',         'Os::datatable',          ['filter' => 'permission:os:visualizar']);
     $routes->get('os/fotos/(:num)',      'Os::photos/$1',          ['filter' => 'permission:os:visualizar']);
     $routes->get('os/nova',              'Os::create',             ['filter' => 'permission:os:criar']);
+    $routes->get('os/checklist-meta',    'Os::checklistMeta',      ['filter' => 'permission:os:visualizar']);
     $routes->post('os/salvar',            'Os::store',              ['filter' => 'permission:os:criar']);
     $routes->get('os/editar/(:num)',      'Os::edit/$1',            ['filter' => 'permission:os:editar']);
     $routes->post('os/atualizar/(:num)',  'Os::update/$1',          ['filter' => 'permission:os:editar']);
     $routes->get('os/visualizar/(:num)', 'Os::show/$1',            ['filter' => 'permission:os:visualizar']);
     $routes->get('os/status-meta/(:num)', 'Os::statusMeta/$1',      ['filter' => 'permission:os:visualizar']);
+    $routes->get('os/prazos-meta/(:num)', 'Os::datesMeta/$1',       ['filter' => 'permission:os:editar']);
+    $routes->post('os/prazos-ajax/(:num)', 'Os::updateDatesAjax/$1',['filter' => 'permission:os:editar']);
+    $routes->get('os/orcamento-meta/(:num)', 'Os::budgetMeta/$1',   ['filter' => 'permission:os:editar']);
+    $routes->post('os/orcamento-ajax/(:num)', 'Os::budgetAjax/$1',  ['filter' => 'permission:os:editar']);
     $routes->post('os/status-ajax/(:num)','Os::updateStatusAjax/$1',['filter' => 'permission:os:editar']);
     $routes->post('os/status/(:num)',    'Os::updateStatus/$1',    ['filter' => 'permission:os:editar']);
     $routes->get('os/imprimir/(:num)',   'Os::print/$1',           ['filter' => 'permission:os:visualizar']);
     $routes->post('os/whatsapp/(:num)',  'Os::sendWhatsApp/$1',    ['filter' => 'permission:os:editar']);
     $routes->post('os/pdf/(:num)/gerar', 'Os::generatePdf/$1',     ['filter' => 'permission:os:visualizar']);
     $routes->post('os/item/salvar',       'Os::addItem',            ['filter' => 'permission:os:editar']);
+    $routes->get('os/item/catalogo',      'Os::itemCatalogSearch',  ['filter' => 'permission:os:editar']);
+    $routes->post('os/item/resolver-pendencia/(:num)', 'Os::resolveItemPendencia/$1', ['filter' => 'permission:os:editar']);
     $routes->get('os/item/excluir/(:num)','Os::removeItem/$1',     ['filter' => 'permission:os:editar']);
     $routes->get('osworkflow',            'OsWorkflow::index',      ['filter' => 'permission:os:editar']);
     $routes->post('osworkflow/salvar',    'OsWorkflow::save',       ['filter' => 'permission:os:editar']);
+    $routes->get('checklists/entrada',                        'Checklists::entrada',            ['filter' => 'permission:os:visualizar']);
+    $routes->post('checklists/entrada/salvar',                'Checklists::salvarEntrada',      ['filter' => 'permission:os:editar']);
+    $routes->post('checklists/entrada/item/salvar',           'Checklists::salvarItemEntrada',  ['filter' => 'permission:os:editar']);
+    $routes->post('checklists/entrada/item/remover/(:num)',   'Checklists::removerItemEntrada/$1', ['filter' => 'permission:os:editar']);
+    $routes->get('checklists/manutencao',                     'Checklists::manutencao',         ['filter' => 'permission:os:visualizar']);
+    $routes->get('checklists/controle-qualidade',             'Checklists::controleQualidade',  ['filter' => 'permission:os:visualizar']);
+    $routes->get('checklists/saida',                          'Checklists::saida',              ['filter' => 'permission:os:visualizar']);
 
     // -- Serviços ----------------------------------------------------------
     $routes->get('servicos',                  'Servicos::index',            ['filter' => 'permission:servicos:visualizar']);
@@ -264,6 +346,51 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->get('servicos/exportar',         'Servicos::exportCsv',        ['filter' => 'permission:servicos:exportar']);
     $routes->get('servicos/modelo-csv',       'Servicos::downloadCsvTemplate',['filter' => 'permission:servicos:importar']);
     $routes->post('servicos/importar',        'Servicos::importCsv',        ['filter' => 'permission:servicos:importar']);
+
+    // -- Orcamentos --------------------------------------------------------
+    $routes->get('orcamentos',                         'Orcamentos::index',        ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('orcamentos/novo',                    'Orcamentos::create',       ['filter' => 'permission:orcamentos:criar']);
+    $routes->get('orcamentos/clientes/lookup',         'Orcamentos::lookupClienteContato', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('orcamentos/equipamentos/cliente',    'Orcamentos::lookupEquipamentosCliente', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('orcamentos/os-abertas/cliente',      'Orcamentos::lookupOsAbertasCliente', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('orcamentos/item/catalogo',           'Orcamentos::itemCatalogSearch', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('orcamentos/pacotes/oferta/detectar', 'Orcamentos::detectPacoteOferta', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->post('orcamentos/pacotes/oferta/enviar',  'Orcamentos::sendPacoteOferta', ['filter' => 'permission:orcamentos:criar']);
+    $routes->post('orcamentos/salvar',                 'Orcamentos::store',        ['filter' => 'permission:orcamentos:criar']);
+    $routes->get('orcamentos/visualizar/(:num)',       'Orcamentos::show/$1',      ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('orcamentos/editar/(:num)',           'Orcamentos::edit/$1',      ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('orcamentos/atualizar/(:num)',       'Orcamentos::update/$1',    ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('orcamentos/revisar/(:num)',         'Orcamentos::createRevision/$1', ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('orcamentos/status/(:num)',          'Orcamentos::updateStatus/$1', ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('orcamentos/converter/(:num)',       'Orcamentos::convert/$1', ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('orcamentos/automacao/executar',     'Orcamentos::runAutomation', ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('orcamentos/pdf/(:num)/gerar',       'Orcamentos::generatePdf/$1', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('orcamentos/pdf/(:num)',              'Orcamentos::downloadPdf/$1', ['filter' => 'permission:orcamentos:visualizar']);
+$routes->post('orcamentos/whatsapp/(:num)/enviar', 'Orcamentos::sendWhatsApp/$1', ['filter' => 'permission:orcamentos:editar']);
+$routes->post('orcamentos/email/(:num)/enviar',    'Orcamentos::sendEmail/$1', ['filter' => 'permission:orcamentos:editar']);
+// Compatibilidade legado: endpoint antigo redireciona internamente para o fluxo dinamico de ofertas.
+$routes->post('orcamentos/pacotes/gerar-enviar/(:num)', 'Orcamentos::sendPacoteLink/$1', ['filter' => 'permission:orcamentos:editar']);
+$routes->post('orcamentos/central-mensagens/gerar-enviar', 'Orcamentos::quickCreateAndSendFromConversa', ['filter' => 'permission:orcamentos:criar']);
+    $routes->get('orcamentos/excluir/(:num)',          'Orcamentos::delete/$1',    ['filter' => 'permission:orcamentos:excluir']);
+    
+    // -- Pacotes de Servicos -----------------------------------------------
+    $routes->get('pacotes-servicos',                    'PacotesServicos::index',    ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('pacotes-servicos/novo',               'PacotesServicos::create',   ['filter' => 'permission:orcamentos:criar']);
+    $routes->post('pacotes-servicos/salvar',            'PacotesServicos::store',    ['filter' => 'permission:orcamentos:criar']);
+    $routes->get('pacotes-servicos/editar/(:num)',      'PacotesServicos::edit/$1',  ['filter' => 'permission:orcamentos:editar']);
+    $routes->get('pacotes-servicos/preview/(:num)',     'PacotesServicos::preview/$1', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->post('pacotes-servicos/atualizar/(:num)',  'PacotesServicos::update/$1',['filter' => 'permission:orcamentos:editar']);
+    $routes->get('pacotes-servicos/excluir/(:num)',     'PacotesServicos::delete/$1',['filter' => 'permission:orcamentos:excluir']);
+    $routes->get('precificacao',                        'Precificacao::index', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('precificacao/configuracao',           'Precificacao::configuracao', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->post('precificacao/configuracao/salvar',    'Precificacao::saveConfiguracao', ['filter' => 'permission:orcamentos:editar']);
+    $routes->get('precificacao/simulador',              'Precificacao::simulador', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('precificacao/categoria-encargos/(:num)', 'Precificacao::categoriaEncargos/$1', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->post('precificacao/categoria-encargos/(:num)', 'Precificacao::salvarCategoriaEncargos/$1', ['filter' => 'permission:orcamentos:editar']);
+    $routes->get('precificacao/categoria-override',       'Precificacao::categoriaOverride', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->post('precificacao/salvar',                'Precificacao::save', ['filter' => 'permission:orcamentos:editar']);
+    $routes->post('precificacao/simular-peca',          'Precificacao::simularPeca', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->post('precificacao/simular-servico',       'Precificacao::simularServico', ['filter' => 'permission:orcamentos:visualizar']);
 
     // -- Vendas ------------------------------------------------------------
     $routes->get('vendas',                    'Vendas::index',              ['filter' => 'permission:vendas:visualizar']);
@@ -301,6 +428,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     // -- Configurações -----------------------------------------------------
     $routes->get('configuracoes',          'Configuracoes::index',   ['filter' => 'permission:configuracoes:visualizar']);
     $routes->post('configuracoes/salvar',  'Configuracoes::save',    ['filter' => 'permission:configuracoes:editar']);
+    $routes->post('configuracoes/email/enviar-teste', 'Configuracoes::sendEmailTest', ['filter' => 'permission:configuracoes:editar']);
     $routes->post('configuracoes/whatsapp/testar-conexao', 'Configuracoes::testWhatsAppConnection', ['filter' => 'permission:configuracoes:editar']);
     $routes->post('configuracoes/whatsapp/enviar-teste', 'Configuracoes::sendWhatsAppTestMessage', ['filter' => 'permission:configuracoes:editar']);
     $routes->get('configuracoes/whatsapp/local-status', 'Configuracoes::whatsappLocalStatus', ['filter' => 'permission:configuracoes:visualizar']);
@@ -328,7 +456,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
 
     // -- Upload (apenas usuários autenticados) -----------------------------
     $routes->post('upload/imagem',         'Upload::image');
-    // ── Busca Global ─────────────────────────────────────────────────────
+    // -- Busca Global ------------------------------------------------------
     $routes->get('api/busca-global', 'GlobalSearch::index');
     $routes->get('busca/resultados', 'GlobalSearch::results');
 });

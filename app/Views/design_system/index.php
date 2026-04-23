@@ -24,7 +24,7 @@
         </div>
         <p class="mb-0 mt-3 text-muted">
             Esta pagina consolida os padroes visuais e comportamentais para uso em todos os modulos:
-            OS, Equipamentos, Servicos, Estoque, Financeiro, Relatorios, Documentacao e Configuracoes.
+            OS, Equipamentos, Serviços, Estoque, Financeiro, Relatórios, Documentação e Configurações.
         </p>
     </div>
 </div>
@@ -116,7 +116,7 @@
                     </div>
                     <div class="col-12">
                         <label class="form-label">Textarea</label>
-                        <textarea class="form-control" rows="3" placeholder="Descricao padrao"></textarea>
+                        <textarea class="form-control" rows="3" placeholder="Descrição padrao"></textarea>
                     </div>
                     <div class="col-md-4">
                         <div class="form-check">
@@ -214,9 +214,9 @@
                     <div class="ds-gallery-thumb"><div class="ds-gallery-fake ds-gallery-fake-c"></div></div>
                     <div class="ds-gallery-thumb"><div class="ds-gallery-fake ds-gallery-fake-d"></div></div>
                 </div>
-                <div class="alert alert-success mb-2"><i class="bi bi-check-circle me-2"></i>Acao salva com sucesso.</div>
+                <div class="alert alert-success mb-2"><i class="bi bi-check-circle me-2"></i>Ação salva com sucesso.</div>
                 <div class="alert alert-warning mb-2"><i class="bi bi-exclamation-triangle me-2"></i>Itens opcionais pendentes.</div>
-                <div class="alert alert-danger mb-0"><i class="bi bi-x-circle me-2"></i>Campo obrigatorio nao preenchido.</div>
+                <div class="alert alert-danger mb-0"><i class="bi bi-x-circle me-2"></i>Campo obrigatorio não preenchido.</div>
             </div>
         </div>
     </div>
@@ -241,3 +241,4 @@
     })();
 </script>
 <?= $this->endSection() ?>
+

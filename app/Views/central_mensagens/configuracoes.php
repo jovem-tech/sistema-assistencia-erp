@@ -1,9 +1,9 @@
-﻿<?= $this->extend('layouts/main') ?>
+<?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
 <div class="page-header">
     <div class="d-flex align-items-center gap-2">
-        <h2><i class="bi bi-sliders me-2"></i>Configuracoes da Central</h2>
+<h2><i class="bi bi-sliders me-2"></i>Configurações da Central</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('atendimento-whatsapp-config')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
@@ -58,13 +58,13 @@
                 <input type="text" class="form-control form-control-sm" name="central_mensagens_dias_uteis" value="<?= esc((string) ($config['central_mensagens_dias_uteis'] ?? '1,2,3,4,5,6')) ?>" placeholder="1,2,3,4,5,6">
             </div>
             <div class="col-12">
-                <label class="form-label form-label-sm">Mensagem de Fallback (quando o bot nao entende)</label>
+                    <label class="form-label form-label-sm">Mensagem de Fallback (quando o bot não entende)</label>
                 <textarea class="form-control form-control-sm" name="central_mensagens_bot_fallback_message" rows="3"><?= esc((string) ($config['central_mensagens_bot_fallback_message'] ?? 'Recebi sua mensagem e vou encaminhar para um atendente humano continuar o atendimento.')) ?></textarea>
-                <div class="form-text small opacity-75">Sera enviada somente se a automacao estiver ativa e o bot nao identificar uma intencao valida.</div>
+                    <div class="form-text small opacity-75">Será enviada somente se a automação estiver ativa e o bot não identificar uma intenção válida.</div>
             </div>
             <div class="col-12 d-flex justify-content-end">
                 <button type="submit" class="btn btn-glow">
-                    <i class="bi bi-check2-circle me-1"></i>Salvar configuracoes
+                <i class="bi bi-check2-circle me-1"></i>Salvar configurações
                 </button>
             </div>
         </form>

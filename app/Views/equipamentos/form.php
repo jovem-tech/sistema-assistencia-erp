@@ -872,7 +872,7 @@ $(document).ready(function() {
     const initClosest = findClosestColor(initHex);
     updateColorUI(initHex, initClosest ? initClosest.name : ($('#corNomeReal').val() || 'Preto'));
 
-    // --- LÓGICA DE DETECÇÃO DE COR INTELIGENTE NA IMAGEM ---
+    // --- LÓGICA DE DETECÇ�O DE COR INTELIGENTE NA IMAGEM ---
 // (smartColorMap removido, usando PROFESSIONAL_COLORS)
 
     function rgbToHexStr(r, g, b) {
@@ -1025,22 +1025,12 @@ $(document).ready(function() {
     const maxPhotos      = 4;
 
     function showPhotoDialog(icon, title, text) {
-        if (window.Swal && typeof window.Swal.fire === 'function') {
-            return window.Swal.fire({
-                icon,
-                title,
-                text,
-                confirmButtonText: 'Ok',
-                customClass: {
-                    confirmButton: 'btn btn-glow px-4'
-                },
-                buttonsStyling: false
-            });
-        }
-
-        console.error('[Equipamentos Fotos] fallback nativo acionado:', { icon, title, text });
-        window.alert([title, text].filter(Boolean).join('\n\n'));
-        return Promise.resolve({ isConfirmed: true });
+        return window.DSFeedback.fire({
+            icon,
+            title,
+            text,
+            confirmButtonText: 'Ok',
+        });
     }
 
     function cleanupStuckModalArtifacts() {
@@ -1124,7 +1114,7 @@ $(document).ready(function() {
             modalCamera?.show();
         } catch (err) {
             console.error('[Equipamentos Fotos] falha ao acessar camera', err);
-            showPhotoDialog('error', 'Camera indisponivel', 'Nao foi possivel acessar a camera deste dispositivo.');
+        showPhotoDialog('error', 'Câmera indisponível', 'Não foi possível acessar a câmera deste dispositivo.');
         }
     });
 
@@ -1146,7 +1136,7 @@ $(document).ready(function() {
         }
 
         if (!imgToCrop) {
-            console.error('[Equipamentos Fotos] imagem do cropper nao encontrada');
+            console.error('[Equipamentos Fotos] imagem do cropper não encontrada');
             return;
         }
 
@@ -1165,7 +1155,7 @@ $(document).ready(function() {
 
                 if (!context) {
                     console.error('[Equipamentos Fotos] fallback canvas sem contexto 2D');
-                    showPhotoDialog('error', 'Falha ao processar imagem', 'Nao foi possivel preparar a foto selecionada.');
+            showPhotoDialog('error', 'Falha ao processar imagem', 'Não foi possível preparar a foto selecionada.');
                     processPendingCropQueue();
                     return;
                 }
@@ -1174,7 +1164,7 @@ $(document).ready(function() {
                 fallbackCanvas.toBlob((blob) => {
                     if (!blob) {
                         console.error('[Equipamentos Fotos] fallback canvas retornou blob vazio');
-                        showPhotoDialog('error', 'Falha ao processar imagem', 'Nao foi possivel gerar a foto selecionada.');
+            showPhotoDialog('error', 'Falha ao processar imagem', 'Não foi possível gerar a foto selecionada.');
                         processPendingCropQueue();
                         return;
                     }
@@ -1184,7 +1174,7 @@ $(document).ready(function() {
             };
             fallbackImage.onerror = (error) => {
                 console.error('[Equipamentos Fotos] erro ao carregar imagem no fallback', error);
-                showPhotoDialog('error', 'Falha ao carregar imagem', 'A imagem escolhida nao pode ser carregada.');
+            showPhotoDialog('error', 'Falha ao carregar imagem', 'A imagem escolhida não pode ser carregada.');
                 processPendingCropQueue();
             };
             fallbackImage.src = source;
@@ -1217,7 +1207,7 @@ $(document).ready(function() {
             console.error('[Equipamentos Fotos] falha ao inicializar cropper', error);
             cropperReady = false;
             hideModalSafe(modalCrop, '#modalCropEquip');
-            showPhotoDialog('error', 'Falha no editor', 'Nao foi possivel abrir o editor de corte da foto.');
+            showPhotoDialog('error', 'Falha no editor', 'Não foi possível abrir o editor de corte da foto.');
             processPendingCropQueue();
         }
     });
@@ -1254,7 +1244,7 @@ $(document).ready(function() {
         const context = canvasCamera.getContext('2d');
         if (!context) {
             console.error('[Equipamentos Fotos] canvas da camera sem contexto 2D');
-            showPhotoDialog('error', 'Falha na camera', 'Nao foi possivel capturar a imagem da camera.');
+            showPhotoDialog('error', 'Falha na câmera', 'Não foi possível capturar a imagem da câmera.');
             return;
         }
 
@@ -1270,20 +1260,20 @@ $(document).ready(function() {
     document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
         if (!cropperReady || !cropper) {
             console.error('[Equipamentos Fotos] confirmacao de crop sem cropper pronto');
-            showPhotoDialog('warning', 'Editor indisponivel', 'A foto ainda nao esta pronta para corte.');
+            showPhotoDialog('warning', 'Editor indisponível', 'A foto ainda não está pronta para corte.');
             return;
         }
 
         try {
             const canvas = cropper.getCroppedCanvas({ width: 1024, height: 1024, imageSmoothingQuality: 'high' });
             if (!canvas) {
-                throw new Error('Canvas do cropper nao retornado.');
+                throw new Error('Canvas do cropper não retornado.');
             }
 
             canvas.toBlob((blob) => {
                 if (!blob) {
                     console.error('[Equipamentos Fotos] cropper retornou blob vazio');
-                    showPhotoDialog('error', 'Falha ao salvar foto', 'Nao foi possivel gerar a foto cortada.');
+            showPhotoDialog('error', 'Falha ao salvar foto', 'Não foi possível gerar a foto cortada.');
                     return;
                 }
 
@@ -1291,7 +1281,7 @@ $(document).ready(function() {
             }, 'image/jpeg', 0.9);
         } catch (error) {
             console.error('[Equipamentos Fotos] erro ao confirmar crop', error);
-            showPhotoDialog('error', 'Falha ao salvar foto', 'Nao foi possivel finalizar o corte da imagem.');
+            showPhotoDialog('error', 'Falha ao salvar foto', 'Não foi possível finalizar o corte da imagem.');
         }
     });
 
@@ -1382,27 +1372,15 @@ $(document).ready(function() {
     });
 
     $(document).on('click', '.btn-del-foto-existente', async function() {
-        let confirmed = true;
-
-        if (window.Swal && typeof window.Swal.fire === 'function') {
-            const result = await window.Swal.fire({
-                icon: 'warning',
-                title: 'Excluir foto?',
-                text: 'Esta foto sera removida do equipamento.',
-                showCancelButton: true,
-                confirmButtonText: 'Excluir',
-                cancelButtonText: 'Cancelar',
-                reverseButtons: true,
-                customClass: {
-                    confirmButton: 'btn btn-danger px-4',
-                    cancelButton: 'btn btn-outline-secondary px-4'
-                },
-                buttonsStyling: false
-            });
-            confirmed = !!result.isConfirmed;
-        } else {
-            confirmed = window.confirm('Deseja realmente excluir esta foto?');
-        }
+        const confirmed = await window.DSFeedback.confirm({
+            icon: 'warning',
+            title: 'Excluir foto?',
+            text: 'Esta foto sera removida do equipamento.',
+            showCancelButton: true,
+            confirmButtonText: 'Excluir',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+        });
 
         if (!confirmed) {
             return;
@@ -1426,13 +1404,13 @@ $(document).ready(function() {
                 $('#foto-existente-' + id).remove();
                 checkPhotosEmptyState();
             } else {
-                showPhotoDialog('error', 'Erro ao excluir foto', data.message || 'Nao foi possivel excluir a foto.');
+            showPhotoDialog('error', 'Erro ao excluir foto', data.message || 'Não foi possível excluir a foto.');
                 btn.prop('disabled', false).html('<i class="bi bi-x"></i>');
             }
         })
         .catch(err => {
             console.error('[Equipamentos Fotos] erro ao excluir foto existente', err);
-            showPhotoDialog('error', 'Erro de comunicacao', 'Nao foi possivel concluir a exclusao da foto.');
+            showPhotoDialog('error', 'Erro de comunicação', 'Não foi possível concluir a exclusão da foto.');
             btn.prop('disabled', false).html('<i class="bi bi-x"></i>');
         });
     });
@@ -1443,7 +1421,10 @@ $(document).ready(function() {
     $('#btnSalvarCliente').click(function() {
         const btn = $(this);
         const nome = $('#cNome').val();
-        if(!nome) { alert('Nome ? obrigatério'); return; }
+        if(!nome) {
+            window.DSFeedback.warning('Nome obrigatorio', 'Informe o nome do cliente para continuar.');
+            return;
+        }
         
         btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
         
@@ -1463,10 +1444,10 @@ $(document).ready(function() {
                 $('#modalNovoCliente').modal('hide');
                 $('#formNovoCliente')[0].reset();
             } else {
-                alert(data.message || 'Erro ao salvar cliente');
+                window.DSFeedback.error('Falha ao salvar cliente', data.message || 'Erro ao salvar cliente');
             }
         })
-        .catch(err => alert('Erro na comunicação'))
+                .catch(() => window.DSFeedback.error('Erro de comunicação', 'Não foi possível salvar o cliente.'))
         .finally(() => btn.prop('disabled', false).html('Salvar Cliente'));
     });
 
@@ -1499,7 +1480,10 @@ $(document).ready(function() {
         const btn = $(this);
         const nome = $('#modNome').val();
         const marca_id = $('#modMarcaId').val();
-        if(!nome || !marca_id) { alert('Preencha os dados.'); return; }
+        if(!nome || !marca_id) {
+            window.DSFeedback.warning('Dados incompletos', 'Preencha nome e marca para salvar o modelo.');
+            return;
+        }
         
         btn.prop('disabled', true);
         const fd = new FormData();
@@ -1639,4 +1623,6 @@ $(document).ready(function() {
 <?= $this->endSection() ?>
 
 <?= $this->endSection() ?>
+
+
 

@@ -19,7 +19,7 @@
         <?php endif; ?>
         <?php if (can('estoque', 'criar')): ?>
         <a href="<?= base_url('estoque/novo') ?>" class="btn btn-primary btn-glow">
-            <i class="bi bi-plus-lg me-1"></i>Nova Peça
+            <i class="bi bi-plus-lg me-1"></i>Nova Peca
         </a>
         <?php endif; ?>
     </div>
@@ -31,43 +31,45 @@
             <table class="table table-hover datatable" id="tabelaEstoque">
                 <thead>
                     <tr>
-                        <th>Código</th>
+                        <th>Codigo</th>
                         <th>Nome</th>
                         <th>Categoria</th>
+                        <th>Tipo Equipamento</th>
                         <th>Custo</th>
                         <th>Venda</th>
                         <th>Qtd</th>
-                        <th>Mín.</th>
+                        <th>Min.</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (!empty($pecas)): foreach ($pecas as $p): ?>
                     <tr>
-                        <td><code><?= esc($p['codigo'] ?? '-') ?></code></td>
-                        <td><strong><?= esc($p['nome']) ?></strong></td>
-                        <td><?= esc($p['categoria'] ?? '-') ?></td>
-                        <td><?= formatMoney($p['preco_custo']) ?></td>
-                        <td><?= formatMoney($p['preco_venda']) ?></td>
-                        <td>
-                            <span class="badge <?= $p['quantidade_atual'] <= $p['estoque_minimo'] ? 'bg-danger' : 'bg-success' ?>">
-                                <?= $p['quantidade_atual'] ?>
+                        <td data-label="Codigo"><code><?= esc((string) ($p['codigo'] ?? '-')) ?></code></td>
+                        <td data-label="Nome"><strong><?= esc((string) ($p['nome'] ?? '')) ?></strong></td>
+                        <td data-label="Categoria"><?= esc((string) ($p['categoria'] ?? '-')) ?></td>
+                        <td data-label="Tipo Equipamento"><?= esc((string) ($p['tipo_equipamento'] ?? 'Diverso')) ?></td>
+                        <td data-label="Custo"><?= formatMoney((float) ($p['preco_custo'] ?? 0)) ?></td>
+                        <td data-label="Venda"><?= formatMoney((float) ($p['preco_venda'] ?? 0)) ?></td>
+                        <td data-label="Qtd">
+                            <span class="badge <?= ((int) ($p['quantidade_atual'] ?? 0)) <= ((int) ($p['estoque_minimo'] ?? 0)) ? 'bg-danger' : 'bg-success' ?>">
+                                <?= (int) ($p['quantidade_atual'] ?? 0) ?>
                             </span>
                         </td>
-                        <td><?= $p['estoque_minimo'] ?></td>
-                        <td>
+                        <td data-label="Min."><?= (int) ($p['estoque_minimo'] ?? 0) ?></td>
+                        <td data-label="Ações">
                             <div class="action-btns">
-                                <a href="<?= base_url('estoque/movimentacoes/' . $p['id']) ?>" class="btn btn-sm btn-outline-secondary" title="Movimentações"><i class="bi bi-arrow-left-right"></i></a>
+                                <a href="<?= base_url('estoque/movimentacoes/' . $p['id']) ?>" class="btn btn-sm btn-outline-secondary" title="Movimentacoes"><i class="bi bi-arrow-left-right"></i></a>
                                 <?php if (can('estoque', 'editar')): ?>
                                 <a href="<?= base_url('estoque/editar/' . $p['id']) ?>" class="btn btn-sm btn-outline-secondary" title="Editar"><i class="bi bi-pencil"></i></a>
                                 <?php endif; ?>
-                                <?php if (can('estoque', 'encerrar') && $p['ativo']): ?>
-                                <button type="button" class="btn btn-sm btn-outline-warning" title="Encerrar" onclick="confirmarEncerramento('estoque/excluir/<?= $p['id'] ?>', '<?= esc($p['nome']) ?>')">
+                                <?php if (can('estoque', 'encerrar') && !empty($p['ativo'])): ?>
+                                <button type="button" class="btn btn-sm btn-outline-warning" title="Encerrar" onclick="confirmarEncerramento('estoque/excluir/<?= $p['id'] ?>', '<?= esc((string) ($p['nome'] ?? '')) ?>')">
                                     <i class="bi bi-archive"></i>
                                 </button>
                                 <?php endif; ?>
                                 <?php if (can('estoque', 'excluir')): ?>
-                                <a href="<?= base_url('estoque/excluir/' . $p['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nome="<?= esc($p['nome']) ?>"><i class="bi bi-trash"></i></a>
+                                <a href="<?= base_url('estoque/excluir/' . $p['id']) ?>" class="btn btn-sm btn-outline-danger btn-delete" data-nome="<?= esc((string) ($p['nome'] ?? '')) ?>"><i class="bi bi-trash"></i></a>
                                 <?php endif; ?>
                             </div>
                         </td>
@@ -79,7 +81,6 @@
     </div>
 </div>
 
-<!-- Modal de Importação CSV -->
 <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content card-custom">
@@ -92,15 +93,15 @@
                 <div class="modal-body">
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle-fill me-2"></i>
-                        Para importar estoque em lote, baixe o modelo CSV, preencha as colunas e faça o upload.
+                        Baixe o modelo CSV, preencha e envie para importar pecas em lote.
                     </div>
-                    
+
                     <div class="text-center mb-4">
                         <a href="<?= base_url('estoque/modelo-csv') ?>" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-download me-2"></i>Baixar Modelo de Estoque (CSV)
                         </a>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label class="form-label fw-bold">Selecione o arquivo CSV</label>
                         <input class="form-control" type="file" name="arquivo_csv" accept=".csv" required>
@@ -109,7 +110,7 @@
                 <div class="modal-footer border-top">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-success btn-glow">
-                        <i class="bi bi-upload me-2"></i>Iniciar Importação
+                        <i class="bi bi-upload me-2"></i>Iniciar Importacao
                     </button>
                 </div>
             </form>

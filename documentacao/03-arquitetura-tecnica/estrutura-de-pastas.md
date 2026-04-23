@@ -1,12 +1,19 @@
 # Estrutura de Pastas (resumo tecnico)
 
-Atualizado em 23/03/2026.
+Atualizado em 03/04/2026 para a release `2.11.1`.
 
 ```text
 sistema-assistencia/
 |-- app/
 |   |-- Config/
+|   |   |-- LegacyImport.php
 |   |   `-- SystemRelease.php
+|   |
+|   |-- Commands/
+|   |   |-- LegacyPreflight.php
+|   |   |-- LegacyPrepareTarget.php
+|   |   |-- LegacyImport.php
+|   |   `-- LegacyReport.php
 |   |
 |   |-- Controllers/
 |   |   |-- Os.php
@@ -26,6 +33,9 @@ sistema-assistencia/
 |   |   |-- ChatbotService.php
 |   |   |-- IntencaoService.php
 |   |   |-- MetricasMensageriaService.php
+|   |   |-- LegacyRecordNormalizer.php
+|   |   |-- LegacyCatalogResolver.php
+|   |   |-- LegacyImportService.php
 |   |   `-- WhatsApp/
 |   |       |-- WhatsAppProviderInterface.php
 |   |       |-- BulkMessageProviderInterface.php
@@ -58,7 +68,12 @@ sistema-assistencia/
 |   |   |-- CrmFollowupModel.php
 |   |   |-- CrmPipelineModel.php
 |   |   |-- CrmPipelineEtapaModel.php
-|   |   `-- CrmTagModel.php
+|   |   |-- CrmTagModel.php
+|   |   |-- LegacyImportAliasModel.php
+|   |   |-- LegacyImportRunModel.php
+|   |   |-- LegacyImportEventModel.php
+|   |   |-- OsDefeitoModel.php
+|   |   `-- OsNotaLegadaModel.php
 |   |
 |   |-- Database/Migrations/
 |   |   |-- 2026-03-16-090000_PreCrmFoundation.php
@@ -71,7 +86,11 @@ sistema-assistencia/
 |   |   |-- 2026-03-20-070500_CreateContatosAndLinkConversas.php
 |   |   |-- 2026-03-20-091500_AddContatoLifecycleMarketingFields.php
 |   |   |-- 2026-03-20-120500_AddContatoEngajamentoLifecycleWindow.php
-|   |   `-- 2026-03-23-031500_AddOsAdvancedFilterIndexes.php
+|   |   |-- 2026-03-23-031500_AddOsAdvancedFilterIndexes.php
+|   |   |-- 2026-03-28-030000_AddLegacyMigrationInfrastructure.php
+|   |   |-- 2026-03-28-040000_AddLegacyImportAliases.php
+|   |   |-- 2026-03-29-010000_AddLegacyTrackingToOsDetailTables.php
+|   |   `-- 2026-03-29-020000_CreateOsNotasLegadasTable.php
 |   |
 |   `-- Views/
 |       |-- crm/
@@ -118,6 +137,63 @@ sistema-assistencia/
 ## Camada de mensageria
 Fluxo interno:
 `Controller -> WhatsAppService -> MensageriaService -> Provider`
+
+## Extensao mobile/PWA (v2.11.0)
+
+Novos blocos estruturais adicionados sem alterar a Central web existente:
+
+- API interna mobile:
+  - `app/Controllers/Api/V1/`
+    - `BaseApiController.php`
+    - `AuthController.php`
+    - `UsersController.php`
+    - `ClientsController.php`
+    - `OrdersController.php`
+    - `ConversationsController.php`
+    - `MessagesController.php`
+    - `NotificationsController.php`
+    - `PushSubscriptionsController.php`
+    - `RealtimeController.php`
+- filtro de auth de API:
+  - `app/Filters/ApiTokenAuthFilter.php`
+- services mobile:
+  - `app/Services/Mobile/ApiTokenService.php`
+  - `app/Services/Mobile/MobilePermissionService.php`
+  - `app/Services/Mobile/MobileNotificationService.php`
+  - `app/Services/Mobile/WebPushService.php`
+- models mobile:
+  - `app/Models/MobileApiTokenModel.php`
+  - `app/Models/MobilePushSubscriptionModel.php`
+  - `app/Models/MobileNotificationModel.php`
+  - `app/Models/MobileNotificationTargetModel.php`
+  - `app/Models/MobileEventOutboxModel.php`
+- migration complementar:
+  - `app/Database/Migrations/2026-04-03-010000_CreateMobilePwaInfrastructure.php`
+- frontend separado:
+  - `mobile-app/` (Next.js PWA)
+    - `src/app/*`
+    - `src/components/*`
+    - `src/lib/*`
+    - `public/manifest.webmanifest`
+    - `public/sw.js`
+
+## Migracao legada SQL
+- configuracao: `app/Config/LegacyImport.php`
+- comandos:
+  - `php spark legacy:preflight`
+  - `php spark legacy:import --execute`
+  - `php spark legacy:report`
+- servico central:
+  - `app/Services/LegacyImportService.php`
+- auxiliares:
+  - `LegacyRecordNormalizer`
+  - `LegacyCatalogResolver`
+- auditoria:
+  - `legacy_import_aliases`
+  - `legacy_import_runs`
+  - `legacy_import_events`
+- guia tecnico dedicado:
+  - `documentacao/03-arquitetura-tecnica/migracao-legado-sql.md`
 
 ## Observacao de layout embed
 - Novo layout tecnico: `app/Views/layouts/embed.php`

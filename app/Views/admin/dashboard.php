@@ -10,6 +10,17 @@ $totalEquipamentos = (int) ($total_equipamentos ?? 0);
 $totalClientes = (int) ($total_clientes ?? 0);
 $totalOs = (int) ($total_os ?? 0);
 $anoDashboard = (int) ($ano_dashboard ?? date('Y'));
+$anosDashboard = array_values(array_unique(array_map(
+    static fn($ano): int => (int) $ano,
+    (array) ($anos_dashboard ?? [])
+)));
+if ($anosDashboard === []) {
+    $anosDashboard[] = $anoDashboard;
+}
+if (!in_array($anoDashboard, $anosDashboard, true)) {
+    $anosDashboard[] = $anoDashboard;
+}
+rsort($anosDashboard, SORT_NUMERIC);
 $statusEntregueCodigo = (string) ($status_entregue_codigo ?? 'entregue_reparado');
 $resumoFinanceiroInicial = [
     'receitas' => (float) ($resumo_financeiro['receitas'] ?? 0),
@@ -104,7 +115,7 @@ $resumoFinanceiroInicial = [
                     </div>
                 </div>
                 <div class="stat-card-footer">
-                    <a href="<?= base_url('os') ?>"><i class="bi bi-arrow-right me-1"></i>Ver operacao</a>
+                                <a href="<?= base_url('os') ?>"><i class="bi bi-arrow-right me-1"></i>Ver operação</a>
                 </div>
             </div>
         </div>
@@ -116,9 +127,18 @@ $resumoFinanceiroInicial = [
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
                         <h5 class="card-title mb-0"><i class="bi bi-graph-up-arrow me-2"></i>OS abertas por mes</h5>
-                        <small class="text-muted">Evolucao de janeiro a dezembro de <span id="dashboardAnoRef"><?= $anoDashboard ?></span></small>
+                            <small class="text-muted">Evolução de janeiro a dezembro de <span id="dashboardAnoRef"><?= $anoDashboard ?></span></small>
                     </div>
-                    <span class="badge text-bg-primary-subtle text-primary-emphasis border">Ano corrente</span>
+                    <div class="ds-dashboard-year-filter">
+                        <label class="small text-muted mb-0" for="dashboardAnoSelect">Ano</label>
+                        <select id="dashboardAnoSelect" class="form-select form-select-sm">
+                            <?php foreach ($anosDashboard as $anoOption): ?>
+                                <option value="<?= (int) $anoOption ?>" <?= (int) $anoOption === $anoDashboard ? 'selected' : '' ?>>
+                                    <?= (int) $anoOption ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="ds-chart-wrap ds-chart-wrap-main">
@@ -187,13 +207,13 @@ $resumoFinanceiroInicial = [
         <div class="col-12">
             <div class="card glass-card h-100 ds-dashboard-table-card">
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <h5 class="card-title mb-0"><i class="bi bi-clock-history me-2"></i>Ultimas Ordens de Servico</h5>
+                            <h5 class="card-title mb-0"><i class="bi bi-clock-history me-2"></i>Últimas Ordens de Serviço</h5>
                     <?php if (can('os', 'criar')): ?>
                         <button
                             type="button"
                             class="btn btn-glow btn-sm"
                             data-os-modal-url="<?= base_url('os/nova?embed=1') ?>"
-                            data-os-modal-title="Nova Ordem de Servico"
+                                            data-os-modal-title="Nova Ordem de Serviço"
                             data-os-open-full-url="<?= base_url('os/nova') ?>"
                         >
                             <i class="bi bi-plus-lg me-1"></i>Nova OS
@@ -210,7 +230,7 @@ $resumoFinanceiroInicial = [
                                     <th>Equipamento</th>
                                     <th>Status</th>
                                     <th>Data</th>
-                                    <th class="text-end">Acao</th>
+                                    <th class="text-end">Ação</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -229,7 +249,7 @@ $resumoFinanceiroInicial = [
                                             <td data-label="Equipamento"><?= esc(trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))) ?></td>
                                             <td data-label="Status"><?= getStatusBadge($os['status']) ?></td>
                                             <td data-label="Data"><?= date('d/m/Y', strtotime($os['created_at'])) ?></td>
-                                            <td data-label="Acao" class="text-end">
+                                        <td data-label="Ação" class="text-end">
                                                 <button
                                                     type="button"
                                                     class="btn btn-sm btn-outline-secondary"
@@ -269,7 +289,7 @@ $resumoFinanceiroInicial = [
                                         <th>Peca</th>
                                         <th>Qtd. atual</th>
                                         <th>Minimo</th>
-                                        <th class="text-end">Acao</th>
+                                    <th class="text-end">Ação</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -301,7 +321,7 @@ $resumoFinanceiroInicial = [
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl modal-fullscreen-md-down">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="dashboardOsModalTitle">Ordem de Servico</h5>
+                    <h5 class="modal-title" id="dashboardOsModalTitle">Ordem de Serviço</h5>
                     <div class="d-flex align-items-center gap-2 ms-auto">
                         <a href="#" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary d-none" id="dashboardOsModalOpenFull">
                             <i class="bi bi-box-arrow-up-right me-1"></i>Abrir pagina
@@ -333,18 +353,21 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     const baseFinanceData = <?= json_encode($resumoFinanceiroInicial, JSON_UNESCAPED_UNICODE) ?>;
-    const chartUrl = '<?= base_url('admin/stats?ano=' . $anoDashboard) ?>';
+    const statsBaseUrl = '<?= base_url('admin/stats') ?>';
     const noDataColor = 'rgba(148, 163, 184, 0.35)';
+    const dashboardYearSelect = document.getElementById('dashboardAnoSelect');
+    const dashboardYearLabel = document.getElementById('dashboardAnoRef');
     let chartStatus = null;
     let chartAbertasAno = null;
     let chartFinanceiro = null;
     let lastPayload = null;
     let resizeTimeoutId = null;
+    let statsRequestToken = 0;
 
     const macroLabels = {
         recepcao: 'Recepcao',
         diagnostico: 'Diagnostico',
-        orcamento: 'Orcamento',
+        orcamento: 'Orçamento',
         execucao: 'Execucao',
         interrupcao: 'Interrupcao',
         qualidade: 'Qualidade',
@@ -658,38 +681,120 @@ document.addEventListener('DOMContentLoaded', function () {
         buildFinancialChart(safePayload.resumo_financeiro || baseFinanceData);
     }
 
+    function buildStatsUrl(year) {
+        const params = new URLSearchParams();
+        const parsedYear = Number(year || 0);
+        if (Number.isFinite(parsedYear) && parsedYear > 0) {
+            params.set('ano', String(parsedYear));
+        }
+        const query = params.toString();
+        return query ? `${statsBaseUrl}?${query}` : statsBaseUrl;
+    }
+
+    function normalizeYears(years) {
+        const source = Array.isArray(years) ? years : [];
+        const list = Array.from(new Set(source
+            .map(function (value) { return Number(value || 0); })
+            .filter(function (value) { return Number.isFinite(value) && value > 0; })));
+
+        list.sort(function (a, b) { return b - a; });
+        return list;
+    }
+
+    function syncYearOptions(years, preferredYear) {
+        if (!dashboardYearSelect) {
+            return;
+        }
+
+        const normalizedYears = normalizeYears(years);
+        if (normalizedYears.length === 0) {
+            return;
+        }
+
+        const fallbackYear = Number(preferredYear || dashboardYearSelect.value || normalizedYears[0]);
+        dashboardYearSelect.innerHTML = '';
+
+        normalizedYears.forEach(function (year) {
+            const option = document.createElement('option');
+            option.value = String(year);
+            option.textContent = String(year);
+            dashboardYearSelect.appendChild(option);
+        });
+
+        const selectedYear = normalizedYears.includes(fallbackYear)
+            ? fallbackYear
+            : normalizedYears[0];
+        dashboardYearSelect.value = String(selectedYear);
+    }
+
+    function updateYearLabel(yearValue) {
+        if (!dashboardYearLabel) {
+            return;
+        }
+        dashboardYearLabel.textContent = String(yearValue || '');
+    }
+
+    function loadDashboardStats(year) {
+        const requestToken = ++statsRequestToken;
+        if (dashboardYearSelect) {
+            dashboardYearSelect.disabled = true;
+        }
+
+        return fetch(buildStatsUrl(year))
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error('Falha ao carregar dados do dashboard');
+                }
+                return response.json();
+            })
+            .then(function (payload) {
+                if (requestToken !== statsRequestToken) {
+                    return;
+                }
+
+                const anoRef = Number(payload.ano_referencia || year || <?= $anoDashboard ?>);
+                syncYearOptions(payload.anos_disponiveis, anoRef);
+                updateYearLabel(anoRef);
+
+                const financeData = payload.resumo_financeiro || baseFinanceData;
+                updateFinanceSummary(financeData);
+                lastPayload = payload;
+                renderCharts(payload);
+            })
+            .catch(function (error) {
+                if (requestToken !== statsRequestToken) {
+                    return;
+                }
+            console.error('[Dashboard] erro ao carregar métricas:', error);
+                lastPayload = {
+                    os_abertas_ano: [],
+                    macro_count: [],
+                    status_count: [],
+                    resumo_financeiro: baseFinanceData,
+                };
+                renderCharts(lastPayload);
+            })
+            .finally(function () {
+                if (requestToken === statsRequestToken && dashboardYearSelect) {
+                    dashboardYearSelect.disabled = false;
+                }
+            });
+    }
+
     updateFinanceSummary(baseFinanceData);
     buildFinancialChart(baseFinanceData);
 
-    fetch(chartUrl)
-        .then(function (response) {
-            if (!response.ok) {
-                throw new Error('Falha ao carregar dados do dashboard');
-            }
-            return response.json();
-        })
-        .then(function (payload) {
-            const anoRef = Number(payload.ano_referencia || <?= $anoDashboard ?>);
-            const yearRefNode = document.getElementById('dashboardAnoRef');
-            if (yearRefNode) {
-                yearRefNode.textContent = String(anoRef);
-            }
+    const initialYear = dashboardYearSelect
+        ? Number(dashboardYearSelect.value || <?= $anoDashboard ?>)
+        : <?= $anoDashboard ?>;
+    loadDashboardStats(initialYear);
 
-            const financeData = payload.resumo_financeiro || baseFinanceData;
-            updateFinanceSummary(financeData);
-            lastPayload = payload;
-            renderCharts(payload);
-        })
-        .catch(function (error) {
-            console.error('[Dashboard] erro ao carregar metricas:', error);
-            lastPayload = {
-                os_abertas_ano: [],
-                macro_count: [],
-                status_count: [],
-                resumo_financeiro: baseFinanceData,
-            };
-            renderCharts(lastPayload);
+    if (dashboardYearSelect) {
+        dashboardYearSelect.addEventListener('change', function () {
+            const selectedYear = Number(dashboardYearSelect.value || 0);
+            loadDashboardStats(selectedYear);
         });
+    }
 
     window.addEventListener('resize', function () {
         scheduleChartRerender();
@@ -735,7 +840,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         clearLoadTimeout();
         setModalLoading(true);
-        modalTitle.textContent = title || 'Ordem de Servico';
+        modalTitle.textContent = title || 'Ordem de Serviço';
         modalFrame.src = 'about:blank';
 
         if (fullUrl) {

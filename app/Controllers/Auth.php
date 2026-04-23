@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\UsuarioModel;
 use App\Models\LogModel;
+use App\Services\ErpMailService;
 
 class Auth extends BaseController
 {
@@ -148,7 +149,7 @@ class Auth extends BaseController
         $usuario = $model->where('email', $email)->first();
 
         if (!$usuario) {
-            return redirect()->back()->with('error', 'Email não encontrado no sistema.');
+            return redirect()->back()->with('error', 'Email nao encontrado no sistema.');
         }
 
         $token = bin2hex(random_bytes(32));
@@ -158,60 +159,27 @@ class Auth extends BaseController
         ]);
 
         $link = base_url('redefinir-senha/' . $token);
-        
-        // Em um cenário real de produção com SMTP configurado, você usaria o serviço de Email do CodeIgniter aqui.
-        $emailService = \Config\Services::email();
-        $configModel = new \App\Models\ConfiguracaoModel();
 
-        // Obtém configurações do banco
-        $config['protocol'] = 'smtp';
-        $config['SMTPHost'] = trim((string)$configModel->get('smtp_host'));
-        $config['SMTPUser'] = trim((string)$configModel->get('smtp_user'));
-        $config['SMTPPass'] = trim((string)$configModel->get('smtp_pass'));
-        $config['SMTPPort'] = (int) $configModel->get('smtp_port');
-        
-        // Define SSL ou TLS baseado na porta para ser compatível com Hostinger e similares
-        if ($config['SMTPPort'] === 465) {
-            $config['SMTPCrypto'] = 'ssl';
-        } elseif ($config['SMTPPort'] === 587) {
-            $config['SMTPCrypto'] = 'tls';
-        }
-        
-        $config['mailType'] = 'html';
-        $config['charset']  = 'utf-8';
-        $config['wordWrap'] = true;
-        $config['CRLF']     = "\r\n"; // Essencial na Hostinger para evitar rejeição do email
-        $config['newline']  = "\r\n"; // Essencial na Hostinger
-
-        $emailService->initialize($config);
-        
-        $remetente = $configModel->get('empresa_email') ?: 'nao-responda@sistema.com';
-        $nomeRemetente = $configModel->get('empresa_nome') ?: 'Assistência Técnica';
-        
-        $emailService->setFrom($remetente, $nomeRemetente);
-        $emailService->setTo($email);
-        $emailService->setSubject('Recuperação de Senha');
-        
         $mensagem = "
         <div style='font-family: Arial, sans-serif; color: #333;'>
-            <h2>Recuperação de Senha</h2>
-            <p>Olá, <strong>{$usuario['nome']}</strong>.</p>
-            <p>Recebemos uma solicitação para redefinir a senha da sua conta.</p>
+            <h2>Recuperacao de Senha</h2>
+            <p>Ola, <strong>{$usuario['nome']}</strong>.</p>
+            <p>Recebemos uma solicitacao para redefinir a senha da sua conta.</p>
             <p>Clique no link abaixo para criar uma nova senha:</p>
             <p><a href='{$link}' style='padding: 10px 15px; background: #0d6efd; color: white; text-decoration: none; border-radius: 5px; display: inline-block;'>Redefinir Minha Senha</a></p>
-            <p>Se você não solicitou isso, pode ignorar com segurança este email.</p>
+            <p>Se voce nao solicitou isso, pode ignorar com seguranca este email.</p>
             <hr>
-            <small>Se o botão não funcionar, cole este link no seu navegador: {$link}</small>
+            <small>Se o botao nao funcionar, cole este link no seu navegador: {$link}</small>
         </div>";
 
-        $emailService->setMessage($mensagem);
-        
-        if ($emailService->send()) {
-            return redirect()->back()->with('success', 'Instruções de recuperação foram enviadas para seu email.');
-        } else {
-            // Retornamos na tela o erro ou debug alertando o usuário que precisa configurar o servidor SMTP
-            return redirect()->back()->with('error', 'Falha ao enviar email. Por favor, verifique se o SMTP do sistema está configurado corretamente.');
+        $mailService = new ErpMailService();
+        $mailResult = $mailService->send($email, 'Recuperacao de Senha', $mensagem);
+
+        if (!empty($mailResult['ok'])) {
+            return redirect()->back()->with('success', 'Instrucoes de recuperacao foram enviadas para seu email.');
         }
+
+        return redirect()->back()->with('error', 'Falha ao enviar email. Por favor, verifique se o SMTP do sistema esta configurado corretamente.');
     }
 
     public function resetPassword($token)

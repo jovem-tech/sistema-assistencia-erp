@@ -18,7 +18,7 @@
             </div>
             <div class="card-body">
                 <?php if (empty($automacoes ?? [])): ?>
-                    <div class="text-muted">Nenhuma automacao CRM cadastrada.</div>
+                    <div class="text-muted">Nenhuma automação CRM cadastrada.</div>
                 <?php else: ?>
                     <div class="d-flex flex-column gap-2">
                         <?php foreach (($automacoes ?? []) as $auto): ?>
@@ -44,7 +44,7 @@
     <div class="col-12 col-xl-7">
         <div class="card glass-card mb-3">
             <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-whatsapp me-1"></i>Templates de Comunicacao</h6>
+                <h6 class="mb-0"><i class="bi bi-whatsapp me-1"></i>Templates de Comunicação</h6>
             </div>
             <div class="card-body">
                 <?php if (empty($templates ?? [])): ?>

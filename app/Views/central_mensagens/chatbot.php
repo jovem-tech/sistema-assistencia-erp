@@ -1,9 +1,9 @@
-﻿<?= $this->extend('layouts/main') ?>
+<?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
 <div class="page-header">
     <div class="d-flex align-items-center gap-2">
-        <h2><i class="bi bi-robot me-2"></i>Chatbot e Automacao 24h</h2>
+<h2><i class="bi bi-robot me-2"></i>Chatbot e Automação 24h</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('atendimento-whatsapp-chatbot')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
@@ -29,7 +29,7 @@
                         <input type="text" name="nome" class="form-control form-control-sm" placeholder="Consultar status da OS" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label form-label-sm">Acao Sistema</label>
+                <label class="form-label form-label-sm">Ação Sistema</label>
                         <input type="text" name="acao_sistema" class="form-control form-control-sm" placeholder="consultar_os_status">
                     </div>
                     <div class="col-12">
@@ -73,9 +73,9 @@
                                 <th>Codigo</th>
                                 <th>Nome</th>
                                 <th>Gatilhos</th>
-                                <th>Acao Sistema</th>
+                            <th>Ação Sistema</th>
                                 <th class="text-center">Ativo</th>
-                                <th class="text-end">Acoes</th>
+                                <th class="text-end">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -106,7 +106,7 @@
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <tr><td colspan="5" class="text-muted">Nenhuma intencao cadastrada.</td></tr>
+                            <tr><td colspan="5" class="text-muted">Nenhuma intenção cadastrada.</td></tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -117,7 +117,7 @@
 
     <div class="col-12 col-xxl-5">
         <div class="card glass-card mb-3">
-            <div class="card-header fw-semibold">Regras ERP -> Automacao</div>
+                <div class="card-header fw-semibold">Regras ERP -> Automação</div>
             <div class="card-body">
                 <form id="formRegra" action="<?= base_url('atendimento-whatsapp/chatbot/regra/salvar') ?>" method="post" class="row g-2 mb-3">
                     <?= csrf_field() ?>
@@ -135,7 +135,7 @@
                         <textarea name="condicao_json" class="form-control form-control-sm" rows="2" placeholder='{"status":"reparado_disponivel_loja"}'></textarea>
                     </div>
                     <div class="col-12">
-                        <label class="form-label form-label-sm">Acao JSON</label>
+                    <label class="form-label form-label-sm">Ação JSON</label>
                         <textarea name="acao_json" class="form-control form-control-sm" rows="2" placeholder='{"tipo":"template","template":"equipamento_pronto"}'></textarea>
                     </div>
                     <div class="col-12 d-flex justify-content-between align-items-center">
@@ -159,7 +159,7 @@
                                 <th>Nome</th>
                                 <th>Evento</th>
                                 <th class="text-center">Ativo</th>
-                                <th class="text-end">Acoes</th>
+                                <th class="text-end">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -205,7 +205,7 @@
                             <tr>
                                 <th>Data</th>
                                 <th>Cliente</th>
-                                <th>Intencao</th>
+                            <th>Intenção</th>
                                 <th>Confianca</th>
                                 <th>Escalado</th>
                             </tr>
@@ -218,7 +218,7 @@
                                         <td class="small"><?= esc((string) ($l['cliente_nome'] ?: $l['telefone'] ?: '-')) ?></td>
                                         <td class="small"><code><?= esc((string) ($l['intencao_detectada'] ?? '-')) ?></code></td>
                                         <td class="small"><?= esc((string) ($l['confianca'] ?? '-')) ?></td>
-                                        <td class="small"><?= (int) ($l['escalado_humano'] ?? 0) === 1 ? 'Sim' : 'Nao' ?></td>
+                            <td class="small"><?= (int) ($l['escalado_humano'] ?? 0) === 1 ? 'Sim' : 'Não' ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
@@ -268,8 +268,8 @@ function resetFormIntencao() {
 
 function deleteIntencao(id) {
     Swal.fire({
-        title: 'Excluir intencao?',
-        text: "Esta acao nao pode ser desfeita!",
+            title: 'Excluir intenção?',
+            text: "Esta ação não pode ser desfeita!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -315,7 +315,7 @@ function resetFormRegra() {
 function deleteRegra(id) {
     Swal.fire({
         title: 'Excluir regra ERP?',
-        text: "Deseja remover esta automacao?",
+            text: "Deseja remover esta automação?",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',

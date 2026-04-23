@@ -657,7 +657,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     carregarProcedimentos(document.getElementById('proc_defeito_id').value);
                     // Aqui poderia atualizar o contador no HTML via JS, mas no reload da pagina já estará certo
                 } else {
-                    alert('Erro ao salvar procedimento: ' + (res.msg || 'Erro desconhecido.'));
+                    window.DSFeedback.error(
+                        'Falha ao salvar',
+                        'Erro ao salvar procedimento: ' + (res.msg || 'Erro desconhecido.')
+                    );
                 }
             });
         });
@@ -665,7 +668,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Edit and Delete Procedimentos using event delegation
     if(procList) {
-        procList.addEventListener('click', function(e) {
+        procList.addEventListener('click', async function(e) {
             const btnEdit = e.target.closest('.btn-edit-proc');
             if (btnEdit) {
                 document.getElementById('proc_id').value = btnEdit.getAttribute('data-id');
@@ -675,20 +678,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const btnDel = e.target.closest('.btn-del-proc');
             if (btnDel) {
-                if (confirm('Excluir este passo?')) {
-                    fetch(`${baseUrl}equipamentosdefeitos/procedimentos/excluir/${btnDel.getAttribute('data-id')}`, {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(res => res.json())
-                    .then(res => {
-                        if (res.status === 'success') {
-                            carregarProcedimentos(document.getElementById('proc_defeito_id').value);
-                        }
-                    });
+                const confirmed = await window.DSFeedback.confirm({
+                    icon: 'warning',
+                    title: 'Excluir passo?',
+                    text: 'Deseja excluir este passo do procedimento?',
+                    confirmButtonText: 'Sim, excluir',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                });
+
+                if (!confirmed) {
+                    return;
                 }
+
+                fetch(`${baseUrl}equipamentosdefeitos/procedimentos/excluir/${btnDel.getAttribute('data-id')}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.status === 'success') {
+                        carregarProcedimentos(document.getElementById('proc_defeito_id').value);
+                    }
+                });
             }
         });
     }

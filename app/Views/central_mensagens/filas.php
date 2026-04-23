@@ -1,9 +1,9 @@
-﻿<?= $this->extend('layouts/main') ?>
+<?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
 <div class="page-header">
     <div class="d-flex align-items-center gap-2">
-        <h2><i class="bi bi-people me-2"></i>Filas e Responsaveis</h2>
+<h2><i class="bi bi-people me-2"></i>Filas e Responsáveis</h2>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('atendimento-whatsapp-filas')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
@@ -69,8 +69,8 @@
                         <th>Status</th>
                         <th>Prioridade</th>
                         <th>Responsavel</th>
-                        <th>Ultima msg</th>
-                        <th class="text-end">Acoes</th>
+                            <th>Última msg</th>
+                        <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -80,7 +80,7 @@
                                 <td>
                                     <div class="fw-semibold"><?= esc((string) ($c['cliente_nome'] ?: $c['nome_contato'] ?: 'Contato sem nome')) ?></div>
                                     <?php if ((int) ($c['nao_lidas'] ?? 0) > 0): ?>
-                                        <span class="badge bg-danger mt-1"><?= (int) $c['nao_lidas'] ?> nao lida(s)</span>
+                                    <span class="badge bg-danger mt-1"><?= (int) $c['nao_lidas'] ?> não lida(s)</span>
                                     <?php endif; ?>
                                     <?php if ((int) ($c['aguardando_humano'] ?? 0) === 1): ?>
                                         <span class="badge bg-warning text-dark mt-1">Aguardando humano</span>
@@ -90,7 +90,7 @@
                                 <td class="small"><?= esc((string) ($c['numero_os'] ?? '-')) ?></td>
                                 <td class="small"><?= esc((string) ($c['status'] ?? '-')) ?></td>
                                 <td class="small"><?= esc((string) ($c['prioridade'] ?? 'normal')) ?></td>
-                                <td class="small"><?= esc((string) ($c['responsavel_nome'] ?? 'Nao atribuido')) ?></td>
+                            <td class="small"><?= esc((string) ($c['responsavel_nome'] ?? 'Não atribuído')) ?></td>
                                 <td class="small"><?= !empty($c['ultima_mensagem_em']) ? esc(date('d/m/Y H:i', strtotime((string) $c['ultima_mensagem_em']))) : '-' ?></td>
                                 <td class="text-end">
                                     <form method="post" action="<?= base_url('atendimento-whatsapp/filas/atualizar') ?>" class="d-flex gap-1 justify-content-end">
@@ -107,7 +107,7 @@
                                             <?php endforeach; ?>
                                         </select>
                                         <select name="responsavel_id" class="form-select form-select-sm" style="max-width: 160px;">
-                                            <option value="">Nao atribuido</option>
+                            <option value="">Não atribuído</option>
                                             <?php foreach (($usuariosAtivos ?? []) as $u): ?>
                                                 <option value="<?= (int) $u['id'] ?>" <?= (int) ($c['responsavel_id'] ?? 0) === (int) $u['id'] ? 'selected' : '' ?>><?= esc($u['nome']) ?></option>
                                             <?php endforeach; ?>

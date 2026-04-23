@@ -53,6 +53,9 @@ class OsStatusFlowService
 
     public function isTransitionAllowed(?string $fromCode, string $toCode): bool
     {
+        if ($toCode === 'cancelado') {
+            return true;
+        }
         if ($fromCode === null || $fromCode === '') {
             return true;
         }

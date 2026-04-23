@@ -1,60 +1,76 @@
-# Documentacao - Sistema de Assistencia Tecnica
+# Documentação - Sistema de Assistência Técnica
 
-> Jovem Tech - Atualizado em 27/03/2026
+> Jovem Tech  
+> ERP atual: `2.15.0`  
+> App mobile/PWA: `0.4.2`  
+> Atualizado em `23/04/2026`
+
+## Objetivo
+
+Este diretório concentra a documentação funcional, técnica e operacional do ERP da assistência técnica. O conteúdo abaixo foi consolidado para refletir o estado real publicado na VPS, com foco especial nos módulos de `Ordens de Serviço` e `Orçamentos`.
 
 ## Estrutura
 
-| Pasta | Conteudo principal |
+| Pasta | Conteúdo principal |
 |---|---|
 | `00-visao-geral` | contexto do produto e stack |
-| `01-manual-do-usuario` | operacao por modulo |
-| `02-manual-administrador` | configuracao e administracao |
-| `03-arquitetura-tecnica` | organizacao do codigo e componentes |
-| `04-banco-de-dados` | tabelas e modelagem |
-| `05-api` | rotas HTTP internas |
-| `06-modulos-do-sistema` | visao tecnica por modulo |
-| `07-novas-implementacoes` | historico de entregas |
-| `08-correcoes` | historico de bugfix |
+| `01-manual-do-usuario` | operação diária por módulo |
+| `02-manual-administrador` | configuração, permissões e governança |
+| `03-arquitetura-tecnica` | estrutura do código e fluxos internos |
+| `04-banco-de-dados` | tabelas, relacionamentos e regras de persistência |
+| `05-api` | rotas HTTP internas e públicas |
+| `06-modulos-do-sistema` | visão técnica por módulo |
+| `07-novas-implementacoes` | releases e entregas funcionais |
+| `08-correcoes` | histórico de bugfixes e hotfixes |
 | `09-roadmap` | planejamento futuro |
-| `10-deploy` | instalacao e publicacao |
-| `11-padroes` | convencoes de projeto |
+| `10-deploy` | instalação, atualização e operação em VPS |
+| `11-padroes` | convenções de projeto |
+| `12-app-mobile-pwa` | documentação dedicada do app mobile/PWA |
 
-## Leitura rapida recomendada
-- Operacao de OS: `01-manual-do-usuario/ordens-de-servico.md`
-- Workflow administrativo de OS: `02-manual-administrador/fluxo-de-trabalho-os.md`
-- Operacao de Contatos: `01-manual-do-usuario/contatos.md`
-- Configuracao pre-CRM: `02-manual-administrador/configuracao-do-sistema.md`
-- Fluxo tecnico pre-CRM: `06-modulos-do-sistema/ordens-de-servico.md`
-- Modulo WhatsApp: `06-modulos-do-sistema/whatsapp.md`
-- Modulo CRM: `06-modulos-do-sistema/crm.md`
-- Modulo Contatos (tecnico): `06-modulos-do-sistema/contatos.md`
-- CRM - Metricas Marketing: `06-modulos-do-sistema/crm.md#metricas-marketing`
-- Central de Mensagens: `06-modulos-do-sistema/central-de-mensagens.md`
-- Central - Chatbot: `06-modulos-do-sistema/central-de-mensagens.md#chatbot`
-- Central - Metricas: `06-modulos-do-sistema/central-de-mensagens.md#metricas`
-- Central - Filas: `06-modulos-do-sistema/central-de-mensagens.md#filas`
-- Central - FAQ: `06-modulos-do-sistema/central-de-mensagens.md#faq`
-- Banco pre-CRM: `04-banco-de-dados/tabelas-principais.md`
-- Rotas pre-CRM: `05-api/rotas.md`
-- Correcao Central (erros + observabilidade + clientes novos + funil): `08-correcoes/2026-03-20-central-mensagens-codigos-erro-observabilidade-clientes-novos.md`
-- Correcao CRM/Contatos (engajamento temporal configuravel): `08-correcoes/2026-03-20-engajamento-temporal-contatos-crm.md`
-- Correcao Dashboard (responsividade, modais de OS e graficos): `08-correcoes/2026-03-22-dashboard-refactor-responsivo-modal-os.md`
-- Correcao Dashboard (alinhamento do "Ver ..." no rodape dos 4 cards): `08-correcoes/2026-03-23-dashboard-alinhamento-footer-cards.md`
-- Correcao OS (botao `+ Nova OS` abrindo modal sem redirecionamento): `08-correcoes/2026-03-23-os-nova-os-modal-sem-redirecionamento.md`
-- Correcao OS (filtros avancados premium com AJAX, chips, persistencia e drawer mobile): `08-correcoes/2026-03-23-os-filtros-avancados-premium-ajax.md`
-- Correcao padrao global de responsividade ultra compatibilidade: `08-correcoes/2026-03-22-padrao-global-responsividade-ultra-compatibilidade.md`
-- Guia de atualizacao de VPS sem downtime (contingencia + Ubuntu novo): `08-correcoes/2026-03-22-guia-atualizacao-vps-sem-downtime.md`
-- Entrega pre-CRM base: `07-novas-implementacoes/2026-03-pre-crm-foundation-os-whatsapp-pdf.md`
-- Entrega CRM + Central: `07-novas-implementacoes/2026-03-crm-central-mensagens-integrados.md`
-- Evolucao faseada da Central de Atendimento: `07-novas-implementacoes/2026-03-central-atendimento-inteligente-faseada.md`
-- Historico oficial de versoes (1.0.0 -> 2.1.0): `07-novas-implementacoes/historico-de-versoes.md`
-- Release 2.1.0 (dashboard + versao no rodape): `07-novas-implementacoes/2026-03-release-2.1.0-dashboard-versao-rodape.md`
-- Gateway local WhatsApp (arquitetura): `07-novas-implementacoes/2026-03-como-foi-implementado-a-api-local-do-whatsapp.md`
-- Gateway local WhatsApp (producao-ready): `07-novas-implementacoes/2026-03-gateway-local-whatsapp-producao.md`
-- Deploy em VPS Linux: `10-deploy/linux-vps-deployment.md`
-- Manual tecnico oficial VPS Ubuntu 24.04 (com troubleshooting real): `10-deploy/manual-tecnico-oficial-vps-ubuntu-24-ci4.md`
-- Atualizacao de VPS sem downtime (Blue/Green + contingencia): `10-deploy/atualizacao-vps-sem-downtime.md`
-- Registro de deploy da release v2.5.9 na VPS: `10-deploy/2026-03-27-atualizacao-vps-release-v2.5.9.md`
-- Script oficial de automacao de deploy: `10-deploy/scripts/install_erp.sh`
-- Politica operacional do agente autonomo DevOps + Engenharia Fullstack: `10-deploy/agente-autonomo-devops-engenharia-fullstack.md`
-- Roadmap: `09-roadmap/funcionalidades-planejadas.md`
+## Leitura rápida recomendada
+
+### Operação
+
+- OS - manual do usuário: `01-manual-do-usuario/ordens-de-servico.md`
+- Orçamentos - manual do usuário: `01-manual-do-usuario/orcamentos.md`
+- Fluxo administrativo de OS: `02-manual-administrador/fluxo-de-trabalho-os.md`
+- Orçamentos e permissões: `02-manual-administrador/orcamentos-e-permissoes.md`
+
+### Técnica
+
+- Módulo OS: `06-modulos-do-sistema/ordens-de-servico.md`
+- Módulo Orçamentos: `06-modulos-do-sistema/orcamentos.md`
+- Arquitetura do módulo de orçamentos: `03-arquitetura-tecnica/modulo-orcamentos.md`
+- Estrutura de pastas: `03-arquitetura-tecnica/estrutura-de-pastas.md`
+- Rotas web de orçamentos: `05-api/orcamentos-web.md`
+
+### Versão e release atual
+
+- Histórico oficial de versões do ERP: `07-novas-implementacoes/historico-de-versoes.md`
+- Release atual: `07-novas-implementacoes/2026-04-23-release-v2.15.0-os-orcamentos-documentacao-e-versionamento.md`
+- Registro desta atualização na VPS: `10-deploy/2026-04-23-atualizacao-vps-release-v2.15.0.md`
+
+### App mobile/PWA
+
+- Hub oficial do app: `12-app-mobile-pwa/README.md`
+- Política de versões do app: `12-app-mobile-pwa/09-versionamento-e-releases/politica-de-versoes.md`
+- Histórico do app: `12-app-mobile-pwa/09-versionamento-e-releases/historico-de-versoes.md`
+
+## O que foi consolidado nesta atualização documental
+
+- nova leitura operacional da visualização da OS;
+- sincronização oficial entre status de OS e status do orçamento vinculado;
+- comportamento do botão de orçamento na OS;
+- comportamento protegido do modal `Nova OS` na listagem;
+- revisão e normalização UTF-8 dos documentos centrais de OS e Orçamentos;
+- alinhamento entre documentação, release publicada e versão do sistema.
+
+## Regra editorial
+
+Sempre que houver nova release do ERP:
+
+1. atualizar `app/Config/SystemRelease.php`;
+2. revisar este índice;
+3. atualizar o histórico oficial em `07-novas-implementacoes/historico-de-versoes.md`;
+4. publicar a nota técnica da release;
+5. registrar a atualização de VPS em `10-deploy/`, quando aplicável.

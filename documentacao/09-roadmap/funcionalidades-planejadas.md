@@ -1,6 +1,6 @@
 # Roadmap - Funcionalidades Planejadas
 
-Atualizado em 17/03/2026.
+Atualizado em 03/04/2026.
 
 ## Concluido (fundacao pre-CRM + CRM operacional inicial)
 - fluxo de OS por macrofases com transicoes validas
@@ -35,6 +35,11 @@ Atualizado em 17/03/2026.
 - refinamento de templates por tipo de cliente/etapa
 - evolucao do painel de contexto da conversa para multi-OS
 - automacao por horario/SLA em camadas (regra + fila)
+- extensao mobile/PWA paralela do ERP:
+  - API interna v1 em CodeIgniter 4
+  - auth mobile por token
+  - conversa/OS/notificacoes no app mobile
+  - base de push notifications com Service Worker
 
 ## Proxima etapa estrategica (CRM avancado)
 - automacoes por SLA com fila de jobs
@@ -42,9 +47,14 @@ Atualizado em 17/03/2026.
 - tags e segmentacao comercial completa
 - campanhas e reativacao com provider de massa oficial
 - notificacoes em tempo real (websocket/push interno)
+- dashboard mobile para tecnicos e atendentes
+- modulo mobile de CRM (clientes e follow-ups)
+- modulo mobile de financeiro e agenda
 
 ## Backlog tecnico
 - provider oficial Meta para massa/campanhas
 - webhooks inbound completos (entrega/leitura/resposta)
 - retries com politicas configuraveis
 - observabilidade do gateway (metricas e alertas)
+- worker de despacho push (Web Push/FCM) consumindo `mobile_event_outbox`
+- politicas de retencao/limpeza para `mobile_notifications` e `mobile_api_tokens`

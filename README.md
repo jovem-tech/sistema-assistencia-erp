@@ -1,69 +1,123 @@
-# CodeIgniter 4 Application Starter
+# Sistema de Assistência Técnica ERP
 
-## What is CodeIgniter?
+Versão atual do ERP: `2.15.0`  
+Data da atualização documental: `23/04/2026`
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+## Visão geral
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+O projeto é o ERP operacional da Jovem Tech para assistência técnica, atendimento comercial e relacionamento com o cliente. O sistema centraliza:
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+- ordens de serviço;
+- orçamentos;
+- pacotes de serviços;
+- CRM e contatos;
+- central de mensagens com WhatsApp;
+- estoque, precificação e documentos PDF;
+- app mobile/PWA integrado ao mesmo domínio operacional.
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+## Destaques da release atual
 
-## Installation & updates
+- visualização da OS reorganizada com foco em contexto, orçamento, fotos e valores;
+- sincronização operacional entre OS e orçamento:
+  - orçamento em andamento vinculado à OS leva a OS para `aguardando_autorizacao`;
+  - orçamento `aprovado` ou `convertido` leva a OS para `aguardando_reparo`;
+- listagem de OS passou a exibir contexto do orçamento vinculado na própria coluna de status;
+- botão da OS respeita orçamento já vinculado:
+  - cria novo somente quando não existe orçamento;
+  - edita/visualiza o orçamento existente quando já houver vínculo;
+- modal `Nova OS` da listagem agora abre em modo protegido:
+  - não fecha ao clicar fora;
+  - não fecha por `ESC`;
+  - só fecha pelo `X`, com alerta de registro em andamento.
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+## Stack principal
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+- backend: `PHP 8.2+` com `CodeIgniter 4`;
+- banco de dados: `MySQL/MariaDB`;
+- frontend: `Bootstrap 5`, `Select2`, `SweetAlert2`, `DataTables`;
+- integrações:
+  - WhatsApp;
+  - geração de PDF;
+  - envio por e-mail;
+  - app mobile/PWA;
+- infraestrutura alvo: VPS Linux com publicação em `/var/www/sistema-hml`.
 
-## Setup
+## Estrutura principal
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+```text
+app/
+  Config/
+  Controllers/
+  Models/
+  Services/
+  Views/
+documentacao/
+  01-manual-do-usuario/
+  06-modulos-do-sistema/
+  07-novas-implementacoes/
+  08-correcoes/
+  10-deploy/
+mobile-app/
+public/
+tests/
+```
 
-## Important Change with index.php
+## Documentação oficial
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+- índice da documentação: `documentacao/README.md`
+- manual do usuário de OS: `documentacao/01-manual-do-usuario/ordens-de-servico.md`
+- manual do usuário de orçamentos: `documentacao/01-manual-do-usuario/orcamentos.md`
+- visão técnica de OS: `documentacao/06-modulos-do-sistema/ordens-de-servico.md`
+- visão técnica de orçamentos: `documentacao/06-modulos-do-sistema/orcamentos.md`
+- histórico oficial de versões: `documentacao/07-novas-implementacoes/historico-de-versoes.md`
+- nota da release atual: `documentacao/07-novas-implementacoes/2026-04-23-release-v2.15.0-os-orcamentos-documentacao-e-versionamento.md`
+- registro desta atualização na VPS: `documentacao/10-deploy/2026-04-23-atualizacao-vps-release-v2.15.0.md`
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+## Versionamento
 
-**Please** read the user guide for a better explanation of how CI4 works!
+O ERP segue `SemVer` no formato `MAJOR.MINOR.PATCH`.
 
-## Repository Management
+- `MAJOR`: ruptura estrutural ou incompatibilidade relevante;
+- `MINOR`: nova funcionalidade compatível;
+- `PATCH`: correção, estabilização ou ajuste sem quebra.
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+Fonte oficial da versão:
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+- arquivo padrão: `app/Config/SystemRelease.php`;
+- override opcional: configuração `sistema_versao` no banco, quando utilizada.
 
-## Server Requirements
+## Operação local
 
-PHP version 8.2 or higher is required, with the following extensions installed:
+Exemplos usuais:
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+```bash
+php spark serve
+php spark migrate
+php spark orcamentos:lifecycle
+php spark cache:clear
+```
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - The end of life date for PHP 8.1 was December 31, 2025.
-> - If you are still using below PHP 8.2, you should upgrade immediately.
-> - The end of life date for PHP 8.2 will be December 31, 2026.
+Validações rápidas antes de publicar:
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+```bash
+php -l app/Config/SystemRelease.php
+php -l app/Controllers/Os.php
+php -l app/Controllers/Orcamentos.php
+php -l app/Controllers/Orcamento.php
+```
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+## Publicação
+
+Ambiente de produção atual:
+
+- aplicação: `/var/www/sistema-hml`
+- servidor: VPS Linux
+- publicação seletiva, preservando:
+  - `.env`
+  - `writable/`
+  - `public/uploads/`
+  - banco de dados operacional
+
+## Observação importante
+
+O repositório nasceu sobre o app starter do CodeIgniter, mas a referência operacional oficial deste projeto passou a ser esta documentação da Jovem Tech. Para manutenção cotidiana, priorize sempre os documentos em `documentacao/`.

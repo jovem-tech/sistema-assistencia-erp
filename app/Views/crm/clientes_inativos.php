@@ -33,9 +33,9 @@
                         <th>Cliente</th>
                         <th>Telefone</th>
                         <th>Email</th>
-                        <th>Ultima OS</th>
+                        <th>Última OS</th>
                         <th>Total OS</th>
-                        <th class="text-end">Acoes</th>
+                        <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>

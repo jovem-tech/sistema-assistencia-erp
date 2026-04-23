@@ -13,7 +13,7 @@ class PecaModel extends Model
     protected $useSoftDeletes = false;
     protected $allowedFields = [
         'codigo', 'codigo_fabricante', 'nome', 'categoria', 'modelos_compativeis',
-        'fornecedor', 'localizacao', 'preco_custo', 'preco_venda',
+        'tipo_equipamento', 'fornecedor', 'localizacao', 'preco_custo', 'preco_venda',
         'quantidade_atual', 'estoque_minimo', 'estoque_maximo',
         'foto', 'observacoes', 'ativo'
     ];
@@ -35,14 +35,22 @@ class PecaModel extends Model
                     ->findAll();
     }
 
-    public function search($term)
+    public function search($term, int $limit = 20)
     {
-        return $this->like('nome', $term)
-                    ->orLike('codigo', $term)
-                    ->orLike('categoria', $term)
+        $term = trim((string) $term);
+        if ($term === '') {
+            return [];
+        }
+
+        return $this->groupStart()
+                        ->like('nome', $term)
+                        ->orLike('codigo', $term)
+                        ->orLike('categoria', $term)
+                        ->orLike('modelos_compativeis', $term)
+                    ->groupEnd()
                     ->where('ativo', 1)
                     ->orderBy('nome', 'ASC')
-                    ->findAll(20);
+                    ->findAll($limit);
     }
 
     public function generateCodigo()
@@ -55,5 +63,37 @@ class PecaModel extends Model
     public function getAtivas()
     {
         return $this->where('ativo', 1)->orderBy('nome', 'ASC')->findAll();
+    }
+
+    public function getCategoriasAtivas(): array
+    {
+        return array_values(array_filter(array_map(
+            static fn (array $row): string => trim((string) ($row['categoria'] ?? '')),
+            $this->select('categoria')
+                ->where('ativo', 1)
+                ->where('categoria IS NOT NULL', null, false)
+                ->where("TRIM(categoria) <> ''", null, false)
+                ->groupBy('categoria')
+                ->orderBy('categoria', 'ASC')
+                ->findAll()
+        )));
+    }
+
+    public function getTiposEquipamentoAtivos(): array
+    {
+        if (! $this->db->fieldExists('tipo_equipamento', $this->table)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map(
+            static fn (array $row): string => trim((string) ($row['tipo_equipamento'] ?? '')),
+            $this->select('tipo_equipamento')
+                ->where('ativo', 1)
+                ->where('tipo_equipamento IS NOT NULL', null, false)
+                ->where("TRIM(tipo_equipamento) <> ''", null, false)
+                ->groupBy('tipo_equipamento')
+                ->orderBy('tipo_equipamento', 'ASC')
+                ->findAll()
+        )));
     }
 }

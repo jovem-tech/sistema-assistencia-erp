@@ -1,53 +1,48 @@
-# Manual do Usuário — Estoque
+﻿# Manual do Usuario - Estoque
 
-## 📋 Visão Geral
+## Visao geral
+O modulo `Estoque de Pecas` controla cadastro, saldo e movimentacao de pecas utilizadas em OS e orcamentos.
 
-Gerencia o estoque de peças e insumos utilizados nos reparos.
+Caminho: `Operacional > Estoque de Pecas`
 
----
+## Cadastro e edicao de peca
+Campos principais:
+- `Nome`
+- `Codigo` / `Codigo fabricante`
+- `Categoria`
+- `Tipo Equipamento` (novo)
+- `Modelos compativeis`
+- `Preco de custo`
+- `Preco de venda`
+- `Quantidade atual`
+- `Estoque minimo`
 
-## 🧭 Navegação
-**Caminho:** OPERACIONAL → Estoque de Peças
+Regra operacional:
+- pecas inativas (`ativo = 0`) nao aparecem na busca Select2 da OS.
 
-## ➕ Cadastrar Peça
+## Listagem
+A grade de estoque agora mostra a coluna:
+- `Tipo Equipamento`
 
-**Campos:**
+Uso recomendado:
+- padronize o tipo (ex.: `Smartphone`, `Notebook`, `Desktop`);
+- use `Diverso` para pecas genericas;
+- isso melhora a filtragem no Select2 da OS, junto com `Categoria`.
 
-| Campo | Obrigatório | Descrição |
-|-------|-------------|-----------|
-| **Nome** | Sim | Nome da peça |
-| **Código / SKU** | Não | Código interno (gerado auto se omitido) |
-| Categoria | Não | Grupo da peça |
-| Fornecedor | Não | Fonte da peça |
-| Quantidade Inicial | Sim | Estoque de entrada |
-| Estoque Mínimo | Não | Alerta de reposição |
-| Preço de Custo | Não | Valor pago ao fornecedor |
-| Preço de Venda | Não | Valor cobrado nas OS |
+## Importacao e exportacao CSV
+- `Exportar CSV`: inclui `tipo_equipamento`.
+- `Baixar Modelo CSV`: inclui `tipo_equipamento`.
+- `Importar CSV`: aceita `tipo_equipamento` e `tipo equipamento`.
 
----
+## Fluxo com OS (peca sem estoque)
+Quando uma peca com estoque `0` e adicionada na OS:
+- o item e permitido;
+- o sistema nao faz baixa de estoque nesse momento;
+- o item fica com status de pendencia (`sem_estoque`, `necessaria_aquisicao` ou `aguardando_compra`);
+- a linha do item exibe acao `Resolver pendencia`.
 
-## 📦 Movimentações
-
-Cada entrada ou saída de peça gera um registro de movimentação com:
-- Tipo (Entrada / Saída / Ajuste)
-- Quantidade
-- Data e hora
-- Usuário responsável
-
-### Ver histórico de movimentações
-Na listagem do estoque, clique no botão **Movimentações** da peça desejada para abrir o histórico completo.  
-Essa tela mostra o saldo atual, valores de custo/venda e o log detalhado de entradas e saídas.
-
----
-
-## 📥 Importação CSV
-
-1. Baixe o modelo em **Estoque → Baixar Modelo CSV**
-2. Preencha o arquivo
-3. Importe em **Estoque → Importar CSV**
-
----
-
-## 📤 Exportação CSV
-
-Clique em **Exportar CSV** para baixar todo o estoque atual com quantidades e valores.
+Ao resolver pendencia:
+- pode registrar entrada de peca;
+- pode reservar automaticamente para a OS;
+- pode registrar despesa de compra no financeiro;
+- o status do item e atualizado para estado operacional correspondente.

@@ -96,7 +96,8 @@
             <?php
             $isConhecimentoActive = str_starts_with(uri_string(), 'equipamentosdefeitos')
                 || str_starts_with(uri_string(), 'defeitosrelatados')
-                || str_starts_with(uri_string(), 'osworkflow');
+                || str_starts_with(uri_string(), 'osworkflow')
+                || str_starts_with(uri_string(), 'checklists');
             ?>
             <li class="nav-item">
                 <a class="nav-link <?= $isConhecimentoActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#conhecimentoSubmenu" role="button">
@@ -126,6 +127,26 @@
                                 <i class="bi bi-diagram-3-fill"></i><span>Fluxo de Trabalho OS</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'checklists/entrada') ? 'active' : '' ?>" href="<?= base_url('checklists/entrada') ?>">
+                                <i class="bi bi-ui-checks-grid"></i><span>Checklist de Entrada</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'checklists/manutencao') ? 'active' : '' ?>" href="<?= base_url('checklists/manutencao') ?>">
+                                <i class="bi bi-tools"></i><span>Checklist de Manutenção</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'checklists/controle-qualidade') ? 'active' : '' ?>" href="<?= base_url('checklists/controle-qualidade') ?>">
+                                <i class="bi bi-clipboard2-check"></i><span>Checklist Controle da Qualidade</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'checklists/saida') ? 'active' : '' ?>" href="<?= base_url('checklists/saida') ?>">
+                                <i class="bi bi-box-arrow-right"></i><span>Checklist de Saída</span>
+                            </a>
+                        </li>
                         <?php endif; ?>
                     </ul>
                 </div>
@@ -135,7 +156,7 @@
 
             <!-- COMERCIAL -->
             <?php 
-            $showComercial = canModule('clientes') || canModule('fornecedores') || canModule('funcionarios') || canModule('vendas');
+            $showComercial = canModule('clientes') || canModule('fornecedores') || canModule('funcionarios') || canModule('orcamentos') || canModule('vendas');
             ?>
             <?php if ($showComercial): ?>
             <li class="nav-section">COMERCIAL</li>
@@ -164,7 +185,7 @@
                         <?php endif; ?>
                         
                         <?php if (canModule('funcionarios')): ?>
-                        <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'funcionarios') ? 'active' : '' ?>" href="<?= base_url('funcionarios') ?>"><i class="bi bi-person-workspace"></i><span>Equipe Técnico</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'funcionarios') ? 'active' : '' ?>" href="<?= base_url('funcionarios') ?>"><i class="bi bi-person-workspace"></i><span>Equipe Técnica</span></a></li>
                         <?php endif; ?>
                         <?php if (canModule('fornecedores')): ?>
                         <li class="nav-item"><a class="nav-link <?= str_starts_with(uri_string(), 'fornecedores') ? 'active' : '' ?>" href="<?= base_url('fornecedores') ?>"><i class="bi bi-truck"></i><span>Fornecedores</span></a></li>
@@ -200,7 +221,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link <?= uri_string() === 'crm/interacoes' ? 'active' : '' ?>" href="<?= base_url('crm/interacoes') ?>">
-                                <i class="bi bi-chat-left-text"></i><span>Interacoes</span>
+                                <i class="bi bi-chat-left-text"></i><span>Interações</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -220,7 +241,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link <?= uri_string() === 'crm/metricas-marketing' ? 'active' : '' ?>" href="<?= base_url('crm/metricas-marketing') ?>">
-                                <i class="bi bi-bar-chart-line"></i><span>Metricas Marketing</span>
+                                <i class="bi bi-bar-chart-line"></i><span>Métricas Marketing</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -247,13 +268,60 @@
                 <div class="collapse <?= $isCentralMensagensActive ? 'show' : '' ?>" id="centralMensagensSubmenu">
                     <ul class="nav flex-column">
                         <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp' || uri_string() === 'central-mensagens') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp') ?>"><i class="bi bi-inboxes"></i><span>Inbox WhatsApp</span></a></li>
-                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/chatbot' || uri_string() === 'central-mensagens/chatbot') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/chatbot') ?>"><i class="bi bi-robot"></i><span>Chatbot / Automacao</span></a></li>
-                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/metricas' || uri_string() === 'central-mensagens/metricas') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/metricas') ?>"><i class="bi bi-graph-up"></i><span>Metricas</span></a></li>
-                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/respostas-rapidas' || uri_string() === 'central-mensagens/respostas-rapidas') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/respostas-rapidas') ?>"><i class="bi bi-chat-dots"></i><span>Respostas Rapidas</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/chatbot' || uri_string() === 'central-mensagens/chatbot') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/chatbot') ?>"><i class="bi bi-robot"></i><span>Chatbot / Automação</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/metricas' || uri_string() === 'central-mensagens/metricas') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/metricas') ?>"><i class="bi bi-graph-up"></i><span>Métricas</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/respostas-rapidas' || uri_string() === 'central-mensagens/respostas-rapidas') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/respostas-rapidas') ?>"><i class="bi bi-chat-dots"></i><span>Respostas Rápidas</span></a></li>
                         <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/fluxos' || uri_string() === 'central-mensagens/fluxos') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/fluxos') ?>"><i class="bi bi-diagram-2"></i><span>Fluxos de Atendimento</span></a></li>
                         <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/faq' || uri_string() === 'central-mensagens/faq') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/faq') ?>"><i class="bi bi-question-circle"></i><span>FAQ / Base de Conhecimento</span></a></li>
-                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/filas' || uri_string() === 'central-mensagens/filas') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/filas') ?>"><i class="bi bi-people"></i><span>Filas e Responsaveis</span></a></li>
-                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/configuracoes' || uri_string() === 'central-mensagens/configuracoes') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/configuracoes') ?>"><i class="bi bi-sliders"></i><span>Configuracoes</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/filas' || uri_string() === 'central-mensagens/filas') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/filas') ?>"><i class="bi bi-people"></i><span>Filas e Responsáveis</span></a></li>
+                        <li class="nav-item"><a class="nav-link <?= (uri_string() === 'atendimento-whatsapp/configuracoes' || uri_string() === 'central-mensagens/configuracoes') ? 'active' : '' ?>" href="<?= base_url('atendimento-whatsapp/configuracoes') ?>"><i class="bi bi-sliders"></i><span>Configurações</span></a></li>
+                    </ul>
+                </div>
+            </li>
+            <?php endif; ?>
+
+            <?php if (canModule('orcamentos')): ?>
+            <?php
+            $isOrcamentosActive = str_starts_with(uri_string(), 'orcamentos')
+                || str_starts_with(uri_string(), 'pacotes-servicos');
+            ?>
+            <li class="nav-item">
+                <a class="nav-link <?= $isOrcamentosActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#orcamentosSubmenu" role="button">
+                    <i class="bi bi-receipt-cutoff"></i>
+                    <span class="d-flex justify-content-between w-100 align-items-center">
+                        Orçamentos
+                        <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
+                    </span>
+                </a>
+                <div class="collapse <?= $isOrcamentosActive ? 'show' : '' ?>" id="orcamentosSubmenu">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link <?= uri_string() === 'orcamentos' ? 'active' : '' ?>" href="<?= base_url('orcamentos') ?>">
+                                <i class="bi bi-speedometer2"></i><span>Painel de Orçamentos</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'pacotes-servicos') ? 'active' : '' ?>" href="<?= base_url('pacotes-servicos') ?>">
+                                <i class="bi bi-box-seam"></i><span>Pacotes de Serviços</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('orcamentos?status=aguardando_resposta') ?>">
+                                <i class="bi bi-hourglass-split"></i><span>Aguardando Resposta</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('orcamentos?status=pendente_abertura_os') ?>">
+                                <i class="bi bi-clipboard-plus"></i><span>Pendentes de OS</span>
+                            </a>
+                        </li>
+                        <?php if (can('orcamentos', 'criar')): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('orcamentos/novo') ?>">
+                                <i class="bi bi-plus-lg"></i><span>Novo Orçamento</span>
+                            </a>
+                        </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </li>
@@ -271,7 +339,7 @@
 
 
             <!-- GESTÃO & RESULTADOS -->
-            <?php if (canModule('financeiro') || canModule('relatorios')): ?>
+            <?php if (canModule('financeiro') || canModule('relatorios') || canModule('orcamentos')): ?>
             <li class="nav-section">GESTÃO & RESULTADOS</li>
             
             <?php if (canModule('financeiro')): ?>
@@ -280,6 +348,35 @@
                     <i class="bi bi-cash-stack"></i>
                     <span>Financeiro</span>
                 </a>
+            </li>
+            <?php endif; ?>
+
+            <?php if (canModule('orcamentos')): ?>
+            <?php
+            $isPrecificacaoActive = str_starts_with(uri_string(), 'precificacao');
+            ?>
+            <li class="nav-item">
+                <a class="nav-link <?= $isPrecificacaoActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#precificacaoSubmenuGestaoResultados" role="button">
+                    <i class="bi bi-calculator"></i>
+                    <span class="d-flex justify-content-between w-100 align-items-center">
+                        Precificação
+                        <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem;"></i>
+                    </span>
+                </a>
+                <div class="collapse <?= $isPrecificacaoActive ? 'show' : '' ?>" id="precificacaoSubmenuGestaoResultados">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link <?= (uri_string() === 'precificacao' || uri_string() === 'precificacao/configuracao') ? 'active' : '' ?>" href="<?= base_url('precificacao/configuracao') ?>">
+                                <i class="bi bi-sliders"></i><span>Configuração</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= uri_string() === 'precificacao/simulador' ? 'active' : '' ?>" href="<?= base_url('precificacao/simulador') ?>">
+                                <i class="bi bi-graph-up"></i><span>Simulador</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
             <?php endif; ?>
 
@@ -352,7 +449,7 @@
 
     <div class="sidebar-footer">
         <div class="system-version-label">
-            <span class="system-version-text">Versao <?= esc(get_system_version()) ?></span>
+            <span class="system-version-text">Versão <?= esc(get_system_version()) ?></span>
         </div>
         <a href="<?= base_url('logout') ?>" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 py-2 logout-btn" title="Sair do Sistema">
             <i class="bi bi-box-arrow-left fs-5"></i>

@@ -657,6 +657,7 @@ a:hover {
     margin-left: var(--sidebar-width);
     flex: 1;
     min-height: 100vh;
+    padding-top: var(--navbar-height);
     transition: var(--transition);
 }
 
@@ -675,9 +676,15 @@ a:hover {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-color);
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 1020;
+    left: var(--sidebar-width);
+    right: 0;
+    z-index: 1040;
+}
+
+.sidebar.collapsed~.main-content .top-navbar {
+    left: var(--sidebar-collapsed);
 }
 
 .navbar-left {
@@ -1299,6 +1306,7 @@ textarea.form-control {
 
     .main-content {
         margin-left: 0 !important;
+        padding-top: 0 !important;
     }
 
     .page-content {
@@ -1333,6 +1341,10 @@ textarea.form-control {
 
     .main-content {
         margin-left: 0;
+    }
+
+    .top-navbar {
+        left: 0;
     }
 
     .mobile-toggle {

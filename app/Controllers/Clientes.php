@@ -10,6 +10,7 @@ use App\Models\CrmInteracaoModel;
 use App\Models\EquipamentoModel;
 use App\Models\OsModel;
 use App\Models\LogModel;
+use App\Services\CnpjLookupService;
 
 class Clientes extends BaseController
 {
@@ -63,7 +64,7 @@ class Clientes extends BaseController
         $cliente = $this->model->find($id);
         if (!$cliente) {
             return redirect()->to('/clientes')
-                ->with('error', 'Cliente não encontrado.');
+                ->with('error', 'Cliente nao encontrado.');
         }
 
         $data = [
@@ -98,11 +99,11 @@ class Clientes extends BaseController
         $cliente = $this->model->find($id);
         if ($cliente) {
             $this->model->delete($id);
-            LogModel::registrar('cliente_excluido', 'Cliente excluído: ' . $cliente['nome_razao']);
+            LogModel::registrar('cliente_excluido', 'Cliente excluido: ' . $cliente['nome_razao']);
         }
 
         return redirect()->to('/clientes')
-            ->with('success', 'Cliente excluído com sucesso!');
+            ->with('success', 'Cliente excluido com sucesso!');
     }
 
     public function show($id)
@@ -110,8 +111,10 @@ class Clientes extends BaseController
         $cliente = $this->model->find($id);
         if (!$cliente) {
             return redirect()->to('/clientes')
-                ->with('error', 'Cliente não encontrado.');
+                ->with('error', 'Cliente nao encontrado.');
         }
+
+        $isEmbedded = $this->request->getGet('embed') === '1';
 
         $equipamentoModel = new EquipamentoModel();
         $osModel = new OsModel();
@@ -197,6 +200,8 @@ class Clientes extends BaseController
             'crmTimeline' => $crmTimeline,
             'crmResumo' => $crmResumo,
             'conversasCliente' => $conversasCliente,
+            'layout' => $isEmbedded ? 'layouts/embed' : 'layouts/main',
+            'isEmbedded' => $isEmbedded,
         ];
         return view('clientes/show', $data);
     }
@@ -212,9 +217,22 @@ class Clientes extends BaseController
     {
         $cliente = $this->model->find($id);
         if (!$cliente) {
-            return $this->response->setJSON(['error' => 'Cliente não encontrado']);
+            return $this->response->setJSON(['error' => 'Cliente nao encontrado']);
         }
         return $this->response->setJSON($cliente);
+    }
+
+    public function consultarCnpj()
+    {
+        $cnpj = (string) $this->request->getGet('cnpj');
+        $service = new CnpjLookupService();
+        $result = $service->lookup($cnpj);
+
+        $statusCode = (($result['status'] ?? '') === 'validation_error') ? 422 : 200;
+
+        return $this->response
+            ->setStatusCode($statusCode)
+            ->setJSON($result);
     }
 
     public function salvar_ajax()
@@ -227,7 +245,7 @@ class Clientes extends BaseController
         if (!$this->validate($rules)) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Verifique se os campos obrigatórios (Nome e Telefone) foram preenchidos corretamente.'
+                'message' => 'Verifique se os campos obrigatorios (Nome e Telefone) foram preenchidos corretamente.'
             ]);
         }
 
@@ -262,7 +280,7 @@ class Clientes extends BaseController
         } catch (\Exception $e) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Ocorreu um erro ao salvar (Verifique se o CPF/CNPJ já existe).'
+                'message' => 'Ocorreu um erro ao salvar (Verifique se o CPF/CNPJ ja existe).'
             ]);
         }
     }
@@ -287,8 +305,8 @@ class Clientes extends BaseController
         fputcsv($f, $fields, ';');
         
         $sampleData = [
-            ['fisica', 'João da Silva', '111.222.333-44', '12345678', 'joao@email.com', '(11) 99999-8888', '', '01001-000', 'Praça da Sé', '1', '', 'Sé', 'São Paulo', 'SP', 'Cliente de demonstração importado'],
-            ['juridica', 'Empresa Modelo Ltda', '11.222.333/0001-44', '123456789012', 'contato@empresa.com', '(11) 3333-4444', '', '01310-100', 'Avenida Paulista', '1000', 'Andar 1', 'Bela Vista', 'São Paulo', 'SP', 'Empresa de demonstração importada']
+            ['fisica', 'Joao da Silva', '111.222.333-44', '12345678', 'joao@email.com', '(11) 99999-8888', '', '01001-000', 'Praca da Se', '1', '', 'Se', 'Sao Paulo', 'SP', 'Cliente de demonstracao importado'],
+            ['juridica', 'Empresa Modelo Ltda', '11.222.333/0001-44', '123456789012', 'contato@empresa.com', '(11) 3333-4444', '', '01310-100', 'Avenida Paulista', '1000', 'Andar 1', 'Bela Vista', 'Sao Paulo', 'SP', 'Empresa de demonstracao importada']
         ];
         
         foreach ($sampleData as $row) {
@@ -303,22 +321,22 @@ class Clientes extends BaseController
     {
         $file = $this->request->getFile('arquivo_csv');
         if (!$file || !$file->isValid() || $file->getExtension() !== 'csv') {
-            return redirect()->to('/clientes')->with('error', 'Arquivo inválido. Por favor, envie um arquivo CSV.');
+            return redirect()->to('/clientes')->with('error', 'Arquivo invalido. Por favor, envie um arquivo CSV.');
         }
 
         $filepath = $file->getTempName();
         $fileStream = fopen($filepath, 'r');
         if (!$fileStream) {
-            return redirect()->to('/clientes')->with('error', 'Não foi possível ler o arquivo.');
+            return redirect()->to('/clientes')->with('error', 'Nao foi possivel ler o arquivo.');
         }
 
         // Pula o BOM se existir
         $bom = fread($fileStream, 3);
         if ($bom !== "\xEF\xBB\xBF") {
-            rewind($fileStream); // Retorna ao início se não for BOM
+            rewind($fileStream); // Retorna ao inicio se nao for BOM
         }
 
-        // Lê a primeira linha (cabeçalhos) para identificar o delimitador correto
+        // Le a primeira linha (cabecalhos) para identificar o delimitador correto
         $headerLine = fgets($fileStream);
         $delimiter = strpos($headerLine, ';') !== false ? ';' : ',';
         rewind($fileStream); // Volta para ler com o fputcsv agora sabendo o delimitador
@@ -328,7 +346,7 @@ class Clientes extends BaseController
 
         $headers = fgetcsv($fileStream, 1000, $delimiter);
         if (!$headers) {
-            return redirect()->to('/clientes')->with('error', 'O arquivo CSV está vazio ou em formato incorreto.');
+            return redirect()->to('/clientes')->with('error', 'O arquivo CSV esta vazio ou em formato incorreto.');
         }
         
         $expectedHeaders = [
@@ -337,7 +355,7 @@ class Clientes extends BaseController
             'complemento', 'bairro', 'cidade', 'uf', 'observacoes'
         ];
         
-        // Remove quaisquer espaços extras dos cabeçalhos importados
+        // Remove quaisquer espacos extras dos cabecalhos importados
         $headers = array_map('trim', $headers);
 
         $importedCount = 0;
@@ -345,7 +363,7 @@ class Clientes extends BaseController
 
         while (($row = fgetcsv($fileStream, 1000, $delimiter)) !== false) {
             if (count($row) < 2 || empty(trim($row[1]))) {
-                continue; // Pula linhas em branco ou onde o nome não foi preenchido
+                continue; // Pula linhas em branco ou onde o nome nao foi preenchido
             }
 
             $clienteData = [];
@@ -365,7 +383,7 @@ class Clientes extends BaseController
                 $clienteData['tipo_pessoa'] = 'fisica';
             }
 
-            // Validação mínima via código antes do insert
+            // Validacao minima via codigo antes do insert
             if (empty($clienteData['nome_razao']) || empty($clienteData['telefone1'])) {
                 $errorCount++;
                 continue;
@@ -382,12 +400,15 @@ class Clientes extends BaseController
         }
         fclose($fileStream);
 
-        LogModel::registrar('cliente_importacao', "Importação CSV realizada: $importedCount sucessos, $errorCount falhas.");
+        LogModel::registrar('cliente_importacao', "Importacao CSV realizada: $importedCount sucessos, $errorCount falhas.");
 
-        $msg = "Importação concluída. $importedCount clientes cadastrados.";
+        $msg = "Importacao concluida. $importedCount clientes cadastrados.";
         if ($errorCount > 0) {
-            $msg .= " $errorCount registros não puderam ser importados (verifique preenchimento do Nome e Telefone1 e se os documentos não são duplicados no sistema).";
-            return redirect()->to('/clientes')->with('success', $msg)->with('warning', true);
+            $msg .= " $errorCount registros nao puderam ser importados (verifique preenchimento do Nome e Telefone1 e se os documentos nao sao duplicados no sistema).";
+            return redirect()
+                ->to('/clientes')
+                ->with('success', $msg)
+                ->with('warning', 'Importacao finalizada com observacoes. Revise os registros nao importados.');
         }
 
         return redirect()->to('/clientes')->with('success', $msg);
@@ -416,3 +437,4 @@ class Clientes extends BaseController
         return ucwords(strtolower($nome));
     }
 }
+

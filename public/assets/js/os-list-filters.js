@@ -5,6 +5,7 @@
     const FILTER_FIELDS = [
         'q',
         'status',
+        'legado',
         'macrofase',
         'estado_fluxo',
         'data_inicio',
@@ -70,6 +71,7 @@
         return {
             q: normalizeString(source.q),
             status: normalizeStatusList(source.status ?? source.status_list ?? ''),
+            legado: normalizeString(source.legado),
             macrofase: normalizeString(source.macrofase),
             estado_fluxo: normalizeString(source.estado_fluxo),
             data_inicio: normalizeString(source.data_inicio),
@@ -289,6 +291,14 @@
                 key: 'estado_fluxo',
                 value: '',
                 text: `Fluxo: ${getLabel('estado_fluxo', state.estado_fluxo)}`,
+            });
+        }
+
+        if (state.legado) {
+            chips.push({
+                key: 'legado',
+                value: '',
+                text: `Origem: ${getLabel('legado', state.legado)}`,
             });
         }
 
@@ -872,6 +882,7 @@
         const clearAllBtn = document.getElementById('osClearAllFilters');
         const mobileFilterButton = document.getElementById('osOpenMobileFilters');
         const mobileFilterCount = document.getElementById('osMobileFilterCount');
+        const legacyToggleButtons = Array.from(document.querySelectorAll('.js-os-legacy-toggle'));
         const loadingOverlay = document.getElementById('osTableLoading');
         const resultsCounter = document.getElementById('osResultsCounter');
         const resultsSpinner = document.getElementById('osResultsSpinner');
@@ -887,8 +898,64 @@
         const statusModalNumero = document.getElementById('osStatusModalNumero');
         const statusModalObservacao = document.getElementById('osStatusModalObservacao');
         const statusModalSubmit = document.getElementById('osStatusModalSubmit');
+        const statusModalCurrentBadges = document.getElementById('osStatusModalCurrentBadges');
+        const statusModalPrimaryHint = document.getElementById('osStatusModalPrimaryHint');
+        const statusModalClientName = document.getElementById('osStatusModalClientName');
+        const statusModalClientPhone = document.getElementById('osStatusModalClientPhone');
+        const statusModalClientEmail = document.getElementById('osStatusModalClientEmail');
+        const statusModalEquipmentName = document.getElementById('osStatusModalEquipmentName');
+        const statusModalEquipmentMeta = document.getElementById('osStatusModalEquipmentMeta');
+        const statusModalEquipmentSerial = document.getElementById('osStatusModalEquipmentSerial');
+        const statusModalQuickNext = document.getElementById('osStatusModalQuickNext');
+        const statusModalQuickCancel = document.getElementById('osStatusModalQuickCancel');
+        const statusModalTargetHint = document.getElementById('osStatusModalTargetHint');
+        const statusModalNotify = document.getElementById('osStatusModalNotify');
+        const statusModalNotifyHelp = document.getElementById('osStatusModalNotifyHelp');
+        const statusModalTimeline = document.getElementById('osStatusModalTimeline');
+        const statusModalHistoryWrap = document.getElementById('osStatusModalHistoryWrap');
+        const statusModalHistoryList = document.getElementById('osStatusModalHistoryList');
         const statusModal = statusModalElement && window.bootstrap
             ? window.bootstrap.Modal.getOrCreateInstance(statusModalElement)
+            : null;
+        const datesModalElement = document.getElementById('osDatesModal');
+        const datesModalForm = document.getElementById('osDatesModalForm');
+        const datesModalNumero = document.getElementById('osDatesModalNumero');
+        const datesModalBadges = document.getElementById('osDatesModalBadges');
+        const datesModalClientName = document.getElementById('osDatesModalClientName');
+        const datesModalEquipmentName = document.getElementById('osDatesModalEquipmentName');
+        const datesModalEntrada = document.getElementById('osDatesModalEntrada');
+        const datesModalPreset = document.getElementById('osDatesModalPreset');
+        const datesModalPrevisao = document.getElementById('osDatesModalPrevisao');
+        const datesModalEntrega = document.getElementById('osDatesModalEntrega');
+        const datesModalEntradaAtual = document.getElementById('osDatesModalEntradaAtual');
+        const datesModalPrevisaoAtual = document.getElementById('osDatesModalPrevisaoAtual');
+        const datesModalEntregaAtual = document.getElementById('osDatesModalEntregaAtual');
+        const datesModalPrazoDias = document.getElementById('osDatesModalPrazoDias');
+        const datesModalSubmit = document.getElementById('osDatesModalSubmit');
+        const datesModal = datesModalElement && window.bootstrap
+            ? window.bootstrap.Modal.getOrCreateInstance(datesModalElement)
+            : null;
+        const budgetModalElement = document.getElementById('osBudgetModal');
+        const budgetModalForm = document.getElementById('osBudgetModalForm');
+        const budgetModalNumero = document.getElementById('osBudgetModalNumero');
+        const budgetModalBadges = document.getElementById('osBudgetModalBadges');
+        const budgetModalClientName = document.getElementById('osBudgetModalClientName');
+        const budgetModalClientPhone = document.getElementById('osBudgetModalClientPhone');
+        const budgetModalClientEmail = document.getElementById('osBudgetModalClientEmail');
+        const budgetModalEquipmentName = document.getElementById('osBudgetModalEquipmentName');
+        const budgetModalEquipmentMeta = document.getElementById('osBudgetModalEquipmentMeta');
+        const budgetModalMaoObra = document.getElementById('osBudgetModalMaoObra');
+        const budgetModalPecas = document.getElementById('osBudgetModalPecas');
+        const budgetModalSubtotal = document.getElementById('osBudgetModalSubtotal');
+        const budgetModalValorFinal = document.getElementById('osBudgetModalValorFinal');
+        const budgetModalNotify = document.getElementById('osBudgetModalNotify');
+        const budgetModalNotifyHelp = document.getElementById('osBudgetModalNotifyHelp');
+        const budgetModalPhone = document.getElementById('osBudgetModalPhone');
+        const budgetModalMessage = document.getElementById('osBudgetModalMessage');
+        const budgetModalDocsList = document.getElementById('osBudgetModalDocsList');
+        const budgetModalSubmit = document.getElementById('osBudgetModalSubmit');
+        const budgetModal = budgetModalElement && window.bootstrap
+            ? window.bootstrap.Modal.getOrCreateInstance(budgetModalElement)
             : null;
         const photoModalElements = {
             element: document.getElementById('osPhotosModal'),
@@ -964,6 +1031,21 @@
             mobileFilterButton?.classList.toggle('btn-glow', count > 0);
         };
 
+        const updateLegacyToggleButtons = () => {
+            if (!legacyToggleButtons.length) {
+                return;
+            }
+
+            legacyToggleButtons.forEach((button) => {
+                const buttonValue = normalizeString(button.getAttribute('data-legacy-value'));
+                const isActive = buttonValue === normalizeString(activeState.legado);
+                button.classList.toggle('active', isActive);
+                button.classList.toggle('btn-primary', isActive);
+                button.classList.toggle('btn-outline-secondary', !isActive);
+                button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+        };
+
         const toggleLoadingOverlay = (isLoading) => {
             if (!loadingOverlay) {
                 if (resultsSpinner) {
@@ -978,12 +1060,498 @@
         };
 
         let activeStatusOsId = null;
+        let activeStatusModalMeta = null;
+        let activeStatusSelectionSource = 'manual';
+        let activeDatesOsId = null;
+        let activeBudgetOsId = null;
 
         const updateCsrfFromPayload = (payload) => {
             if (!payload || !payload.csrfHash || !config.csrfTokenKey) {
                 return;
             }
             config.csrfTokenValue = payload.csrfHash;
+        };
+
+        const formatStatusDateTime = (value) => {
+            const raw = String(value || '').trim();
+            if (!raw) {
+                return '';
+            }
+
+            const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/);
+            if (!match) {
+                return raw;
+            }
+
+            const [, year, month, day, hour = '', minute = ''] = match;
+            return `${day}/${month}/${year}${hour && minute ? ` ${hour}:${minute}` : ''}`;
+        };
+
+        const formatCurrencyValue = (value) => {
+            const numeric = Number.parseFloat(value ?? 0);
+            const safeValue = Number.isFinite(numeric) ? numeric : 0;
+            return safeValue.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+            });
+        };
+
+        const computeDateFromPreset = (entryValue, days) => {
+            const rawEntry = String(entryValue || '').trim();
+            const safeDays = Number.parseInt(days, 10);
+            if (!rawEntry || !Number.isFinite(safeDays)) {
+                return '';
+            }
+
+            const base = new Date(rawEntry);
+            if (Number.isNaN(base.getTime())) {
+                return '';
+            }
+
+            base.setHours(0, 0, 0, 0);
+            base.setDate(base.getDate() + safeDays);
+
+            const year = base.getFullYear();
+            const month = String(base.getMonth() + 1).padStart(2, '0');
+            const day = String(base.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        const setDatesModalLoading = (isLoading) => {
+            if (datesModalSubmit) {
+                datesModalSubmit.disabled = Boolean(isLoading);
+                datesModalSubmit.innerHTML = isLoading
+                    ? '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Salvando...'
+                    : '<i class="bi bi-calendar-check me-1"></i>Salvar prazos';
+            }
+
+            datesModalEntrada && (datesModalEntrada.disabled = Boolean(isLoading));
+            datesModalPreset && (datesModalPreset.disabled = Boolean(isLoading));
+            datesModalPrevisao && (datesModalPrevisao.disabled = Boolean(isLoading));
+            datesModalEntrega && (datesModalEntrega.disabled = Boolean(isLoading));
+        };
+
+        const setBudgetModalSubmitLabel = () => {
+            if (!budgetModalSubmit) {
+                return;
+            }
+
+            const shouldSend = Boolean(budgetModalNotify?.checked) && budgetModalNotify?.dataset.available === '1';
+            budgetModalSubmit.innerHTML = shouldSend
+                ? '<i class="bi bi-whatsapp me-1"></i>Gerar e enviar'
+                : '<i class="bi bi-file-earmark-pdf me-1"></i>Gerar PDF';
+        };
+
+        const setBudgetModalLoading = (isLoading) => {
+            if (budgetModalSubmit) {
+                budgetModalSubmit.disabled = Boolean(isLoading);
+                budgetModalSubmit.innerHTML = isLoading
+                    ? '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processando...'
+                    : budgetModalSubmit.innerHTML;
+            }
+
+            budgetModalNotify && (budgetModalNotify.disabled = Boolean(isLoading) || budgetModalNotify.dataset.available !== '1');
+            budgetModalPhone && (budgetModalPhone.disabled = Boolean(isLoading));
+            budgetModalMessage && (budgetModalMessage.disabled = Boolean(isLoading));
+
+            if (!isLoading) {
+                setBudgetModalSubmitLabel();
+            }
+        };
+
+        const renderBudgetDocuments = (documents) => {
+            if (!budgetModalDocsList) {
+                return;
+            }
+
+            if (!Array.isArray(documents) || documents.length === 0) {
+                budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Nenhum orçamento PDF registrado para esta OS.</p>';
+                return;
+            }
+
+            budgetModalDocsList.innerHTML = documents.map((doc) => {
+                const downloadUrl = String(doc?.url || '').trim();
+                const version = Number.parseInt(doc?.versao || 1, 10) || 1;
+                const createdAt = String(doc?.created_at_label || '').trim() || 'Sem data';
+
+                return [
+                    '<div class="os-budget-doc-item">',
+                    '<div>',
+                    `<strong>Orçamento v${version}</strong>`,
+                    `<span>${escapeHtml(createdAt)}</span>`,
+                    '</div>',
+                    downloadUrl
+                        ? `<a href="${escapeHtml(downloadUrl)}" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener"><i class="bi bi-download"></i></a>`
+                        : '<span class="badge bg-light text-dark border">Sem arquivo</span>',
+                    '</div>',
+                ].join('');
+            }).join('');
+        };
+
+        const hydrateDatesModal = (payload) => {
+            const osMeta = payload?.os || {};
+            const datesMeta = payload?.dates || {};
+            const entryBaseValue = String(datesMeta?.data_entrada || '').trim();
+
+            datesModalNumero && (datesModalNumero.textContent = osMeta?.numero_os ? `#${osMeta.numero_os}` : '-');
+            datesModalBadges && (datesModalBadges.innerHTML = [
+                String(osMeta?.statusBadgeHtml || '').trim(),
+                String(osMeta?.flowBadgeHtml || '').trim(),
+                String(osMeta?.priorityBadgeHtml || '').trim(),
+            ].filter(Boolean).join(''));
+            datesModalClientName && (datesModalClientName.textContent = String(osMeta?.cliente_nome || '').trim() || '-');
+            datesModalEquipmentName && (datesModalEquipmentName.textContent = String(osMeta?.equipamento_nome || '').trim() || '-');
+            datesModalElement && (datesModalElement.dataset.entryBase = entryBaseValue);
+            datesModalEntrada && (datesModalEntrada.value = String(datesMeta?.data_entrada_label || '-'));
+            datesModalPrevisao && (datesModalPrevisao.value = String(datesMeta?.data_previsao || '').trim());
+            datesModalEntrega && (datesModalEntrega.value = String(datesMeta?.data_entrega_label || '-'));
+            datesModalPreset && (datesModalPreset.value = '');
+            datesModalEntradaAtual && (datesModalEntradaAtual.textContent = String(datesMeta?.data_entrada_label || '-'));
+            datesModalPrevisaoAtual && (datesModalPrevisaoAtual.textContent = String(datesMeta?.data_previsao_label || '-'));
+            datesModalEntregaAtual && (datesModalEntregaAtual.textContent = String(datesMeta?.data_entrega_label || '-'));
+            datesModalPrazoDias && (datesModalPrazoDias.textContent = Number.isFinite(Number(datesMeta?.prazo_dias))
+                ? `${Number(datesMeta.prazo_dias)} dia(s)`
+                : '-');
+        };
+
+        const openDatesModal = async (osId) => {
+            if (!datesModal || !config.datesMetaUrlBase) {
+                return;
+            }
+
+            activeDatesOsId = osId;
+            datesModalNumero && (datesModalNumero.textContent = '-');
+            datesModalBadges && (datesModalBadges.innerHTML = '');
+            datesModalClientName && (datesModalClientName.textContent = '-');
+            datesModalEquipmentName && (datesModalEquipmentName.textContent = '-');
+            datesModalElement && (datesModalElement.dataset.entryBase = '');
+            datesModalEntrada && (datesModalEntrada.value = '-');
+            datesModalEntrega && (datesModalEntrega.value = '-');
+            datesModalEntradaAtual && (datesModalEntradaAtual.textContent = '-');
+            datesModalPrevisaoAtual && (datesModalPrevisaoAtual.textContent = '-');
+            datesModalEntregaAtual && (datesModalEntregaAtual.textContent = '-');
+            datesModalPrazoDias && (datesModalPrazoDias.textContent = '-');
+            datesModalForm?.reset();
+            setDatesModalLoading(true);
+            datesModal.show();
+
+            try {
+                const response = await window.fetch(`${config.datesMetaUrlBase}/${osId}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin',
+                });
+                const payload = await response.json();
+                updateCsrfFromPayload(payload);
+
+                if (!response.ok || !payload.ok) {
+                    throw new Error(payload.message || 'Nao foi possivel carregar os prazos da OS.');
+                }
+
+                hydrateDatesModal(payload);
+            } catch (error) {
+                datesModal.hide();
+                if (window.Swal) {
+                    window.Swal.fire({
+                        icon: 'error',
+                        title: 'Falha ao carregar prazos',
+                        text: error.message || 'Nao foi possivel carregar os prazos da OS.',
+                    });
+                } else {
+                    alert(error.message || 'Nao foi possivel carregar os prazos da OS.');
+                }
+            } finally {
+                setDatesModalLoading(false);
+            }
+        };
+
+        const hydrateBudgetModal = (payload) => {
+            const osMeta = payload?.os || {};
+            const budgetMeta = payload?.budget || {};
+            const tipo = String(osMeta?.equip_tipo_label || osMeta?.equip_tipo || '').trim() || '-';
+            const marca = String(osMeta?.equip_marca || '').trim() || '-';
+            const modelo = String(osMeta?.equip_modelo || '').trim() || '-';
+            const phone = String(budgetMeta?.telefone || osMeta?.cliente_telefone || '').trim();
+            const canSend = Boolean(budgetMeta?.can_send_whatsapp);
+            const hasPhone = phone !== '';
+
+            budgetModalNumero && (budgetModalNumero.textContent = osMeta?.numero_os ? `#${osMeta.numero_os}` : '-');
+            budgetModalBadges && (budgetModalBadges.innerHTML = [
+                String(osMeta?.statusBadgeHtml || '').trim(),
+                String(osMeta?.flowBadgeHtml || '').trim(),
+                String(osMeta?.priorityBadgeHtml || '').trim(),
+            ].filter(Boolean).join(''));
+            budgetModalClientName && (budgetModalClientName.textContent = String(osMeta?.cliente_nome || '').trim() || '-');
+            budgetModalClientPhone && (budgetModalClientPhone.textContent = `Telefone: ${phone || '-'}`);
+            budgetModalClientEmail && (budgetModalClientEmail.textContent = `Email: ${String(osMeta?.cliente_email || '').trim() || '-'}`);
+            budgetModalEquipmentName && (budgetModalEquipmentName.textContent = String(osMeta?.equipamento_nome || '').trim() || '-');
+            budgetModalEquipmentMeta && (budgetModalEquipmentMeta.textContent = `Tipo: ${tipo} | Marca: ${marca} | Modelo: ${modelo}`);
+            budgetModalMaoObra && (budgetModalMaoObra.textContent = String(budgetMeta?.valor_mao_obra_label || formatCurrencyValue(budgetMeta?.valor_mao_obra)));
+            budgetModalPecas && (budgetModalPecas.textContent = String(budgetMeta?.valor_pecas_label || formatCurrencyValue(budgetMeta?.valor_pecas)));
+            budgetModalSubtotal && (budgetModalSubtotal.textContent = String(budgetMeta?.valor_total_label || formatCurrencyValue(budgetMeta?.valor_total)));
+            budgetModalValorFinal && (budgetModalValorFinal.textContent = String(budgetMeta?.valor_final_label || formatCurrencyValue(budgetMeta?.valor_final)));
+            budgetModalPhone && (budgetModalPhone.value = phone);
+            budgetModalMessage && (budgetModalMessage.value = '');
+
+            if (budgetModalNotify) {
+                budgetModalNotify.dataset.available = canSend ? '1' : '0';
+                budgetModalNotify.checked = canSend && hasPhone;
+                budgetModalNotify.disabled = !canSend;
+            }
+
+            if (budgetModalNotifyHelp) {
+                if (!canSend) {
+                    budgetModalNotifyHelp.textContent = 'Seu perfil atual não possui permissão para envio do orçamento ao cliente.';
+                    budgetModalNotifyHelp.classList.add('text-danger');
+                } else if (!hasPhone) {
+                    budgetModalNotifyHelp.textContent = 'Cliente sem telefone cadastrado. Informe um número abaixo se quiser enviar o orçamento agora.';
+                    budgetModalNotifyHelp.classList.remove('text-danger');
+                } else {
+                    budgetModalNotifyHelp.textContent = `Telefone atual para envio: ${phone}`;
+                    budgetModalNotifyHelp.classList.remove('text-danger');
+                }
+            }
+
+            renderBudgetDocuments(budgetMeta?.documents || []);
+            setBudgetModalSubmitLabel();
+        };
+
+        const openBudgetModal = async (osId) => {
+            if (!budgetModal || !config.budgetMetaUrlBase) {
+                return;
+            }
+
+            activeBudgetOsId = osId;
+            budgetModalNumero && (budgetModalNumero.textContent = '-');
+            budgetModalBadges && (budgetModalBadges.innerHTML = '');
+            budgetModalClientName && (budgetModalClientName.textContent = '-');
+            budgetModalClientPhone && (budgetModalClientPhone.textContent = 'Telefone: -');
+            budgetModalClientEmail && (budgetModalClientEmail.textContent = 'Email: -');
+            budgetModalEquipmentName && (budgetModalEquipmentName.textContent = '-');
+            budgetModalEquipmentMeta && (budgetModalEquipmentMeta.textContent = 'Tipo: -');
+            budgetModalMaoObra && (budgetModalMaoObra.textContent = 'R$ 0,00');
+            budgetModalPecas && (budgetModalPecas.textContent = 'R$ 0,00');
+            budgetModalSubtotal && (budgetModalSubtotal.textContent = 'R$ 0,00');
+            budgetModalValorFinal && (budgetModalValorFinal.textContent = 'R$ 0,00');
+            budgetModalPhone && (budgetModalPhone.value = '');
+            budgetModalMessage && (budgetModalMessage.value = '');
+            budgetModalDocsList && (budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Carregando orçamentos...</p>');
+            budgetModalForm?.reset();
+            if (budgetModalNotify) {
+                budgetModalNotify.dataset.available = '0';
+                budgetModalNotify.checked = false;
+            }
+            setBudgetModalLoading(true);
+            budgetModal.show();
+
+            try {
+                const response = await window.fetch(`${config.budgetMetaUrlBase}/${osId}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin',
+                });
+                const payload = await response.json();
+                updateCsrfFromPayload(payload);
+
+                if (!response.ok || !payload.ok) {
+                    throw new Error(payload.message || 'Não foi possível carregar o orçamento da OS.');
+                }
+
+                hydrateBudgetModal(payload);
+            } catch (error) {
+                budgetModal.hide();
+                if (window.Swal) {
+                    window.Swal.fire({
+                        icon: 'error',
+                        title: 'Falha ao carregar orçamento',
+                        text: error.message || 'Não foi possível carregar o orçamento da OS.',
+                    });
+                } else {
+                    alert(error.message || 'Não foi possível carregar o orçamento da OS.');
+                }
+            } finally {
+                setBudgetModalLoading(false);
+            }
+        };
+
+        const resolveTimelineBadge = (state) => {
+            const key = String(state || 'upcoming').trim();
+            if (key === 'completed') {
+                return {
+                    label: 'Concluida',
+                    className: 'bg-success-subtle text-success-emphasis border border-success-subtle',
+                };
+            }
+            if (key === 'current') {
+                return {
+                    label: 'Atual',
+                    className: 'bg-primary-subtle text-primary-emphasis border border-primary-subtle',
+                };
+            }
+            if (key === 'probable') {
+                return {
+                    label: 'Provavel',
+                    className: 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
+                };
+            }
+
+            return {
+                label: 'Futura',
+                className: 'bg-light text-dark border',
+            };
+        };
+
+        const resolveStatusName = (groupedOptions, code) => {
+            const normalizedCode = String(code || '').trim();
+            if (!normalizedCode) {
+                return '';
+            }
+
+            const groups = groupedOptions || {};
+            for (const items of Object.values(groups)) {
+                if (!Array.isArray(items)) {
+                    continue;
+                }
+
+                const match = items.find((item) => String(item?.codigo || '').trim() === normalizedCode);
+                if (match) {
+                    return String(match?.nome || normalizedCode).trim();
+                }
+            }
+
+            return normalizedCode;
+        };
+
+        const setStatusModalSubmitLabel = (label) => {
+            if (!statusModalSubmit) {
+                return;
+            }
+
+            const actionLabel = String(label || '').trim() || 'Salvar status';
+            statusModalSubmit.dataset.label = actionLabel;
+            statusModalSubmit.innerHTML = `<i class="bi bi-check2-circle me-1"></i>${escapeHtml(actionLabel)}`;
+        };
+
+        const setStatusQuickButtonState = (button, enabled, code, name, submitLabel) => {
+            if (!button) {
+                return;
+            }
+
+            button.disabled = !enabled;
+            button.dataset.statusCode = enabled ? String(code || '') : '';
+            button.dataset.statusName = enabled ? String(name || '') : '';
+            button.dataset.submitLabel = enabled ? String(submitLabel || '') : '';
+            button.classList.remove('active');
+        };
+
+        const setSelectedStatusTarget = (statusCode, statusName, options = {}) => {
+            const code = String(statusCode || '').trim();
+            const name = String(statusName || code || '').trim();
+            const submitLabel = String(options.submitLabel || '').trim() || 'Salvar status';
+            const source = String(options.source || 'manual').trim() || 'manual';
+
+            activeStatusSelectionSource = source;
+
+            if (statusModalSelect) {
+                statusModalSelect.value = code;
+            }
+
+            if (statusModalTargetHint) {
+                if (!code) {
+                    statusModalTargetHint.textContent = 'Selecione um destino no fluxo para continuar.';
+                } else if (source === 'quick-next') {
+                    statusModalTargetHint.innerHTML = `Fluxo normal selecionado: <strong>${escapeHtml(name)}</strong>.`;
+                } else if (source === 'quick-cancel') {
+                    statusModalTargetHint.innerHTML = 'Atendimento marcado para <strong>Cancelado</strong>.';
+                } else {
+                    statusModalTargetHint.innerHTML = `Destino selecionado: <strong>${escapeHtml(name)}</strong>.`;
+                }
+            }
+
+            setStatusModalSubmitLabel(submitLabel);
+
+            statusModalQuickNext?.classList.toggle('active', code !== '' && code === String(statusModalQuickNext?.dataset.statusCode || ''));
+            statusModalQuickCancel?.classList.toggle('active', code !== '' && code === String(statusModalQuickCancel?.dataset.statusCode || ''));
+        };
+
+        const renderStatusTimeline = (timeline) => {
+            if (!statusModalTimeline) {
+                return;
+            }
+
+            if (!Array.isArray(timeline) || timeline.length === 0) {
+                statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponivel para esta OS.</p>';
+                return;
+            }
+
+            const html = timeline.map((stage) => {
+                const stageState = String(stage?.state || 'upcoming').trim() || 'upcoming';
+                const badgeMeta = resolveTimelineBadge(stageState);
+                const label = escapeHtml(stage?.label || 'Etapa');
+                const currentStatusName = String(stage?.current_status_name || '').trim();
+                const lastStatusName = String(stage?.last_status_name || '').trim();
+                const nextStatusNames = Array.isArray(stage?.next_status_names) ? stage.next_status_names.filter(Boolean) : [];
+                const lastEventAt = formatStatusDateTime(stage?.last_event_at || '');
+                const lastUserName = String(stage?.last_user_name || '').trim();
+
+                let description = 'Etapa futura do fluxo da ordem de servico.';
+                if (stageState === 'current' && currentStatusName) {
+                    description = `Etapa atual: ${escapeHtml(currentStatusName)}.`;
+                } else if (stageState === 'completed' && lastStatusName) {
+                    description = `Passou por ${escapeHtml(lastStatusName)}.`;
+                } else if (stageState === 'probable' && nextStatusNames.length > 0) {
+                    description = `Proximos movimentos provaveis: ${escapeHtml(nextStatusNames.join(', '))}.`;
+                }
+
+                const metaParts = [];
+                if (lastEventAt) {
+                    metaParts.push(lastEventAt);
+                }
+                if (lastUserName) {
+                    metaParts.push(`por ${escapeHtml(lastUserName)}`);
+                }
+
+                return [
+                    `<div class="os-workflow-step is-${escapeHtml(stageState)}">`,
+                    '<div class="os-workflow-step-marker"></div>',
+                    '<div class="os-workflow-step-body">',
+                    '<div class="os-workflow-step-top">',
+                    `<div class="os-workflow-step-title">${label}</div>`,
+                    `<span class="badge ${badgeMeta.className}">${badgeMeta.label}</span>`,
+                    '</div>',
+                    `<div class="os-workflow-step-text">${description}</div>`,
+                    (metaParts.length > 0 ? `<div class="os-workflow-step-meta">${metaParts.join(' ')}</div>` : ''),
+                    '</div>',
+                    '</div>',
+                ].join('');
+            }).join('');
+
+            statusModalTimeline.innerHTML = `<div class="os-workflow-timeline">${html}</div>`;
+        };
+
+        const renderStatusHistory = (history) => {
+            if (!statusModalHistoryWrap || !statusModalHistoryList) {
+                return;
+            }
+
+            if (!Array.isArray(history) || history.length === 0) {
+                statusModalHistoryWrap.classList.add('is-empty');
+                statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem historico recente para esta OS.</p>';
+                return;
+            }
+
+            statusModalHistoryWrap.classList.remove('is-empty');
+            statusModalHistoryList.innerHTML = history.map((item) => {
+                const statusName = escapeHtml(String(item?.status_novo || '-').replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()));
+                const createdAt = formatStatusDateTime(item?.created_at || '');
+                const userName = String(item?.usuario_nome || '').trim();
+
+                return [
+                    '<div class="os-workflow-history-item">',
+                    `<strong>${statusName}</strong>`,
+                    (createdAt ? `<span>${escapeHtml(createdAt)}</span>` : ''),
+                    (userName ? `<small>por ${escapeHtml(userName)}</small>` : ''),
+                    '</div>',
+                ].join('');
+            }).join('');
         };
 
         const setPhotoModalLoading = (isLoading) => {
@@ -1091,10 +1659,13 @@
             statusModalSubmit.disabled = Boolean(isLoading);
             statusModalSelect && (statusModalSelect.disabled = Boolean(isLoading));
             statusModalObservacao && (statusModalObservacao.disabled = Boolean(isLoading));
+            statusModalQuickNext && (statusModalQuickNext.disabled = Boolean(isLoading) || !statusModalQuickNext.dataset.statusCode);
+            statusModalQuickCancel && (statusModalQuickCancel.disabled = Boolean(isLoading) || !statusModalQuickCancel.dataset.statusCode);
+            statusModalNotify && (statusModalNotify.disabled = Boolean(isLoading) || statusModalNotify.dataset.available !== '1');
 
             statusModalSubmit.innerHTML = isLoading
                 ? '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Salvando...'
-                : '<i class="bi bi-check2-circle me-1"></i>Salvar status';
+                : `<i class="bi bi-check2-circle me-1"></i>${escapeHtml(statusModalSubmit.dataset.label || 'Salvar status')}`;
         };
 
         const populateStatusOptions = (groupedOptions, currentStatus) => {
@@ -1127,16 +1698,139 @@
             statusModalSelect.innerHTML = fragments.join('');
         };
 
+        const hydrateStatusModal = (payload) => {
+            activeStatusModalMeta = payload || null;
+            const osMeta = payload?.os || {};
+            const groupedOptions = payload?.options || {};
+            const primaryNextStatus = payload?.primaryNextStatus || null;
+            const hasClientPhone = Boolean(payload?.hasClientPhone);
+            const phoneLabel = String(osMeta?.cliente_telefone || '').trim();
+
+            statusModalNumero.textContent = osMeta?.numero_os
+                ? `#${osMeta.numero_os}`
+                : '-';
+
+            if (statusModalClientName) {
+                statusModalClientName.textContent = String(osMeta?.cliente_nome || '').trim() || '-';
+            }
+            if (statusModalClientPhone) {
+                statusModalClientPhone.textContent = `Telefone: ${String(osMeta?.cliente_telefone || '').trim() || '-'}`;
+            }
+            if (statusModalClientEmail) {
+                statusModalClientEmail.textContent = `Email: ${String(osMeta?.cliente_email || '').trim() || '-'}`;
+            }
+            if (statusModalEquipmentName) {
+                statusModalEquipmentName.textContent = String(osMeta?.equipamento_nome || '').trim() || '-';
+            }
+            if (statusModalEquipmentMeta) {
+                const tipo = String(osMeta?.equip_tipo_label || osMeta?.equip_tipo || '').trim() || '-';
+                const marca = String(osMeta?.equip_marca || '').trim() || '-';
+                const modelo = String(osMeta?.equip_modelo || '').trim() || '-';
+                statusModalEquipmentMeta.textContent = `Tipo: ${tipo} | Marca: ${marca} | Modelo: ${modelo}`;
+            }
+            if (statusModalEquipmentSerial) {
+                statusModalEquipmentSerial.textContent = `N de serie: ${String(osMeta?.equip_serie || '').trim() || '-'}`;
+            }
+
+            if (statusModalCurrentBadges) {
+                statusModalCurrentBadges.innerHTML = [
+                    String(osMeta?.statusBadgeHtml || '').trim(),
+                    String(osMeta?.flowBadgeHtml || '').trim(),
+                    String(osMeta?.priorityBadgeHtml || '').trim(),
+                ].filter(Boolean).join('');
+            }
+
+            populateStatusOptions(groupedOptions, osMeta?.status || '');
+
+            if (statusModalPrimaryHint) {
+                statusModalPrimaryHint.innerHTML = primaryNextStatus?.nome
+                    ? `Fluxo normal sugerido: <strong>${escapeHtml(primaryNextStatus.nome)}</strong>.`
+                    : 'Nao ha uma proxima etapa principal disponivel no fluxo atual.';
+            }
+
+            setStatusQuickButtonState(
+                statusModalQuickNext,
+                Boolean(primaryNextStatus?.codigo),
+                primaryNextStatus?.codigo || '',
+                primaryNextStatus?.nome || '',
+                'Avancar etapa'
+            );
+
+            const canCancel = Object.values(groupedOptions).some((items) => Array.isArray(items) && items.some((item) => String(item?.codigo || '').trim() === 'cancelado'));
+            const cancelStatusName = resolveStatusName(groupedOptions, 'cancelado') || 'Cancelado';
+            setStatusQuickButtonState(
+                statusModalQuickCancel,
+                canCancel,
+                canCancel ? 'cancelado' : '',
+                cancelStatusName,
+                'Cancelar OS'
+            );
+
+            if (statusModalNotify) {
+                statusModalNotify.dataset.available = hasClientPhone ? '1' : '0';
+                statusModalNotify.checked = hasClientPhone;
+                statusModalNotify.disabled = !hasClientPhone;
+            }
+
+            if (statusModalNotifyHelp) {
+                statusModalNotifyHelp.textContent = hasClientPhone
+                    ? `Telefone atual para comunicacao: ${phoneLabel || 'nao informado'}.`
+                    : 'Cliente sem telefone cadastrado para comunicacao automatica.';
+                statusModalNotifyHelp.classList.toggle('text-danger', !hasClientPhone);
+            }
+
+            renderStatusTimeline(payload?.workflowTimeline || []);
+            renderStatusHistory(payload?.workflowRecentHistory || []);
+
+            if (primaryNextStatus?.codigo) {
+                setSelectedStatusTarget(primaryNextStatus.codigo, primaryNextStatus.nome || primaryNextStatus.codigo, {
+                    source: 'quick-next',
+                    submitLabel: 'Avancar etapa',
+                });
+            } else {
+                setSelectedStatusTarget('', '', {
+                    source: 'manual',
+                    submitLabel: 'Salvar status',
+                });
+            }
+        };
+
         const openStatusModal = async (osId) => {
             if (!statusModal || !statusModalSelect) {
                 return;
             }
 
             activeStatusOsId = osId;
+            activeStatusModalMeta = null;
+            activeStatusSelectionSource = 'manual';
+            setStatusModalSubmitLabel('Salvar status');
             setStatusModalLoading(true);
             statusModalNumero.textContent = '-';
             statusModalObservacao.value = '';
             statusModalSelect.innerHTML = '<option value="">Carregando...</option>';
+            statusModalClientName && (statusModalClientName.textContent = '-');
+            statusModalClientPhone && (statusModalClientPhone.textContent = 'Telefone: -');
+            statusModalClientEmail && (statusModalClientEmail.textContent = 'Email: -');
+            statusModalEquipmentName && (statusModalEquipmentName.textContent = '-');
+            statusModalEquipmentMeta && (statusModalEquipmentMeta.textContent = 'Tipo: -');
+            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'N de serie: -');
+            statusModalCurrentBadges && (statusModalCurrentBadges.innerHTML = '');
+            statusModalPrimaryHint && (statusModalPrimaryHint.textContent = 'Carregando contexto da OS...');
+            statusModalTargetHint && (statusModalTargetHint.textContent = 'Selecione um destino no fluxo para continuar.');
+            statusModalTimeline && (statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Carregando fluxo visual...</p>');
+            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Carregando historico recente...</p>');
+            statusModalHistoryWrap?.classList.remove('is-empty');
+            if (statusModalNotify) {
+                statusModalNotify.checked = false;
+                statusModalNotify.disabled = true;
+                statusModalNotify.dataset.available = '0';
+            }
+            if (statusModalNotifyHelp) {
+                statusModalNotifyHelp.textContent = 'Verificando disponibilidade de comunicacao com o cliente...';
+                statusModalNotifyHelp.classList.remove('text-danger');
+            }
+            setStatusQuickButtonState(statusModalQuickNext, false, '', '', '');
+            setStatusQuickButtonState(statusModalQuickCancel, false, '', '', '');
             statusModal.show();
 
             try {
@@ -1154,10 +1848,7 @@
                     throw new Error(payload.message || 'Nao foi possivel carregar o fluxo de status.');
                 }
 
-                statusModalNumero.textContent = payload.os?.numero_os
-                    ? `#${payload.os.numero_os}`
-                    : '-';
-                populateStatusOptions(payload.options, payload.os?.status || '');
+                hydrateStatusModal(payload);
             } catch (error) {
                 statusModal.hide();
                 if (window.Swal) {
@@ -1181,6 +1872,7 @@
             writeUrlState(activeState);
             setupActiveChips(activeState, labelsMap, chipsWrap, chipsContainer, clearAllBtn);
             updateMobileFilterBadge();
+            updateLegacyToggleButtons();
 
             if (options.reload !== false) {
                 toggleLoadingOverlay(true);
@@ -1200,6 +1892,7 @@
             payload.q = activeState.q;
             payload.status = activeState.status;
             payload.status_list = activeState.status.join(',');
+            payload.legado = activeState.legado;
             payload.macrofase = activeState.macrofase;
             payload.estado_fluxo = activeState.estado_fluxo;
             payload.data_inicio = activeState.data_inicio;
@@ -1328,6 +2021,34 @@
                 return;
             }
 
+            const datesTrigger = event.target.closest('[data-os-dates-action]');
+            if (datesTrigger) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const osId = Number(datesTrigger.getAttribute('data-os-id') || '0');
+                if (!Number.isFinite(osId) || osId <= 0) {
+                    return;
+                }
+
+                openDatesModal(osId);
+                return;
+            }
+
+            const budgetTrigger = event.target.closest('[data-os-budget-action]');
+            if (budgetTrigger) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const osId = Number(budgetTrigger.getAttribute('data-os-id') || '0');
+                if (!Number.isFinite(osId) || osId <= 0) {
+                    return;
+                }
+
+                openBudgetModal(osId);
+                return;
+            }
+
             const trigger = event.target.closest('[data-os-status-action]');
             if (!trigger) {
                 return;
@@ -1342,6 +2063,174 @@
             }
 
             openStatusModal(osId);
+        });
+
+        datesModalPreset?.addEventListener('change', function () {
+            const previewValue = computeDateFromPreset(datesModalElement?.dataset.entryBase || '', this.value);
+            if (previewValue && datesModalPrevisao) {
+                datesModalPrevisao.value = previewValue;
+            }
+        });
+
+        budgetModalNotify?.addEventListener('change', function () {
+            setBudgetModalSubmitLabel();
+        });
+
+        statusModalQuickNext?.addEventListener('click', function () {
+            const code = String(this.dataset.statusCode || '').trim();
+            const name = String(this.dataset.statusName || '').trim() || resolveStatusName(activeStatusModalMeta?.options || {}, code);
+            if (!code) {
+                return;
+            }
+
+            setSelectedStatusTarget(code, name, {
+                source: 'quick-next',
+                submitLabel: String(this.dataset.submitLabel || 'Avancar etapa'),
+            });
+        });
+
+        statusModalQuickCancel?.addEventListener('click', function () {
+            const code = String(this.dataset.statusCode || '').trim();
+            const name = String(this.dataset.statusName || '').trim() || 'Cancelado';
+            if (!code) {
+                return;
+            }
+
+            setSelectedStatusTarget(code, name, {
+                source: 'quick-cancel',
+                submitLabel: String(this.dataset.submitLabel || 'Cancelar OS'),
+            });
+        });
+
+        statusModalSelect?.addEventListener('change', function () {
+            const code = String(this.value || '').trim();
+            const name = resolveStatusName(activeStatusModalMeta?.options || {}, code);
+            setSelectedStatusTarget(code, name, {
+                source: 'manual',
+                submitLabel: 'Salvar status',
+            });
+        });
+
+        datesModalForm?.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            if (!activeDatesOsId) {
+                return;
+            }
+
+            const formData = new window.FormData();
+            formData.append('data_previsao', datesModalPrevisao?.value || '');
+
+            if (config.csrfTokenKey && config.csrfTokenValue) {
+                formData.append(config.csrfTokenKey, config.csrfTokenValue);
+            }
+
+            setDatesModalLoading(true);
+
+            try {
+                const response = await window.fetch(`${config.datesUpdateUrlBase}/${activeDatesOsId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'same-origin',
+                    body: formData,
+                });
+
+                const payload = await response.json();
+                updateCsrfFromPayload(payload);
+
+                if (!response.ok || !payload.ok) {
+                    throw new Error(payload.message || 'Nao foi possivel atualizar os prazos.');
+                }
+
+                datesModal.hide();
+                if (window.Swal) {
+                    await window.Swal.fire({
+                        icon: 'success',
+                        title: 'Prazos atualizados',
+                        text: payload.message || 'Os prazos da OS foram atualizados com sucesso.',
+                    });
+                }
+
+                window.osListController.reload(true);
+            } catch (error) {
+                if (window.Swal) {
+                    window.Swal.fire({
+                        icon: 'error',
+                        title: 'Falha ao atualizar prazos',
+                        text: error.message || 'Nao foi possivel atualizar os prazos da OS.',
+                    });
+                } else {
+                    alert(error.message || 'Nao foi possivel atualizar os prazos da OS.');
+                }
+            } finally {
+                setDatesModalLoading(false);
+            }
+        });
+
+        budgetModalForm?.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            if (!activeBudgetOsId) {
+                return;
+            }
+
+            const formData = new window.FormData();
+            formData.append('telefone', budgetModalPhone?.value || '');
+            formData.append('mensagem_manual', budgetModalMessage?.value || '');
+            if (budgetModalNotify?.checked && budgetModalNotify.dataset.available === '1') {
+                formData.append('enviar_cliente', '1');
+            }
+
+            if (config.csrfTokenKey && config.csrfTokenValue) {
+                formData.append(config.csrfTokenKey, config.csrfTokenValue);
+            }
+
+            setBudgetModalLoading(true);
+
+            try {
+                const response = await window.fetch(`${config.budgetActionUrlBase}/${activeBudgetOsId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'same-origin',
+                    body: formData,
+                });
+
+                const payload = await response.json();
+                updateCsrfFromPayload(payload);
+
+                if (!response.ok || !payload.ok) {
+                    throw new Error(payload.message || 'Não foi possível gerar o orçamento da OS.');
+                }
+
+                budgetModal.hide();
+                if (window.Swal) {
+                    await window.Swal.fire({
+                        icon: payload.warning ? 'warning' : 'success',
+                        title: payload.warning ? 'Orçamento gerado com ressalvas' : 'Orçamento pronto',
+                        text: payload.warning
+                            ? `${payload.message || 'O PDF foi gerado.'} ${payload.warning}`
+                            : (payload.message || 'O PDF do orçamento foi gerado com sucesso.'),
+                    });
+                }
+
+                window.osListController.reload(true);
+            } catch (error) {
+                if (window.Swal) {
+                    window.Swal.fire({
+                        icon: 'error',
+                        title: 'Falha ao gerar orçamento',
+                        text: error.message || 'Não foi possível gerar o orçamento da OS.',
+                    });
+                } else {
+                    alert(error.message || 'Não foi possível gerar o orçamento da OS.');
+                }
+            } finally {
+                setBudgetModalLoading(false);
+            }
         });
 
         statusModalForm?.addEventListener('submit', async function (event) {
@@ -1367,6 +2256,10 @@
             const formData = new window.FormData();
             formData.append('status', statusModalSelect.value);
             formData.append('observacao_status', statusModalObservacao?.value || '');
+            formData.append('controla_comunicacao_cliente', '1');
+            if (statusModalNotify?.checked && statusModalNotify.dataset.available === '1') {
+                formData.append('comunicar_cliente', '1');
+            }
             if (config.csrfTokenKey && config.csrfTokenValue) {
                 formData.append(config.csrfTokenKey, config.csrfTokenValue);
             }
@@ -1395,7 +2288,9 @@
                     await window.Swal.fire({
                         icon: 'success',
                         title: 'Status atualizado',
-                        text: payload.message || 'O status da OS foi atualizado com sucesso.',
+                        text: payload.warning
+                            ? `${payload.message || 'O status da OS foi atualizado com sucesso.'} ${payload.warning}`
+                            : (payload.message || 'O status da OS foi atualizado com sucesso.'),
                     });
                 }
 
@@ -1417,13 +2312,83 @@
 
         statusModalElement?.addEventListener('hidden.bs.modal', function () {
             activeStatusOsId = null;
+            activeStatusModalMeta = null;
+            activeStatusSelectionSource = 'manual';
             if (statusModalForm) {
                 statusModalForm.reset();
             }
             if (statusModalSelect) {
                 statusModalSelect.innerHTML = '<option value="">Selecione um status</option>';
             }
+            statusModalClientName && (statusModalClientName.textContent = '-');
+            statusModalClientPhone && (statusModalClientPhone.textContent = 'Telefone: -');
+            statusModalClientEmail && (statusModalClientEmail.textContent = 'Email: -');
+            statusModalEquipmentName && (statusModalEquipmentName.textContent = '-');
+            statusModalEquipmentMeta && (statusModalEquipmentMeta.textContent = 'Tipo: -');
+            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'N de serie: -');
+            statusModalCurrentBadges && (statusModalCurrentBadges.innerHTML = '');
+            statusModalPrimaryHint && (statusModalPrimaryHint.textContent = 'Carregando contexto da OS...');
+            statusModalTargetHint && (statusModalTargetHint.textContent = 'Selecione um destino no fluxo para continuar.');
+            statusModalTimeline && (statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponivel para esta OS.</p>');
+            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem historico recente para esta OS.</p>');
+            statusModalHistoryWrap?.classList.remove('is-empty');
+            setStatusQuickButtonState(statusModalQuickNext, false, '', '', '');
+            setStatusQuickButtonState(statusModalQuickCancel, false, '', '', '');
+            if (statusModalNotify) {
+                statusModalNotify.checked = false;
+                statusModalNotify.disabled = true;
+                statusModalNotify.dataset.available = '0';
+            }
+            if (statusModalNotifyHelp) {
+                statusModalNotifyHelp.textContent = 'O cliente sera comunicado apenas se voce mantiver esta opcao ativa.';
+                statusModalNotifyHelp.classList.remove('text-danger');
+            }
+            setStatusModalSubmitLabel('Salvar status');
             setStatusModalLoading(false);
+        });
+
+        datesModalElement?.addEventListener('hidden.bs.modal', function () {
+            activeDatesOsId = null;
+            datesModalElement.dataset.entryBase = '';
+            datesModalForm?.reset();
+            datesModalNumero && (datesModalNumero.textContent = '-');
+            datesModalBadges && (datesModalBadges.innerHTML = '');
+            datesModalClientName && (datesModalClientName.textContent = '-');
+            datesModalEquipmentName && (datesModalEquipmentName.textContent = '-');
+            datesModalEntrada && (datesModalEntrada.value = '-');
+            datesModalEntrega && (datesModalEntrega.value = '-');
+            datesModalEntradaAtual && (datesModalEntradaAtual.textContent = '-');
+            datesModalPrevisaoAtual && (datesModalPrevisaoAtual.textContent = '-');
+            datesModalEntregaAtual && (datesModalEntregaAtual.textContent = '-');
+            datesModalPrazoDias && (datesModalPrazoDias.textContent = '-');
+            setDatesModalLoading(false);
+        });
+
+        budgetModalElement?.addEventListener('hidden.bs.modal', function () {
+            activeBudgetOsId = null;
+            budgetModalForm?.reset();
+            budgetModalNumero && (budgetModalNumero.textContent = '-');
+            budgetModalBadges && (budgetModalBadges.innerHTML = '');
+            budgetModalClientName && (budgetModalClientName.textContent = '-');
+            budgetModalClientPhone && (budgetModalClientPhone.textContent = 'Telefone: -');
+            budgetModalClientEmail && (budgetModalClientEmail.textContent = 'Email: -');
+            budgetModalEquipmentName && (budgetModalEquipmentName.textContent = '-');
+            budgetModalEquipmentMeta && (budgetModalEquipmentMeta.textContent = 'Tipo: -');
+            budgetModalMaoObra && (budgetModalMaoObra.textContent = 'R$ 0,00');
+            budgetModalPecas && (budgetModalPecas.textContent = 'R$ 0,00');
+            budgetModalSubtotal && (budgetModalSubtotal.textContent = 'R$ 0,00');
+            budgetModalValorFinal && (budgetModalValorFinal.textContent = 'R$ 0,00');
+            budgetModalDocsList && (budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Nenhum orçamento PDF registrado para esta OS.</p>');
+            if (budgetModalNotify) {
+                budgetModalNotify.checked = false;
+                budgetModalNotify.disabled = true;
+                budgetModalNotify.dataset.available = '0';
+            }
+            if (budgetModalNotifyHelp) {
+                budgetModalNotifyHelp.textContent = 'O envio utiliza o telefone cadastrado do cliente.';
+                budgetModalNotifyHelp.classList.remove('text-danger');
+            }
+            setBudgetModalLoading(false);
         });
 
         photoModalElements.element?.addEventListener('hidden.bs.modal', function () {
@@ -1560,7 +2525,19 @@
         syncForms();
         setupActiveChips(activeState, labelsMap, chipsWrap, chipsContainer, clearAllBtn);
         updateMobileFilterBadge();
+        updateLegacyToggleButtons();
         writeUrlState(activeState);
         saveStorageState(activeState);
+
+        legacyToggleButtons.forEach((button) => {
+            button.addEventListener('click', function () {
+                const nextState = normalizeState({
+                    ...activeState,
+                    legado: normalizeString(this.getAttribute('data-legacy-value')),
+                });
+                applyState(nextState, { reload: true });
+            });
+        });
     });
 })();
+

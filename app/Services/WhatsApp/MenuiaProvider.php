@@ -4,6 +4,8 @@ namespace App\Services\WhatsApp;
 
 class MenuiaProvider implements WhatsAppProviderInterface
 {
+    private const DEFAULT_BASE_URL = 'https://chatbot.menuia.com/api';
+
     private string $baseUrl;
     private string $authKey;
     private string $appKey;
@@ -101,7 +103,7 @@ class MenuiaProvider implements WhatsAppProviderInterface
         if (!empty($phone)) {
             return $this->sendText(
                 $phone,
-                '[Teste de conexao] ERP integracao Menuia ativa.',
+                '[Teste de conexao] ERP integracao Menuia ativa em ' . date('d/m/Y H:i:s') . '.',
                 ['tipo_evento' => 'teste_conexao']
             );
         }
@@ -200,7 +202,13 @@ class MenuiaProvider implements WhatsAppProviderInterface
     {
         $base = trim(rtrim($url, '/'));
         if ($base === '') {
-            return 'https://chatbot.menuia.com/api';
+            return self::DEFAULT_BASE_URL;
+        }
+
+        $parts = parse_url($base);
+        $host = strtolower((string) ($parts['host'] ?? ''));
+        if ($host === 'api.menuia.com') {
+            return self::DEFAULT_BASE_URL;
         }
 
         if (!str_ends_with(strtolower($base), '/api')) {

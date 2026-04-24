@@ -121,6 +121,21 @@ if (empty($itens)) {
                                 </label>
                             </div>
                         </div>
+                        <div class="col-12 d-none" id="orcamentoContatoAdicionalWrap">
+                            <div class="border rounded-3 bg-light-subtle px-3 py-2">
+                                <div class="small text-uppercase text-muted fw-semibold mb-1">Contato adicional do cliente</div>
+                                <div class="small d-flex flex-wrap gap-3">
+                                    <span class="d-none" id="orcamentoContatoAdicionalNomeWrap">
+                                        <strong>Nome:</strong>
+                                        <span id="orcamentoContatoAdicionalNome"></span>
+                                    </span>
+                                    <span class="d-none" id="orcamentoContatoAdicionalTelefoneWrap">
+                                        <strong>Telefone:</strong>
+                                        <span id="orcamentoContatoAdicionalTelefone"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label">Telefone de contato</label>
                             <input
@@ -133,8 +148,8 @@ if (empty($itens)) {
                                 maxlength="15"
                                 autocomplete="tel-national"
                                 placeholder="(11) 98765-4321"
-                                required
                             >
+                            <small class="text-muted d-block mt-1">Opcional. Informe quando quiser usar este numero no envio por WhatsApp.</small>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label">Email de contato</label>
@@ -806,6 +821,11 @@ if (empty($itens)) {
     const registrarContatoCheckbox = document.getElementById('orcamentoRegistrarContato');
     const telefoneInput = document.getElementById('orcamentoTelefone');
     const emailInput = document.getElementById('orcamentoEmail');
+    const contatoAdicionalWrap = document.getElementById('orcamentoContatoAdicionalWrap');
+    const contatoAdicionalNomeWrap = document.getElementById('orcamentoContatoAdicionalNomeWrap');
+    const contatoAdicionalNome = document.getElementById('orcamentoContatoAdicionalNome');
+    const contatoAdicionalTelefoneWrap = document.getElementById('orcamentoContatoAdicionalTelefoneWrap');
+    const contatoAdicionalTelefone = document.getElementById('orcamentoContatoAdicionalTelefone');
     const validadeDiasInput = document.getElementById('orcamentoValidadeDias');
     const validadeDataInput = document.getElementById('orcamentoValidadeData');
     const clienteLookupUrl = <?= json_encode(base_url('orcamentos/clientes/lookup')) ?>;
@@ -1957,6 +1977,7 @@ if (empty($itens)) {
 
         setNomeAvulsoLocked(false);
         setRegistrarContatoVisibility(false, false);
+        clearContatoAdicionalInfo();
 
         if (statusSelect) {
             statusSelect.value = DRAFT_STATUS_RASCUNHO;
@@ -2281,6 +2302,61 @@ if (empty($itens)) {
         return `(${ddd}) ${numero.slice(0, 5)}-${numero.slice(5, 9)}`;
     };
 
+    const formatContactPhoneDisplay = (rawValue) => {
+        let digits = String(rawValue ?? '').replace(/\D+/g, '');
+        if (digits.startsWith('55') && digits.length > 11) {
+            digits = digits.slice(2);
+        }
+        if (digits.length > 11) {
+            digits = digits.slice(0, 11);
+        }
+        if (digits.length <= 2) return digits;
+        const ddd = digits.slice(0, 2);
+        const numero = digits.slice(2);
+        if (numero.length <= 4) {
+            return `(${ddd}) ${numero}`;
+        }
+        if (numero.length <= 8) {
+            return `(${ddd}) ${numero.slice(0, 4)}-${numero.slice(4, 8)}`;
+        }
+        return `(${ddd}) ${numero.slice(0, 5)}-${numero.slice(5, 9)}`;
+    };
+
+    const clearContatoAdicionalInfo = () => {
+        if (contatoAdicionalNome) {
+            contatoAdicionalNome.textContent = '';
+        }
+        if (contatoAdicionalTelefone) {
+            contatoAdicionalTelefone.textContent = '';
+        }
+        contatoAdicionalNomeWrap?.classList.add('d-none');
+        contatoAdicionalTelefoneWrap?.classList.add('d-none');
+        contatoAdicionalWrap?.classList.add('d-none');
+    };
+
+    const renderContatoAdicionalInfo = (item) => {
+        const nome = normalizeTitleChunk(item?.contato_adicional_nome || '');
+        const telefoneRaw = normalizeTitleChunk(item?.contato_adicional_telefone || '');
+        const telefoneFormatado = formatContactPhoneDisplay(telefoneRaw) || telefoneRaw;
+        const hasNome = nome !== '';
+        const hasTelefone = telefoneFormatado !== '';
+
+        if (!hasNome && !hasTelefone) {
+            clearContatoAdicionalInfo();
+            return;
+        }
+
+        if (contatoAdicionalNome) {
+            contatoAdicionalNome.textContent = nome;
+        }
+        if (contatoAdicionalTelefone) {
+            contatoAdicionalTelefone.textContent = telefoneFormatado;
+        }
+        contatoAdicionalNomeWrap?.classList.toggle('d-none', !hasNome);
+        contatoAdicionalTelefoneWrap?.classList.toggle('d-none', !hasTelefone);
+        contatoAdicionalWrap?.classList.remove('d-none');
+    };
+
     const syncTelefoneValidation = () => {
         if (!telefoneInput) return '';
         const normalized = normalizeWhatsappDigits(telefoneInput.value);
@@ -2288,7 +2364,7 @@ if (empty($itens)) {
         telefoneInput.value = masked;
 
         if (normalized === '') {
-            telefoneInput.setCustomValidity('Informe um telefone celular com DDD para WhatsApp.');
+            telefoneInput.setCustomValidity('');
             return normalized;
         }
         if (!/^[1-9]{2}9\d{8}$/.test(normalized)) {
@@ -2375,6 +2451,7 @@ if (empty($itens)) {
         if (pacoteOfertaTelefoneInput) {
             pacoteOfertaTelefoneInput.value = '';
         }
+        clearContatoAdicionalInfo();
         clearPacoteOfertaState();
     };
 
@@ -2485,6 +2562,7 @@ if (empty($itens)) {
             if (nomeAvulsoInput) nomeAvulsoInput.value = '';
             if (telefoneInput) telefoneInput.value = telefone;
             if (emailInput) emailInput.value = email;
+            renderContatoAdicionalInfo(item);
             syncTelefoneValidation();
             syncPacoteOfertaPhoneFromContato();
             syncEmailValidation();
@@ -2498,6 +2576,7 @@ if (empty($itens)) {
             if (nomeAvulsoInput && nome !== '') nomeAvulsoInput.value = nome;
             if (telefoneInput) telefoneInput.value = telefone;
             if (emailInput) emailInput.value = email;
+            renderContatoAdicionalInfo(item);
             syncTelefoneValidation();
             syncPacoteOfertaPhoneFromContato();
             syncEmailValidation();
@@ -2518,6 +2597,7 @@ if (empty($itens)) {
             } else if (nomeAvulsoInput && termo !== '') {
                 nomeAvulsoInput.value = termo;
             }
+            clearContatoAdicionalInfo();
             syncTelefoneValidation();
             syncPacoteOfertaPhoneFromContato();
             syncEmailValidation();
@@ -2530,6 +2610,7 @@ if (empty($itens)) {
         if (nomeAvulsoInput && clienteId === '') {
             nomeAvulsoInput.value = nomeAvulsoInput.value || nome;
         }
+        renderContatoAdicionalInfo(item);
         setNomeAvulsoLocked(clienteId !== '' || contatoId !== '');
         syncTelefoneValidation();
         syncPacoteOfertaPhoneFromContato();
@@ -2843,6 +2924,11 @@ if (empty($itens)) {
         const jq = window.jQuery;
         if (!jq || !jq.fn || typeof jq.fn.select2 !== 'function' || !clienteLookupSelect) {
             setRegistrarContatoVisibility((clienteIdInput?.value || '') === '' && (contatoIdInput?.value || '') === '', false);
+            if (clienteLookupInitial && clienteLookupInitial.id) {
+                renderContatoAdicionalInfo(clienteLookupInitial);
+            } else {
+                clearContatoAdicionalInfo();
+            }
             currentClienteLookupKey = resolveClienteLookupKey(null);
             return;
         }
@@ -2854,6 +2940,9 @@ if (empty($itens)) {
             const badgeClass = tipo === 'cliente' ? 'bg-primary-subtle text-primary' : (tipo === 'contato' ? 'bg-info-subtle text-info' : 'bg-warning-subtle text-warning');
             const telefone = item?.telefone ? ` | ${escapeHtml(item.telefone)}` : '';
             const email = item?.email ? ` | ${escapeHtml(item.email)}` : '';
+            const contatoAdicionalNome = normalizeTitleChunk(item?.contato_adicional_nome || '');
+            const contatoAdicionalTelefone = formatContactPhoneDisplay(item?.contato_adicional_telefone || '');
+            const contatoAdicionalResumo = [contatoAdicionalNome, contatoAdicionalTelefone].filter(Boolean).map(escapeHtml).join(' | ');
             return `
                 <div class="d-flex flex-column">
                     <div class="d-flex align-items-center gap-2">
@@ -2861,6 +2950,7 @@ if (empty($itens)) {
                         <span>${escapeHtml(item.text || '')}</span>
                     </div>
                     ${(telefone || email) ? `<small class="text-muted">${telefone}${email}</small>` : ''}
+                    ${contatoAdicionalResumo !== '' ? `<small class="text-muted">Contato adicional: ${contatoAdicionalResumo}</small>` : ''}
                 </div>
             `;
         };
@@ -2914,6 +3004,7 @@ if (empty($itens)) {
         } else {
             setNomeAvulsoLocked(false);
             setRegistrarContatoVisibility((clienteIdInput?.value || '') === '' && (contatoIdInput?.value || '') === '', false);
+            clearContatoAdicionalInfo();
             syncTelefoneValidation();
             syncEmailValidation();
             notifyClienteSelectionChanged();
@@ -4207,13 +4298,6 @@ if (empty($itens)) {
             });
 
             bindClienteProgressiveEnterFlow(nomeAvulsoInput, () => {
-                const clienteId = normalizeId(clienteIdInput?.value || '');
-                const telefoneDigits = normalizeWhatsappDigits(String(telefoneInput?.value || ''));
-                if (clienteId === '' && telefoneInput && telefoneDigits === '') {
-                    telefoneInput.focus();
-                    telefoneInput.select?.();
-                    return;
-                }
                 focusPrimeiroCampoEquipamento();
             });
 
@@ -4636,7 +4720,7 @@ if (empty($itens)) {
                 errors.push('Tipo de orcamento: um orcamento previo não pode permanecer vinculado a uma OS aberta. Ajuste o tipo para "com equipamento na assistencia".');
             }
 
-            if (!isWhatsappMobileValid(phoneDigits)) {
+            if (phoneDigits !== '' && !isWhatsappMobileValid(phoneDigits)) {
                 errors.push('Telefone de contato: informe um celular WhatsApp com DDD (ex.: 11987654321).');
             }
 
@@ -4870,4 +4954,3 @@ if (empty($itens)) {
 <?= $this->endSection() ?>
 
 <?= $this->endSection() ?>
-

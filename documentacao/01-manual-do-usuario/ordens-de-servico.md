@@ -120,6 +120,16 @@ Também existem ações inline:
 - `Novo`
 - `Editar`
 
+### Sidebar de fotos na edição
+
+Na edição da OS, a lateral `Foto do Equipamento` continua exibindo a imagem principal e as miniaturas de forma imediata.
+
+Comportamento atual:
+
+- fotos reais do equipamento recebem atualização anti-cache automática quando há troca de principal, inclusão ou exclusão;
+- quando o equipamento não possui arquivo físico disponível, o sistema usa fallback inline sem quebrar a visualização;
+- o preview principal e as miniaturas permanecem sincronizados sem exigir recarga manual da página.
+
 ## Visualização da OS (`/os/visualizar/{id}`)
 
 ### Estrutura atual da tela

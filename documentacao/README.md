@@ -1,76 +1,76 @@
-# Documentação - Sistema de Assistência Técnica
+# Documentacao - Sistema de Assistencia Tecnica
 
 > Jovem Tech  
-> ERP atual: `2.15.0`  
+> ERP atual: `2.15.1`  
 > App mobile/PWA: `0.4.2`  
-> Atualizado em `23/04/2026`
+> Atualizado em `24/04/2026`
 
 ## Objetivo
 
-Este diretório concentra a documentação funcional, técnica e operacional do ERP da assistência técnica. O conteúdo abaixo foi consolidado para refletir o estado real publicado na VPS, com foco especial nos módulos de `Ordens de Serviço` e `Orçamentos`.
+Este diretorio concentra a documentacao funcional, tecnica e operacional do ERP da assistencia tecnica.
+
+O indice abaixo foi revisado para refletir a release `2.15.1`, com destaque para o modulo de `Orcamentos` e para o fluxo atualizado de `Dados do Cliente`.
 
 ## Estrutura
 
-| Pasta | Conteúdo principal |
+| Pasta | Conteudo principal |
 |---|---|
 | `00-visao-geral` | contexto do produto e stack |
-| `01-manual-do-usuario` | operação diária por módulo |
-| `02-manual-administrador` | configuração, permissões e governança |
-| `03-arquitetura-tecnica` | estrutura do código e fluxos internos |
-| `04-banco-de-dados` | tabelas, relacionamentos e regras de persistência |
-| `05-api` | rotas HTTP internas e públicas |
-| `06-modulos-do-sistema` | visão técnica por módulo |
+| `01-manual-do-usuario` | operacao diaria por modulo |
+| `02-manual-administrador` | configuracao, permissoes e governanca |
+| `03-arquitetura-tecnica` | estrutura do codigo e fluxos internos |
+| `04-banco-de-dados` | tabelas, relacionamentos e regras de persistencia |
+| `05-api` | rotas HTTP internas e publicas |
+| `06-modulos-do-sistema` | visao tecnica por modulo |
 | `07-novas-implementacoes` | releases e entregas funcionais |
-| `08-correcoes` | histórico de bugfixes e hotfixes |
+| `08-correcoes` | historico de bugfixes e hotfixes |
 | `09-roadmap` | planejamento futuro |
-| `10-deploy` | instalação, atualização e operação em VPS |
-| `11-padroes` | convenções de projeto |
-| `12-app-mobile-pwa` | documentação dedicada do app mobile/PWA |
+| `10-deploy` | instalacao, atualizacao e operacao em VPS |
+| `11-padroes` | convencoes de projeto |
+| `12-app-mobile-pwa` | documentacao dedicada do app mobile/PWA |
 
-## Leitura rápida recomendada
+## Leitura rapida recomendada
 
-### Operação
+### Operacao
 
-- OS - manual do usuário: `01-manual-do-usuario/ordens-de-servico.md`
-- Orçamentos - manual do usuário: `01-manual-do-usuario/orcamentos.md`
+- OS - manual do usuario: `01-manual-do-usuario/ordens-de-servico.md`
+- Orcamentos - manual do usuario: `01-manual-do-usuario/orcamentos.md`
 - Fluxo administrativo de OS: `02-manual-administrador/fluxo-de-trabalho-os.md`
-- Orçamentos e permissões: `02-manual-administrador/orcamentos-e-permissoes.md`
 
-### Técnica
+### Tecnica
 
-- Módulo OS: `06-modulos-do-sistema/ordens-de-servico.md`
-- Módulo Orçamentos: `06-modulos-do-sistema/orcamentos.md`
-- Arquitetura do módulo de orçamentos: `03-arquitetura-tecnica/modulo-orcamentos.md`
+- Modulo OS: `06-modulos-do-sistema/ordens-de-servico.md`
+- Modulo Orcamentos: `06-modulos-do-sistema/orcamentos.md`
+- Arquitetura do modulo de orcamentos: `03-arquitetura-tecnica/modulo-orcamentos.md`
 - Estrutura de pastas: `03-arquitetura-tecnica/estrutura-de-pastas.md`
-- Rotas web de orçamentos: `05-api/orcamentos-web.md`
 
-### Versão e release atual
+### Versao e release atual
 
-- Histórico oficial de versões do ERP: `07-novas-implementacoes/historico-de-versoes.md`
-- Release atual: `07-novas-implementacoes/2026-04-23-release-v2.15.0-os-orcamentos-documentacao-e-versionamento.md`
-- Registro desta atualização na VPS: `10-deploy/2026-04-23-atualizacao-vps-release-v2.15.0.md`
+- Historico oficial de versoes do ERP: `07-novas-implementacoes/historico-de-versoes.md`
+- Release atual: `07-novas-implementacoes/2026-04-24-release-v2.15.1-orcamentos-contato-opcional.md`
+- Registro da release anterior na VPS: `10-deploy/2026-04-23-atualizacao-vps-release-v2.15.0.md`
 
 ### App mobile/PWA
 
 - Hub oficial do app: `12-app-mobile-pwa/README.md`
-- Política de versões do app: `12-app-mobile-pwa/09-versionamento-e-releases/politica-de-versoes.md`
-- Histórico do app: `12-app-mobile-pwa/09-versionamento-e-releases/historico-de-versoes.md`
+- Politica de versoes do app: `12-app-mobile-pwa/09-versionamento-e-releases/politica-de-versoes.md`
+- Historico do app: `12-app-mobile-pwa/09-versionamento-e-releases/historico-de-versoes.md`
 
-## O que foi consolidado nesta atualização documental
+## O que foi consolidado nesta atualizacao documental
 
-- nova leitura operacional da visualização da OS;
-- sincronização oficial entre status de OS e status do orçamento vinculado;
-- comportamento do botão de orçamento na OS;
-- comportamento protegido do modal `Nova OS` na listagem;
-- revisão e normalização UTF-8 dos documentos centrais de OS e Orçamentos;
-- alinhamento entre documentação, release publicada e versão do sistema.
+- manual oficial de Orcamentos publicado em `01-manual-do-usuario/orcamentos.md`;
+- documentacao tecnica do modulo publicada em `06-modulos-do-sistema/orcamentos.md`;
+- arquitetura do modulo consolidada em `03-arquitetura-tecnica/modulo-orcamentos.md`;
+- formulario de Orcamentos atualizado para aceitar telefone de contato opcional;
+- exibicao do contato adicional do cliente documentada para o card `Dados do Cliente`;
+- alinhamento entre documentacao, release `2.15.1` e versao exibida no sistema.
 
 ## Regra editorial
 
 Sempre que houver nova release do ERP:
 
 1. atualizar `app/Config/SystemRelease.php`;
-2. revisar este índice;
-3. atualizar o histórico oficial em `07-novas-implementacoes/historico-de-versoes.md`;
-4. publicar a nota técnica da release;
-5. registrar a atualização de VPS em `10-deploy/`, quando aplicável.
+2. revisar este indice;
+3. atualizar o historico oficial em `07-novas-implementacoes/historico-de-versoes.md`;
+4. publicar a nota tecnica da release;
+5. registrar a atualizacao de VPS em `10-deploy/`, quando aplicavel.

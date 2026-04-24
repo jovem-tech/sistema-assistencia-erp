@@ -5541,9 +5541,18 @@ function bumpEquipamentoFotosVersion() {
 
 function withFotoVersion(url, version = equipamentoFotosVersion) {
     if (!url) return '';
-    const value = String(url);
-    const separator = value.includes('?') ? '&' : '?';
-    return `${value}${separator}v=${version}`;
+    const value = String(url).trim();
+    if (!value) return '';
+    if (/^(data:|blob:)/i.test(value)) {
+        return value;
+    }
+
+    const hashIndex = value.indexOf('#');
+    const hash = hashIndex >= 0 ? value.slice(hashIndex) : '';
+    const base = hashIndex >= 0 ? value.slice(0, hashIndex) : value;
+    const separator = base.includes('?') ? '&' : '?';
+
+    return `${base}${separator}v=${version}${hash}`;
 }
 
 function renderFotosEquipamentoSidebar(fotos, equipData) {
@@ -8640,4 +8649,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?= $this->endSection() ?>
-

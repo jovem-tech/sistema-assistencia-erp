@@ -203,6 +203,7 @@ class Orcamentos extends BaseController
             }
         }
         $contatos = $this->searchContatosForLookup($term, $limit, array_keys($phonesFromClientes));
+        $contatoAdicionalPorCliente = $this->loadContatoAdicionalByClienteIds($contatos);
         $results = [];
         foreach ($clientes as $cliente) {
             $nome = trim((string) ($cliente['nome_razao'] ?? ''));
@@ -215,7 +216,7 @@ class Orcamentos extends BaseController
             if ($email !== '') {
                 $text .= ' | ' . $email;
             }
-            $results[] = [
+            $results[] = array_merge([
                 'id' => 'cliente:' . (int) $cliente['id'],
                 'text' => $text,
                 'tipo' => 'cliente',
@@ -225,7 +226,7 @@ class Orcamentos extends BaseController
                 'telefone' => $telefone,
                 'email' => $email,
                 'source_label' => 'Cliente',
-            ];
+            ], $this->buildContatoAdicionalPayload($cliente));
         }
         foreach ($contatos as $contato) {
             $nome = trim((string) ($contato['nome'] ?? ''));
@@ -241,17 +242,21 @@ class Orcamentos extends BaseController
             if ($email !== '') {
                 $text .= ' | ' . $email;
             }
-            $results[] = [
+            $clienteVinculadoId = (int) ($contato['cliente_id'] ?? 0);
+            $contatoAdicional = $clienteVinculadoId > 0
+                ? ($contatoAdicionalPorCliente[$clienteVinculadoId] ?? $this->buildContatoAdicionalPayload([]))
+                : $this->buildContatoAdicionalPayload([]);
+            $results[] = array_merge([
                 'id' => 'contato:' . (int) $contato['id'],
                 'text' => $text,
                 'tipo' => 'contato',
-                'cliente_id' => (int) ($contato['cliente_id'] ?? 0) ?: null,
+                'cliente_id' => $clienteVinculadoId ?: null,
                 'contato_id' => (int) $contato['id'],
                 'nome' => $nome,
                 'telefone' => $telefone,
                 'email' => $email,
                 'source_label' => 'Contato',
-            ];
+            ], $contatoAdicional);
         }
         if ($term !== '' && empty($results)) {
             $results[] = [
@@ -2816,10 +2821,7 @@ class Orcamentos extends BaseController
     private function validateContatoPayload(array $payload): ?string
     {
         $telefone = trim((string) ($payload['telefone_contato'] ?? ''));
-        if ($telefone === '') {
-            return 'Informe o telefone de contato (celular com DDD e WhatsApp).';
-        }
-        if (!$this->isWhatsAppPhoneValid($telefone)) {
+        if ($telefone !== '' && !$this->isWhatsAppPhoneValid($telefone)) {
             return 'Telefone de contato invalido. Use um celular WhatsApp com DDD no formato 11987654321.';
         }
         $email = trim((string) ($payload['email_contato'] ?? ''));
@@ -2850,11 +2852,12 @@ class Orcamentos extends BaseController
     {
         $clienteModel = new ClienteModel();
         $builder = $clienteModel
-            ->select('id, nome_razao, telefone1, telefone_contato, email, cpf_cnpj, updated_at');
+            ->select('id, nome_razao, telefone1, nome_contato, telefone_contato, email, cpf_cnpj, updated_at');
         $digitsTerm = $this->normalizePhone($term);
         if ($term !== '') {
             $builder->groupStart()
                 ->like('nome_razao', $term)
+                ->orLike('nome_contato', $term)
                 ->orLike('cpf_cnpj', $term)
                 ->orLike('email', $term)
                 ->orLike('telefone1', $term)
@@ -2886,6 +2889,7 @@ class Orcamentos extends BaseController
     {
         $score = 100;
         $nome = strtolower((string) ($cliente['nome_razao'] ?? ''));
+        $nomeContato = strtolower((string) ($cliente['nome_contato'] ?? ''));
         $termLower = strtolower($term);
         $telefone1 = $this->normalizePhone((string) ($cliente['telefone1'] ?? ''));
         $telefoneContato = $this->normalizePhone((string) ($cliente['telefone_contato'] ?? ''));
@@ -2905,6 +2909,13 @@ class Orcamentos extends BaseController
                 $score = min($score, 10);
             } elseif ($termLower !== '' && str_contains($nome, $termLower)) {
                 $score = min($score, 20);
+            }
+        }
+        if ($nomeContato !== '') {
+            if ($termLower !== '' && str_starts_with($nomeContato, $termLower)) {
+                $score = min($score, 14);
+            } elseif ($termLower !== '' && str_contains($nomeContato, $termLower)) {
+                $score = min($score, 24);
             }
         }
         return $score;
@@ -2985,6 +2996,47 @@ class Orcamentos extends BaseController
         return $score;
     }
     /**
+     * @param array<string,mixed> $cliente
+     * @return array<string,string>
+     */
+    private function buildContatoAdicionalPayload(array $cliente): array
+    {
+        return [
+            'contato_adicional_nome' => trim((string) ($cliente['nome_contato'] ?? '')),
+            'contato_adicional_telefone' => trim((string) ($cliente['telefone_contato'] ?? '')),
+        ];
+    }
+    /**
+     * @param array<int,array<string,mixed>> $contatos
+     * @return array<int,array<string,string>>
+     */
+    private function loadContatoAdicionalByClienteIds(array $contatos): array
+    {
+        $clienteIds = [];
+        foreach ($contatos as $contato) {
+            $clienteId = (int) ($contato['cliente_id'] ?? 0);
+            if ($clienteId > 0) {
+                $clienteIds[$clienteId] = $clienteId;
+            }
+        }
+        if (empty($clienteIds)) {
+            return [];
+        }
+        $rows = (new ClienteModel())
+            ->select('id, nome_contato, telefone_contato')
+            ->whereIn('id', array_values($clienteIds))
+            ->findAll();
+        $map = [];
+        foreach ($rows as $cliente) {
+            $clienteId = (int) ($cliente['id'] ?? 0);
+            if ($clienteId <= 0) {
+                continue;
+            }
+            $map[$clienteId] = $this->buildContatoAdicionalPayload($cliente);
+        }
+        return $map;
+    }
+    /**
      * @return array<string,mixed>
      */
     private function buildClienteLookupInitial(array $orcamento): array
@@ -3004,7 +3056,7 @@ class Orcamentos extends BaseController
                 if ($email !== '') {
                     $text .= ' | ' . $email;
                 }
-                return [
+                return array_merge([
                     'id' => 'cliente:' . $clienteId,
                     'text' => $text,
                     'tipo' => 'cliente',
@@ -3014,7 +3066,7 @@ class Orcamentos extends BaseController
                     'telefone' => $telefone,
                     'email' => $email,
                     'source_label' => 'Cliente',
-                ];
+                ], $this->buildContatoAdicionalPayload($cliente));
             }
         }
         if ($contatoId > 0) {
@@ -3030,17 +3082,23 @@ class Orcamentos extends BaseController
                 if ($email !== '') {
                     $text .= ' | ' . $email;
                 }
-                return [
+                $clienteVinculadoId = (int) ($contato['cliente_id'] ?? 0);
+                $clienteContatoPayload = $clienteVinculadoId > 0
+                    ? $this->buildContatoAdicionalPayload((new ClienteModel())
+                        ->select('id, nome_contato, telefone_contato')
+                        ->find($clienteVinculadoId) ?? [])
+                    : $this->buildContatoAdicionalPayload([]);
+                return array_merge([
                     'id' => 'contato:' . $contatoId,
                     'text' => $text,
                     'tipo' => 'contato',
-                    'cliente_id' => (int) ($contato['cliente_id'] ?? 0) ?: null,
+                    'cliente_id' => $clienteVinculadoId ?: null,
                     'contato_id' => $contatoId,
                     'nome' => $nome,
                     'telefone' => $telefone,
                     'email' => $email,
                     'source_label' => 'Contato',
-                ];
+                ], $clienteContatoPayload);
             }
         }
         return [];

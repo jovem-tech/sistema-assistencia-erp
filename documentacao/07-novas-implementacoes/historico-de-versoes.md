@@ -1,7 +1,7 @@
 # Historico de Versoes do Sistema
 
-Atualizado em: 23/04/2026  
-Versao atual oficial: `2.15.0`
+Atualizado em: 24/04/2026  
+Versao atual oficial: `2.15.1`
 
 ## Observacao sobre o App Mobile/PWA
 
@@ -20,6 +20,19 @@ Estado documental atual do app:
 - documentacao exclusiva aprofundada em 04/04/2026
 
 ## Release ERP + App
+
+### 24/04/2026 - v2.15.1 / app 0.4.2
+- o formulario de Orcamentos passou a aceitar `Telefone de contato` como campo opcional em `/orcamentos/novo` e `/orcamentos/editar/{id}`;
+- a validacao do modulo foi alinhada em `frontend + backend`, mantendo a checagem de celular WhatsApp com DDD apenas quando o numero for informado;
+- o card `Dados do Cliente` passou a exibir `Contato adicional do cliente` com nome e telefone quando o cadastro possuir `clientes.nome_contato` e `clientes.telefone_contato`;
+- o autocomplete de cliente/contato passou a levar esse resumo adicional para a selecao e para o estado inicial de edicao;
+- publicada a documentacao oficial de Orcamentos nas secoes de manual do usuario, modulo tecnico, arquitetura e nota de release;
+- sincronizada a versao exibida no ERP com `app/Config/SystemRelease.php` em `2.15.1`.
+
+### 24/04/2026 - hotfix fotos fallback da OS (sem bump de versao)
+- corrigido o helper `withFotoVersion()` da tela `app/Views/os/form.php` para nao anexar `?v=timestamp` em origens `data:` e `blob:`;
+- a sidebar de foto do equipamento e o modal de fotos da OS voltaram a renderizar corretamente fallbacks inline quando o arquivo fisico nao existe;
+- mantido o anti-cache apenas para URLs reais de upload, preservando a reatividade apos inserir, excluir ou definir foto principal.
 
 ### 23/04/2026 - v2.15.0 / app 0.4.2
 - consolidada a nova leitura operacional da OS, com abas `Informacoes`, `Orcamento`, `Diagnostico`, `Fotos` e `Valores`;

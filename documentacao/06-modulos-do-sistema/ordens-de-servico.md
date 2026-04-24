@@ -121,6 +121,16 @@ O seletor de equipamento passou a operar com contexto expandido:
 - cor;
 - número de série/IMEI.
 
+### Regra de anti-cache para fotos da OS
+
+Na view `app/Views/os/form.php`, o helper frontend `withFotoVersion()` é usado para anexar `?v=timestamp` somente em URLs reais de foto.
+
+Regra técnica consolidada:
+
+- caminhos HTTP/relativos continuam recebendo versionamento para evitar cache visual;
+- fallbacks inline em `data:` devem ser preservados sem alteração;
+- previews temporários em `blob:` também devem ser preservados sem query string adicional.
+
 ## Visualização da OS
 
 ### View principal

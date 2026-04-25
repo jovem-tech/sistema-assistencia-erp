@@ -43,12 +43,64 @@ class OsStatusFlowService
             ->findAll();
     }
 
+    public function getStatusOrderMap(): array
+    {
+        $map = [];
+        $ordered = $this->getAllStatusesOrdered();
+
+        if (! empty($ordered)) {
+            foreach ($ordered as $index => $status) {
+                $code = trim((string) ($status['codigo'] ?? ''));
+                if ($code === '') {
+                    continue;
+                }
+
+                $fallbackOrder = $index + 1;
+                $order = (int) ($status['ordem_fluxo'] ?? 0);
+                $map[$code] = $order > 0 ? $order : $fallbackOrder;
+            }
+
+            return $map;
+        }
+
+        $fallbackOrder = 0;
+        foreach ($this->getStatusGrouped() as $items) {
+            foreach ($items as $status) {
+                $code = trim((string) ($status['codigo'] ?? ''));
+                if ($code === '' || isset($map[$code])) {
+                    continue;
+                }
+
+                $map[$code] = ++$fallbackOrder;
+            }
+        }
+
+        return $map;
+    }
+
     public function getStatusByCode(string $codigo): ?array
     {
         if (! $this->statusModel->db->tableExists('os_status')) {
             return null;
         }
         return $this->statusModel->byCode($codigo);
+    }
+
+    public function hasAdvancedPast(string $currentStatus, string $referenceStatus): bool
+    {
+        $currentStatus = strtolower(trim($currentStatus));
+        $referenceStatus = strtolower(trim($referenceStatus));
+
+        if ($currentStatus === '' || $referenceStatus === '' || $currentStatus === $referenceStatus) {
+            return false;
+        }
+
+        $orderMap = $this->getStatusOrderMap();
+        if (! isset($orderMap[$currentStatus], $orderMap[$referenceStatus])) {
+            return false;
+        }
+
+        return $orderMap[$currentStatus] > $orderMap[$referenceStatus];
     }
 
     public function isTransitionAllowed(?string $fromCode, string $toCode): bool

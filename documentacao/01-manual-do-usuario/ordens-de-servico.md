@@ -56,7 +56,13 @@ Regras práticas:
 
 - orçamento criado/vinculado e ainda em andamento: a OS tende a aparecer em `Aguardando Autorização`;
 - orçamento `Aprovado` ou `Convertido`: a OS passa para `Aguardando Reparo`;
+- depois que a equipe avança a OS para etapas como `Em Execução do Serviço`, `Aguardando Peça`, `Testes` ou fases posteriores, a listagem não deve mais voltar o status automaticamente para `Aguardando Reparo` só porque o orçamento continua aprovado;
 - quando a OS não tiver `valor_final` preenchido, a listagem pode usar o total do orçamento vinculado como fallback visual.
+
+Na prática:
+
+- o orçamento continua sugerindo o ponto de entrada do reparo;
+- a condução manual do reparo passa a prevalecer depois que a OS sai da fase inicial de execução.
 
 ### Filtros
 

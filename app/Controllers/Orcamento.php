@@ -627,7 +627,19 @@ class Orcamento extends BaseController
             return;
         }
 
-        $estadoFluxo = (new OsStatusFlowService())->resolveEstadoFluxo($targetStatus);
+        $currentOs = $db->table('os')
+            ->select('status')
+            ->where('id', $osId)
+            ->get()
+            ->getFirstRow('array');
+
+        $statusFlowService = new OsStatusFlowService();
+        $currentStatus = trim((string) ($currentOs['status'] ?? ''));
+        if ($statusFlowService->hasAdvancedPast($currentStatus, $targetStatus)) {
+            return;
+        }
+
+        $estadoFluxo = $statusFlowService->resolveEstadoFluxo($targetStatus);
 
         $db->table('os')
             ->where('id', $osId)

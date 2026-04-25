@@ -1,7 +1,7 @@
 # Documentacao - Sistema de Assistencia Tecnica
 
 > Jovem Tech  
-> ERP atual: `2.15.4`  
+> ERP atual: `2.15.6`  
 > App mobile/PWA: `0.4.2`  
 > Atualizado em `25/04/2026`
 
@@ -9,7 +9,7 @@
 
 Este diretorio concentra a documentacao funcional, tecnica e operacional do ERP da assistencia tecnica.
 
-O indice abaixo foi revisado para refletir a release `2.15.4`, com destaque para a correcao da coluna `Status` da listagem de OS em homologacao e para o fluxo oficial de `desenvolvimento -> homologacao -> producao` entre `PC`, `notebook`, `VM` e `VPS`.
+O indice abaixo foi revisado para refletir a release `2.15.6`, com destaque para o retorno do `Limpar` ao estado padrao da fila aberta, para o novo seletor avancado de `Todos os status` na listagem `/os` e para o fluxo oficial de `desenvolvimento -> homologacao -> producao` entre `PC`, `notebook`, `VM` e `VPS`.
 
 ## Estrutura
 
@@ -50,7 +50,7 @@ O indice abaixo foi revisado para refletir a release `2.15.4`, com destaque para
 ### Versao e release atual
 
 - Historico oficial de versoes do ERP: `07-novas-implementacoes/historico-de-versoes.md`
-- Release atual: `07-novas-implementacoes/2026-04-25-release-v2.15.4-coluna-status-os-exibe-status-real.md`
+- Release atual: `07-novas-implementacoes/2026-04-25-release-v2.15.6-ajuste-reset-e-filtro-geral-os.md`
 - Registro da release anterior na VPS: `10-deploy/2026-04-23-atualizacao-vps-release-v2.15.0.md`
 
 ### App mobile/PWA
@@ -65,8 +65,11 @@ O indice abaixo foi revisado para refletir a release `2.15.4`, com destaque para
 - homologacao da `VM Ubuntu 24` formalizada como etapa obrigatoria antes da promocao para `main`;
 - checklist de backup da `VPS` consolidado com codigo, banco e arquivos antes de cada deploy;
 - a sincronizacao entre `Orcamento` e `OS` foi endurecida para nao rebaixar fases ja avancadas do reparo quando o orcamento permanece `aprovado` ou `convertido`;
-- a coluna `Status` da listagem `/os` voltou a usar o status real salvo na OS como badge principal, mantendo o orcamento apenas como contexto auxiliar;
-- indice principal sincronizado com a release `2.15.4` e com a nova nota tecnica da correcao operacional.
+- a listagem `/os` segue iniciando pela fila de ordens abertas, com multiselect dedicado para etapas abertas e dropdown especifico para ordens fechadas;
+- o reset manual por `Limpar` e `Limpar todos` voltou a limpar apenas os filtros selecionados e restaurar o estado inicial da fila aberta;
+- o seletor avancado `Status geral` passou a concentrar a consulta ampla de `Todos os status`, incluindo abertas + fechadas;
+- a coluna `Status` da listagem `/os` continua usando o status real salvo na OS como badge principal, mantendo o orcamento apenas como contexto auxiliar;
+- indice principal sincronizado com a release `2.15.6` e com a nova nota tecnica da filtragem operacional.
 
 ## Regra editorial
 

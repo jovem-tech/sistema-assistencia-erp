@@ -1,10 +1,12 @@
 (function () {
     'use strict';
 
-    const STORAGE_KEY = 'os_advanced_filters_v1';
+    const STORAGE_KEY = 'os_advanced_filters_v3';
     const FILTER_FIELDS = [
         'q',
         'status',
+        'status_fechadas',
+        'status_scope',
         'legado',
         'macrofase',
         'estado_fluxo',
@@ -18,6 +20,7 @@
     ];
 
     const ADVANCED_FIELDS = [
+        'status_scope',
         'macrofase',
         'estado_fluxo',
         'data_inicio',
@@ -68,9 +71,13 @@
 
     function normalizeState(rawState) {
         const source = rawState || {};
+        const statusScope = normalizeString(source.status_scope) === 'all' ? 'all' : '';
+        const closedStatus = statusScope === 'all' ? '' : normalizeString(source.status_fechadas);
         return {
             q: normalizeString(source.q),
-            status: normalizeStatusList(source.status ?? source.status_list ?? ''),
+            status: closedStatus !== '' || statusScope === 'all' ? [] : normalizeStatusList(source.status ?? source.status_list ?? ''),
+            status_fechadas: closedStatus,
+            status_scope: statusScope,
             legado: normalizeString(source.legado),
             macrofase: normalizeString(source.macrofase),
             estado_fluxo: normalizeString(source.estado_fluxo),
@@ -88,6 +95,9 @@
         return FILTER_FIELDS.some((key) => {
             if (key === 'status') {
                 return Array.isArray(state.status) && state.status.length > 0;
+            }
+            if (key === 'status_scope') {
+                return normalizeString(state.status_scope) === 'all';
             }
             return normalizeString(state[key]) !== '';
         });
@@ -278,6 +288,22 @@
             });
         });
 
+        if (state.status_fechadas) {
+            chips.push({
+                key: 'status_fechadas',
+                value: '',
+                text: `Fechadas: ${getLabel('status_fechadas', state.status_fechadas)}`,
+            });
+        }
+
+        if (state.status_scope) {
+            chips.push({
+                key: 'status_scope',
+                value: '',
+                text: `Status geral: ${getLabel('status_scope', state.status_scope)}`,
+            });
+        }
+
         if (state.macrofase) {
             chips.push({
                 key: 'macrofase',
@@ -373,6 +399,53 @@
                 `</span>`
             ))
             .join('');
+    }
+
+    function isClosedQueueActive(state) {
+        return normalizeString(state?.status_fechadas) !== '';
+    }
+
+    function isAllQueueActive(state) {
+        return normalizeString(state?.status_scope) === 'all';
+    }
+
+    function resolveStatusModeState(state, sourceKey = '') {
+        const normalized = normalizeState(state);
+        if (sourceKey === 'status' && (normalized.status || []).length > 0) {
+            normalized.status_fechadas = '';
+            normalized.status_scope = '';
+            return normalized;
+        }
+
+        if (sourceKey === 'status_fechadas' && normalized.status_fechadas) {
+            normalized.status = [];
+            normalized.status_scope = '';
+            return normalized;
+        }
+
+        if (sourceKey === 'status_scope' && normalized.status_scope === 'all') {
+            normalized.status = [];
+            normalized.status_fechadas = '';
+            return normalized;
+        }
+
+        if (normalized.status_fechadas) {
+            normalized.status = [];
+            normalized.status_scope = '';
+            return normalized;
+        }
+
+        if (normalized.status_scope === 'all') {
+            normalized.status = [];
+            normalized.status_fechadas = '';
+            return normalized;
+        }
+
+        if ((normalized.status || []).length > 0) {
+            normalized.status_scope = '';
+        }
+
+        return normalized;
     }
 
     function getResponsiveAvailableWidth(tableElement) {
@@ -884,6 +957,9 @@
         const mobileFilterCount = document.getElementById('osMobileFilterCount');
         const legacyToggleButtons = Array.from(document.querySelectorAll('.js-os-legacy-toggle'));
         const loadingOverlay = document.getElementById('osTableLoading');
+        const tableTitle = document.getElementById('osTableTitle');
+        const tableTitleText = document.getElementById('osTableTitleText');
+        const tableSubtitle = document.getElementById('osTableSubtitle');
         const resultsCounter = document.getElementById('osResultsCounter');
         const resultsSpinner = document.getElementById('osResultsSpinner');
         const advancedCollapseElement = document.getElementById('osAdvancedFiltersCollapse');
@@ -1014,6 +1090,101 @@
                 });
             });
             syncInProgress = false;
+        };
+
+        const setSelect2DisabledState = (control, disabled) => {
+            if (!control) {
+                return;
+            }
+
+            control.disabled = Boolean(disabled);
+            if (window.jQuery && window.jQuery(control).hasClass('select2-hidden-accessible')) {
+                window.jQuery(control).prop('disabled', Boolean(disabled)).trigger('change.select2');
+            }
+        };
+
+        const buildListContext = () => {
+            const statusLabels = labelsMap?.status || {};
+            const closedLabels = labelsMap?.status_fechadas || {};
+            const closedValue = normalizeString(activeState.status_fechadas);
+
+            if (closedValue !== '') {
+                const closedLabel = closedLabels[closedValue] || closedValue;
+                if (closedValue === 'fechadas') {
+                    return {
+                        title: 'Ordens fechadas',
+                        subtitle: 'Exibindo apenas OS encerradas por entrega, devolucao sem reparo ou descarte.',
+                        counterLabel: 'OS fechadas encontradas',
+                    };
+                }
+
+                return {
+                    title: `Fechadas: ${closedLabel}`,
+                    subtitle: 'Exibindo apenas um desfecho operacional da fila encerrada.',
+                    counterLabel: 'OS fechadas encontradas',
+                };
+            }
+
+            if (isAllQueueActive(activeState)) {
+                return {
+                    title: 'Todas as ordens de servico',
+                    subtitle: 'Exibindo OS abertas e fechadas sem o recorte padrao da fila.',
+                    counterLabel: 'OS encontradas',
+                };
+            }
+
+            if ((activeState.status || []).length === 1) {
+                const statusCode = activeState.status[0];
+                const statusLabel = statusLabels[statusCode] || statusCode;
+                return {
+                    title: `Ordens abertas: ${statusLabel}`,
+                    subtitle: 'Fila aberta refinada por um status detalhado.',
+                    counterLabel: 'OS abertas encontradas',
+                };
+            }
+
+            if ((activeState.status || []).length > 1) {
+                return {
+                    title: 'Ordens abertas filtradas',
+                    subtitle: `${activeState.status.length} status detalhados selecionados na fila aberta.`,
+                    counterLabel: 'OS abertas encontradas',
+                };
+            }
+
+            return {
+                title: 'Ordens em aberto',
+                subtitle: 'A listagem inicia nas etapas abertas da oficina. Use "Ordens fechadas" para consultar entregas, devolucoes e descartes.',
+                counterLabel: 'OS abertas encontradas',
+            };
+        };
+
+        const updateListContextUi = (filteredCount = null) => {
+            const context = buildListContext();
+            if (tableTitleText) {
+                tableTitleText.textContent = context.title;
+            } else if (tableTitle) {
+                tableTitle.textContent = context.title;
+            }
+            if (tableSubtitle) {
+                tableSubtitle.textContent = context.subtitle;
+            }
+            if (resultsCounter && filteredCount !== null) {
+                resultsCounter.textContent = `${filteredCount} ${context.counterLabel}`;
+            }
+        };
+
+        const updateStatusModeUi = () => {
+            const closedQueueActive = isClosedQueueActive(activeState);
+            [desktopForm, mobileForm].forEach((form) => {
+                if (!form) {
+                    return;
+                }
+
+                const statusControl = getFieldControl(form, 'status');
+                const statusBlock = statusControl?.closest('[data-filter-block="status"]');
+                setSelect2DisabledState(statusControl, closedQueueActive);
+                statusBlock?.classList.toggle('is-disabled', closedQueueActive);
+            });
         };
 
         const updateMobileFilterBadge = () => {
@@ -1866,13 +2037,15 @@
         };
 
         const applyState = (nextState, options = {}) => {
-            activeState = normalizeState(nextState);
+            activeState = resolveStatusModeState(nextState, options.sourceKey || '');
             syncForms();
             saveStorageState(activeState);
             writeUrlState(activeState);
             setupActiveChips(activeState, labelsMap, chipsWrap, chipsContainer, clearAllBtn);
             updateMobileFilterBadge();
             updateLegacyToggleButtons();
+            updateStatusModeUi();
+            updateListContextUi();
 
             if (options.reload !== false) {
                 toggleLoadingOverlay(true);
@@ -1892,6 +2065,8 @@
             payload.q = activeState.q;
             payload.status = activeState.status;
             payload.status_list = activeState.status.join(',');
+            payload.status_fechadas = activeState.status_fechadas;
+            payload.status_scope = activeState.status_scope;
             payload.legado = activeState.legado;
             payload.macrofase = activeState.macrofase;
             payload.estado_fluxo = activeState.estado_fluxo;
@@ -1999,9 +2174,7 @@
 
         window.jQuery(tableElement).on('xhr.dt', function (_event, _settings, json) {
             const filtered = Number(json?.recordsFiltered ?? 0);
-            if (resultsCounter) {
-                resultsCounter.textContent = `${filtered} OS encontradas`;
-            }
+            updateListContextUi(filtered);
             toggleLoadingOverlay(false);
             fitRelatoCells(tableElement);
         });
@@ -2413,8 +2586,12 @@
             if (!form) {
                 return;
             }
+            const sourceKey = options.sourceKey || '';
             const nextState = collectFormState(form);
-            applyState(nextState, options);
+            applyState(nextState, {
+                ...options,
+                sourceKey: sourceKey,
+            });
         };
 
         const debouncedQuickSearchApply = debounce((form) => {
@@ -2437,7 +2614,11 @@
                 const clearTrigger = event.target.closest('[data-filter-action="clear"]');
                 if (clearTrigger) {
                     event.preventDefault();
-                    applyState(normalizeState({}), { reload: true, closeMobile: Boolean(isMobileForm) });
+                    applyState(normalizeState({}), {
+                        reload: true,
+                        closeMobile: Boolean(isMobileForm),
+                        sourceKey: 'clear',
+                    });
                 }
             });
 
@@ -2451,7 +2632,8 @@
                     return;
                 }
 
-                applyFromForm(form, { reload: true, closeMobile: false });
+                const sourceKey = normalizeString(target.getAttribute('data-filter-field'));
+                applyFromForm(form, { reload: true, closeMobile: false, sourceKey: sourceKey });
             });
 
             const quickSearchInput = getFieldControl(form, 'q');
@@ -2490,7 +2672,11 @@
         });
 
         clearAllBtn?.addEventListener('click', function () {
-            applyState(normalizeState({}), { reload: true, closeMobile: false });
+            applyState(normalizeState({}), {
+                reload: true,
+                closeMobile: false,
+                sourceKey: 'clear',
+            });
         });
 
         if (advancedToggleBtn && advancedCollapseElement && window.bootstrap) {
@@ -2526,6 +2712,8 @@
         setupActiveChips(activeState, labelsMap, chipsWrap, chipsContainer, clearAllBtn);
         updateMobileFilterBadge();
         updateLegacyToggleButtons();
+        updateStatusModeUi();
+        updateListContextUi();
         writeUrlState(activeState);
         saveStorageState(activeState);
 

@@ -50,6 +50,15 @@ Estados esperados:
 - paginação server-side;
 - leitura combinada de OS, cliente, equipamento, prazo e orçamento.
 
+### Escopo operacional da listagem
+
+- a abertura da tela aplica implicitamente o recorte de OS abertas definido em `OsStatusFlowService::getListOpenStatusCodes()`;
+- o multiselect `Ordens abertas` mostra apenas esse subconjunto de etapas;
+- o dropdown `Ordens fechadas` trabalha com `entregue_reparado`, `devolvido_sem_reparo` e `descartado`;
+- o seletor avancado `Status geral` envia `status_scope=all`, removendo o recorte padrao e liberando a consulta conjunta de abertas + fechadas;
+- o reset manual por `Limpar` ou `Limpar todos` volta ao estado inicial da fila aberta e limpa apenas os filtros aplicados;
+- a UI dessa leitura operacional fica concentrada em `app/Views/os/index.php`, `public/assets/js/os-list-filters.js` e `public/assets/css/design-system/layouts/os-list-layout.css`.
+
 ### Comportamento atual da coluna de status
 
 A listagem passou a consolidar o contexto da OS com o orçamento mais recente vinculado.

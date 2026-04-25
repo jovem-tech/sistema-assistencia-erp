@@ -44,6 +44,7 @@ use Config\Database;
 class Os extends BaseController
 {
     protected $model;
+    protected OsStatusFlowService $statusFlowService;
     protected array $osListSearchMatcherCache = [];
     protected ?bool $osRelatoFulltextAvailable = null;
     protected ?PecaPrecificacaoService $pecaPrecificacaoService = null;
@@ -53,6 +54,7 @@ class Os extends BaseController
     public function __construct()
     {
         $this->model = new OsModel();
+        $this->statusFlowService = new OsStatusFlowService();
         requirePermission('os');
     }
 
@@ -60,8 +62,7 @@ class Os extends BaseController
     {
         $filters = $this->collectListFilters('get');
 
-        $statusFlowService = new OsStatusFlowService();
-        $statusGrouped = $statusFlowService->getStatusGrouped();
+        $statusGrouped = $this->statusFlowService->getStatusGrouped();
         $statusFlat = [];
         foreach ($statusGrouped as $macro => $items) {
             foreach ($items as $item) {
@@ -77,6 +78,16 @@ class Os extends BaseController
         foreach (array_keys($statusGrouped) as $macro) {
             $macrofases[$macro] = ucwords(str_replace('_', ' ', (string) $macro));
         }
+
+        $statusGroupedOpen = $this->filterStatusGroupsByCodes(
+            $statusGrouped,
+            $this->statusFlowService->getListOpenStatusCodes()
+        );
+        $statusClosedOptions = $this->buildStatusLabelMapByCodes(
+            $statusFlat,
+            $this->statusFlowService->getListClosedStatusCodes()
+        );
+        $statusClosedOptions = ['fechadas' => 'Todas as fechadas'] + $statusClosedOptions;
 
         $tecnicos = (new FuncionarioModel())
             ->select('id, nome, cargo')
@@ -112,8 +123,11 @@ class Os extends BaseController
             'filtro_status_list' => $filters['status'],
             'filtro_macrofase' => $filters['macrofase'],
             'filtro_estado_fluxo' => $filters['estado_fluxo'],
+            'filtro_status_fechadas' => $filters['status_fechadas'],
             'statusGrouped' => $statusGrouped,
+            'statusGroupedOpen' => $statusGroupedOpen,
             'statusFlat' => $statusFlat,
+            'statusClosedOptions' => $statusClosedOptions,
             'macrofases' => $macrofases,
             'tecnicos' => $tecnicos,
             'tiposServico' => $tiposServico,
@@ -139,7 +153,7 @@ class Os extends BaseController
         $totalRecords = (int) $this->model->countAll();
         $filteredRecords = $totalRecords;
 
-        if ($this->hasActiveListFilters($filters)) {
+        if ($this->shouldCountFilteredList($filters)) {
             $filteredBuilder = $this->buildOsListCountBuilder($filters, $hasStatusTable, $db);
             $filteredRecords = (int) $filteredBuilder->countAllResults();
         }
@@ -235,6 +249,8 @@ class Os extends BaseController
         return [
             'q' => trim((string) ($read('q') ?? '')),
             'status' => $this->normalizeStringList($statusRaw),
+            'status_fechadas' => $this->normalizeClosedStatusFilterValue($read('status_fechadas')),
+            'status_scope' => $this->normalizeStatusScopeValue($read('status_scope')),
             'legado' => $this->normalizeToggleValue($read('legado')),
             'macrofase' => trim((string) ($read('macrofase') ?? '')),
             'estado_fluxo' => trim((string) ($read('estado_fluxo') ?? '')),
@@ -254,8 +270,9 @@ class Os extends BaseController
             $this->applyOsGlobalSearchFilter($builder, (string) $filters['q'], $db);
         }
 
-        if (!empty($filters['status'])) {
-            $builder->whereIn('os.status', $filters['status']);
+        $statusFilter = $this->resolveOsListStatusFilter($filters);
+        if (!empty($statusFilter)) {
+            $builder->whereIn('os.status', $statusFilter);
         }
 
         if (!empty($filters['legado'])) {
@@ -2186,7 +2203,11 @@ class Os extends BaseController
 
     private function hasActiveListFilters(array $filters): bool
     {
-        foreach ($filters as $value) {
+        foreach ($filters as $key => $value) {
+            if ($key === 'status_scope') {
+                continue;
+            }
+
             if (is_array($value) && !empty($value)) {
                 return true;
             }
@@ -2199,9 +2220,50 @@ class Os extends BaseController
         return false;
     }
 
+    private function shouldCountFilteredList(array $filters): bool
+    {
+        return $this->hasActiveListFilters($filters) || $this->usesDefaultOpenStatusScope($filters);
+    }
+
+    private function usesDefaultOpenStatusScope(array $filters): bool
+    {
+        return empty($filters['status'])
+            && trim((string) ($filters['status_fechadas'] ?? '')) === ''
+            && trim((string) ($filters['status_scope'] ?? '')) !== 'all';
+    }
+
     private function requiresStatusLookupJoin(array $filters): bool
     {
         return trim((string) ($filters['macrofase'] ?? '')) !== '';
+    }
+
+    private function resolveOsListStatusFilter(array $filters): array
+    {
+        $closedFilter = trim((string) ($filters['status_fechadas'] ?? ''));
+        $closedStatuses = $this->statusFlowService->getListClosedStatusCodes();
+        if ($closedFilter !== '') {
+            if ($closedFilter === 'fechadas') {
+                return $closedStatuses;
+            }
+
+            return in_array($closedFilter, $closedStatuses, true)
+                ? [$closedFilter]
+                : $closedStatuses;
+        }
+
+        $selectedOpenStatuses = array_values(array_intersect(
+            $filters['status'] ?? [],
+            $this->statusFlowService->getListOpenStatusCodes()
+        ));
+        if (!empty($selectedOpenStatuses)) {
+            return $selectedOpenStatuses;
+        }
+
+        if (trim((string) ($filters['status_scope'] ?? '')) === 'all') {
+            return [];
+        }
+
+        return $this->statusFlowService->getListOpenStatusCodes();
     }
 
     private function isLikelyOsNumberSearch(string $query): bool
@@ -2260,6 +2322,62 @@ class Os extends BaseController
         $values = array_filter($values, static fn ($value) => $value !== '' && $value !== 'todos');
 
         return array_values(array_unique($values));
+    }
+
+    private function normalizeClosedStatusFilterValue($raw): string
+    {
+        $value = trim((string) ($raw ?? ''));
+        if ($value === '') {
+            return '';
+        }
+
+        $allowed = array_merge(
+            ['fechadas'],
+            $this->statusFlowService->getListClosedStatusCodes()
+        );
+
+        return in_array($value, $allowed, true) ? $value : '';
+    }
+
+    private function normalizeStatusScopeValue($raw): string
+    {
+        return trim((string) ($raw ?? '')) === 'all' ? 'all' : '';
+    }
+
+    private function filterStatusGroupsByCodes(array $statusGrouped, array $allowedCodes): array
+    {
+        $allowedLookup = array_fill_keys($allowedCodes, true);
+        $filteredGroups = [];
+
+        foreach ($statusGrouped as $macro => $items) {
+            $filteredItems = array_values(array_filter($items, static function (array $item) use ($allowedLookup): bool {
+                $code = (string) ($item['codigo'] ?? '');
+                return $code !== '' && isset($allowedLookup[$code]);
+            }));
+
+            if (!empty($filteredItems)) {
+                $filteredGroups[$macro] = $filteredItems;
+            }
+        }
+
+        return $filteredGroups;
+    }
+
+    private function buildStatusLabelMapByCodes(array $statusFlat, array $allowedCodes): array
+    {
+        $allowedLookup = array_fill_keys($allowedCodes, true);
+        $labels = [];
+
+        foreach ($statusFlat as $statusItem) {
+            $code = (string) ($statusItem['codigo'] ?? '');
+            if ($code === '' || !isset($allowedLookup[$code])) {
+                continue;
+            }
+
+            $labels[$code] = (string) ($statusItem['nome'] ?? $code);
+        }
+
+        return $labels;
     }
 
     private function normalizeDateValue($raw): ?string

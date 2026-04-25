@@ -60,6 +60,17 @@ Essa configuracao afeta:
 - validacao de transicao no backend
 - hints do fluxo operacional usados pela OS
 
+## Reflexo na listagem `/os`
+
+A configuracao de status tambem impacta a filtragem principal da listagem:
+
+- a tela inicia por padrao mostrando a fila de ordens abertas;
+- o filtro `Ordens abertas` usa apenas etapas operacionais ainda em andamento;
+- o filtro `Ordens fechadas` consulta os encerramentos `Equipamento Entregue`, `Devolvido Sem Reparo` e `Equipamento Descartado`;
+- `Limpar` e `Limpar todos` limpam os filtros aplicados e restauram a fila padrao de ordens abertas;
+- a consulta ampla de abertas + fechadas foi movida para `Status geral -> Todos os status` nos filtros avancados;
+- se a equipe alterar, desativar ou reorganizar codigos centrais do workflow, convem revisar tambem a experiencia da listagem `/os`.
+
 ## Procedimento recomendado de alteracao
 
 1. Abrir `Gestao de Conhecimento -> Fluxo de Trabalho OS`.

@@ -74,6 +74,7 @@ Regra complementar obrigatoria:
 
 - essa sincronizacao automatica nao pode rebaixar uma OS que ja avancou manualmente para etapas posteriores do reparo, como `reparo_execucao`, `aguardando_peca`, `testes_operacionais`, `testes_finais`, `reparo_concluido` e similares;
 - o orcamento continua definindo o ponto de entrada do fluxo tecnico, mas nao sobrescreve fases mais avancadas ja confirmadas pela equipe.
+- na DataTable `/os`, o status principal renderizado deve sempre refletir `os.status` e `os.estado_fluxo` reais; o status do orcamento permanece apenas como badge auxiliar e nao pode substituir visualmente a OS.
 
 Também foi aplicado fallback de valor:
 

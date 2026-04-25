@@ -1,15 +1,15 @@
 # Documentacao - Sistema de Assistencia Tecnica
 
 > Jovem Tech  
-> ERP atual: `2.15.3`  
+> ERP atual: `2.15.4`  
 > App mobile/PWA: `0.4.2`  
-> Atualizado em `24/04/2026`
+> Atualizado em `25/04/2026`
 
 ## Objetivo
 
 Este diretorio concentra a documentacao funcional, tecnica e operacional do ERP da assistencia tecnica.
 
-O indice abaixo foi revisado para refletir a release `2.15.3`, com destaque para o ajuste do fluxo de status da OS em homologacao e para o fluxo oficial de `desenvolvimento -> homologacao -> producao` entre `PC`, `notebook`, `VM` e `VPS`.
+O indice abaixo foi revisado para refletir a release `2.15.4`, com destaque para a correcao da coluna `Status` da listagem de OS em homologacao e para o fluxo oficial de `desenvolvimento -> homologacao -> producao` entre `PC`, `notebook`, `VM` e `VPS`.
 
 ## Estrutura
 
@@ -50,7 +50,7 @@ O indice abaixo foi revisado para refletir a release `2.15.3`, com destaque para
 ### Versao e release atual
 
 - Historico oficial de versoes do ERP: `07-novas-implementacoes/historico-de-versoes.md`
-- Release atual: `07-novas-implementacoes/2026-04-24-release-v2.15.3-status-os-nao-retrocede-com-orcamento-aprovado.md`
+- Release atual: `07-novas-implementacoes/2026-04-25-release-v2.15.4-coluna-status-os-exibe-status-real.md`
 - Registro da release anterior na VPS: `10-deploy/2026-04-23-atualizacao-vps-release-v2.15.0.md`
 
 ### App mobile/PWA
@@ -65,7 +65,8 @@ O indice abaixo foi revisado para refletir a release `2.15.3`, com destaque para
 - homologacao da `VM Ubuntu 24` formalizada como etapa obrigatoria antes da promocao para `main`;
 - checklist de backup da `VPS` consolidado com codigo, banco e arquivos antes de cada deploy;
 - a sincronizacao entre `Orcamento` e `OS` foi endurecida para nao rebaixar fases ja avancadas do reparo quando o orcamento permanece `aprovado` ou `convertido`;
-- indice principal sincronizado com a release `2.15.3` e com a nova nota tecnica da correcao operacional.
+- a coluna `Status` da listagem `/os` voltou a usar o status real salvo na OS como badge principal, mantendo o orcamento apenas como contexto auxiliar;
+- indice principal sincronizado com a release `2.15.4` e com a nova nota tecnica da correcao operacional.
 
 ## Regra editorial
 

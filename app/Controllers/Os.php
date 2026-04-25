@@ -1233,11 +1233,6 @@ class Os extends BaseController
             ? 'R$ ' . number_format($valorOs, 2, ',', '.')
             : '-';
         if ($latestOrcamento) {
-            $managedOsStatus = trim((string) ($latestOrcamento['os_status_sugerido'] ?? ''));
-            if ($managedOsStatus !== '' && !in_array((string) ($row['estado_fluxo'] ?? ''), ['encerrado', 'cancelado'], true)) {
-                $statusRow['status'] = $managedOsStatus;
-                $statusRow['estado_fluxo'] = (new OsStatusFlowService())->resolveEstadoFluxo($managedOsStatus);
-            }
             $statusRow['orcamento_id'] = (int) ($latestOrcamento['id'] ?? 0);
             $statusRow['orcamento_numero'] = (string) ($latestOrcamento['numero'] ?? '');
             $statusRow['orcamento_status'] = (string) ($latestOrcamento['status'] ?? '');

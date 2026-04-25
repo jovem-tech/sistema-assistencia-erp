@@ -54,15 +54,19 @@ A coluna de status agora concentra o contexto operacional completo da OS:
 
 Regras práticas:
 
-- orçamento criado/vinculado e ainda em andamento: a OS tende a aparecer em `Aguardando Autorização`;
-- orçamento `Aprovado` ou `Convertido`: a OS passa para `Aguardando Reparo`;
+- o badge principal sempre mostra o status real salvo na OS;
+- o badge de fluxo continua mostrando a etapa operacional real da OS;
+- o status do orçamento vinculado aparece apenas como contexto comercial secundário;
+- orçamento criado/vinculado e ainda em andamento pode sugerir `Aguardando Autorização`, sem substituir o status principal da OS;
+- orçamento `Aprovado` ou `Convertido` pode sugerir `Aguardando Reparo`, sem substituir o status principal da OS na listagem;
 - depois que a equipe avança a OS para etapas como `Em Execução do Serviço`, `Aguardando Peça`, `Testes` ou fases posteriores, a listagem não deve mais voltar o status automaticamente para `Aguardando Reparo` só porque o orçamento continua aprovado;
 - quando a OS não tiver `valor_final` preenchido, a listagem pode usar o total do orçamento vinculado como fallback visual.
 
 Na prática:
 
 - o orçamento continua sugerindo o ponto de entrada do reparo;
-- a condução manual do reparo passa a prevalecer depois que a OS sai da fase inicial de execução.
+- a condução manual do reparo passa a prevalecer depois que a OS sai da fase inicial de execução;
+- a coluna `Status` não deve mascarar o status real da OS com o status sugerido do orçamento.
 
 ### Filtros
 

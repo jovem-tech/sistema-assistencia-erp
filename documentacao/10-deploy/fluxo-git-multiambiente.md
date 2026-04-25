@@ -1,128 +1,190 @@
 # Fluxo Git Multiambiente
 
-Atualizado em `23/04/2026`.
+Atualizado em `24/04/2026`.
 
 ## Objetivo
 
-Padronizar o desenvolvimento do ERP em múltiplos ambientes sem perder sincronização entre:
+Padronizar o desenvolvimento, a homologacao e a publicacao do ERP em quatro ambientes:
 
-- PC principal;
-- notebook;
-- VM Ubuntu 24 de validação;
-- VPS Ubuntu 24 de produção;
-- GitHub como origem central do código.
+- `PC` de desenvolvimento principal;
+- `notebook` de desenvolvimento auxiliar;
+- `VM Ubuntu 24` de homologacao final;
+- `VPS Ubuntu 24` de producao.
+
+O GitHub continua sendo a origem central do codigo, mas a branch `main` so deve ser promovida depois da validacao completa na `VM`.
 
 ## Fluxo oficial
 
 ```text
-PC / notebook -> GitHub (develop) -> VM Ubuntu 24 -> GitHub (main) -> VPS
+PC / notebook -> GitHub (develop-desktop) -> GitHub (homolog-vm) -> VM Ubuntu 24 -> GitHub (main) -> VPS
 ```
 
 ## Papel de cada ambiente
 
-- `PC` e `notebook`: desenvolvimento diário, correções, novas features e documentação.
-- `GitHub/develop`: branch de integração e homologação.
-- `VM Ubuntu 24`: validação técnica em ambiente próximo da produção.
-- `GitHub/main`: branch estável pronta para produção.
-- `VPS`: produção. Não deve ser usada como ambiente normal de desenvolvimento.
+- `PC` e `notebook`: desenvolvimento diario, ajustes, correcoes, documentacao e validacao local.
+- `GitHub/develop-desktop`: branch operacional de desenvolvimento continuo.
+- `GitHub/homolog-vm`: branch oficial de homologacao, usada para validar exatamente o que sera candidato a producao.
+- `VM Ubuntu 24`: ambiente de homologacao final, espelhando o comportamento esperado da VPS antes da promocao.
+- `GitHub/main`: branch oficial de producao. So recebe codigo validado na `VM`.
+- `VPS`: ambiente produtivo. Nunca deve ser usado como origem regular de desenvolvimento.
 
-## Regras obrigatórias
+## Branches oficiais
 
-1. Antes de iniciar trabalho em qualquer máquina, executar `git pull`.
-2. Toda alteração funcional deve sair do PC ou notebook para o GitHub antes de chegar à VM ou VPS.
-3. A VM pode receber ajustes durante testes, mas qualquer correção feita nela deve voltar para o GitHub antes do deploy.
-4. A VPS só deve receber código vindo do GitHub.
-5. Nunca usar a VPS como fonte permanente de desenvolvimento.
+- `develop-desktop`: desenvolvimento do dia a dia no `PC` e no `notebook`.
+- `homolog-vm`: consolidacao de tudo que precisa ser homologado na `VM`.
+- `main`: linha oficial de producao.
 
-## Branches recomendadas
+## Regras obrigatorias
 
-- `main`: produção estável.
-- `develop`: homologação e preparação de release.
-- `feature/*`: novas funcionalidades.
-- `fix/*`: correções.
-- `docs/*`: documentação e versionamento documental.
+1. Antes de iniciar qualquer trabalho em `PC` ou `notebook`, atualizar a branch `develop-desktop`.
+2. Toda alteracao funcional deve sair do ambiente de desenvolvimento para `develop-desktop` antes de seguir para homologacao.
+3. A `VM` deve testar sempre a branch `homolog-vm`, nunca uma branch solta de desenvolvimento.
+4. A branch `main` so deve ser atualizada depois da validacao completa na `VM`.
+5. A `VPS` so deve receber codigo vindo da `main`.
+6. Antes de atualizar a `VPS`, fazer backup de codigo, banco e arquivos.
+7. Nunca usar `git add .` na `VPS`.
 
-## Fluxo prático
+## Fluxo pratico
 
 ### 1. Desenvolvimento no PC ou notebook
 
+Antes de comecar:
+
 ```bash
-git pull
-git checkout develop
-git checkout -b feature/nome-da-tarefa
+git checkout develop-desktop
+git pull origin develop-desktop
 ```
 
 Depois do trabalho:
 
 ```bash
+git status
 git add .
-git commit -m "feat: descricao da alteracao"
-git push -u origin feature/nome-da-tarefa
+git commit -m "mensagem clara da alteracao"
+git push origin develop-desktop
 ```
 
-### 2. Integração em develop
+### 2. Envio para homologacao
 
-Após revisão/organização da tarefa:
+Quando a entrega estiver pronta para teste na `VM`:
 
 ```bash
-git checkout develop
-git pull
-git merge --no-ff feature/nome-da-tarefa
-git push origin develop
+git checkout homolog-vm
+git pull origin homolog-vm
+git merge develop-desktop
+git push origin homolog-vm
 ```
 
-### 3. Validação na VM Ubuntu 24
+### 3. Homologacao oficial na VM Ubuntu 24
 
-Na VM:
+Na `VM`:
 
 ```bash
-git checkout develop
-git pull origin develop
+cd /var/www/sistema-hml
+git config --global --add safe.directory /var/www/sistema-hml
+git checkout homolog-vm
+git pull --ff-only origin homolog-vm
 php spark migrate
+php spark cache:clear
 ```
 
-Validar no mínimo:
+Validar no minimo:
 
 - login;
-- ordens de serviço;
-- orçamentos;
-- uploads/fotos;
-- geração de PDF;
-- integrações de WhatsApp;
-- permissões e rotas críticas.
+- dashboard;
+- ordens de servico;
+- orcamentos;
+- uploads e fotos;
+- PDFs;
+- integracoes de WhatsApp;
+- rotas e acoes criticas.
 
-### 4. Promoção para produção
+### 4. Promocao da VM para producao
 
-Depois da validação na VM:
+Depois da homologacao aprovada na `VM`, a propria `VM` promove o que foi testado para a `main`:
 
 ```bash
+cd /var/www/sistema-hml
 git checkout main
-git pull
-git merge --no-ff develop
+git pull origin main
+git merge homolog-vm
 git push origin main
 ```
 
-### 5. Publicação na VPS
+### 5. Backup obrigatorio antes da VPS
 
-Na VPS:
+Na `VPS`, antes de atualizar:
+
+#### 5.1 Backup Git do codigo atual
 
 ```bash
-git checkout main
-git pull origin main
-php spark migrate
+cd /var/www/sistema-hml
+git push backup HEAD:backup/vps-antes-update-AAAA-MM-DD
 ```
 
-Depois validar serviços e logs.
+#### 5.2 Backup do banco
 
-## O que não deve entrar em commit
+```bash
+mysqldump --single-transaction --routines --triggers --no-tablespaces -u sistema_hml -p sistema_hml > /root/sistema_hml_db_pre_update_$(date +%F_%H%M).sql
+```
+
+#### 5.3 Backup dos arquivos
+
+```bash
+cd /var/www
+sudo tar -czf /root/sistema-hml-pre-update-$(date +%F_%H%M).tar.gz sistema-hml
+```
+
+### 6. Atualizacao da VPS
+
+Na `VPS`:
+
+```bash
+cd /var/www/sistema-hml
+git fetch origin
+git checkout main
+git pull --ff-only origin main
+php spark migrate
+php spark cache:clear
+sudo systemctl restart php8.3-fpm
+sudo systemctl restart nginx
+```
+
+Depois validar:
+
+- login;
+- dashboard;
+- ordens de servico;
+- orcamentos;
+- uploads e fotos;
+- WhatsApp;
+- logs do servidor.
+
+## Resumo visual
+
+```text
+PC / notebook
+    -> git push origin develop-desktop
+    -> merge develop-desktop -> homolog-vm
+    -> VM: git pull origin homolog-vm + testes
+    -> VM aprovada: merge homolog-vm -> main
+    -> VPS: backup completo
+    -> VPS: git pull --ff-only origin main
+```
+
+## O que nao deve entrar em commit
 
 - `.env`
-- backups temporários (`*.utf8bak`, `*.pre_*`, `*.codex.bak_`)
+- backups temporarios (`*.utf8bak`, `*.pre_*`, `*.codex.bak_`)
 - `node_modules/`
-- builds temporários locais
-- artefatos gerados de publicação local
-- logs de execução
+- builds temporarios locais
+- artefatos gerados de publicacao local
+- logs de execucao
 
-## Observação importante
+## Regra de ouro
 
-No primeiro alinhamento entre ambientes, a VPS pode ser usada como fonte inicial de código para popular o GitHub. Depois desse ponto, o GitHub passa a ser a origem oficial do projeto.
+- `PC` e `notebook` desenvolvem.
+- `VM` homologa.
+- `main` publica.
+- `VPS` produz.
+

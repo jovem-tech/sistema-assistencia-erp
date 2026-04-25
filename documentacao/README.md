@@ -1,7 +1,7 @@
 # Documentacao - Sistema de Assistencia Tecnica
 
 > Jovem Tech  
-> ERP atual: `2.15.1`  
+> ERP atual: `2.15.2`  
 > App mobile/PWA: `0.4.2`  
 > Atualizado em `24/04/2026`
 
@@ -9,7 +9,7 @@
 
 Este diretorio concentra a documentacao funcional, tecnica e operacional do ERP da assistencia tecnica.
 
-O indice abaixo foi revisado para refletir a release `2.15.1`, com destaque para o modulo de `Orcamentos` e para o fluxo atualizado de `Dados do Cliente`.
+O indice abaixo foi revisado para refletir a release `2.15.2`, com destaque para o fluxo oficial de `desenvolvimento -> homologacao -> producao` entre `PC`, `notebook`, `VM` e `VPS`.
 
 ## Estrutura
 
@@ -43,11 +43,12 @@ O indice abaixo foi revisado para refletir a release `2.15.1`, com destaque para
 - Modulo Orcamentos: `06-modulos-do-sistema/orcamentos.md`
 - Arquitetura do modulo de orcamentos: `03-arquitetura-tecnica/modulo-orcamentos.md`
 - Estrutura de pastas: `03-arquitetura-tecnica/estrutura-de-pastas.md`
+- Fluxo Git multiambiente: `10-deploy/fluxo-git-multiambiente.md`
 
 ### Versao e release atual
 
 - Historico oficial de versoes do ERP: `07-novas-implementacoes/historico-de-versoes.md`
-- Release atual: `07-novas-implementacoes/2026-04-24-release-v2.15.1-orcamentos-contato-opcional.md`
+- Release atual: `07-novas-implementacoes/2026-04-24-release-v2.15.2-fluxo-homolog-vm-e-governanca-deploy.md`
 - Registro da release anterior na VPS: `10-deploy/2026-04-23-atualizacao-vps-release-v2.15.0.md`
 
 ### App mobile/PWA
@@ -58,12 +59,10 @@ O indice abaixo foi revisado para refletir a release `2.15.1`, com destaque para
 
 ## O que foi consolidado nesta atualizacao documental
 
-- manual oficial de Orcamentos publicado em `01-manual-do-usuario/orcamentos.md`;
-- documentacao tecnica do modulo publicada em `06-modulos-do-sistema/orcamentos.md`;
-- arquitetura do modulo consolidada em `03-arquitetura-tecnica/modulo-orcamentos.md`;
-- formulario de Orcamentos atualizado para aceitar telefone de contato opcional;
-- exibicao do contato adicional do cliente documentada para o card `Dados do Cliente`;
-- alinhamento entre documentacao, release `2.15.1` e versao exibida no sistema.
+- fluxo Git multiambiente atualizado para o modelo oficial `develop-desktop -> homolog-vm -> main -> VPS`;
+- homologacao da `VM Ubuntu 24` formalizada como etapa obrigatoria antes da promocao para `main`;
+- checklist de backup da `VPS` consolidado com codigo, banco e arquivos antes de cada deploy;
+- indice principal sincronizado com a release `2.15.2` e com a nova nota tecnica de governanca operacional.
 
 ## Regra editorial
 

@@ -1,7 +1,7 @@
 # Historico de Versoes do Sistema
 
 Atualizado em: 24/04/2026  
-Versao atual oficial: `2.15.1`
+Versao atual oficial: `2.15.2`
 
 ## Observacao sobre o App Mobile/PWA
 
@@ -20,6 +20,13 @@ Estado documental atual do app:
 - documentacao exclusiva aprofundada em 04/04/2026
 
 ## Release ERP + App
+
+### 24/04/2026 - v2.15.2 / app 0.4.2
+- formalizado o novo fluxo Git multiambiente com `develop-desktop` para desenvolvimento, `homolog-vm` para homologacao e `main` exclusiva para producao;
+- a `VM Ubuntu 24` passou a ser a etapa oficial de validacao final antes de promover codigo para a `main`, alinhando homologacao e infraestrutura da `VPS`;
+- documentado o checklist completo de deploy com backup Git da `VPS`, dump do banco com `--no-tablespaces` e compactacao dos arquivos antes de cada atualizacao;
+- sincronizada a documentacao operacional do projeto com a nova governanca de quatro ambientes: `PC`, `notebook`, `VM` e `VPS`;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.2`.
 
 ### 24/04/2026 - v2.15.1 / app 0.4.2
 - o formulario de Orcamentos passou a aceitar `Telefone de contato` como campo opcional em `/orcamentos/novo` e `/orcamentos/editar/{id}`;

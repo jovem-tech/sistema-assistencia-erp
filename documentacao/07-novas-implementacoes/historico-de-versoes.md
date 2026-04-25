@@ -1,7 +1,7 @@
 # Historico de Versoes do Sistema
 
-Atualizado em: 24/04/2026  
-Versao atual oficial: `2.15.3`
+Atualizado em: 25/04/2026  
+Versao atual oficial: `2.15.4`
 
 ## Observacao sobre o App Mobile/PWA
 
@@ -20,6 +20,12 @@ Estado documental atual do app:
 - documentacao exclusiva aprofundada em 04/04/2026
 
 ## Release ERP + App
+
+### 25/04/2026 - v2.15.4 / app 0.4.2
+- corrigida a listagem `/os` para exibir na coluna `Status` o status real salvo na OS, mesmo quando existe um orcamento vinculado com status sugerido para o fluxo;
+- o badge principal e o badge de fluxo da DataTable deixaram de ser sobrescritos visualmente por `os_status_sugerido`, preservando a leitura real da oficina na homologacao e na producao;
+- o orcamento vinculado continua aparecendo na mesma celula apenas como contexto comercial auxiliar, com badge proprio e numero da proposta;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.4`.
 
 ### 24/04/2026 - v2.15.3 / app 0.4.2
 - corrigida a regressao em que a sincronizacao automatica com orcamentos `aprovados` ou `convertidos` voltava a OS para `aguardando_reparo` mesmo depois de a oficina avancar manualmente para fases posteriores;

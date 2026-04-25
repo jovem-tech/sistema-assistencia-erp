@@ -9,6 +9,36 @@ use App\Models\OsStatusTransicaoModel;
 
 class OsStatusFlowService
 {
+    private const LIST_OPEN_STATUS_CODES = [
+        'triagem',
+        'diagnostico',
+        'aguardando_avaliacao',
+        'verificacao_garantia',
+        'aguardando_orcamento',
+        'aguardando_autorizacao',
+        'aguardando_reparo',
+        'reparo_execucao',
+        'cumprimento_garantia',
+        'retrabalho',
+        'testes_operacionais',
+        'testes_finais',
+        'aguardando_peca',
+        'pagamento_pendente',
+        'entregue_pagamento_pendente',
+        'reparo_concluido',
+        'reparado_disponivel_loja',
+        'garantia_concluida',
+        'irreparavel',
+        'irreparavel_disponivel_loja',
+        'reparo_recusado',
+    ];
+
+    private const LIST_CLOSED_STATUS_CODES = [
+        'entregue_reparado',
+        'devolvido_sem_reparo',
+        'descartado',
+    ];
+
     private OsStatusModel $statusModel;
     private OsStatusTransicaoModel $transicaoModel;
     private OsStatusHistoricoModel $historicoModel;
@@ -29,6 +59,26 @@ class OsStatusFlowService
         }
 
         return $this->statusModel->getActiveGrouped();
+    }
+
+    public function getListOpenStatusCodes(): array
+    {
+        return self::LIST_OPEN_STATUS_CODES;
+    }
+
+    public function getListClosedStatusCodes(): array
+    {
+        return self::LIST_CLOSED_STATUS_CODES;
+    }
+
+    public function getListClosedFilterOptions(): array
+    {
+        return [
+            'fechadas' => 'Todas as fechadas',
+            'entregue_reparado' => 'Equipamento Entregue',
+            'devolvido_sem_reparo' => 'Devolvido Sem Reparo',
+            'descartado' => 'Equipamento Descartado',
+        ];
     }
 
     public function getAllStatusesOrdered(): array

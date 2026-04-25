@@ -1,7 +1,7 @@
 # Historico de Versoes do Sistema
 
 Atualizado em: 25/04/2026  
-Versao atual oficial: `2.15.4`
+Versao atual oficial: `2.15.6`
 
 ## Observacao sobre o App Mobile/PWA
 
@@ -20,6 +20,23 @@ Estado documental atual do app:
 - documentacao exclusiva aprofundada em 04/04/2026
 
 ## Release ERP + App
+
+### 25/04/2026 - v2.15.6 / app 0.4.2
+- o botao `Limpar` da listagem `/os` voltou a restaurar o estado inicial da tela, exibindo novamente apenas as ordens abertas;
+- `Limpar todos` agora segue a mesma regra e remove apenas os filtros escolhidos pela equipe, sem abrir automaticamente a fila completa;
+- a consulta ampla de abertas + fechadas foi movida para os filtros avancados, no novo seletor `Status geral`;
+- a opcao `Todos os status` passou a concentrar o envio de `status_scope=all`, mantendo a busca geral fora da barra principal;
+- a listagem continua iniciando pela fila de abertas, mas agora separa melhor `reset de filtros` de `consulta geral`;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.6`.
+
+### 25/04/2026 - v2.15.5 / app 0.4.2
+- a listagem `/os` passou a iniciar por padrao com a fila de ordens abertas;
+- o antigo filtro `Status detalhado` foi renomeado para `Ordens abertas` e agora exibe apenas etapas operacionais abertas;
+- foi adicionado o dropdown `Ordens fechadas` para consultar `Equipamento Entregue`, `Devolvido Sem Reparo` e `Equipamento Descartado`;
+- `Busca global`, `Ordens abertas` e `Ordens fechadas` receberam textos auxiliares para reduzir ambiguidade na filtragem;
+- o contexto visual da tabela agora alterna entre `Ordens em aberto`, `Ordens fechadas` e `Todas as ordens de servico` conforme o modo de consulta;
+- os botoes `Limpar` e `Limpar todos` agora removem todas as filtragens e exibem juntas as OS abertas e fechadas por meio de `status_scope=all`;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.5`.
 
 ### 25/04/2026 - v2.15.4 / app 0.4.2
 - corrigida a listagem `/os` para exibir na coluna `Status` o status real salvo na OS, mesmo quando existe um orcamento vinculado com status sugerido para o fluxo;

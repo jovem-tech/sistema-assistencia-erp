@@ -1,13 +1,20 @@
 <?php
 $listFilters = $listFilters ?? [];
 $statusGrouped = $statusGrouped ?? [];
+$statusGroupedOpen = $statusGroupedOpen ?? $statusGrouped;
 $statusFlat = $statusFlat ?? [];
+$statusClosedOptions = $statusClosedOptions ?? [];
 $macrofases = $macrofases ?? [];
 $tecnicos = $tecnicos ?? [];
 $tiposServico = $tiposServico ?? [];
 $situacaoOptions = $situacaoOptions ?? [];
 
 $statusSelected = is_array($listFilters['status'] ?? null) ? $listFilters['status'] : [];
+$statusClosedSelected = (string) ($listFilters['status_fechadas'] ?? '');
+$statusScope = (string) ($listFilters['status_scope'] ?? '');
+if ($statusClosedSelected !== '') {
+    $statusSelected = [];
+}
 $estadoFluxoOptions = [
     'em_atendimento' => 'Em atendimento',
     'em_execucao' => 'Em execucao',
@@ -37,6 +44,10 @@ foreach ($tecnicos as $tecnico) {
 
 $labelsMap = [
     'status' => $statusLabels,
+    'status_fechadas' => $statusClosedOptions,
+    'status_scope' => [
+        'all' => 'Todos os status',
+    ],
     'macrofases' => $macrofases,
     'estado_fluxo' => $estadoFluxoOptions,
     'tecnicos' => $tecnicoLabels,
@@ -45,6 +56,29 @@ $labelsMap = [
         '1' => 'Somente OS legado',
     ],
 ];
+
+$tableTitleText = 'Ordens em aberto';
+$tableSubtitleText = 'A listagem inicia nas etapas abertas da oficina. Use "Ordens fechadas" para consultar entregas, devolucoes e descartes.';
+
+if ($statusClosedSelected !== '') {
+    if ($statusClosedSelected === 'fechadas') {
+        $tableTitleText = 'Ordens fechadas';
+        $tableSubtitleText = 'Exibindo apenas OS encerradas por entrega, devolucao sem reparo ou descarte.';
+    } else {
+        $tableTitleText = 'Fechadas: ' . ($statusClosedOptions[$statusClosedSelected] ?? $statusClosedSelected);
+        $tableSubtitleText = 'Exibindo apenas um desfecho operacional da fila encerrada.';
+    }
+} elseif ($statusScope === 'all') {
+    $tableTitleText = 'Todas as ordens de servico';
+    $tableSubtitleText = 'Exibindo OS abertas e fechadas sem o recorte padrao da fila.';
+} elseif (count($statusSelected) === 1) {
+    $selectedCode = (string) $statusSelected[0];
+    $tableTitleText = 'Ordens abertas: ' . ($statusLabels[$selectedCode] ?? $selectedCode);
+    $tableSubtitleText = 'Fila aberta refinada por um status detalhado.';
+} elseif (count($statusSelected) > 1) {
+    $tableTitleText = 'Ordens abertas filtradas';
+    $tableSubtitleText = count($statusSelected) . ' status detalhados selecionados na fila aberta.';
+}
 ?>
 
 <?= $this->extend('layouts/main') ?>
@@ -84,7 +118,7 @@ $labelsMap = [
             <form id="osFiltersDesktopForm" data-os-filter-form="desktop" novalidate>
                 <input type="hidden" data-filter-field="legado" value="<?= esc((string) ($listFilters['legado'] ?? '')) ?>">
                 <div class="os-filters-inline">
-                    <div class="os-filter-field">
+                    <div class="os-filter-field" data-filter-block="q">
                         <label class="form-label" for="osFilterQDesktop">Busca global</label>
                         <div class="os-input-icon">
                             <i class="bi bi-search"></i>
@@ -98,18 +132,19 @@ $labelsMap = [
                                 autocomplete="off"
                             >
                         </div>
+                        <div class="os-filter-helper">Busca cliente, equipamento, numero da OS ou OS legado.</div>
                     </div>
 
-                    <div class="os-filter-field">
-                        <label class="form-label" for="osFilterStatusDesktop">Status detalhado</label>
+                    <div class="os-filter-field" data-filter-block="status">
+                        <label class="form-label" for="osFilterStatusDesktop">Ordens abertas</label>
                         <select
                             id="osFilterStatusDesktop"
                             data-filter-field="status"
                             class="form-select js-os-select2"
                             multiple
-                            data-placeholder="Selecione status"
+                            data-placeholder="Selecione etapas abertas"
                         >
-                            <?php foreach ($statusGrouped as $macro => $items): ?>
+                            <?php foreach ($statusGroupedOpen as $macro => $items): ?>
                                 <?php if (empty($items)) continue; ?>
                                 <optgroup label="<?= esc(ucwords(str_replace('_', ' ', (string) $macro))) ?>">
                                     <?php foreach ($items as $item): ?>
@@ -122,6 +157,25 @@ $labelsMap = [
                                 </optgroup>
                             <?php endforeach; ?>
                         </select>
+                        <div class="os-filter-helper">Refina a fila pelas etapas abertas da oficina.</div>
+                    </div>
+
+                    <div class="os-filter-field" data-filter-block="status_fechadas">
+                        <label class="form-label" for="osFilterClosedDesktop">Ordens fechadas</label>
+                        <select
+                            id="osFilterClosedDesktop"
+                            data-filter-field="status_fechadas"
+                            class="form-select js-os-select2"
+                            data-placeholder="Listar fechadas"
+                        >
+                            <option value="">Exibindo abertas</option>
+                            <?php foreach ($statusClosedOptions as $closedStatusCode => $closedStatusName): ?>
+                                <option value="<?= esc((string) $closedStatusCode) ?>" <?= $statusClosedSelected === (string) $closedStatusCode ? 'selected' : '' ?>>
+                                    <?= esc((string) $closedStatusName) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="os-filter-helper">Troca a fila para OS encerradas.</div>
                     </div>
 
                     <div class="os-filters-actions">
@@ -147,6 +201,15 @@ $labelsMap = [
 
                 <div class="collapse os-filters-advanced" id="osAdvancedFiltersCollapse">
                     <div class="row g-3">
+                        <div class="col-12 col-xxl-3 col-xl-4 col-md-6">
+                            <label class="form-label" for="osFilterStatusScopeDesktop">Status geral</label>
+                            <select id="osFilterStatusScopeDesktop" data-filter-field="status_scope" class="form-select js-os-select2" data-placeholder="Padrao: ordens abertas">
+                                <option value="">Padrao: ordens abertas</option>
+                                <option value="all" <?= $statusScope === 'all' ? 'selected' : '' ?>>Todos os status</option>
+                            </select>
+                            <div class="form-text">Use aqui quando quiser consultar abertas e fechadas na mesma fila.</div>
+                        </div>
+
                         <div class="col-12 col-xxl-3 col-xl-4 col-md-6">
                             <label class="form-label" for="osFilterMacrofaseDesktop">Macrofase</label>
                             <select id="osFilterMacrofaseDesktop" data-filter-field="macrofase" class="form-select js-os-select2" data-placeholder="Todas as macrofases">
@@ -259,18 +322,19 @@ $labelsMap = [
                                 autocomplete="off"
                             >
                         </div>
+                        <div class="os-filter-helper">Busca cliente, equipamento, numero da OS ou OS legado.</div>
                     </div>
 
-                    <div class="col-12">
-                        <label class="form-label" for="osFilterStatusMobile">Status detalhado</label>
+                    <div class="col-12" data-filter-block="status">
+                        <label class="form-label" for="osFilterStatusMobile">Ordens abertas</label>
                         <select
                             id="osFilterStatusMobile"
                             data-filter-field="status"
                             class="form-select js-os-select2"
                             multiple
-                            data-placeholder="Selecione status"
+                            data-placeholder="Selecione etapas abertas"
                         >
-                            <?php foreach ($statusGrouped as $macro => $items): ?>
+                            <?php foreach ($statusGroupedOpen as $macro => $items): ?>
                                 <?php if (empty($items)) continue; ?>
                                 <optgroup label="<?= esc(ucwords(str_replace('_', ' ', (string) $macro))) ?>">
                                     <?php foreach ($items as $item): ?>
@@ -283,6 +347,34 @@ $labelsMap = [
                                 </optgroup>
                             <?php endforeach; ?>
                         </select>
+                        <div class="os-filter-helper">Refina a fila pelas etapas abertas da oficina.</div>
+                    </div>
+
+                    <div class="col-12" data-filter-block="status_fechadas">
+                        <label class="form-label" for="osFilterClosedMobile">Ordens fechadas</label>
+                        <select
+                            id="osFilterClosedMobile"
+                            data-filter-field="status_fechadas"
+                            class="form-select js-os-select2"
+                            data-placeholder="Listar fechadas"
+                        >
+                            <option value="">Exibindo abertas</option>
+                            <?php foreach ($statusClosedOptions as $closedStatusCode => $closedStatusName): ?>
+                                <option value="<?= esc((string) $closedStatusCode) ?>" <?= $statusClosedSelected === (string) $closedStatusCode ? 'selected' : '' ?>>
+                                    <?= esc((string) $closedStatusName) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="os-filter-helper">Use para consultar entregas, devolucoes e descartes.</div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="osFilterStatusScopeMobile">Status geral</label>
+                        <select id="osFilterStatusScopeMobile" data-filter-field="status_scope" class="form-select js-os-select2" data-placeholder="Padrao: ordens abertas">
+                            <option value="">Padrao: ordens abertas</option>
+                            <option value="all" <?= $statusScope === 'all' ? 'selected' : '' ?>>Todos os status</option>
+                        </select>
+                        <div class="form-text">Amplia a consulta para abertas + fechadas na mesma listagem.</div>
                     </div>
 
                     <div class="col-12">
@@ -400,7 +492,10 @@ $labelsMap = [
             </div>
 
             <div class="os-table-header">
-                <h5 class="os-table-title"><i class="bi bi-list-check me-2"></i>Lista de Ordens de Servico</h5>
+                <div class="os-table-heading">
+                    <h5 class="os-table-title" id="osTableTitle"><i class="bi bi-list-check me-2"></i><span id="osTableTitleText"><?= esc($tableTitleText) ?></span></h5>
+                    <div class="os-table-subtitle" id="osTableSubtitle"><?= esc($tableSubtitleText) ?></div>
+                </div>
                 <div class="os-table-meta">
                     <span class="spinner-border spinner-border-sm d-none" id="osResultsSpinner" role="status" aria-hidden="true"></span>
                     <span id="osResultsCounter">Carregando...</span>

@@ -70,11 +70,25 @@ Na prática:
 
 ### Filtros
 
-A tela suporta:
+A tela agora abre por padrao na fila de OS abertas.
+
+Filtros principais:
 
 - busca global;
-- filtro por status detalhado;
-- filtros avançados por contexto operacional.
+- `Ordens abertas`: refina apenas as etapas operacionais ainda em andamento;
+- `Ordens fechadas`: permite consultar `Equipamento Entregue`, `Devolvido Sem Reparo` e `Equipamento Descartado`;
+- filtros avancados por contexto operacional.
+
+Nos filtros avancados:
+
+- `Status geral` oferece a consulta ampla `Todos os status`;
+- esse modo junta abertas + fechadas na mesma listagem sem depender do atalho rapido da tela principal.
+
+Comportamento do reset:
+
+- `Limpar` e `Limpar todos` removem apenas os filtros selecionados e devolvem a tela ao estado inicial de OS abertas;
+- para consultar abertas + fechadas juntas, use `Status geral -> Todos os status` nos filtros avancados;
+- ao acessar novamente a tela sem filtro salvo/manual, a listagem volta a iniciar pela fila aberta.
 
 ### Fechamento da nova OS pela listagem
 

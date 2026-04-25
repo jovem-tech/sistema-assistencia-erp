@@ -1,7 +1,7 @@
 # Documentacao - Sistema de Assistencia Tecnica
 
 > Jovem Tech  
-> ERP atual: `2.15.2`  
+> ERP atual: `2.15.3`  
 > App mobile/PWA: `0.4.2`  
 > Atualizado em `24/04/2026`
 
@@ -9,7 +9,7 @@
 
 Este diretorio concentra a documentacao funcional, tecnica e operacional do ERP da assistencia tecnica.
 
-O indice abaixo foi revisado para refletir a release `2.15.2`, com destaque para o fluxo oficial de `desenvolvimento -> homologacao -> producao` entre `PC`, `notebook`, `VM` e `VPS`.
+O indice abaixo foi revisado para refletir a release `2.15.3`, com destaque para o ajuste do fluxo de status da OS em homologacao e para o fluxo oficial de `desenvolvimento -> homologacao -> producao` entre `PC`, `notebook`, `VM` e `VPS`.
 
 ## Estrutura
 
@@ -44,11 +44,13 @@ O indice abaixo foi revisado para refletir a release `2.15.2`, com destaque para
 - Arquitetura do modulo de orcamentos: `03-arquitetura-tecnica/modulo-orcamentos.md`
 - Estrutura de pastas: `03-arquitetura-tecnica/estrutura-de-pastas.md`
 - Fluxo Git multiambiente: `10-deploy/fluxo-git-multiambiente.md`
+- Guia rapido do fluxo 4 ambientes: `10-deploy/guia-rapido-fluxo-4-ambientes.md`
+- PDF do guia rapido 4 ambientes: `10-deploy/guia-rapido-fluxo-4-ambientes.pdf`
 
 ### Versao e release atual
 
 - Historico oficial de versoes do ERP: `07-novas-implementacoes/historico-de-versoes.md`
-- Release atual: `07-novas-implementacoes/2026-04-24-release-v2.15.2-fluxo-homolog-vm-e-governanca-deploy.md`
+- Release atual: `07-novas-implementacoes/2026-04-24-release-v2.15.3-status-os-nao-retrocede-com-orcamento-aprovado.md`
 - Registro da release anterior na VPS: `10-deploy/2026-04-23-atualizacao-vps-release-v2.15.0.md`
 
 ### App mobile/PWA
@@ -62,7 +64,8 @@ O indice abaixo foi revisado para refletir a release `2.15.2`, com destaque para
 - fluxo Git multiambiente atualizado para o modelo oficial `develop-desktop -> homolog-vm -> main -> VPS`;
 - homologacao da `VM Ubuntu 24` formalizada como etapa obrigatoria antes da promocao para `main`;
 - checklist de backup da `VPS` consolidado com codigo, banco e arquivos antes de cada deploy;
-- indice principal sincronizado com a release `2.15.2` e com a nova nota tecnica de governanca operacional.
+- a sincronizacao entre `Orcamento` e `OS` foi endurecida para nao rebaixar fases ja avancadas do reparo quando o orcamento permanece `aprovado` ou `convertido`;
+- indice principal sincronizado com a release `2.15.3` e com a nova nota tecnica da correcao operacional.
 
 ## Regra editorial
 

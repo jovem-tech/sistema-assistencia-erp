@@ -70,6 +70,11 @@ Regra técnica consolidada:
 - orçamento `aprovado` ou `convertido`:
   - OS sugerida/atualizada para `aguardando_reparo`.
 
+Regra complementar obrigatoria:
+
+- essa sincronizacao automatica nao pode rebaixar uma OS que ja avancou manualmente para etapas posteriores do reparo, como `reparo_execucao`, `aguardando_peca`, `testes_operacionais`, `testes_finais`, `reparo_concluido` e similares;
+- o orcamento continua definindo o ponto de entrada do fluxo tecnico, mas nao sobrescreve fases mais avancadas ja confirmadas pela equipe.
+
 Também foi aplicado fallback de valor:
 
 - se `os.valor_final` estiver vazio, a listagem pode usar o total do orçamento vinculado mais recente.
@@ -185,6 +190,15 @@ Mapeamento atual:
   - OS -> `aguardando_autorizacao`
 - `aprovado`, `convertido`
   - OS -> `aguardando_reparo`
+
+Protecao adicional da release `2.15.3`:
+
+- `app/Controllers/Os.php`
+- `app/Controllers/Orcamentos.php`
+- `app/Controllers/Orcamento.php`
+- `app/Services/OsStatusFlowService.php`
+
+Esses pontos passaram a comparar a ordem do fluxo antes de sincronizar a OS com o status do orçamento. Se a OS ja estiver em uma etapa posterior ao alvo sugerido pelo orçamento, o sistema preserva o status manual da oficina.
 
 ## PDFs e mensageria
 

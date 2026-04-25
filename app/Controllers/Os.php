@@ -925,16 +925,39 @@ class Os extends BaseController
             return;
         }
 
+        $statusFlowService = new OsStatusFlowService();
+
         foreach ($osIdsByTargetStatus as $targetStatus => $osIds) {
             $osIds = array_values(array_unique(array_filter(array_map('intval', (array) $osIds))));
             if (empty($osIds)) {
                 continue;
             }
 
-            $estadoFluxo = (new OsStatusFlowService())->resolveEstadoFluxo((string) $targetStatus);
+            $currentOsRows = $db->table('os')
+                ->select('id, status')
+                ->whereIn('id', $osIds)
+                ->get()
+                ->getResultArray();
+
+            $eligibleOsIds = [];
+            foreach ($currentOsRows as $row) {
+                $currentStatus = trim((string) ($row['status'] ?? ''));
+                if ($statusFlowService->hasAdvancedPast($currentStatus, (string) $targetStatus)) {
+                    continue;
+                }
+
+                $eligibleOsIds[] = (int) ($row['id'] ?? 0);
+            }
+
+            $eligibleOsIds = array_values(array_unique(array_filter($eligibleOsIds)));
+            if (empty($eligibleOsIds)) {
+                continue;
+            }
+
+            $estadoFluxo = $statusFlowService->resolveEstadoFluxo((string) $targetStatus);
 
             $db->table('os')
-                ->whereIn('id', $osIds)
+                ->whereIn('id', $eligibleOsIds)
                 ->where('status <>', (string) $targetStatus)
                 ->groupStart()
                     ->where('estado_fluxo IS NULL', null, false)

@@ -1,7 +1,7 @@
 # Historico de Versoes do Sistema
 
 Atualizado em: 24/04/2026  
-Versao atual oficial: `2.15.2`
+Versao atual oficial: `2.15.3`
 
 ## Observacao sobre o App Mobile/PWA
 
@@ -20,6 +20,13 @@ Estado documental atual do app:
 - documentacao exclusiva aprofundada em 04/04/2026
 
 ## Release ERP + App
+
+### 24/04/2026 - v2.15.3 / app 0.4.2
+- corrigida a regressao em que a sincronizacao automatica com orcamentos `aprovados` ou `convertidos` voltava a OS para `aguardando_reparo` mesmo depois de a oficina avancar manualmente para fases posteriores;
+- o historico de status da OS ja registrava a mudanca manual, mas a listagem e outros fluxos podiam regravar `os.status` por causa da regra de sincronizacao com o orcamento mais recente;
+- `Os.php`, `Orcamentos.php` e `Orcamento.php` passaram a preservar o status manual quando a OS ja estiver em etapa mais avancada do que o alvo sugerido pelo orcamento;
+- `OsStatusFlowService` ganhou comparacao centralizada de ordem do fluxo para evitar rebaixamento indevido entre status tecnicos;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.3`.
 
 ### 24/04/2026 - v2.15.2 / app 0.4.2
 - formalizado o novo fluxo Git multiambiente com `develop-desktop` para desenvolvimento, `homolog-vm` para homologacao e `main` exclusiva para producao;

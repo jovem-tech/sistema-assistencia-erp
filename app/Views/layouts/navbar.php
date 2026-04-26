@@ -5,6 +5,11 @@ $uri = service('uri');
 $currentModule = $uri->getSegment(1);
 $currentSubroute = $uri->getSegment(2);
 $isOsListPage = $currentModule === 'os' && empty($currentSubroute);
+$notificationFeedUrl = site_url('notificacoes/navbar-feed');
+$notificationStreamUrl = site_url('notificacoes/stream');
+$notificationReadBaseUrl = site_url('notificacoes/lida');
+$notificationReadAllUrl = site_url('notificacoes/lidas');
+$notificationAppUrl = rtrim(site_url(), '/') . '/';
 ?>
 <nav class="top-navbar">
     <div class="navbar-left">
@@ -131,6 +136,42 @@ $isOsListPage = $currentModule === 'os' && empty($currentSubroute);
                 <i class="bi bi-plus-lg me-1"></i><span class="nav-action-label">Nova OS</span>
             </a>
             <?php endif; ?>
+        </div>
+
+        <div
+            class="dropdown navbar-notifications"
+            id="navbarNotifications"
+            data-feed-url="<?= esc($notificationFeedUrl) ?>"
+            data-stream-url="<?= esc($notificationStreamUrl) ?>"
+            data-read-url-base="<?= esc($notificationReadBaseUrl) ?>"
+            data-read-all-url="<?= esc($notificationReadAllUrl) ?>"
+            data-base-url="<?= esc(base_url()) ?>"
+            data-app-url="<?= esc($notificationAppUrl) ?>"
+        >
+            <button
+                class="btn btn-link navbar-notification-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                aria-label="Abrir notificacoes"
+            >
+                <i class="bi bi-bell"></i>
+                <span class="navbar-notification-badge d-none" id="navbarNotificationCount">0</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end navbar-notification-menu p-0">
+                <div class="navbar-notification-header">
+                    <div>
+                        <strong>Notificacoes</strong>
+                        <small id="navbarNotificationMeta">Sincronizando...</small>
+                    </div>
+                    <button type="button" class="btn btn-link btn-sm navbar-notification-mark-all" id="navbarNotificationMarkAll">
+                        Marcar todas
+                    </button>
+                </div>
+                <div class="navbar-notification-list" id="navbarNotificationList">
+                    <div class="navbar-notification-empty">Carregando notificacoes...</div>
+                </div>
+            </div>
         </div>
         
         <!-- User Menu -->

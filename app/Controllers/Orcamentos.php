@@ -1247,7 +1247,9 @@ class Orcamentos extends BaseController
         if (!$orcamento) {
             return redirect()->to('/orcamentos')->with('error', 'Orçamento nao encontrado.');
         }
-        if ($this->orcamentoModel->isLockedStatus((string) ($orcamento['status'] ?? ''))) {
+        $statusAtual = (string) ($orcamento['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
+        $allowEmbeddedLockedEdit = $this->canEditLockedOrcamentoFromOsEmbed($orcamento);
+        if ($this->orcamentoModel->isLockedStatus($statusAtual) && !$allowEmbeddedLockedEdit) {
             return redirect()->to($this->orcamentoShowUrl((int) $id))
                 ->with('error', 'Este orcamento esta bloqueado para edicao direta. Crie uma revisao para enviar uma nova autorizacao.');
         }
@@ -1260,6 +1262,8 @@ class Orcamentos extends BaseController
             'actionUrl' => base_url('orcamentos/atualizar/' . (int) $id . ($isEmbedded ? '?embed=1' : '')),
             'layout' => $isEmbedded ? 'layouts/embed' : 'layouts/main',
             'isEmbedded' => $isEmbedded,
+            'statusOptions' => $this->buildEditStatusOptions($statusAtual, $allowEmbeddedLockedEdit),
+            'orcamentoLockedEmbeddedEdit' => $allowEmbeddedLockedEdit,
         ]));
     }
     public function update($id)
@@ -1270,7 +1274,9 @@ class Orcamentos extends BaseController
         if (!$current) {
             return redirect()->to('/orcamentos')->with('error', 'Orçamento nao encontrado.');
         }
-        if ($this->orcamentoModel->isLockedStatus((string) ($current['status'] ?? ''))) {
+        $statusAnterior = (string) ($current['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
+        $allowEmbeddedLockedEdit = $this->canEditLockedOrcamentoFromOsEmbed($current);
+        if ($this->orcamentoModel->isLockedStatus($statusAnterior) && !$allowEmbeddedLockedEdit) {
             return redirect()->to($this->orcamentoShowUrl($orcamentoId))
                 ->with('error', 'Este orcamento esta bloqueado para edicao direta. Crie uma revisao para enviar uma nova autorizacao.');
         }
@@ -1284,7 +1290,9 @@ class Orcamentos extends BaseController
             return redirect()->back()->withInput()->with('error', $contatoValidationError);
         }
         $itens = $this->extractItensPayload();
-        $pacoteOfertaIntent = $this->extractPacoteOfertaIntent();
+        $pacoteOfertaIntent = $allowEmbeddedLockedEdit
+            ? $this->buildEmbeddedLockedPacoteIntent($statusAnterior)
+            : $this->extractPacoteOfertaIntent();
         $isPacoteBased = !empty($pacoteOfertaIntent['orcamento_baseado_pacote']);
         $pacoteOfertaResolution = $this->resolvePacoteOfertaForApply($pacoteOfertaIntent, array_merge($current, $payload), $orcamentoId);
         if (!empty($pacoteOfertaResolution['error'])) {
@@ -1295,7 +1303,10 @@ class Orcamentos extends BaseController
         $linkedOfertaStatus = trim((string) ($linkedOferta['status'] ?? ''));
         $hasReusableLinkedOferta = $linkedOferta !== null
             && in_array($linkedOfertaStatus, ['ativo', 'enviado', 'escolhido', 'aplicado_orcamento'], true);
-        $shouldCreateLinkedOferta = $isPacoteBased && $pacoteOferta === null && !$hasReusableLinkedOferta;
+        $shouldCreateLinkedOferta = !$allowEmbeddedLockedEdit
+            && $isPacoteBased
+            && $pacoteOferta === null
+            && !$hasReusableLinkedOferta;
         if (empty($itens) && $pacoteOferta === null && !$isPacoteBased) {
             return redirect()->back()->withInput()->with('error', 'Adicione pelo menos um item no orcamento.');
         }
@@ -1308,18 +1319,21 @@ class Orcamentos extends BaseController
         $usuarioId = (int) (session()->get('user_id') ?? 0);
         $now = date('Y-m-d H:i:s');
         $payload['atualizado_por'] = $usuarioId > 0 ? $usuarioId : null;
-        $requestedStatus = (string) ($payload['status'] ?: (string) ($current['status'] ?? OrcamentoModel::STATUS_RASCUNHO));
-        if ($isPacoteBased) {
+        $requestedStatus = $allowEmbeddedLockedEdit
+            ? $statusAnterior
+            : (string) ($payload['status'] ?: $statusAnterior);
+        if (!$allowEmbeddedLockedEdit && $isPacoteBased) {
             if ($pacoteOferta !== null || in_array($linkedOfertaStatus, ['escolhido', 'aplicado_orcamento'], true)) {
                 $requestedStatus = OrcamentoModel::STATUS_PACOTE_APROVADO;
             } else {
                 $requestedStatus = OrcamentoModel::STATUS_AGUARDANDO_PACOTE;
             }
         }
-        $payload['status'] = $this->resolveApprovedStatus(array_merge($current, $payload), $requestedStatus);
+        $payload['status'] = $allowEmbeddedLockedEdit
+            ? $statusAnterior
+            : $this->resolveApprovedStatus(array_merge($current, $payload), $requestedStatus);
         $payload = array_merge($payload, $this->statusTimestampColumns($payload['status'], $now, $current));
         $autoOfertaResult = ['warning' => null, 'error' => null];
-        $statusAnterior = (string) ($current['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
         $statusNovo = (string) $payload['status'];
         if (!$this->orcamentoService->canTransition($statusAnterior, $statusNovo)) {
             return redirect()->back()->withInput()->with('error', 'Transicao de status do orcamento nao permitida.');
@@ -2708,6 +2722,56 @@ class Orcamentos extends BaseController
         return $opcoes;
     }
     /**
+     * @return array<string,string>
+     */
+    private function buildEditStatusOptions(string $statusAtual, bool $preserveCurrentOnly = false): array
+    {
+        $statusAtual = trim($statusAtual);
+        $labels = $this->orcamentoModel->statusLabels();
+        if ($preserveCurrentOnly && $statusAtual !== '') {
+            return [
+                $statusAtual => $labels[$statusAtual] ?? ucfirst(str_replace('_', ' ', $statusAtual)),
+            ];
+        }
+
+        return $this->buildShowStatusOptions($statusAtual);
+    }
+    /**
+     * @param array<string,mixed> $orcamento
+     */
+    private function canEditLockedOrcamentoFromOsEmbed(array $orcamento): bool
+    {
+        if (!$this->isEmbedRequest()) {
+            return false;
+        }
+
+        if ((int) ($orcamento['os_id'] ?? 0) <= 0) {
+            return false;
+        }
+
+        return $this->orcamentoModel->isLockedStatus((string) ($orcamento['status'] ?? ''));
+    }
+    /**
+     * @return array<string,mixed>
+     */
+    private function buildEmbeddedLockedPacoteIntent(string $statusAtual): array
+    {
+        $statusAtual = trim($statusAtual);
+        return [
+            'oferta_id' => 0,
+            'aplicar' => false,
+            'orcamento_baseado_pacote' => in_array($statusAtual, [
+                OrcamentoModel::STATUS_AGUARDANDO_PACOTE,
+                OrcamentoModel::STATUS_PACOTE_APROVADO,
+            ], true),
+            'pacote_servico_id' => 0,
+            'telefone' => '',
+            'enviar_whatsapp' => false,
+            'mensagem' => '',
+            'mensagem_personalizada_com_link' => false,
+        ];
+    }
+    /**
      * @return array<int, array<string, mixed>>
      */
     private function loadPacotesAtivosForOferta(): array
@@ -3989,6 +4053,7 @@ class Orcamentos extends BaseController
         $defaults = [
             'clientes' => [],
             'statusLabels' => $this->orcamentoModel->statusLabels(),
+            'statusOptions' => $this->orcamentoModel->statusLabels(),
             'tipoLabels' => $this->orcamentoModel->tipoLabels(),
             'clienteLookupInitial' => $clienteLookupInitial,
             'equipamentoLookupInitial' => $equipamentoLookupInitial,
@@ -3997,6 +4062,7 @@ class Orcamentos extends BaseController
             'equipamentoManual' => $equipamentoManual,
             'pacoteOfertaModuleReady' => $this->isPacoteOfertaModuleReady(),
             'pacotesAtivosOferta' => $this->loadPacotesAtivosForOferta(),
+            'orcamentoLockedEmbeddedEdit' => false,
         ];
         return array_merge($defaults, $overrides);
     }

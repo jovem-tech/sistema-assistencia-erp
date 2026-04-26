@@ -295,8 +295,10 @@
 
 .os-list-page #osTable th:nth-child(2),
 .os-list-page #osTable td:nth-child(2) {
-    width: 78px;
-    min-width: 78px;
+    width: 64px;
+    min-width: 64px;
+    max-width: 64px;
+    padding-inline: 0.35rem !important;
 }
 
 .os-list-page #osTable .os-foto-cell {
@@ -376,8 +378,9 @@
 
 .os-list-page #osTable th:nth-child(3),
 .os-list-page #osTable td:nth-child(3) {
-    width: 118px;
-    min-width: 118px;
+    width: 11ch;
+    min-width: 11ch;
+    max-width: 11ch;
     white-space: nowrap;
 }
 
@@ -389,6 +392,7 @@
     min-width: 0;
     white-space: normal;
     word-break: keep-all;
+    font-variant-numeric: tabular-nums;
 }
 
 .os-list-page #osTable .os-numero-link {
@@ -449,14 +453,15 @@
 
 .os-list-page #osTable th:nth-child(4),
 .os-list-page #osTable td:nth-child(4) {
-    width: 220px;
-    min-width: 220px;
+    width: auto;
+    min-width: 0;
+    padding-right: 0.35rem !important;
 }
 
 .os-list-page #osTable th:nth-child(5),
 .os-list-page #osTable td:nth-child(5) {
-    width: 190px;
-    min-width: 190px;
+    width: auto;
+    min-width: 0;
 }
 
 .os-list-page #osTable th:nth-child(6),
@@ -479,15 +484,23 @@
 
 .os-list-page #osTable th:nth-child(9),
 .os-list-page #osTable td:nth-child(9) {
-    width: 72px;
-    min-width: 72px;
-    white-space: nowrap;
+    width: auto;
+    min-width: 0;
 }
 
 .os-list-page #osTable th:nth-child(10),
 .os-list-page #osTable td:nth-child(10) {
     width: 88px;
     min-width: 88px;
+    white-space: nowrap;
+}
+
+.os-list-page #osTable th:nth-child(9) {
+    white-space: normal;
+    line-height: 1.18;
+}
+
+.os-list-page #osTable td:nth-child(9) {
     white-space: nowrap;
 }
 
@@ -501,15 +514,27 @@
     display: grid;
     gap: 0.08rem;
     line-height: 1.4;
+    width: fit-content;
     max-width: 100%;
     font-size: 0.98rem;
     font-weight: 600;
     word-break: normal;
     overflow-wrap: break-word;
+    justify-self: center;
+    text-align: center;
 }
 
 .os-list-page #osTable .os-cliente-line {
     display: block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.os-list-page #osTable .os-cell-link-client {
+    align-items: center;
+    text-align: center;
 }
 
 .os-list-page #osTable .os-equipamento-cell,
@@ -517,6 +542,10 @@
 .os-list-page #osTable .os-status-content {
     display: grid;
     gap: 0.38rem;
+}
+
+.os-list-page #osTable .os-equipamento-cell {
+    position: relative;
 }
 
 .os-list-page #osTable .os-equipamento-line,
@@ -543,15 +572,45 @@
     flex: 1 1 auto;
 }
 
-.os-list-page #osTable .os-relato-cell {
-    display: block;
-    max-height: calc(1.35em * 4);
-    overflow: hidden;
-    line-height: 1.35;
-    font-size: 0.92rem;
+.os-list-page #osTable .os-equipamento-value {
     white-space: normal;
-    word-break: break-word;
     overflow-wrap: anywhere;
+}
+
+.os-list-page #osTable .os-equipamento-measure {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    visibility: hidden;
+    pointer-events: none;
+    white-space: nowrap;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+}
+
+.os-list-page #osTable .os-relato-cell {
+    display: grid;
+    gap: 0.08rem;
+    line-height: 1.25;
+    font-size: 0.92rem;
+    cursor: help;
+}
+
+.os-list-page #osTable .os-relato-line {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.os-list-page #osTable .os-relato-more {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
 }
 
 .os-list-page #osTable .os-date-indicator {
@@ -765,6 +824,150 @@
 
 .os-list-page .os-status-modal-quick-actions .btn.active {
     box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.16);
+}
+
+.os-list-page .os-status-modal-title {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.os-list-page .os-status-modal-title-number {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.os-list-page .os-status-modal-panel-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.os-list-page .os-status-modal-tabs-shell {
+    gap: 0.95rem;
+}
+
+.os-list-page .os-status-modal-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+.os-list-page .os-status-modal-tabs .nav-link {
+    border: 1px solid #dbe5f1;
+    background: #ffffff;
+    color: var(--text-secondary);
+    border-radius: 999px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 0.58rem 0.92rem;
+    line-height: 1.2;
+}
+
+.os-list-page .os-status-modal-tabs .nav-link:hover {
+    color: var(--primary);
+    border-color: rgba(99, 91, 255, 0.28);
+}
+
+.os-list-page .os-status-modal-tabs .nav-link.active {
+    background: linear-gradient(135deg, #635bff 0%, #7c74ff 100%);
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 10px 22px rgba(99, 91, 255, 0.18);
+}
+
+.os-list-page .os-status-modal-tab-content {
+    min-width: 0;
+}
+
+.os-list-page .os-status-modal-tab-content .tab-pane {
+    display: none;
+}
+
+.os-list-page .os-status-modal-tab-content .tab-pane.active.show {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.os-list-page .os-status-modal-flow-hints {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.os-list-page .os-status-modal-flow-hints strong {
+    color: var(--text-primary);
+}
+
+.os-list-page .os-status-modal-solution-card,
+.os-list-page .os-status-modal-field-card {
+    padding: 0.9rem 0.95rem;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid #dbe5f1;
+}
+
+.os-list-page .os-status-modal-solution-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+}
+
+.os-list-page .os-status-modal-procedure-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: stretch;
+}
+
+.os-list-page .os-status-modal-procedure-toolbar .form-control {
+    flex: 1 1 280px;
+    min-width: 0;
+}
+
+.os-list-page .os-status-modal-procedure-toolbar .btn {
+    flex: 0 0 auto;
+}
+
+.os-list-page .os-status-modal-procedure-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-height: 2.2rem;
+}
+
+.os-list-page .os-status-modal-procedure-item {
+    padding: 0.72rem 0.8rem;
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1px solid #dbe5f1;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.45;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.os-list-page .os-status-modal-budget-host {
+    min-width: 0;
+}
+
+.os-list-page .os-status-modal-budget-host .row {
+    margin-bottom: 0;
+}
+
+.os-list-page .os-status-modal-budget-card {
+    overflow: hidden;
+}
+
+.os-list-page .os-status-modal-budget-card .card-header {
+    background: #ffffff;
+}
+
+.os-list-page .os-status-modal-budget-card .table-responsive {
+    overflow-x: auto;
 }
 
 .os-list-page .os-status-modal-divider {
@@ -1286,26 +1489,28 @@
 
     .os-list-page #osTable th:nth-child(2),
     .os-list-page #osTable td:nth-child(2) {
-        width: 72px;
-        min-width: 72px;
+        width: 64px;
+        min-width: 64px;
+        max-width: 64px;
     }
 
     .os-list-page #osTable th:nth-child(3),
     .os-list-page #osTable td:nth-child(3) {
-        width: 116px;
-        min-width: 116px;
+        width: 11ch;
+        min-width: 11ch;
+        max-width: 11ch;
     }
 
     .os-list-page #osTable th:nth-child(4),
     .os-list-page #osTable td:nth-child(4) {
-        width: 204px;
-        min-width: 204px;
+        width: auto;
+        min-width: 0;
     }
 
     .os-list-page #osTable th:nth-child(5),
     .os-list-page #osTable td:nth-child(5) {
-        width: 180px;
-        min-width: 180px;
+        width: auto;
+        min-width: 0;
     }
 
     .os-list-page #osTable th:nth-child(6),
@@ -1328,8 +1533,8 @@
 
     .os-list-page #osTable th:nth-child(9),
     .os-list-page #osTable td:nth-child(9) {
-        width: 70px;
-        min-width: 70px;
+        width: auto;
+        min-width: 0;
     }
 
     .os-list-page .os-status-trigger-hint {
@@ -1368,26 +1573,28 @@
 
     .os-list-page #osTable th:nth-child(2),
     .os-list-page #osTable td:nth-child(2) {
-        width: 70px;
-        min-width: 70px;
+        width: 64px;
+        min-width: 64px;
+        max-width: 64px;
     }
 
     .os-list-page #osTable th:nth-child(3),
     .os-list-page #osTable td:nth-child(3) {
-        width: 112px;
-        min-width: 112px;
+        width: 11ch;
+        min-width: 11ch;
+        max-width: 11ch;
     }
 
     .os-list-page #osTable th:nth-child(4),
     .os-list-page #osTable td:nth-child(4) {
-        width: 196px;
-        min-width: 196px;
+        width: auto;
+        min-width: 0;
     }
 
     .os-list-page #osTable th:nth-child(5),
     .os-list-page #osTable td:nth-child(5) {
-        width: 166px;
-        min-width: 166px;
+        width: auto;
+        min-width: 0;
     }
 
     .os-list-page #osTable th:nth-child(6),
@@ -1410,8 +1617,8 @@
 
     .os-list-page #osTable th:nth-child(9),
     .os-list-page #osTable td:nth-child(9) {
-        width: 68px;
-        min-width: 68px;
+        width: auto;
+        min-width: 0;
     }
 
     .os-list-page #osTable th:nth-child(10),
@@ -1551,6 +1758,26 @@
 
     .os-list-page .os-status-modal-quick-actions {
         flex-direction: column;
+    }
+
+    .os-list-page .os-status-modal-solution-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .os-list-page .os-status-modal-tabs .nav-link {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .os-list-page .os-status-modal-procedure-toolbar {
+        flex-direction: column;
+    }
+
+    .os-list-page .os-status-modal-procedure-toolbar .form-control,
+    .os-list-page .os-status-modal-procedure-toolbar .btn {
+        width: 100%;
+        flex: 1 1 auto;
     }
 
     .os-list-page .os-budget-metrics {
@@ -1881,6 +2108,16 @@
         padding-inline: 1rem;
     }
 
+    .os-list-page .os-status-modal-title {
+        gap: 0.3rem;
+        line-height: 1.35;
+    }
+
+    .os-list-page .os-status-modal-title-number {
+        display: inline-flex;
+        width: 100%;
+    }
+
     .os-list-page #osStatusModal .os-workflow-step {
         grid-template-columns: 16px minmax(0, 1fr);
         gap: 0.65rem;
@@ -1954,6 +2191,11 @@
     .os-list-page #osTable.os-mobile-cards tbody tr {
         padding: 0.8rem;
     }
+
+    .os-list-page .os-status-modal-solution-card,
+    .os-list-page .os-status-modal-field-card {
+        padding: 0.82rem 0.84rem;
+    }
 }
 
 @media (max-width: 390px) {
@@ -1967,6 +2209,14 @@
 
     .os-list-page #osTable.os-mobile-cards .os-numero-cell {
         font-size: 0.96rem;
+    }
+
+    .os-list-page .os-status-modal-title {
+        font-size: 1rem;
+    }
+
+    .os-list-page .os-status-modal-flow-hints {
+        gap: 0.24rem;
     }
 }
 
@@ -1986,6 +2236,16 @@
     .os-list-page #osTable.os-mobile-cards td.col-acoes .btn-group > .btn {
         flex-basis: 100%;
     }
+
+    .os-list-page .os-status-modal-summary,
+    .os-list-page .os-status-modal-panel {
+        padding: 0.8rem;
+    }
+
+    .os-list-page .os-status-modal-solution-card,
+    .os-list-page .os-status-modal-field-card {
+        padding: 0.78rem;
+    }
 }
 
 @media (max-width: 320px) {
@@ -2003,5 +2263,15 @@
 
     .os-list-page #osTable.os-mobile-cards tbody td::before {
         font-size: 0.64rem;
+    }
+
+    .os-list-page #osStatusModal .modal-body,
+    .os-list-page #osStatusModal .modal-header,
+    .os-list-page #osStatusModal .modal-footer {
+        padding-inline: 0.85rem;
+    }
+
+    .os-list-page .os-status-modal-title {
+        font-size: 0.96rem;
     }
 }

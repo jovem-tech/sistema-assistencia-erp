@@ -23,7 +23,8 @@ foreach ($statusGrouped as $macro => $items) {
         ];
     }
 }
-$statusDefaultLabel = (string) ($statusFlat[$statusDefault]['nome'] ?? 'Triagem');
+$statusSelecionado = (string) old('status', $statusDefault);
+$statusDefaultLabel = (string) ($statusFlat[$statusSelecionado]['nome'] ?? $statusFlat[$statusDefault]['nome'] ?? 'Triagem');
 
 $origemConversaId = (int) ($origemConversaId ?? 0);
 $origemContatoId = (int) ($origemContatoId ?? 0);
@@ -44,9 +45,42 @@ if ($origemTelefoneHint === '') {
 $isOrigemCentralWhatsapp = !$isEdit
     && ($origemConversaId > 0 || $origemContatoId > 0 || $clientePreSelecionado > 0 || $origemTelefoneHint !== '' || $origemNomeHint !== '');
 
-$clienteSelecionadoNoForm = $isEdit
+$clienteSelecionadoDefault = $isEdit
     ? (int) ($os['cliente_id'] ?? 0)
     : ($clientePreSelecionado > 0 ? $clientePreSelecionado : 0);
+$clienteSelecionadoNoForm = (int) old('cliente_id', $clienteSelecionadoDefault);
+$equipamentoSelecionadoNoForm = (int) old('equipamento_id', (int) ($os['equipamento_id'] ?? 0));
+$tecnicoSelecionadoNoForm = (string) old('tecnico_id', (string) ($os['tecnico_id'] ?? ''));
+$prioridadeSelecionada = (string) old('prioridade', (string) ($os['prioridade'] ?? 'normal'));
+$relatoClienteValue = (string) old('relato_cliente', (string) ($os['relato_cliente'] ?? ''));
+
+$dataEntradaRaw = trim((string) old('data_entrada', $isEdit ? (string) ($os['data_entrada'] ?? '') : ''));
+if ($dataEntradaRaw === '') {
+    $dataEntradaRaw = date('Y-m-d H:i:s');
+}
+$dataEntradaTimestamp = strtotime($dataEntradaRaw);
+$dataEntradaInputValue = $dataEntradaTimestamp ? date('Y-m-d\TH:i', $dataEntradaTimestamp) : date('Y-m-d\TH:i');
+
+$dataPrevisaoRaw = trim((string) old('data_previsao', (string) ($os['data_previsao'] ?? '')));
+$dataPrevisaoTimestamp = $dataPrevisaoRaw !== '' ? strtotime($dataPrevisaoRaw) : false;
+$dataPrevisaoInputValue = $dataPrevisaoTimestamp ? date('Y-m-d', $dataPrevisaoTimestamp) : '';
+$prazoEntregaPresets = [
+    '1' => '1 dia',
+    '3' => '3 dias',
+    '7' => '7 dias',
+    '30' => '30 dias',
+];
+$prazoEntregaSelecionado = '';
+if ($dataEntradaTimestamp && $dataPrevisaoTimestamp) {
+    $entradaBaseTimestamp = strtotime(date('Y-m-d', $dataEntradaTimestamp));
+    $previsaoBaseTimestamp = strtotime(date('Y-m-d', $dataPrevisaoTimestamp));
+    if ($entradaBaseTimestamp !== false && $previsaoBaseTimestamp !== false) {
+        $prazoCalculado = (int) round(($previsaoBaseTimestamp - $entradaBaseTimestamp) / 86400);
+        if ($prazoCalculado > 0) {
+            $prazoEntregaSelecionado = (string) $prazoCalculado;
+        }
+    }
+}
 
 $clientes = $clientes ?? [];
 $clientesMeta = [];
@@ -328,6 +362,11 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
 
 .os-cliente-tech-helper {
     min-height: 1.25rem;
+}
+
+.os-required-mark {
+    color: #dc2626;
+    font-weight: 700;
 }
 
 .os-operational-card {
@@ -642,7 +681,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <div class="col-12 col-xl-8 os-cliente-tech-col os-cliente-tech-col--cliente">
                                         <div class="os-inline-label">
                                             <label for="clienteOsSelect" class="form-label mb-0">
-                                                <span>Cliente *</span>
+                                                <span>Cliente <span class="os-required-mark" aria-hidden="true">*</span></span>
                                             </label>
                                             <span class="os-inline-actions">
                                                 <?php if (can('clientes', 'criar')): ?>
@@ -685,7 +724,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                         <select name="tecnico_id" id="tecnicoResponsavelSelect" class="form-select">
                                             <option value="">Nao atribuido</option>
                                             <?php foreach ($tecnicos as $t): ?>
-                                            <option value="<?= $t['id'] ?>" <?= ($isEdit && ($os['tecnico_id'] ?? '') == $t['id']) ? 'selected' : '' ?>><?= esc($t['nome']) ?></option>
+                                            <option value="<?= $t['id'] ?>" <?= ($tecnicoSelecionadoNoForm !== '' && $tecnicoSelecionadoNoForm === (string) $t['id']) ? 'selected' : '' ?>><?= esc($t['nome']) ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                         <small class="text-muted d-block mt-2 os-cliente-tech-helper">
@@ -723,7 +762,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <div class="col-12">
                                         <div class="os-inline-label">
                                             <label for="equipamentoSelect" class="form-label mb-0">
-                                                <span>Equipamento *</span>
+                                                <span>Equipamento <span class="os-required-mark" aria-hidden="true">*</span></span>
                                             </label>
                                             <span class="os-inline-actions">
                                                 <?php if (can('equipamentos', 'criar')): ?>
@@ -760,7 +799,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                                 data-estado_fisico="<?= esc($eq['estado_fisico'] ?? '') ?>"
                                                 data-acessorios="<?= esc($eq['acessorios'] ?? '') ?>"
                                                 data-foto_url="<?= esc($eqFotoUrl) ?>"
-                                                <?= $os['equipamento_id'] == $eq['id'] ? 'selected' : '' ?>>
+                                                <?= ($equipamentoSelecionadoNoForm === (int) $eq['id']) ? 'selected' : '' ?>>
                                                 <?= esc(($eq['marca_nome'] ?? $eq['marca'] ?? '') . ' ' . ($eq['modelo_nome'] ?? $eq['modelo'] ?? '') . ' (' . ($eq['tipo_nome'] ?? $eq['tipo'] ?? '') . ')') ?>
                                             </option>
                                             <?php endforeach; endif; ?>
@@ -867,6 +906,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                 <div class="os-tab-helper">
                                     Registre o que foi informado na entrada antes de detalhar o equipamento e as condicoes tecnicas.
                                 </div>
+                                <label for="relatoClienteInput" class="form-label">Relato do Cliente <span class="os-required-mark" aria-hidden="true">*</span></label>
                                 <?php if (!$isEdit): ?>
                                 <div class="mb-3">
                                     <div id="relatoQuickButtons" class="d-flex flex-wrap gap-2 relato-quick-grid">
@@ -911,7 +951,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <small class="text-muted d-block mt-2">Escolha a categoria e clique em um item rapido para inserir no relato.</small>
                                 </div>
                                 <?php endif; ?>
-                                <textarea name="relato_cliente" id="relatoClienteInput" class="form-control" rows="6"><?= $isEdit ? esc($os['relato_cliente']) : old('relato_cliente') ?></textarea>
+                                <textarea name="relato_cliente" id="relatoClienteInput" class="form-control" rows="6"><?= esc($relatoClienteValue) ?></textarea>
                                 <?php if (!$isEdit): ?>
                                 <small class="text-muted d-block mt-2">Voce pode complementar manualmente o relato a qualquer momento.</small>
                                 <?php endif; ?>
@@ -974,26 +1014,32 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <div class="col-md-3">
                                         <label class="form-label">Prioridade</label>
                                         <select name="prioridade" class="form-select">
-                                            <option value="baixa"   <?= ($isEdit && $os['prioridade'] === 'baixa')   ? 'selected' : '' ?>>Baixa</option>
-                                            <option value="normal"  <?= (!$isEdit || $os['prioridade'] === 'normal')  ? 'selected' : '' ?>>Normal</option>
-                                            <option value="alta"    <?= ($isEdit && $os['prioridade'] === 'alta')    ? 'selected' : '' ?>>Alta</option>
-                                            <option value="urgente" <?= ($isEdit && $os['prioridade'] === 'urgente') ? 'selected' : '' ?>>Urgente</option>
+                                            <option value="baixa"   <?= $prioridadeSelecionada === 'baixa' ? 'selected' : '' ?>>Baixa</option>
+                                            <option value="normal"  <?= $prioridadeSelecionada === 'normal' ? 'selected' : '' ?>>Normal</option>
+                                            <option value="alta"    <?= $prioridadeSelecionada === 'alta' ? 'selected' : '' ?>>Alta</option>
+                                            <option value="urgente" <?= $prioridadeSelecionada === 'urgente' ? 'selected' : '' ?>>Urgente</option>
                                         </select>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label">Data de Entrada *</label>
-                                        <input type="datetime-local" name="data_entrada" class="form-control" value="<?= $isEdit ? ($os['data_entrada'] ?? date('Y-m-d\TH:i')) : date('Y-m-d\TH:i') ?>" required>
+                                        <label class="form-label">Data de Entrada <span class="os-required-mark" aria-hidden="true">*</span></label>
+                                        <input type="datetime-local" name="data_entrada" class="form-control" value="<?= esc($dataEntradaInputValue) ?>" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Previsao de Entrega</label>
                                         <select id="prazoEntregaSelect" class="form-select mb-2">
-                                            <option value="">Prazo (dias)</option>
-                                            <option value="1">1 dia</option>
-                                            <option value="3">3 dias</option>
-                                            <option value="7">7 dias</option>
-                                            <option value="30">30 dias</option>
+                                            <option value="" <?= $prazoEntregaSelecionado === '' ? 'selected' : '' ?>>Prazo (dias)</option>
+                                            <?php foreach ($prazoEntregaPresets as $prazoDias => $prazoLabel): ?>
+                                            <option value="<?= esc($prazoDias) ?>" <?= $prazoEntregaSelecionado === (string) $prazoDias ? 'selected' : '' ?>>
+                                                <?= esc($prazoLabel) ?>
+                                            </option>
+                                            <?php endforeach; ?>
+                                            <?php if ($prazoEntregaSelecionado !== '' && !isset($prazoEntregaPresets[$prazoEntregaSelecionado])): ?>
+                                            <option value="<?= esc($prazoEntregaSelecionado) ?>" selected data-dynamic-option="1">
+                                                <?= esc($prazoEntregaSelecionado . ((int) $prazoEntregaSelecionado === 1 ? ' dia' : ' dias')) ?>
+                                            </option>
+                                            <?php endif; ?>
                                         </select>
-                                        <input type="date" name="data_previsao" class="form-control" value="<?= $isEdit ? ($os['data_previsao'] ?? '') : '' ?>">
+                                        <input type="date" name="data_previsao" class="form-control" value="<?= esc($dataPrevisaoInputValue) ?>">
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Status</label>
@@ -1005,14 +1051,14 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                                         <?php foreach ($items as $item): ?>
                                                             <?php $codigo = (string) ($item['codigo'] ?? ''); ?>
                                                             <?php if ($codigo === '') continue; ?>
-                                                            <option value="<?= esc($codigo) ?>" data-status-cor="<?= esc((string) ($item['cor'] ?? 'secondary')) ?>" <?= ((string) ($os['status'] ?? $statusDefault) === $codigo) ? 'selected' : '' ?>>
+                                                            <option value="<?= esc($codigo) ?>" data-status-cor="<?= esc((string) ($item['cor'] ?? 'secondary')) ?>" <?= ($statusSelecionado === $codigo) ? 'selected' : '' ?>>
                                                                 <?= esc((string) ($item['nome'] ?? $codigo)) ?>
                                                             </option>
                                                         <?php endforeach; ?>
                                                     </optgroup>
                                                 <?php endforeach; ?>
                                             <?php else: ?>
-                                                <?php $currStatus = (string) ($os['status'] ?? $statusDefault); ?>
+                                                <?php $currStatus = $statusSelecionado; ?>
                                                 <option value="triagem" <?= $currStatus === 'triagem' ? 'selected' : '' ?>>Triagem</option>
                                                 <option value="diagnostico" <?= $currStatus === 'diagnostico' ? 'selected' : '' ?>>Diagnostico Tecnico</option>
                                                 <option value="aguardando_orcamento" <?= $currStatus === 'aguardando_orcamento' ? 'selected' : '' ?>>Aguardando Orcamento</option>
@@ -1023,6 +1069,9 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                                 <option value="cancelado" <?= $currStatus === 'cancelado' ? 'selected' : '' ?>>Cancelado</option>
                                             <?php endif; ?>
                                         </select>
+                                        <?php if ($isEdit): ?>
+                                        <small class="text-muted d-block mt-2">A edicao permite ajustar qualquer status operacional cadastrado para esta OS.</small>
+                                        <?php endif; ?>
                                     </div>
                                     <?php if ($isEdit): ?>
                                     <div class="col-md-3">
@@ -1086,6 +1135,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                         </div>
                         <?php endif; ?>
                         <?php if (false): ?>
+                    <fieldset class="d-none" disabled aria-hidden="true">
                     <div class="os-data-section mb-4">
                         <div class="os-data-section-title">
                             <i class="bi bi-people me-1"></i>Cliente, Equipamento e Técnico Responsável
@@ -1170,7 +1220,10 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                     </div>
 
                     </div>
+                    </fieldset>
+                    </fieldset>
 
+                    <fieldset class="d-none" disabled aria-hidden="true">
                     <div class="os-data-section mb-4">
                         <div class="os-data-section-title">
                             <i class="bi bi-calendar-check me-1"></i>Prioridade, Entrada, Previsão e Status
@@ -1436,7 +1489,16 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                         </div>
                         <?php if ($isEdit): ?>
                         <div class="tab-pane fade" id="tab-financeiro" role="tabpanel" aria-labelledby="tab-financeiro-btn" tabindex="0">
-                    <div class="row g-3 mb-4">
+                    <div id="osBudgetSummaryPanel">
+                        <?= view('os/partials/orcamento_editor_panel', [
+                            'os' => $os,
+                            'orcamentoVinculado' => $orcamentoVinculado ?? null,
+                            'orcamentoItensResumo' => $orcamentoItensResumo ?? [],
+                            'orcamentoStatusLabels' => $orcamentoStatusLabels ?? [],
+                            'orcamentoTipoLabels' => $orcamentoTipoLabels ?? [],
+                        ]) ?>
+                    </div>
+                    <div class="row g-3 mb-4 d-none">
                         <div class="col-12">
                             <div class="card" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;">
                                 <div class="card-header py-2" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.1);">
@@ -1526,6 +1588,26 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
 </div><!-- /formCol -->
 </div><!-- /row -->
 </div>
+
+<?php if ($isEdit): ?>
+<div class="modal fade dashboard-os-modal" id="osBudgetEditorModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="osBudgetEditorModalTitle">Orcamento da OS</h5>
+                <button type="button" class="btn-close ms-auto" id="osBudgetEditorModalCloseBtn" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body p-0 position-relative">
+                <div class="dashboard-os-modal-loading" id="osBudgetEditorModalLoading">
+                    <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+                    <span>Carregando orcamento...</span>
+                </div>
+                <iframe id="osBudgetEditorModalFrame" title="Orcamento da OS" class="dashboard-os-modal-frame" src="about:blank"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <!-- ===== MODAL: CADASTRAR NOVO CLIENTE ===== -->
 <div class="modal fade" id="modalNovoCliente" tabindex="-1" aria-hidden="true">
@@ -5330,7 +5412,6 @@ if (formOs) {
         const requiredFields = [
             { selector: '#clienteOsSelect', label: 'Cliente', tabBtnId: 'tab-cliente-btn' },
             { selector: '#equipamentoSelect', label: 'Equipamento', tabBtnId: 'tab-equipamento-btn' },
-            { selector: 'select[name="tecnico_id"]', label: 'Tecnico', tabBtnId: 'tab-cliente-btn' },
             { selector: 'input[name="data_entrada"]', label: 'Data de Entrada', tabBtnId: 'tab-relato-btn' },
             { selector: '#relatoClienteInput', label: 'Relato do Cliente', tabBtnId: 'tab-defeito-btn' },
         ];
@@ -5398,6 +5479,25 @@ if (formOs) {
             const labels = missingOptional.map((m) => m.label).join(', ');
             const firstMissing = missingOptional[0];
             const target = document.querySelector(firstMissing.selector);
+
+            if (isEdit) {
+                markWarning(target);
+                if (window.Swal && typeof window.Swal.fire === 'function') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Salvando com pendencias opcionais',
+                        text: labels + '.',
+                        toast: true,
+                        position: 'top-end',
+                        timer: 2600,
+                        showConfirmButton: false,
+                        timerProgressBar: true,
+                    });
+                }
+                finalizeOsSubmit();
+                return;
+            }
+
             const proceedWithoutOptional = () => finalizeOsSubmit();
             const fillOptional = () => {
                 markWarning(target);
@@ -5436,6 +5536,59 @@ if (formOs) {
 }
 
 const prazoEntregaSelect = document.getElementById('prazoEntregaSelect');
+
+function syncPrazoEntregaSelectWithDates() {
+    if (!prazoEntregaSelect) {
+        return;
+    }
+
+    Array.from(prazoEntregaSelect.options).forEach((option) => {
+        if (option?.dataset?.dynamicOption === '1') {
+            option.remove();
+        }
+    });
+
+    const entradaVal = document.querySelector('input[name="data_entrada"]')?.value || '';
+    const previsaoVal = document.querySelector('input[name="data_previsao"]')?.value || '';
+    if (!entradaVal || !previsaoVal) {
+        prazoEntregaSelect.value = '';
+        return;
+    }
+
+    const entradaDate = new Date(entradaVal);
+    const previsaoDate = new Date(`${previsaoVal}T00:00:00`);
+    if (Number.isNaN(entradaDate.getTime()) || Number.isNaN(previsaoDate.getTime())) {
+        prazoEntregaSelect.value = '';
+        return;
+    }
+
+    entradaDate.setHours(0, 0, 0, 0);
+    previsaoDate.setHours(0, 0, 0, 0);
+
+    const prazoDias = Math.round((previsaoDate.getTime() - entradaDate.getTime()) / 86400000);
+    if (!Number.isFinite(prazoDias) || prazoDias <= 0) {
+        prazoEntregaSelect.value = '';
+        return;
+    }
+
+    const prazoValue = String(prazoDias);
+    const existingOption = Array.from(prazoEntregaSelect.options).find((option) => option.value === prazoValue);
+    if (existingOption) {
+        prazoEntregaSelect.value = prazoValue;
+        return;
+    }
+
+    const dynamicOption = new Option(
+        prazoDias === 1 ? '1 dia' : `${prazoValue} dias`,
+        prazoValue,
+        true,
+        true
+    );
+    dynamicOption.dataset.dynamicOption = '1';
+    prazoEntregaSelect.add(dynamicOption);
+    prazoEntregaSelect.value = prazoValue;
+}
+
 prazoEntregaSelect?.addEventListener('change', function() {
     const days = parseInt(this.value, 10);
     if (!days) return;
@@ -5451,6 +5604,7 @@ prazoEntregaSelect?.addEventListener('change', function() {
         previsaoInp.value = `${yyyy}-${mm}-${dd}`;
         updateResumo();
         scheduleDraftSave();
+        syncPrazoEntregaSelectWithDates();
     }
 });
 
@@ -5816,11 +5970,14 @@ if (equipSelect) {
         scheduleDraftSave();
         if (prazoEntregaSelect?.value) {
             prazoEntregaSelect.dispatchEvent(new Event('change'));
+            return;
         }
+        syncPrazoEntregaSelectWithDates();
     });
     document.querySelector('input[name="data_previsao"]')?.addEventListener(evt, () => {
         updateResumo();
         scheduleDraftSave();
+        syncPrazoEntregaSelectWithDates();
     });
     document.querySelector('select[name="forma_pagamento"]')?.addEventListener(evt, () => {
         updateResumo();
@@ -5828,8 +5985,18 @@ if (equipSelect) {
     });
 });
 
+syncPrazoEntregaSelectWithDates();
+
 // --- Preview fotos de entrada ---
-const osFotosExistingData = <?= json_encode(array_map(fn($f) => ['url' => $f['url']], $fotos_entrada ?? [])) ?>;
+const csrfTokenName = '<?= csrf_token() ?>';
+let csrfTokenValue = document.querySelector('input[name="<?= csrf_token() ?>"]')?.value || '<?= csrf_hash() ?>';
+const currentOsId = <?= (int) ($os['id'] ?? 0) ?>;
+const osBudgetSummaryUrl = <?= json_encode(!empty($os['id']) ? base_url('os/orcamento-resumo/' . (int) $os['id']) : '') ?>;
+const osFotosDeleteUrlBase = <?= json_encode(base_url('os/fotos-entrada/excluir')) ?>;
+const osFotosExistingData = <?= json_encode(array_map(static fn($f) => [
+    'id' => (int) ($f['id'] ?? 0),
+    'url' => (string) ($f['url'] ?? ''),
+], $fotos_entrada ?? []), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
 const osFotosMaxFiles = 4;
 const osFotoMaxSizeMb = 2;
 const fotosEntradaInput = document.getElementById('fotosEntradaInput');
@@ -5844,6 +6011,25 @@ const btnFotosEntradaGaleria = document.getElementById('btnFotosEntradaGaleria')
 const btnLimparFotos = document.getElementById('btnLimparFotos');
 const osDataTransfer = new DataTransfer();
 let fotosEntradaCropQueue = [];
+
+function appendCsrfToFormData(formData) {
+    if (formData instanceof FormData && csrfTokenName && csrfTokenValue) {
+        formData.append(csrfTokenName, csrfTokenValue);
+    }
+    return formData;
+}
+
+function syncCsrfHashFromPayload(payload) {
+    const nextHash = typeof payload?.csrfHash === 'string' ? payload.csrfHash.trim() : '';
+    if (!nextHash) {
+        return;
+    }
+
+    csrfTokenValue = nextHash;
+    document.querySelectorAll(`input[name="${csrfTokenName}"]`).forEach((input) => {
+        input.value = nextHash;
+    });
+}
 
 function syncFotosEntradaInput() {
     if (fotosEntradaInput) {
@@ -5861,7 +6047,7 @@ function queueFotosEntradaFromFiles(files) {
     const incoming = Array.from(files || []).filter(file => file.type?.startsWith('image/'));
     if (!incoming.length) return;
 
-    const disponivel = osFotosMaxFiles - osDataTransfer.files.length;
+    const disponivel = osFotosMaxFiles - getTotalEntradaFotos();
     if (disponivel <= 0) {
         showWarningDialog(`Voce pode enviar ate ${osFotosMaxFiles} fotos no total.`);
         return;
@@ -5895,16 +6081,98 @@ function renderExistingFotos() {
     osFotosExisting.innerHTML = '';
     osFotosExistingData.forEach((foto, idx) => {
         const thumb = document.createElement('div');
+        const fotoId = Number(foto?.id || 0);
         thumb.className = 'position-relative border rounded overflow-hidden cursor-pointer';
-        thumb.style.cssText = 'width:90px; height:90px;';
+        thumb.style.cssText = 'width:110px; height:110px;';
         thumb.innerHTML = `
             <img src="${foto.url}" class="w-100 h-100 object-fit-cover">
+            ${fotoId > 0 ? `
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-1 btn-remover-foto-existente"
+                    data-foto-id="${fotoId}"
+                    aria-label="Excluir foto"
+                >
+                    <i class="bi bi-trash"></i>
+                </button>
+            ` : ''}
         `;
         thumb.setAttribute('data-bs-toggle', 'modal');
         thumb.setAttribute('data-bs-target', '#imageModal');
         thumb.setAttribute('data-img-src', foto.url);
         osFotosExisting.appendChild(thumb);
     });
+}
+
+async function deleteExistingEntradaPhoto(fotoId) {
+    if (!fotoId) return;
+
+    let confirmado = false;
+    if (window.Swal && typeof window.Swal.fire === 'function') {
+        const result = await Swal.fire({
+            icon: 'warning',
+            title: 'Excluir foto?',
+            text: 'Essa foto de entrada sera removida da visualizacao e da pasta de uploads.',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, excluir',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            customClass: { popup: 'glass-card' }
+        });
+        confirmado = !!result.isConfirmed;
+    } else {
+        confirmado = window.confirm('Essa foto de entrada sera removida permanentemente. Deseja continuar?');
+    }
+
+    if (!confirmado) return;
+
+    const previousFotos = Array.isArray(osFotosExistingData)
+        ? osFotosExistingData.map((foto) => ({ ...foto }))
+        : [];
+    const remainingFotos = previousFotos.filter((foto) => Number(foto?.id || 0) !== Number(fotoId));
+    osFotosExistingData.splice(0, osFotosExistingData.length, ...remainingFotos);
+    renderExistingFotos();
+    updatePhotoState();
+
+    try {
+        const formData = appendCsrfToFormData(new FormData());
+        const response = await fetch(`${osFotosDeleteUrlBase}/${fotoId}`, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const payload = await response.json();
+        syncCsrfHashFromPayload(payload);
+
+        if (!response.ok || !payload || payload.success !== true) {
+            throw new Error(payload?.message || 'Nao foi possivel excluir a foto de entrada.');
+        }
+
+        const refreshedFotos = Array.isArray(payload.fotos)
+            ? payload.fotos.map((foto) => ({
+                id: Number(foto?.id || 0),
+                url: String(foto?.url || ''),
+            }))
+            : [];
+        osFotosExistingData.splice(0, osFotosExistingData.length, ...refreshedFotos);
+        renderExistingFotos();
+        updatePhotoState();
+
+        if (window.Swal && typeof window.Swal.fire === 'function') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Foto excluida',
+                timer: 1200,
+                showConfirmButton: false,
+                customClass: { popup: 'glass-card' }
+            });
+        }
+    } catch (error) {
+        osFotosExistingData.splice(0, osFotosExistingData.length, ...previousFotos);
+        renderExistingFotos();
+        updatePhotoState();
+        showWarningDialog(error?.message || 'Nao foi possivel excluir a foto.', 'Falha na exclusao');
+    }
 }
 
 function renderNewFotos() {
@@ -5983,9 +6251,171 @@ osFotosPreview?.addEventListener('click', function(event) {
     updatePhotoState();
     scheduleDraftSave();
 });
+osFotosExisting?.addEventListener('click', async function(event) {
+    const remover = event.target.closest('.btn-remover-foto-existente');
+    if (!remover) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const fotoId = parseInt(remover.dataset.fotoId || '', 10);
+    if (!Number.isNaN(fotoId)) {
+        await deleteExistingEntradaPhoto(fotoId);
+    }
+});
 renderExistingFotos();
 renderNewFotos();
 updatePhotoState();
+
+const osBudgetSummaryPanel = document.getElementById('osBudgetSummaryPanel');
+const osBudgetEditorModalElement = document.getElementById('osBudgetEditorModal');
+const osBudgetEditorModalFrame = document.getElementById('osBudgetEditorModalFrame');
+const osBudgetEditorModalLoading = document.getElementById('osBudgetEditorModalLoading');
+const osBudgetEditorModalTitle = document.getElementById('osBudgetEditorModalTitle');
+const osBudgetEditorModalCloseBtn = document.getElementById('osBudgetEditorModalCloseBtn');
+const osBudgetEditorModal = osBudgetEditorModalElement
+    ? bootstrap.Modal.getOrCreateInstance(osBudgetEditorModalElement)
+    : null;
+let osBudgetEditorLoadTimeout = null;
+
+function setOsBudgetEditorLoading(isLoading) {
+    osBudgetEditorModalLoading?.classList.toggle('d-none', !isLoading);
+}
+
+function clearOsBudgetEditorTimeout() {
+    if (!osBudgetEditorLoadTimeout) {
+        return;
+    }
+    window.clearTimeout(osBudgetEditorLoadTimeout);
+    osBudgetEditorLoadTimeout = null;
+}
+
+function openOsBudgetEditorModal(url, title) {
+    if (!url || !osBudgetEditorModalFrame || !osBudgetEditorModal) {
+        return;
+    }
+
+    clearOsBudgetEditorTimeout();
+    setOsBudgetEditorLoading(true);
+    if (osBudgetEditorModalTitle) {
+        osBudgetEditorModalTitle.textContent = title || 'Orcamento da OS';
+    }
+    osBudgetEditorModalFrame.src = 'about:blank';
+    osBudgetEditorModal.show();
+    osBudgetEditorModalFrame.src = url;
+    osBudgetEditorLoadTimeout = window.setTimeout(() => {
+        setOsBudgetEditorLoading(false);
+    }, 12000);
+}
+
+async function confirmCloseBudgetEditorModal() {
+    if (window.Swal && typeof window.Swal.fire === 'function') {
+        const result = await Swal.fire({
+            icon: 'warning',
+            title: 'Fechar orcamento?',
+            text: 'Se houver alteracoes nao salvas no modal do orcamento, elas serao perdidas.',
+            showCancelButton: true,
+            confirmButtonText: 'Fechar mesmo assim',
+            cancelButtonText: 'Continuar editando',
+            reverseButtons: true,
+            customClass: { popup: 'glass-card' }
+        });
+        return !!result.isConfirmed;
+    }
+
+    return window.confirm('Existem alteracoes nao salvas no orcamento. Deseja fechar mesmo assim?');
+}
+
+async function refreshOsBudgetSummary(options = {}) {
+    if (!osBudgetSummaryPanel || !osBudgetSummaryUrl) {
+        return;
+    }
+
+    osBudgetSummaryPanel.classList.add('opacity-50');
+    try {
+        const response = await fetch(osBudgetSummaryUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload || payload.ok !== true) {
+            throw new Error(payload?.message || 'Nao foi possivel atualizar o resumo do orcamento.');
+        }
+
+        osBudgetSummaryPanel.innerHTML = payload.html || '';
+
+        if (options.successMessage && window.Swal && typeof window.Swal.fire === 'function') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Orcamento atualizado',
+                text: options.successMessage,
+                timer: 1800,
+                showConfirmButton: false,
+                customClass: { popup: 'glass-card' }
+            });
+        }
+    } finally {
+        osBudgetSummaryPanel.classList.remove('opacity-50');
+    }
+}
+
+document.addEventListener('click', function(event) {
+    const modalTrigger = event.target.closest('[data-os-orcamento-modal-url]');
+    if (!modalTrigger) {
+        return;
+    }
+
+    event.preventDefault();
+    openOsBudgetEditorModal(
+        modalTrigger.getAttribute('data-os-orcamento-modal-url') || '',
+        modalTrigger.getAttribute('data-os-orcamento-modal-title') || 'Orcamento da OS'
+    );
+});
+
+osBudgetEditorModalFrame?.addEventListener('load', () => {
+    clearOsBudgetEditorTimeout();
+    setOsBudgetEditorLoading(false);
+});
+
+osBudgetEditorModalCloseBtn?.addEventListener('click', async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const confirmed = await confirmCloseBudgetEditorModal();
+    if (!confirmed) {
+        return;
+    }
+
+    osBudgetEditorModal?.hide();
+});
+
+osBudgetEditorModalElement?.addEventListener('hidden.bs.modal', () => {
+    clearOsBudgetEditorTimeout();
+    setOsBudgetEditorLoading(false);
+    if (osBudgetEditorModalFrame) {
+        osBudgetEditorModalFrame.src = 'about:blank';
+    }
+});
+
+window.addEventListener('message', async function(event) {
+    if (event.origin !== window.location.origin) {
+        return;
+    }
+
+    const payload = event.data || {};
+    if (payload.type !== 'os:orcamento-updated') {
+        return;
+    }
+    if (currentOsId > 0 && Number(payload.osId || 0) !== currentOsId) {
+        return;
+    }
+
+    try {
+        await refreshOsBudgetSummary({
+            successMessage: String(payload.message || '').trim(),
+        });
+        osBudgetEditorModal?.hide();
+    } catch (error) {
+        showWarningDialog(error?.message || 'Nao foi possivel atualizar o resumo do orcamento.', 'Falha ao sincronizar');
+    }
+});
 
 // --- Modal: Cadastrar Novo Equipamento ---
 const osEquipamentosCache = window._osEquipamentosCache || (window._osEquipamentosCache = {});

@@ -233,6 +233,46 @@ class Os extends BaseController
         ]);
     }
 
+    public function deleteEntryPhoto($fotoId)
+    {
+        $fotoId = (int) $fotoId;
+        $fotoModel = new OsFotoModel();
+        $foto = $fotoModel->find($fotoId);
+
+        if (!$foto || strtolower(trim((string) ($foto['tipo'] ?? ''))) !== 'recepcao') {
+            return $this->response
+                ->setStatusCode(404)
+                ->setJSON([
+                    'success' => false,
+                    'message' => 'Foto de entrada nao encontrada.',
+                    'csrfHash' => csrf_hash(),
+                ]);
+        }
+
+        $osId = (int) ($foto['os_id'] ?? 0);
+        $arquivo = (string) ($foto['arquivo'] ?? '');
+        $absolutePath = $this->resolveOsEntradaFotoAbsolutePath($arquivo);
+
+        if ($absolutePath !== null && is_file($absolutePath)) {
+            @unlink($absolutePath);
+        }
+
+        $fotoModel->delete($fotoId);
+
+        LogModel::registrar(
+            'os_foto_entrada_excluida',
+            'Foto de entrada removida da OS ID: ' . $osId . ' (foto ID ' . $fotoId . ').'
+        );
+
+        return $this->response->setJSON([
+            'success' => true,
+            'os_id' => $osId,
+            'total_fotos' => $osId > 0 ? count($this->getOsEntradaFotosWithUrls($osId)) : 0,
+            'fotos' => $osId > 0 ? $this->getOsEntradaFotosWithUrls($osId) : [],
+            'csrfHash' => csrf_hash(),
+        ]);
+    }
+
     private function collectListFilters(string $method = 'get'): array
     {
         $read = static function (string $key) use ($method) {
@@ -1141,6 +1181,38 @@ class Os extends BaseController
         ];
     }
 
+    private function buildOsOrcamentoEditorViewData(array $os): array
+    {
+        $osId = (int) ($os['id'] ?? 0);
+        $orcamentoVinculado = $this->findLatestOrcamentoForOs($osId);
+        $orcamentoItensResumo = $orcamentoVinculado !== null
+            ? $this->summarizeOrcamentoItems((int) ($orcamentoVinculado['id'] ?? 0))
+            : [
+                'items' => [],
+                'groups' => [],
+                'total_items' => 0,
+                'total_quantity' => 0.0,
+            ];
+        $orcamentoModel = new \App\Models\OrcamentoModel();
+
+        return [
+            'orcamentoVinculado' => $orcamentoVinculado,
+            'orcamentoItensResumo' => $orcamentoItensResumo,
+            'orcamentoStatusLabels' => $orcamentoModel->statusLabels(),
+            'orcamentoTipoLabels' => $orcamentoModel->tipoLabels(),
+        ];
+    }
+
+    private function normalizeNullableString($value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $text = trim((string) $value);
+        return $text !== '' ? $text : null;
+    }
+
     private function summarizeOrcamentoItems(int $orcamentoId): array
     {
         if ($orcamentoId <= 0) {
@@ -1282,14 +1354,131 @@ class Os extends BaseController
         return [
             $this->formatOsPhotoCell($row, $photoContext),
             '<a href="' . base_url('os/visualizar/' . $row['id']) . '" class="os-numero-link" title="Abrir visualização da OS">' . $numeroOsHtml . '</a>',
-            $this->formatOsClientCell($row),
-            $this->formatOsEquipmentCell($row),
+            $this->formatOsClientCellCompact($row),
+            $this->formatOsEquipmentCellCompact($row),
             $this->formatOsRelatoCell($row),
             $this->formatOsDatesCell($row),
             $this->formatOsStatusCell($statusRow),
             $this->formatOsValueCell($valueRow, $valorFormatado),
             $acoes,
         ];
+    }
+
+    private function formatOsClientCellCompact(array $row): string
+    {
+        $clientName = trim((string) ($row['cliente_nome'] ?? ''));
+        if ($clientName === '') {
+            return '<div class="fw-semibold os-cliente-cell text-muted">-</div>';
+        }
+
+        $preview = $this->buildOsClientPreview($clientName, 3, 3);
+        $content = '<div class="fw-semibold os-cliente-cell" title="' . esc($preview['full']) . '" aria-label="' . esc($preview['full']) . '">'
+            . implode('', array_map(
+                static fn (string $line): string => '<span class="os-cliente-line">' . esc($line) . '</span>',
+                $preview['lines']
+            ))
+            . '</div>';
+
+        $clienteId = (int) ($row['cliente_id'] ?? 0);
+        if ($clienteId <= 0 || !can('clientes', 'visualizar')) {
+            return $content;
+        }
+
+        $buttonTitle = 'Cliente: ' . $clientName . ' - Abrir ficha completa e historico do cliente';
+
+        return '<button type="button" class="btn btn-link p-0 text-start os-cell-link os-cell-link-client" data-os-frame-modal-url="' . esc(base_url('clientes/visualizar/' . $clienteId . '?embed=1')) . '" data-os-frame-modal-title="' . esc('Cliente: ' . $clientName) . '" title="' . esc($buttonTitle) . '" aria-label="' . esc($buttonTitle) . '">' . $content . '</button>';
+    }
+
+    private function buildOsClientPreview(string $clientName, int $wordsPerLine = 3, int $maxLines = 3): array
+    {
+        $normalized = preg_replace('/\s+/u', ' ', trim($clientName)) ?? trim($clientName);
+        if ($normalized === '') {
+            return [
+                'full' => '',
+                'lines' => [],
+                'has_overflow' => false,
+            ];
+        }
+
+        $parts = preg_split('/\s+/u', $normalized) ?: [];
+        $parts = array_values(array_filter($parts, static fn (string $part): bool => $part !== ''));
+
+        $visibleWordLimit = max(1, $wordsPerLine * $maxLines);
+        $previewWords = array_slice($parts, 0, $visibleWordLimit);
+        $lines = array_map(
+            static fn (array $chunk): string => implode(' ', $chunk),
+            array_chunk($previewWords, max(1, $wordsPerLine))
+        );
+
+        $hasOverflow = count($parts) > count($previewWords);
+        if ($hasOverflow && !empty($lines)) {
+            $lastIndex = count($lines) - 1;
+            $lines[$lastIndex] = rtrim($lines[$lastIndex]) . '...';
+        }
+
+        return [
+            'full' => $normalized,
+            'lines' => $lines,
+            'has_overflow' => $hasOverflow,
+        ];
+    }
+
+    private function formatOsEquipmentCellCompact(array $row): string
+    {
+        $type = trim((string) ($row['equip_tipo'] ?? '')) ?: '-';
+        $brand = trim((string) ($row['equip_marca'] ?? '')) ?: '-';
+        $model = trim((string) ($row['equip_modelo'] ?? '')) ?: '-';
+        $longestWord = $this->resolveLongestVisibleWordForList([$type, $brand, $model]);
+
+        $content = implode('', [
+            '<div class="os-equipamento-cell">',
+            '<div class="os-equipamento-line"><span class="os-equipamento-label">Tipo:</span><span class="os-equipamento-value">' . esc($type) . '</span></div>',
+            '<div class="os-equipamento-line"><span class="os-equipamento-label">Marca:</span><span class="os-equipamento-value">' . esc($brand) . '</span></div>',
+            '<div class="os-equipamento-line"><span class="os-equipamento-label">Modelo:</span><span class="os-equipamento-value">' . esc($model) . '</span></div>',
+            '<span class="os-equipamento-value os-equipamento-measure" aria-hidden="true">' . esc($longestWord) . '</span>',
+            '</div>',
+        ]);
+
+        $equipamentoId = (int) ($row['equipamento_id'] ?? 0);
+        if ($equipamentoId <= 0 || !can('equipamentos', 'visualizar')) {
+            return $content;
+        }
+
+        $modalTitle = trim((string) (($row['equip_marca'] ?? '') . ' ' . ($row['equip_modelo'] ?? '')));
+        if ($modalTitle === '') {
+            $modalTitle = 'Equipamento';
+        }
+
+        return '<button type="button" class="btn btn-link p-0 text-start os-cell-link os-cell-link-equipment" data-os-frame-modal-url="' . esc(base_url('equipamentos/visualizar/' . $equipamentoId . '?embed=1')) . '" data-os-frame-modal-title="' . esc('Equipamento: ' . $modalTitle) . '" title="Abrir detalhes do equipamento">' . $content . '</button>';
+    }
+
+    private function resolveLongestVisibleWordForList(array $values): string
+    {
+        $longestWord = '-';
+        $longestLength = function_exists('mb_strlen') ? mb_strlen($longestWord) : strlen($longestWord);
+
+        foreach ($values as $value) {
+            $normalized = preg_replace('/\s+/u', ' ', trim((string) $value)) ?? trim((string) $value);
+            if ($normalized === '') {
+                continue;
+            }
+
+            $parts = preg_split('/\s+/u', $normalized) ?: [];
+            foreach ($parts as $part) {
+                $candidate = trim($part, " \t\n\r\0\x0B,;:.!?()[]{}");
+                if ($candidate === '') {
+                    continue;
+                }
+
+                $candidateLength = function_exists('mb_strlen') ? mb_strlen($candidate) : strlen($candidate);
+                if ($candidateLength > $longestLength) {
+                    $longestWord = $candidate;
+                    $longestLength = $candidateLength;
+                }
+            }
+        }
+
+        return $longestWord;
     }
 
     private function formatOsClientCell(array $row): string
@@ -1392,7 +1581,44 @@ class Os extends BaseController
             return '<span class="text-muted">-</span>';
         }
 
-        return '<div class="os-relato-cell">' . nl2br(esc($relato)) . '</div>';
+        $preview = $this->buildOsRelatoPreview($relato, 3, 3);
+        $linesHtml = implode('', array_map(
+            static fn (string $line): string => '<span class="os-relato-line">' . esc($line) . '</span>',
+            $preview['lines']
+        ));
+
+        return '<div class="os-relato-cell" title="' . esc($preview['full']) . '" aria-label="' . esc($preview['full']) . '">'
+            . $linesHtml
+            . ($preview['has_overflow'] ? '<span class="os-relato-more" aria-hidden="true">...</span>' : '')
+            . '</div>';
+    }
+
+    private function buildOsRelatoPreview(string $relato, int $wordsPerLine = 3, int $maxLines = 3): array
+    {
+        $normalized = preg_replace('/\s+/u', ' ', trim($relato)) ?? trim($relato);
+        if ($normalized === '') {
+            return [
+                'full' => '',
+                'lines' => [],
+                'has_overflow' => false,
+            ];
+        }
+
+        $words = preg_split('/\s+/u', $normalized) ?: [];
+        $words = array_values(array_filter($words, static fn (string $word): bool => $word !== ''));
+
+        $visibleWordLimit = max(1, $wordsPerLine * $maxLines);
+        $previewWords = array_slice($words, 0, $visibleWordLimit);
+        $lines = array_map(
+            static fn (array $chunk): string => implode(' ', $chunk),
+            array_chunk($previewWords, max(1, $wordsPerLine))
+        );
+
+        return [
+            'full' => $normalized,
+            'lines' => $lines,
+            'has_overflow' => count($words) > count($previewWords),
+        ];
     }
 
     private function formatOsDatesCell(array $row): string
@@ -1621,6 +1847,13 @@ class Os extends BaseController
             ? (new OsStatusHistoricoModel())->byOs($id)
             : [];
         $estadoFluxo = trim((string) ($os['estado_fluxo'] ?? ''));
+        $orcamentoViewData = array_merge(
+            [
+                'os' => $os,
+                'orcamentoContext' => 'status_modal',
+            ],
+            $this->buildOsOrcamentoEditorViewData($os)
+        );
 
         return $this->response->setJSON([
             'ok' => true,
@@ -1634,12 +1867,16 @@ class Os extends BaseController
                 'cliente_nome' => (string) ($os['cliente_nome'] ?? ''),
                 'cliente_telefone' => (string) ($os['cliente_telefone'] ?? ''),
                 'cliente_email' => (string) ($os['cliente_email'] ?? ''),
+                'tecnico_nome' => (string) ($os['tecnico_nome'] ?? ''),
                 'equipamento_nome' => trim((string) (($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))),
                 'equip_tipo' => (string) ($os['equip_tipo'] ?? ''),
                 'equip_tipo_label' => getEquipTipo((string) ($os['equip_tipo'] ?? '')),
                 'equip_marca' => (string) ($os['equip_marca'] ?? ''),
                 'equip_modelo' => (string) ($os['equip_modelo'] ?? ''),
                 'equip_serie' => (string) ($os['equip_serie'] ?? ''),
+                'procedimentos_executados' => (string) ($os['procedimentos_executados'] ?? ''),
+                'solucao_aplicada' => (string) ($os['solucao_aplicada'] ?? ''),
+                'diagnostico_tecnico' => (string) ($os['diagnostico_tecnico'] ?? ''),
                 'statusBadgeHtml' => getStatusBadge((string) ($os['status'] ?? '')),
                 'flowBadgeHtml' => $estadoFluxo !== ''
                     ? '<span class="badge bg-light text-dark border">' . esc(ucwords(str_replace('_', ' ', $estadoFluxo))) . '</span>'
@@ -1660,6 +1897,7 @@ class Os extends BaseController
             ),
             'workflowRecentHistory' => array_slice($statusHistorico, 0, 4),
             'hasClientPhone' => trim((string) ($os['cliente_telefone'] ?? '')) !== '',
+            'budgetPanelHtml' => view('os/partials/orcamento_editor_panel', $orcamentoViewData),
             'csrfHash' => csrf_hash(),
         ]);
     }
@@ -1679,6 +1917,12 @@ class Os extends BaseController
         $observacao = trim((string) $this->request->getPost('observacao_status'));
         $controlaComunicacaoCliente = !empty($this->request->getPost('controla_comunicacao_cliente'));
         $comunicarCliente = $controlaComunicacaoCliente && !empty($this->request->getPost('comunicar_cliente'));
+        $detailUpdates = [];
+        foreach (['procedimentos_executados', 'solucao_aplicada', 'diagnostico_tecnico'] as $field) {
+            if ($this->request->getPost($field) !== null) {
+                $detailUpdates[$field] = $this->normalizeNullableString($this->request->getPost($field));
+            }
+        }
 
         if ($status === '') {
             return $this->response->setStatusCode(422)->setJSON([
@@ -1702,6 +1946,15 @@ class Os extends BaseController
                 'message' => $result['message'] ?? 'Não foi possível atualizar o status.',
                 'csrfHash' => csrf_hash(),
             ]);
+        }
+
+        $warningMessages = [];
+        if ($detailUpdates !== [] && !$this->model->update((int) $id, $detailUpdates)) {
+            log_message('error', '[OS status modal] Falha ao salvar bloco tecnico da OS {os_id}: {errors}', [
+                'os_id' => (int) $id,
+                'errors' => json_encode($this->model->errors(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            ]);
+            $warningMessages[] = 'O status foi atualizado, mas nao foi possivel salvar solucao, diagnostico e procedimentos.';
         }
 
         $this->finalizeStatusSideEffects((int) $id, $os, $status, !$controlaComunicacaoCliente);
@@ -1729,7 +1982,11 @@ class Os extends BaseController
         ];
 
         if ($warningMessage !== null) {
-            $response['warning'] = $warningMessage;
+            $warningMessages[] = $warningMessage;
+        }
+
+        if ($warningMessages !== []) {
+            $response['warning'] = implode(' ', array_filter($warningMessages));
         }
 
         return $this->response->setJSON($response);
@@ -2002,6 +2259,27 @@ class Os extends BaseController
                 'documents' => $documents,
             ],
             'csrfHash' => csrf_hash(),
+        ]);
+    }
+
+    public function budgetSummary($id)
+    {
+        $os = $this->model->getComplete((int) $id);
+        if (!$os) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'ok' => false,
+                'message' => 'OS nao encontrada.',
+            ]);
+        }
+
+        $viewData = array_merge(
+            ['os' => $os],
+            $this->buildOsOrcamentoEditorViewData($os)
+        );
+
+        return $this->response->setJSON([
+            'ok' => true,
+            'html' => view('os/partials/orcamento_editor_panel', $viewData),
         ]);
     }
 
@@ -2575,28 +2853,10 @@ class Os extends BaseController
             $defeitoModel->saveOsDefeitos($osId, $defeitoIds);
         }
 
-        // Salva fotos de estado do equipamento na abertura
-        if ($files = $this->request->getFiles()) {
-            if (!empty($files['fotos_entrada'])) {
-                $fotoOsModel = new \App\Models\OsFotoModel();
-                $osNumero = $dados['numero_os'];
-                $slug = strtolower(url_title($osNumero, '_', true));
-
-                foreach ($files['fotos_entrada'] as $index => $img) {
-                    if ($img->isValid() && !$img->hasMoved()) {
-                        $ext = $img->getExtension();
-                        $newName = $slug . '_entrada_' . ($index + 1) . '_' . time() . '.' . $ext;
-                        $img->move(FCPATH . 'uploads/os_anormalidades', $newName);
-                        
-                        $fotoOsModel->insert([
-                            'os_id'    => $osId,
-                            'tipo'     => 'recepcao',
-                            'arquivo'  => $newName,
-                        ]);
-                    }
-                }
-            }
-        }
+        $entryPhotoWarning = $this->persistEntryPhotosFromRequest(
+            (int) $osId,
+            (string) ($dados['numero_os'] ?? '')
+        );
 
         $this->persistAccessoryData($osId, $dados['numero_os']);
         $this->persistChecklistEntradaData(
@@ -2613,6 +2873,10 @@ class Os extends BaseController
         );
 
         LogModel::registrar('os_criada', 'OS criada: ' . $dados['numero_os']);
+
+        if ($entryPhotoWarning !== null) {
+            session()->setFlashdata('warning', $entryPhotoWarning);
+        }
 
         return redirect()->to($this->osViewUrl((int) $osId))
             ->with('success', 'Ordem de Serviço ' . $dados['numero_os'] . ' criada com sucesso!');
@@ -2962,6 +3226,9 @@ class Os extends BaseController
         }
 
         $checklistEntrada = $this->resolveChecklistEntradaPayloadForOs((int) $id, $os);
+        $statusFlowService = new OsStatusFlowService();
+        $statusGrouped = $statusFlowService->getStatusGrouped();
+        $orcamentoViewData = $this->buildOsOrcamentoEditorViewData((array) $os);
 
         $data = [
             'title'        => 'Editar OS ' . $os['numero_os'],
@@ -2976,11 +3243,12 @@ class Os extends BaseController
             'fotos_entrada'    => $fotos_entrada,
             'relatosRapidos'   => $defeitoRelatadoModel->getActiveGrouped(),
             'checklistEntrada' => $checklistEntrada,
-            'statusGrouped' => (new OsStatusFlowService())->getStatusGrouped(),
+            'statusGrouped' => $statusGrouped,
             'statusDefault' => (string) ($os['status'] ?? 'triagem'),
             'layout' => $isEmbedded ? 'layouts/embed' : 'layouts/main',
             'isEmbedded' => $isEmbedded,
         ];
+        $data = array_merge($data, $orcamentoViewData);
         return view('os/form', $data);
     }
 
@@ -2988,16 +3256,60 @@ class Os extends BaseController
     {
         $dados = $this->request->getPost();
         $osAnterior = $this->model->find($id);
+
+        try {
+            if (array_key_exists('data_entrada', $dados)) {
+                $dados['data_entrada'] = $this->normalizeNullableDateTimeInput((string) ($dados['data_entrada'] ?? ''));
+            }
+            if (array_key_exists('data_previsao', $dados)) {
+                $dados['data_previsao'] = $this->normalizeNullableDateInput((string) ($dados['data_previsao'] ?? ''));
+            }
+        } catch (\InvalidArgumentException $e) {
+            return redirect()->to($this->osEditUrl((int) $id))
+                ->withInput()
+                ->with('error', $e->getMessage());
+        }
+
+        if (($dados['data_entrada'] ?? null) === null) {
+            return redirect()->to($this->osEditUrl((int) $id))
+                ->withInput()
+                ->with('error', 'Informe a data de entrada.');
+        }
+
+        $entradaComparacao = $this->extractDateOnly((string) ($dados['data_entrada'] ?? ''));
+        $previsaoComparacao = trim((string) ($dados['data_previsao'] ?? ''));
+        if ($entradaComparacao !== null && $previsaoComparacao !== '' && strtotime($previsaoComparacao) < strtotime($entradaComparacao)) {
+            return redirect()->to($this->osEditUrl((int) $id))
+                ->withInput()
+                ->with('error', 'A previsao nao pode ser anterior a data de entrada.');
+        }
+
         $statusNovo = strtolower(trim((string) ($dados['status'] ?? '')));
         $statusAlterado = $statusNovo !== '' && !empty($osAnterior) && $statusNovo !== (string) ($osAnterior['status'] ?? '');
         $statusService = new OsStatusFlowService();
-        if ($statusAlterado && !$statusService->isTransitionAllowed((string) ($osAnterior['status'] ?? ''), $statusNovo)) {
+        $statusDisponiveis = array_values(array_filter(array_map(
+            static fn (array $item): string => strtolower(trim((string) ($item['codigo'] ?? ''))),
+            $statusService->buildTransitionHints(null)
+        )));
+        if ($statusNovo !== '' && !in_array($statusNovo, $statusDisponiveis, true)) {
             return redirect()->to($this->osEditUrl((int) $id))
                 ->withInput()
-                ->with('error', 'Transicao de status invalida para esta OS.');
+                ->with('error', 'Status informado para a OS e invalido.');
         }
         if ($statusAlterado) {
-            unset($dados['status']);
+            $dados['status'] = $statusNovo;
+            $dados['estado_fluxo'] = $statusService->resolveEstadoFluxo($statusNovo);
+            $dados['status_atualizado_em'] = date('Y-m-d H:i:s');
+
+            if (in_array($statusNovo, ['reparo_concluido', 'reparado_disponivel_loja', 'garantia_concluida'], true)) {
+                $dados['data_conclusao'] = date('Y-m-d H:i:s');
+                $garantiaDias = (int) ($dados['garantia_dias'] ?? $osAnterior['garantia_dias'] ?? 90);
+                $dados['garantia_validade'] = date('Y-m-d', strtotime('+' . max(0, $garantiaDias) . ' days'));
+            }
+
+            if (in_array($statusNovo, ['entregue_reparado', 'devolvido_sem_reparo'], true)) {
+                $dados['data_entrega'] = date('Y-m-d H:i:s');
+            }
         }
         
         // Calculate totals
@@ -3012,37 +3324,25 @@ class Os extends BaseController
         $this->model->update($id, $dados);
 
         if ($statusAlterado) {
-            $statusService->applyStatus(
-                (int) $id,
-                $statusNovo,
-                session()->get('user_id') ?: null,
-                'Alterado na edicao da OS'
-            );
+            $historicoModel = new OsStatusHistoricoModel();
+            if ($historicoModel->db->tableExists('os_status_historico')) {
+                $historicoModel->insert([
+                    'os_id' => (int) $id,
+                    'status_anterior' => (string) ($osAnterior['status'] ?? ''),
+                    'status_novo' => $statusNovo,
+                    'estado_fluxo' => (string) ($dados['estado_fluxo'] ?? $statusService->resolveEstadoFluxo($statusNovo)),
+                    'usuario_id' => session()->get('user_id') ?: null,
+                    'observacao' => 'Alterado na edicao da OS',
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
             $this->triggerAutomaticEventsOnStatus((int) $id, $statusNovo, session()->get('user_id') ?: null);
         }
         
-        // Salva novas fotos de estado do equipamento
-        if ($files = $this->request->getFiles()) {
-            if (!empty($files['fotos_entrada'])) {
-                $fotoOsModel = new \App\Models\OsFotoModel();
-                $osObj = $this->model->find($id);
-                $slug = strtolower(url_title($osObj['numero_os'], '_', true));
-
-                foreach ($files['fotos_entrada'] as $index => $img) {
-                    if ($img && $img->isValid() && !$img->hasMoved()) {
-                        $ext = $img->getExtension();
-                        $newName = $slug . '_edit_' . ($index + 1) . '_' . time() . '.' . $ext;
-                        $img->move(FCPATH . 'uploads/os_anormalidades', $newName);
-                        
-                        $fotoOsModel->insert([
-                            'os_id'    => $id,
-                            'tipo'     => 'recepcao',
-                            'arquivo'  => $newName,
-                        ]);
-                    }
-                }
-            }
-        }
+        $entryPhotoWarning = $this->persistEntryPhotosFromRequest(
+            (int) $id,
+            (string) ($dados['numero_os'] ?? ($osAnterior['numero_os'] ?? ''))
+        );
 
         // Salva defeitos selecionados
         $defeitoIds = $this->request->getPost('defeitos') ?? [];
@@ -3060,6 +3360,10 @@ class Os extends BaseController
         }
 
         LogModel::registrar('os_atualizada', 'OS atualizada ID: ' . $id);
+
+        if ($entryPhotoWarning !== null) {
+            session()->setFlashdata('warning', $entryPhotoWarning);
+        }
 
         return redirect()->to($this->osViewUrl((int) $id))
             ->with('success', 'OS atualizada com sucesso!');
@@ -4642,6 +4946,103 @@ class Os extends BaseController
         return $clean ?: 'os';
     }
 
+    private function persistEntryPhotosFromRequest(int $osId, string $numeroOs): ?string
+    {
+        if ($osId <= 0) {
+            return null;
+        }
+
+        $files = [];
+        foreach (['fotos_entrada', 'fotos_entrada[]'] as $field) {
+            $multi = $this->request->getFileMultiple($field);
+            if (!is_array($multi) || $multi === []) {
+                continue;
+            }
+
+            foreach ($multi as $file) {
+                if ($file instanceof \CodeIgniter\HTTP\Files\UploadedFile && $file->isValid() && !$file->hasMoved()) {
+                    $files[] = $file;
+                }
+            }
+
+            if (!empty($files)) {
+                break;
+            }
+        }
+
+        if (empty($files)) {
+            foreach (['fotos_entrada', 'fotos_entrada[]'] as $field) {
+                $single = $this->request->getFile($field);
+                if ($single instanceof \CodeIgniter\HTTP\Files\UploadedFile && $single->isValid() && !$single->hasMoved()) {
+                    $files[] = $single;
+                    break;
+                }
+            }
+        }
+
+        if (empty($files)) {
+            return null;
+        }
+
+        $targetDir = rtrim(FCPATH, '\\/') . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'os_anormalidades';
+        if (!is_dir($targetDir) && !@mkdir($targetDir, 0775, true) && !is_dir($targetDir)) {
+            log_message('error', '[OS] diretorio de fotos de entrada indisponivel', [
+                'os_id' => $osId,
+                'target_dir' => $targetDir,
+            ]);
+
+            return 'A OS foi salva, mas nao foi possivel preparar o diretorio das fotos de entrada.';
+        }
+
+        $slug = strtolower($this->normalizeOsSlug($numeroOs));
+        $fotoOsModel = new OsFotoModel();
+        $saved = 0;
+        $timestamp = time();
+
+        foreach ($files as $index => $img) {
+            try {
+                $ext = strtolower((string) $img->getExtension());
+                if ($ext === '') {
+                    $ext = 'jpg';
+                }
+
+                $newName = sprintf(
+                    '%s_entrada_%d_%d_%04d.%s',
+                    $slug,
+                    $index + 1,
+                    $timestamp,
+                    random_int(1000, 9999),
+                    $ext
+                );
+
+                $img->move($targetDir, $newName);
+                $fotoOsModel->insert([
+                    'os_id'   => $osId,
+                    'tipo'    => 'recepcao',
+                    'arquivo' => $newName,
+                ]);
+                $saved++;
+            } catch (\Throwable $e) {
+                log_message('error', '[OS] falha ao persistir foto de entrada', [
+                    'os_id' => $osId,
+                    'file_name' => (string) ($img->getClientName() ?: ('entrada_' . ($index + 1))),
+                    'target_dir' => $targetDir,
+                    'message' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        if ($saved === count($files)) {
+            return null;
+        }
+
+        if ($saved > 0) {
+            return 'A OS foi salva, mas uma ou mais fotos de entrada nao puderam ser anexadas.';
+        }
+
+        return 'A OS foi salva, mas nao foi possivel anexar as fotos de entrada.';
+    }
+
     private function ensureAccessoryDirectory(string $slug): string
     {
         $base = FCPATH . 'uploads/acessorios/';
@@ -5055,16 +5456,16 @@ class Os extends BaseController
         return $fotos;
     }
 
-    private function resolveOsEntradaFotoPublicUrl(string $arquivo): string
+    private function buildOsEntradaFotoCandidates(string $arquivo): array
     {
         $arquivo = str_replace('\\', '/', ltrim($arquivo, '/'));
         if ($arquivo === '') {
-            return $this->missingImageDataUri();
+            return [];
         }
 
         $arquivoFs = str_replace('/', DIRECTORY_SEPARATOR, $arquivo);
         $basename = basename($arquivo);
-        $candidates = [
+        return [
             [
                 'path' => FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'os_anormalidades' . DIRECTORY_SEPARATOR . $arquivoFs,
                 'url'  => base_url('uploads/os_anormalidades/' . $arquivo),
@@ -5078,6 +5479,14 @@ class Os extends BaseController
                 'url'  => base_url('uploads/os/' . $basename),
             ],
         ];
+    }
+
+    private function resolveOsEntradaFotoPublicUrl(string $arquivo): string
+    {
+        $candidates = $this->buildOsEntradaFotoCandidates($arquivo);
+        if ($candidates === []) {
+            return $this->missingImageDataUri();
+        }
 
         foreach ($candidates as $candidate) {
             if (is_file($candidate['path'])) {
@@ -5086,6 +5495,17 @@ class Os extends BaseController
         }
 
         return $this->missingImageDataUri();
+    }
+
+    private function resolveOsEntradaFotoAbsolutePath(string $arquivo): ?string
+    {
+        foreach ($this->buildOsEntradaFotoCandidates($arquivo) as $candidate) {
+            if (is_file($candidate['path'])) {
+                return $candidate['path'];
+            }
+        }
+
+        return null;
     }
 
     private function getOsEntradaFotosWithUrls(int $osId): array

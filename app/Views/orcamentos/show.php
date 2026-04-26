@@ -889,6 +889,23 @@ $showSendActions = !$dispatchBlocked;
             }
         });
     });
+
+    if (<?= $isEmbedded ? 'true' : 'false' ?> && window.parent && window.parent !== window) {
+        const flashPayload = window.__ERP_FLASH || {};
+        const successMessage = String(flashPayload.success || '').trim();
+        if (successMessage) {
+            try {
+                window.parent.postMessage({
+                    type: 'os:orcamento-updated',
+                    osId: Number(<?= (int) ($orcamento['os_id'] ?? 0) ?>),
+                    orcamentoId: Number(<?= (int) ($orcamento['id'] ?? 0) ?>),
+                    message: successMessage,
+                }, window.location.origin);
+            } catch (error) {
+                console.error('[Orcamentos] Falha ao notificar a tela pai sobre atualizacao do orcamento.', error);
+            }
+        }
+    }
 })();
 </script>
 
@@ -976,4 +993,3 @@ $showSendActions = !$dispatchBlocked;
 }
 </style>
 <?= $this->endSection() ?>
-

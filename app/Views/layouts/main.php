@@ -75,6 +75,7 @@
     </script>
 
     <script src="<?= base_url('assets/js/scripts.js') . '?v=' . urlencode($assetVersion) ?>"></script>
+    <script src="<?= base_url('assets/js/navbar-notifications.js') . '?v=' . urlencode($assetVersion) ?>"></script>
     <script src="<?= base_url('assets/js/global-search.js') . '?v=' . urlencode($assetVersion) ?>"></script>
 
     <?= $this->renderSection('scripts') ?>

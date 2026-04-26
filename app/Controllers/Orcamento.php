@@ -8,6 +8,9 @@ use App\Models\OrcamentoModel;
 use App\Models\PacoteOfertaModel;
 use App\Models\OrcamentoStatusHistoricoModel;
 use App\Models\PacoteServicoNivelModel;
+use App\Models\UsuarioModel;
+use App\Services\Mobile\MobileNotificationService;
+use App\Services\Mobile\MobilePermissionService;
 use App\Services\OrcamentoLifecycleService;
 use App\Services\OrcamentoService;
 use App\Services\OsStatusFlowService;
@@ -20,6 +23,9 @@ class Orcamento extends BaseController
     private OrcamentoItemModel $itemModel;
     private PacoteOfertaModel $pacoteOfertaModel;
     private PacoteServicoNivelModel $pacoteNivelModel;
+    private UsuarioModel $usuarioModel;
+    private MobileNotificationService $notificationService;
+    private MobilePermissionService $permissionService;
     private OrcamentoService $orcamentoService;
     private OrcamentoLifecycleService $lifecycleService;
 
@@ -31,6 +37,9 @@ class Orcamento extends BaseController
         $this->itemModel = new OrcamentoItemModel();
         $this->pacoteOfertaModel = new PacoteOfertaModel();
         $this->pacoteNivelModel = new PacoteServicoNivelModel();
+        $this->usuarioModel = new UsuarioModel();
+        $this->notificationService = new MobileNotificationService();
+        $this->permissionService = new MobilePermissionService();
         $this->orcamentoService = new OrcamentoService();
         $this->lifecycleService = new OrcamentoLifecycleService();
     }
@@ -140,6 +149,7 @@ class Orcamento extends BaseController
             (int) ($orcamento['os_id'] ?? 0),
             $statusAprovacao
         );
+        $this->notifyStaffAboutPublicBudgetStatusChange($orcamento, $statusAtual, $statusAprovacao);
 
         return redirect()->to('/orcamento/' . $token)->with(
             'success',
@@ -198,6 +208,7 @@ class Orcamento extends BaseController
             'Rejeitado via link publico',
             'publico'
         );
+        $this->notifyStaffAboutPublicBudgetStatusChange($orcamento, $statusAtual, OrcamentoModel::STATUS_REJEITADO);
 
         return redirect()->to('/orcamento/' . $token)->with('success', 'Rejeicao registrada com sucesso.');
     }
@@ -653,6 +664,117 @@ class Orcamento extends BaseController
                 'estado_fluxo' => $estadoFluxo,
                 'status_atualizado_em' => date('Y-m-d H:i:s'),
             ]);
+    }
+
+    /**
+     * @param array<string,mixed> $orcamento
+     */
+    private function notifyStaffAboutPublicBudgetStatusChange(array $orcamento, string $statusAnterior, string $statusNovo): void
+    {
+        $recipientIds = $this->resolveBudgetNotificationRecipients();
+        if (empty($recipientIds)) {
+            return;
+        }
+
+        $orcamentoId = (int) ($orcamento['id'] ?? 0);
+        $osId = (int) ($orcamento['os_id'] ?? 0);
+        $numero = trim((string) ($orcamento['numero'] ?? ''));
+        $numeroOs = trim((string) ($orcamento['numero_os'] ?? ''));
+        $clienteNome = trim((string) ($orcamento['cliente_nome'] ?? $orcamento['cliente_nome_avulso'] ?? ''));
+        $statusLabels = $this->orcamentoModel->statusLabels();
+        $statusLabel = $statusLabels[$statusNovo] ?? ucfirst(str_replace('_', ' ', $statusNovo));
+
+        $title = match ($statusNovo) {
+            OrcamentoModel::STATUS_APROVADO,
+            OrcamentoModel::STATUS_PENDENTE_OS => 'Orcamento aprovado pelo cliente',
+            OrcamentoModel::STATUS_REJEITADO => 'Orcamento rejeitado pelo cliente',
+            default => 'Orcamento respondido pelo cliente',
+        };
+
+        $bodyParts = [];
+        if ($clienteNome !== '') {
+            $bodyParts[] = $clienteNome;
+        }
+        if ($numero !== '') {
+            $bodyParts[] = 'orcamento ' . $numero;
+        }
+        if ($numeroOs !== '') {
+            $bodyParts[] = 'OS #' . $numeroOs;
+        }
+
+        $body = trim(implode(' | ', $bodyParts));
+        if ($body !== '') {
+            $body .= ' | status: ' . $statusLabel . '.';
+        } else {
+            $body = 'O cliente respondeu o orcamento pelo link publico.';
+        }
+
+        $payload = [
+            'os_id' => $osId > 0 ? $osId : null,
+            'orcamento_id' => $orcamentoId > 0 ? $orcamentoId : null,
+            'orcamento_numero' => $numero !== '' ? $numero : null,
+            'orcamento_status' => $statusNovo,
+            'orcamento_status_label' => $statusLabel,
+            'status_anterior' => $statusAnterior,
+            'cliente_nome' => $clienteNome !== '' ? $clienteNome : null,
+            'numero_os' => $numeroOs !== '' ? $numeroOs : null,
+            'origem' => 'link_publico',
+        ];
+
+        $targets = [];
+        if ($orcamentoId > 0) {
+            $targets[] = ['tipo' => 'budget', 'id' => $orcamentoId];
+        }
+        if ($osId > 0) {
+            $targets[] = ['tipo' => 'order', 'id' => $osId];
+        }
+
+        $route = $osId > 0
+            ? site_url('os')
+            : ($orcamentoId > 0 ? site_url('orcamentos/visualizar/' . $orcamentoId) : site_url('orcamentos'));
+
+        $this->notificationService->notifyUsers(
+            $recipientIds,
+            'orcamento.public_status_changed',
+            $title,
+            $body,
+            $payload,
+            $route,
+            $targets
+        );
+    }
+
+    /**
+     * @return array<int,int>
+     */
+    private function resolveBudgetNotificationRecipients(): array
+    {
+        $users = $this->usuarioModel
+            ->select('id, perfil, grupo_id, ativo')
+            ->where('ativo', 1)
+            ->orderBy('nome', 'ASC')
+            ->findAll();
+
+        $recipients = [];
+        foreach ($users as $user) {
+            $userId = (int) ($user['id'] ?? 0);
+            if ($userId <= 0) {
+                continue;
+            }
+
+            $canViewOs = $this->permissionService->userCan($user, 'os', 'visualizar');
+            $canViewOrcamentos = $this->permissionService->userCan($user, 'orcamentos', 'visualizar');
+            if (!$canViewOs && !$canViewOrcamentos) {
+                continue;
+            }
+
+            $recipients[] = $userId;
+            if (count($recipients) >= 80) {
+                break;
+            }
+        }
+
+        return array_values(array_unique($recipients));
     }
 
     private function findByToken(string $token): ?array

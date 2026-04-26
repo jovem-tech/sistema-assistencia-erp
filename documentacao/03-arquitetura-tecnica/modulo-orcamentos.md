@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Este documento resume a estrutura tecnica do modulo de `Orcamentos` no ERP web, com foco no fluxo `Dados do Cliente` consolidado na release `2.15.1`.
+Este documento resume a estrutura tecnica do modulo de `Orcamentos` no ERP web, com foco no fluxo `Dados do Cliente` consolidado na release `2.15.1` e na notificacao web em tempo real publicada na release `2.15.17`.
 
 ## Estrutura principal
 
@@ -88,6 +88,66 @@ O bloco `Dados do Cliente` foi mantido dentro do padrao reativo do sistema:
 - selecionar cliente atualiza telefone, email e contato adicional imediatamente;
 - limpar a selecao remove o resumo adicional sem refresh;
 - carregar uma edicao existente reaplica o mesmo estado inicial no primeiro render.
+
+## Resposta publica e notificacao web em tempo real
+
+Na release `2.15.17`, o controller complementar `app/Controllers/Orcamento.php` passou a disparar notificacoes internas quando o cliente responde o orcamento pelo link publico.
+
+### Ponto de disparo
+
+- `Orcamento::aprovar($token)`:
+  - atualiza o status comercial;
+  - registra aprovacao em `orcamento_aprovacoes`;
+  - sincroniza a OS vinculada quando existir;
+  - chama `notifyStaffAboutPublicBudgetStatusChange(...)`.
+- `Orcamento::recusar($token)`:
+  - atualiza o status para `rejeitado`;
+  - registra a resposta do cliente;
+  - chama o mesmo emissor de notificacao interna.
+
+### Resolucao de destinatarios
+
+O metodo `resolveBudgetNotificationRecipients()` consulta usuarios ativos e filtra apenas quem possui permissao para:
+
+- `os:visualizar`; ou
+- `orcamentos:visualizar`.
+
+Com isso, a notificacao vai apenas para a equipe que realmente consegue agir sobre a OS ou sobre a proposta.
+
+### Transporte e inbox web
+
+O emissor reutiliza `App\Services\Mobile\MobileNotificationService`, persistindo o evento em `mobile_notifications` e `mobile_notification_targets`.
+
+Na camada web, a navbar passa a consumir esse mesmo inbox por meio de `app/Controllers/Notificacoes.php`:
+
+- `GET /notificacoes/navbar-feed`
+- `GET /notificacoes/stream`
+- `POST /notificacoes/lida/{id}`
+- `POST /notificacoes/lidas`
+
+O endpoint `stream` usa `text/event-stream` com autenticacao de sessao, cursor `after_id`, eventos `delta/ping/end` e fallback de polling no frontend quando SSE nao estiver disponivel.
+
+### Resolucao de rota da notificacao
+
+O campo `rota_destino` das notificacoes desse fluxo passou a ser persistido com `site_url(...)` no backend.
+
+No frontend, `public/assets/js/navbar-notifications.js` tambem normaliza rotas antigas que ainda venham com prefixo `/`, convertendo-as para o contexto correto do ERP antes da navegacao.
+
+Com isso, o clique na notificacao continua funcional mesmo em ambientes com:
+
+- `index.php` habilitado;
+- aplicacao publicada em subdiretorio;
+- itens antigos ainda gravados com caminho absoluto da raiz do host.
+
+### Reflexo na listagem de OS
+
+O script global `public/assets/js/navbar-notifications.js` publica o evento de janela `erp:notification` sempre que chega uma notificacao nova do tipo `orcamento.public_status_changed`.
+
+A listagem `/os`, por meio de `public/assets/js/os-list-filters.js`, escuta esse evento para:
+
+- recarregar a DataTable automaticamente;
+- atualizar o badge comercial de orcamento na coluna `Status`;
+- reidratar o modal `Alterar status da OS` quando ele estiver aberto para a mesma ordem.
 
 ## Help mapping
 

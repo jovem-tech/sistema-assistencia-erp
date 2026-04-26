@@ -1,7 +1,7 @@
 # Historico de Versoes do Sistema
 
-Atualizado em: 25/04/2026  
-Versao atual oficial: `2.15.6`
+Atualizado em: 26/04/2026  
+Versao atual oficial: `2.15.18`
 
 ## Observacao sobre o App Mobile/PWA
 
@@ -20,6 +20,75 @@ Estado documental atual do app:
 - documentacao exclusiva aprofundada em 04/04/2026
 
 ## Release ERP + App
+
+### 26/04/2026 - v2.15.18 / app 0.4.2
+- corrigido o clique das notificacoes de resposta publica de orcamento na navbar, que em alguns ambientes estava abrindo `/os` fora do contexto do ERP e caindo em `404 Not Found`;
+- o backend passou a persistir `rota_destino` com `site_url(...)`, respeitando instalacoes com `index.php` e subdiretorio;
+- o frontend da navbar ganhou normalizacao adicional para notificacoes antigas ainda gravadas com rota iniciando por `/`, preservando a navegacao correta mesmo antes da limpeza da inbox;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.18`.
+
+### 26/04/2026 - v2.15.17 / app 0.4.2
+- a resposta publica do cliente ao orcamento (`aprovar` ou `rejeitar`) agora cria notificacao interna para usuarios com permissao de visualizar `OS` ou `Orcamentos`;
+- a navbar passou a exibir um sino ao lado da foto do perfil, com feed autenticado, contador de nao lidas, stream SSE e fallback de polling;
+- a listagem `/os` passou a escutar o evento `orcamento.public_status_changed` e recarrega automaticamente a grade para atualizar o badge comercial do orcamento sem `F5`;
+- quando o modal `Alterar status da OS` estiver aberto para a mesma ordem, o contexto comercial tambem pode ser reidratado assim que a notificacao chega;
+- foram adicionadas as rotas web `GET /notificacoes/navbar-feed`, `GET /notificacoes/stream`, `POST /notificacoes/lida/{id}` e `POST /notificacoes/lidas`;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.17`.
+
+### 26/04/2026 - v2.15.16 / app 0.4.2
+- o painel esquerdo do modal `Alterar status da OS` deixou de usar blocos empilhados e passou a operar com `3 abas internas`: `Acoes rapidas`, `Solucao e diagnostico` e `Gerenciamento do Orcamento`;
+- a aba `Acoes rapidas` passou a ser a aba inicial padrao do modal, enquanto o frontend preserva a aba atual quando o resumo do orcamento e reidratado apos um `os:orcamento-updated`;
+- a conversao para abas reduziu a altura ocupada no modal sem mexer na coluna fixa de `Historico e progresso`;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.16`.
+
+### 25/04/2026 - v2.15.15 / app 0.4.2
+- o modal `Alterar status da OS` da listagem `/os` passou a mostrar o numero da ordem no cabecalho, mantendo o contexto principal visivel desde a abertura;
+- o card de `Acoes rapidas` agora agrupa `Status atual da OS`, `Fluxo normal sugerido` e `Fluxo selecionado`, sem depender do hint antigo espalhado entre cards;
+- o modal recebeu um novo card tecnico de `Solucao e diagnostico`, com persistencia de `procedimentos_executados`, `solucao_aplicada` e `diagnostico_tecnico` no mesmo `POST /os/status-ajax/{id}`;
+- o resumo de `Gerenciamento do Orcamento` passou a ficar embutido no modal de status, com abertura de `Criar`, `Editar` e `Visualizar` em iframe e sincronizacao automatica apos salvar o orcamento;
+- o iframe de detalhes/orcamento aberto a partir do modal de status agora recebe promocao de camada para ficar acima do `#osStatusModal`, inclusive com backdrop correto;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.15`.
+
+### 25/04/2026 - v2.15.14 / app 0.4.2
+- o nome do cliente na listagem `/os` passou a ficar centralizado visualmente dentro da propria celula;
+- a centralizacao foi aplicada tanto ao bloco de texto quanto ao botao clicavel da coluna `Cliente`, mantendo a navegacao para a ficha do cliente;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.14`.
+
+### 25/04/2026 - v2.15.13 / app 0.4.2
+- a coluna `Cliente` da listagem `/os` recebeu um ajuste fino adicional para aproximar a borda direita do texto exibido;
+- o autoajuste do frontend passou a somar menos folga extra na medicao da coluna `Cliente`;
+- a propria celula `Cliente` passou a usar `padding-right` mais enxuto, reduzindo o espaco visual antes da coluna `Equipamento`;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.13`.
+
+### 25/04/2026 - v2.15.12 / app 0.4.2
+- a coluna `Cliente` da listagem `/os` passou a quebrar o nome em ate `3 palavras por linha`, com limite de `3 linhas`, preservando o nome completo no hover;
+- a largura de `Cliente` agora segue a maior linha efetivamente exibida entre as OS da pagina atual, em vez de manter um bloco mais largo do que o necessario;
+- a coluna `Equipamento` deixou a largura fixa e passou a se ajustar pela maior palavra operacional visivel entre `Tipo`, `Marca` e `Modelo`;
+- a medicao responsiva dessas colunas foi centralizada no frontend da listagem, preservando `Foto`, `N OS`, `Relato` e o restante da tabela sem regressao estrutural;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.12`.
+
+### 25/04/2026 - v2.15.9 / app 0.4.2
+- a aba `Pecas e Orcamento` de `/os/editar/{id}` passou a listar o orcamento vinculado com resumo por grupo e tabela completa de itens;
+- quando a OS nao possui itens no orcamento, a propria aba agora oferece o fluxo de criar/lancar itens em modal iframe no mesmo padrao da `Nova OS` da listagem;
+- quando ja existe orcamento vinculado, a aba passou a exibir acoes contextuais de `Visualizar orcamento` e `Editar orcamento` sem tirar o operador da edicao da OS;
+- o modal embed do orcamento passou a sincronizar a aba da OS por `postMessage`, atualizando apenas o bloco do orcamento apos salvar;
+- as `Fotos de Entrada` persistidas na edicao da OS agora podem ser excluidas da visualizacao e de `public/uploads/os_anormalidades` em uma unica acao reativa;
+- a validacao da edicao da OS foi reforcada para aceitar apenas transicoes de status permitidas no select e impedir `Previsao de Entrega` anterior a `Data de Entrada`;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.9`.
+
+### 25/04/2026 - v2.15.8 / app 0.4.2
+- endurecido o salvamento das `Fotos de Entrada` da OS em `app/Controllers/Os.php`, cobrindo abertura e edicao;
+- o backend agora aceita `fotos_entrada` e `fotos_entrada[]`, cria automaticamente `public/uploads/os_anormalidades` e usa nomes unicos com sufixo aleatorio para evitar colisao;
+- falhas de caminho ou de movimentacao do arquivo passaram a gerar log tecnico e `warning` ao usuario, sem abortar o restante do salvamento da OS;
+- a correcao foi validada em navegacao local nas OS `OS26033567` e `OS26033569`, incluindo o fluxo de edicao com anexo em `Fotos de Entrada`;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.8`.
+
+### 25/04/2026 - v2.15.7 / app 0.4.2
+- corrigido o bloqueio de salvamento em `/os/editar/{id}` quando a OS estava sem `Tecnico Responsavel` preenchido;
+- a validacao customizada do frontend tratava `tecnico_id` como obrigatorio, mas o backend e o manual do modulo continuam considerando o campo opcional;
+- a tela de edicao voltou a enviar `POST /os/atualizar/{id}` normalmente mesmo sem tecnico atribuido;
+- validado o fluxo completo com persistencia real e restauracao do valor original no ambiente local;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.7`.
 
 ### 25/04/2026 - v2.15.6 / app 0.4.2
 - o botao `Limpar` da listagem `/os` voltou a restaurar o estado inicial da tela, exibindo novamente apenas as ordens abertas;
@@ -778,3 +847,11 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 - Exemplo 1: adicionou funcionalidade nova sem quebrar fluxo existente -> sobe `MINOR` (`2.1.0` -> `2.2.0`).
 - Exemplo 2: corrigiu bug sem alterar contrato funcional -> sobe `PATCH` (`2.1.0` -> `2.1.1`).
 - Exemplo 3: alterou contrato/estrutura com impacto de compatibilidade -> sobe `MAJOR` (`2.1.0` -> `3.0.0`).
+### v2.15.10 - Prazo sincronizado na edicao da OS
+- A aba `Dados Operacionais` da tela `/os/editar/{id}` voltou a refletir corretamente o prazo salvo no dropdown `Prazo (dias)`, calculando a diferenca entre `Data de Entrada` e `Previsao de Entrega`.
+- Quando a previsao salva coincide com os atalhos padrao (`1`, `3`, `7`, `30`), o select reabre ja selecionado; para intervalos personalizados, a interface cria uma opcao dinamica com a quantidade exata de dias.
+- A persistencia continuou centralizada em `os.data_previsao`, evitando duplicidade de campo no banco e removendo a falsa impressao de que o prazo nao havia sido salvo.
+### v2.15.11 - Larguras refinadas na tabela de OS e preview controlado do relato
+- A listagem `/os` teve ajuste fino manual nas colunas `Foto` e `N OS`, reduzindo o espaco dessas areas para o tamanho estritamente necessario ao thumb e ao numero operacional.
+- As colunas `Cliente` e `Valor Total` passaram a se ajustar automaticamente pela maior celula visivel na pagina atual, em vez de depender de larguras fixas excessivas.
+- A coluna `Relato` passou a mostrar preview de ate `3 palavras por linha` em no maximo `3 linhas`, mantendo o texto completo disponivel no hover da celula.

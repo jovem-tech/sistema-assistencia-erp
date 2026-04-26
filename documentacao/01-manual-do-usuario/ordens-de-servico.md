@@ -68,6 +68,55 @@ Na prática:
 - a condução manual do reparo passa a prevalecer depois que a OS sai da fase inicial de execução;
 - a coluna `Status` não deve mascarar o status real da OS com o status sugerido do orçamento.
 
+### Atualizacao automatica do status do orcamento
+
+Quando a resposta do cliente acontece pelo link publico do orcamento:
+
+- a equipe nao precisa atualizar a pagina manualmente;
+- a listagem `/os` detecta a resposta em tempo real e recarrega a grade automaticamente;
+- o badge comercial de orcamento na coluna `Status` volta sincronizado sem `F5`;
+- se o modal `Alterar status da OS` estiver aberto para a mesma ordem, o contexto do modal tambem e reidratado;
+- a navbar mostra uma notificacao nova no sino ao lado da foto do perfil;
+- ao abrir o dropdown, o operador ve qual orcamento foi respondido e qual foi o novo status comercial;
+- ao clicar na notificacao, o ERP abre a rota correta da tela de destino, sem sair para um caminho invalido fora do contexto do sistema.
+
+### Modal `Alterar status da OS`
+
+Ao clicar em `Alterar status` na coluna de status da listagem `/os`, a janela operacional agora concentra:
+
+- cabecalho com `Alterar status da OS #OS...`;
+- resumo de cliente e equipamento da ordem;
+- badges atuais da OS;
+- uma area de trabalho com `3 abas internas`:
+  - `Acoes rapidas`;
+  - `Solucao e diagnostico`;
+  - `Gerenciamento do Orcamento`;
+- timeline do fluxo e historico recente.
+
+Comportamento pratico:
+
+- a aba inicial padrao e `Acoes rapidas`;
+- a aba `Acoes rapidas` concentra `Proxima etapa`, `Cancelar`, `Status atual da OS`, `Fluxo normal sugerido`, `Fluxo selecionado` e a escolha manual do destino;
+- a aba `Solucao e diagnostico` concentra `Procedimentos executados`, `Solucao aplicada` e `Diagnostico`;
+- a aba `Gerenciamento do Orcamento` concentra o resumo e as acoes de criar, editar ou visualizar o orcamento;
+- o modal continua respeitando o fluxo permitido para troca de status;
+- os procedimentos inseridos passam a registrar automaticamente data/hora e tecnico atual da OS;
+- ao abrir `Editar orcamento` ou `Visualizar`, a janela do orcamento sobe na frente do modal de status para evitar sobreposicao invertida;
+- quando o orcamento e salvo em modo embed, o resumo dentro do modal de status e atualizado automaticamente;
+- quando o cliente responde o orcamento pelo link publico, o contexto comercial da ordem volta sincronizado assim que a notificacao em tempo real chega ao ERP.
+
+### Largura e leitura da tabela
+
+Na tabela principal `/os`:
+
+- `Foto` agora ocupa apenas a largura visual da thumbnail;
+- `N OS` foi reduzida para acompanhar a sequencia do numero da ordem;
+- `Cliente` agora quebra o nome em ate `3 palavras por linha`, com no maximo `3 linhas`, acompanha a maior linha visivel na pagina atual, mantem a borda direita mais proxima do nome e deixa o texto centralizado na celula;
+- `Equipamento` passa a se ajustar pela maior palavra visivel entre `Tipo`, `Marca` e `Modelo`;
+- `Valor Total` continua se ajustando pela maior celula exibida na pagina atual;
+- `Relato` mostra preview com ate `3 palavras por linha`, em no maximo `3 linhas`;
+- ao passar o mouse sobre `Relato`, o navegador exibe o texto completo da observacao.
+
 ### Filtros
 
 A tela agora abre por padrao na fila de OS abertas.
@@ -153,6 +202,41 @@ Comportamento atual:
 - fotos reais do equipamento recebem atualização anti-cache automática quando há troca de principal, inclusão ou exclusão;
 - quando o equipamento não possui arquivo físico disponível, o sistema usa fallback inline sem quebrar a visualização;
 - o preview principal e as miniaturas permanecem sincronizados sem exigir recarga manual da página.
+
+### Aba `Dados Operacionais` na edição
+
+Na edição, os campos `Status` e `Previsão de Entrega` seguem o fluxo de salvamento direto da OS.
+
+Regras práticas:
+
+- o select `Status` da edicao exibe todos os status operacionais cadastrados, permitindo ajustes fora da trilha curta do fluxo quando a equipe precisar corrigir a etapa manualmente;
+- a `Previsão de Entrega` não pode ficar anterior à `Data de Entrada`;
+- o dropdown `Prazo (dias)` passa a refletir novamente o prazo salvo ao reabrir a OS, calculando a diferenca entre `Data de Entrada` e `Previsão de Entrega`;
+- pendências opcionais da recepção não bloqueiam mais o salvamento da edição.
+
+### Aba `Fotos`
+
+As `Fotos de Entrada do Equipamento` agora trabalham com inclusão e remoção sem recarregar a tela.
+
+Comportamento atual:
+
+- fotos novas continuam podendo ser capturadas pela câmera ou escolhidas na galeria;
+- fotos já persistidas aparecem com botão de exclusão;
+- ao excluir uma foto persistida, ela sai da visualização imediatamente;
+- a mesma exclusão remove o arquivo físico correspondente de `public/uploads/os_anormalidades`.
+
+### Aba `Pecas e Orcamento`
+
+A aba `Pecas e Orcamento` passou a mostrar o conteúdo real do orçamento vinculado à OS.
+
+Comportamento atual:
+
+- lista todos os itens lançados no orçamento, incluindo peças, serviços, pacotes e outros tipos;
+- mostra resumo por grupo e tabela completa de itens;
+- quando não houver itens, a aba exibe o botão para criar ou lançar itens no orçamento;
+- quando já houver orçamento vinculado, a aba pode mostrar `Visualizar orçamento` e também `Editar orçamento`;
+- a abertura dessas ações acontece em modal, no mesmo padrão visual da `Nova OS` da listagem;
+- depois do salvamento do orçamento no modal, o bloco da aba é atualizado automaticamente dentro da tela da OS.
 
 ## Visualização da OS (`/os/visualizar/{id}`)
 

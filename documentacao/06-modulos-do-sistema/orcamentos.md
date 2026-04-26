@@ -70,3 +70,31 @@ Na pratica, isso evita divergencia entre:
 - o usuario nao precisa mais preencher telefone apenas para salvar a proposta;
 - a equipe visualiza o contato adicional logo no bloco `Dados do Cliente`;
 - o autocomplete de cliente e contato fica mais completo para operacao comercial.
+
+## Resposta publica e notificacao interna
+
+Na release `2.15.17`, o controller complementar `app/Controllers/Orcamento.php` passou a transformar a resposta publica do cliente em notificacao interna do ERP.
+
+### Eventos cobertos
+
+- `Orcamento::aprovar($token)`
+- `Orcamento::recusar($token)`
+
+### Efeito operacional
+
+- o status comercial do orcamento e atualizado normalmente;
+- a resposta do cliente e registrada em historico e em `orcamento_aprovacoes`;
+- quando existir `os_id` vinculado, a OS continua passando pela sincronizacao comercial ja prevista;
+- a equipe recebe notificacao interna no sino da navbar, ao lado da foto do perfil;
+- a listagem `/os` recarrega automaticamente para refletir o badge comercial atualizado na coluna `Status`;
+- o clique na notificacao passou a abrir a rota correta do ERP, mesmo quando o ambiente usa `index.php` ou publica a aplicacao abaixo da raiz do host.
+
+### Servicos e inbox reutilizados
+
+O fluxo reutiliza:
+
+- `App\Services\Mobile\MobileNotificationService`
+- `mobile_notifications`
+- `mobile_notification_targets`
+
+Mesmo sendo um recurso visivel na web, a inbox continua unificada com a infraestrutura de notificacoes do app mobile/PWA.

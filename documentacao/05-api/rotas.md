@@ -1,6 +1,6 @@
 # Rotas Internas (ERP + CRM + Mensageria)
 
-Atualizado em 03/04/2026 para a release `2.11.2`.
+Atualizado em 26/04/2026 para a release `2.15.17`.
 
 ## API Mobile/PWA (v1)
 
@@ -95,6 +95,26 @@ Notas de sessao:
   - `redirect_url`
 - o frontend usa esse envelope para mostrar aviso SweetAlert2 e redirecionar ao login sem deixar a tela falhar silenciosamente.
 
+## ERP - Notificacoes Web
+
+| Metodo | Rota | Objetivo | Permissao |
+|---|---|---|---|
+| GET | `/notificacoes/navbar-feed` | Feed inicial do sino da navbar (ultimas notificacoes + contador nao lido) | `auth` |
+| GET | `/notificacoes/stream` | Stream SSE autenticado para deltas em tempo real da navbar | `auth` |
+| POST | `/notificacoes/lida/{id}` | Marcar uma notificacao da navbar como lida | `auth` |
+| POST | `/notificacoes/lidas` | Marcar todas as notificacoes da navbar como lidas | `auth` |
+
+Notas do fluxo web:
+
+- o feed e o stream reutilizam `mobile_notifications` como inbox unico entre web e app;
+- `GET /notificacoes/stream` aceita `after_id` para retomar do ultimo evento conhecido;
+- o stream publica eventos `delta`, `ping` e `end`;
+- cada `delta` devolve:
+  - `notifications`
+  - `cursor.after_id`
+  - `unread_count`
+- o frontend da navbar usa fallback de polling quando `EventSource` nao estiver disponivel ou quando o stream cair.
+
 ## ERP - Dashboard
 
 | Metodo | Rota | Objetivo | Permissao |
@@ -132,6 +152,7 @@ Notas da interface de OS:
 - Em modo embed, formularios e acoes internas preservam o contexto para manter o fluxo dentro do modal.
 - `GET /os/visualizar/{id}` usa um card de status com acoes rapidas (`Proxima etapa` e `Cancelar`) que submetem em `POST /os/status/{id}`.
 - A listagem `/os` usa o mesmo workflow da visualizacao: clicar em `N OS` abre `/os/visualizar/{id}` e clicar em `Status` abre um modal enriquecido com historico, progresso e acoes rapidas.
+- Quando chega uma notificacao `orcamento.public_status_changed`, a listagem `/os` recarrega automaticamente a grade para atualizar o badge comercial do orcamento sem `F5`.
 - A listagem `/os` tambem aceita busca por `numero_os_legado` para localizar ordens migradas do sistema antigo.
 - A listagem `/os` aceita `legado=1` para restringir o resultado apenas a ordens importadas do sistema anterior.
 - A barra de busca global da navbar tambem passou a consultar `numero_os_legado`.

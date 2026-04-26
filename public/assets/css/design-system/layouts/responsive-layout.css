@@ -160,6 +160,10 @@ body:not(.modal-open) {
     gap: 8px;
 }
 
+.navbar-notification-menu {
+    max-width: calc(100vw - 24px);
+}
+
 .ds-split-layout > .ds-split-sidebar {
     flex: 0 0 320px;
     max-width: 320px;
@@ -756,6 +760,10 @@ body:not(.modal-open) {
         justify-content: space-between;
     }
 
+    .navbar-notifications {
+        margin-left: auto;
+    }
+
     .navbar-actions .btn .me-1 {
         margin-right: 0 !important;
     }
@@ -819,6 +827,42 @@ body:not(.modal-open) {
     .os-show-page .os-workflow-step-top {
         flex-direction: column;
         align-items: flex-start;
+    }
+}
+
+@media (max-width: 430px) {
+    .navbar-right {
+        gap: 8px;
+        align-items: center;
+    }
+
+    .navbar-notification-menu {
+        width: min(320px, calc(100vw - 16px));
+    }
+
+    .navbar-notification-header {
+        padding: 12px 14px 10px;
+    }
+
+    .navbar-notification-item,
+    .navbar-notification-empty {
+        padding-inline: 14px;
+    }
+}
+
+@media (max-width: 360px) {
+    .navbar-notification-toggle {
+        width: 38px;
+        height: 38px;
+    }
+
+    .navbar-notification-badge {
+        top: 3px;
+        right: 2px;
+    }
+
+    .user-dropdown {
+        gap: 6px;
     }
 }
 

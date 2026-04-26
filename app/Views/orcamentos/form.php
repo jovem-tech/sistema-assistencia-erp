@@ -6,6 +6,7 @@ $isEdit = !empty($isEdit);
 $orcamento = $orcamento ?? [];
 $itens = $itens ?? [];
 $statusLabels = $statusLabels ?? [];
+$statusOptions = $statusOptions ?? $statusLabels;
 $tipoLabels = $tipoLabels ?? [];
 $clientes = $clientes ?? [];
 $clienteLookupInitial = $clienteLookupInitial ?? [];
@@ -14,6 +15,7 @@ $equipamentoCatalog = $equipamentoCatalog ?? ['tipos' => [], 'marcasAll' => [], 
 $equipamentoManual = $equipamentoManual ?? ['tipo_id' => null, 'marca_id' => null, 'modelo_id' => null, 'cor' => '', 'cor_hex' => '', 'cor_rgb' => ''];
 $equipamentoLookupInitial = $equipamentoLookupInitial ?? [];
 $isEmbedded = !empty($isEmbedded);
+$orcamentoLockedEmbeddedEdit = !empty($orcamentoLockedEmbeddedEdit);
 $pacoteOfertaModuleReady = !empty($pacoteOfertaModuleReady);
 $pacotesAtivosOferta = $pacotesAtivosOferta ?? [];
 $equipamentoFotoFallback = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MCcgaGVpZ2h0PSc4MCcgdmlld0JveD0nMCAwIDgwIDgwJz48cmVjdCB3aWR0aD0nODAnIGhlaWdodD0nODAnIHJ4PSc0MCcgZmlsbD0nI2VlZjJmZicvPjxjaXJjbGUgY3g9JzQwJyBjeT0nMzAnIHI9JzEyJyBmaWxsPScjYzdkMmZlJy8+PHRleHQgeD0nNDAnIHk9JzU4JyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmb250LXNpemU9JzEwJyBmaWxsPScjNjQ3NDhiJz5zZW0gZm90bzwvdGV4dD48L3N2Zz4=';
@@ -80,6 +82,15 @@ if (empty($itens)) {
             <input type="hidden" name="aplicar_pacote_oferta" id="orcamentoAplicarPacoteOferta" value="0">
             <input type="hidden" id="orcamentoOsNumeroHint" value="<?= esc((string) ($vinculosContext['os']['numero'] ?? '')) ?>">
             <input type="hidden" id="orcamentoEquipamentoTituloHint" value="<?= esc($equipamentoTituloHintInicial) ?>">
+
+            <?php if ($orcamentoLockedEmbeddedEdit): ?>
+                <div class="alert alert-warning border-0 shadow-sm" role="alert">
+                    <div class="fw-semibold mb-1">Edicao vinculada pela OS</div>
+                    <div class="small mb-0">
+                        Esta tela foi aberta pela aba <strong>Pecas e Orcamento</strong> da OS. O sistema vai preservar o status atual deste orcamento e manter a oferta de pacote em modo de consulta. Se precisar reenviar uma nova autorizacao ao cliente, use a revisao no modulo de orcamentos.
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <div class="alert alert-info d-none orc-draft-alert" id="orcamentoDraftRecoverBar" role="alert">
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-2">
@@ -431,11 +442,14 @@ if (empty($itens)) {
                         <div class="col-12 col-md-4">
                             <label class="form-label">Status</label>
                             <select name="status" class="form-select" id="orcamentoStatus">
-                                <?php foreach ($statusLabels as $statusCode => $statusName): ?>
+                                <?php foreach ($statusOptions as $statusCode => $statusName): ?>
                                     <?php $selected = ((string) ($orcamento['status'] ?? 'rascunho')) === $statusCode ? 'selected' : ''; ?>
                                     <option value="<?= esc($statusCode) ?>" <?= $selected ?>><?= esc($statusName) ?></option>
                                 <?php endforeach; ?>
                             </select>
+                            <?php if ($orcamentoLockedEmbeddedEdit): ?>
+                                <small class="text-muted d-block mt-1">Status preservado automaticamente durante a edicao embutida desta OS.</small>
+                            <?php endif; ?>
                         </div>
                         <div class="col-12 col-md-4">
                             <label class="form-label">Origem</label>
@@ -485,6 +499,12 @@ if (empty($itens)) {
                         </div>
                     </div>
                     <div class="card-body">
+                        <?php if ($orcamentoLockedEmbeddedEdit): ?>
+                            <div class="alert alert-light border small mb-3">
+                                A oferta dinamica de pacote permanece somente para consulta neste contexto, evitando alterar o fluxo de aprovacao ja consolidado.
+                            </div>
+                        <?php endif; ?>
+                        <fieldset<?= $orcamentoLockedEmbeddedEdit ? ' disabled' : '' ?>>
                         <div class="row g-3 mb-2">
                             <div class="col-12">
                                 <div class="form-check form-switch">
@@ -589,6 +609,7 @@ if (empty($itens)) {
                                 </div>
                             </div>
                         </div>
+                        </fieldset>
                     </div>
                 </div>
             <?php endif; ?>

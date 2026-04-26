@@ -1,15 +1,15 @@
 # Documentacao - Sistema de Assistencia Tecnica
 
 > Jovem Tech  
-> ERP atual: `2.15.6`  
+> ERP atual: `2.15.18`  
 > App mobile/PWA: `0.4.2`  
-> Atualizado em `25/04/2026`
+> Atualizado em `26/04/2026`
 
 ## Objetivo
 
 Este diretorio concentra a documentacao funcional, tecnica e operacional do ERP da assistencia tecnica.
 
-O indice abaixo foi revisado para refletir a release `2.15.6`, com destaque para o retorno do `Limpar` ao estado padrao da fila aberta, para o novo seletor avancado de `Todos os status` na listagem `/os` e para o fluxo oficial de `desenvolvimento -> homologacao -> producao` entre `PC`, `notebook`, `VM` e `VPS`.
+O indice abaixo foi revisado para refletir a release `2.15.18`, com destaque para a edicao da OS com exclusao reativa das fotos persistidas de entrada, para o resumo embutido do orcamento na aba `Pecas e Orcamento`, para o modal de criacao/edicao de orcamento sem sair da tela da OS, para o ajuste do select de prazo na aba `Dados Operacionais`, para o refinamento manual das larguras da tabela `/os`, para o ajuste fino das colunas `Cliente` e `Equipamento`, para o aperto adicional da borda direita de `Cliente`, para a centralizacao visual do nome do cliente na celula, para o modal de status com abas internas, para a notificacao web em tempo real quando o cliente responde o orcamento pelo link publico e para o hotfix de navegação correta ao clicar nessa notificacao.
 
 ## Estrutura
 
@@ -50,7 +50,7 @@ O indice abaixo foi revisado para refletir a release `2.15.6`, com destaque para
 ### Versao e release atual
 
 - Historico oficial de versoes do ERP: `07-novas-implementacoes/historico-de-versoes.md`
-- Release atual: `07-novas-implementacoes/2026-04-25-release-v2.15.6-ajuste-reset-e-filtro-geral-os.md`
+- Release atual: `07-novas-implementacoes/2026-04-26-release-v2.15.18-fix-rota-notificacao-orcamento.md`
 - Registro da release anterior na VPS: `10-deploy/2026-04-23-atualizacao-vps-release-v2.15.0.md`
 
 ### App mobile/PWA
@@ -68,8 +68,27 @@ O indice abaixo foi revisado para refletir a release `2.15.6`, com destaque para
 - a listagem `/os` segue iniciando pela fila de ordens abertas, com multiselect dedicado para etapas abertas e dropdown especifico para ordens fechadas;
 - o reset manual por `Limpar` e `Limpar todos` voltou a limpar apenas os filtros selecionados e restaurar o estado inicial da fila aberta;
 - o seletor avancado `Status geral` passou a concentrar a consulta ampla de `Todos os status`, incluindo abertas + fechadas;
+- a edicao da OS voltou a salvar normalmente mesmo quando `Tecnico Responsavel` estiver vazio, alinhando a validacao do frontend com a regra opcional do modulo;
+- o upload de `Fotos de Entrada` na abertura e na edicao da OS continua endurecido no backend e agora a tela de edicao tambem permite excluir fotos persistidas, removendo banco + arquivo fisico em `public/uploads/os_anormalidades` sem recarregar a pagina;
+- a aba `Pecas e Orcamento` da edicao da OS passou a listar todos os itens do orcamento vinculado, com resumo por grupo (`pecas`, `servicos`, `pacotes` e similares);
+- quando a OS ainda nao possui itens no orcamento, a propria aba abre um modal iframe para criar/lancar itens no orcamento no mesmo padrao visual da `Nova OS` da listagem;
+- quando ja existe orcamento com itens, a mesma aba passa a oferecer acao contextual para editar ou visualizar o orcamento sem sair da edicao da OS;
 - a coluna `Status` da listagem `/os` continua usando o status real salvo na OS como badge principal, mantendo o orcamento apenas como contexto auxiliar;
-- indice principal sincronizado com a release `2.15.6` e com a nova nota tecnica da filtragem operacional.
+- na aba `Dados Operacionais` da edicao, o prazo voltou a reaparecer no dropdown `Prazo (dias)` a partir da combinacao salva entre `Data de Entrada` e `Previsao de Entrega`, inclusive para intervalos personalizados;
+- a listagem `/os` passou a ajustar `Cliente` e `Valor Total` pela maior celula da pagina atual, reduziu `Foto` e `N OS` para o tamanho estritamente necessario e transformou `Relato` em preview de ate 3 linhas com leitura completa no hover;
+- a coluna `Cliente` agora quebra o nome em ate `3 linhas` de `3 palavras` e usa a largura da maior linha visivel da pagina;
+- a coluna `Equipamento` deixou a largura fixa e agora se ajusta pela maior palavra operacional visivel entre `Tipo`, `Marca` e `Modelo`;
+- a coluna `Cliente` recebeu um aperto adicional na borda direita, reduzindo a folga entre o nome e a coluna `Equipamento`;
+- o nome do cliente passou a ficar centralizado visualmente dentro da propria celula na listagem `/os`;
+- o modal `Alterar status da OS` da listagem `/os` passou a trazer o numero da ordem no cabecalho e uma area de trabalho com abas internas para `Acoes rapidas`, `Solucao e diagnostico` e `Gerenciamento do Orcamento`;
+- as acoes rapidas do modal de status agora mostram `Status atual da OS`, `Fluxo normal sugerido` e `Fluxo selecionado` de forma agrupada, mantendo cliente, equipamento, timeline e historico no mesmo contexto;
+- o card de orcamento dentro do modal de status passou a abrir `Criar`, `Editar` e `Visualizar orcamento` em iframe, com sincronizacao reativa do resumo apos salvar;
+- a abertura de `Editar` ou `Visualizar orcamento` a partir do modal de status agora sobe na frente da troca de status, com camada de modal e backdrop promovidas corretamente;
+- quando o cliente aprova ou rejeita o orcamento pelo link publico, o ERP passa a criar notificacao interna para usuarios com permissao de visualizar `OS` ou `Orcamentos`;
+- a navbar ganhou um sino ao lado do perfil com feed autenticado, stream SSE e fallback por polling para exibir essas notificacoes sem recarregar a pagina;
+- a listagem `/os` agora escuta o evento `orcamento.public_status_changed`, recarrega a grade automaticamente e atualiza o contexto do modal de status quando ele estiver aberto;
+- o clique na notificacao da navbar passou a abrir a rota correta do ERP mesmo em ambientes com `index.php` e subdiretorio, sem cair em `404 Not Found`;
+- indice principal sincronizado com a release `2.15.18` e com a nova nota tecnica do hotfix de rota das notificacoes.
 
 ## Regra editorial
 

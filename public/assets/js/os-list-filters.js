@@ -43,6 +43,11 @@
         { dtIndex: 8, dataIndex: 7, key: 'valor_total', label: 'Valor Total' },
         { dtIndex: 9, dataIndex: 8, key: 'acoes', label: 'Acoes' },
     ];
+    const OS_AUTO_FIT_COLUMNS = [
+        { dtIndex: 3, nthChild: 4, contentSelector: '.os-cliente-cell', minWidth: 88, paddingOffset: 14, measureMode: 'intrinsic' },
+        { dtIndex: 4, nthChild: 5, contentSelector: '.os-equipamento-cell', minWidth: 92, paddingOffset: 18, measureMode: 'equipment-longest-word', textSelector: '.os-equipamento-measure', labelSelector: '.os-equipamento-label', inlineGap: 10 },
+        { dtIndex: 8, nthChild: 9, contentSelector: '.os-valor-cell', minWidth: 72, paddingOffset: 18, measureMode: 'intrinsic' },
+    ];
     const OS_OVERFLOW_HIDE_PRIORITY = [9, 5, 7, 6, 4];
 
     let syncInProgress = false;
@@ -735,6 +740,138 @@
         });
     }
 
+    function clearAutoFitColumnWidth(tableElement, nthChild) {
+        if (!tableElement || !nthChild) {
+            return;
+        }
+
+        tableElement
+            .querySelectorAll(`thead th:nth-child(${nthChild}), tbody td:nth-child(${nthChild})`)
+            .forEach((cell) => {
+                cell.style.removeProperty('width');
+                cell.style.removeProperty('min-width');
+                cell.style.removeProperty('max-width');
+            });
+    }
+
+    function applyAutoFitColumnWidth(tableElement, nthChild, widthPx) {
+        if (!tableElement || !nthChild || !Number.isFinite(widthPx) || widthPx <= 0) {
+            return;
+        }
+
+        const widthValue = `${Math.ceil(widthPx)}px`;
+        tableElement
+            .querySelectorAll(`thead th:nth-child(${nthChild}), tbody td:nth-child(${nthChild})`)
+            .forEach((cell) => {
+                cell.style.width = widthValue;
+                cell.style.minWidth = widthValue;
+                cell.style.maxWidth = widthValue;
+            });
+    }
+
+    function measureIntrinsicElementWidth(element) {
+        if (!(element instanceof Element)) {
+            return 0;
+        }
+
+        const sandbox = document.createElement('div');
+        sandbox.style.position = 'absolute';
+        sandbox.style.left = '-99999px';
+        sandbox.style.top = '-99999px';
+        sandbox.style.visibility = 'hidden';
+        sandbox.style.pointerEvents = 'none';
+        sandbox.style.width = 'max-content';
+        sandbox.style.maxWidth = 'none';
+        sandbox.style.minWidth = '0';
+
+        const clone = element.cloneNode(true);
+        if (clone instanceof HTMLElement) {
+            clone.style.width = 'max-content';
+            clone.style.maxWidth = 'none';
+            clone.style.minWidth = '0';
+        }
+
+        sandbox.appendChild(clone);
+        document.body.appendChild(sandbox);
+        const measuredWidth = Math.ceil(sandbox.getBoundingClientRect().width);
+        sandbox.remove();
+        return measuredWidth;
+    }
+
+    function measureTextLikeElement(element, text) {
+        if (!(element instanceof Element)) {
+            return 0;
+        }
+
+        const clone = element.cloneNode(false);
+        clone.textContent = String(text ?? '');
+        return measureIntrinsicElementWidth(clone);
+    }
+
+    function measureAutoFitCellWidth(cell, column) {
+        const mode = String(column.measureMode || 'intrinsic');
+        const content = cell.querySelector(column.contentSelector) || cell;
+
+        if (mode === 'equipment-longest-word') {
+            let labelWidth = 0;
+            content.querySelectorAll(column.labelSelector || '.os-equipamento-label').forEach((label) => {
+                labelWidth = Math.max(labelWidth, measureIntrinsicElementWidth(label));
+            });
+
+            let longestWordWidth = 0;
+            Array.from(content.querySelectorAll(column.textSelector || '.os-equipamento-measure')).forEach((target) => {
+                const rawText = String(target.textContent || '').trim();
+                if (rawText === '') {
+                    return;
+                }
+
+                longestWordWidth = Math.max(longestWordWidth, measureTextLikeElement(target, rawText));
+            });
+
+            return Math.ceil(
+                longestWordWidth
+                + labelWidth
+                + Number(column.inlineGap || 0)
+                + Number(column.paddingOffset || 0)
+            );
+        }
+
+        return Math.ceil(
+            measureIntrinsicElementWidth(content) + Number(column.paddingOffset || 0)
+        );
+    }
+
+    function syncAutoFitColumns(dataTable, tableElement) {
+        if (!dataTable || !tableElement) {
+            return;
+        }
+
+        OS_AUTO_FIT_COLUMNS.forEach((column) => {
+            if (!dataTable.column(column.dtIndex).visible()) {
+                clearAutoFitColumnWidth(tableElement, column.nthChild);
+                return;
+            }
+
+            const cells = Array.from(
+                tableElement.querySelectorAll(`tbody tr:not(.child) td:nth-child(${column.nthChild})`)
+            ).filter((cell) => window.getComputedStyle(cell).display !== 'none');
+
+            let targetWidth = Number(column.minWidth || 0);
+            cells.forEach((cell) => {
+                targetWidth = Math.max(
+                    targetWidth,
+                    measureAutoFitCellWidth(cell, column)
+                );
+            });
+
+            if (targetWidth > 0) {
+                applyAutoFitColumnWidth(tableElement, column.nthChild, targetWidth);
+            } else {
+                clearAutoFitColumnWidth(tableElement, column.nthChild);
+            }
+        });
+    }
+
     function syncResponsiveRowDetails(dataTable) {
         const hasHiddenColumns = getHiddenResponsiveColumns(dataTable).length > 0;
 
@@ -865,6 +1002,7 @@
             dataTable.columns.adjust();
         }
 
+        syncAutoFitColumns(dataTable, tableElement);
         syncResponsiveRowDetails(dataTable);
         fitRelatoCells(tableElement);
 
@@ -975,6 +1113,7 @@
         const statusModalObservacao = document.getElementById('osStatusModalObservacao');
         const statusModalSubmit = document.getElementById('osStatusModalSubmit');
         const statusModalCurrentBadges = document.getElementById('osStatusModalCurrentBadges');
+        const statusModalCurrentStatusHint = document.getElementById('osStatusModalCurrentStatusHint');
         const statusModalPrimaryHint = document.getElementById('osStatusModalPrimaryHint');
         const statusModalClientName = document.getElementById('osStatusModalClientName');
         const statusModalClientPhone = document.getElementById('osStatusModalClientPhone');
@@ -990,6 +1129,16 @@
         const statusModalTimeline = document.getElementById('osStatusModalTimeline');
         const statusModalHistoryWrap = document.getElementById('osStatusModalHistoryWrap');
         const statusModalHistoryList = document.getElementById('osStatusModalHistoryList');
+        const statusModalProcedimentoTextoInput = document.getElementById('osStatusModalProcedimentoTextoInput');
+        const statusModalInserirProcedimento = document.getElementById('osStatusModalInserirProcedimento');
+        const statusModalProcedimentosInput = document.getElementById('osStatusModalProcedimentosInput');
+        const statusModalProcedimentosLista = document.getElementById('osStatusModalProcedimentosLista');
+        const statusModalSolucaoInput = document.getElementById('osStatusModalSolucaoInput');
+        const statusModalDiagnosticoInput = document.getElementById('osStatusModalDiagnosticoInput');
+        const statusModalBudgetPanel = document.getElementById('osStatusModalBudgetPanel');
+        const statusModalTabQuickBtn = document.getElementById('osStatusTabQuickBtn');
+        const statusModalTabSolutionBtn = document.getElementById('osStatusTabSolutionBtn');
+        const statusModalTabBudgetBtn = document.getElementById('osStatusTabBudgetBtn');
         const statusModal = statusModalElement && window.bootstrap
             ? window.bootstrap.Modal.getOrCreateInstance(statusModalElement)
             : null;
@@ -1627,13 +1776,11 @@
 
             if (statusModalTargetHint) {
                 if (!code) {
-                    statusModalTargetHint.textContent = 'Selecione um destino no fluxo para continuar.';
-                } else if (source === 'quick-next') {
-                    statusModalTargetHint.innerHTML = `Fluxo normal selecionado: <strong>${escapeHtml(name)}</strong>.`;
+                    statusModalTargetHint.textContent = 'Selecione um fluxo para continuar.';
                 } else if (source === 'quick-cancel') {
-                    statusModalTargetHint.innerHTML = 'Atendimento marcado para <strong>Cancelado</strong>.';
+                    statusModalTargetHint.innerHTML = 'Fluxo selecionado: <strong>Cancelado</strong>.';
                 } else {
-                    statusModalTargetHint.innerHTML = `Destino selecionado: <strong>${escapeHtml(name)}</strong>.`;
+                    statusModalTargetHint.innerHTML = `Fluxo selecionado: <strong>${escapeHtml(name)}</strong>.`;
                 }
             }
 
@@ -1641,6 +1788,211 @@
 
             statusModalQuickNext?.classList.toggle('active', code !== '' && code === String(statusModalQuickNext?.dataset.statusCode || ''));
             statusModalQuickCancel?.classList.toggle('active', code !== '' && code === String(statusModalQuickCancel?.dataset.statusCode || ''));
+        };
+
+        const getStatusBudgetLoadingMarkup = (message) => `
+            <div class="card os-tab-card os-status-modal-budget-card">
+                <div class="card-body p-4 text-muted small">${escapeHtml(message || 'Carregando gerenciamento do orcamento...')}</div>
+            </div>
+        `;
+
+        const setStatusBudgetPanelHtml = (html, emptyMessage = 'Nenhuma informacao de orcamento disponivel para esta OS.') => {
+            if (!statusModalBudgetPanel) {
+                return;
+            }
+
+            const markup = String(html || '').trim();
+            statusModalBudgetPanel.innerHTML = markup !== '' ? markup : getStatusBudgetLoadingMarkup(emptyMessage);
+        };
+
+        const getStatusModalActiveTabTarget = () => {
+            const activeButton = statusModalElement?.querySelector('.os-status-modal-tabs .nav-link.active');
+            return String(activeButton?.getAttribute('data-bs-target') || '#osStatusTabQuick').trim() || '#osStatusTabQuick';
+        };
+
+        const activateStatusModalTab = (targetSelector) => {
+            if (!window.bootstrap) {
+                return;
+            }
+
+            const normalizedTarget = String(targetSelector || '#osStatusTabQuick').trim() || '#osStatusTabQuick';
+            const button = statusModalElement?.querySelector(`.os-status-modal-tabs .nav-link[data-bs-target="${normalizedTarget}"]`)
+                || statusModalTabQuickBtn;
+            if (!button) {
+                return;
+            }
+
+            window.bootstrap.Tab.getOrCreateInstance(button).show();
+        };
+
+        const parseStatusModalProcedures = (value) => {
+            const raw = String(value || '');
+            if (!raw.trim()) {
+                return [];
+            }
+
+            return raw
+                .split(/\r?\n/)
+                .map((item) => item.trim())
+                .filter((item) => item !== '');
+        };
+
+        const formatStatusProcedureTimestamp = (date = new Date()) => {
+            const dt = date instanceof Date ? date : new Date(date);
+            if (Number.isNaN(dt.getTime())) {
+                return '';
+            }
+
+            const dd = String(dt.getDate()).padStart(2, '0');
+            const mm = String(dt.getMonth() + 1).padStart(2, '0');
+            const yy = String(dt.getFullYear()).slice(-2);
+            const hh = String(dt.getHours()).padStart(2, '0');
+            const min = String(dt.getMinutes()).padStart(2, '0');
+            return `${dd}/${mm}/${yy}-${hh}:${min}`;
+        };
+
+        const getStatusModalTechnicianLabel = () => {
+            const label = String(activeStatusModalMeta?.os?.tecnico_nome || '').trim();
+            return label || 'Nao atribuido';
+        };
+
+        const renderStatusModalProceduresList = (items) => {
+            if (!statusModalProcedimentosLista) {
+                return;
+            }
+
+            statusModalProcedimentosLista.innerHTML = '';
+            if (!Array.isArray(items) || items.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'text-muted small';
+                empty.textContent = 'Nenhum procedimento inserido.';
+                statusModalProcedimentosLista.appendChild(empty);
+                return;
+            }
+
+            items.forEach((item) => {
+                const line = document.createElement('div');
+                line.className = 'os-status-modal-procedure-item';
+                line.textContent = item;
+                statusModalProcedimentosLista.appendChild(line);
+            });
+        };
+
+        const syncStatusModalProcedures = (items) => {
+            if (statusModalProcedimentosInput) {
+                statusModalProcedimentosInput.value = Array.isArray(items) ? items.join('\n') : '';
+            }
+            renderStatusModalProceduresList(Array.isArray(items) ? items : []);
+        };
+
+        const insertStatusModalProcedure = () => {
+            if (!statusModalProcedimentosInput || !statusModalProcedimentoTextoInput) {
+                return;
+            }
+
+            const procedimentoBase = String(statusModalProcedimentoTextoInput.value || '').trim();
+            if (!procedimentoBase) {
+                if (window.Swal) {
+                    window.Swal.fire({
+                        icon: 'warning',
+                        title: 'Procedimento vazio',
+                        text: 'Informe o procedimento antes de inserir.',
+                    });
+                } else {
+                    alert('Informe o procedimento antes de inserir.');
+                }
+                statusModalProcedimentoTextoInput.focus();
+                return;
+            }
+
+            const tecnicoNome = getStatusModalTechnicianLabel();
+            const stamp = formatStatusProcedureTimestamp(new Date());
+            const line = `[${procedimentoBase} - ${stamp} - tecnico: ${tecnicoNome}]`;
+            const items = parseStatusModalProcedures(statusModalProcedimentosInput.value);
+            items.push(line);
+            syncStatusModalProcedures(items);
+
+            statusModalProcedimentoTextoInput.value = '';
+            statusModalProcedimentoTextoInput.focus();
+        };
+
+        const captureStatusModalDraft = () => ({
+            activeTabTarget: getStatusModalActiveTabTarget(),
+            selectedStatus: String(statusModalSelect?.value || '').trim(),
+            selectionSource: String(activeStatusSelectionSource || 'manual').trim() || 'manual',
+            submitLabel: String(statusModalSubmit?.dataset.label || 'Salvar status').trim() || 'Salvar status',
+            observacao: String(statusModalObservacao?.value || ''),
+            comunicarCliente: Boolean(statusModalNotify?.checked),
+            procedimentos: String(statusModalProcedimentosInput?.value || ''),
+            solucao: String(statusModalSolucaoInput?.value || ''),
+            diagnostico: String(statusModalDiagnosticoInput?.value || ''),
+        });
+
+        const restoreStatusModalDraft = (draft) => {
+            if (!draft || typeof draft !== 'object') {
+                return;
+            }
+
+            activateStatusModalTab(String(draft.activeTabTarget || '#osStatusTabQuick'));
+
+            if (statusModalObservacao) {
+                statusModalObservacao.value = String(draft.observacao || '');
+            }
+            syncStatusModalProcedures(parseStatusModalProcedures(draft.procedimentos || ''));
+            if (statusModalSolucaoInput) {
+                statusModalSolucaoInput.value = String(draft.solucao || '');
+            }
+            if (statusModalDiagnosticoInput) {
+                statusModalDiagnosticoInput.value = String(draft.diagnostico || '');
+            }
+            if (statusModalNotify && statusModalNotify.dataset.available === '1') {
+                statusModalNotify.checked = Boolean(draft.comunicarCliente);
+            }
+
+            const selectedStatus = String(draft.selectedStatus || '').trim();
+            if (!selectedStatus || !statusModalSelect) {
+                return;
+            }
+
+            const hasOption = Array.from(statusModalSelect.options || []).some((option) => String(option.value || '').trim() === selectedStatus);
+            if (!hasOption) {
+                return;
+            }
+
+            const selectedName = resolveStatusName(activeStatusModalMeta?.options || {}, selectedStatus);
+            setSelectedStatusTarget(selectedStatus, selectedName || selectedStatus, {
+                source: String(draft.selectionSource || 'manual').trim() || 'manual',
+                submitLabel: String(draft.submitLabel || 'Salvar status').trim() || 'Salvar status',
+            });
+        };
+
+        const refreshStatusModalContext = async (options = {}) => {
+            if (!activeStatusOsId) {
+                return null;
+            }
+
+            const preserveDraft = Boolean(options.preserveDraft);
+            const draft = preserveDraft ? captureStatusModalDraft() : null;
+            const response = await window.fetch(`${config.statusMetaUrlBase}/${activeStatusOsId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                credentials: 'same-origin',
+            });
+
+            const payload = await response.json();
+            updateCsrfFromPayload(payload);
+
+            if (!response.ok || !payload.ok) {
+                throw new Error(payload.message || 'Nao foi possivel carregar o fluxo de status.');
+            }
+
+            hydrateStatusModal(payload);
+            if (draft) {
+                restoreStatusModalDraft(draft);
+            }
+
+            return payload;
         };
 
         const renderStatusTimeline = (timeline) => {
@@ -1833,6 +2185,10 @@
             statusModalQuickNext && (statusModalQuickNext.disabled = Boolean(isLoading) || !statusModalQuickNext.dataset.statusCode);
             statusModalQuickCancel && (statusModalQuickCancel.disabled = Boolean(isLoading) || !statusModalQuickCancel.dataset.statusCode);
             statusModalNotify && (statusModalNotify.disabled = Boolean(isLoading) || statusModalNotify.dataset.available !== '1');
+            statusModalProcedimentoTextoInput && (statusModalProcedimentoTextoInput.disabled = Boolean(isLoading));
+            statusModalInserirProcedimento && (statusModalInserirProcedimento.disabled = Boolean(isLoading));
+            statusModalSolucaoInput && (statusModalSolucaoInput.disabled = Boolean(isLoading));
+            statusModalDiagnosticoInput && (statusModalDiagnosticoInput.disabled = Boolean(isLoading));
 
             statusModalSubmit.innerHTML = isLoading
                 ? '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Salvando...'
@@ -1876,6 +2232,7 @@
             const primaryNextStatus = payload?.primaryNextStatus || null;
             const hasClientPhone = Boolean(payload?.hasClientPhone);
             const phoneLabel = String(osMeta?.cliente_telefone || '').trim();
+            const currentStatusName = String(osMeta?.status_nome || resolveStatusName(groupedOptions, osMeta?.status || '') || '').trim() || '-';
 
             statusModalNumero.textContent = osMeta?.numero_os
                 ? `#${osMeta.numero_os}`
@@ -1913,11 +2270,23 @@
 
             populateStatusOptions(groupedOptions, osMeta?.status || '');
 
+            if (statusModalCurrentStatusHint) {
+                statusModalCurrentStatusHint.innerHTML = `Status atual da OS: <strong>${escapeHtml(currentStatusName)}</strong>.`;
+            }
             if (statusModalPrimaryHint) {
                 statusModalPrimaryHint.innerHTML = primaryNextStatus?.nome
                     ? `Fluxo normal sugerido: <strong>${escapeHtml(primaryNextStatus.nome)}</strong>.`
-                    : 'Nao ha uma proxima etapa principal disponivel no fluxo atual.';
+                    : 'Fluxo normal sugerido: <strong>indisponivel no momento</strong>.';
             }
+
+            syncStatusModalProcedures(parseStatusModalProcedures(osMeta?.procedimentos_executados || ''));
+            if (statusModalSolucaoInput) {
+                statusModalSolucaoInput.value = String(osMeta?.solucao_aplicada || '');
+            }
+            if (statusModalDiagnosticoInput) {
+                statusModalDiagnosticoInput.value = String(osMeta?.diagnostico_tecnico || '');
+            }
+            setStatusBudgetPanelHtml(payload?.budgetPanelHtml || '');
 
             setStatusQuickButtonState(
                 statusModalQuickNext,
@@ -1986,11 +2355,18 @@
             statusModalEquipmentMeta && (statusModalEquipmentMeta.textContent = 'Tipo: -');
             statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'N de serie: -');
             statusModalCurrentBadges && (statusModalCurrentBadges.innerHTML = '');
-            statusModalPrimaryHint && (statusModalPrimaryHint.textContent = 'Carregando contexto da OS...');
-            statusModalTargetHint && (statusModalTargetHint.textContent = 'Selecione um destino no fluxo para continuar.');
+            statusModalCurrentStatusHint && (statusModalCurrentStatusHint.textContent = 'Status atual da OS: aguardando contexto.');
+            statusModalPrimaryHint && (statusModalPrimaryHint.textContent = 'Fluxo normal sugerido: aguardando contexto.');
+            statusModalTargetHint && (statusModalTargetHint.textContent = 'Selecione um fluxo para continuar.');
             statusModalTimeline && (statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Carregando fluxo visual...</p>');
             statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Carregando historico recente...</p>');
             statusModalHistoryWrap?.classList.remove('is-empty');
+            syncStatusModalProcedures([]);
+            statusModalProcedimentoTextoInput && (statusModalProcedimentoTextoInput.value = '');
+            statusModalSolucaoInput && (statusModalSolucaoInput.value = '');
+            statusModalDiagnosticoInput && (statusModalDiagnosticoInput.value = '');
+            setStatusBudgetPanelHtml('', 'Carregando gerenciamento do orcamento...');
+            activateStatusModalTab('#osStatusTabQuick');
             if (statusModalNotify) {
                 statusModalNotify.checked = false;
                 statusModalNotify.disabled = true;
@@ -2005,21 +2381,7 @@
             statusModal.show();
 
             try {
-                const response = await window.fetch(`${config.statusMetaUrlBase}/${osId}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                    credentials: 'same-origin',
-                });
-
-                const payload = await response.json();
-                updateCsrfFromPayload(payload);
-
-                if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'Nao foi possivel carregar o fluxo de status.');
-                }
-
-                hydrateStatusModal(payload);
+                await refreshStatusModalContext();
             } catch (error) {
                 statusModal.hide();
                 if (window.Swal) {
@@ -2249,6 +2611,21 @@
             setBudgetModalSubmitLabel();
         });
 
+        statusModalInserirProcedimento?.addEventListener('click', insertStatusModalProcedure);
+
+        statusModalProcedimentoTextoInput?.addEventListener('keydown', function (event) {
+            if (event.key !== 'Enter') {
+                return;
+            }
+
+            event.preventDefault();
+            insertStatusModalProcedure();
+        });
+
+        statusModalProcedimentosInput?.addEventListener('input', function () {
+            renderStatusModalProceduresList(parseStatusModalProcedures(this.value));
+        });
+
         statusModalQuickNext?.addEventListener('click', function () {
             const code = String(this.dataset.statusCode || '').trim();
             const name = String(this.dataset.statusName || '').trim() || resolveStatusName(activeStatusModalMeta?.options || {}, code);
@@ -2429,6 +2806,9 @@
             const formData = new window.FormData();
             formData.append('status', statusModalSelect.value);
             formData.append('observacao_status', statusModalObservacao?.value || '');
+            formData.append('procedimentos_executados', statusModalProcedimentosInput?.value || '');
+            formData.append('solucao_aplicada', statusModalSolucaoInput?.value || '');
+            formData.append('diagnostico_tecnico', statusModalDiagnosticoInput?.value || '');
             formData.append('controla_comunicacao_cliente', '1');
             if (statusModalNotify?.checked && statusModalNotify.dataset.available === '1') {
                 formData.append('comunicar_cliente', '1');
@@ -2500,11 +2880,18 @@
             statusModalEquipmentMeta && (statusModalEquipmentMeta.textContent = 'Tipo: -');
             statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'N de serie: -');
             statusModalCurrentBadges && (statusModalCurrentBadges.innerHTML = '');
-            statusModalPrimaryHint && (statusModalPrimaryHint.textContent = 'Carregando contexto da OS...');
-            statusModalTargetHint && (statusModalTargetHint.textContent = 'Selecione um destino no fluxo para continuar.');
+            statusModalCurrentStatusHint && (statusModalCurrentStatusHint.textContent = 'Status atual da OS: aguardando contexto.');
+            statusModalPrimaryHint && (statusModalPrimaryHint.textContent = 'Fluxo normal sugerido: aguardando contexto.');
+            statusModalTargetHint && (statusModalTargetHint.textContent = 'Selecione um fluxo para continuar.');
             statusModalTimeline && (statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponivel para esta OS.</p>');
             statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem historico recente para esta OS.</p>');
             statusModalHistoryWrap?.classList.remove('is-empty');
+            syncStatusModalProcedures([]);
+            statusModalProcedimentoTextoInput && (statusModalProcedimentoTextoInput.value = '');
+            statusModalSolucaoInput && (statusModalSolucaoInput.value = '');
+            statusModalDiagnosticoInput && (statusModalDiagnosticoInput.value = '');
+            setStatusBudgetPanelHtml('', 'Gerenciamento do orcamento sera exibido aqui.');
+            activateStatusModalTab('#osStatusTabQuick');
             setStatusQuickButtonState(statusModalQuickNext, false, '', '', '');
             setStatusQuickButtonState(statusModalQuickCancel, false, '', '', '');
             if (statusModalNotify) {
@@ -2575,12 +2962,81 @@
             }
 
             const payload = event.data || {};
-            if (payload.type !== 'os:list-refresh') {
+            if (payload.type === 'os:list-refresh') {
+                window.osListController.reload(true);
+                return;
+            }
+
+            if (payload.type !== 'os:orcamento-updated') {
                 return;
             }
 
             window.osListController.reload(true);
+
+            const detailsModalElement = document.getElementById('osDetailsModal');
+            const detailsModal = detailsModalElement && window.bootstrap
+                ? window.bootstrap.Modal.getInstance(detailsModalElement)
+                : null;
+
+            const updatedOsId = Number(payload.osId || 0);
+            if (!activeStatusOsId || updatedOsId <= 0 || updatedOsId !== Number(activeStatusOsId)) {
+                detailsModal?.hide();
+                return;
+            }
+
+            refreshStatusModalContext({ preserveDraft: true })
+                .then(() => {
+                    detailsModal?.hide();
+                    if (window.Swal && payload.message) {
+                        window.Swal.fire({
+                            icon: 'success',
+                            title: 'Orcamento atualizado',
+                            text: String(payload.message || 'O resumo do orcamento foi sincronizado na OS.'),
+                            timer: 1800,
+                            showConfirmButton: false,
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error('[OS status modal] Falha ao sincronizar o orcamento apos edicao.', error);
+                    detailsModal?.hide();
+                    if (window.Swal) {
+                        window.Swal.fire({
+                            icon: 'warning',
+                            title: 'Orcamento salvo com ressalvas',
+                            text: error?.message || 'O orcamento foi salvo, mas o resumo da OS nao foi atualizado automaticamente.',
+                        });
+                    }
+                });
         });
+
+        const handleRealtimeBudgetNotification = debounce(function (event) {
+            const detail = event?.detail || {};
+            const eventType = String(detail.tipo_evento || detail.notification?.tipo_evento || '').trim();
+            if (eventType !== 'orcamento.public_status_changed') {
+                return;
+            }
+
+            const payload = detail.payload && typeof detail.payload === 'object'
+                ? detail.payload
+                : (detail.notification?.payload && typeof detail.notification.payload === 'object' ? detail.notification.payload : {});
+            const osId = Number(payload.os_id || 0);
+            if (osId <= 0) {
+                return;
+            }
+
+            if (window.osListController && typeof window.osListController.reload === 'function') {
+                window.osListController.reload(true);
+            }
+
+            if (activeStatusOsId && Number(activeStatusOsId) === osId) {
+                refreshStatusModalContext({ preserveDraft: true }).catch(function (error) {
+                    console.error('[OS status modal] Falha ao reidratar contexto apos notificacao publica de orcamento.', error);
+                });
+            }
+        }, 300);
+
+        window.addEventListener('erp:notification', handleRealtimeBudgetNotification);
 
         const applyFromForm = (form, options = {}) => {
             if (!form) {

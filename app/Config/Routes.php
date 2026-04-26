@@ -96,6 +96,10 @@ $routes->group('api/v1', static function ($routes) {
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 // -- Dashboard (todos os autenticados) -----------------------------------
     $routes->get('sessao/heartbeat', 'Sessao::heartbeat');
+    $routes->get('notificacoes/navbar-feed', 'Notificacoes::navbarFeed');
+    $routes->get('notificacoes/stream', 'Notificacoes::stream');
+    $routes->post('notificacoes/lida/(:num)', 'Notificacoes::markAsRead/$1');
+    $routes->post('notificacoes/lidas', 'Notificacoes::markAllRead');
     $routes->get('dashboard',   'Admin::index', ['filter' => 'permission:dashboard:visualizar']);
     $routes->get('admin/stats', 'Admin::stats', ['filter' => 'permission:dashboard:visualizar']);
     // -- Perfil (proprio usuario) -----------------------------------------
@@ -305,6 +309,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->get('os',                    'Os::index',              ['filter' => 'permission:os:visualizar']);
     $routes->post('os/datatable',         'Os::datatable',          ['filter' => 'permission:os:visualizar']);
     $routes->get('os/fotos/(:num)',      'Os::photos/$1',          ['filter' => 'permission:os:visualizar']);
+    $routes->post('os/fotos-entrada/excluir/(:num)', 'Os::deleteEntryPhoto/$1', ['filter' => 'permission:os:editar']);
     $routes->get('os/nova',              'Os::create',             ['filter' => 'permission:os:criar']);
     $routes->get('os/checklist-meta',    'Os::checklistMeta',      ['filter' => 'permission:os:visualizar']);
     $routes->post('os/salvar',            'Os::store',              ['filter' => 'permission:os:criar']);
@@ -315,6 +320,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->get('os/prazos-meta/(:num)', 'Os::datesMeta/$1',       ['filter' => 'permission:os:editar']);
     $routes->post('os/prazos-ajax/(:num)', 'Os::updateDatesAjax/$1',['filter' => 'permission:os:editar']);
     $routes->get('os/orcamento-meta/(:num)', 'Os::budgetMeta/$1',   ['filter' => 'permission:os:editar']);
+    $routes->get('os/orcamento-resumo/(:num)', 'Os::budgetSummary/$1', ['filter' => 'permission:os:editar']);
     $routes->post('os/orcamento-ajax/(:num)', 'Os::budgetAjax/$1',  ['filter' => 'permission:os:editar']);
     $routes->post('os/status-ajax/(:num)','Os::updateStatusAjax/$1',['filter' => 'permission:os:editar']);
     $routes->post('os/status/(:num)',    'Os::updateStatus/$1',    ['filter' => 'permission:os:editar']);

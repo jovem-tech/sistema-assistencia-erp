@@ -852,16 +852,17 @@ if ($statusClosedSelected !== '') {
                 <form id="osStatusModalForm" class="os-status-modal-form" novalidate>
                     <input type="hidden" name="controla_comunicacao_cliente" value="1">
                     <div class="modal-header">
-                        <h5 class="modal-title">Alterar status da OS</h5>
+                        <h5 class="modal-title os-status-modal-title">
+                            Alterar status da OS <span id="osStatusModalNumero" class="os-status-modal-title-number">-</span>
+                        </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                     </div>
                     <div class="modal-body">
                         <div class="os-status-modal-summary mb-4">
-                            <div class="small text-muted">OS selecionada</div>
                             <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
                                 <div>
-                                    <div class="fw-semibold fs-4" id="osStatusModalNumero">-</div>
-                                    <div class="small text-muted mt-1" id="osStatusModalPrimaryHint">Carregando contexto da OS...</div>
+                                    <div class="small text-muted">Contexto da ordem selecionada</div>
+                                    <div class="small text-muted mt-1">Confira o cliente, o equipamento e os badges atuais antes de mover esta OS.</div>
                                 </div>
                                 <div class="os-status-modal-badges" id="osStatusModalCurrentBadges"></div>
                             </div>
@@ -887,47 +888,116 @@ if ($statusClosedSelected !== '') {
 
                         <div class="row g-4">
                             <div class="col-12 col-xl-7">
-                                <div class="os-status-modal-panel">
-                                    <div class="os-status-modal-section">
-                                        <div class="os-status-modal-section-title">Acoes rapidas</div>
-                                        <div class="os-status-modal-quick-actions">
-                                            <button type="button" class="btn btn-glow" id="osStatusModalQuickNext" disabled>
-                                                <i class="bi bi-arrow-right-circle me-1"></i>Proxima etapa
+                                <div class="os-status-modal-panel os-status-modal-tabs-shell">
+                                    <ul class="nav nav-pills os-status-modal-tabs" id="osStatusModalTabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="osStatusTabQuickBtn" data-bs-toggle="pill" data-bs-target="#osStatusTabQuick" type="button" role="tab" aria-controls="osStatusTabQuick" aria-selected="true">
+                                                Acoes rapidas
                                             </button>
-                                            <button type="button" class="btn btn-outline-danger" id="osStatusModalQuickCancel" disabled>
-                                                <i class="bi bi-x-circle me-1"></i>Cancelar
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="osStatusTabSolutionBtn" data-bs-toggle="pill" data-bs-target="#osStatusTabSolution" type="button" role="tab" aria-controls="osStatusTabSolution" aria-selected="false">
+                                                Solucao e diagnostico
                                             </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="osStatusTabBudgetBtn" data-bs-toggle="pill" data-bs-target="#osStatusTabBudget" type="button" role="tab" aria-controls="osStatusTabBudget" aria-selected="false">
+                                                Gerenciamento do Orcamento
+                                            </button>
+                                        </li>
+                                    </ul>
+
+                                    <div class="tab-content os-status-modal-tab-content" id="osStatusModalTabContent">
+                                        <div class="tab-pane fade show active" id="osStatusTabQuick" role="tabpanel" aria-labelledby="osStatusTabQuickBtn" tabindex="0">
+                                            <div class="os-status-modal-section">
+                                                <div class="os-status-modal-section-title">Acoes rapidas</div>
+                                                <div class="os-status-modal-quick-actions">
+                                                    <button type="button" class="btn btn-glow" id="osStatusModalQuickNext" disabled>
+                                                        <i class="bi bi-arrow-right-circle me-1"></i>Proxima etapa
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-danger" id="osStatusModalQuickCancel" disabled>
+                                                        <i class="bi bi-x-circle me-1"></i>Cancelar
+                                                    </button>
+                                                </div>
+                                                <div class="os-status-modal-flow-hints">
+                                                    <div class="small text-muted" id="osStatusModalCurrentStatusHint">Status atual da OS: aguardando contexto.</div>
+                                                    <div class="small text-muted" id="osStatusModalPrimaryHint">Fluxo normal sugerido: aguardando contexto.</div>
+                                                    <div class="small text-muted" id="osStatusModalTargetHint">Selecione um fluxo para continuar.</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="os-status-modal-section">
+                                                <label class="form-label" for="osStatusModalSelect">Status de destino</label>
+                                                <select id="osStatusModalSelect" name="status" class="form-select" required>
+                                                    <option value="">Selecione um status</option>
+                                                </select>
+                                                <div class="form-text">A lista respeita o fluxo de trabalho configurado para avancar, retornar etapas ou cancelar o atendimento.</div>
+                                            </div>
+
+                                            <div class="os-status-modal-section">
+                                                <label class="form-label" for="osStatusModalObservacao">Observacoes</label>
+                                                <textarea
+                                                    id="osStatusModalObservacao"
+                                                    name="observacao_status"
+                                                    class="form-control"
+                                                    rows="4"
+                                                    placeholder="Registre contexto da mudanca, combinados com o cliente ou justificativa do cancelamento."
+                                                ></textarea>
+                                            </div>
+
+                                            <div class="os-status-modal-section">
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="osStatusModalNotify" name="comunicar_cliente" value="1">
+                                                    <label class="form-check-label" for="osStatusModalNotify">
+                                                        Notificar o cliente sobre esta mudanca
+                                                    </label>
+                                                </div>
+                                                <div class="form-text" id="osStatusModalNotifyHelp">O cliente sera comunicado apenas se voce mantiver esta opcao ativa.</div>
+                                            </div>
                                         </div>
-                                        <div class="small text-muted mt-2" id="osStatusModalTargetHint">Selecione um destino no fluxo para continuar.</div>
-                                    </div>
 
-                                    <div class="os-status-modal-section">
-                                        <label class="form-label" for="osStatusModalSelect">Status de destino</label>
-                                        <select id="osStatusModalSelect" name="status" class="form-select" required>
-                                            <option value="">Selecione um status</option>
-                                        </select>
-                                        <div class="form-text">A lista respeita o fluxo de trabalho configurado para avancar, retornar etapas ou cancelar o atendimento.</div>
-                                    </div>
+                                        <div class="tab-pane fade" id="osStatusTabSolution" role="tabpanel" aria-labelledby="osStatusTabSolutionBtn" tabindex="0">
+                                            <div class="os-status-modal-section">
+                                                <div class="os-status-modal-section-title">Solucao e diagnostico</div>
+                                                <p class="small text-muted mb-0">Registre os procedimentos executados e consolide a solucao aplicada sem sair da mudanca de status.</p>
+                                            </div>
 
-                                    <div class="os-status-modal-section">
-                                        <label class="form-label" for="osStatusModalObservacao">Observacoes</label>
-                                        <textarea
-                                            id="osStatusModalObservacao"
-                                            name="observacao_status"
-                                            class="form-control"
-                                            rows="4"
-                                            placeholder="Registre contexto da mudanca, combinados com o cliente ou justificativa do cancelamento."
-                                        ></textarea>
-                                    </div>
+                                            <div class="os-status-modal-solution-card">
+                                                <label class="form-label fw-semibold" for="osStatusModalProcedimentoTextoInput">Procedimentos executados</label>
+                                                <div class="os-status-modal-procedure-toolbar">
+                                                    <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        id="osStatusModalProcedimentoTextoInput"
+                                                        placeholder="Ex.: feito testes no processador">
+                                                    <button type="button" class="btn btn-outline-primary" id="osStatusModalInserirProcedimento">
+                                                        + Inserir novo procedimento
+                                                    </button>
+                                                </div>
+                                                <textarea name="procedimentos_executados" id="osStatusModalProcedimentosInput" class="d-none"></textarea>
+                                                <div id="osStatusModalProcedimentosLista" class="os-status-modal-procedure-list"></div>
+                                                <small class="text-muted d-block mt-2">Cada insercao registra automaticamente data/hora e tecnico selecionado.</small>
+                                            </div>
 
-                                    <div class="os-status-modal-section">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" role="switch" id="osStatusModalNotify" name="comunicar_cliente" value="1">
-                                            <label class="form-check-label" for="osStatusModalNotify">
-                                                Notificar o cliente sobre esta mudanca
-                                            </label>
+                                            <div class="os-status-modal-solution-grid">
+                                                <div class="os-status-modal-field-card">
+                                                    <label class="form-label fw-semibold" for="osStatusModalSolucaoInput">Solucao aplicada</label>
+                                                    <textarea name="solucao_aplicada" id="osStatusModalSolucaoInput" class="form-control" rows="5"></textarea>
+                                                </div>
+                                                <div class="os-status-modal-field-card">
+                                                    <label class="form-label fw-semibold" for="osStatusModalDiagnosticoInput">Diagnostico</label>
+                                                    <textarea name="diagnostico_tecnico" id="osStatusModalDiagnosticoInput" class="form-control" rows="5"></textarea>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="form-text" id="osStatusModalNotifyHelp">O cliente sera comunicado apenas se voce mantiver esta opcao ativa.</div>
+
+                                        <div class="tab-pane fade" id="osStatusTabBudget" role="tabpanel" aria-labelledby="osStatusTabBudgetBtn" tabindex="0">
+                                            <div id="osStatusModalBudgetPanel" class="os-status-modal-budget-host">
+                                                <div class="card os-tab-card os-status-modal-budget-card">
+                                                    <div class="card-body p-4 text-muted small">Carregando gerenciamento do orcamento...</div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1042,6 +1112,27 @@ document.addEventListener('DOMContentLoaded', function () {
             loadTimeout = null;
         };
 
+        const bringModalToFront = () => {
+            const stackedNodes = Array.from(document.querySelectorAll('.modal.show, .modal-backdrop'));
+            const stackedZIndexes = stackedNodes
+                .map((element) => {
+                    const raw = window.getComputedStyle(element)?.zIndex || element.style?.zIndex || '';
+                    const parsed = Number.parseInt(String(raw), 10);
+                    return Number.isFinite(parsed) ? parsed : 0;
+                })
+                .filter((value) => value > 0);
+
+            const topZIndex = stackedZIndexes.length > 0 ? Math.max(...stackedZIndexes) : 1055;
+            const modalZIndex = topZIndex >= 1055 ? topZIndex + 20 : 1075;
+            modalElement.style.zIndex = String(modalZIndex);
+
+            const backdrops = Array.from(document.querySelectorAll('.modal-backdrop'));
+            const activeBackdrop = backdrops[backdrops.length - 1];
+            if (activeBackdrop) {
+                activeBackdrop.style.zIndex = String(modalZIndex - 5);
+            }
+        };
+
         const openModal = (url, modalTitle) => {
             if (!url || !frame) {
                 return;
@@ -1079,6 +1170,10 @@ document.addEventListener('DOMContentLoaded', function () {
             setLoading(false);
         });
 
+        modalElement.addEventListener('shown.bs.modal', () => {
+            bringModalToFront();
+        });
+
         if (closeButton) {
             closeButton.addEventListener('click', async (event) => {
                 event.preventDefault();
@@ -1099,6 +1194,7 @@ document.addEventListener('DOMContentLoaded', function () {
         modalElement.addEventListener('hidden.bs.modal', () => {
             clearLoadTimeout();
             setLoading(false);
+            modalElement.style.removeProperty('z-index');
             if (frame) {
                 frame.src = 'about:blank';
             }

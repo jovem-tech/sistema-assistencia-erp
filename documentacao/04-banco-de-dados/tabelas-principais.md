@@ -1,7 +1,7 @@
 # Tabelas Principais do Banco de Dados
 
 Base: `assistencia_tecnica`  
-Atualizado em 09/04/2026 (catalogo estrutural de equipamentos, pacotes de servicos e oferta dinamica de pacote em orcamentos)
+Atualizado em 26/04/2026 (catalogo estrutural de equipamentos, pacotes de servicos, oferta dinamica de pacote em orcamentos e notificacao web em tempo real)
 
 ## Nucleo operacional
 - `clientes`
@@ -387,9 +387,12 @@ Tabelas complementares (sem duplicar `clientes`, `os`, `conversas_whatsapp` e `m
 - `mobile_push_subscriptions`
   - subscriptions de push por usuario/dispositivo (`endpoint_hash`, chaves `p256dh/auth`, `ativo`).
 - `mobile_notifications`
-  - inbox de notificacoes por usuario (`tipo_evento`, `titulo`, `corpo`, `rota_destino`, `payload_json`, `lida_em`).
+  - inbox de notificacoes por usuario (`tipo_evento`, `titulo`, `corpo`, `rota_destino`, `payload_json`, `lida_em`);
+  - agora atende tanto o app mobile/PWA quanto o sino de notificacoes da navbar web;
+  - registra, entre outros eventos, a resposta publica do cliente ao orcamento (`orcamento.public_status_changed`).
 - `mobile_notification_targets`
-  - relaciona notificacao a alvos de dominio (`order`, `conversation`, `client`).
+  - relaciona notificacao a alvos de dominio (`order`, `conversation`, `client`, `budget`);
+  - no fluxo de orcamento publico, a mesma notificacao pode apontar simultaneamente para `budget` e `order`.
 - `mobile_event_outbox`
   - fila de eventos para despacho assíncrono (`event_type`, `aggregate_type`, `status`, `tentativas`, `processado_em`).
 

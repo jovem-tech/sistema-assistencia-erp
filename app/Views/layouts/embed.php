@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR" data-theme="<?= get_theme() ?>" data-bs-theme="<?= get_theme() ?>">
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,7 @@
     <meta name="session-heartbeat-url" content="<?= base_url('sessao/heartbeat') ?>">
     <meta name="session-login-url" content="<?= base_url('login') ?>">
     <meta name="session-remember-active" content="<?= get_cookie('remember_login') ? '1' : '0' ?>">
-    <title><?= $title ?? 'Sistema' ?> - <?= esc(get_config('sistema_nome', 'Assistencia Técnica')) ?></title>
+    <title><?= $title ?? 'Sistema' ?> - <?= esc(get_config('sistema_nome', 'Assistência Técnica')) ?></title>
 
     <link rel="icon" href="<?= base_url('favicon.ico') ?>">
     <link href="<?= base_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>" rel="stylesheet">
@@ -72,3 +72,4 @@
     <?= $this->renderSection('scripts') ?>
 </body>
 </html>
+

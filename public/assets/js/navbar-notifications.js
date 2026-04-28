@@ -249,7 +249,7 @@
             });
             const payload = await response.json();
             if (!response.ok || payload?.ok !== true) {
-                throw new Error(payload?.message || 'Falha ao carregar notificacoes.');
+            throw new Error(payload?.message || 'Falha ao carregar notificações.');
             }
 
             applyFeedPayload(payload, normalizedOptions);
@@ -306,7 +306,7 @@
             });
             const payload = await response.json();
             if (!response.ok || payload?.ok !== true) {
-                throw new Error(payload?.message || 'Falha ao marcar notificacoes como lidas.');
+            throw new Error(payload?.message || 'Falha ao marcar notificações como lidas.');
             }
 
             state.items = state.items.map(function (item) {
@@ -339,7 +339,7 @@
                     emitRealtime: true,
                     showToast: true,
                 }).catch(function (error) {
-                    console.error('[NavbarNotifications] Falha no polling de notificacoes.', error);
+        console.error('[NavbarNotifications] Falha no polling de notificações.', error);
                 });
             }, 15000);
         }
@@ -421,7 +421,7 @@
                     scheduleStreamReconnect();
                 };
             } catch (error) {
-                console.error('[NavbarNotifications] Nao foi possivel abrir o stream SSE.', error);
+        console.error('[NavbarNotifications] Não foi possível abrir o stream SSE.', error);
                 startFallbackPolling();
             }
         }
@@ -457,9 +457,9 @@
 
         markAllButton?.addEventListener('click', function () {
             markAllRead().catch(function (error) {
-                console.error('[NavbarNotifications] Falha ao marcar notificacoes como lidas.', error);
+        console.error('[NavbarNotifications] Falha ao marcar notificações como lidas.', error);
                 if (window.DSFeedback && typeof window.DSFeedback.error === 'function') {
-                    window.DSFeedback.error('Notificacoes', error?.message || 'Nao foi possivel marcar as notificacoes como lidas.');
+            window.DSFeedback.error('Notificações', error?.message || 'Não foi possível marcar as notificações como lidas.');
                 }
             });
         });
@@ -470,10 +470,10 @@
             emitRealtime: false,
             showToast: false,
         }).catch(function (error) {
-            console.error('[NavbarNotifications] Falha ao carregar notificacoes iniciais.', error);
+        console.error('[NavbarNotifications] Falha ao carregar notificações iniciais.', error);
             state.connectionState = 'offline';
             updateMetaLabel();
-            listElement.innerHTML = '<div class="navbar-notification-empty">Nao foi possivel carregar as notificacoes agora.</div>';
+        listElement.innerHTML = '<div class="navbar-notification-empty">Não foi possível carregar as notificações agora.</div>';
         }).finally(function () {
             connectStream();
             if (!('EventSource' in window)) {

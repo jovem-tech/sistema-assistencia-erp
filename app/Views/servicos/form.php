@@ -9,9 +9,9 @@ $tiposEquipamento = array_values(array_filter((array) ($tiposEquipamento ?? []),
 <div class="page-header mb-4 d-flex justify-content-between align-items-center">
     <h2 class="mb-0">
         <i class="bi bi-gear-wide-connected me-2"></i>
-        <?= $isEdit ? 'Editar Servico' : 'Novo Servico' ?>
+        <?= $isEdit ? 'Editar Serviço' : 'Novo Serviço' ?>
     </h2>
-    <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('servicos')" title="Ajuda sobre Servicos">
+    <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('servicos')" title="Ajuda sobre Serviços">
         <i class="bi bi-question-circle me-1"></i>Ajuda
     </button>
 </div>
@@ -24,18 +24,18 @@ $tiposEquipamento = array_values(array_filter((array) ($tiposEquipamento ?? []),
                     <?= csrf_field() ?>
 
                     <div class="mb-3">
-                        <label class="form-label">Nome do Servico <span class="text-danger">*</span></label>
+                        <label class="form-label">Nome do Serviço <span class="text-danger">*</span></label>
                         <input type="text" name="nome" class="form-control" value="<?= old('nome', $servico['nome'] ?? '') ?>" required placeholder="Ex: Troca de Tela">
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Descricao</label>
-                        <textarea name="descricao" class="form-control" rows="3" placeholder="Detalhes tecnicos do servico..."><?= old('descricao', $servico['descricao'] ?? '') ?></textarea>
+                        <label class="form-label">Descrição</label>
+                        <textarea name="descricao" class="form-control" rows="3" placeholder="Detalhes técnicos do serviço..."><?= old('descricao', $servico['descricao'] ?? '') ?></textarea>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Tipo Equipamento</label>
+                            <label class="form-label">Tipo de Equipamento</label>
                             <input
                                 type="text"
                                 name="tipo_equipamento"
@@ -52,7 +52,7 @@ $tiposEquipamento = array_values(array_filter((array) ($tiposEquipamento ?? []),
                             </datalist>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Valor Padrao (R$) <span class="text-danger">*</span></label>
+                            <label class="form-label">Valor Padrão (R$) <span class="text-danger">*</span></label>
                             <input type="text" name="valor" class="form-control money" value="<?= old('valor', isset($servico) ? number_format((float) ($servico['valor'] ?? 0), 2, ',', '.') : '') ?>" required>
                         </div>
                     </div>
@@ -74,7 +74,7 @@ $tiposEquipamento = array_values(array_filter((array) ($tiposEquipamento ?? []),
                             <i class="bi bi-arrow-left me-1"></i>Voltar
                         </a>
                         <button type="submit" class="btn btn-primary btn-glow px-4">
-                            <i class="bi bi-save me-1"></i>Salvar Servico
+                            <i class="bi bi-save me-1"></i>Salvar Serviço
                         </button>
                     </div>
                 </form>

@@ -18,25 +18,25 @@ $metaParts = array_values(array_filter([
 ?>
 <?php if ($watermarkLogo !== ''): ?>
     <div class="pdf-watermark">
-        <img src="<?= esc($watermarkLogo) ?>" alt="Marca d'agua">
+        <img src="<?= esc($watermarkLogo) ?>" alt="Marca d'água">
     </div>
 <?php endif; ?>
 
 <div class="pdf-branding">
     <table class="pdf-branding-main">
         <tr>
+            <td class="pdf-branding-copy-cell">
+                <div class="pdf-branding-company"><?= esc($empresaNome !== '' ? $empresaNome : 'Assistência Técnica') ?></div>
+                <div class="pdf-branding-title"><?= esc($tituloDocumento) ?></div>
+                <?php if ($documentoReferencia !== ''): ?>
+                    <div class="pdf-branding-reference">Referência: <?= esc($documentoReferencia) ?></div>
+                <?php endif; ?>
+            </td>
             <?php if ($headerLogo !== ''): ?>
                 <td class="pdf-branding-logo-cell">
                     <img src="<?= esc($headerLogo) ?>" alt="Logo" class="pdf-branding-logo">
                 </td>
             <?php endif; ?>
-            <td class="pdf-branding-copy-cell">
-                <div class="pdf-branding-company"><?= esc($empresaNome !== '' ? $empresaNome : 'Assistencia Tecnica') ?></div>
-                <div class="pdf-branding-title"><?= esc($tituloDocumento) ?></div>
-                <?php if ($documentoReferencia !== ''): ?>
-                    <div class="pdf-branding-reference">Referencia: <?= esc($documentoReferencia) ?></div>
-                <?php endif; ?>
-            </td>
         </tr>
     </table>
 

@@ -17,7 +17,7 @@ if ($statusClosedSelected !== '') {
 }
 $estadoFluxoOptions = [
     'em_atendimento' => 'Em atendimento',
-    'em_execucao' => 'Em execucao',
+    'em_execucao' => 'Em execução',
     'pausado' => 'Pausado',
     'pronto' => 'Pronto',
     'encerrado' => 'Encerrado',
@@ -39,7 +39,7 @@ foreach ($tecnicos as $tecnico) {
     if ($tecnicoId === '') {
         continue;
     }
-    $tecnicoLabels[$tecnicoId] = (string) ($tecnico['nome'] ?? ('Tecnico #' . $tecnicoId));
+    $tecnicoLabels[$tecnicoId] = (string) ($tecnico['nome'] ?? ('Técnico #' . $tecnicoId));
 }
 
 $labelsMap = [
@@ -58,19 +58,19 @@ $labelsMap = [
 ];
 
 $tableTitleText = 'Ordens em aberto';
-$tableSubtitleText = 'A listagem inicia nas etapas abertas da oficina. Use "Ordens fechadas" para consultar entregas, devolucoes e descartes.';
+$tableSubtitleText = 'A listagem inicia nas etapas abertas da oficina. Use "Ordens fechadas" para consultar entregas, devoluções e descartes.';
 
 if ($statusClosedSelected !== '') {
     if ($statusClosedSelected === 'fechadas') {
         $tableTitleText = 'Ordens fechadas';
-        $tableSubtitleText = 'Exibindo apenas OS encerradas por entrega, devolucao sem reparo ou descarte.';
+        $tableSubtitleText = 'Exibindo apenas OS encerradas por entrega, devolução sem reparo ou descarte.';
     } else {
         $tableTitleText = 'Fechadas: ' . ($statusClosedOptions[$statusClosedSelected] ?? $statusClosedSelected);
         $tableSubtitleText = 'Exibindo apenas um desfecho operacional da fila encerrada.';
     }
 } elseif ($statusScope === 'all') {
-    $tableTitleText = 'Todas as ordens de servico';
-    $tableSubtitleText = 'Exibindo OS abertas e fechadas sem o recorte padrao da fila.';
+    $tableTitleText = 'Todas as ordens de serviço';
+    $tableSubtitleText = 'Exibindo OS abertas e fechadas sem o recorte padrão da fila.';
 } elseif (count($statusSelected) === 1) {
     $selectedCode = (string) $statusSelected[0];
     $tableTitleText = 'Ordens abertas: ' . ($statusLabels[$selectedCode] ?? $selectedCode);
@@ -87,8 +87,8 @@ if ($statusClosedSelected !== '') {
 <div class="os-list-page" data-sidebar-auto-collapse="hover">
     <div class="page-header">
         <div class="d-flex align-items-center gap-3 os-page-heading">
-            <h2><i class="bi bi-clipboard-check me-2"></i>Ordens de Servico</h2>
-            <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')" title="Ajuda sobre este modulo">
+            <h2><i class="bi bi-clipboard-check me-2"></i>Ordens de Serviço</h2>
+            <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')" title="Ajuda sobre este módulo">
                 <i class="bi bi-question-circle me-1"></i> Ajuda
             </button>
         </div>
@@ -98,7 +98,7 @@ if ($statusClosedSelected !== '') {
                 class="btn btn-glow os-page-create-btn"
                 data-os-modal-role="create"
                 data-os-modal-url="<?= base_url('os/nova?embed=1') ?>"
-                data-os-modal-title="Nova Ordem de Servico"
+                data-os-modal-title="Nova Ordem de Serviço"
             >
                 <i class="bi bi-plus-lg me-1"></i>Nova OS
             </button>
@@ -127,12 +127,12 @@ if ($statusClosedSelected !== '') {
                                 class="form-control"
                                 id="osFilterQDesktop"
                                 data-filter-field="q"
-                                placeholder="Cliente, equipamento, numero da OS ou OS legado..."
+                                placeholder="Cliente, equipamento, número da OS ou OS legado..."
                                 value="<?= esc((string) ($listFilters['q'] ?? '')) ?>"
                                 autocomplete="off"
                             >
                         </div>
-                        <div class="os-filter-helper">Busca cliente, equipamento, numero da OS ou OS legado.</div>
+                        <div class="os-filter-helper">Busca cliente, equipamento, número da OS ou OS legado.</div>
                     </div>
 
                     <div class="os-filter-field" data-filter-block="status">
@@ -194,7 +194,7 @@ if ($statusClosedSelected !== '') {
                             aria-expanded="false"
                             aria-controls="osAdvancedFiltersCollapse"
                         >
-                            <i class="bi bi-sliders me-1"></i>Filtros avancados
+                            <i class="bi bi-sliders me-1"></i>Filtros avançados
                         </button>
                     </div>
                 </div>
@@ -203,8 +203,8 @@ if ($statusClosedSelected !== '') {
                     <div class="row g-3">
                         <div class="col-12 col-xxl-3 col-xl-4 col-md-6">
                             <label class="form-label" for="osFilterStatusScopeDesktop">Status geral</label>
-                            <select id="osFilterStatusScopeDesktop" data-filter-field="status_scope" class="form-select js-os-select2" data-placeholder="Padrao: ordens abertas">
-                                <option value="">Padrao: ordens abertas</option>
+                            <select id="osFilterStatusScopeDesktop" data-filter-field="status_scope" class="form-select js-os-select2" data-placeholder="Padr�o: ordens abertas">
+                                <option value="">Padr�o: ordens abertas</option>
                                 <option value="all" <?= $statusScope === 'all' ? 'selected' : '' ?>>Todos os status</option>
                             </select>
                             <div class="form-text">Use aqui quando quiser consultar abertas e fechadas na mesma fila.</div>
@@ -235,7 +235,7 @@ if ($statusClosedSelected !== '') {
                         </div>
 
                         <div class="col-12 col-xxl-3 col-xl-4 col-md-6">
-                            <label class="form-label" for="osFilterSituacaoDesktop">Situacao operacional</label>
+                            <label class="form-label" for="osFilterSituacaoDesktop">Situação operacional</label>
                             <select id="osFilterSituacaoDesktop" data-filter-field="situacao" class="form-select js-os-select2" data-placeholder="Todas">
                                 <option value="">Todas</option>
                                 <?php foreach ($situacaoOptions as $situacaoCode => $situacaoName): ?>
@@ -247,22 +247,22 @@ if ($statusClosedSelected !== '') {
                         </div>
 
                         <div class="col-12 col-xxl-3 col-xl-4 col-md-6">
-                            <label class="form-label" for="osFilterTecnicoDesktop">Tecnico responsavel</label>
+                            <label class="form-label" for="osFilterTecnicoDesktop">Técnico responsável</label>
                             <select id="osFilterTecnicoDesktop" data-filter-field="tecnico_id" class="form-select js-os-select2" data-placeholder="Todos">
                                 <option value="">Todos</option>
                                 <?php foreach ($tecnicos as $tecnico): ?>
                                     <?php $tecnicoId = (string) ($tecnico['id'] ?? ''); ?>
                                     <?php if ($tecnicoId === '') continue; ?>
                                     <option value="<?= esc($tecnicoId) ?>" <?= ((string) ($listFilters['tecnico_id'] ?? '') === $tecnicoId) ? 'selected' : '' ?>>
-                                        <?= esc((string) ($tecnico['nome'] ?? ('Tecnico #' . $tecnicoId))) ?>
+                                        <?= esc((string) ($tecnico['nome'] ?? ('Técnico #' . $tecnicoId))) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
 
                         <div class="col-12 col-xxl-3 col-xl-4 col-md-6">
-                            <label class="form-label" for="osFilterTipoServicoDesktop">Tipo de servico</label>
-                            <select id="osFilterTipoServicoDesktop" data-filter-field="tipo_servico" class="form-select js-os-select2" data-placeholder="Todos os servicos">
+                            <label class="form-label" for="osFilterTipoServicoDesktop">Tipo de serviço</label>
+                            <select id="osFilterTipoServicoDesktop" data-filter-field="tipo_servico" class="form-select js-os-select2" data-placeholder="Todos os serviços">
                                 <option value="">Todos</option>
                                 <?php foreach ($tiposServico as $servico): ?>
                                     <?php $descricao = trim((string) ($servico['descricao'] ?? '')); ?>
@@ -280,17 +280,17 @@ if ($statusClosedSelected !== '') {
                         </div>
 
                         <div class="col-6 col-xxl-2 col-xl-4 col-md-3">
-                            <label class="form-label" for="osFilterDataFimDesktop">Abertura ate</label>
+                            <label class="form-label" for="osFilterDataFimDesktop">Abertura até</label>
                             <input type="date" id="osFilterDataFimDesktop" data-filter-field="data_fim" class="form-control" value="<?= esc((string) ($listFilters['data_fim'] ?? '')) ?>">
                         </div>
 
                         <div class="col-6 col-xxl-2 col-xl-3 col-md-3">
-                            <label class="form-label" for="osFilterValorMinDesktop">Valor minimo</label>
+                            <label class="form-label" for="osFilterValorMinDesktop">Valor mínimo</label>
                             <input type="text" id="osFilterValorMinDesktop" data-filter-field="valor_min" class="form-control mask-money" placeholder="0,00" value="<?= esc((string) ($listFilters['valor_min'] ?? '')) ?>">
                         </div>
 
                         <div class="col-6 col-xxl-2 col-xl-3 col-md-3">
-                            <label class="form-label" for="osFilterValorMaxDesktop">Valor maximo</label>
+                            <label class="form-label" for="osFilterValorMaxDesktop">Valor máximo</label>
                             <input type="text" id="osFilterValorMaxDesktop" data-filter-field="valor_max" class="form-control mask-money" placeholder="0,00" value="<?= esc((string) ($listFilters['valor_max'] ?? '')) ?>">
                         </div>
                     </div>
@@ -317,12 +317,12 @@ if ($statusClosedSelected !== '') {
                                 class="form-control"
                                 id="osFilterQMobile"
                                 data-filter-field="q"
-                                placeholder="Cliente, equipamento, numero da OS ou OS legado..."
+                                placeholder="Cliente, equipamento, número da OS ou OS legado..."
                                 value="<?= esc((string) ($listFilters['q'] ?? '')) ?>"
                                 autocomplete="off"
                             >
                         </div>
-                        <div class="os-filter-helper">Busca cliente, equipamento, numero da OS ou OS legado.</div>
+                        <div class="os-filter-helper">Busca cliente, equipamento, número da OS ou OS legado.</div>
                     </div>
 
                     <div class="col-12" data-filter-block="status">
@@ -365,13 +365,13 @@ if ($statusClosedSelected !== '') {
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="os-filter-helper">Use para consultar entregas, devolucoes e descartes.</div>
+                        <div class="os-filter-helper">Use para consultar entregas, devoluções e descartes.</div>
                     </div>
 
                     <div class="col-12">
                         <label class="form-label" for="osFilterStatusScopeMobile">Status geral</label>
-                        <select id="osFilterStatusScopeMobile" data-filter-field="status_scope" class="form-select js-os-select2" data-placeholder="Padrao: ordens abertas">
-                            <option value="">Padrao: ordens abertas</option>
+                        <select id="osFilterStatusScopeMobile" data-filter-field="status_scope" class="form-select js-os-select2" data-placeholder="Padr�o: ordens abertas">
+                            <option value="">Padr�o: ordens abertas</option>
                             <option value="all" <?= $statusScope === 'all' ? 'selected' : '' ?>>Todos os status</option>
                         </select>
                         <div class="form-text">Amplia a consulta para abertas + fechadas na mesma listagem.</div>
@@ -402,7 +402,7 @@ if ($statusClosedSelected !== '') {
                     </div>
 
                     <div class="col-12">
-                        <label class="form-label" for="osFilterSituacaoMobile">Situacao operacional</label>
+                        <label class="form-label" for="osFilterSituacaoMobile">Situação operacional</label>
                         <select id="osFilterSituacaoMobile" data-filter-field="situacao" class="form-select js-os-select2" data-placeholder="Todas">
                             <option value="">Todas</option>
                             <?php foreach ($situacaoOptions as $situacaoCode => $situacaoName): ?>
@@ -414,22 +414,22 @@ if ($statusClosedSelected !== '') {
                     </div>
 
                     <div class="col-12">
-                        <label class="form-label" for="osFilterTecnicoMobile">Tecnico responsavel</label>
+                        <label class="form-label" for="osFilterTecnicoMobile">Técnico responsável</label>
                         <select id="osFilterTecnicoMobile" data-filter-field="tecnico_id" class="form-select js-os-select2" data-placeholder="Todos">
                             <option value="">Todos</option>
                             <?php foreach ($tecnicos as $tecnico): ?>
                                 <?php $tecnicoId = (string) ($tecnico['id'] ?? ''); ?>
                                 <?php if ($tecnicoId === '') continue; ?>
                                 <option value="<?= esc($tecnicoId) ?>" <?= ((string) ($listFilters['tecnico_id'] ?? '') === $tecnicoId) ? 'selected' : '' ?>>
-                                    <?= esc((string) ($tecnico['nome'] ?? ('Tecnico #' . $tecnicoId))) ?>
+                                    <?= esc((string) ($tecnico['nome'] ?? ('Técnico #' . $tecnicoId))) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
 
                     <div class="col-12">
-                        <label class="form-label" for="osFilterTipoServicoMobile">Tipo de servico</label>
-                        <select id="osFilterTipoServicoMobile" data-filter-field="tipo_servico" class="form-select js-os-select2" data-placeholder="Todos os servicos">
+                        <label class="form-label" for="osFilterTipoServicoMobile">Tipo de serviço</label>
+                        <select id="osFilterTipoServicoMobile" data-filter-field="tipo_servico" class="form-select js-os-select2" data-placeholder="Todos os serviços">
                             <option value="">Todos</option>
                             <?php foreach ($tiposServico as $servico): ?>
                                 <?php $descricao = trim((string) ($servico['descricao'] ?? '')); ?>
@@ -447,17 +447,17 @@ if ($statusClosedSelected !== '') {
                     </div>
 
                     <div class="col-6">
-                        <label class="form-label" for="osFilterDataFimMobile">Abertura ate</label>
+                        <label class="form-label" for="osFilterDataFimMobile">Abertura até</label>
                         <input type="date" id="osFilterDataFimMobile" data-filter-field="data_fim" class="form-control" value="<?= esc((string) ($listFilters['data_fim'] ?? '')) ?>">
                     </div>
 
                     <div class="col-6">
-                        <label class="form-label" for="osFilterValorMinMobile">Valor minimo</label>
+                        <label class="form-label" for="osFilterValorMinMobile">Valor mínimo</label>
                         <input type="text" id="osFilterValorMinMobile" data-filter-field="valor_min" class="form-control mask-money" placeholder="0,00" value="<?= esc((string) ($listFilters['valor_min'] ?? '')) ?>">
                     </div>
 
                     <div class="col-6">
-                        <label class="form-label" for="osFilterValorMaxMobile">Valor maximo</label>
+                        <label class="form-label" for="osFilterValorMaxMobile">Valor máximo</label>
                         <input type="text" id="osFilterValorMaxMobile" data-filter-field="valor_max" class="form-control mask-money" placeholder="0,00" value="<?= esc((string) ($listFilters['valor_max'] ?? '')) ?>">
                     </div>
                 </div>
@@ -515,7 +515,7 @@ if ($statusClosedSelected !== '') {
                             <th>Datas</th>
                             <th>Status</th>
                             <th>Valor Total</th>
-                            <th>Acoes</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -528,7 +528,7 @@ if ($statusClosedSelected !== '') {
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl modal-fullscreen-md-down">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="osCreateModalTitle">Nova Ordem de Servico</h5>
+                    <h5 class="modal-title" id="osCreateModalTitle">Nova Ordem de Serviço</h5>
                     <button type="button" class="btn-close ms-auto" id="osCreateModalCloseBtn" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body p-0 position-relative">
@@ -536,7 +536,7 @@ if ($statusClosedSelected !== '') {
                         <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
                         <span>Carregando...</span>
                     </div>
-                    <iframe id="osCreateModalFrame" title="Nova Ordem de Servico" class="dashboard-os-modal-frame" src="about:blank"></iframe>
+                    <iframe id="osCreateModalFrame" title="Nova Ordem de Serviço" class="dashboard-os-modal-frame" src="about:blank"></iframe>
                 </div>
             </div>
         </div>
@@ -618,7 +618,7 @@ if ($statusClosedSelected !== '') {
                                 </div>
                                 <div class="os-photo-viewer-empty d-none" id="osPhotosEntryEmpty">
                                     <i class="bi bi-camera text-muted"></i>
-                                    <span>Nenhuma foto foi registrada na abertura desta ordem de servico.</span>
+                                    <span>Nenhuma foto foi registrada na abertura desta ordem de serviço.</span>
                                 </div>
                                 <div class="os-photo-viewer-grid" id="osPhotosEntryGrid"></div>
                             </div>
@@ -643,7 +643,7 @@ if ($statusClosedSelected !== '') {
                             <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
                                 <div>
                                     <div class="fw-semibold fs-4" id="osDatesModalNumero">-</div>
-                                    <div class="small text-muted mt-1">Atualize apenas a previsao sem sair da listagem. Entrada e entrega seguem o fluxo operacional correto.</div>
+                                    <div class="small text-muted mt-1">Atualize apenas a previsão sem sair da listagem. Entrada e entrega seguem o fluxo operacional correto.</div>
                                 </div>
                                 <div class="os-status-modal-badges" id="osDatesModalBadges"></div>
                             </div>
@@ -693,7 +693,7 @@ if ($statusClosedSelected !== '') {
                                     <div class="os-status-modal-section">
                                         <label class="form-label" for="osDatesModalEntrega">Entrega</label>
                                         <input type="text" class="form-control" id="osDatesModalEntrega" value="-" readonly disabled>
-                                        <div class="form-text">A data de entrega e controlada automaticamente pela mudanca de status correta da OS.</div>
+                                        <div class="form-text">A data de entrega é controlada automaticamente pela mudança de status correta da OS.</div>
                                     </div>
 
                                     <div class="os-dates-status-note">
@@ -720,11 +720,11 @@ if ($statusClosedSelected !== '') {
                                             <strong id="osDatesModalEntregaAtual">-</strong>
                                         </div>
                                         <div class="os-inline-meta-item">
-                                            <span class="os-inline-meta-label">Dias entre entrada e previsao</span>
+                                            <span class="os-inline-meta-label">Dias entre entrada e previsão</span>
                                             <strong id="osDatesModalPrazoDias">-</strong>
                                         </div>
                                     </div>
-                                    <div class="form-text">A listagem sera atualizada automaticamente apos salvar.</div>
+                                    <div class="form-text">A listagem será atualizada automaticamente após salvar.</div>
                                 </div>
                             </div>
                         </div>
@@ -784,12 +784,12 @@ if ($statusClosedSelected !== '') {
                                         <div class="os-status-modal-section-title">Resumo financeiro</div>
                                         <div class="os-budget-metrics">
                                             <div class="os-budget-metric-card">
-                                                <span class="os-budget-metric-label">Mao de obra</span>
+                                                <span class="os-budget-metric-label">Mão de obra</span>
                                                 <strong id="osBudgetModalMaoObra">R$ 0,00</strong>
                                             </div>
                                             <div class="os-budget-metric-card">
-                                                <span class="os-budget-metric-label">Pecas</span>
-                                                <strong id="osBudgetModalPecas">R$ 0,00</strong>
+                                                <span class="os-budget-metric-label">Peças</span>
+                                                <strong id="osBudgetModalPeças">R$ 0,00</strong>
                                             </div>
                                             <div class="os-budget-metric-card">
                                                 <span class="os-budget-metric-label">Subtotal</span>
@@ -880,7 +880,7 @@ if ($statusClosedSelected !== '') {
                                         <div class="os-status-context-title">Equipamento</div>
                                         <div class="os-status-context-name" id="osStatusModalEquipmentName">-</div>
                                         <div class="os-status-context-meta" id="osStatusModalEquipmentMeta">Tipo: -</div>
-                                        <div class="os-status-context-meta" id="osStatusModalEquipmentSerial">N de serie: -</div>
+                                        <div class="os-status-context-meta" id="osStatusModalEquipmentSerial">Nº de série: -</div>
                                     </div>
                                 </div>
                             </div>
@@ -892,17 +892,17 @@ if ($statusClosedSelected !== '') {
                                     <ul class="nav nav-pills os-status-modal-tabs" id="osStatusModalTabs" role="tablist">
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link active" id="osStatusTabQuickBtn" data-bs-toggle="pill" data-bs-target="#osStatusTabQuick" type="button" role="tab" aria-controls="osStatusTabQuick" aria-selected="true">
-                                                Acoes rapidas
+                                                Ações rápidas
                                             </button>
                                         </li>
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link" id="osStatusTabSolutionBtn" data-bs-toggle="pill" data-bs-target="#osStatusTabSolution" type="button" role="tab" aria-controls="osStatusTabSolution" aria-selected="false">
-                                                Solucao e diagnostico
+                                                Solução e diagnóstico
                                             </button>
                                         </li>
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link" id="osStatusTabBudgetBtn" data-bs-toggle="pill" data-bs-target="#osStatusTabBudget" type="button" role="tab" aria-controls="osStatusTabBudget" aria-selected="false">
-                                                Gerenciamento do Orcamento
+                                                Gerenciamento do Orçamento
                                             </button>
                                         </li>
                                     </ul>
@@ -910,10 +910,10 @@ if ($statusClosedSelected !== '') {
                                     <div class="tab-content os-status-modal-tab-content" id="osStatusModalTabContent">
                                         <div class="tab-pane fade show active" id="osStatusTabQuick" role="tabpanel" aria-labelledby="osStatusTabQuickBtn" tabindex="0">
                                             <div class="os-status-modal-section">
-                                                <div class="os-status-modal-section-title">Acoes rapidas</div>
+                                                <div class="os-status-modal-section-title">Ações rápidas</div>
                                                 <div class="os-status-modal-quick-actions">
                                                     <button type="button" class="btn btn-glow" id="osStatusModalQuickNext" disabled>
-                                                        <i class="bi bi-arrow-right-circle me-1"></i>Proxima etapa
+                                                        <i class="bi bi-arrow-right-circle me-1"></i>Próxima etapa
                                                     </button>
                                                     <button type="button" class="btn btn-outline-danger" id="osStatusModalQuickCancel" disabled>
                                                         <i class="bi bi-x-circle me-1"></i>Cancelar
@@ -931,17 +931,17 @@ if ($statusClosedSelected !== '') {
                                                 <select id="osStatusModalSelect" name="status" class="form-select" required>
                                                     <option value="">Selecione um status</option>
                                                 </select>
-                                                <div class="form-text">A lista respeita o fluxo de trabalho configurado para avancar, retornar etapas ou cancelar o atendimento.</div>
+                                                <div class="form-text">A lista respeita o fluxo de trabalho configurado para avançar, retornar etapas ou cancelar o atendimento.</div>
                                             </div>
 
                                             <div class="os-status-modal-section">
-                                                <label class="form-label" for="osStatusModalObservacao">Observacoes</label>
+                                                <label class="form-label" for="osStatusModalObservacao">Observações</label>
                                                 <textarea
                                                     id="osStatusModalObservacao"
                                                     name="observacao_status"
                                                     class="form-control"
                                                     rows="4"
-                                                    placeholder="Registre contexto da mudanca, combinados com o cliente ou justificativa do cancelamento."
+                                                    placeholder="Registre contexto da mudança, combinados com o cliente ou justificativa do cancelamento."
                                                 ></textarea>
                                             </div>
 
@@ -949,17 +949,17 @@ if ($statusClosedSelected !== '') {
                                                 <div class="form-check form-switch">
                                                     <input class="form-check-input" type="checkbox" role="switch" id="osStatusModalNotify" name="comunicar_cliente" value="1">
                                                     <label class="form-check-label" for="osStatusModalNotify">
-                                                        Notificar o cliente sobre esta mudanca
+                                                        Notificar o cliente sobre esta mudança
                                                     </label>
                                                 </div>
-                                                <div class="form-text" id="osStatusModalNotifyHelp">O cliente sera comunicado apenas se voce mantiver esta opcao ativa.</div>
+                                                <div class="form-text" id="osStatusModalNotifyHelp">O cliente será comunicado apenas se você mantiver esta opção ativa.</div>
                                             </div>
                                         </div>
 
                                         <div class="tab-pane fade" id="osStatusTabSolution" role="tabpanel" aria-labelledby="osStatusTabSolutionBtn" tabindex="0">
                                             <div class="os-status-modal-section">
-                                                <div class="os-status-modal-section-title">Solucao e diagnostico</div>
-                                                <p class="small text-muted mb-0">Registre os procedimentos executados e consolide a solucao aplicada sem sair da mudanca de status.</p>
+                                                <div class="os-status-modal-section-title">Solução e diagnóstico</div>
+                                                <p class="small text-muted mb-0">Registre os procedimentos executados e consolide a solução aplicada sem sair da mudança de status.</p>
                                             </div>
 
                                             <div class="os-status-modal-solution-card">
@@ -976,12 +976,12 @@ if ($statusClosedSelected !== '') {
                                                 </div>
                                                 <textarea name="procedimentos_executados" id="osStatusModalProcedimentosInput" class="d-none"></textarea>
                                                 <div id="osStatusModalProcedimentosLista" class="os-status-modal-procedure-list"></div>
-                                                <small class="text-muted d-block mt-2">Cada insercao registra automaticamente data/hora e tecnico selecionado.</small>
+                                                <small class="text-muted d-block mt-2">Cada inserção registra automaticamente data/hora e técnico selecionado.</small>
                                             </div>
 
                                             <div class="os-status-modal-solution-grid">
                                                 <div class="os-status-modal-field-card">
-                                                    <label class="form-label fw-semibold" for="osStatusModalSolucaoInput">Solucao aplicada</label>
+                                                    <label class="form-label fw-semibold" for="osStatusModalSolucaoInput">Solução aplicada</label>
                                                     <textarea name="solucao_aplicada" id="osStatusModalSolucaoInput" class="form-control" rows="5"></textarea>
                                                 </div>
                                                 <div class="os-status-modal-field-card">
@@ -994,7 +994,7 @@ if ($statusClosedSelected !== '') {
                                         <div class="tab-pane fade" id="osStatusTabBudget" role="tabpanel" aria-labelledby="osStatusTabBudgetBtn" tabindex="0">
                                             <div id="osStatusModalBudgetPanel" class="os-status-modal-budget-host">
                                                 <div class="card os-tab-card os-status-modal-budget-card">
-                                                    <div class="card-body p-4 text-muted small">Carregando gerenciamento do orcamento...</div>
+                                                    <div class="card-body p-4 text-muted small">Carregando gerenciamento do orçamento...</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1004,7 +1004,7 @@ if ($statusClosedSelected !== '') {
 
                             <div class="col-12 col-xl-5">
                                 <div class="os-status-modal-panel os-status-modal-workflow">
-                                    <div class="os-status-modal-section-title">Historico e progresso</div>
+                                    <div class="os-status-modal-section-title">Histórico e progresso</div>
                                     <p class="small text-muted mb-0">Etapas percorridas, etapa atual e provaveis proximos movimentos.</p>
 
                                     <div id="osStatusModalTimeline" class="os-status-modal-timeline-wrap">
@@ -1013,9 +1013,9 @@ if ($statusClosedSelected !== '') {
 
                                     <div class="os-status-modal-history-wrap" id="osStatusModalHistoryWrap">
                                         <div class="os-status-modal-divider"></div>
-                                        <div class="os-status-modal-section-title">Ultimas movimentacoes</div>
+                                        <div class="os-status-modal-section-title">Últimas movimentações</div>
                                         <div id="osStatusModalHistoryList" class="os-status-modal-history-list">
-                                            <p class="text-muted small mb-0">Sem historico recente.</p>
+                                            <p class="text-muted small mb-0">Sem histórico recente.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1053,7 +1053,7 @@ window.osListConfig = {
     labels: <?= json_encode($labelsMap, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
 };
 </script>
-<script src="<?= base_url('assets/js/os-list-filters.js') ?>"></script>
+<script src="<?= base_url('assets/js/os-list-filters.js') ?>?v=<?= urlencode((string) @filemtime(FCPATH . 'assets/js/os-list-filters.js')) ?>"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     if (typeof bootstrap === 'undefined') {
@@ -1207,7 +1207,7 @@ document.addEventListener('DOMContentLoaded', function () {
         loadingId: 'osCreateModalLoading',
         titleId: 'osCreateModalTitle',
         triggerSelector: '[data-os-modal-role="create"][data-os-modal-url]',
-        defaultTitle: 'Nova Ordem de Servico',
+        defaultTitle: 'Nova Ordem de Serviço',
         closeButtonSelector: '#osCreateModalCloseBtn',
         closeConfirmOptions: {
             icon: 'warning',

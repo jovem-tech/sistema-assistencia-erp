@@ -20,7 +20,7 @@ $categoriaOverrideUrl = base_url('precificacao/categoria-override');
 ?>
 
 <div class="page-header">
-    <h2><i class="bi bi-<?= $isEdit ? 'pencil' : 'plus-lg' ?> me-2"></i><?= esc((string) ($title ?? 'Peca')) ?></h2>
+    <h2><i class="bi bi-<?= $isEdit ? 'pencil' : 'plus-lg' ?> me-2"></i><?= esc((string) ($title ?? 'Peça')) ?></h2>
     <div class="d-flex gap-2">
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('estoque')" title="Ajuda sobre Estoque">
             <i class="bi bi-question-circle me-1"></i>Ajuda
@@ -34,11 +34,11 @@ $categoriaOverrideUrl = base_url('precificacao/categoria-override');
         <form action="<?= $isEdit ? base_url('estoque/atualizar/' . $peca['id']) : base_url('estoque/salvar') ?>" method="POST">
             <div class="row g-3 mb-4">
                 <div class="col-md-3">
-                    <label class="form-label">Codigo</label>
+                    <label class="form-label">Código</label>
                     <input type="text" name="codigo" class="form-control" value="<?= $isEdit ? esc((string) ($peca['codigo'] ?? '')) : esc((string) ($codigo ?? '')) ?>">
                 </div>
                 <div class="col-md-5">
-                    <label class="form-label">Nome *</label>
+                    <label class="form-label">Nome <span class="text-danger">*</span></label>
                     <input type="text" name="nome" class="form-control" required value="<?= $isEdit ? esc((string) ($peca['nome'] ?? '')) : '' ?>">
                 </div>
                 <div class="col-md-4">
@@ -56,7 +56,7 @@ $categoriaOverrideUrl = base_url('precificacao/categoria-override');
 
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
-                    <label class="form-label">Tipo Equipamento</label>
+                    <label class="form-label">Tipo de Equipamento</label>
                     <input
                         type="text"
                         name="tipo_equipamento"
@@ -73,11 +73,11 @@ $categoriaOverrideUrl = base_url('precificacao/categoria-override');
                     </datalist>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Preco Custo (R$) *</label>
+                    <label class="form-label">Preço de Custo (R$) <span class="text-danger">*</span></label>
                     <input type="number" step="0.01" name="preco_custo" class="form-control" required value="<?= $isEdit ? (float) ($peca['preco_custo'] ?? 0) : '' ?>">
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Preco Venda (R$) *</label>
+                    <label class="form-label">Preço de Venda (R$) <span class="text-danger">*</span></label>
                     <input type="number" step="0.01" name="preco_venda" class="form-control" required value="<?= $isEdit ? (float) ($peca['preco_venda'] ?? 0) : '' ?>">
                 </div>
                 <div class="col-12">
@@ -90,16 +90,16 @@ $categoriaOverrideUrl = base_url('precificacao/categoria-override');
                         data-respeitar-venda="<?= $precificacaoRespeitarPrecoVenda ? '1' : '0' ?>"
                     >
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-                            <strong class="mb-0">Simulacao de peca instalada (precificacao automatica)</strong>
+                            <strong class="mb-0">Simulação de peça instalada (precificação automática)</strong>
                             <span class="badge text-bg-primary" id="pecaPricingConfigBadge">Base custo</span>
                         </div>
                         <div class="small text-muted mb-3">
                             Configuração atual: encargos <strong id="pecaPricingEncargosPct">0,00%</strong> + margem <strong id="pecaPricingMargemPct">0,00%</strong>.<br>
-                            Essa regra e aplicada no orcamento/OS para garantir piso minimo da peca instalada.
+                            Essa regra é aplicada no orçamento/OS para garantir piso mínimo da peça instalada.
                         </div>
                         <div class="row g-2 align-items-end">
                             <div class="col-lg-3 col-md-6">
-                                <label class="form-label form-label-sm text-muted mb-1">Preco base aplicado</label>
+                                <label class="form-label form-label-sm text-muted mb-1">Preço base aplicado</label>
                                 <input type="text" class="form-control form-control-sm" id="pecaPricingBaseValor" readonly>
                             </div>
                             <div class="col-lg-3 col-md-6">
@@ -111,14 +111,14 @@ $categoriaOverrideUrl = base_url('precificacao/categoria-override');
                                 <input type="text" class="form-control form-control-sm" id="pecaPricingMargemValor" readonly>
                             </div>
                             <div class="col-lg-3 col-md-6">
-                                <label class="form-label form-label-sm text-muted mb-1">Recomendado instalado</label>
+                                <label class="form-label form-label-sm text-muted mb-1">Preço recomendado instalado</label>
                                 <input type="text" class="form-control form-control-sm fw-semibold" id="pecaPricingRecomendadoValor" readonly>
                             </div>
                         </div>
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
                             <small id="pecaPricingAviso" class="text-muted mb-0"></small>
                             <button type="button" class="btn btn-sm btn-outline-primary" id="btnAplicarPrecoRecomendado">
-                                <i class="bi bi-magic me-1"></i>Usar recomendado no preco de venda
+                                <i class="bi bi-magic me-1"></i>Usar recomendado no preço de venda
                             </button>
                         </div>
                     </div>
@@ -131,15 +131,15 @@ $categoriaOverrideUrl = base_url('precificacao/categoria-override');
                     <input type="number" name="quantidade_atual" class="form-control" value="<?= $isEdit ? (int) ($peca['quantidade_atual'] ?? 0) : 0 ?>">
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Estoque Min.</label>
+                    <label class="form-label">Estoque Mín.</label>
                     <input type="number" name="estoque_minimo" class="form-control" value="<?= $isEdit ? (int) ($peca['estoque_minimo'] ?? 1) : 1 ?>">
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Estoque Max.</label>
+                    <label class="form-label">Estoque Máx.</label>
                     <input type="number" name="estoque_maximo" class="form-control" value="<?= $isEdit ? esc((string) ($peca['estoque_maximo'] ?? '')) : '' ?>">
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Cod. Fabricante</label>
+                    <label class="form-label">Cód. Fabricante</label>
                     <input type="text" name="codigo_fabricante" class="form-control" value="<?= $isEdit ? esc((string) ($peca['codigo_fabricante'] ?? '')) : '' ?>">
                 </div>
                 <div class="col-md-3">
@@ -150,18 +150,18 @@ $categoriaOverrideUrl = base_url('precificacao/categoria-override');
 
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label class="form-label">Localizacao</label>
+                    <label class="form-label">Localização</label>
                     <input type="text" name="localizacao" class="form-control" placeholder="Ex: Prateleira A3" value="<?= $isEdit ? esc((string) ($peca['localizacao'] ?? '')) : '' ?>">
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Modelos Compativeis</label>
+                    <label class="form-label">Modelos Compatíveis</label>
                     <textarea name="modelos_compativeis" class="form-control" rows="2"><?= $isEdit ? esc((string) ($peca['modelos_compativeis'] ?? '')) : '' ?></textarea>
                 </div>
             </div>
 
             <div class="row g-3 mb-4">
                 <div class="col-12">
-                    <label class="form-label">Observacoes</label>
+                    <label class="form-label">Observações</label>
                     <textarea name="observacoes" class="form-control" rows="2"><?= $isEdit ? esc((string) ($peca['observacoes'] ?? '')) : '' ?></textarea>
                 </div>
             </div>
@@ -240,16 +240,16 @@ $categoriaOverrideUrl = base_url('precificacao/categoria-override');
         if (avisoEl) {
             if (baseConfig === 'venda') {
                 avisoEl.className = 'text-warning mb-0';
-                avisoEl.textContent = 'Base configurada como venda: o recomendado considera percentual sobre o proprio preco de venda.';
+                avisoEl.textContent = 'Base configurada como venda: o recomendado considera percentual sobre o próprio preço de venda.';
             } else if (precoVenda > 0 && precoVenda < recomendado) {
                 avisoEl.className = 'text-warning mb-0';
-                avisoEl.textContent = `Preco de venda atual esta abaixo do recomendado para peca instalada (${moeda.format(recomendado)}).`;
+                avisoEl.textContent = `Preço de venda atual está abaixo do recomendado para peça instalada (${moeda.format(recomendado)}).`;
             } else if (precoVenda > 0 && precoVenda >= recomendado) {
                 avisoEl.className = 'text-success mb-0';
-                avisoEl.textContent = 'Preco de venda esta coerente com o recomendado para peca instalada.';
+                avisoEl.textContent = 'Preço de venda está coerente com o recomendado para peça instalada.';
             } else {
                 avisoEl.className = 'text-muted mb-0';
-                avisoEl.textContent = 'Preencha custo e venda para visualizar comparativo completo.';
+                avisoEl.textContent = 'Preencha custo e venda para visualizar o comparativo completo.';
             }
         }
 
@@ -257,7 +257,7 @@ $categoriaOverrideUrl = base_url('precificacao/categoria-override');
             const bloquearAplicacao = baseConfig === 'venda';
             btnAplicar.disabled = bloquearAplicacao;
             btnAplicar.title = bloquearAplicacao
-                ? 'Aplicacao automatica indisponivel quando a base de calculo esta em venda.'
+                ? 'Aplicação automática indisponível quando a base de cálculo está em venda.'
                 : '';
         }
 
@@ -306,8 +306,8 @@ $categoriaOverrideUrl = base_url('precificacao/categoria-override');
             if (window.Swal && typeof window.Swal.fire === 'function') {
                 await window.Swal.fire({
                     icon: 'info',
-                    title: 'Ação indisponivel para base venda',
-                    text: 'Para aplicacao automatica no cadastro da peca, use a base de precificacao em custo.',
+                    title: 'Ação indisponível para base venda',
+                    text: 'Para aplicação automática no cadastro da peça, use a base de precificação em custo.',
                     confirmButtonText: 'Entendi',
                 });
             }
@@ -319,8 +319,8 @@ $categoriaOverrideUrl = base_url('precificacao/categoria-override');
         if (window.Swal && typeof window.Swal.fire === 'function') {
             await window.Swal.fire({
                 icon: 'success',
-                title: 'Preco recomendado aplicado',
-                text: 'O valor recomendado foi aplicado no campo Preco Venda.',
+                title: 'Preço recomendado aplicado',
+                text: 'O valor recomendado foi aplicado no campo Preço de Venda.',
                 toast: true,
                 position: 'top-end',
                 timer: 2200,
@@ -343,7 +343,7 @@ $categoriaOverrideUrl = base_url('precificacao/categoria-override');
 
     btnAplicar?.addEventListener('click', () => {
         aplicarRecomendado().catch((error) => {
-            console.error('[Estoque] Falha ao aplicar preco recomendado.', error);
+            console.error('[Estoque] Falha ao aplicar preço recomendado.', error);
         });
     });
 

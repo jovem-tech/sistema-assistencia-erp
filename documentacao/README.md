@@ -1,15 +1,15 @@
 # Documentacao - Sistema de Assistencia Tecnica
 
 > Jovem Tech  
-> ERP atual: `2.15.18`  
+> ERP atual: `2.16.5`
 > App mobile/PWA: `0.4.2`  
-> Atualizado em `26/04/2026`
+> Atualizado em `27/04/2026`
 
 ## Objetivo
 
 Este diretorio concentra a documentacao funcional, tecnica e operacional do ERP da assistencia tecnica.
 
-O indice abaixo foi revisado para refletir a release `2.15.18`, com destaque para a edicao da OS com exclusao reativa das fotos persistidas de entrada, para o resumo embutido do orcamento na aba `Pecas e Orcamento`, para o modal de criacao/edicao de orcamento sem sair da tela da OS, para o ajuste do select de prazo na aba `Dados Operacionais`, para o refinamento manual das larguras da tabela `/os`, para o ajuste fino das colunas `Cliente` e `Equipamento`, para o aperto adicional da borda direita de `Cliente`, para a centralizacao visual do nome do cliente na celula, para o modal de status com abas internas, para a notificacao web em tempo real quando o cliente responde o orcamento pelo link publico e para o hotfix de navegação correta ao clicar nessa notificacao.
+O indice abaixo foi revisado para refletir a release `2.16.5`, com destaque para o restauro da rota `/os` apos um conjunto de parse errors introduzidos durante a auditoria de pt-BR, para a retomada da edicao e da visualizacao de OS sem erro `500`, para a limpeza adicional de labels e mensagens legadas em `Ordens de Servico` e para a normalizacao complementar do menu lateral do ERP.
 
 ## Estrutura
 
@@ -50,7 +50,7 @@ O indice abaixo foi revisado para refletir a release `2.15.18`, com destaque par
 ### Versao e release atual
 
 - Historico oficial de versoes do ERP: `07-novas-implementacoes/historico-de-versoes.md`
-- Release atual: `07-novas-implementacoes/2026-04-26-release-v2.15.18-fix-rota-notificacao-orcamento.md`
+- Release atual: `07-novas-implementacoes/2026-04-27-release-v2.16.5-restauro-os-ptbr-listagem.md`
 - Registro da release anterior na VPS: `10-deploy/2026-04-23-atualizacao-vps-release-v2.15.0.md`
 
 ### App mobile/PWA
@@ -88,7 +88,24 @@ O indice abaixo foi revisado para refletir a release `2.15.18`, com destaque par
 - a navbar ganhou um sino ao lado do perfil com feed autenticado, stream SSE e fallback por polling para exibir essas notificacoes sem recarregar a pagina;
 - a listagem `/os` agora escuta o evento `orcamento.public_status_changed`, recarrega a grade automaticamente e atualiza o contexto do modal de status quando ele estiver aberto;
 - o clique na notificacao da navbar passou a abrir a rota correta do ERP mesmo em ambientes com `index.php` e subdiretorio, sem cair em `404 Not Found`;
-- indice principal sincronizado com a release `2.15.18` e com a nova nota tecnica do hotfix de rota das notificacoes.
+- a visualizacao `/os/visualizar/{id}` passou a concentrar geracao/listagem de PDFs e envios por `WhatsApp` e `e-mail` dentro da nova aba `Documentos`;
+- o backend da OS ganhou a rota `POST /os/email/{id}/enviar`, usando `ErpMailService` para anexar um PDF ja gerado da ordem;
+- o tipo `Orcamento` dentro da aba `Documentos` passou a reutilizar exatamente o PDF oficial emitido por `Orcamentos`, incluindo o link/botao de aprovacao publica no documento;
+- quando a OS ainda nao possui orcamento vinculado e o operador escolhe gerar o PDF de `Orcamento`, a tela exibe confirmacao SweetAlert2 e pode abrir imediatamente o modal embutido de criacao do orcamento;
+- ao lado do download do PDF gerado, a OS agora oferece visualizacao inline em modal para leitura rapida do documento;
+- `Gestao de Conhecimento` passou a expor os submenus `Modelos PDF` e `Templates WhatsApp`, permitindo criar, editar, ativar e desativar modelos documentais e mensagens padrao reutilizadas pela aba `Documentos`;
+- os nomes canonicos dos status da OS e os labels centrais do modulo de orcamentos foram normalizados para pt-BR, e um arquivo legado da camada `app/` foi saneado para UTF-8 valido;
+- a listagem `/os`, o modal `Alterar status da OS` e a visualizacao `/os/visualizar/{id}` receberam normalizacao complementar de labels em pt-BR, cobrindo termos como `Ações rápidas`, `Solução e diagnóstico`, `Histórico e progresso`, `Últimas movimentações`, `Técnico`, `Orçamento`, `Previsão` e `Conclusão`;
+- o fechamento da `Nova OS` pela listagem continua exigindo confirmacao, mas agora o SweetAlert2 sobe corretamente acima dos modais iframe e backdrops empilhados;
+- o modulo `Serviços` teve as telas de listagem, importacao CSV e cadastro normalizadas em pt-BR nos titulos, labels, botoes e mensagens operacionais;
+- o modulo `Estoque de Pecas` recebeu a mesma normalizacao em pt-BR nas telas de listagem, importacao CSV, cadastro/edicao, movimentacoes e mensagens do controller;
+- a tela de edicao da OS, a visualizacao da OS, o formulario de Orcamentos, a visualizacao de Orcamentos e as mensagens reativas da listagem `/os` passaram por uma auditoria complementar de labels e mensagens em pt-BR/UTF-8;
+- a `Central de Mensagens` recebeu limpeza adicional de alertas, notificacoes e textos de modal para reduzir exibicao de frases legadas sem acentuacao;
+- o fallback do nome do sistema nos layouts `main.php` e `embed.php` foi alinhado para reduzir variacao textual entre ambientes;
+- a listagem `/os` deixou de retornar `500` depois da restauracao sintatica de `app/Controllers/Os.php`, `app/Views/os/index.php`, `app/Views/os/form.php` e `app/Views/os/show.php`;
+- a pagina de edicao e a visualizacao da OS receberam nova limpeza de labels, avisos e mensagens em pt-BR, reduzindo exibicao de textos legados com `?` no lugar de acentos;
+- o menu lateral voltou a exibir corretamente rotulos como `Ordens de Servico`, `Servicos`, `Estoque de Pecas` e `Gestao de Conhecimento` em ambientes afetados por texto mojibake;
+- indice principal sincronizado com a release `2.16.5` e com a nova nota tecnica de restauro da listagem `/os`.
 
 ## Regra editorial
 

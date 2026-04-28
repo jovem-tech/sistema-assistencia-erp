@@ -326,6 +326,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->post('os/status/(:num)',    'Os::updateStatus/$1',    ['filter' => 'permission:os:editar']);
     $routes->get('os/imprimir/(:num)',   'Os::print/$1',           ['filter' => 'permission:os:visualizar']);
     $routes->post('os/whatsapp/(:num)',  'Os::sendWhatsApp/$1',    ['filter' => 'permission:os:editar']);
+    $routes->post('os/email/(:num)/enviar', 'Os::sendEmail/$1',    ['filter' => 'permission:os:editar']);
     $routes->post('os/pdf/(:num)/gerar', 'Os::generatePdf/$1',     ['filter' => 'permission:os:visualizar']);
     $routes->post('os/item/salvar',       'Os::addItem',            ['filter' => 'permission:os:editar']);
     $routes->get('os/item/catalogo',      'Os::itemCatalogSearch',  ['filter' => 'permission:os:editar']);
@@ -340,6 +341,12 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->get('checklists/manutencao',                     'Checklists::manutencao',         ['filter' => 'permission:os:visualizar']);
     $routes->get('checklists/controle-qualidade',             'Checklists::controleQualidade',  ['filter' => 'permission:os:visualizar']);
     $routes->get('checklists/saida',                          'Checklists::saida',              ['filter' => 'permission:os:visualizar']);
+    $routes->get('conhecimento/modelos-pdf',                  'ConhecimentoTemplates::pdfs',    ['filter' => 'permission:os:editar']);
+    $routes->post('conhecimento/modelos-pdf/salvar',          'ConhecimentoTemplates::savePdf', ['filter' => 'permission:os:editar']);
+    $routes->post('conhecimento/modelos-pdf/toggle/(:num)',   'ConhecimentoTemplates::togglePdf/$1', ['filter' => 'permission:os:editar']);
+    $routes->get('conhecimento/templates-whatsapp',           'ConhecimentoTemplates::whatsapp', ['filter' => 'permission:os:editar']);
+    $routes->post('conhecimento/templates-whatsapp/salvar',   'ConhecimentoTemplates::saveWhatsapp', ['filter' => 'permission:os:editar']);
+    $routes->post('conhecimento/templates-whatsapp/toggle/(:num)', 'ConhecimentoTemplates::toggleWhatsapp/$1', ['filter' => 'permission:os:editar']);
 
     // -- Serviços ----------------------------------------------------------
     $routes->get('servicos',                  'Servicos::index',            ['filter' => 'permission:servicos:visualizar']);

@@ -78,6 +78,7 @@ Consequencia administrativa:
 - quando um status operacional deixar de ter proximo passo principal, o card passa a informar que nao ha fluxo normal sugerido disponivel;
 - quando o operador abrir `Editar` ou `Visualizar orcamento` a partir desse modal, o iframe de detalhes precisa abrir acima da troca de status e com backdrop proprio;
 - se o orcamento alterar a OS por sincronizacao comercial, o resumo do card de orcamento e o contexto do modal precisam continuar coerentes com o workflow configurado.
+- na visualizacao `/os/visualizar/{id}`, a aba `Documentos` agora usa o status atual da OS como contexto para montar envios de PDF por `WhatsApp` e `e-mail`, entao alteracoes no fluxo tambem impactam a comunicacao entregue ao cliente.
 
 ## Reflexo na listagem `/os`
 

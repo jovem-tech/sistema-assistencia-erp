@@ -7,6 +7,7 @@ use App\Models\EstadoFisicoOsModel;
 use App\Models\OsDocumentoModel;
 use App\Models\OsItemModel;
 use App\Models\OsModel;
+use App\Models\OrcamentoModel;
 
 class OsPdfService
 {
@@ -14,6 +15,7 @@ class OsPdfService
     private OsItemModel $itemModel;
     private OsDocumentoModel $documentoModel;
     private PdfBrandingService $pdfBrandingService;
+    private OsPdfTemplateService $templateService;
 
     public function __construct()
     {
@@ -21,18 +23,12 @@ class OsPdfService
         $this->itemModel = new OsItemModel();
         $this->documentoModel = new OsDocumentoModel();
         $this->pdfBrandingService = new PdfBrandingService();
+        $this->templateService = new OsPdfTemplateService();
     }
 
     public function tiposDisponiveis(): array
     {
-        return [
-            'abertura' => 'Comprovante de Abertura',
-            'orcamento' => 'Orcamento',
-            'laudo' => 'Laudo Tecnico',
-            'cobranca_manutencao' => 'Cobranca / Manutencao',
-            'entrega' => 'Comprovante de Entrega',
-            'devolucao_sem_reparo' => 'Devolucao Sem Reparo',
-        ];
+        return $this->templateService->getTemplateOptions();
     }
 
     public function gerar(int $osId, string $tipo, ?int $usuarioId = null): array
@@ -40,28 +36,51 @@ class OsPdfService
         if (!class_exists('Dompdf\\Dompdf')) {
             return [
                 'ok' => false,
-                'message' => 'Biblioteca Dompdf nao instalada. Execute: composer require dompdf/dompdf:^2.0',
+                'message' => 'Biblioteca Dompdf não instalada. Execute: composer require dompdf/dompdf:^2.0',
             ];
         }
 
         $os = $this->osModel->getComplete($osId);
         if (!$os) {
-            return ['ok' => false, 'message' => 'OS nao encontrada para gerar PDF.'];
+            return ['ok' => false, 'message' => 'OS não encontrada para gerar PDF.'];
         }
 
         $tipos = $this->tiposDisponiveis();
         if (!isset($tipos[$tipo])) {
-            return ['ok' => false, 'message' => 'Tipo de documento invalido.'];
+            return ['ok' => false, 'message' => 'Tipo de documento inválido.'];
+        }
+
+        if ($tipo === 'orcamento') {
+            return $this->gerarDocumentoOficialDeOrcamento($osId, $usuarioId);
         }
 
         $payload = $this->buildPayload($osId);
-        $html = view('os/pdf/' . $tipo, [
-            'os' => $os,
-            'payload' => $payload,
-            'branding' => $this->pdfBrandingService->getContext(),
-            'tituloDocumento' => $tipos[$tipo],
-            'geradoEm' => date('d/m/Y H:i:s'),
-        ]);
+        $template = $this->templateService->findByCode($tipo);
+        $legacyViewPath = APPPATH . 'Views/os/pdf/' . $tipo . '.php';
+
+        if ($template !== null && trim((string) ($template['conteudo_html'] ?? '')) !== '') {
+            $conteudoHtml = $this->templateService->renderTemplateHtml($template, $os, $payload);
+            $html = view('os/pdf/template_padrao', [
+                'os' => $os,
+                'branding' => $this->pdfBrandingService->getContext(),
+                'tituloDocumento' => $tipos[$tipo],
+                'geradoEm' => date('d/m/Y H:i:s'),
+                'conteudoHtml' => $conteudoHtml,
+            ]);
+        } elseif (is_file($legacyViewPath)) {
+            $html = view('os/pdf/' . $tipo, [
+                'os' => $os,
+                'payload' => $payload,
+                'branding' => $this->pdfBrandingService->getContext(),
+                'tituloDocumento' => $tipos[$tipo],
+                'geradoEm' => date('d/m/Y H:i:s'),
+            ]);
+        } else {
+            return [
+                'ok' => false,
+                'message' => 'Nenhum modelo PDF ativo foi encontrado para este tipo de documento.',
+            ];
+        }
 
         $folderInfo = $this->ensureFolder((string)$os['numero_os']);
         $versao = $this->nextVersion($osId, $tipo);
@@ -95,6 +114,77 @@ class OsPdfService
             'tipo' => $tipo,
             'versao' => $versao,
         ];
+    }
+
+    public function syncBudgetDocumentsForOs(int $osId, ?array $orcamento = null): void
+    {
+        if ($osId <= 0 || !$this->documentoModel->db->tableExists('os_documentos')) {
+            return;
+        }
+
+        $orcamentoModel = new OrcamentoModel();
+        $orcamentoService = new OrcamentoService();
+
+        if ($orcamento === null || (int) ($orcamento['id'] ?? 0) <= 0) {
+            if (!$orcamentoModel->db->tableExists('orcamentos')) {
+                return;
+            }
+
+            $orcamento = $orcamentoModel
+                ->select('id, numero')
+                ->where('os_id', $osId)
+                ->orderBy('created_at', 'DESC')
+                ->orderBy('id', 'DESC')
+                ->first();
+        }
+
+        if (!is_array($orcamento) || (int) ($orcamento['id'] ?? 0) <= 0) {
+            return;
+        }
+
+        $orcamentoId = (int) ($orcamento['id'] ?? 0);
+        $numero = trim((string) ($orcamento['numero'] ?? ''));
+        if ($numero === '') {
+            $numero = $orcamentoService->ensureNumero($orcamentoModel, $orcamentoId);
+        }
+        if ($numero === '') {
+            return;
+        }
+
+        $slug = strtolower(preg_replace('/[^a-z0-9_]+/i', '_', $numero) ?? 'orcamento');
+        $slug = trim($slug, '_') ?: 'orcamento';
+        $folderPath = rtrim(FCPATH, '/\\') . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'orcamentos' . DIRECTORY_SEPARATOR . 'ORC_' . $slug;
+        if (!is_dir($folderPath)) {
+            return;
+        }
+
+        $files = glob($folderPath . DIRECTORY_SEPARATOR . 'orcamento_v*.pdf') ?: [];
+        foreach ($files as $filePath) {
+            $fileName = basename((string) $filePath);
+            if (preg_match('/orcamento_v(\d+)\.pdf$/i', $fileName, $matches) !== 1) {
+                continue;
+            }
+
+            $relative = str_replace('\\', '/', ltrim(substr((string) $filePath, strlen(rtrim(FCPATH, '/\\'))), '/\\'));
+            $exists = $this->documentoModel
+                ->where('os_id', $osId)
+                ->where('tipo_documento', 'orcamento')
+                ->where('arquivo', $relative)
+                ->countAllResults();
+
+            if ($exists > 0) {
+                continue;
+            }
+
+            $this->documentoModel->insert([
+                'os_id' => $osId,
+                'tipo_documento' => 'orcamento',
+                'arquivo' => $relative,
+                'versao' => (int) ($matches[1] ?? 1),
+                'hash_sha1' => sha1_file($filePath) ?: null,
+                'gerado_por' => null,
+            ]);
+        }
     }
 
     private function buildPayload(int $osId): array
@@ -148,7 +238,7 @@ class OsPdfService
                 'valor_final' => (float) ($os['valor_final'] ?? 0),
                 'valor_final_label' => formatMoney((float) ($os['valor_final'] ?? 0)),
                 'forma_pagamento' => $formaPagamento !== '' ? $formaPagamento : 'A combinar',
-                'status_atual' => $statusAtual !== '' ? ucwords(str_replace('_', ' ', $statusAtual)) : '-',
+                'status_atual' => $statusAtual !== '' ? $this->templateService->labelForStatusCode($statusAtual) : '-',
                 'garantia_label' => $this->buildGarantiaLabel($garantiaDias, $garantiaValidade),
                 'data_entrega_label' => $this->formatDateTimeLabel((string) ($os['data_entrega'] ?? '')),
                 'prazo_label' => $this->formatDateTimeLabel((string) ($os['data_previsao'] ?? '')),
@@ -176,7 +266,7 @@ class OsPdfService
             $parts[] = 'ate ' . $this->formatDateTimeLabel($garantiaValidade, false);
         }
 
-        return !empty($parts) ? implode(' | ', $parts) : 'Nao informada';
+        return !empty($parts) ? implode(' | ', $parts) : 'Não informada';
     }
 
     private function formatDateTimeLabel(string $value, bool $withTime = true): string
@@ -218,5 +308,67 @@ class OsPdfService
             ->first();
 
         return (int)($last['versao'] ?? 0) + 1;
+    }
+
+    private function gerarDocumentoOficialDeOrcamento(int $osId, ?int $usuarioId = null): array
+    {
+        $orcamentoModel = new OrcamentoModel();
+        if (!$orcamentoModel->db->tableExists('orcamentos')) {
+            return [
+                'ok' => false,
+                'needs_budget' => true,
+                'message' => 'Crie primeiro um orçamento vinculado à OS para gerar este PDF.',
+            ];
+        }
+
+        $orcamento = $orcamentoModel
+            ->select('id, numero')
+            ->where('os_id', $osId)
+            ->orderBy('created_at', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->first();
+
+        if (!$orcamento) {
+            return [
+                'ok' => false,
+                'needs_budget' => true,
+                'message' => 'Crie primeiro um orçamento vinculado à OS para gerar este PDF.',
+            ];
+        }
+
+        $pdfResult = (new OrcamentoPdfService())->gerar((int) ($orcamento['id'] ?? 0), $usuarioId);
+        if (empty($pdfResult['ok'])) {
+            return $pdfResult;
+        }
+
+        $relative = (string) ($pdfResult['relative'] ?? '');
+        $exists = $relative !== ''
+            ? $this->documentoModel
+                ->where('os_id', $osId)
+                ->where('tipo_documento', 'orcamento')
+                ->where('arquivo', $relative)
+                ->countAllResults()
+            : 0;
+
+        if ($relative !== '' && $exists === 0) {
+            $this->documentoModel->insert([
+                'os_id' => $osId,
+                'tipo_documento' => 'orcamento',
+                'arquivo' => $relative,
+                'versao' => (int) ($pdfResult['versao'] ?? 1),
+                'hash_sha1' => $pdfResult['hash_sha1'] ?? null,
+                'gerado_por' => $usuarioId,
+            ]);
+        }
+
+        return [
+            'ok' => true,
+            'path' => $pdfResult['path'] ?? '',
+            'relative' => $relative,
+            'url' => $pdfResult['url'] ?? '',
+            'tipo' => 'orcamento',
+            'versao' => (int) ($pdfResult['versao'] ?? 1),
+            'orcamento_id' => (int) ($orcamento['id'] ?? 0),
+        ];
     }
 }

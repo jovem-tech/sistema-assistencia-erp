@@ -433,16 +433,16 @@ class OsStatusFlowService
     {
         return [
             'diagnostico' => [
-                ['codigo' => 'aguardando_analise', 'nome' => 'Aguardando Analise', 'grupo_macro' => 'diagnostico', 'cor' => 'secondary'],
+                ['codigo' => 'aguardando_analise', 'nome' => 'Aguardando Análise', 'grupo_macro' => 'diagnostico', 'cor' => 'secondary'],
             ],
             'orcamento' => [
-                ['codigo' => 'aguardando_orcamento', 'nome' => 'Aguardando Orcamento', 'grupo_macro' => 'orcamento', 'cor' => 'info'],
-                ['codigo' => 'aguardando_aprovacao', 'nome' => 'Aguardando Aprovacao', 'grupo_macro' => 'orcamento', 'cor' => 'purple'],
+                ['codigo' => 'aguardando_orcamento', 'nome' => 'Aguardando Orçamento', 'grupo_macro' => 'orcamento', 'cor' => 'info'],
+                ['codigo' => 'aguardando_aprovacao', 'nome' => 'Aguardando Aprovação', 'grupo_macro' => 'orcamento', 'cor' => 'purple'],
             ],
             'execucao' => [
                 ['codigo' => 'aprovado', 'nome' => 'Aprovado', 'grupo_macro' => 'execucao', 'cor' => 'primary'],
                 ['codigo' => 'em_reparo', 'nome' => 'Em Reparo', 'grupo_macro' => 'execucao', 'cor' => 'warning'],
-                ['codigo' => 'aguardando_peca', 'nome' => 'Aguardando Peca', 'grupo_macro' => 'interrupcao', 'cor' => 'orange'],
+                ['codigo' => 'aguardando_peca', 'nome' => 'Aguardando Peça', 'grupo_macro' => 'interrupcao', 'cor' => 'orange'],
             ],
             'concluido' => [
                 ['codigo' => 'pronto', 'nome' => 'Pronto', 'grupo_macro' => 'concluido', 'cor' => 'success'],

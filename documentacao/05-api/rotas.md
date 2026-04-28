@@ -143,6 +143,7 @@ Query params suportados em `GET /admin/stats`:
 | POST | `/os/status-ajax/{id}` | Alterar status por AJAX na listagem | `os:editar` |
 | POST | `/os/status/{id}` | Alterar status | `os:editar` |
 | POST | `/os/whatsapp/{id}` | Envio WhatsApp (texto/PDF/template) | `os:editar` |
+| POST | `/os/email/{id}/enviar` | Envio de PDF da OS por e-mail | `os:editar` |
 | POST | `/os/pdf/{id}/gerar` | Gerar documento PDF | `os:visualizar` |
 | GET | `/osworkflow` | Tela administrativa do fluxo de trabalho da OS | `os:editar` |
 | POST | `/osworkflow/salvar` | Persistir ordem e transicoes do fluxo da OS | `os:editar` |
@@ -151,6 +152,7 @@ Notas da interface de OS:
 - `GET /os/nova` e `GET /os/visualizar/{id}` aceitam `?embed=1` para renderizacao em modal interno (sem sidebar/navbar).
 - Em modo embed, formularios e acoes internas preservam o contexto para manter o fluxo dentro do modal.
 - `GET /os/visualizar/{id}` usa um card de status com acoes rapidas (`Proxima etapa` e `Cancelar`) que submetem em `POST /os/status/{id}`.
+- `GET /os/visualizar/{id}` passou a concentrar geracao/listagem de PDFs e os envios por `WhatsApp` e `e-mail` dentro da aba `Documentos`.
 - A listagem `/os` usa o mesmo workflow da visualizacao: clicar em `N OS` abre `/os/visualizar/{id}` e clicar em `Status` abre um modal enriquecido com historico, progresso e acoes rapidas.
 - Quando chega uma notificacao `orcamento.public_status_changed`, a listagem `/os` recarrega automaticamente a grade para atualizar o badge comercial do orcamento sem `F5`.
 - A listagem `/os` tambem aceita busca por `numero_os_legado` para localizar ordens migradas do sistema antigo.

@@ -111,15 +111,15 @@ $showSendActions = !$dispatchBlocked;
                     </div>
                 <?php else: ?>
                     <div class="alert alert-light border small">
-                        Este registro esta tratado como <strong>orcamento com equipamento na assistencia</strong> e deve refletir a OS/equipamento em atendimento.
+                        Este registro está tratado como <strong>orçamento com equipamento na assistência</strong> e deve refletir a OS/equipamento em atendimento.
                     </div>
                 <?php endif; ?>
 
                 <?php if (!empty($orcamento['orcamento_revisao_de_id'])): ?>
                     <div class="alert alert-warning small">
-                        Revisao derivada do orcamento base
+                        Revisão derivada do orçamento base
                         <strong><?= esc((string) ($orcamento['revisao_base_numero'] ?? ('#' . (int) $orcamento['orcamento_revisao_de_id']))) ?></strong>.
-                        Use esta versao para ajustes e nova autorizacao do cliente.
+                        Use esta versão para ajustes e nova autorização do cliente.
                     </div>
                 <?php endif; ?>
 
@@ -153,7 +153,7 @@ $showSendActions = !$dispatchBlocked;
                         <div><?= !empty($orcamento['conversa_id']) ? '#' . esc((string) $orcamento['conversa_id']) : '-' ?></div>
                     </div>
                     <div class="col-12 col-md-4">
-                        <div class="small text-muted">Conversao</div>
+                        <div class="small text-muted">Conversão</div>
                         <div>
                             <?php if (!empty($orcamento['convertido_tipo'])): ?>
                                 <?= esc((string) $orcamento['convertido_tipo']) ?>

@@ -76,10 +76,10 @@ class OrcamentoModel extends Model
     {
         return [
             self::STATUS_RASCUNHO  => 'Rascunho',
-            self::STATUS_PENDENTE_ENVIO => 'Pendente de envio para aprovacao do cliente',
+            self::STATUS_PENDENTE_ENVIO => 'Pendente de envio para aprovação do cliente',
             self::STATUS_ENVIADO   => 'Enviado',
             self::STATUS_AGUARDANDO => 'Aguardando resposta',
-            self::STATUS_AGUARDANDO_PACOTE => 'Aguardando escolha/aprovacao do pacote',
+            self::STATUS_AGUARDANDO_PACOTE => 'Aguardando escolha/aprovação do pacote',
             self::STATUS_PACOTE_APROVADO => 'Pacote escolhido e aprovado',
             self::STATUS_PENDENTE => 'Pendente (sem retorno do pacote)',
             self::STATUS_APROVADO  => 'Aprovado',
@@ -94,8 +94,8 @@ class OrcamentoModel extends Model
     public function tipoLabels(): array
     {
         return [
-            self::TIPO_PREVIO => 'Orcamento previo',
-            self::TIPO_ASSISTENCIA => 'Orcamento com equipamento na assistencia',
+            self::TIPO_PREVIO => 'Orçamento prévio',
+            self::TIPO_ASSISTENCIA => 'Orçamento com equipamento na assistência',
         ];
     }
 

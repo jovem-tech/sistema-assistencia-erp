@@ -595,7 +595,7 @@ class Orcamentos extends BaseController
         if (!$this->isPacoteOfertaModuleReady()) {
             return $this->response->setJSON([
                 'ok' => false,
-                'message' => 'Modulo de ofertas de pacote nao inicializado.',
+                'message' => 'Módulo de ofertas de pacote não inicializado.',
                 'oferta' => null,
             ]);
         }
@@ -633,7 +633,7 @@ class Orcamentos extends BaseController
         if (!$this->isPacoteOfertaModuleReady()) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'Modulo de ofertas de pacote nao inicializado. Execute as migracoes.',
+                'message' => 'Módulo de ofertas de pacote não inicializado. Execute as migrações.',
             ]);
         }
         $pacoteId = (int) ($this->request->getPost('pacote_servico_id') ?? 0);
@@ -650,7 +650,7 @@ class Orcamentos extends BaseController
         if (!$pacote) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
-                'message' => 'Pacote de servicos nao encontrado ou inativo.',
+                'message' => 'Pacote de serviços não encontrado ou inativo.',
             ]);
         }
         $niveis = (new PacoteServicoNivelModel())
@@ -661,7 +661,7 @@ class Orcamentos extends BaseController
         if (empty($niveis)) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'Este pacote nao possui niveis ativos para envio.',
+                'message' => 'Este pacote não possui níveis ativos para envio.',
             ]);
         }
         $clienteId = (int) ($this->request->getPost('cliente_id') ?? 0);
@@ -732,7 +732,7 @@ class Orcamentos extends BaseController
             $this->orcamentoModel->db->transRollback();
             return $this->response->setStatusCode(500)->setJSON([
                 'ok' => false,
-                'message' => 'Nao foi possivel criar a oferta de pacote.',
+                'message' => 'Não foi possível criar a oferta de pacote.',
             ]);
         }
         $dispatch = ['ok' => true];
@@ -799,7 +799,7 @@ class Orcamentos extends BaseController
         }
         $pacoteOferta = $pacoteOfertaResolution['oferta'] ?? null;
         if (empty($itens) && $pacoteOferta === null && !$isPacoteBased) {
-            return redirect()->back()->withInput()->with('error', 'Adicione pelo menos um item no orcamento.');
+        return redirect()->back()->withInput()->with('error', 'Adicione pelo menos um item no orçamento.');
         }
         if ($isPacoteBased && $pacoteOferta === null) {
             $autoIntentError = $this->validatePacoteOfertaAutosendIntent($pacoteOfertaIntent, $payload);
@@ -831,7 +831,7 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $this->orcamentoModel->getInsertID();
         if ($orcamentoId <= 0) {
             $this->orcamentoModel->db->transRollback();
-            return redirect()->back()->withInput()->with('error', 'Nao foi possivel salvar o orcamento.');
+            return redirect()->back()->withInput()->with('error', 'Não foi possível salvar o orçamento.');
         }
         $numero = $this->orcamentoService->ensureNumero($this->orcamentoModel, $orcamentoId);
         if (!empty($itens)) {
@@ -866,7 +866,7 @@ class Orcamentos extends BaseController
             null,
             (string) $payload['status'],
             $usuarioId > 0 ? $usuarioId : null,
-            'Criacao do orcamento',
+            'Criação do orçamento',
             'interno'
         );
         $this->orcamentoModel->db->transComplete();
@@ -944,7 +944,7 @@ class Orcamentos extends BaseController
         $isEmbedded = $this->isEmbedRequest();
         $orcamento = $this->findOrcamento((int) $id);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento nao encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'Orçamento não encontrado.');
         }
         $orcamento = $this->ensurePublicToken($orcamento);
         $itens = $this->itemModel->byOrcamento((int) $id);
@@ -993,7 +993,7 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $id;
         $orcamento = $this->findOrcamento($orcamentoId);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento nao encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'Orçamento não encontrado.');
         }
         $usuarioId = (int) (session()->get('user_id') ?? 0);
         $forceNew = (string) $this->request->getPost('force_new') === '1';
@@ -1004,11 +1004,11 @@ class Orcamentos extends BaseController
             $forceNew
         );
         if (empty($pdfResult['ok'])) {
-            $error = (string) ($pdfResult['message'] ?? 'Falha ao gerar PDF do orcamento.');
+        $error = (string) ($pdfResult['message'] ?? 'Falha ao gerar PDF do orçamento.');
             return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', $error);
         }
         LogModel::registrar('orcamento_pdf_gerado', 'PDF gerado para o orcamento ID ' . $orcamentoId . '.');
-        return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('success', 'PDF do orcamento gerado com sucesso.');
+        return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('success', 'PDF do orçamento gerado com sucesso.');
     }
     public function downloadPdf($id)
     {
@@ -1016,7 +1016,7 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $id;
         $orcamento = $this->findOrcamento($orcamentoId);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento nao encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'Orçamento não encontrado.');
         }
         $usuarioId = (int) (session()->get('user_id') ?? 0);
         $pdfResult = $this->resolvePdfDocument(
@@ -1026,17 +1026,17 @@ class Orcamentos extends BaseController
             false
         );
         if (empty($pdfResult['ok'])) {
-            $error = (string) ($pdfResult['message'] ?? 'Falha ao preparar o PDF do orcamento.');
+        $error = (string) ($pdfResult['message'] ?? 'Falha ao preparar o PDF do orçamento.');
             return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', $error);
         }
         $filePath = (string) ($pdfResult['path'] ?? '');
         $fileName = (string) ($pdfResult['nome_arquivo'] ?? ('orcamento_' . $orcamentoId . '.pdf'));
         if ($filePath === '' || !is_file($filePath)) {
-            return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', 'Arquivo PDF do orcamento nao encontrado no servidor.');
+            return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', 'Arquivo PDF do orçamento não encontrado no servidor.');
         }
         $content = file_get_contents($filePath);
         if ($content === false) {
-            return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', 'Nao foi possivel carregar o arquivo PDF do orcamento.');
+            return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', 'Não foi possível carregar o arquivo PDF do orçamento.');
         }
         return $this->response
             ->setContentType('application/pdf')
@@ -1049,7 +1049,7 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $id;
         $orcamento = $this->findOrcamento($orcamentoId);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento nao encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'Orçamento não encontrado.');
         }
         $statusAtual = (string) ($orcamento['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
         if (!$this->canDispatchByStatus($statusAtual)) {
@@ -1068,7 +1068,7 @@ class Orcamentos extends BaseController
                 'whatsapp',
                 $telefone,
                 null,
-                'Telefone invalido para envio do orcamento.',
+            'Telefone inválido para envio do orçamento.',
                 $usuarioId
             );
             return redirect()->to($this->orcamentoShowUrl($orcamentoId))
@@ -1093,7 +1093,7 @@ class Orcamentos extends BaseController
                 : 'Orçamento enviado por WhatsApp com sucesso.';
             return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('success', $success);
         }
-        $error = (string) ($dispatch['message'] ?? 'Falha ao enviar orcamento por WhatsApp.');
+        $error = (string) ($dispatch['message'] ?? 'Falha ao enviar orçamento por WhatsApp.');
         LogModel::registrar('orcamento_whatsapp_erro', 'Falha no envio WhatsApp do orcamento ID ' . $orcamentoId . '.');
         return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', $error);
     }
@@ -1103,7 +1103,7 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $id;
         $orcamento = $this->findOrcamento($orcamentoId);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento nao encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'Orçamento não encontrado.');
         }
         $statusAtual = (string) ($orcamento['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
         if (!$this->canDispatchByStatus($statusAtual)) {
@@ -1122,11 +1122,11 @@ class Orcamentos extends BaseController
                 'email',
                 $emailDestino,
                 null,
-                'Email de destino invalido para envio do orcamento.',
+            'E-mail de destino inválido para envio do orçamento.',
                 $usuarioId
             );
             return redirect()->to($this->orcamentoShowUrl($orcamentoId))
-                ->with('error', 'Email de destino invalido para envio do orcamento.');
+            ->with('error', 'E-mail de destino inválido para envio do orçamento.');
         }
         $assunto = trim((string) $this->request->getPost('assunto_email'));
         if ($assunto === '') {
@@ -1175,11 +1175,11 @@ class Orcamentos extends BaseController
         if ($ok) {
             $this->markAsDispatched($orcamento, 'email', $usuarioId > 0 ? $usuarioId : null);
             LogModel::registrar('orcamento_email', 'Orçamento ID ' . $orcamentoId . ' enviado por email.');
-            return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('success', 'Orçamento enviado por email com sucesso.');
+        return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('success', 'Orçamento enviado por e-mail com sucesso.');
         }
         LogModel::registrar('orcamento_email_erro', 'Falha no envio de email do orcamento ID ' . $orcamentoId . '.');
         return redirect()->to($this->orcamentoShowUrl($orcamentoId))
-            ->with('error', (string) ($mailResult['message'] ?? 'Falha ao enviar orcamento por email.'));
+            ->with('error', (string) ($mailResult['message'] ?? 'Falha ao enviar orçamento por e-mail.'));
     }
     public function sendPacoteLink($id)
     {

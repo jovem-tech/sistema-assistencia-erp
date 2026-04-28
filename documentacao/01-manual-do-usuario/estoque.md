@@ -1,48 +1,63 @@
-﻿# Manual do Usuario - Estoque
+# Manual do Usuário - Estoque
 
-## Visao geral
-O modulo `Estoque de Pecas` controla cadastro, saldo e movimentacao de pecas utilizadas em OS e orcamentos.
+## Visão geral
+O módulo `Estoque de Peças` controla cadastro, saldo e movimentação de peças utilizadas em OS e orçamentos.
 
-Caminho: `Operacional > Estoque de Pecas`
+Caminho: `Operacional > Estoque de Peças`
 
-## Cadastro e edicao de peca
+## Cadastro e edição de peça
 Campos principais:
 - `Nome`
-- `Codigo` / `Codigo fabricante`
+- `Código` / `Cód. Fabricante`
 - `Categoria`
-- `Tipo Equipamento` (novo)
-- `Modelos compativeis`
-- `Preco de custo`
-- `Preco de venda`
-- `Quantidade atual`
-- `Estoque minimo`
+- `Tipo de Equipamento`
+- `Modelos Compatíveis`
+- `Preço de Custo`
+- `Preço de Venda`
+- `Quantidade Atual`
+- `Estoque Mínimo`
 
 Regra operacional:
-- pecas inativas (`ativo = 0`) nao aparecem na busca Select2 da OS.
+- peças inativas (`ativo = 0`) não aparecem na busca Select2 da OS.
 
 ## Listagem
-A grade de estoque agora mostra a coluna:
-- `Tipo Equipamento`
+A grade de estoque mostra:
+- `Código`
+- `Nome`
+- `Categoria`
+- `Tipo de Equipamento`
+- `Custo`
+- `Venda`
+- `Qtd`
+- `Mín.`
+- `Ações`
 
 Uso recomendado:
 - padronize o tipo (ex.: `Smartphone`, `Notebook`, `Desktop`);
-- use `Diverso` para pecas genericas;
+- use `Diverso` para peças genéricas;
 - isso melhora a filtragem no Select2 da OS, junto com `Categoria`.
 
-## Importacao e exportacao CSV
+## Importação e exportação CSV
 - `Exportar CSV`: inclui `tipo_equipamento`.
-- `Baixar Modelo CSV`: inclui `tipo_equipamento`.
-- `Importar CSV`: aceita `tipo_equipamento` e `tipo equipamento`.
+- `Baixar Modelo de Estoque (CSV)`: inclui `tipo_equipamento`.
+- `Importar Estoque (CSV)`: aceita `tipo_equipamento` e `tipo equipamento`.
 
-## Fluxo com OS (peca sem estoque)
-Quando uma peca com estoque `0` e adicionada na OS:
-- o item e permitido;
-- o sistema nao faz baixa de estoque nesse momento;
-- o item fica com status de pendencia (`sem_estoque`, `necessaria_aquisicao` ou `aguardando_compra`);
-- a linha do item exibe acao `Resolver pendencia`.
+## Movimentações
+Cada peça possui tela dedicada de `Movimentações`, com:
+- saldo atual;
+- preço de custo;
+- preço de venda;
+- histórico com `Data`, `Tipo`, `Quantidade`, `Motivo`, `OS` e `Responsável`.
 
-Ao resolver pendencia:
-- pode registrar entrada de peca;
+## Fluxo com OS (peça sem estoque)
+Quando uma peça com estoque `0` é adicionada na OS:
+- o item é permitido;
+- o sistema não faz baixa de estoque nesse momento;
+- o item fica com status de pendência (`sem_estoque`, `necessaria_aquisicao` ou `aguardando_compra`);
+- a linha do item exibe a ação `Resolver pendência`.
+
+Ao resolver a pendência:
+- pode registrar entrada de peça;
 - pode reservar automaticamente para a OS;
 - pode registrar despesa de compra no financeiro;
-- o status do item e atualizado para estado operacional correspondente.
+- o status do item é atualizado para o estado operacional correspondente.

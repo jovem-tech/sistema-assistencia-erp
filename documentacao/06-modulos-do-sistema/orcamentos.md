@@ -89,6 +89,15 @@ Na release `2.15.17`, o controller complementar `app/Controllers/Orcamento.php` 
 - a listagem `/os` recarrega automaticamente para refletir o badge comercial atualizado na coluna `Status`;
 - o clique na notificacao passou a abrir a rota correta do ERP, mesmo quando o ambiente usa `index.php` ou publica a aplicacao abaixo da raiz do host.
 
+## Normalizacao textual recente
+
+As views `app/Views/orcamentos/form.php` e `app/Views/orcamentos/show.php` receberam uma revisao complementar de pt-BR/UTF-8 para reduzir labels legados sem acentuacao nos blocos:
+
+- aviso de abertura embutida a partir da OS;
+- resumo comercial e contextual do orcamento;
+- mensagens de vinculacao com OS/equipamento;
+- instrucoes de validacao e leitura do operador.
+
 ### Servicos e inbox reutilizados
 
 O fluxo reutiliza:

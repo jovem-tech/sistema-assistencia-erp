@@ -421,7 +421,7 @@ $(document).ready(function () {
         if (window.Swal && typeof window.Swal.fire === 'function') {
             Swal.fire({
                 icon: 'warning',
-                title: 'CEP nao encontrado',
+                title: 'CEP não encontrado',
                 text: message,
                 confirmButtonText: 'Fechar',
                 customClass: { popup: 'glass-card' }
@@ -1141,6 +1141,8 @@ function openDocPage(page) {
         'central-mensagens-config': '06-modulos-do-sistema/central-de-mensagens.md#configuracoes',
         'design-system': '06-modulos-do-sistema/design-system.md',
         'estoque-movimentacoes': '01-manual-do-usuario/estoque.md#movimentacoes',
+        'modelos-pdf-os': '06-modulos-do-sistema/ordens-de-servico.md#modelos-pdf-da-os',
+        'templates-whatsapp-os': '06-modulos-do-sistema/ordens-de-servico.md#templates-de-whatsapp-para-documentos',
         'deploy-vps': '10-deploy/manual-tecnico-oficial-vps-ubuntu-24-ci4.md',
         'deploy-vps-script': '10-deploy/scripts/install_erp.sh',
         'deploy-vps-guia': '10-deploy/linux-vps-deployment.md',
@@ -1518,4 +1520,3 @@ window.initPatternPasswordField = function initPatternPasswordField(config) {
 
     return controller;
 };
-

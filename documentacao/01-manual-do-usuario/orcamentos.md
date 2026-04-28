@@ -100,7 +100,18 @@ Quando o orcamento e enviado ao cliente com link de aprovacao:
 - a equipe do ERP recebe notificacao interna no sino da navbar, ao lado da foto do perfil;
 - ao clicar nessa notificacao, o ERP abre a rota correta da listagem de OS ou da visualizacao do orcamento, conforme o contexto da proposta;
 - se houver uma OS vinculada, a listagem `/os` atualiza automaticamente o badge comercial do orcamento, sem exigir recarga manual da pagina;
+
+## Reuso do PDF oficial dentro da OS
+
+Quando uma ordem de servico vinculada usa a aba `Documentos` para gerar ou enviar `Orcamento`:
+
+- a OS nao gera um PDF paralelo;
+- ela reaproveita o mesmo PDF oficial de `Orcamentos`;
+- o envio por `WhatsApp` e `E-mail` segue as mesmas validacoes do modulo comercial;
+- o documento continua levando o link de aprovacao publica do cliente no proprio PDF.
 - o mesmo evento em tempo real tambem pode reidratar o modal `Alterar status da OS` quando ele estiver aberto para a ordem relacionada.
+
+Tambem foi aplicada uma revisao complementar de pt-BR/UTF-8 nas telas de formulario e visualizacao do modulo `Orcamentos`, cobrindo avisos de vinculo com OS, blocos de resumo, labels de acompanhamento e mensagens de orientacao ao operador.
 
 ## Ajuda rapida
 

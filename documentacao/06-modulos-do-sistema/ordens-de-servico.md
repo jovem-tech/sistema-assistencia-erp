@@ -43,6 +43,28 @@ Estados esperados:
 
 ## Listagem `/os`
 
+### Correcao de 2026-04-27
+
+- `public/assets/js/os-list-filters.js` agora evita segunda inicializacao da mesma instancia de DataTables ao reutilizar `#osTable`;
+- a grade server-side passou a inicializar com `retrieve: true`, absorvendo cenarios em que a tabela ja foi preparada antes do bootstrap completo da tela;
+- o include da listagem ganhou querystring baseada em `filemtime` para invalidar cache antigo do navegador em `assets/js/os-list-filters.js`;
+- o frontend intercepta especificamente o warning de reinicializacao da `osTable`, registrando no console sem abrir alerta modal para o usuario;
+- o bootstrap jQuery/DataTables agora reutiliza defensivamente a instancia existente de `#osTable` mesmo quando outra rotina tocar a grade depois da carga inicial;
+- o modal de status passou a normalizar textos renderizados dinamicamente apos hidratar timeline, historico e painel de orcamento;
+- os textos fixos do modal `Alterar status da OS` e do embed de orcamento tambem foram normalizados em pt-BR, incluindo `Nº de serie`, abas, cards e mensagens de apoio;
+- `app/Views/os/index.php` teve os principais labels e placeholders da listagem normalizados novamente em pt-BR;
+- `public/assets/js/os-list-filters.js` passou a apontar para os IDs corretos de e-mail no contexto do modal, evitando hidratacao incompleta do resumo lateral;
+- o ajuste preserva o fluxo AJAX server-side existente e atua apenas como hardening de bootstrap da grade.
+
+### Restauro tecnico da release 2.16.5
+
+Na release `2.16.5`, o modulo passou por uma recuperacao estrutural apos uma substituicao ampla de texto ter corrompido fallbacks `??`, nomes de metodos e trechos de bootstrap de dados:
+
+- `app/Controllers/Os.php` voltou a compilar apos a restauracao de metodos de e-mail, validacoes auxiliares e fallbacks de arrays/inteiros;
+- `app/Views/os/index.php`, `app/Views/os/form.php` e `app/Views/os/show.php` voltaram a compilar apos a correcao de ternarios quebrados e valores padrao mutilados;
+- a validacao minima voltou a ser feita com `php -l` nesses arquivos antes de qualquer nova rodada de limpeza textual;
+- depois do restauro sintatico, o modulo recebeu nova normalizacao de labels e mensagens em pt-BR.
+
 ### Responsabilidades
 
 - busca global;
@@ -129,6 +151,7 @@ Mensagem exibida:
 
 - existe um registro de ordem de servico em andamento;
 - o preenchimento nao salvo sera perdido.
+- o SweetAlert2 de confirmacao agora recebe promocao de camada e fica acima do modal iframe e do respectivo backdrop.
 
 ## Modal de status na listagem
 
@@ -151,6 +174,7 @@ O modal `Alterar status da OS` passou a ser composto por:
 - aba `Solucao e diagnostico`, com `procedimentos_executados`, `solucao_aplicada` e `diagnostico_tecnico`;
 - aba `Gerenciamento do Orcamento`, renderizada pelo mesmo resumo reutilizado da aba `Pecas e Orcamento`;
 - coluna lateral de `Historico e progresso`.
+- os labels visiveis desse modal foram normalizados em pt-BR no frontend, cobrindo tabs, hints, placeholders e blocos de historico.
 
 ### Persistencia do card tecnico
 
@@ -182,6 +206,7 @@ Ao salvar o modal de status:
 - o backend de `Fotos de Entrada` na abertura e na edicao usa um persistidor centralizado em `Os::persistEntryPhotosFromRequest()` para aceitar `fotos_entrada` e `fotos_entrada[]`, criar `public/uploads/os_anormalidades` quando necessario e registrar warning sem perder o restante do salvamento se houver falha de caminho;
 - na edicao, o select `Status` agora usa a arvore completa de status operacionais ativos cadastrados, permitindo ajuste administrativo fora da sequencia curta do fluxo;
 - `data_entrada` e `data_previsao` passam por normalizacao e validacao no backend antes do `update`, impedindo previsao anterior a entrada.
+- a normalizacao textual do formulario agora tambem cobre pp/Views/os/form.php, com revisao de labels, placeholders, mensagens de checklist, avisos de camera, resumo lateral e textos operacionais em pt-BR/UTF-8.
 
 ### Areas centrais
 
@@ -295,6 +320,8 @@ Quando o orcamento e salvo em modo embed:
 - a aba `Orcamento` centraliza o vinculo comercial da OS;
 - a aba `Fotos` consolida fotos de perfil, equipamento, entrada, acessorios e checklist;
 - a aba `Valores` detalha financeiro da OS e do orcamento vinculado.
+- a lateral `Historico e Progresso`, a timeline e os labels auxiliares da visualizacao foram alinhados em pt-BR/UTF-8 no frontend e nos helpers do controller.
+- a normalizacao complementar desta release tambem revisou os textos de contexto da visualizacao em pp/Views/os/show.php, incluindo resumo primario, blocos de status, cards do orcamento vinculado e labels das abas.
 
 ## Integracao com o modulo de Orcamentos
 
@@ -313,6 +340,16 @@ A sincronizacao foi distribuida entre:
 - `app/Controllers/Orcamento.php`
 - `app/Controllers/Os.php`
 
+## Frontend reativo e linguagem operacional
+
+Arquivos revisados nesta rodada para normalizacao textual:
+
+- pp/Views/os/form.php`r
+- pp/Views/os/show.php`r
+- public/assets/js/os-list-filters.js`r
+
+Esse lote corrigiu textos visiveis de modais, timeline, filtros, status, camera e resumo operacional sem alterar a semantica dos fluxos existentes.
+
 Mapeamento atual:
 
 - `rascunho`, `pendente_envio`, `enviado`, `aguardando_resposta`, `aguardando_pacote`, `pacote_aprovado`, `pendente`
@@ -323,6 +360,16 @@ Mapeamento atual:
 Protecao adicional da release `2.15.3`:
 
 - `app/Controllers/Os.php`
+
+## Frontend reativo e linguagem operacional
+
+Arquivos revisados nesta rodada para normalizacao textual:
+
+- pp/Views/os/form.php`r
+- pp/Views/os/show.php`r
+- public/assets/js/os-list-filters.js`r
+
+Esse lote corrigiu textos visiveis de modais, timeline, filtros, status, camera e resumo operacional sem alterar a semantica dos fluxos existentes.
 - `app/Controllers/Orcamentos.php`
 - `app/Controllers/Orcamento.php`
 - `app/Services/OsStatusFlowService.php`
@@ -330,6 +377,12 @@ Protecao adicional da release `2.15.3`:
 Esses pontos passaram a comparar a ordem do fluxo antes de sincronizar a OS com o status do orcamento. Se a OS ja estiver em uma etapa posterior ao alvo sugerido pelo orcamento, o sistema preserva o status manual da oficina.
 
 ## PDFs e mensageria
+
+Na tela `/os/visualizar/{id}`, o envio documental passou a ficar concentrado na aba `Documentos`, com tres frentes operacionais no mesmo contexto:
+
+- `Documentos PDF`, para gerar e listar versoes;
+- `Enviar por WhatsApp`, com anexo opcional de PDF e fallback automatico para o consolidado de impressao quando nenhum arquivo salvo e escolhido;
+- `Enviar por E-mail`, anexando um PDF ja gerado da OS.
 
 ### PDF
 
@@ -346,6 +399,72 @@ Tipos usuais:
 - entrega;
 - devolucao sem reparo.
 
+### Impressao consolidada
+
+O topo da visualizacao da OS agora expande o fluxo de impressao com dois caminhos distintos por formato:
+
+- dropdown `Imprimir` com `Folha A4` e `Bobina 80mm`;
+- modal reativo em `app/Views/os/show.php` para `Folha A4`;
+- abertura direta do documento termico para a caixa de dialogo de impressao do sistema operacional em `Bobina 80mm`;
+- documento consolidado renderizado por `app/Views/os/print.php`;
+- montagem de contexto centralizada em `app/Services/OsPrintService.php`.
+
+Fluxo visual atual do `A4`:
+
+- a escolha do formato acontece exclusivamente no dropdown `Imprimir`, e o modal apenas reflete a selecao ativa em badge no cabecalho;
+- a barra lateral antiga foi removida para que a area util fique concentrada na pre-visualizacao do documento;
+- o botao `Abrir em nova guia` passou para o cabecalho do modal, ao lado do badge do formato atual;
+- o rodape do modal concentra `Incluir fotos no documento`, `Enviar PDF por WhatsApp` e `Imprimir agora`;
+- o envio de WhatsApp foi desacoplado da lateral e agora abre um modal proprio, mantendo sincronizados o formato e a opcao `incluir_fotos` do fluxo `A4`;
+- a janela de pre-visualizacao passou a operar como espelho do HTML final de `app/Views/os/print.php`, para que a organizacao visual da OS corresponda ao documento realmente impresso.
+
+Fluxo visual atual do `80mm`:
+
+- ao clicar em `Bobina 80mm`, a OS nao abre modal intermediario;
+- `app/Views/os/show.php` abre diretamente o endpoint de impressao termica com `auto_print=1`;
+- a view `app/Views/os/print.php` dispara `window.print()` automaticamente quando o formato termico e aberto no navegador;
+- o modelo termico foi refeito em bloco proprio, com largura util de bobina, tipografia mono, secoes lineares e leitura otimizada para impressoras termicas.
+
+Endpoint reutilizado:
+
+- `GET /os/imprimir/{id}?formato=a4|80mm&incluir_fotos=0|1`
+- `GET /os/imprimir/{id}?formato=80mm&auto_print=1`
+
+Responsabilidades de `OsPrintService`:
+
+- consolidar dados da OS, cliente, equipamento, itens, defeitos e procedimentos;
+- reunir checklist, acessorios, estado fisico, orcamento e notas complementares;
+- montar grupos de fotos por categoria operacional;
+- gerar PDF temporario em `writable/uploads/os_print/` quando o envio partir do modal de impressao.
+- converter foto principal e galerias em `data URI` no contexto da impressao, evitando dependencia de URL publica durante a renderizacao do `Dompdf`.
+
+Comportamento documental:
+
+- `A4` pode destacar a foto principal de perfil do equipamento ao lado esquerdo do bloco de equipamento quando `incluir_fotos = 1`;
+- no layout `A4`, o cabecalho institucional da empresa ocupa toda a largura superior do documento, sem selo lateral adicional;
+- o card-resumo da OS fica logo abaixo em faixa horizontal principal para destacar numero, badges, datas e identificacao operacional;
+- os badges visuais do topo do documento consolidado foram removidos tanto da impressao quanto do PDF final;
+- os dados do cliente passam a ocupar uma secao dedicada, separada do resumo principal;
+- as informacoes do equipamento passam a ocupar uma faixa propria em largura total;
+- quando `incluir_fotos = 1`, a foto principal entra na lateral esquerda desse bloco de equipamento;
+- o bloco `Equipamento` permanece focado apenas nos dados tecnicos do aparelho;
+- o campo `Formato` foi removido dos quadros informativos do documento consolidado;
+- uma secao propria `Relato do Cliente e Diagnostico Tecnico` passa a ser exibida logo apos `Equipamento`, substituindo o antigo espaco de `Tecnico responsavel`;
+- no `A4`, a primeira pagina e fechada deliberadamente apos o bloco de contexto inicial, preservando resumo operacional, equipamento e relato tecnico antes de iniciar o conteudo analitico;
+- a propria pagina 2 concentra a sequencia de `Checklist de Entrada`, `Itens e Servicos Lancados na OS`, `Resumo Financeiro` e `Orcamento Vinculado`, respeitando a ordem operacional do documento;
+- `Fotos Anexadas` passam a abrir uma terceira pagina exclusiva no `A4`, deixando a galeria fora do corpo tecnico-financeiro;
+- a pre-visualizacao `A4` passa a montar folhas explicitas no HTML, permitindo que o rodape do iframe mostre `Pagina X de Y` de forma coerente com a divisao visual apresentada ao operador;
+- no fluxo de geracao do PDF final, `app/Services/OsPrintService.php` desenha a paginacao no canvas do `Dompdf` apos o `render()`, refletindo o total real do arquivo mesmo quando houver variacao de quebra;
+- o template `app/Views/os/print.php` passou a filtrar grupos de fotos sem URL valida antes da montagem das folhas, evitando pagina dedicada de `Fotos Anexadas` sem conteudo no PDF enviado;
+- o modo `render-mode-pdf` da view `app/Views/os/print.php` agora replica os resets estruturais da impressao do navegador, removendo bordas e paddings extras do wrapper para aproximar a area util do PDF ao documento efetivamente impresso;
+- no PDF gerado pelo `Dompdf`, as secoes grandes passaram a aceitar quebra entre paginas enquanto linhas, cards e blocos internos continuam protegidos contra fragmentacao visual;
+- o modo `render-mode-pdf` deixou de reutilizar a casca paginada em tabela usada na pre-visualizacao do navegador; no PDF final, a quebra entre pagina 1, pagina 2 e `Fotos Anexadas` passou a usar divisores dedicados, reduzindo paginas vazias e desalinhamento estrutural no `Dompdf`;
+- o `Resumo financeiro` fica imediatamente antes da secao `Orcamento vinculado`;
+- as demais fotos seguem para o fechamento do documento agrupadas por tipo;
+- `80mm` passou a usar um template termico dedicado, separado da casca visual do `A4`, com secoes compactas para tecnico, cliente, equipamento, relato, diagnostico, checklist, financeiro e orcamento;
+- na visualizacao da OS, `80mm` nao depende mais da modal de gerenciamento de impressao e segue direto para a caixa de dialogo nativa do sistema operacional;
+- a composicao do arquivo passou a priorizar tabelas e blocos simples no HTML para aumentar a fidelidade entre navegador e `Dompdf`.
+
 ### WhatsApp
 
 Camada principal:
@@ -353,12 +472,51 @@ Camada principal:
 - `WhatsAppService`
 - `MensageriaService`
 
+Fluxo adicional coberto nesta release:
+
+- o modal de impressao pode enviar um PDF sem criar uma nova versao persistida em `os_documentos`;
+- quando necessario, `Os::sendWhatsApp($id)` gera um PDF temporario pelo `OsPrintService`, envia o anexo e faz limpeza do arquivo ao final;
+- o formulario geral de `WhatsApp` da OS tambem passou a usar esse mesmo fallback, garantindo que o PDF gerado sob demanda siga o mesmo layout consolidado da impressao `A4`;
+- os templates configurados em `Gestao de Conhecimento -> Templates WhatsApp` continuam sendo a base de mensagem, mas o operador pode editar o texto antes do envio;
+- dentro do fluxo de impressao, o formulario de WhatsApp agora abre em modal dedicado, sem competir por espaco com a area de preview;
+- as respostas AJAX desse modal retornam `csrfHash`, mensagem operacional e flag de duplicidade para manter a interface reativa sem refresh.
+- a view `app/Views/os/print.php` recebeu hardening visual para compatibilidade simultanea com navegador e `Dompdf`, reduzindo dependencia de recursos CSS que degradavam blocos graficos no PDF final.
+
+### E-mail
+
+Camada principal:
+
+- `ErpMailService`
+- `Os::sendEmail($id)`
+
+Comportamento:
+
+- o envio valida o e-mail de destino usando o cadastro atual da OS como fallback;
+- o operador precisa selecionar um registro existente de `os_documentos` para anexar;
+- o corpo do e-mail e montado com contexto de cliente, equipamento, status atual e tipo do documento;
+- falhas e sucessos ficam registrados em `LogModel` com eventos `os_email` e `os_email_erro`.
+
 ## Arquivos de referencia
 
 - `app/Controllers/Os.php`
+- `app/Services/OsPrintService.php`
+- `app/Views/os/print.php`
+- `app/Views/os/show.php`
+
+## Frontend reativo e linguagem operacional
+
+Arquivos revisados nesta rodada para normalizacao textual:
+
+- pp/Views/os/form.php`r
+- pp/Views/os/show.php`r
+- public/assets/js/os-list-filters.js`r
+
+Esse lote corrigiu textos visiveis de modais, timeline, filtros, status, camera e resumo operacional sem alterar a semantica dos fluxos existentes.
 - `app/Models/OsModel.php`
+- `app/Models/OsDocumentoModel.php`
 - `app/Services/OsStatusFlowService.php`
 - `app/Services/OsPdfService.php`
+- `app/Services/ErpMailService.php`
 - `app/Views/os/index.php`
 - `app/Views/os/form.php`
 - `app/Views/os/show.php`

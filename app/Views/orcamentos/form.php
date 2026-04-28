@@ -1,4 +1,4 @@
-<?= $this->extend($layout ?? 'layouts/main') ?>
+﻿<?= $this->extend($layout ?? 'layouts/main') ?>
 
 <?= $this->section('content') ?>
 <?php
@@ -18,7 +18,7 @@ $isEmbedded = !empty($isEmbedded);
 $orcamentoLockedEmbeddedEdit = !empty($orcamentoLockedEmbeddedEdit);
 $pacoteOfertaModuleReady = !empty($pacoteOfertaModuleReady);
 $pacotesAtivosOferta = $pacotesAtivosOferta ?? [];
-$equipamentoFotoFallback = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MCcgaGVpZ2h0PSc4MCcgdmlld0JveD0nMCAwIDgwIDgwJz48cmVjdCB3aWR0aD0nODAnIGhlaWdodD0nODAnIHJ4PSc0MCcgZmlsbD0nI2VlZjJmZicvPjxjaXJjbGUgY3g9JzQwJyBjeT0nMzAnIHI9JzEyJyBmaWxsPScjYzdkMmZlJy8+PHRleHQgeD0nNDAnIHk9JzU4JyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmb250LXNpemU9JzEwJyBmaWxsPScjNjQ3NDhiJz5zZW0gZm90bzwvdGV4dD48L3N2Zz4=';
+$equipamentoFotoFallback = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MCcgaGVpZ2h0PSc4MCcgdmlld0JveD0nMCAwIDgwIDgwJz48cmVjdCB3aWR0aD0nbDAnIGhlaWdodD0nbDAnIHJ4PSc0MCcgZmlsbD0nI2VlZjJmZicvPjxjaXJjbGUgY3g9JzQwJyBjeT0nMzAnIHI9JzEyJyBmaWxsPScjYzdkMmZlJy8+PHRleHQgeD0nNDAnIHk9JzU4JyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmb250LXNpemU9JzEwJyBmaWxsPScjNjQ3NDhiJz5zZW0gZm90bzwvdGV4dD48L3N2Zz4=';
 $osNumeroVinculoInicial = trim((string) ($vinculosContext['os']['numero'] ?? ''));
 $osTituloVinculoInicial = $osNumeroVinculoInicial !== ''
     ? (stripos($osNumeroVinculoInicial, 'OS') === 0 ? $osNumeroVinculoInicial : ('OS ' . $osNumeroVinculoInicial))
@@ -52,7 +52,7 @@ if (empty($itens)) {
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
     <h2 class="mb-0"><i class="bi bi-<?= $isEdit ? 'pencil' : 'plus-lg' ?> me-2"></i><?= esc($title ?? html_entity_decode('Or&ccedil;amento', ENT_QUOTES, 'UTF-8')) ?></h2>
     <div class="d-flex gap-2 flex-wrap">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('orcamentos')" title="Ajuda sobre Or&ccedil;amentos">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('orcamentos')" title="Ajuda sobre orçamentos">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <?php if (!$isEmbedded): ?>
@@ -78,16 +78,16 @@ if (empty($itens)) {
             <input type="hidden" name="os_id" id="orcamentoOsId" value="<?= esc((string) ($orcamento['os_id'] ?? '')) ?>">
             <input type="hidden" name="equipamento_id" id="orcamentoEquipamentoId" value="<?= esc((string) ($orcamento['equipamento_id'] ?? '')) ?>">
             <input type="hidden" name="conversa_id" id="orcamentoConversaId" value="<?= esc((string) ($orcamento['conversa_id'] ?? '')) ?>">
-            <input type="hidden" name="pacote_oferta_id" id="orcamentoPacoteOfertaId" value="">
-            <input type="hidden" name="aplicar_pacote_oferta" id="orcamentoAplicarPacoteOferta" value="0">
+            <input type="hidden" name="pacote_oferta_id" id="orcamentoPacotebfertaId" value="">
+            <input type="hidden" name="aplicar_pacote_oferta" id="orcamentoAplicarPacotebferta" value="0">
             <input type="hidden" id="orcamentoOsNumeroHint" value="<?= esc((string) ($vinculosContext['os']['numero'] ?? '')) ?>">
             <input type="hidden" id="orcamentoEquipamentoTituloHint" value="<?= esc($equipamentoTituloHintInicial) ?>">
 
             <?php if ($orcamentoLockedEmbeddedEdit): ?>
                 <div class="alert alert-warning border-0 shadow-sm" role="alert">
-                    <div class="fw-semibold mb-1">Edicao vinculada pela OS</div>
+                    <div class="fw-semibold mb-1">Edição vinculada pela OS</div>
                     <div class="small mb-0">
-                        Esta tela foi aberta pela aba <strong>Pecas e Orcamento</strong> da OS. O sistema vai preservar o status atual deste orcamento e manter a oferta de pacote em modo de consulta. Se precisar reenviar uma nova autorizacao ao cliente, use a revisao no modulo de orcamentos.
+                        Esta tela foi aberta pela aba <strong>Peças e orçamento</strong> da OS. O sistema vai preservar o status atual deste orçamento e manter a oferta de pacote em modo de consulta. Se precisar reenviar uma nova autorização ao cliente, use a revisão no módulo de orçamentos.
                     </div>
                 </div>
             <?php endif; ?>
@@ -160,7 +160,7 @@ if (empty($itens)) {
                                 autocomplete="tel-national"
                                 placeholder="(11) 98765-4321"
                             >
-                            <small class="text-muted d-block mt-1">Opcional. Informe quando quiser usar este numero no envio por WhatsApp.</small>
+                            <small class="text-muted d-block mt-1">Opcional. Informe quando quiser usar este número no envio por WhatsApp.</small>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label">Email de contato</label>
@@ -174,7 +174,7 @@ if (empty($itens)) {
                                 maxlength="160"
                                 placeholder="cliente@dominio.com"
                             >
-                            <small class="text-muted d-block mt-1">Opcional. Quando informado, este e-mail poder&aacute; ser utilizado para envio do or&ccedil;amento.</small>
+                            <small class="text-muted d-block mt-1">Opcional. Quando informado, este e-mail poderá ser utilizado para envio do orçamento.</small>
                         </div>
                     </div>
                 </div>
@@ -201,7 +201,7 @@ if (empty($itens)) {
                                 <div class="card-body py-3">
                                     <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
                                         <div>
-                                            <small class="text-muted d-block mb-1">Vinculo OS</small>
+                                            <small class="text-muted d-block mb-1">Vínculo OS</small>
                                             <div class="fw-semibold" id="orcamentoVinculoOsTitulo"><?= esc($osTituloVinculoInicial) ?></div>
                                         </div>
                                         <span class="badge rounded-pill text-bg-light d-none" id="orcamentoVinculoOsCounter"></span>
@@ -223,7 +223,7 @@ if (empty($itens)) {
                         <div class="col-12 col-lg-4<?= !empty($vinculosContext['equipamento']) ? '' : ' d-none' ?>" id="orcamentoVinculoEquipamentoCol">
                             <div class="card border-0 bg-light-subtle h-100 orc-vinculo-card">
                                 <div class="card-body py-3">
-                                    <small class="text-muted d-block mb-1">Vinculo Equipamento</small>
+                                    <small class="text-muted d-block mb-1">Vínculo Equipamento</small>
                                     <div class="d-flex align-items-center gap-2">
                                         <img
                                             src="<?= esc($equipamentoFotoVinculoInicial !== '' ? $equipamentoFotoVinculoInicial : $equipamentoFotoFallback) ?>"
@@ -252,7 +252,7 @@ if (empty($itens)) {
                         <div class="col-12 col-lg-4<?= !empty($vinculosContext['conversa']) ? '' : ' d-none' ?>" id="orcamentoVinculoConversaCol">
                             <div class="card border-0 bg-light-subtle h-100 orc-vinculo-card">
                                 <div class="card-body py-3">
-                                    <small class="text-muted d-block mb-1">Vinculo Conversa</small>
+                                    <small class="text-muted d-block mb-1">Vínculo Conversa</small>
                                     <div class="fw-semibold">Conversa #<?= esc((string) ($vinculosContext['conversa']['id'] ?? '')) ?></div>
                                     <small class="text-muted">
                                         <?= esc(trim((string) (($vinculosContext['conversa']['nome'] ?? '') . ' ' . ($vinculosContext['conversa']['telefone'] ?? '')))) ?>
@@ -269,7 +269,7 @@ if (empty($itens)) {
                             </div>
                             <div class="row g-2 align-items-end mb-3">
                                 <div class="col-12 col-xl-9">
-                                    <label class="form-label">Equipamentos ja cadastrados para este cliente</label>
+                                    <label class="form-label">Equipamentos já cadastrados para este cliente</label>
                                     <select class="form-select" id="orcamentoEquipamentoLookup">
                                         <?php if (!empty($equipamentoLookupInitial)): ?>
                                             <option value="<?= esc((string) ($equipamentoLookupInitial['id'] ?? '')) ?>" selected>
@@ -363,7 +363,7 @@ if (empty($itens)) {
                                             <div id="orcColorCatalog" class="orc-color-catalog custom-scrollbar pe-1"></div>
                                         </div>
                                     </div>
-                                    <small class="text-muted d-block mt-2">Padrao de cor alinhado com a abertura da OS (nome + HEX + RGB).</small>
+                                    <small class="text-muted d-block mt-2">Padrão de cor alinhado com a abertura da OS (nome + HEX + RGB).</small>
                                 </div>
                             </div>
                     </div>
@@ -377,8 +377,8 @@ if (empty($itens)) {
                 <div class="card-body">
                     <?php
                     $origens = [
-                        'manual' => 'Manual / Balcao',
-                        'os' => 'Ordem de servico',
+                        'manual' => 'Manual / Balcão',
+                        'os' => 'Ordem de serviço',
                         'conversa' => 'Central de mensagens',
                         'cliente' => 'Cadastro de cliente',
                     ];
@@ -395,30 +395,30 @@ if (empty($itens)) {
                             </div>
                         <?php endif; ?>
                         <div class="<?= esc($tituloColClass) ?>">
-                            <label class="form-label">Titulo</label>
-                            <input type="text" class="form-control" id="orcamentoTitulo" name="titulo" value="<?= esc((string) ($orcamento['titulo'] ?? '')) ?>" placeholder="Ex.: Or&ccedil;amento para reparo de notebook">
+                            <label class="form-label">Título</label>
+                            <input type="text" class="form-control" id="orcamentoTitulo" name="titulo" value="<?= esc((string) ($orcamento['titulo'] ?? '')) ?>" placeholder="Ex.: orçamento para reparo de notebook">
                             <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
-                                <small class="text-muted fw-semibold mb-0">Titulos rapidos:</small>
+                                <small class="text-muted fw-semibold mb-0">Títulos rápidos:</small>
                                 <div class="orc-title-presets d-flex flex-wrap gap-2">
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-titulo-template="Or&ccedil;amento para {{cliente}}">
-                                        Or&ccedil;amento para cliente
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-titulo-template="Orçamento para {{cliente}}">
+                                        Orçamento para cliente
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-titulo-template="Or&ccedil;amento OS {{os}} - {{cliente}}">
-                                        Or&ccedil;amento com OS
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-titulo-template="Orçamento OS {{os}} - {{cliente}}">
+                                        Orçamento com OS
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-titulo-template="Analise técnica - {{equipamento}}">
-                                        Analise técnica
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-titulo-template="Análise técnica - {{equipamento}}">
+                                        Análise técnica
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-titulo-template="Troca de peca - {{equipamento}}">
-                                        Troca de peca
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-titulo-template="Troca de peça - {{equipamento}}">
+                                        Troca de peça
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-titulo-template="Pacote de servicos para {{cliente}}">
-                                        Pacote de servicos
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-titulo-template="Pacote de serviços para {{cliente}}">
+                                        Pacote de serviços
                                     </button>
                                 </div>
                             </div>
                             <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
-                                <small class="text-muted fw-semibold mb-0">Inserir no titulo:</small>
+                                <small class="text-muted fw-semibold mb-0">Inserir no título:</small>
                                 <div class="d-flex flex-wrap gap-2">
                                     <button type="button" class="btn btn-outline-primary btn-sm" data-titulo-insert="cliente">+ Cliente</button>
                                     <button type="button" class="btn btn-outline-primary btn-sm" data-titulo-insert="os">+ OS</button>
@@ -427,7 +427,7 @@ if (empty($itens)) {
                             </div>
                         </div>
                         <div class="col-12 col-md-4">
-                            <label class="form-label">Tipo do orcamento</label>
+                            <label class="form-label">Tipo do orçamento</label>
                             <select name="tipo_orcamento" class="form-select" id="orcamentoTipo">
                                 <?php foreach ($tipoLabels as $tipoCode => $tipoLabel): ?>
                                     <option value="<?= esc($tipoCode) ?>" <?= $tipoAtual === $tipoCode ? 'selected' : '' ?>><?= esc($tipoLabel) ?></option>
@@ -435,8 +435,8 @@ if (empty($itens)) {
                             </select>
                             <small class="text-muted d-block mt-1" id="orcamentoTipoHelp">
                                 <?= $tipoAtual === 'assistencia'
-                                    ? 'Use quando o equipamento ja estiver na assistencia e vinculado a uma OS.'
-                                    : 'Use para estimativa inicial quando o equipamento ainda não tiver entrado na assistencia.' ?>
+                                    ? 'Use quando o equipamento já estiver na assistência e vinculado a uma OS aberta.'
+                                    : 'Use para estimativa inicial quando o equipamento ainda não tiver entrado na assistência.' ?>
                             </small>
                         </div>
                         <div class="col-12 col-md-4">
@@ -448,7 +448,7 @@ if (empty($itens)) {
                                 <?php endforeach; ?>
                             </select>
                             <?php if ($orcamentoLockedEmbeddedEdit): ?>
-                                <small class="text-muted d-block mt-1">Status preservado automaticamente durante a edicao embutida desta OS.</small>
+                                <small class="text-muted d-block mt-1">Status preservado automaticamente durante a edição embutida desta OS.</small>
                             <?php endif; ?>
                         </div>
                         <div class="col-12 col-md-4">
@@ -471,7 +471,7 @@ if (empty($itens)) {
                                     <small class="text-muted">Data calculada automaticamente pelos dias corridos da validade.</small>
                                 </div>
                                 <div class="col-12 col-md-4">
-                                    <label class="form-label">Prazo de execucao</label>
+                                    <label class="form-label">Prazo de execução</label>
                                     <select class="form-select" name="prazo_execucao" id="orcamentoPrazoExecucao">
                                         <?php foreach ($prazosExecucao as $prazoOpcao): ?>
                                             <?php $labelPrazo = $prazoOpcao === '1' ? '1 dia' : $prazoOpcao . ' dias'; ?>
@@ -489,11 +489,11 @@ if (empty($itens)) {
             </div>
 
             <?php if ($pacoteOfertaModuleReady): ?>
-                <div class="card border-0 shadow-sm mb-3 orc-section-card" id="orcPacoteOfertaCard">
+                <div class="card border-0 shadow-sm mb-3 orc-section-card" id="orcPacotebfertaCard">
                     <div class="card-header bg-transparent border-0 pb-0">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <h5 class="mb-0">Oferta dinamica de pacote</h5>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnOrcPacoteOfertaRefresh">
+                            <h5 class="mb-0">Oferta dinâmica de pacote</h5>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnOrcPacotebfertaRefresh">
                                 <i class="bi bi-arrow-clockwise me-1"></i>Atualizar status
                             </button>
                         </div>
@@ -501,7 +501,7 @@ if (empty($itens)) {
                     <div class="card-body">
                         <?php if ($orcamentoLockedEmbeddedEdit): ?>
                             <div class="alert alert-light border small mb-3">
-                                A oferta dinamica de pacote permanece somente para consulta neste contexto, evitando alterar o fluxo de aprovacao ja consolidado.
+                                A oferta dinâmica de pacote permanece somente para consulta neste contexto, evitando alterar o fluxo de aprovação já consolidado.
                             </div>
                         <?php endif; ?>
                         <fieldset<?= $orcamentoLockedEmbeddedEdit ? ' disabled' : '' ?>>
@@ -526,7 +526,7 @@ if (empty($itens)) {
                         <div class="row g-3">
                             <div class="col-12 col-lg-4">
                                 <label class="form-label">Pacote para enviar</label>
-                                <select class="form-select" id="orcPacoteOfertaPacoteId" name="pacote_oferta_pacote_id">
+                                <select class="form-select" id="orcPacotebfertaPacoteId" name="pacote_oferta_pacote_id">
                                     <option value="">Selecione o pacote...</option>
                                     <?php foreach ($pacotesAtivosOferta as $pacoteOferta): ?>
                                         <?php $pacoteOfertaId = (int) ($pacoteOferta['id'] ?? 0); ?>
@@ -542,7 +542,7 @@ if (empty($itens)) {
                                 <input
                                     type="text"
                                     class="form-control"
-                                    id="orcPacoteOfertaTelefone"
+                                    id="orcPacotebfertaTelefone"
                                     name="pacote_oferta_telefone"
                                     value="<?= esc((string) ($orcamento['telefone_contato'] ?? '')) ?>"
                                     placeholder="(11) 98765-4321"
@@ -550,59 +550,59 @@ if (empty($itens)) {
                             </div>
                             <div class="col-12 col-md-6 col-lg-2">
                                 <label class="form-label">Validade do link</label>
-                                <select class="form-select" id="orcPacoteOfertaExpiraDias" disabled>
+                                <select class="form-select" id="orcPacotebfertaExpiraDias" disabled>
                                     <option value="2" selected>48 horas</option>
                                 </select>
                             </div>
                             <div class="col-12 col-lg-3 d-flex align-items-end">
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" value="1" id="orcPacoteOfertaEnviarWhatsapp" name="pacote_oferta_enviar_whatsapp" checked>
-                                    <label class="form-check-label" for="orcPacoteOfertaEnviarWhatsapp">
+                                    <input class="form-check-input" type="checkbox" value="1" id="orcPacotebfertaEnviarWhatsapp" name="pacote_oferta_enviar_whatsapp" checked>
+                                    <label class="form-check-label" for="orcPacotebfertaEnviarWhatsapp">
                                         Enviar automaticamente no WhatsApp
                                     </label>
                                 </div>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Mensagem (opcional)</label>
-                                <textarea class="form-control" id="orcPacoteOfertaMensagem" name="pacote_oferta_mensagem" rows="3" placeholder="Se vazio, o sistema monta uma mensagem pronta com link e niveis."></textarea>
+                                <textarea class="form-control" id="orcPacotebfertaMensagem" name="pacote_oferta_mensagem" rows="3" placeholder="Se vazio, o sistema monta uma mensagem pronta com link e níveis."></textarea>
                             </div>
-                            <div class="col-12 d-none" id="orcPacoteOfertaMensagemLinkWrap">
+                            <div class="col-12 d-none" id="orcPacotebfertaMensagemLinkWrap">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="1" id="orcPacoteOfertaMensagemComLink" name="pacote_oferta_mensagem_com_link" checked>
-                                    <label class="form-check-label" for="orcPacoteOfertaMensagemComLink">
+                                    <input class="form-check-input" type="checkbox" value="1" id="orcPacotebfertaMensagemComLink" name="pacote_oferta_mensagem_com_link" checked>
+                                    <label class="form-check-label" for="orcPacotebfertaMensagemComLink">
                                         Incluir o link da oferta junto da mensagem personalizada
                                     </label>
                                 </div>
                             </div>
                             <div class="col-12 d-flex flex-wrap gap-2">
-                                <button type="button" class="btn btn-outline-primary" id="btnEnviarPacoteOferta">
+                                <button type="button" class="btn btn-outline-primary" id="btnEnviarPacotebferta">
                                     <i class="bi bi-send me-1"></i>Enviar oferta
                                 </button>
                                 <small class="text-muted align-self-center">
-                                    O sistema identifica cliente/contato/telefone com validacao contextual inteligente para detectar a oferta escolhida.
+                                    O sistema identifica cliente/contato/telefone com validação contextual inteligente para detectar a oferta escolhida.
                                 </small>
                             </div>
                             <div class="col-12">
-                                <div class="alert alert-light border mb-0 d-none" id="orcPacoteOfertaStatusWrap">
+                                <div class="alert alert-light border mb-0 d-none" id="orcPacotebfertaStatusWrap">
                                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                                         <div>
-                                            <div class="fw-semibold" id="orcPacoteOfertaStatusTitle">Nenhuma oferta identificada</div>
-                                            <div class="small text-muted" id="orcPacoteOfertaStatusDesc"></div>
+                                            <div class="fw-semibold" id="orcPacotebfertaStatusTitle">Nenhuma oferta identificada</div>
+                                            <div class="small text-muted" id="orcPacotebfertaStatusDesc"></div>
                                         </div>
-                                        <span class="badge text-bg-secondary" id="orcPacoteOfertaStatusBadge">-</span>
+                                        <span class="badge text-bg-secondary" id="orcPacotebfertaStatusBadge">-</span>
                                     </div>
-                                    <div class="small mt-2 text-muted" id="orcPacoteOfertaDetalhes"></div>
-                                    <div class="form-check mt-2 d-none" id="orcPacoteOfertaApplyWrap">
-                                        <input class="form-check-input" type="checkbox" id="orcPacoteOfertaApplyCheck" checked>
-                                        <label class="form-check-label" for="orcPacoteOfertaApplyCheck">
-                                            Aplicar automaticamente no orcamento ao salvar
+                                    <div class="small mt-2 text-muted" id="orcPacotebfertaDetalhes"></div>
+                                    <div class="form-check mt-2 d-none" id="orcPacotebfertaApplyWrap">
+                                        <input class="form-check-input" type="checkbox" id="orcPacotebfertaApplyCheck" checked>
+                                        <label class="form-check-label" for="orcPacotebfertaApplyCheck">
+                                            Aplicar automaticamente no orçamento ao salvar
                                         </label>
                                     </div>
-                                    <div class="d-flex flex-wrap gap-2 mt-2 d-none" id="orcPacoteOfertaLinkWrap">
-                                        <a href="#" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary" id="orcPacoteOfertaLinkBtn">
-                                            <i class="bi bi-box-arrow-up-right me-1"></i>Abrir pagina do cliente
+                                    <div class="d-flex flex-wrap gap-2 mt-2 d-none" id="orcPacotebfertaLinkWrap">
+                                        <a href="#" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary" id="orcPacotebfertaLinkBtn">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i>Abrir página do cliente
                                         </a>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnOrcPacoteOfertaCopyLink">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnOrcPacotebfertaCopyLink">
                                             <i class="bi bi-clipboard me-1"></i>Copiar link
                                         </button>
                                     </div>
@@ -617,7 +617,7 @@ if (empty($itens)) {
             <div class="card border-0 shadow-sm mb-3 orc-section-card" id="orcSecaoItens">
                 <div class="card-header bg-transparent border-0 pb-0">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <h5 class="mb-0">Itens do Or&ccedil;amento</h5>
+                        <h5 class="mb-0">Itens do orçamento</h5>
                         <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddItem">
                             <i class="bi bi-plus-lg me-1"></i>Adicionar item
                         </button>
@@ -633,7 +633,7 @@ if (empty($itens)) {
                                     <th style="min-width: 90px;">Qtd.</th>
                                     <th style="min-width: 120px;">Valor unit.</th>
                                     <th style="min-width: 120px;">Desconto</th>
-                                    <th style="min-width: 120px;">Acrescimo</th>
+                                    <th style="min-width: 120px;">Acréscimo</th>
                                     <th style="min-width: 120px;">Total</th>
                                     <th class="text-center">Ação</th>
                                 </tr>
@@ -645,7 +645,7 @@ if (empty($itens)) {
                                             <select name="item_tipo[]" class="form-select form-select-sm">
                                                 <?php
                                                 $itemTipo = (string) ($item['tipo_item'] ?? 'servico');
-                                                $tiposItem = ['servico' => 'Serviço', 'peca' => 'Peca', 'combo' => 'Combo', 'avulso' => 'Avulso'];
+                                                $tiposItem = ['servico' => 'Serviço', 'peca' => 'Peça', 'combo' => 'Combo', 'avulso' => 'Avulso'];
                                                 foreach ($tiposItem as $tipoItemCode => $tipoItemLabel):
                                                 ?>
                                                     <option value="<?= esc($tipoItemCode) ?>" <?= $itemTipo === $tipoItemCode ? 'selected' : '' ?>><?= esc($tipoItemLabel) ?></option>
@@ -668,12 +668,12 @@ if (empty($itens)) {
                                                 data-valor-recomendado="<?= esc(number_format((float) ($item['valor_recomendado'] ?? 0), 2, '.', '')) ?>"
                                                 data-modo-precificacao="<?= esc((string) ($item['modo_precificacao'] ?? '')) ?>"
                                             ></small>
-                                            <input type="text" class="form-control form-control-sm mt-1" name="item_observacao[]" value="<?= esc((string) ($item['observacoes'] ?? '')) ?>" placeholder="Observacao do item (opcional)">
+                                            <input type="text" class="form-control form-control-sm mt-1" name="item_observacao[]" value="<?= esc((string) ($item['observacoes'] ?? '')) ?>" placeholder="Observação do item (opcional)">
                                         </td>
                                         <td data-label="Qtd."><input type="number" step="0.01" min="0.01" class="form-control form-control-sm item-qty" name="item_quantidade[]" value="<?= esc((string) ($item['quantidade'] ?? 1)) ?>"></td>
                                         <td data-label="Valor unit."><input type="text" class="form-control form-control-sm item-unit" name="item_valor_unitario[]" value="<?= esc(number_format((float) ($item['valor_unitario'] ?? 0), 2, '.', '')) ?>"></td>
                                         <td data-label="Desconto"><input type="text" class="form-control form-control-sm item-desconto" name="item_desconto[]" value="<?= esc(number_format((float) ($item['desconto'] ?? 0), 2, '.', '')) ?>"></td>
-                                        <td data-label="Acrescimo"><input type="text" class="form-control form-control-sm item-acrescimo" name="item_acrescimo[]" value="<?= esc(number_format((float) ($item['acrescimo'] ?? 0), 2, '.', '')) ?>"></td>
+                                        <td data-label="Acréscimo"><input type="text" class="form-control form-control-sm item-acrescimo" name="item_acrescimo[]" value="<?= esc(number_format((float) ($item['acrescimo'] ?? 0), 2, '.', '')) ?>"></td>
                                         <td data-label="Total"><input type="text" class="form-control form-control-sm item-total" value="<?= esc(number_format((float) ($item['total'] ?? 0), 2, '.', '')) ?>" readonly></td>
                                         <td data-label="Ação" class="text-center">
                                             <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item" title="Remover item">
@@ -690,7 +690,7 @@ if (empty($itens)) {
 
             <div class="card border-0 shadow-sm mb-4 orc-section-card" id="orcSecaoFinanceiro">
                 <div class="card-header bg-transparent border-0 pb-0">
-                    <h5 class="mb-0">Financeiro do Or&ccedil;amento</h5>
+                    <h5 class="mb-0">Financeiro do orçamento</h5>
                 </div>
                 <div class="card-body">
                     <div class="row g-3 mb-3">
@@ -703,7 +703,7 @@ if (empty($itens)) {
                             <input type="text" class="form-control" id="orcDescontoInput" name="desconto" value="<?= esc(number_format((float) ($orcamento['desconto'] ?? 0), 2, '.', '')) ?>">
                         </div>
                         <div class="col-12 col-md-3">
-                            <label class="form-label">Acrescimo global</label>
+                            <label class="form-label">Acréscimo global</label>
                             <input type="text" class="form-control" id="orcAcrescimoInput" name="acrescimo" value="<?= esc(number_format((float) ($orcamento['acrescimo'] ?? 0), 2, '.', '')) ?>">
                         </div>
                         <div class="col-12 col-md-3">
@@ -714,15 +714,15 @@ if (empty($itens)) {
 
                     <div class="row g-3">
                         <div class="col-12 col-md-6">
-                            <label class="form-label">Condicoes</label>
+                            <label class="form-label">Condições</label>
                             <textarea class="form-control" name="condicoes" rows="4"><?= esc((string) ($orcamento['condicoes'] ?? '')) ?></textarea>
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label">Observacoes</label>
+                            <label class="form-label">Observações</label>
                             <textarea class="form-control" name="observacoes" rows="4"><?= esc((string) ($orcamento['observacoes'] ?? '')) ?></textarea>
                         </div>
                         <div class="col-12 d-none" id="motivoRejeicaoWrap">
-                            <label class="form-label">Motivo da rejeicao</label>
+                            <label class="form-label">Motivo da rejeição</label>
                             <textarea class="form-control" name="motivo_rejeicao" rows="3"><?= esc((string) ($orcamento['motivo_rejeicao'] ?? '')) ?></textarea>
                         </div>
                     </div>
@@ -753,7 +753,7 @@ if (empty($itens)) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
-                <input type="hidden" id="inputEditarMarcaIdOrc" value="">
+                <input type="hidden" id="inputEditarMarcaIdbrc" value="">
                 <input type="text" class="form-control" id="inputNovaMarcaOrc" placeholder="Ex.: Samsung, Apple...">
                 <div id="errorNovaMarcaOrc" class="text-danger small mt-2 d-none"></div>
             </div>
@@ -772,7 +772,7 @@ if (empty($itens)) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
-                <input type="hidden" id="inputEditarModeloIdOrc" value="">
+                <input type="hidden" id="inputEditarModeloIdbrc" value="">
                 <div class="mb-2">
                     <label class="small text-muted">Marca selecionada:</label>
                     <input type="text" id="displayMarcaOrc" class="form-control form-control-sm bg-transparent" readonly>
@@ -891,8 +891,8 @@ if (empty($itens)) {
     const btnSalvarModeloOrc = document.getElementById('btnSalvarModeloOrc');
     const inputNovaMarcaOrc = document.getElementById('inputNovaMarcaOrc');
     const inputNovoModeloOrc = document.getElementById('inputNovoModeloOrc');
-    const inputEditarMarcaIdOrc = document.getElementById('inputEditarMarcaIdOrc');
-    const inputEditarModeloIdOrc = document.getElementById('inputEditarModeloIdOrc');
+    const inputEditarMarcaIdbrc = document.getElementById('inputEditarMarcaIdbrc');
+    const inputEditarModeloIdbrc = document.getElementById('inputEditarModeloIdbrc');
     const labelModalMarcaOrc = document.getElementById('labelModalMarcaOrc');
     const labelModalModeloOrc = document.getElementById('labelModalModeloOrc');
     const displayMarcaOrc = document.getElementById('displayMarcaOrc');
@@ -911,32 +911,32 @@ if (empty($itens)) {
     const pacoteOfertaDetectUrl = <?= json_encode(base_url('orcamentos/pacotes/oferta/detectar')) ?>;
     const pacoteOfertaSendUrl = <?= json_encode(base_url('orcamentos/pacotes/oferta/enviar')) ?>;
     const pacoteBaseadoSwitch = document.getElementById('orcPacoteBaseadoSwitch');
-    const pacoteOfertaApplyIdInput = document.getElementById('orcamentoPacoteOfertaId');
-    const pacoteOfertaApplyFlagInput = document.getElementById('orcamentoAplicarPacoteOferta');
-    const pacoteOfertaPacoteSelect = document.getElementById('orcPacoteOfertaPacoteId');
-    const pacoteOfertaTelefoneInput = document.getElementById('orcPacoteOfertaTelefone');
-    const pacoteOfertaExpiraSelect = document.getElementById('orcPacoteOfertaExpiraDias');
-    const pacoteOfertaEnviarWhatsappCheckbox = document.getElementById('orcPacoteOfertaEnviarWhatsapp');
-    const pacoteOfertaMensagemInput = document.getElementById('orcPacoteOfertaMensagem');
-    const pacoteOfertaMensagemLinkWrap = document.getElementById('orcPacoteOfertaMensagemLinkWrap');
-    const pacoteOfertaMensagemComLinkCheckbox = document.getElementById('orcPacoteOfertaMensagemComLink');
-    const pacoteOfertaStatusWrap = document.getElementById('orcPacoteOfertaStatusWrap');
-    const pacoteOfertaStatusTitle = document.getElementById('orcPacoteOfertaStatusTitle');
-    const pacoteOfertaStatusDesc = document.getElementById('orcPacoteOfertaStatusDesc');
-    const pacoteOfertaStatusBadge = document.getElementById('orcPacoteOfertaStatusBadge');
-    const pacoteOfertaDetalhes = document.getElementById('orcPacoteOfertaDetalhes');
-    const pacoteOfertaApplyWrap = document.getElementById('orcPacoteOfertaApplyWrap');
-    const pacoteOfertaApplyCheck = document.getElementById('orcPacoteOfertaApplyCheck');
-    const pacoteOfertaLinkWrap = document.getElementById('orcPacoteOfertaLinkWrap');
-    const pacoteOfertaLinkBtn = document.getElementById('orcPacoteOfertaLinkBtn');
-    const btnPacoteOfertaCopyLink = document.getElementById('btnOrcPacoteOfertaCopyLink');
-    const btnPacoteOfertaRefresh = document.getElementById('btnOrcPacoteOfertaRefresh');
-    const btnPacoteOfertaEnviar = document.getElementById('btnEnviarPacoteOferta');
+    const pacoteOfertaApplyIdInput = document.getElementById('orcamentoPacotebfertaId');
+    const pacoteOfertaApplyFlagInput = document.getElementById('orcamentoAplicarPacotebferta');
+    const pacoteOfertaPacoteSelect = document.getElementById('orcPacotebfertaPacoteId');
+    const pacoteOfertaTelefoneInput = document.getElementById('orcPacotebfertaTelefone');
+    const pacoteOfertaExpiraSelect = document.getElementById('orcPacotebfertaExpiraDias');
+    const pacoteOfertaEnviarWhatsappCheckbox = document.getElementById('orcPacotebfertaEnviarWhatsapp');
+    const pacoteOfertaMensagemInput = document.getElementById('orcPacotebfertaMensagem');
+    const pacoteOfertaMensagemLinkWrap = document.getElementById('orcPacotebfertaMensagemLinkWrap');
+    const pacoteOfertaMensagemComLinkCheckbox = document.getElementById('orcPacotebfertaMensagemComLink');
+    const pacoteOfertaStatusWrap = document.getElementById('orcPacotebfertaStatusWrap');
+    const pacoteOfertaStatusTitle = document.getElementById('orcPacotebfertaStatusTitle');
+    const pacoteOfertaStatusDesc = document.getElementById('orcPacotebfertaStatusDesc');
+    const pacoteOfertaStatusBadge = document.getElementById('orcPacotebfertaStatusBadge');
+    const pacoteOfertaDetalhes = document.getElementById('orcPacotebfertaDetalhes');
+    const pacoteOfertaApplyWrap = document.getElementById('orcPacotebfertaApplyWrap');
+    const pacoteOfertaApplyCheck = document.getElementById('orcPacotebfertaApplyCheck');
+    const pacoteOfertaLinkWrap = document.getElementById('orcPacotebfertaLinkWrap');
+    const pacoteOfertaLinkBtn = document.getElementById('orcPacotebfertaLinkBtn');
+    const btnPacotebfertaCopyLink = document.getElementById('btnOrcPacotebfertaCopyLink');
+    const btnPacotebfertaRefresh = document.getElementById('btnOrcPacotebfertaRefresh');
+    const btnPacotebfertaEnviar = document.getElementById('btnEnviarPacotebferta');
     const pacoteOfertaStatusLabels = {
         ativo: 'Ativo',
         enviado: 'Enviado',
         escolhido: 'Escolhido pelo cliente',
-        aplicado_orcamento: 'Aplicado no orcamento',
+        aplicado_orcamento: 'Aplicado no orçamento',
         expirado: 'Expirado',
         cancelado: 'Cancelado',
         erro_envio: 'Erro de envio',
@@ -946,12 +946,12 @@ if (empty($itens)) {
         resend: 'Reenviar oferta',
     };
     const setPacoteOfertaSendLabel = (isResend = false) => {
-        if (!btnPacoteOfertaEnviar) {
+        if (!btnPacotebfertaEnviar) {
             return;
         }
         const label = isResend ? pacoteOfertaSendLabels.resend : pacoteOfertaSendLabels.send;
-        btnPacoteOfertaEnviar.dataset.mode = isResend ? 'resend' : 'send';
-        btnPacoteOfertaEnviar.innerHTML = `<i class="bi bi-send me-1"></i>${label}`;
+        btnPacotebfertaEnviar.dataset.mode = isResend ? 'resend' : 'send';
+        btnPacotebfertaEnviar.innerHTML = `<i class="bi bi-send me-1"></i>${label}`;
     };
 
     const toNumber = (value) => {
@@ -1027,7 +1027,7 @@ if (empty($itens)) {
             return {
                 code: 'assistencia_sem_os',
                 title: 'Selecione uma OS aberta',
-                text: 'Para salvar um orcamento com equipamento na assistencia, escolha primeiro uma OS aberta vinculada ao equipamento em atendimento.',
+                text: 'Para salvar um orçamento com equipamento na assistência, escolha primeiro uma OS aberta vinculada ao equipamento em atendimento.',
                 focusTarget: osLookupSelect || tipoSelect || null,
             };
         }
@@ -1035,8 +1035,8 @@ if (empty($itens)) {
         if (!tipoAssistencia && possuiVinculoOs) {
             return {
                 code: 'previo_com_os',
-                title: 'Revise o tipo do orcamento',
-                text: 'Este orcamento ainda possui uma OS vinculada. Mantenha o tipo como "com equipamento na assistencia" ou remova o vinculo da OS antes de salvar.',
+                title: 'Revise o tipo do orçamento',
+                text: 'Este orçamento ainda possui uma OS vinculada. Mantenha o tipo como "com equipamento na assistência" ou remova o vínculo da OS antes de salvar.',
                 focusTarget: tipoSelect || osLookupSelect || null,
             };
         }
@@ -1142,7 +1142,7 @@ if (empty($itens)) {
         row.dataset.pieceRecommendedPrice = fixed(pricingMeta.valorRecomendado);
         row.dataset.piecePricingMode = String(pricingMeta.modoPrecificacao || 'peca_instalada_auto');
 
-        const detalhe = `Peca instalada: base ${formatMoneyLabel(pricingMeta.precoBase)} + encargos ${formatPercentLabel(pricingMeta.percentualEncargos)} (${formatMoneyLabel(pricingMeta.valorEncargos)}) + margem ${formatPercentLabel(pricingMeta.percentualMargem)} (${formatMoneyLabel(pricingMeta.valorMargem)}) = recomendado ${formatMoneyLabel(pricingMeta.valorRecomendado)}.`;
+        const detalhe = `Peça instalada: base ${formatMoneyLabel(pricingMeta.precoBase)} + encargos ${formatPercentLabel(pricingMeta.percentualEncargos)} (${formatMoneyLabel(pricingMeta.valorEncargos)}) + margem ${formatPercentLabel(pricingMeta.percentualMargem)} (${formatMoneyLabel(pricingMeta.valorMargem)}) = recomendado ${formatMoneyLabel(pricingMeta.valorRecomendado)}.`;
         metaEl.textContent = detalhe;
         metaEl.classList.remove('d-none', 'text-warning');
         metaEl.classList.add('text-primary');
@@ -1222,8 +1222,8 @@ if (empty($itens)) {
         if (notifyUser && window.Swal) {
             await window.Swal.fire({
                 icon: 'info',
-                title: 'Valor ajustado para peca instalada',
-                text: `O piso minimo recomendado e ${formatMoneyLabel(valorRecomendado)}.`,
+                title: 'Valor ajustado para peça instalada',
+                text: `O piso mínimo recomendado é ${formatMoneyLabel(valorRecomendado)}.`,
                 toast: true,
                 position: 'top-end',
                 timer: 2500,
@@ -1326,7 +1326,7 @@ if (empty($itens)) {
                     const isPeca = String(item?.kind || '').toLowerCase() === 'peca';
                     const priceLabelRaw = formatMoneyLabel(item.valor_unitario);
                     const priceLabel = isPeca && priceLabelRaw
-                        ? `Recomendado (peca instalada): ${priceLabelRaw}`
+                        ? `Recomendado (peça instalada): ${priceLabelRaw}`
                         : priceLabelRaw;
                     const estoqueLabel = item.kind === 'peca' && item.estoque !== null
                         ? `Estoque: ${item.estoque}`
@@ -1335,7 +1335,7 @@ if (empty($itens)) {
                     if (item.codigo) metaParts.push(item.codigo);
                     if (item.categoria) metaParts.push(item.categoria);
                     if (item.tipo_equipamento) metaParts.push(item.tipo_equipamento);
-                    const metaLabel = metaParts.length ? metaParts.join(' • ') : '';
+                    const metaLabel = metaParts.length ? metaParts.join(' â€¢ ') : '';
                     const infoLine = [priceLabel, estoqueLabel].filter(Boolean).join(' | ');
                     return `
                         <div class="d-flex flex-column">
@@ -1449,7 +1449,7 @@ if (empty($itens)) {
         if (unitInput) {
             unitInput.addEventListener('blur', () => {
                 enforcePieceMinimumPrice(row, true).catch((error) => {
-                    console.error('[Orçamentos] Falha ao aplicar piso minimo de peca instalada.', error);
+                    console.error('[Orçamentos] Falha ao aplicar piso mínimo de peça instalada.', error);
                 });
             });
         }
@@ -1465,7 +1465,7 @@ if (empty($itens)) {
                 const proceed = await window.DSFeedback.confirm({
                     icon: 'warning',
                     title: 'Remover item?',
-                    text: 'Este item sera removido do orcamento.',
+                    text: 'Este item será removido do orçamento.',
                     showCancelButton: true,
                     confirmButtonText: 'Remover',
                     cancelButtonText: 'Cancelar',
@@ -1482,7 +1482,7 @@ if (empty($itens)) {
         syncItemCatalogVisibility(row);
         hydrateRowPricingMeta(row);
         enforcePieceMinimumPrice(row, false).catch((error) => {
-            console.error('[Orçamentos] Falha ao aplicar piso minimo inicial de peca instalada.', error);
+            console.error('[Orçamentos] Falha ao aplicar piso mínimo inicial de peça instalada.', error);
         });
     };
 
@@ -1493,7 +1493,7 @@ if (empty($itens)) {
             <td data-label="Tipo">
                 <select name="item_tipo[]" class="form-select form-select-sm">
                     <option value="servico">Serviço</option>
-                    <option value="peca">Peca</option>
+                    <option value="peca">Peça</option>
                     <option value="combo">Combo</option>
                     <option value="avulso">Avulso</option>
                 </select>
@@ -1505,12 +1505,12 @@ if (empty($itens)) {
                     <input type="hidden" class="item-referencia-id" name="item_referencia_id[]" value="">
                 </div>
                 <small class="item-pricing-meta d-none"></small>
-                <input type="text" class="form-control form-control-sm mt-1" name="item_observacao[]" placeholder="Observacao do item (opcional)">
+                <input type="text" class="form-control form-control-sm mt-1" name="item_observacao[]" placeholder="Observação do item (opcional)">
             </td>
             <td data-label="Qtd."><input type="number" step="0.01" min="0.01" class="form-control form-control-sm item-qty" name="item_quantidade[]" value="1"></td>
             <td data-label="Valor unit."><input type="text" class="form-control form-control-sm item-unit" name="item_valor_unitario[]" value="0.00"></td>
             <td data-label="Desconto"><input type="text" class="form-control form-control-sm item-desconto" name="item_desconto[]" value="0.00"></td>
-            <td data-label="Acrescimo"><input type="text" class="form-control form-control-sm item-acrescimo" name="item_acrescimo[]" value="0.00"></td>
+            <td data-label="Acréscimo"><input type="text" class="form-control form-control-sm item-acrescimo" name="item_acrescimo[]" value="0.00"></td>
             <td data-label="Total"><input type="text" class="form-control form-control-sm item-total" value="0.00" readonly></td>
             <td data-label="Ação" class="text-center">
                 <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item" title="Remover item">
@@ -1571,8 +1571,8 @@ if (empty($itens)) {
     const syncTipoOrcamentoHelp = () => {
         if (!tipoHelp) return;
         tipoHelp.textContent = isTipoAssistencia()
-            ? 'Use quando o equipamento ja estiver na assistencia e vinculado a uma OS aberta.'
-            : 'Use para estimativa inicial quando o equipamento ainda não tiver entrado na assistencia.';
+            ? 'Use quando o equipamento já estiver na assistência e vinculado a uma OS aberta.'
+            : 'Use para estimativa inicial quando o equipamento ainda não tiver entrado na assistência.';
     };
 
     const normalizeTitleChunk = (value) => String(value ?? '').replace(/\s+/g, ' ').trim();
@@ -1751,7 +1751,7 @@ if (empty($itens)) {
     const resolveOsTitulo = () => {
         const osNumero = normalizeTitleChunk(osNumeroHintInput?.value || '');
         if (osNumero !== '') {
-            return osNumero.toUpperCase().startsWith('OS') ? osNumero : `OS ${osNumero}`;
+            return osNumero.toUpperCase().startsWith('OS') ? osNumero : `bS ${osNumero}`;
         }
         const osId = normalizeTitleChunk(osIdInput?.value || '');
         if (osId !== '') {
@@ -2161,7 +2161,7 @@ if (empty($itens)) {
         return String(raw ?? '').trim() !== '';
     };
 
-    const hasDraftClienteOuEquipamento = (snapshot) => {
+    const hasDraftClientebuEquipamento = (snapshot) => {
         if (!snapshot || typeof snapshot !== 'object') return false;
         if (String(snapshot?.cliente_lookup?.value || '').trim() !== '') {
             return true;
@@ -2248,7 +2248,7 @@ if (empty($itens)) {
             hideDraftAlert();
             return;
         }
-        if (!hasDraftClienteOuEquipamento(snapshot)) {
+        if (!hasDraftClientebuEquipamento(snapshot)) {
             clearDraftStorage();
             hideDraftAlert();
             return;
@@ -2389,7 +2389,7 @@ if (empty($itens)) {
             return normalized;
         }
         if (!/^[1-9]{2}9\d{8}$/.test(normalized)) {
-            telefoneInput.setCustomValidity('Use um celular WhatsApp valido com DDD. Ex.: (11) 98765-4321.');
+            telefoneInput.setCustomValidity('Use um celular WhatsApp válido com DDD. Ex.: (11) 98765-4321.');
             return normalized;
         }
         telefoneInput.setCustomValidity('');
@@ -2700,7 +2700,7 @@ if (empty($itens)) {
 
         const status = String(oferta.status || 'ativo').trim();
         const statusLabel = String(oferta.status_label || pacoteOfertaStatusLabels[status] || status || 'Ativo');
-        const pacoteNome = String(oferta.pacote_nome || 'Pacote de servicos').trim();
+        const pacoteNome = String(oferta.pacote_nome || 'Pacote de serviços').trim();
         const pacoteId = String(oferta.pacote_servico_id || '').trim();
         const nivelNome = String(oferta.nivel_nome_exibicao || oferta.nivel_escolhido || '').trim();
         const valor = Number(oferta.valor_escolhido || 0);
@@ -2846,7 +2846,7 @@ if (empty($itens)) {
             if (requestToken !== pacoteOfertaRequestToken) return;
             renderPacoteOfertaState(payload?.oferta || null);
         } catch (error) {
-            console.error('[Orçamentos] Falha ao detectar oferta dinamica de pacote.', error);
+            console.error('[Orçamentos] Falha ao detectar oferta dinâmica de pacote.', error);
         }
     };
 
@@ -2861,7 +2861,7 @@ if (empty($itens)) {
     };
 
     const sendPacoteOferta = async () => {
-        if (!pacoteOfertaModuleReady || !btnPacoteOfertaEnviar) {
+        if (!pacoteOfertaModuleReady || !btnPacotebfertaEnviar) {
             return;
         }
 
@@ -2880,7 +2880,7 @@ if (empty($itens)) {
             : (telefoneContato || telefoneOferta);
         if (!isWhatsappMobileValid(telefoneDigits)) {
             if (window.Swal) {
-                await window.Swal.fire('Telefone invalido', 'Informe um celular WhatsApp valido com DDD para envio da oferta.', 'warning');
+                await window.Swal.fire('Telefone inválido', 'Informe um celular WhatsApp válido com DDD para envio da oferta.', 'warning');
             }
             return;
         }
@@ -2905,7 +2905,7 @@ if (empty($itens)) {
         formData.append('itens_snapshot', JSON.stringify(collectItemRowsSnapshot()));
         formData.append(csrfTokenName, csrfHashValue);
 
-        btnPacoteOfertaEnviar.disabled = true;
+        btnPacotebfertaEnviar.disabled = true;
         try {
             const response = await fetch(pacoteOfertaSendUrl, {
                 method: 'POST',
@@ -2931,12 +2931,12 @@ if (empty($itens)) {
                 });
             }
         } catch (error) {
-            console.error('[Orçamentos] Falha ao enviar oferta dinamica de pacote.', error);
+            console.error('[Orçamentos] Falha ao enviar oferta dinâmica de pacote.', error);
             if (window.Swal) {
                 await window.Swal.fire('Erro de comunicação', 'Não foi possível concluir o envio da oferta.', 'error');
             }
         } finally {
-            btnPacoteOfertaEnviar.disabled = false;
+            btnPacotebfertaEnviar.disabled = false;
             scheduleDetectPacoteOferta();
         }
     };
@@ -3171,8 +3171,8 @@ if (empty($itens)) {
                 }
             }
 
-            // Fallback alinhado ao comportamento da abertura da OS:
-            // quando não houver histórico da combinacao tipo+marca,
+            // Fallback alinhado ao comportamento da abertura da bS:
+            // quando não houver histórico da combinação tipo+marca,
             // listar os modelos da marca para não travar a selecao.
             return catalogState.modelosByMarca[marcaKey] || [];
         };
@@ -3250,7 +3250,7 @@ if (empty($itens)) {
             setSelectOptions(
                 equipModeloSelect,
                 modelos,
-                modelos.length > 0 ? 'Selecione o modelo...' : 'Nenhum modelo para esta combinacao',
+                modelos.length > 0 ? 'Selecione o modelo...' : 'Nenhum modelo para esta combinação',
                 selectedModelo
             );
         };
@@ -3600,7 +3600,7 @@ if (empty($itens)) {
             btnOrcNovoModelo,
         ];
 
-        const hasLinkedEquipamentoInSelectedOs = () => {
+        const hasLinkedEquipamentoInSelectedbs = () => {
             const selectedOsId = normalizeId(osIdInput?.value || '');
             if (!selectedOsId) {
                 return false;
@@ -3778,8 +3778,8 @@ if (empty($itens)) {
             }
             setOsLookupHelp(
                 totalAbertas > 1
-                    ? 'Cliente com mais de uma OS aberta. Escolha abaixo a OS correta para este orcamento.'
-                    : 'OS aberta vinculada automaticamente para este orcamento.'
+                    ? 'Cliente com mais de uma OS aberta. Escolha abaixo a OS correta para este orçamento.'
+                    : 'OS aberta vinculada automaticamente para este orçamento.'
             );
             if (osLookupSelect) {
                 osLookupSelect.value = osSelecionadaId;
@@ -3863,7 +3863,7 @@ if (empty($itens)) {
                     }
                     renderOsLookupPrompt(
                         1,
-                        'Existe 1 OS aberta para este cliente. Se este orcamento for de assistencia, selecione a OS para herdar o equipamento.'
+                        'Existe 1 OS aberta para este cliente. Se este orçamento for de assistência, selecione a OS para herdar o equipamento.'
                     );
                     return;
                 }
@@ -3876,7 +3876,7 @@ if (empty($itens)) {
                     return;
                 }
 
-                renderOsLookupPrompt(0, 'Este cliente não possui OS aberta elegivel para vinculo automatico.');
+                renderOsLookupPrompt(0, 'Este cliente não possui OS aberta elegível para vínculo automático.');
             } catch (error) {
                 console.error('[Orçamentos] Falha ao consultar OS abertas do cliente.', error);
                 if (requestToken !== osLookupRequestToken) {
@@ -3965,7 +3965,7 @@ if (empty($itens)) {
             const equipamentoSelecionado = normalizeId(equipamentoIdInput?.value || '');
             const tipoAssistencia = isTipoAssistencia();
             const requestToken = ++visibilityRequestToken;
-            const osTemEquipamentoVinculado = hasLinkedEquipamentoInSelectedOs();
+            const osTemEquipamentoVinculado = hasLinkedEquipamentoInSelectedbs();
             const osSemEquipamentoVinculado = osSelecionada !== '' && !osTemEquipamentoVinculado;
 
             setManualSectionVisible(!osTemEquipamentoVinculado);
@@ -3987,7 +3987,7 @@ if (empty($itens)) {
                     }
                     setManualLocked(true);
                     setManualFieldsVisible(false);
-                    setEquipamentoLookupHint('Selecione primeiro o cliente e a OS aberta para orcamento com equipamento na assistencia.', 'light');
+                    setEquipamentoLookupHint('Selecione primeiro o cliente e a OS aberta para orçamento com equipamento na assistência.', 'light');
                     return;
                 }
                 setManualLocked(false);
@@ -4011,7 +4011,7 @@ if (empty($itens)) {
                 setManualLocked(true);
                 setManualFieldsVisible(false);
                 setEquipamentoLookupHint(
-                    'Equipamento herdado da OS selecionada. Para trocar o equipamento, altere primeiro o vinculo da OS aberta.',
+                    'Equipamento herdado da OS selecionada. Para trocar o equipamento, altere primeiro o vínculo da OS aberta.',
                     'info'
                 );
                 return;
@@ -4027,9 +4027,9 @@ if (empty($itens)) {
                 setManualLocked(true);
                 setManualFieldsVisible(false);
                 if (currentOsAbertasOptions.length > 0) {
-                    setEquipamentoLookupHint('Selecione uma OS aberta para herdar automaticamente o equipamento em assistencia.', 'info');
+                    setEquipamentoLookupHint('Selecione uma OS aberta para herdar automaticamente o equipamento em assistência.', 'info');
                 } else {
-                    setEquipamentoLookupHint('Não há OS aberta elegivel para este cliente. Abra uma OS ou mude o tipo para orcamento previo.', 'warning');
+                    setEquipamentoLookupHint('Não há OS aberta elegível para este cliente. Abra uma OS ou mude o tipo para orçamento prévio.', 'warning');
                 }
                 return;
             }
@@ -4103,7 +4103,7 @@ if (empty($itens)) {
                     await window.Swal.fire({
                         icon: 'info',
                         title: 'Tipo ajustado automaticamente',
-                        text: 'Como este orcamento esta vinculado a uma OS aberta, ele precisa permanecer como "Orçamento com equipamento na assistencia".',
+                        text: 'Como este orçamento está vinculado a uma OS aberta, ele precisa permanecer como "orçamento com equipamento na assistência".',
                         confirmButtonText: 'Entendi',
                     });
                 }
@@ -4417,12 +4417,12 @@ if (empty($itens)) {
                     }
                     return;
                 }
-                if (inputEditarMarcaIdOrc) inputEditarMarcaIdOrc.value = marcaId;
+                if (inputEditarMarcaIdbrc) inputEditarMarcaIdbrc.value = marcaId;
                 if (inputNovaMarcaOrc) inputNovaMarcaOrc.value = marcaNome;
                 if (labelModalMarcaOrc) labelModalMarcaOrc.innerHTML = '<i class="bi bi-pencil text-warning me-2"></i>Editar Marca';
                 if (btnSalvarMarcaOrc) btnSalvarMarcaOrc.textContent = 'Salvar alteracao';
             } else {
-                if (inputEditarMarcaIdOrc) inputEditarMarcaIdOrc.value = '';
+                if (inputEditarMarcaIdbrc) inputEditarMarcaIdbrc.value = '';
                 if (inputNovaMarcaOrc) inputNovaMarcaOrc.value = '';
                 if (labelModalMarcaOrc) labelModalMarcaOrc.innerHTML = '<i class="bi bi-tag text-warning me-2"></i>Nova Marca';
                 if (btnSalvarMarcaOrc) btnSalvarMarcaOrc.textContent = 'Salvar Marca';
@@ -4458,12 +4458,12 @@ if (empty($itens)) {
                     }
                     return;
                 }
-                if (inputEditarModeloIdOrc) inputEditarModeloIdOrc.value = modeloId;
+                if (inputEditarModeloIdbrc) inputEditarModeloIdbrc.value = modeloId;
                 if (inputNovoModeloOrc) inputNovoModeloOrc.value = modeloNome;
                 if (labelModalModeloOrc) labelModalModeloOrc.innerHTML = '<i class="bi bi-pencil text-warning me-2"></i>Editar Modelo';
                 if (btnSalvarModeloOrc) btnSalvarModeloOrc.innerHTML = '<i class="bi bi-check-lg me-1"></i>Salvar alteracao';
             } else {
-                if (inputEditarModeloIdOrc) inputEditarModeloIdOrc.value = '';
+                if (inputEditarModeloIdbrc) inputEditarModeloIdbrc.value = '';
                 if (inputNovoModeloOrc) inputNovoModeloOrc.value = '';
                 if (labelModalModeloOrc) labelModalModeloOrc.innerHTML = '<i class="bi bi-cpu text-warning me-2"></i>Novo Modelo';
                 if (btnSalvarModeloOrc) btnSalvarModeloOrc.innerHTML = '<i class="bi bi-check-lg me-1"></i>Salvar Modelo';
@@ -4479,7 +4479,7 @@ if (empty($itens)) {
 
         btnSalvarMarcaOrc?.addEventListener('click', async function () {
             const nome = normalizeName(inputNovaMarcaOrc?.value || '');
-            const editingMarcaId = normalizeId(inputEditarMarcaIdOrc?.value || '');
+            const editingMarcaId = normalizeId(inputEditarMarcaIdbrc?.value || '');
             if (!nome) return;
 
             this.disabled = true;
@@ -4536,7 +4536,7 @@ if (empty($itens)) {
             const nome = normalizeName(inputNovoModeloOrc?.value || '');
             const marcaId = normalizeId(equipMarcaSelect.value);
             const tipoId = normalizeId(equipTipoSelect.value);
-            const editingModeloId = normalizeId(inputEditarModeloIdOrc?.value || '');
+            const editingModeloId = normalizeId(inputEditarModeloIdbrc?.value || '');
             if (!nome || !marcaId) return;
 
             this.disabled = true;
@@ -4679,13 +4679,13 @@ if (empty($itens)) {
     });
 
     pacoteOfertaApplyCheck?.addEventListener('change', syncPacoteOfertaApplyHidden);
-    btnPacoteOfertaRefresh?.addEventListener('click', () => {
+    btnPacotebfertaRefresh?.addEventListener('click', () => {
         detectPacoteOferta();
     });
-    btnPacoteOfertaEnviar?.addEventListener('click', async () => {
+    btnPacotebfertaEnviar?.addEventListener('click', async () => {
         await sendPacoteOferta();
     });
-    btnPacoteOfertaCopyLink?.addEventListener('click', async () => {
+    btnPacotebfertaCopyLink?.addEventListener('click', async () => {
         const url = String(pacoteOfertaLinkBtn?.href || '').trim();
         if (!url || url === '#') {
             return;
@@ -4702,7 +4702,7 @@ if (empty($itens)) {
                 ta.remove();
             }
             if (window.Swal) {
-                await window.Swal.fire('Link copiado', 'O link da oferta foi copiado para a area de transferencia.', 'success');
+                await window.Swal.fire('Link copiado', 'b link da oferta foi copiado para a area de transferencia.', 'success');
             }
         } catch (error) {
             console.error('[Orçamentos] Falha ao copiar link da oferta.', error);
@@ -4730,15 +4730,15 @@ if (empty($itens)) {
             const osSelecionada = normalizeId(osIdInput?.value || '');
 
             if (tipoAssistencia && clienteSelecionado === '') {
-                errors.push('Tipo de orcamento: selecione um cliente cadastrado para vincular a OS aberta do equipamento em assistencia.');
+                errors.push('Tipo de orçamento: selecione um cliente cadastrado para vincular a OS aberta do equipamento em assistência.');
             }
 
             if (tipoAssistencia && osSelecionada === '') {
-                errors.push('Tipo de orcamento: selecione uma OS aberta para herdar o equipamento ja em assistencia.');
+                errors.push('Tipo de orçamento: selecione uma OS aberta para herdar o equipamento já em assistência.');
             }
 
             if (!tipoAssistencia && osSelecionada !== '') {
-                errors.push('Tipo de orcamento: um orcamento previo não pode permanecer vinculado a uma OS aberta. Ajuste o tipo para "com equipamento na assistencia".');
+                errors.push('Tipo de orçamento: um orçamento prévio não pode permanecer vinculado a uma OS aberta. Ajuste o tipo para "com equipamento na assistência".');
             }
 
             if (phoneDigits !== '' && !isWhatsappMobileValid(phoneDigits)) {
@@ -4763,7 +4763,7 @@ if (empty($itens)) {
                 errors.push('Orçamento baseado em pacote: selecione o pacote para envio da oferta.');
             }
             if (isPacoteBaseado && !isWhatsappMobileValid(pacoteTelefoneDigits)) {
-                errors.push('Orçamento baseado em pacote: informe um telefone WhatsApp valido para envio do link.');
+                errors.push('Orçamento baseado em pacote: informe um telefone WhatsApp válido para envio do link.');
             }
 
             if (errors.length > 0) {
@@ -4772,7 +4772,7 @@ if (empty($itens)) {
                 setSubmitLoading(false);
                 await window.DSFeedback.fire({
                     icon: 'warning',
-                    title: 'Revise os dados do orcamento',
+                    title: 'Revise os dados do orçamento',
                     html: errors.map((item) => `<div class="text-start">${escapeHtml(item)}</div>`).join(''),
                     confirmButtonText: 'Entendi',
                 });
@@ -4975,3 +4975,7 @@ if (empty($itens)) {
 <?= $this->endSection() ?>
 
 <?= $this->endSection() ?>
+
+
+
+

@@ -202,12 +202,12 @@ class CrmService
 
         $map = [
             'triagem' => ['os_aberta', 'OS aberta', 'OS registrada no atendimento'],
-            'diagnostico' => ['diagnostico_iniciado', 'Diagnostico iniciado', 'Diagnostico tecnico em andamento'],
-            'aguardando_autorizacao' => ['orcamento_aguardando', 'Aguardando autorizacao', 'Orcamento aguardando retorno do cliente'],
-            'aguardando_peca' => ['os_pausada_peca', 'Aguardando peca', 'Atendimento pausado aguardando peca'],
+            'diagnostico' => ['diagnostico_iniciado', 'Diagnóstico iniciado', 'Diagnóstico técnico em andamento'],
+            'aguardando_autorizacao' => ['orcamento_aguardando', 'Aguardando autorização', 'Orçamento aguardando retorno do cliente'],
+            'aguardando_peca' => ['os_pausada_peca', 'Aguardando peça', 'Atendimento pausado aguardando peça'],
             'reparado_disponivel_loja' => ['equipamento_pronto', 'Equipamento pronto', 'Equipamento pronto para retirada'],
             'entregue_reparado' => ['os_entregue', 'Equipamento entregue', 'Atendimento finalizado com entrega'],
-            'devolvido_sem_reparo' => ['os_devolvida_sem_reparo', 'Devolucao sem reparo', 'Atendimento finalizado sem reparo'],
+            'devolvido_sem_reparo' => ['os_devolvida_sem_reparo', 'Devolução sem reparo', 'Atendimento finalizado sem reparo'],
         ];
 
         if (isset($map[$statusCode])) {

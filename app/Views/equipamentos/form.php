@@ -872,7 +872,7 @@ $(document).ready(function() {
     const initClosest = findClosestColor(initHex);
     updateColorUI(initHex, initClosest ? initClosest.name : ($('#corNomeReal').val() || 'Preto'));
 
-    // --- LÓGICA DE DETECÇ�O DE COR INTELIGENTE NA IMAGEM ---
+    // --- L?GICA DE DETEC??O DE COR INTELIGENTE NA IMAGEM ---
 // (smartColorMap removido, usando PROFESSIONAL_COLORS)
 
     function rgbToHexStr(r, g, b) {

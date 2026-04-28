@@ -1,7 +1,7 @@
-# Historico de Versoes do Sistema
+﻿# Historico de Versoes do Sistema
 
-Atualizado em: 26/04/2026  
-Versao atual oficial: `2.15.18`
+Atualizado em: 28/04/2026  
+Versao atual oficial: `2.16.17`
 
 ## Observacao sobre o App Mobile/PWA
 
@@ -20,6 +20,131 @@ Estado documental atual do app:
 - documentacao exclusiva aprofundada em 04/04/2026
 
 ## Release ERP + App
+
+### 28/04/2026 - v2.16.17 / app 0.4.2
+- o dropdown `Imprimir` da visualizacao da OS passou a tratar `Bobina 80mm` como fluxo direto, abrindo o documento termico ja com disparo automatico da caixa de dialogo de impressao do sistema operacional;
+- o formato `80mm` deixou de reutilizar a modal de pre-visualizacao do `A4` e ganhou layout proprio em `app/Views/os/print.php`, com composicao linear e tipografia mono mais adequada para impressoras termicas;
+- o endpoint de impressao da OS passou a aceitar `auto_print=1` no contexto termico para acionar `window.print()` automaticamente sem etapa extra de gerenciamento;
+- a documentacao funcional e o historico oficial foram sincronizados com o novo fluxo de impressao termica direta;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.17`.
+
+### 27/04/2026 - v2.16.16 / app 0.4.2
+- foi criada uma secao propria `Relato do Cliente e Diagnostico Tecnico` logo apos `Equipamento` no documento consolidado da OS;
+- essa nova secao passa a ocupar o espaco antes usado por `Tecnico Responsavel`, simplificando a hierarquia do documento;
+- a secao `Equipamento` voltou a ficar restrita aos dados tecnicos do aparelho;
+- a documentacao funcional e o historico oficial foram sincronizados com essa reorganizacao do layout;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.16`.
+
+### 27/04/2026 - v2.16.14 / app 0.4.2
+- o bloco `Equipamento` do documento consolidado voltou a exibir `Relato do cliente` e `Diagnostico tecnico`, mas sem os cards/retangulos internos usados na tentativa anterior;
+- os textos passaram a ser renderizados de forma integrada ao fluxo da secao, mantendo o contexto tecnico sem pesar visualmente o layout;
+- a documentacao funcional e o historico oficial foram sincronizados com essa nova composicao do documento;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.14`.
+
+### 27/04/2026 - v2.16.13 / app 0.4.2
+- os cards detalhados de `Relato do cliente` e `Diagnostico tecnico` foram removidos de dentro da secao `Equipamento` no documento consolidado da OS;
+- o bloco `Equipamento` voltou a permanecer focado apenas nos dados tecnicos principais do aparelho;
+- a documentacao funcional e o historico oficial foram sincronizados com essa limpeza do layout do documento;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.13`.
+
+### 27/04/2026 - v2.16.12 / app 0.4.2
+- a secao `Técnico Responsável` deixou de ser renderizada no PDF gerado para envio por WhatsApp, permanecendo apenas no fluxo de impressao/preview quando aplicavel;
+- os badges visuais do topo do documento consolidado foram removidos tanto da impressao quanto do PDF final;
+- o campo `Formato` foi removido dos quadros informativos do documento consolidado;
+- o bloco `Equipamento` passou a incorporar `Relato do cliente`, `Diagnostico tecnico`, `Solucao aplicada`, `Procedimentos executados` e observacoes relacionadas;
+- a documentacao funcional e o historico oficial foram sincronizados com a nova composicao do documento consolidado da OS;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.12`.
+
+### 27/04/2026 - v2.16.11 / app 0.4.2
+- a secao `Relato do Cliente & Diagnostico Tecnico` foi removida especificamente do `render-mode-pdf` do documento consolidado da OS;
+- com isso, o PDF gerado para envio deixa de incluir esse bloco, enquanto o preview do navegador pode continuar exibindo a secao quando necessario;
+- a documentacao funcional e o historico oficial foram sincronizados com a remocao da secao no PDF;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.11`.
+
+### 27/04/2026 - v2.16.10 / app 0.4.2
+- o PDF consolidado da OS deixou de reutilizar a casca paginada em tabela da pre-visualizacao e passou a quebrar suas macrosecoes com divisores dedicados no `render-mode-pdf`;
+- a mudanca busca reduzir paginas vazias, blocos deslocados e reordenacao agressiva de layout no arquivo anexado pelo WhatsApp;
+- o preview do navegador continua com a paginação visual rica, enquanto o PDF final usa uma estrutura mais simples e previsivel para o `Dompdf`;
+- documentacao tecnica e funcional do modulo de OS foi sincronizada com a nova estrategia de geracao do PDF;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.10`.
+
+### 27/04/2026 - v2.16.9 / app 0.4.2
+- o modo PDF do documento consolidado da OS passou a reproduzir com mais fidelidade a mesma area util da impressao do navegador, removendo folgas extras de wrapper que alteravam a quebra das paginas no `Dompdf`;
+- as secoes extensas do documento agora podem quebrar entre paginas no PDF gerado, enquanto linhas de tabela, cards e blocos internos continuam preservados para evitar fragmentacao visual;
+- o ajuste busca aproximar o anexo enviado por WhatsApp da mesma organizacao de secoes e paginas vista no fluxo de impressao da OS;
+- documentacao tecnica e funcional do modulo de OS foi sincronizada com a correcao de fidelidade entre impressao e PDF;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.9`.
+
+### 27/04/2026 - v2.16.8 / app 0.4.2
+- o modal de impressao consolidada da OS foi simplificado para usar o formato selecionado exclusivamente no dropdown `Imprimir`, eliminando a duplicidade de selecao dentro da propria janela;
+- a barra lateral antiga do preview foi removida para priorizar a leitura do documento real que sera impresso;
+- o botao `Abrir em nova guia` foi movido para o cabecalho da modal, ao lado do badge do formato atual;
+- o rodape da modal passou a concentrar `Incluir fotos no documento`, `Enviar PDF por WhatsApp` e `Imprimir agora`;
+- o envio do PDF por WhatsApp a partir da impressao foi separado em um modal proprio, mantendo sincronizados formato e opcao de fotos com a pre-visualizacao;
+- a documentacao funcional e de correcao do modulo de OS foi sincronizada com o novo fluxo de impressao;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.8`.
+
+### 27/04/2026 - v2.16.7 / app 0.4.2
+- consolidada a release tecnica dos ajustes recentes da listagem `/os`, incluindo a estabilizacao do bootstrap da `osTable` e a eliminacao do warning `Cannot reinitialise DataTable`;
+- o modal `Alterar status da OS` recebeu saneamento complementar de labels PT-BR, contexto visual e timeline operacional;
+- a impressao consolidada em `Folha A4` foi reorganizada para deixar o cabecalho institucional da empresa em largura total, destacar a identificacao operacional da OS em card proprio, separar os dados do cliente em secao dedicada, criar uma faixa propria para o equipamento e posicionar a foto principal opcional na lateral esquerda desse bloco;
+- o envio de PDF da OS por `WhatsApp` passou a reutilizar o mesmo layout consolidado da impressao `A4` quando houver geracao sob demanda, inclusive como fallback automatico sem depender de um PDF salvo previamente;
+- a view de impressao consolidada recebeu hardening de compatibilidade para manter elementos graficos, cards e blocos coloridos tambem no PDF final gerado pelo `Dompdf`;
+- a composicao do PDF consolidado da OS foi simplificada em tabelas e secoes mais estaveis, melhorando a fidelidade do documento entre pre-visualizacao e envio por WhatsApp;
+- as fotos da impressao consolidada passaram a ser incorporadas em `data URI`, garantindo a presenca da foto principal e das galerias tambem no PDF final;
+- a paginacao do A4 foi organizada em tres blocos: pagina 1 com resumo operacional, pagina 2 com relato/checklist/financeiro/orcamento e pagina 3 reservada para Fotos Anexadas;
+- o rodape do A4 passou a usar contagem coerente na pre-visualizacao e total real no PDF final gerado para envio;
+- paginas sem conteudo util passaram a ser suprimidas no PDF consolidado, evitando folha de Fotos Anexadas sem imagem valida;
+- o backend da OS teve alinhamento do mapa `humanizeWorkflowMacro()`, corrigindo labels de macrofases como `InterrupÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o` e `ConcluÃƒÆ’Ã‚Â­do`;
+- a documentacao oficial da release foi sincronizada com a nova versao do ERP;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.7`.
+
+### 27/04/2026 - v2.16.5 / app 0.4.2
+- restaurada a rota `/os`, que havia passado a responder com erro `500` apos uma rodada de substituicoes textuais em pt-BR corromper fallbacks `??`, nomes de metodos e blocos de bootstrap de dados;
+- `app/Controllers/Os.php`, `app/Views/os/index.php`, `app/Views/os/form.php` e `app/Views/os/show.php` foram saneados ate voltarem a passar em `php -l`;
+- a pagina de edicao da OS e a visualizacao da OS receberam nova limpeza de labels, avisos e mensagens legadas em pt-BR/UTF-8;
+- o menu lateral voltou a exibir corretamente labels como `Ordens de Servico`, `Servicos`, `Estoque de Pecas` e `Gestao de Conhecimento` em ambientes afetados por texto mojibake;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.5`.
+
+### 26/04/2026 - v2.16.4 / app 0.4.2
+- a visualizacao da OS (`/os/visualizar/{id}`) ganhou um novo fluxo de `Imprimir` com dropdown de formatos `Folha A4` e `Bobina 80mm`;
+- antes da impressao final, a tela agora abre um modal de pre-visualizacao com troca imediata de formato e opcao de incluir fotos sem sair da OS;
+- o documento consolidado da impressao passou a reunir cliente, equipamento, datas, status, diagnostico, procedimentos, checklist, acessorios, estado fisico, itens, valores, orcamento vinculado e notas complementares;
+- no modelo `A4`, quando as fotos estao habilitadas, a foto principal de perfil do equipamento passa a ocupar o topo direito do documento;
+- as demais fotos anexadas sao agrupadas ao final por tipo operacional, incluindo entrada, acessorios, perfil e demais grupos tecnicos disponiveis;
+- o modal de pre-visualizacao agora tambem pode enviar o PDF da OS por WhatsApp com mensagem personalizada baseada nos `Templates WhatsApp` da `Gestao de Conhecimento`;
+- o backend passou a gerar PDF temporario para esse envio quando necessario, sem criar nova versao persistida em `os_documentos`;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.4`.
+
+### 26/04/2026 - v2.16.3 / app 0.4.2
+- a tela de edicao da OS (`/os/editar/{id}`) recebeu uma auditoria ampliada de pt-BR/UTF-8, cobrindo labels, placeholders, mensagens de checklist, textos de camera, resumo lateral e blocos operacionais;
+- a visualizacao da OS (`/os/visualizar/{id}`) teve normalizacao complementar nos cards de contexto, na timeline `Historico e Progresso`, nas abas e no resumo do orcamento vinculado;
+- o frontend reativo da listagem `/os` (`public/assets/js/os-list-filters.js`) passou a exibir mensagens e labels auxiliares em pt-BR consistente nos fluxos de status, prazo, fotos e orcamento;
+- as telas `Orcamentos` de formulario e visualizacao receberam revisao adicional de textos de apoio, avisos de vinculo com OS e blocos de resumo comercial;
+- a `Central de Mensagens` teve limpeza complementar de avisos, notificacoes e textos de modal para reduzir exibicao de frases legadas sem acentuacao;
+- os layouts base `app/Views/layouts/main.php` e `app/Views/layouts/embed.php` alinharam o fallback do nome do sistema, reduzindo variacao textual em ambientes sem override de configuracao;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.3`.
+
+### 26/04/2026 - v2.16.2 / app 0.4.2
+- o modulo `Estoque de Pecas` recebeu normalizacao complementar de labels em pt-BR nas telas `Estoque de Pecas`, `Nova Peca`, `Editar Peca` e `Movimentacoes`;
+- foram revisados titulos, cabecalhos de tabela, botoes, textos do modal `Importar Estoque (CSV)` e mensagens operacionais ligadas ao cadastro e importacao de pecas;
+- a simulacao de precificacao da peca instalada passou a exibir toda a interface auxiliar em pt-BR consistente, incluindo avisos e toasts do SweetAlert2;
+- o controller `Estoque.php` teve mensagens de sucesso, erro, exportacao CSV e logs operacionais ajustados para pt-BR;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.2`.
+
+### 26/04/2026 - v2.16.1 / app 0.4.2
+- normalizados em pt-BR os labels mais expostos da listagem `/os`, do modal `Alterar status da OS` e da visualizacao `/os/visualizar/{id}`, incluindo fluxo, timeline, hints e textos auxiliares;
+- a confirmacao de fechamento da `Nova OS` pela listagem ganhou promocao de camada no SweetAlert2 para permanecer acima do modal iframe e do backdrop;
+- o modulo `Servicos` recebeu revisao de labels em pt-BR nas telas de listagem, importacao CSV, cadastro/edicao e nas mensagens globais reaproveitadas pelo frontend;
+- textos operacionais de controllers e scripts auxiliares tambem foram normalizados em pt-BR para reduzir alertas e mensagens com grafia inconsistente;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.1`.
+
+### 26/04/2026 - v2.15.19 / app 0.4.2
+- a tela `/os/visualizar/{id}` ganhou a nova aba `Documentos`, reunindo no mesmo contexto os cards de `Documentos PDF`, `Enviar por WhatsApp` e `Enviar por E-mail`;
+- os cards antigos de `Documentos PDF` e `WhatsApp` deixaram de ficar soltos abaixo da visualizacao principal e passaram a acompanhar a navegacao por abas da OS;
+- foi adicionada a rota `POST /os/email/{id}/enviar`, permitindo anexar um PDF ja gerado da ordem e enviar pelo SMTP configurado no ERP;
+- o backend de `Os.php` passou a montar assunto, mensagem padrao e anexo a partir do documento selecionado em `os_documentos`;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.15.19`.
 
 ### 26/04/2026 - v2.15.18 / app 0.4.2
 - corrigido o clique das notificacoes de resposta publica de orcamento na navbar, que em alguns ambientes estava abrindo `/os` fora do contexto do ERP e caindo em `404 Not Found`;
@@ -749,7 +874,7 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 ### v2.2.13 - Obrigatoriedade de cor e foto no cadastro de equipamento
 - Implementada a validacao obrigatoria de `Cor` e `Foto de Perfil` ao cadastrar novo equipamento via modal na OS.
 - O sistema agora redireciona automaticamente para a aba e campo pendentes (Info, Cor ou Foto) antes de permitir salvar o registro.
-- A cor inicial do cadastro foi resetada para "Nao selecionada" para forçar a identificacao visual correta pelo usuario.
+- A cor inicial do cadastro foi resetada para "Nao selecionada" para forÃƒÆ’Ã‚Â§ar a identificacao visual correta pelo usuario.
 
 ### v2.2.15 - Hotfix de empilhamento de alertas no Checklist da OS
 - O aviso `Checklist incompleto` e demais alertas de validacao passaram a calcular `z-index` dinamicamente com base na pilha ativa de `modals + backdrops`.
@@ -780,7 +905,7 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 ### v2.2.10 - Hardening da paginacao e busca global da listagem de OS
 - A listagem `POST /os/datatable` passou a paginar por IDs ordenados e carregar os detalhes da grade apenas para a pagina atual.
 - A busca global `q` deixou de depender de joins pesados na consulta principal e passou a priorizar numero de OS, cliente, equipamento e tecnico via subconsultas indexadas.
-- Novos indices foram adicionados para catálogos de lookup e para os caminhos cronologicos por `cliente_id` e `equipamento_id`.
+- Novos indices foram adicionados para catÃƒÆ’Ã‚Â¡logos de lookup e para os caminhos cronologicos por `cliente_id` e `equipamento_id`.
 
 ### v2.2.9 - Otimizacao da listagem de OS para alto volume
 - A listagem `POST /os/datatable` passou a separar contagem total, contagem filtrada e consulta paginada com builders mais enxutos.
@@ -799,7 +924,7 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 
 ### v2.2.7 - Alinhamento da Nova OS ao design system
 - A pagina `Nova Ordem de Servico` teve a camada visual consolidada com classes do design system, reduzindo dependencia de estilos inline na area visivel.
-- Sidebar, shell principal, painel de fotos, resumo lateral e titulos auxiliares passaram a seguir o mesmo vocabulário visual do DS.
+- Sidebar, shell principal, painel de fotos, resumo lateral e titulos auxiliares passaram a seguir o mesmo vocabulÃƒÆ’Ã‚Â¡rio visual do DS.
 - Os relatos rapidos visiveis passaram a seguir o padrao direto de botoes pequenos do sistema.
 
 ### v2.2.5 - Paleta azul/cinza suave na Nova OS

@@ -41,7 +41,7 @@
         { dtIndex: 6, dataIndex: 5, key: 'datas', label: 'Datas' },
         { dtIndex: 7, dataIndex: 6, key: 'status', label: 'Status' },
         { dtIndex: 8, dataIndex: 7, key: 'valor_total', label: 'Valor Total' },
-        { dtIndex: 9, dataIndex: 8, key: 'acoes', label: 'Acoes' },
+        { dtIndex: 9, dataIndex: 8, key: 'acoes', label: 'Ações' },
     ];
     const OS_AUTO_FIT_COLUMNS = [
         { dtIndex: 3, nthChild: 4, contentSelector: '.os-cliente-cell', minWidth: 88, paddingOffset: 14, measureMode: 'intrinsic' },
@@ -54,6 +54,75 @@
 
     function normalizeString(value) {
         return String(value ?? '').trim();
+    }
+
+    const PTBR_MOJIBAKE_REPLACEMENTS = [
+        ['ÃƒÆ’Ã‚Â§', 'ç'],
+        ['ÃƒÆ’Ã‚Â£', 'ã'],
+        ['ÃƒÆ’Ã‚Âµ', 'õ'],
+        ['ÃƒÆ’Ã‚Â³', 'ó'],
+        ['ÃƒÆ’Ã‚Â¡', 'á'],
+        ['ÃƒÆ’Ã‚Â©', 'é'],
+        ['ÃƒÆ’Ã‚Âª', 'ê'],
+        ['ÃƒÆ’Ã‚Â­', 'í'],
+        ['ÃƒÆ’Ã‚Âº', 'ú'],
+        ['ÃƒÆ’Ã‚Â', 'Á'],
+        ['Ãƒâ€šÂº', 'º'],
+        ['Ã‚Âº', 'º'],
+        ['ÃƒÂ§', 'ç'],
+        ['ÃƒÂ£', 'ã'],
+        ['ÃƒÂµ', 'õ'],
+        ['ÃƒÂ³', 'ó'],
+        ['ÃƒÂ¡', 'á'],
+        ['ÃƒÂ©', 'é'],
+        ['ÃƒÂª', 'ê'],
+        ['ÃƒÂ­', 'í'],
+        ['ÃƒÂº', 'ú'],
+        ['ÃƒÂ', 'Á'],
+        ['Ã§', 'ç'],
+        ['Ã£', 'ã'],
+        ['Ãµ', 'õ'],
+        ['Ã³', 'ó'],
+        ['Ã¡', 'á'],
+        ['Ã©', 'é'],
+        ['Ãª', 'ê'],
+        ['Ã­', 'í'],
+        ['Ãº', 'ú'],
+        ['Ã', 'Á'],
+        ['ï¿½', ''],
+        ['�', ''],
+    ];
+
+    function normalizePtBrText(value) {
+        let normalized = String(value ?? '');
+        PTBR_MOJIBAKE_REPLACEMENTS.forEach(([from, to]) => {
+            normalized = normalized.split(from).join(to);
+        });
+        return normalized;
+    }
+
+    function normalizeRenderedText(root) {
+        if (!(root instanceof Element)) {
+            return;
+        }
+
+        const elements = [root, ...root.querySelectorAll('*')];
+        elements.forEach((element) => {
+            ['placeholder', 'title', 'aria-label'].forEach((attribute) => {
+                if (!element.hasAttribute(attribute)) {
+                    return;
+                }
+
+                element.setAttribute(attribute, normalizePtBrText(element.getAttribute(attribute)));
+            });
+        });
+
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        let currentNode = walker.nextNode();
+        while (currentNode) {
+            currentNode.nodeValue = normalizePtBrText(currentNode.nodeValue);
+            currentNode = walker.nextNode();
+        }
     }
 
     function normalizeStatusList(value) {
@@ -345,7 +414,7 @@
             chips.push({
                 key: 'data_fim',
                 value: '',
-                text: `Abertura ate: ${state.data_fim}`,
+                text: `Abertura até: ${state.data_fim}`,
             });
         }
 
@@ -353,7 +422,7 @@
             chips.push({
                 key: 'tecnico_id',
                 value: '',
-                text: `Tecnico: ${getLabel('tecnicos', state.tecnico_id)}`,
+                text: `Técnico: ${getLabel('tecnicos', state.tecnico_id)}`,
             });
         }
 
@@ -361,7 +430,7 @@
             chips.push({
                 key: 'tipo_servico',
                 value: '',
-                text: `Servico: ${state.tipo_servico}`,
+                text: `Serviço: ${state.tipo_servico}`,
             });
         }
 
@@ -369,7 +438,7 @@
             chips.push({
                 key: 'valor_min',
                 value: '',
-                text: `Valor min: ${state.valor_min}`,
+                text: `Valor mín.: ${state.valor_min}`,
             });
         }
 
@@ -377,7 +446,7 @@
             chips.push({
                 key: 'valor_max',
                 value: '',
-                text: `Valor max: ${state.valor_max}`,
+                text: `Valor máx.: ${state.valor_max}`,
             });
         }
 
@@ -385,7 +454,7 @@
             chips.push({
                 key: 'situacao',
                 value: '',
-                text: `Situacao: ${getLabel('situacao', state.situacao)}`,
+                text: `Situação: ${getLabel('situacao', state.situacao)}`,
             });
         }
 
@@ -960,6 +1029,9 @@
         const visibility = getResponsiveColumnVisibility(viewport);
         const useCardLayout = isCardLayoutViewport(viewport);
         const pageRoot = tableElement.closest('.os-list-page');
+        if (pageRoot && document.body) {
+            document.body.classList.add('os-list-page');
+        }
         const responsiveProfile = getResponsiveProfile(viewport);
 
         tableElement.classList.toggle('os-mobile-cards', useCardLayout);
@@ -1014,7 +1086,7 @@
                 const columnMeta = OS_TABLE_DATA_COLUMNS.find((column) => column.dtIndex === idx) || null;
                 const isVisibleColumn = columnMeta ? dataTable.column(columnMeta.dtIndex).visible() : false;
                 const label = columnMeta?.label || '';
-                const isActionsCell = !isControlCell && label === 'Acoes' && isVisibleColumn;
+                const isActionsCell = !isControlCell && label === 'Ações' && isVisibleColumn;
 
                 if (isControlCell) {
                     cell.removeAttribute('data-label');
@@ -1083,6 +1155,103 @@
         if (!tableElement || !window.jQuery || !window.jQuery.fn || !window.jQuery.fn.DataTable) {
             return;
         }
+
+        [
+            'osCreateModal',
+            'osDetailsModal',
+            'osPhotosModal',
+            'osDatesModal',
+            'osBudgetModal',
+            'osStatusModal',
+        ].forEach((modalId) => {
+            const modalElement = document.getElementById(modalId);
+            if (modalElement && modalElement.parentElement !== document.body) {
+                document.body.appendChild(modalElement);
+            }
+        });
+
+        if (!window.__osTableFactoryPatched) {
+            const originalUpperDataTable = window.jQuery.fn.DataTable;
+            const originalLowerDataTable = window.jQuery.fn.dataTable;
+
+            if (typeof originalUpperDataTable === 'function') {
+                window.jQuery.fn.DataTable = function patchedOsTableDataTable(...args) {
+                    const tableNode = this && this[0];
+                    const shouldReuse = tableNode
+                        && tableNode.id === 'osTable'
+                        && args.length > 0
+                        && window.jQuery.fn.dataTable.isDataTable(tableNode);
+
+                    return shouldReuse
+                        ? originalUpperDataTable.call(this)
+                        : originalUpperDataTable.apply(this, args);
+                };
+            }
+
+            if (typeof originalLowerDataTable === 'function') {
+                const patchedLowerDataTable = function patchedOsTabledataTable(...args) {
+                    const tableNode = this && this[0];
+                    const shouldReuse = tableNode
+                        && tableNode.id === 'osTable'
+                        && args.length > 0
+                        && originalLowerDataTable.isDataTable(tableNode);
+
+                    return shouldReuse
+                        ? originalLowerDataTable.call(this)
+                        : originalLowerDataTable.apply(this, args);
+                };
+
+                Object.keys(originalLowerDataTable).forEach((key) => {
+                    patchedLowerDataTable[key] = originalLowerDataTable[key];
+                });
+
+                window.jQuery.fn.dataTable = patchedLowerDataTable;
+            }
+
+            window.__osTableFactoryPatched = true;
+        }
+
+        const dataTableExtension = window.jQuery.fn.dataTable?.ext;
+        if (dataTableExtension && !window.__osTableErrModePatched) {
+            const previousErrMode = dataTableExtension.errMode;
+            dataTableExtension.errMode = function osTableErrMode(settings, techNote, message) {
+                const tableId = String(settings?.sTableId || settings?.nTable?.id || '').trim();
+                const normalizedMessage = String(message || '').trim();
+                const isOsReinitWarning = tableId === 'osTable'
+                    && /Cannot reinitialise DataTable/i.test(normalizedMessage);
+
+                if (isOsReinitWarning) {
+                    console.warn('[OS list] Reutilizando instância existente do DataTable.', {
+                        techNote: techNote,
+                        message: normalizedMessage,
+                    });
+                    return;
+                }
+
+                if (typeof previousErrMode === 'function') {
+                    previousErrMode(settings, techNote, message);
+                    return;
+                }
+
+                if (previousErrMode === 'throw') {
+                    throw new Error(normalizedMessage || `DataTables warning (tn/${techNote})`);
+                }
+
+                if (previousErrMode === 'none') {
+                    console.error(normalizedMessage || `DataTables warning (tn/${techNote})`);
+                    return;
+                }
+
+                console.error(normalizedMessage || `DataTables warning (tn/${techNote})`);
+            };
+            window.__osTableErrModePatched = true;
+        }
+
+        if (tableElement.dataset.osListInitialized === '1') {
+            return;
+        }
+
+        tableElement.dataset.osListInitialized = '1';
 
         const config = window.osListConfig || {};
         const labelsMap = config.labels || {};
@@ -1276,7 +1445,7 @@
 
             if (isAllQueueActive(activeState)) {
                 return {
-                    title: 'Todas as ordens de servico',
+                    title: 'Todas as ordens de serviço',
                     subtitle: 'Exibindo OS abertas e fechadas sem o recorte padrao da fila.',
                     counterLabel: 'OS encontradas',
                 };
@@ -1564,7 +1733,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'Nao foi possivel carregar os prazos da OS.');
+                    throw new Error(payload.message || 'Não foi possível carregar os prazos da OS.');
                 }
 
                 hydrateDatesModal(payload);
@@ -1574,10 +1743,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao carregar prazos',
-                        text: error.message || 'Nao foi possivel carregar os prazos da OS.',
+                        text: error.message || 'Não foi possível carregar os prazos da OS.',
                     });
                 } else {
-                    alert(error.message || 'Nao foi possivel carregar os prazos da OS.');
+                    alert(error.message || 'Não foi possível carregar os prazos da OS.');
                 }
             } finally {
                 setDatesModalLoading(false);
@@ -1602,7 +1771,7 @@
             ].filter(Boolean).join(''));
             budgetModalClientName && (budgetModalClientName.textContent = String(osMeta?.cliente_nome || '').trim() || '-');
             budgetModalClientPhone && (budgetModalClientPhone.textContent = `Telefone: ${phone || '-'}`);
-            budgetModalClientEmail && (budgetModalClientEmail.textContent = `Email: ${String(osMeta?.cliente_email || '').trim() || '-'}`);
+            budgetModalClientEmail && (budgetModalClientEmail.textContent = `E-mail: ${String(osMeta?.cliente_email || '').trim() || '-'}`);
             budgetModalEquipmentName && (budgetModalEquipmentName.textContent = String(osMeta?.equipamento_nome || '').trim() || '-');
             budgetModalEquipmentMeta && (budgetModalEquipmentMeta.textContent = `Tipo: ${tipo} | Marca: ${marca} | Modelo: ${modelo}`);
             budgetModalMaoObra && (budgetModalMaoObra.textContent = String(budgetMeta?.valor_mao_obra_label || formatCurrencyValue(budgetMeta?.valor_mao_obra)));
@@ -1633,6 +1802,7 @@
 
             renderBudgetDocuments(budgetMeta?.documents || []);
             setBudgetModalSubmitLabel();
+            normalizeRenderedText(budgetModalElement);
         };
 
         const openBudgetModal = async (osId) => {
@@ -1645,7 +1815,7 @@
             budgetModalBadges && (budgetModalBadges.innerHTML = '');
             budgetModalClientName && (budgetModalClientName.textContent = '-');
             budgetModalClientPhone && (budgetModalClientPhone.textContent = 'Telefone: -');
-            budgetModalClientEmail && (budgetModalClientEmail.textContent = 'Email: -');
+            budgetModalClientEmail && (budgetModalClientEmail.textContent = 'E-mail: -');
             budgetModalEquipmentName && (budgetModalEquipmentName.textContent = '-');
             budgetModalEquipmentMeta && (budgetModalEquipmentMeta.textContent = 'Tipo: -');
             budgetModalMaoObra && (budgetModalMaoObra.textContent = 'R$ 0,00');
@@ -1696,7 +1866,7 @@
             const key = String(state || 'upcoming').trim();
             if (key === 'completed') {
                 return {
-                    label: 'Concluida',
+                    label: 'Concluída',
                     className: 'bg-success-subtle text-success-emphasis border border-success-subtle',
                 };
             }
@@ -1708,7 +1878,7 @@
             }
             if (key === 'probable') {
                 return {
-                    label: 'Provavel',
+                    label: 'Provável',
                     className: 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
                 };
             }
@@ -1792,11 +1962,11 @@
 
         const getStatusBudgetLoadingMarkup = (message) => `
             <div class="card os-tab-card os-status-modal-budget-card">
-                <div class="card-body p-4 text-muted small">${escapeHtml(message || 'Carregando gerenciamento do orcamento...')}</div>
+                <div class="card-body p-4 text-muted small">${escapeHtml(message || 'Carregando gerenciamento do orçamento...')}</div>
             </div>
         `;
 
-        const setStatusBudgetPanelHtml = (html, emptyMessage = 'Nenhuma informacao de orcamento disponivel para esta OS.') => {
+        const setStatusBudgetPanelHtml = (html, emptyMessage = 'Nenhuma informação de orçamento disponível para esta OS.') => {
             if (!statusModalBudgetPanel) {
                 return;
             }
@@ -1853,7 +2023,7 @@
 
         const getStatusModalTechnicianLabel = () => {
             const label = String(activeStatusModalMeta?.os?.tecnico_nome || '').trim();
-            return label || 'Nao atribuido';
+            return label || 'Não atribuído';
         };
 
         const renderStatusModalProceduresList = (items) => {
@@ -1907,7 +2077,7 @@
 
             const tecnicoNome = getStatusModalTechnicianLabel();
             const stamp = formatStatusProcedureTimestamp(new Date());
-            const line = `[${procedimentoBase} - ${stamp} - tecnico: ${tecnicoNome}]`;
+            const line = `[${procedimentoBase} - ${stamp} - técnico: ${tecnicoNome}]`;
             const items = parseStatusModalProcedures(statusModalProcedimentosInput.value);
             items.push(line);
             syncStatusModalProcedures(items);
@@ -1984,7 +2154,7 @@
             updateCsrfFromPayload(payload);
 
             if (!response.ok || !payload.ok) {
-                throw new Error(payload.message || 'Nao foi possivel carregar o fluxo de status.');
+                throw new Error(payload.message || 'Não foi possível carregar o fluxo de status.');
             }
 
             hydrateStatusModal(payload);
@@ -2001,7 +2171,7 @@
             }
 
             if (!Array.isArray(timeline) || timeline.length === 0) {
-                statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponivel para esta OS.</p>';
+                statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponível para esta OS.</p>';
                 return;
             }
 
@@ -2015,13 +2185,13 @@
                 const lastEventAt = formatStatusDateTime(stage?.last_event_at || '');
                 const lastUserName = String(stage?.last_user_name || '').trim();
 
-                let description = 'Etapa futura do fluxo da ordem de servico.';
+                let description = 'Etapa futura do fluxo da ordem de serviço.';
                 if (stageState === 'current' && currentStatusName) {
                     description = `Etapa atual: ${escapeHtml(currentStatusName)}.`;
                 } else if (stageState === 'completed' && lastStatusName) {
                     description = `Passou por ${escapeHtml(lastStatusName)}.`;
                 } else if (stageState === 'probable' && nextStatusNames.length > 0) {
-                    description = `Proximos movimentos provaveis: ${escapeHtml(nextStatusNames.join(', '))}.`;
+                    description = `Próximos movimentos prováveis: ${escapeHtml(nextStatusNames.join(', '))}.`;
                 }
 
                 const metaParts = [];
@@ -2048,6 +2218,7 @@
             }).join('');
 
             statusModalTimeline.innerHTML = `<div class="os-workflow-timeline">${html}</div>`;
+            normalizeRenderedText(statusModalTimeline);
         };
 
         const renderStatusHistory = (history) => {
@@ -2057,7 +2228,7 @@
 
             if (!Array.isArray(history) || history.length === 0) {
                 statusModalHistoryWrap.classList.add('is-empty');
-                statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem historico recente para esta OS.</p>';
+                statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem histórico recente para esta OS.</p>';
                 return;
             }
 
@@ -2075,6 +2246,7 @@
                     '</div>',
                 ].join('');
             }).join('');
+            normalizeRenderedText(statusModalHistoryList);
         };
 
         const setPhotoModalLoading = (isLoading) => {
@@ -2124,7 +2296,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'Nao foi possivel carregar as fotos da OS.');
+                    throw new Error(payload.message || 'Não foi possível carregar as fotos da OS.');
                 }
 
                 const numeroOs = payload.os?.numero_os ? `#${payload.os.numero_os}` : '-';
@@ -2149,7 +2321,7 @@
                 renderPhotoGallery(
                     photoViewerMap.entry,
                     entryPhotos,
-                    'Nenhuma foto foi registrada na abertura desta ordem de servico.'
+                    'Nenhuma foto foi registrada na abertura desta ordem de serviço.'
                 );
 
                 if (window.bootstrap && photoModalTabs.equipmentButton && photoModalTabs.entryButton) {
@@ -2164,10 +2336,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao carregar fotos',
-                        text: error.message || 'Nao foi possivel carregar as fotos da OS.',
+                        text: error.message || 'Não foi possível carregar as fotos da OS.',
                     });
                 } else {
-                    alert(error.message || 'Nao foi possivel carregar as fotos da OS.');
+                    alert(error.message || 'Não foi possível carregar as fotos da OS.');
                 }
             } finally {
                 setPhotoModalLoading(false);
@@ -2245,7 +2417,7 @@
                 statusModalClientPhone.textContent = `Telefone: ${String(osMeta?.cliente_telefone || '').trim() || '-'}`;
             }
             if (statusModalClientEmail) {
-                statusModalClientEmail.textContent = `Email: ${String(osMeta?.cliente_email || '').trim() || '-'}`;
+                statusModalClientEmail.textContent = `E-mail: ${String(osMeta?.cliente_email || '').trim() || '-'}`;
             }
             if (statusModalEquipmentName) {
                 statusModalEquipmentName.textContent = String(osMeta?.equipamento_nome || '').trim() || '-';
@@ -2257,7 +2429,7 @@
                 statusModalEquipmentMeta.textContent = `Tipo: ${tipo} | Marca: ${marca} | Modelo: ${modelo}`;
             }
             if (statusModalEquipmentSerial) {
-                statusModalEquipmentSerial.textContent = `N de serie: ${String(osMeta?.equip_serie || '').trim() || '-'}`;
+                statusModalEquipmentSerial.textContent = `Nº de série: ${String(osMeta?.equip_serie || '').trim() || '-'}`;
             }
 
             if (statusModalCurrentBadges) {
@@ -2276,7 +2448,7 @@
             if (statusModalPrimaryHint) {
                 statusModalPrimaryHint.innerHTML = primaryNextStatus?.nome
                     ? `Fluxo normal sugerido: <strong>${escapeHtml(primaryNextStatus.nome)}</strong>.`
-                    : 'Fluxo normal sugerido: <strong>indisponivel no momento</strong>.';
+                    : 'Fluxo normal sugerido: <strong>indisponível no momento</strong>.';
             }
 
             syncStatusModalProcedures(parseStatusModalProcedures(osMeta?.procedimentos_executados || ''));
@@ -2314,8 +2486,8 @@
 
             if (statusModalNotifyHelp) {
                 statusModalNotifyHelp.textContent = hasClientPhone
-                    ? `Telefone atual para comunicacao: ${phoneLabel || 'nao informado'}.`
-                    : 'Cliente sem telefone cadastrado para comunicacao automatica.';
+                    ? `Telefone atual para comunicação: ${phoneLabel || 'não informado'}.`
+                    : 'Cliente sem telefone cadastrado para comunicação automática.';
                 statusModalNotifyHelp.classList.toggle('text-danger', !hasClientPhone);
             }
 
@@ -2333,6 +2505,8 @@
                     submitLabel: 'Salvar status',
                 });
             }
+
+            normalizeRenderedText(statusModalElement);
         };
 
         const openStatusModal = async (osId) => {
@@ -2350,22 +2524,22 @@
             statusModalSelect.innerHTML = '<option value="">Carregando...</option>';
             statusModalClientName && (statusModalClientName.textContent = '-');
             statusModalClientPhone && (statusModalClientPhone.textContent = 'Telefone: -');
-            statusModalClientEmail && (statusModalClientEmail.textContent = 'Email: -');
+            statusModalClientEmail && (statusModalClientEmail.textContent = 'E-mail: -');
             statusModalEquipmentName && (statusModalEquipmentName.textContent = '-');
             statusModalEquipmentMeta && (statusModalEquipmentMeta.textContent = 'Tipo: -');
-            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'N de serie: -');
+            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'Nº de série: -');
             statusModalCurrentBadges && (statusModalCurrentBadges.innerHTML = '');
             statusModalCurrentStatusHint && (statusModalCurrentStatusHint.textContent = 'Status atual da OS: aguardando contexto.');
             statusModalPrimaryHint && (statusModalPrimaryHint.textContent = 'Fluxo normal sugerido: aguardando contexto.');
             statusModalTargetHint && (statusModalTargetHint.textContent = 'Selecione um fluxo para continuar.');
             statusModalTimeline && (statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Carregando fluxo visual...</p>');
-            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Carregando historico recente...</p>');
+            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Carregando histórico recente...</p>');
             statusModalHistoryWrap?.classList.remove('is-empty');
             syncStatusModalProcedures([]);
             statusModalProcedimentoTextoInput && (statusModalProcedimentoTextoInput.value = '');
             statusModalSolucaoInput && (statusModalSolucaoInput.value = '');
             statusModalDiagnosticoInput && (statusModalDiagnosticoInput.value = '');
-            setStatusBudgetPanelHtml('', 'Carregando gerenciamento do orcamento...');
+            setStatusBudgetPanelHtml('', 'Carregando gerenciamento do orçamento...');
             activateStatusModalTab('#osStatusTabQuick');
             if (statusModalNotify) {
                 statusModalNotify.checked = false;
@@ -2373,7 +2547,7 @@
                 statusModalNotify.dataset.available = '0';
             }
             if (statusModalNotifyHelp) {
-                statusModalNotifyHelp.textContent = 'Verificando disponibilidade de comunicacao com o cliente...';
+                statusModalNotifyHelp.textContent = 'Verificando disponibilidade de comunicação com o cliente...';
                 statusModalNotifyHelp.classList.remove('text-danger');
             }
             setStatusQuickButtonState(statusModalQuickNext, false, '', '', '');
@@ -2388,10 +2562,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao carregar status',
-                        text: error.message || 'Nao foi possivel carregar o fluxo de status.',
+                        text: error.message || 'Não foi possível carregar o fluxo de status.',
                     });
                 } else {
-                    alert(error.message || 'Nao foi possivel carregar o fluxo de status.');
+                    alert(error.message || 'Não foi possível carregar o fluxo de status.');
                 }
             } finally {
                 setStatusModalLoading(false);
@@ -2445,7 +2619,9 @@
             }
         };
 
-        const dataTable = window.jQuery(tableElement).DataTable({
+        const dataTable = window.jQuery.fn.dataTable.isDataTable(tableElement)
+            ? window.jQuery(tableElement).DataTable()
+            : window.jQuery(tableElement).DataTable({
             language: {
                 url: config.languageUrl || `${window.location.origin}/assets/json/pt-BR.json`,
             },
@@ -2482,6 +2658,7 @@
             serverSide: true,
             searching: false,
             autoWidth: false,
+            retrieve: true,
             pageLength: 10,
             lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
             order: [[6, 'desc']],
@@ -2495,8 +2672,8 @@
                 error: function (xhr) {
                     toggleLoadingOverlay(false);
                     const message = xhr?.status === 0
-                        ? 'Falha de conexao ao carregar OS.'
-                        : 'Nao foi possivel aplicar os filtros no momento.';
+                        ? 'Falha de conexão ao carregar OS.'
+                        : 'Não foi possível aplicar os filtros no momento.';
                     if (window.Swal) {
                         window.Swal.fire({
                             icon: 'error',
@@ -2517,8 +2694,9 @@
                 setupResponsiveColumns(this.api(), tableElement);
                 toggleLoadingOverlay(false);
                 fitRelatoCells(tableElement);
+                normalizeRenderedText(tableElement.closest('.os-list-page') || tableElement);
             },
-        });
+            });
 
         bindResponsiveDetailsToggle(dataTable, tableElement);
         window.addEventListener('resize', buildResponsiveResizeHandler(dataTable, tableElement));
@@ -2691,7 +2869,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'Nao foi possivel atualizar os prazos.');
+                    throw new Error(payload.message || 'Não foi possível atualizar os prazos.');
                 }
 
                 datesModal.hide();
@@ -2709,10 +2887,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao atualizar prazos',
-                        text: error.message || 'Nao foi possivel atualizar os prazos da OS.',
+                        text: error.message || 'Não foi possível atualizar os prazos da OS.',
                     });
                 } else {
-                    alert(error.message || 'Nao foi possivel atualizar os prazos da OS.');
+                    alert(error.message || 'Não foi possível atualizar os prazos da OS.');
                 }
             } finally {
                 setDatesModalLoading(false);
@@ -2795,10 +2973,10 @@
                     window.Swal.fire({
                         icon: 'warning',
                         title: 'Selecione um status',
-                        text: 'Escolha o proximo status permitido para continuar.',
+                        text: 'Escolha o próximo status permitido para continuar.',
                     });
                 } else {
-                    alert('Escolha o proximo status permitido para continuar.');
+                    alert('Escolha o próximo status permitido para continuar.');
                 }
                 return;
             }
@@ -2833,7 +3011,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'Nao foi possivel atualizar o status.');
+                    throw new Error(payload.message || 'Não foi possível atualizar o status.');
                 }
 
                 statusModal.hide();
@@ -2853,10 +3031,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao atualizar status',
-                        text: error.message || 'Nao foi possivel atualizar o status.',
+                        text: error.message || 'Não foi possível atualizar o status.',
                     });
                 } else {
-                    alert(error.message || 'Nao foi possivel atualizar o status.');
+                    alert(error.message || 'Não foi possível atualizar o status.');
                 }
             } finally {
                 setStatusModalLoading(false);
@@ -2875,22 +3053,22 @@
             }
             statusModalClientName && (statusModalClientName.textContent = '-');
             statusModalClientPhone && (statusModalClientPhone.textContent = 'Telefone: -');
-            statusModalClientEmail && (statusModalClientEmail.textContent = 'Email: -');
+            statusModalClientEmail && (statusModalClientEmail.textContent = 'E-mail: -');
             statusModalEquipmentName && (statusModalEquipmentName.textContent = '-');
             statusModalEquipmentMeta && (statusModalEquipmentMeta.textContent = 'Tipo: -');
-            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'N de serie: -');
+            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'Nº de série: -');
             statusModalCurrentBadges && (statusModalCurrentBadges.innerHTML = '');
             statusModalCurrentStatusHint && (statusModalCurrentStatusHint.textContent = 'Status atual da OS: aguardando contexto.');
             statusModalPrimaryHint && (statusModalPrimaryHint.textContent = 'Fluxo normal sugerido: aguardando contexto.');
             statusModalTargetHint && (statusModalTargetHint.textContent = 'Selecione um fluxo para continuar.');
-            statusModalTimeline && (statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponivel para esta OS.</p>');
-            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem historico recente para esta OS.</p>');
+            statusModalTimeline && (statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponível para esta OS.</p>');
+            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem histórico recente para esta OS.</p>');
             statusModalHistoryWrap?.classList.remove('is-empty');
             syncStatusModalProcedures([]);
             statusModalProcedimentoTextoInput && (statusModalProcedimentoTextoInput.value = '');
             statusModalSolucaoInput && (statusModalSolucaoInput.value = '');
             statusModalDiagnosticoInput && (statusModalDiagnosticoInput.value = '');
-            setStatusBudgetPanelHtml('', 'Gerenciamento do orcamento sera exibido aqui.');
+            setStatusBudgetPanelHtml('', 'Gerenciamento do orçamento será exibido aqui.');
             activateStatusModalTab('#osStatusTabQuick');
             setStatusQuickButtonState(statusModalQuickNext, false, '', '', '');
             setStatusQuickButtonState(statusModalQuickCancel, false, '', '', '');
@@ -2900,7 +3078,7 @@
                 statusModalNotify.dataset.available = '0';
             }
             if (statusModalNotifyHelp) {
-                statusModalNotifyHelp.textContent = 'O cliente sera comunicado apenas se voce mantiver esta opcao ativa.';
+                statusModalNotifyHelp.textContent = 'O cliente será comunicado apenas se você mantiver esta opção ativa.';
                 statusModalNotifyHelp.classList.remove('text-danger');
             }
             setStatusModalSubmitLabel('Salvar status');
@@ -2931,7 +3109,7 @@
             budgetModalBadges && (budgetModalBadges.innerHTML = '');
             budgetModalClientName && (budgetModalClientName.textContent = '-');
             budgetModalClientPhone && (budgetModalClientPhone.textContent = 'Telefone: -');
-            budgetModalClientEmail && (budgetModalClientEmail.textContent = 'Email: -');
+            budgetModalClientEmail && (budgetModalClientEmail.textContent = 'E-mail: -');
             budgetModalEquipmentName && (budgetModalEquipmentName.textContent = '-');
             budgetModalEquipmentMeta && (budgetModalEquipmentMeta.textContent = 'Tipo: -');
             budgetModalMaoObra && (budgetModalMaoObra.textContent = 'R$ 0,00');
@@ -2990,21 +3168,21 @@
                     if (window.Swal && payload.message) {
                         window.Swal.fire({
                             icon: 'success',
-                            title: 'Orcamento atualizado',
-                            text: String(payload.message || 'O resumo do orcamento foi sincronizado na OS.'),
+                            title: 'Orçamento atualizado',
+                            text: String(payload.message || 'O resumo do orçamento foi sincronizado na OS.'),
                             timer: 1800,
                             showConfirmButton: false,
                         });
                     }
                 })
                 .catch((error) => {
-                    console.error('[OS status modal] Falha ao sincronizar o orcamento apos edicao.', error);
+                    console.error('[OS status modal] Falha ao sincronizar o orçamento após edição.', error);
                     detailsModal?.hide();
                     if (window.Swal) {
                         window.Swal.fire({
                             icon: 'warning',
-                            title: 'Orcamento salvo com ressalvas',
-                            text: error?.message || 'O orcamento foi salvo, mas o resumo da OS nao foi atualizado automaticamente.',
+                            title: 'Orçamento salvo com ressalvas',
+                            text: error?.message || 'O orçamento foi salvo, mas o resumo da OS não foi atualizado automaticamente.',
                         });
                     }
                 });
@@ -3031,7 +3209,7 @@
 
             if (activeStatusOsId && Number(activeStatusOsId) === osId) {
                 refreshStatusModalContext({ preserveDraft: true }).catch(function (error) {
-                    console.error('[OS status modal] Falha ao reidratar contexto apos notificacao publica de orcamento.', error);
+                    console.error('[OS status modal] Falha ao reidratar contexto após notificação pública de orçamento.', error);
                 });
             }
         }, 300);
@@ -3184,4 +3362,3 @@
         });
     });
 })();
-

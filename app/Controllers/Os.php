@@ -34,9 +34,12 @@ use App\Models\OsDocumentoModel;
 use App\Services\OsStatusFlowService;
 use App\Services\WhatsAppService;
 use App\Services\OsPdfService;
+use App\Services\OrcamentoService;
+use App\Services\ErpMailService;
 use App\Services\CrmService;
 use App\Services\CentralMensagensService;
 use App\Services\ChecklistService;
+use App\Services\OsPrintService;
 use App\Services\PecaPrecificacaoService;
 use App\Services\ServicoPrecificacaoService;
 use Config\Database;
@@ -244,7 +247,7 @@ class Os extends BaseController
                 ->setStatusCode(404)
                 ->setJSON([
                     'success' => false,
-                    'message' => 'Foto de entrada nao encontrada.',
+                'message' => 'Foto de entrada não encontrada.',
                     'csrfHash' => csrf_hash(),
                 ]);
         }
@@ -607,11 +610,11 @@ class Os extends BaseController
             }
         }
 
-        if ($searchPlan['tecnico'] !== null) {
+        if ($searchPlan['técnico'] !== null) {
             if ($hasStructuredMatch) {
-                $builder->orWhere("os.tecnico_id IN ({$searchPlan['tecnico']})", null, false);
+                $builder->orWhere("os.tecnico_id IN ({$searchPlan['técnico']})", null, false);
             } else {
-                $builder->where("os.tecnico_id IN ({$searchPlan['tecnico']})", null, false);
+                $builder->where("os.tecnico_id IN ({$searchPlan['técnico']})", null, false);
                 $hasStructuredMatch = true;
             }
         }
@@ -652,11 +655,11 @@ class Os extends BaseController
         $plan = [
             'cliente' => $this->resolveSearchSubquery('clientes', 'c', 'id', 'nome_razao', $query, $db, $allowContains),
             'equipamento' => $this->resolveEquipmentSearchSubquery($query, $db, $allowContains),
-            'tecnico' => $this->resolveSearchSubquery('funcionarios', 'f', 'id', 'nome', $query, $db, $allowContains),
+            'técnico' => $this->resolveSearchSubquery('funcionarios', 'f', 'id', 'nome', $query, $db, $allowContains),
             'relato_mode' => null,
         ];
 
-        if ($plan['cliente'] === null && $plan['equipamento'] === null && $plan['tecnico'] === null && mb_strlen($query) >= 4) {
+        if ($plan['cliente'] === null && $plan['equipamento'] === null && $plan['técnico'] === null && mb_strlen($query) >= 4) {
             $plan['relato_mode'] = $this->canUseRelatoFulltext($query, $db) ? 'fulltext' : 'like';
         }
 
@@ -1141,7 +1144,8 @@ class Os extends BaseController
         }
 
         $orcamento = $db->table('orcamentos')
-            ->select('id, os_id, numero, status, tipo_orcamento, subtotal, desconto, acrescimo, total, validade_data, prazo_execucao, created_at, updated_at, enviado_em, aprovado_em, rejeitado_em, cancelado_em')
+            ->select('orcamentos.id, orcamentos.os_id, orcamentos.numero, orcamentos.status, orcamentos.tipo_orcamento, orcamentos.subtotal, orcamentos.desconto, orcamentos.acrescimo, orcamentos.total, orcamentos.validade_data, orcamentos.prazo_execucao, orcamentos.created_at, orcamentos.updated_at, orcamentos.enviado_em, orcamentos.aprovado_em, orcamentos.rejeitado_em, orcamentos.cancelado_em, orcamentos.telefone_contato, orcamentos.email_contato, orcamentos.token_publico, clientes.nome_razao as cliente_nome')
+            ->join('clientes', 'clientes.id = orcamentos.cliente_id', 'left')
             ->where('os_id', $osId)
             ->orderBy('created_at', 'DESC')
             ->orderBy('id', 'DESC')
@@ -1177,6 +1181,10 @@ class Os extends BaseController
             'aprovado_em' => (string) ($orcamento['aprovado_em'] ?? ''),
             'rejeitado_em' => (string) ($orcamento['rejeitado_em'] ?? ''),
             'cancelado_em' => (string) ($orcamento['cancelado_em'] ?? ''),
+            'telefone_contato' => (string) ($orcamento['telefone_contato'] ?? ''),
+            'email_contato' => (string) ($orcamento['email_contato'] ?? ''),
+            'token_publico' => (string) ($orcamento['token_publico'] ?? ''),
+            'cliente_nome' => (string) ($orcamento['cliente_nome'] ?? ''),
             'is_locked' => $orcamentoModel->isLockedStatus($status),
         ];
     }
@@ -1285,12 +1293,12 @@ class Os extends BaseController
         return match ($normalized) {
             'servico', 'servicos' => [
                 'key' => 'servico',
-                'label' => 'Servicos',
+                'label' => 'Serviços',
                 'badge_class' => 'bg-info text-dark',
             ],
             'peca', 'pecas' => [
                 'key' => 'peca',
-                'label' => 'Pecas',
+                'label' => 'Peças',
                 'badge_class' => 'bg-warning text-dark',
             ],
             'pacote', 'pacotes', 'pacote_servico', 'pacote_servicos' => [
@@ -1300,7 +1308,7 @@ class Os extends BaseController
             ],
             'acessorio', 'acessorios' => [
                 'key' => 'acessorio',
-                'label' => 'Acessorios',
+                'label' => 'Acessórios',
                 'badge_class' => 'bg-secondary',
             ],
             default => [
@@ -1384,7 +1392,7 @@ class Os extends BaseController
             return $content;
         }
 
-        $buttonTitle = 'Cliente: ' . $clientName . ' - Abrir ficha completa e historico do cliente';
+        $buttonTitle = 'Cliente: ' . $clientName . ' - Abrir ficha completa e histórico do cliente';
 
         return '<button type="button" class="btn btn-link p-0 text-start os-cell-link os-cell-link-client" data-os-frame-modal-url="' . esc(base_url('clientes/visualizar/' . $clienteId . '?embed=1')) . '" data-os-frame-modal-title="' . esc('Cliente: ' . $clientName) . '" title="' . esc($buttonTitle) . '" aria-label="' . esc($buttonTitle) . '">' . $content . '</button>';
     }
@@ -1691,22 +1699,14 @@ class Os extends BaseController
         $badgeClass = $badgeMap[$status] ?? 'bg-light text-dark border';
         $resolvedLabel = trim($label) !== '' ? $label : ucfirst(str_replace('_', ' ', $status ?: 'rascunho'));
 
-        return '<span class="badge ' . $badgeClass . '">Orcamento: ' . esc($resolvedLabel) . '</span>';
+        return '<span class="badge ' . $badgeClass . '">Orçamento: ' . esc($resolvedLabel) . '</span>';
     }
 
     private function formatOsStatusCell(array $row): string
     {
         $statusBadge = getStatusBadge((string) ($row['status'] ?? ''));
         $fluxo = trim((string) ($row['estado_fluxo'] ?? ''));
-        $fluxoMap = [
-            'em_atendimento' => 'Em atendimento',
-            'em_execucao' => 'Em execução',
-            'pausado' => 'Pausado',
-            'pronto' => 'Pronto',
-            'encerrado' => 'Encerrado',
-            'cancelado' => 'Cancelado',
-        ];
-        $fluxoLabel = $fluxoMap[$fluxo] ?? ucwords(str_replace('_', ' ', $fluxo));
+        $fluxoLabel = $this->humanizeEstadoFluxo($fluxo);
         $fluxoBadge = $fluxo !== ''
             ? '<span class="badge bg-light text-dark border">' . esc($fluxoLabel) . '</span>'
             : '<span class="text-muted">-</span>';
@@ -1722,7 +1722,7 @@ class Os extends BaseController
             '<div>' . $statusBadge . '</div>',
             '<div class="mt-1">' . $fluxoBadge . '</div>',
             $orcamentoBadge !== '' ? '<div class="mt-1">' . $orcamentoBadge . '</div>' : '',
-            $orcamentoNumero !== '' ? '<small class="d-block text-muted mt-1">Orcamento ' . esc($orcamentoNumero) . '</small>' : '',
+            $orcamentoNumero !== '' ? '<small class="d-block text-muted mt-1">Orçamento ' . esc($orcamentoNumero) . '</small>' : '',
             '</div>',
         ]);
 
@@ -1813,7 +1813,7 @@ class Os extends BaseController
 
         $overdueDays = $this->calculateElapsedDays($previsaoRaw, date('Y-m-d'));
         if ($overdueDays !== null && $overdueDays > 0) {
-            return 'Atrasado ha ' . $overdueDays . ' dia' . ($overdueDays === 1 ? '' : 's') . ' - ' . $previsaoLabel;
+            return 'Atrasado há ' . $overdueDays . ' dia' . ($overdueDays === 1 ? '' : 's') . ' - ' . $previsaoLabel;
         }
 
         return $prazoBaseLabel . ' - ' . $previsaoLabel;
@@ -1879,7 +1879,7 @@ class Os extends BaseController
                 'diagnostico_tecnico' => (string) ($os['diagnostico_tecnico'] ?? ''),
                 'statusBadgeHtml' => getStatusBadge((string) ($os['status'] ?? '')),
                 'flowBadgeHtml' => $estadoFluxo !== ''
-                    ? '<span class="badge bg-light text-dark border">' . esc(ucwords(str_replace('_', ' ', $estadoFluxo))) . '</span>'
+                    ? '<span class="badge bg-light text-dark border">' . esc($this->humanizeEstadoFluxo($estadoFluxo)) . '</span>'
                     : '',
                 'priorityBadgeHtml' => getPriorityBadge((string) ($os['prioridade'] ?? 'normal')),
             ],
@@ -1895,7 +1895,7 @@ class Os extends BaseController
                 (string) ($os['status'] ?? ''),
                 $allowed
             ),
-            'workflowRecentHistory' => array_slice($statusHistorico, 0, 4),
+            'workflowRecentHistory' => $this->formatWorkflowRecentHistory(array_slice($statusHistorico, 0, 4)),
             'hasClientPhone' => trim((string) ($os['cliente_telefone'] ?? '')) !== '',
             'budgetPanelHtml' => view('os/partials/orcamento_editor_panel', $orcamentoViewData),
             'csrfHash' => csrf_hash(),
@@ -1950,11 +1950,11 @@ class Os extends BaseController
 
         $warningMessages = [];
         if ($detailUpdates !== [] && !$this->model->update((int) $id, $detailUpdates)) {
-            log_message('error', '[OS status modal] Falha ao salvar bloco tecnico da OS {os_id}: {errors}', [
+            log_message('error', '[OS status modal] Falha ao salvar bloco técnico da OS {os_id}: {errors}', [
                 'os_id' => (int) $id,
                 'errors' => json_encode($this->model->errors(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
             ]);
-            $warningMessages[] = 'O status foi atualizado, mas nao foi possivel salvar solucao, diagnostico e procedimentos.';
+            $warningMessages[] = 'O status foi atualizado, mas não foi possível salvar solução, diagnóstico e procedimentos.';
         }
 
         $this->finalizeStatusSideEffects((int) $id, $os, $status, !$controlaComunicacaoCliente);
@@ -1994,7 +1994,8 @@ class Os extends BaseController
 
     public function datesMeta($id)
     {
-        $os = $this->model->getComplete((int) $id);
+        $osId = (int) $id;
+        $os = $this->model->getComplete($osId);
         if (!$os) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
@@ -2103,7 +2104,7 @@ class Os extends BaseController
         if ($entradaComparacao !== null && $entrega !== null && strtotime($entrega) < strtotime($entradaComparacao)) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'A data de entrega nao pode ser anterior a data de entrada.',
+                'message' => 'A data de entrega não pode ser anterior à data de entrada.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -2127,7 +2128,7 @@ class Os extends BaseController
             'Datas da OS ' . ($os['numero_os'] ?? ('#' . $osId))
                 . ' atualizadas via listagem. Entrada: '
                 . $this->formatDateDisplay($entradaAnterior, true) . ' -> ' . $this->formatDateDisplay($entrada, true)
-                . ' | Previsao: ' . $this->formatDateDisplay($previsaoAnterior) . ' -> ' . $this->formatDateDisplay($previsao)
+                . ' | Previsão: ' . $this->formatDateDisplay($previsaoAnterior) . ' -> ' . $this->formatDateDisplay($previsao)
                 . ' | Entrega: ' . $this->formatDateDisplay($entregaAnterior) . ' -> ' . $this->formatDateDisplay($entrega)
                 . ' | Motivo: ' . $motivo
                 . ' | ' . $aprovacaoContexto . '.'
@@ -2268,7 +2269,7 @@ class Os extends BaseController
         if (!$os) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
-                'message' => 'OS nao encontrada.',
+                'message' => 'OS não encontrada.',
             ]);
         }
 
@@ -2739,7 +2740,7 @@ class Os extends BaseController
                         $origemContatoId = (int) ($origemConversa['contato_id'] ?? 0);
                     }
                     if ($telefoneHint === '') {
-                        $telefoneHint = preg_replace('/\D+/', '', (string) ($origemConversa['telefone'] ?? '')) ?? '';
+                $telefoneHint = preg_replace('/\D+/', '', (string) ($origemConversa['telefone'] ?? '')) ?? '';
                     }
                     if ($nomeHint === '') {
                         $nomeConversa = trim((string) ($origemConversa['nome_contato'] ?? ''));
@@ -2763,7 +2764,7 @@ class Os extends BaseController
                         $nomeHint = trim((string) ($origemContato['nome'] ?? $origemContato['whatsapp_nome_perfil'] ?? ''));
                     }
                     if ($telefoneHint === '') {
-                        $telefoneHint = preg_replace('/\D+/', '', (string) ($origemContato['telefone_normalizado'] ?? $origemContato['telefone'] ?? '')) ?? '';
+                $telefoneHint = preg_replace('/\D+/', '', (string) ($origemContato['telefone_normalizado'] ?? $origemContato['telefone'] ?? '')) ?? '';
                     }
                 }
             }
@@ -2964,6 +2965,9 @@ class Os extends BaseController
             $itens
         )));
         $orcamentoVinculado = $this->findLatestOrcamentoForOs((int) $id);
+        if ($orcamentoVinculado !== null) {
+            $orcamentoVinculado = $this->ensurePublicTokenForOrcamento($orcamentoVinculado);
+        }
         $orcamentoItensResumo = $orcamentoVinculado !== null
             ? $this->summarizeOrcamentoItems((int) ($orcamentoVinculado['id'] ?? 0))
             : [
@@ -2972,7 +2976,16 @@ class Os extends BaseController
                 'total_items' => 0,
                 'total_quantity' => 0.0,
             ];
+        $osPdfService = new OsPdfService();
+        $osPdfService->syncBudgetDocumentsForOs((int) $id, $orcamentoVinculado);
         $orcamentoModel = new \App\Models\OrcamentoModel();
+        $emailDefaultMessage = $this->buildDefaultOsEmailMessage($os);
+        $orcamentoWhatsappDefaultMessage = $orcamentoVinculado !== null
+            ? $this->buildDefaultOrcamentoWhatsAppMessage($orcamentoVinculado)
+            : '';
+        $orcamentoEmailDefaultSubject = $orcamentoVinculado !== null
+            ? $this->buildDefaultOrcamentoEmailSubject($orcamentoVinculado)
+            : '';
 
         $data = [
             'title'          => 'OS ' . $os['numero_os'],
@@ -2995,7 +3008,8 @@ class Os extends BaseController
                 (string) ($os['status'] ?? ''),
                 $statusOptions
             ),
-            'workflowRecentHistory' => array_slice($statusHistorico, 0, 4),
+            'workflowRecentHistory' => $this->formatWorkflowRecentHistory(array_slice($statusHistorico, 0, 4)),
+            'estadoFluxoLabel' => $this->humanizeEstadoFluxo((string) ($os['estado_fluxo'] ?? '')),
             'primaryNextStatus' => $this->resolvePrimaryNextStatus(
                 $statusFlowService,
                 (string) ($os['status'] ?? ''),
@@ -3017,10 +3031,19 @@ class Os extends BaseController
             'orcamentoItensResumo' => $orcamentoItensResumo,
             'orcamentoStatusLabels' => $orcamentoModel->statusLabels(),
             'orcamentoTipoLabels' => $orcamentoModel->tipoLabels(),
+            'orcamentoDispatchBlocked' => $orcamentoVinculado !== null
+                ? !$this->canDispatchOrcamentoByStatus((string) ($orcamentoVinculado['status'] ?? ''))
+                : false,
             'documentosOs' => ((new OsDocumentoModel())->db->tableExists('os_documentos'))
                 ? (new OsDocumentoModel())->byOs((int) $id)
                 : [],
-            'pdfTipos' => (new OsPdfService())->tiposDisponiveis(),
+            'pdfTipos' => $osPdfService->tiposDisponiveis(),
+            'printFormats' => (new OsPrintService())->availableFormats(),
+            'emailDefaultTo' => trim((string) ($os['cliente_email'] ?? '')),
+            'emailDefaultSubject' => $this->buildDefaultOsEmailSubject($os),
+            'emailDefaultMessage' => $emailDefaultMessage,
+            'orcamentoWhatsappDefaultMessage' => $orcamentoWhatsappDefaultMessage,
+            'orcamentoEmailDefaultSubject' => $orcamentoEmailDefaultSubject,
             'layout' => $isEmbedded ? 'layouts/embed' : 'layouts/main',
             'isEmbedded' => $isEmbedded,
         ];
@@ -3184,13 +3207,13 @@ class Os extends BaseController
 
             $timeline[] = [
                 'key' => (string) $macro,
-                'label' => ucwords(str_replace('_', ' ', (string) $macro)),
+                'label' => $this->humanizeWorkflowMacro((string) $macro),
                 'state' => $state,
                 'current_status_name' => $containsCurrent
-                    ? (string) ($currentMeta['nome'] ?? ucfirst(str_replace('_', ' ', $currentStatus)))
+                    ? (string) ($currentMeta['nome'] ?? $this->humanizeOsStatus($currentStatus))
                     : '',
                 'last_status_name' => $latestEntry
-                    ? (string) (($statusMetaByCode[$latestEntry['status_novo'] ?? '']['nome'] ?? null) ?: ucfirst(str_replace('_', ' ', (string) ($latestEntry['status_novo'] ?? ''))))
+                    ? (string) (($statusMetaByCode[$latestEntry['status_novo'] ?? '']['nome'] ?? null) ?: $this->humanizeOsStatus((string) ($latestEntry['status_novo'] ?? '')))
                     : '',
                 'last_event_at' => $latestEntry['created_at'] ?? null,
                 'last_user_name' => $latestEntry['usuario_nome'] ?? null,
@@ -3281,7 +3304,7 @@ class Os extends BaseController
         if ($entradaComparacao !== null && $previsaoComparacao !== '' && strtotime($previsaoComparacao) < strtotime($entradaComparacao)) {
             return redirect()->to($this->osEditUrl((int) $id))
                 ->withInput()
-                ->with('error', 'A previsao nao pode ser anterior a data de entrada.');
+            ->with('error', 'A previsão não pode ser anterior à data de entrada.');
         }
 
         $statusNovo = strtolower(trim((string) ($dados['status'] ?? '')));
@@ -3294,7 +3317,7 @@ class Os extends BaseController
         if ($statusNovo !== '' && !in_array($statusNovo, $statusDisponiveis, true)) {
             return redirect()->to($this->osEditUrl((int) $id))
                 ->withInput()
-                ->with('error', 'Status informado para a OS e invalido.');
+                ->with('error', 'Status informado para a OS ?? inválido.');
         }
         if ($statusAlterado) {
             $dados['status'] = $statusNovo;
@@ -3332,7 +3355,7 @@ class Os extends BaseController
                     'status_novo' => $statusNovo,
                     'estado_fluxo' => (string) ($dados['estado_fluxo'] ?? $statusService->resolveEstadoFluxo($statusNovo)),
                     'usuario_id' => session()->get('user_id') ?: null,
-                    'observacao' => 'Alterado na edicao da OS',
+                    'observacao' => 'Alterado na edição da OS',
                     'created_at' => date('Y-m-d H:i:s'),
                 ]);
             }
@@ -3436,7 +3459,7 @@ class Os extends BaseController
                     $finModel->insert([
                         'os_id'           => $id,
                         'tipo'            => 'receber',
-                        'categoria'       => 'Servico',
+                        'categoria'       => 'Serviço',
                         'descricao'       => 'OS ' . (($osAtualizada['numero_os'] ?? '') ?: ($os['numero_os'] ?? '')),
                         'valor'           => $osAtualizada['valor_final'],
                         'status'          => 'pendente',
@@ -3514,69 +3537,512 @@ class Os extends BaseController
         return ucwords(str_replace('_', ' ', $statusCode));
     }
 
+    private function humanizeWorkflowMacro(string $macro): string
+    {
+        $macro = strtolower(trim($macro));
+
+        $map = [
+            'recepcao' => 'Recepção',
+            'diagnostico' => 'Diagnóstico',
+            'orcamento' => 'Orçamento',
+            'execucao' => 'Execução',
+            'qualidade' => 'Qualidade',
+            'interrupcao' => 'Interrupção',
+            'concluido' => 'Concluído',
+            'finalizado_sem_reparo' => 'Finalizado sem Reparo',
+            'encerrado' => 'Encerrado',
+            'cancelado' => 'Cancelado',
+            'outros' => 'Outros',
+        ];
+
+        return $map[$macro] ?? ucwords(str_replace('_', ' ', $macro));
+    }
+
+    private function humanizeEstadoFluxo(string $estadoFluxo): string
+    {
+        $estadoFluxo = strtolower(trim($estadoFluxo));
+
+        $map = [
+            'em_atendimento' => 'Em atendimento',
+            'em_execucao' => 'Em execução',
+            'pausado' => 'Pausado',
+            'pronto' => 'Pronto',
+            'encerrado' => 'Encerrado',
+            'cancelado' => 'Cancelado',
+        ];
+
+        return $map[$estadoFluxo] ?? ucwords(str_replace('_', ' ', $estadoFluxo));
+    }
+
+    private function formatWorkflowRecentHistory(array $history): array
+    {
+        return array_map(function (array $item): array {
+            $item['status_novo_nome'] = $this->humanizeOsStatus((string) ($item['status_novo'] ?? ''));
+            return $item;
+        }, $history);
+    }
+
+    private function resolveOsDocumentoAttachment(int $osId, int $documentoId): ?array
+    {
+        if ($osId <= 0 || $documentoId <= 0) {
+            return null;
+        }
+
+        $documento = (new OsDocumentoModel())
+            ->where('id', $documentoId)
+            ->where('os_id', $osId)
+            ->first();
+
+        if (!$documento) {
+            return null;
+        }
+
+        $arquivoRelativo = trim((string) ($documento['arquivo'] ?? ''));
+        if ($arquivoRelativo === '') {
+            return null;
+        }
+
+        $arquivoRelativo = ltrim(str_replace('\\', '/', $arquivoRelativo), '/');
+        $arquivoAbsoluto = FCPATH . str_replace('/', DIRECTORY_SEPARATOR, $arquivoRelativo);
+        if (!is_file($arquivoAbsoluto)) {
+            return null;
+        }
+
+        $documento['arquivo'] = $arquivoRelativo;
+        $documento['path'] = $arquivoAbsoluto;
+        $documento['url'] = base_url($arquivoRelativo);
+
+        return $documento;
+    }
+
+    private function humanizeOsDocumentoTipo(string $tipoDocumento): string
+    {
+        $tipoDocumento = strtolower(trim($tipoDocumento));
+        if ($tipoDocumento === '') {
+            return 'Documento PDF';
+        }
+
+        $map = [
+            'abertura' => 'Abertura',
+            'orcamento' => 'Orçamento',
+            'laudo' => 'Laudo',
+            'entrega' => 'Entrega',
+            'devolucao_sem_reparo' => 'Devolução sem Reparo',
+        ];
+
+        if (isset($map[$tipoDocumento])) {
+            return $map[$tipoDocumento];
+        }
+
+        return ucwords(str_replace('_', ' ', $tipoDocumento));
+    }
+
+    private function buildDefaultOsEmailSubject(array $os): string
+    {
+        $numeroOs = trim((string) ($os['numero_os'] ?? '#'));
+        $empresa = trim((string) get_config('empresa_nome', 'Assist?ncia T?cnica'));
+
+        return 'Documentos da OS ' . $numeroOs . ' - ' . $empresa;
+    }
+
+    private function buildDefaultOsEmailMessage(array $os): string
+    {
+        $cliente = trim((string) ($os['cliente_nome'] ?? 'cliente'));
+        $numeroOs = trim((string) ($os['número_os'] ?? '#'));
+        $equipamento = trim((string) (($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? '')));
+
+        $mensagem = 'Olá ' . $cliente . ',' . "\n\n";
+        $mensagem .= 'Segue em anexo o PDF da sua ordem de serviço ' . $numeroOs . '.';
+        if ($equipamento !== '') {
+            $mensagem .= "\nEquipamento: " . $equipamento . '.';
+        }
+        $mensagem .= "\n\n";
+        $mensagem .= 'Permanecemos à disposição para qualquer dúvida.';
+
+        return $mensagem;
+    }
+
+    private function buildDefaultOsEmailBody(array $os, array $documento, string $mensagemLivre = ''): string
+    {
+        $cliente = htmlspecialchars(trim((string) ($os['cliente_nome'] ?? 'cliente')), ENT_QUOTES, 'UTF-8');
+        $numeroOs = htmlspecialchars(trim((string) ($os['numero_os'] ?? '#')), ENT_QUOTES, 'UTF-8');
+        $equipamento = htmlspecialchars(trim((string) (($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))), ENT_QUOTES, 'UTF-8');
+        $statusAtual = htmlspecialchars($this->humanizeOsStatus((string) ($os['status'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $documentoLabel = htmlspecialchars(
+            $this->humanizeOsDocumentoTipo((string) ($documento['tipo_documento'] ?? 'documento')) . ' v' . (string) ($documento['versao'] ?? 1),
+            ENT_QUOTES,
+            'UTF-8'
+        );
+        $mensagem = trim($mensagemLivre) !== ''
+            ? trim($mensagemLivre)
+            : $this->buildDefaultOsEmailMessage($os);
+
+        return
+            '<div style="font-family:Arial,sans-serif;color:#1f2937;font-size:14px;line-height:1.5;">' .
+                '<h2 style="margin:0 0 12px;color:#0f172a;">Documentos da OS ' . $numeroOs . '</h2>' .
+                '<p style="margin:0 0 12px;">' . nl2br(htmlspecialchars($mensagem, ENT_QUOTES, 'UTF-8')) . '</p>' .
+                '<table style="border-collapse:collapse;width:100%;max-width:560px;">' .
+                    '<tr><td style="padding:6px;border:1px solid #e5e7eb;"><strong>Cliente</strong></td><td style="padding:6px;border:1px solid #e5e7eb;">' . $cliente . '</td></tr>' .
+                    '<tr><td style="padding:6px;border:1px solid #e5e7eb;"><strong>Equipamento</strong></td><td style="padding:6px;border:1px solid #e5e7eb;">' . ($equipamento !== '' ? $equipamento : '-') . '</td></tr>' .
+                    '<tr><td style="padding:6px;border:1px solid #e5e7eb;"><strong>Status atual</strong></td><td style="padding:6px;border:1px solid #e5e7eb;">' . $statusAtual . '</td></tr>' .
+                    '<tr><td style="padding:6px;border:1px solid #e5e7eb;"><strong>Documento anexado</strong></td><td style="padding:6px;border:1px solid #e5e7eb;">' . $documentoLabel . '</td></tr>' .
+                '</table>' .
+                '<p style="margin:12px 0 0;">Agradecemos o contato.</p>' .
+            '</div>';
+    }
+
+    private function ensurePublicTokenForOrcamento(array $orcamento): array
+    {
+        $orcamentoId = (int) ($orcamento['id'] ?? 0);
+        if ($orcamentoId <= 0) {
+            return $orcamento;
+        }
+
+        $token = trim((string) ($orcamento['token_publico'] ?? ''));
+        if ($token !== '') {
+            return $orcamento;
+        }
+
+        $token = (new OrcamentoService())->generateToken();
+        (new OrcamentoModel())->update($orcamentoId, ['token_publico' => $token]);
+        $orcamento['token_publico'] = $token;
+
+        return $orcamento;
+    }
+
+    private function canDispatchOrcamentoByStatus(string $status): bool
+    {
+        return !in_array(trim($status), [
+            OrcamentoModel::STATUS_APROVADO,
+            OrcamentoModel::STATUS_PENDENTE_OS,
+            OrcamentoModel::STATUS_CANCELADO,
+            OrcamentoModel::STATUS_CONVERTIDO,
+        ], true);
+    }
+
+    private function buildDefaultOrcamentoWhatsAppMessage(array $orcamento): string
+    {
+        $cliente = trim((string) ($orcamento['cliente_nome'] ?? ''));
+        if ($cliente === '') {
+            $cliente = 'cliente';
+        }
+
+        $numero = trim((string) ($orcamento['numero'] ?? '#'));
+        $total = formatMoney($orcamento['total'] ?? 0);
+        $validade = formatDate($orcamento['validade_data'] ?? null);
+        $tipoOrcamento = (new OrcamentoModel())->normalizeTipo(
+            (string) ($orcamento['tipo_orcamento'] ?? ''),
+            (int) ($orcamento['os_id'] ?? 0) ?: null
+        );
+
+        $mensagem = 'Ol? ' . $cliente . ', segue o orçamento ' . $numero . ' no valor total de ' . $total . '.';
+        if ($tipoOrcamento === OrcamentoModel::TIPO_PREVIO) {
+            $mensagem .= "\nEste documento representa uma estimativa inicial, sujeita à confirmação após a análise presencial do equipamento.";
+        } else {
+            $mensagem .= "\nEste documento considera o equipamento já recebido em assist?ncia e a análise t?cnica realizada.";
+        }
+        if ($validade !== '-') {
+            $mensagem .= "\nValidade: " . $validade . '.';
+        }
+        if (!empty($orcamento['token_publico'])) {
+            $mensagem .= "\nAprovação online: " . base_url('orcamento/' . $orcamento['token_publico']);
+        }
+        $mensagem .= "\nFico à disposição para qualquer dúvida.";
+
+        return $mensagem;
+    }
+
+    private function buildDefaultOrcamentoEmailSubject(array $orcamento): string
+    {
+        $numero = trim((string) ($orcamento['numero'] ?? '#'));
+        $empresa = trim((string) get_config('empresa_nome', 'Assist?ncia T?cnica'));
+
+        return 'Orçamento ' . $numero . ' - ' . $empresa;
+    }
+
+    private function requestExpectsJson(): bool
+    {
+        $accept = strtolower($this->request->getHeaderLine('Accept'));
+        $requestedWith = strtolower($this->request->getHeaderLine('X-Requested-With'));
+
+        return $this->request->isAJAX()
+            || str_contains($accept, 'application/json')
+            || $requestedWith === 'xmlhttprequest';
+    }
+
+    private function normalizeTruthyFlag($value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        return in_array(
+            strtolower(trim((string) $value)),
+            ['1', 'true', 'yes', 'sim', 'on'],
+            true
+        );
+    }
+
+    private function generateTemporaryOsPrintPdfAttachment(int $osId, string $printFormatRaw = '', bool $includePhotos = false): array
+    {
+        $printService = new OsPrintService();
+        $generatedPdf = $printService->generatePdf($osId, [
+            'format' => $printFormatRaw !== '' ? $printFormatRaw : OsPrintService::FORMAT_A4,
+            'include_photos' => $includePhotos,
+        ]);
+
+        if (empty($generatedPdf['ok']) || empty($generatedPdf['path'])) {
+            return [
+                'ok' => false,
+                'message' => $generatedPdf['message'] ?? 'Nao foi possivel gerar o PDF consolidado da impressao para envio.',
+            ];
+        }
+
+        return [
+            'ok' => true,
+            'pdfPath' => (string) ($generatedPdf['path'] ?? ''),
+            'pdfFileName' => trim((string) ($generatedPdf['file_name'] ?? '')),
+            'temporaryPdfPath' => (string) ($generatedPdf['path'] ?? ''),
+            'temporaryPrintService' => $printService,
+        ];
+    }
+
+    private function buildOsPdfAttachmentOptions(string $pdfPath = '', string $pdfRelative = '', string $pdfFileName = ''): array
+    {
+        if ($pdfPath === '') {
+            return [];
+        }
+
+        $attachmentOptions = [
+            'arquivo_path' => $pdfPath,
+            'arquivo' => $pdfRelative,
+            'mime_type' => 'application/pdf',
+            'tipo_conteudo' => 'pdf',
+        ];
+
+        if ($pdfFileName !== '') {
+            $attachmentOptions['arquivo_nome'] = $pdfFileName;
+        }
+
+        $fileSize = is_file($pdfPath) ? (int) filesize($pdfPath) : 0;
+        if ($fileSize > 0) {
+            $attachmentOptions['arquivo_tamanho'] = $fileSize;
+        }
+
+        return $attachmentOptions;
+    }
+
+    private function respondOsInteraction(int $osId, bool $ok, string $message, int $statusCode = 200, array $extra = [])
+    {
+        if ($this->requestExpectsJson()) {
+            return $this->response
+                ->setStatusCode($statusCode)
+                ->setJSON(array_merge([
+                    'ok' => $ok,
+                    'message' => $message,
+                    'csrfHash' => csrf_hash(),
+                ], $extra));
+        }
+
+        return redirect()->to($this->osViewUrl($osId))->with($ok ? 'success' : 'error', $message);
+    }
+
     public function sendWhatsApp($id)
     {
-        $os = $this->model->getComplete((int) $id);
+        $jsonNotFoundPayload = [
+            'ok' => false,
+            'message' => 'OS nao encontrada.',
+            'csrfHash' => csrf_hash(),
+        ];
+        $osId = (int) $id;
+        $os = $this->model->getComplete($osId);
+        if (!$os && $this->requestExpectsJson()) {
+            return $this->response
+                ->setStatusCode(404)
+                ->setJSON($jsonNotFoundPayload);
+        }
         if (!$os) {
             return redirect()->to('/os')->with('error', 'OS não encontrada.');
         }
 
         $telefone = trim((string) ($this->request->getPost('telefone') ?: ($os['cliente_telefone'] ?? '')));
+        if ($telefone === '' && $this->requestExpectsJson()) {
+            return $this->respondOsInteraction($osId, false, 'Cliente sem telefone para envio.', 422);
+        }
+
         if ($telefone === '') {
             return redirect()->to($this->osViewUrl((int) $id))->with('error', 'Cliente sem telefone para envio.');
+        }
+
+        $printFormatRaw = trim((string) ($this->request->getPost('print_formato') ?? ''));
+        if ($this->requestExpectsJson() || $printFormatRaw !== '') {
+            $templateCode = trim((string) $this->request->getPost('template_codigo'));
+            $mensagem = trim((string) $this->request->getPost('mensagem_manual'));
+            $documentoId = (int) ($this->request->getPost('documento_id') ?? 0);
+            $printIncludePhotos = $this->normalizeTruthyFlag($this->request->getPost('print_incluir_fotos'));
+            $whatsService = new WhatsAppService();
+            $os['cliente_telefone'] = $telefone;
+            $pdfUrl = '';
+            $pdfPath = '';
+            $pdfRelative = '';
+            $pdfFileName = '';
+            $temporaryPdfPath = '';
+            $temporaryPrintService = null;
+
+            try {
+                if ($documentoId > 0) {
+                    $doc = (new OsDocumentoModel())
+                        ->where('id', $documentoId)
+                        ->where('os_id', $osId)
+                        ->first();
+                    if ($doc && !empty($doc['arquivo'])) {
+                        $pdfRelative = (string) $doc['arquivo'];
+                        $pdfUrl = base_url($pdfRelative);
+                        $candidatePath = FCPATH . ltrim($pdfRelative, '/\\');
+                        if (is_file($candidatePath)) {
+                            $pdfPath = $candidatePath;
+                            $pdfFileName = basename($candidatePath);
+                        }
+                    }
+                }
+
+                if ($pdfPath === '' && ($printFormatRaw !== '' || $documentoId <= 0)) {
+                    $generatedPdf = $this->generateTemporaryOsPrintPdfAttachment($osId, $printFormatRaw, $printIncludePhotos);
+
+                    if (empty($generatedPdf['ok']) || empty($generatedPdf['pdfPath'])) {
+                        return $this->respondOsInteraction(
+                            $osId,
+                            false,
+                            $generatedPdf['message'] ?? 'Nao foi possivel gerar o PDF da impressao para envio no WhatsApp.',
+                            422
+                        );
+                    }
+
+                    $pdfPath = (string) ($generatedPdf['pdfPath'] ?? '');
+                    $temporaryPdfPath = (string) ($generatedPdf['temporaryPdfPath'] ?? '');
+                    $pdfFileName = trim((string) ($generatedPdf['pdfFileName'] ?? ''));
+                    $temporaryPrintService = $generatedPdf['temporaryPrintService'] ?? null;
+                }
+
+                $attachmentOptions = $this->buildOsPdfAttachmentOptions($pdfPath, $pdfRelative, $pdfFileName);
+
+                if ($mensagem !== '') {
+                    if ($templateCode !== '') {
+                        $attachmentOptions['template_codigo'] = $templateCode;
+                    }
+
+                    $result = $whatsService->sendRaw(
+                        $osId,
+                        (int) ($os['cliente_id'] ?? 0),
+                        $telefone,
+                        $mensagem,
+                        $templateCode !== '' ? $templateCode : 'manual',
+                        null,
+                        session()->get('user_id') ?: null,
+                        $attachmentOptions
+                    );
+                } else {
+                    if ($templateCode === '') {
+                        return $this->respondOsInteraction($osId, false, 'Selecione um template ou informe uma mensagem personalizada.', 422);
+                    }
+
+                    $extra = [];
+                    if ($pdfUrl !== '') {
+                        $extra['pdf_url'] = $pdfUrl;
+                    }
+                    if (!empty($attachmentOptions)) {
+                        $extra = array_merge($extra, $attachmentOptions);
+                    }
+                    $result = $whatsService->sendByTemplate($os, $templateCode, session()->get('user_id') ?: null, $extra);
+                }
+            } finally {
+                if ($temporaryPdfPath !== '' && $temporaryPrintService instanceof OsPrintService) {
+                    $temporaryPrintService->cleanupTemporaryFile($temporaryPdfPath);
+                }
+            }
+
+            if (!empty($result['ok'])) {
+                return $this->respondOsInteraction($osId, true, 'Mensagem WhatsApp enviada com sucesso.', 200, [
+                    'duplicate' => !empty($result['duplicate']),
+                ]);
+            }
+
+            return $this->respondOsInteraction($osId, false, $result['message'] ?? 'Falha ao enviar mensagem no WhatsApp.', 422);
         }
 
         $templateCode = trim((string) $this->request->getPost('template_codigo'));
         $mensagem = trim((string) $this->request->getPost('mensagem_manual'));
         $documentoId = (int) ($this->request->getPost('documento_id') ?? 0);
+        $printIncludePhotos = $this->normalizeTruthyFlag($this->request->getPost('print_incluir_fotos'));
         $whatsService = new WhatsAppService();
         $os['cliente_telefone'] = $telefone;
         $pdfUrl = '';
         $pdfPath = '';
         $pdfRelative = '';
+        $pdfFileName = '';
+        $temporaryPdfPath = '';
+        $temporaryPrintService = null;
 
-        if ($documentoId > 0) {
-            $doc = (new OsDocumentoModel())
-                ->where('id', $documentoId)
-                ->where('os_id', (int) $id)
-                ->first();
-            if ($doc && !empty($doc['arquivo'])) {
-                $pdfRelative = (string) $doc['arquivo'];
-                $pdfUrl = base_url($pdfRelative);
-                $candidatePath = FCPATH . ltrim($pdfRelative, '/\\');
-                if (is_file($candidatePath)) {
-                    $pdfPath = $candidatePath;
+        try {
+            if ($documentoId > 0) {
+                $doc = (new OsDocumentoModel())
+                    ->where('id', $documentoId)
+                    ->where('os_id', (int) $id)
+                    ->first();
+                if ($doc && !empty($doc['arquivo'])) {
+                    $pdfRelative = (string) $doc['arquivo'];
+                    $pdfUrl = base_url($pdfRelative);
+                    $candidatePath = FCPATH . ltrim($pdfRelative, '/\\');
+                    if (is_file($candidatePath)) {
+                        $pdfPath = $candidatePath;
+                        $pdfFileName = basename($candidatePath);
+                    }
                 }
             }
-        }
 
-        if ($mensagem !== '') {
-            $result = $whatsService->sendRaw(
-                (int) $id,
-                (int) ($os['cliente_id'] ?? 0),
-                $telefone,
-                $mensagem,
-                'manual',
-                null,
-                session()->get('user_id') ?: null,
-                [
-                    'arquivo_path' => $pdfPath,
-                    'arquivo' => $pdfRelative,
-                ]
-            );
-        } else {
-            if ($templateCode === '') {
-                return redirect()->to($this->osViewUrl((int) $id))->with('error', 'Selecione um template ou informe uma mensagem manual.');
+            if ($pdfPath === '' && ($printFormatRaw !== '' || $documentoId <= 0)) {
+                $generatedPdf = $this->generateTemporaryOsPrintPdfAttachment($osId, $printFormatRaw, $printIncludePhotos);
+                if (empty($generatedPdf['ok']) || empty($generatedPdf['pdfPath'])) {
+                    return redirect()->to($this->osViewUrl((int) $id))
+                        ->with('error', $generatedPdf['message'] ?? 'Nao foi possivel gerar o PDF consolidado da impressao para envio.');
+                }
+
+                $pdfPath = (string) ($generatedPdf['pdfPath'] ?? '');
+                $temporaryPdfPath = (string) ($generatedPdf['temporaryPdfPath'] ?? '');
+                $pdfFileName = trim((string) ($generatedPdf['pdfFileName'] ?? ''));
+                $temporaryPrintService = $generatedPdf['temporaryPrintService'] ?? null;
             }
-            $extra = [];
-            if ($pdfUrl !== '') {
-                $extra['pdf_url'] = $pdfUrl;
+
+            $attachmentOptions = $this->buildOsPdfAttachmentOptions($pdfPath, $pdfRelative, $pdfFileName);
+
+            if ($mensagem !== '') {
+                $result = $whatsService->sendRaw(
+                    (int) $id,
+                    (int) ($os['cliente_id'] ?? 0),
+                    $telefone,
+                    $mensagem,
+                    'manual',
+                    null,
+                    session()->get('user_id') ?: null,
+                    $attachmentOptions
+                );
+            } else {
+                if ($templateCode === '') {
+                    return redirect()->to($this->osViewUrl((int) $id))->with('error', 'Selecione um template ou informe uma mensagem manual.');
+                }
+                $extra = [];
+                if ($pdfUrl !== '') {
+                    $extra['pdf_url'] = $pdfUrl;
+                }
+                if (!empty($attachmentOptions)) {
+                    $extra = array_merge($extra, $attachmentOptions);
+                }
+                $result = $whatsService->sendByTemplate($os, $templateCode, session()->get('user_id') ?: null, $extra);
             }
-            if ($pdfPath !== '') {
-                $extra['arquivo_path'] = $pdfPath;
-                $extra['arquivo'] = $pdfRelative;
+        } finally {
+            if ($temporaryPdfPath !== '' && $temporaryPrintService instanceof OsPrintService) {
+                $temporaryPrintService->cleanupTemporaryFile($temporaryPdfPath);
             }
-            $result = $whatsService->sendByTemplate($os, $templateCode, session()->get('user_id') ?: null, $extra);
         }
 
         if (!empty($result['ok'])) {
@@ -3584,6 +4050,67 @@ class Os extends BaseController
         }
 
         return redirect()->to($this->osViewUrl((int) $id))->with('error', $result['message'] ?? 'Falha ao enviar mensagem no WhatsApp.');
+    }
+
+    public function sendEmail($id)
+    {
+        $os = $this->model->getComplete((int) $id);
+        if (!$os) {
+            return redirect()->to('/os')->with('error', 'OS n�o encontrada.');
+        }
+
+        $osId = (int) $id;
+        $emailDestino = trim((string) ($this->request->getPost('email_destino') ?: ($os['cliente_email'] ?? '')));
+        if ($emailDestino === '' || !filter_var($emailDestino, FILTER_VALIDATE_EMAIL)) {
+        LogModel::registrar('os_email_erro', 'Falha no envio de e-mail da OS ID ' . $osId . ': e-mail de destino inválido.');
+            return redirect()->to($this->osViewUrl($osId))
+            ->with('error', 'E-mail de destino inválido para envio dos documentos da OS.');
+        }
+
+        $documentoId = (int) ($this->request->getPost('documento_id') ?? 0);
+        if ($documentoId <= 0) {
+            return redirect()->to($this->osViewUrl($osId))
+                ->with('error', 'Selecione um PDF gerado para anexar no email.');
+        }
+
+        $documento = $this->resolveOsDocumentoAttachment($osId, $documentoId);
+        if ($documento === null) {
+            LogModel::registrar('os_email_erro', 'Falha no envio de email da OS ID ' . $osId . ': documento PDF ausente ou indisponivel.');
+            return redirect()->to($this->osViewUrl($osId))
+            ->with('error', 'O PDF selecionado não foi encontrado. Gere novamente o documento antes de enviar.');
+        }
+
+        $assunto = trim((string) $this->request->getPost('assunto_email'));
+        if ($assunto === '') {
+        $assunto = $this->buildDefaultOsEmailSubject($os);
+        }
+
+        $mensagemLivre = trim((string) $this->request->getPost('mensagem_email'));
+        if ($mensagemLivre === '') {
+        $mensagemLivre = $this->buildDefaultOsEmailMessage($os);
+        }
+
+        $mailResult = (new ErpMailService())->send(
+            $emailDestino,
+            $assunto,
+            $this->buildDefaultOsEmailBody($os, $documento, $mensagemLivre),
+            (string) ($documento['path'] ?? '')
+        );
+
+        if (!empty($mailResult['ok'])) {
+            LogModel::registrar(
+                'os_email',
+                'OS ID ' . $osId . ' enviada por email para ' . $emailDestino . ' com o documento ' . ($documento['arquivo'] ?? 'pdf') . '.'
+            );
+            return redirect()->to($this->osViewUrl($osId))
+                ->with('success', 'E-mail enviado com sucesso com o PDF da OS em anexo.');
+        }
+
+        $erroDetalhe = (string) ($mailResult['message'] ?? 'Falha ao enviar email com o PDF da OS.');
+        LogModel::registrar('os_email_erro', 'Falha no envio de email da OS ID ' . $osId . ': ' . $erroDetalhe);
+
+        return redirect()->to($this->osViewUrl($osId))
+            ->with('error', $erroDetalhe);
     }
 
     public function generatePdf($id)
@@ -3601,6 +4128,10 @@ class Os extends BaseController
         $pdfService = new OsPdfService();
         $result = $pdfService->gerar((int) $id, $tipo, session()->get('user_id') ?: null);
         if (empty($result['ok'])) {
+            if (!empty($result['needs_budget'])) {
+                return redirect()->to($this->osViewUrl((int) $id))
+                    ->with('warning', $result['message'] ?? 'Crie primeiro um orçamento vinculado à OS para gerar este PDF.');
+            }
             return redirect()->to($this->osViewUrl((int) $id))->with('error', $result['message'] ?? 'Falha ao gerar PDF.');
         }
 
@@ -3941,7 +4472,7 @@ class Os extends BaseController
                     'risco_percentual' => (float) ($quote['risco_percentual'] ?? 0),
                     'valor_risco' => (float) ($quote['valor_risco'] ?? 0),
                     'custo_total' => (float) ($quote['custo_total'] ?? 0),
-                    'preco_minimo' => (float) ($quote['preco_minimo'] ?? 0),
+                    'preco_m?nimo' => (float) ($quote['preco_m?nimo'] ?? 0),
                     'valor_recomendado' => (float) ($quote['valor_recomendado'] ?? 0),
                     'modo_precificacao' => (string) ($quote['modo_precificacao'] ?? 'servico_cadastro'),
                 ],
@@ -4902,7 +5433,7 @@ class Os extends BaseController
 
             return true;
         } catch (\Throwable $e) {
-            log_message('error', '[Checklist] Falha ao validar infraestrutura no módulo OS: ' . $e->getMessage());
+            log_message('error', '[Checklist] Falha ao validar infraestrutura no m?dulo OS: ' . $e->getMessage());
             return false;
         }
     }
@@ -4991,7 +5522,7 @@ class Os extends BaseController
                 'target_dir' => $targetDir,
             ]);
 
-            return 'A OS foi salva, mas nao foi possivel preparar o diretorio das fotos de entrada.';
+        return 'A OS foi salva, mas não foi possível preparar o diretório das fotos de entrada.';
         }
 
         $slug = strtolower($this->normalizeOsSlug($numeroOs));
@@ -5040,7 +5571,7 @@ class Os extends BaseController
             return 'A OS foi salva, mas uma ou mais fotos de entrada nao puderam ser anexadas.';
         }
 
-        return 'A OS foi salva, mas nao foi possivel anexar as fotos de entrada.';
+        return 'A OS foi salva, mas não foi possível anexar as fotos de entrada.';
     }
 
     private function ensureAccessoryDirectory(string $slug): string
@@ -5113,7 +5644,7 @@ class Os extends BaseController
             ]);
             $sequence++;
         } catch (\Throwable $e) {
-            log_message('warning', 'Erro ao salvar foto de acessório: ' . $e->getMessage());
+            log_message('warning', 'Erro ao salvar foto de acess?rio: ' . $e->getMessage());
         }
     }
 
@@ -5594,6 +6125,17 @@ class Os extends BaseController
 
     public function print($id)
     {
+        $printService = new OsPrintService();
+        $context = $printService->buildDocumentContext((int) $id, [
+            'format' => $this->request->getGet('formato'),
+            'include_photos' => $this->normalizeTruthyFlag($this->request->getGet('incluir_fotos')),
+            'render_mode' => 'preview',
+        ]);
+        if ($context !== null) {
+            $context['autoPrint'] = $this->normalizeTruthyFlag($this->request->getGet('auto_print'));
+            return view('os/print', $context);
+        }
+
         $os = $this->model->getComplete($id);
         if (!$os) {
             return redirect()->back()->with('error', 'OS não encontrada.');

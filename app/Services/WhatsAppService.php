@@ -54,6 +54,10 @@ class WhatsAppService
             'template_codigo' => $templateCode,
             'arquivo_path' => $extra['arquivo_path'] ?? null,
             'arquivo' => $extra['arquivo'] ?? null,
+            'mime_type' => $extra['mime_type'] ?? null,
+            'tipo_conteudo' => $extra['tipo_conteudo'] ?? null,
+            'arquivo_nome' => $extra['arquivo_nome'] ?? null,
+            'arquivo_tamanho' => $extra['arquivo_tamanho'] ?? null,
         ];
 
         return $this->sendRaw(
@@ -331,6 +335,11 @@ class WhatsAppService
 
     private function renderTemplate(string $template, array $os, array $extra = []): string
     {
+        $pdfUrl = trim((string) ($extra['pdf_url'] ?? ''));
+        if ($pdfUrl === '' && !empty($extra['arquivo_path'])) {
+            $pdfUrl = 'PDF em anexo nesta mensagem.';
+        }
+
         $vars = [
             'numero_os' => $os['numero_os'] ?? '',
             'data_abertura' => !empty($os['data_abertura']) ? date('d/m/Y H:i', strtotime($os['data_abertura'])) : '',
@@ -338,6 +347,7 @@ class WhatsAppService
             'cliente' => $os['cliente_nome'] ?? '',
             'valor_final' => isset($os['valor_final']) ? formatMoney((float)$os['valor_final']) : 'R$ 0,00',
             'status' => $os['status'] ?? '',
+            'pdf_url' => $pdfUrl,
         ];
 
         foreach ($extra as $k => $v) {
@@ -349,9 +359,13 @@ class WhatsAppService
             $message = str_replace('{{' . $key . '}}', (string) $value, $message);
         }
 
-        $pdfUrl = trim((string)($vars['pdf_url'] ?? ''));
-        if ($pdfUrl !== '' && !str_contains($template, '{{pdf_url}}')) {
-            $message .= "\n\nPDF da OS: " . $pdfUrl;
+        $resolvedPdfUrl = trim((string) ($vars['pdf_url'] ?? ''));
+        if ($resolvedPdfUrl !== '' && !str_contains($template, '{{pdf_url}}')) {
+            if (filter_var($resolvedPdfUrl, FILTER_VALIDATE_URL)) {
+                $message .= "\n\nPDF da OS: " . $resolvedPdfUrl;
+            } else {
+                $message .= "\n\n" . $resolvedPdfUrl;
+            }
         }
 
         return $message;

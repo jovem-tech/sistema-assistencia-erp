@@ -21,6 +21,10 @@ Regra operacional:
 A grade de `Servicos` passou a exibir a coluna:
 - `Tipo Equipamento`
 
+Padronizacao visual atual:
+- a tela usa labels em pt-BR para `Serviços`, `Descrição`, `Valor Padrão`, `Ações` e demais titulos principais;
+- o modal `Importar Serviços (CSV)` e o formulario `Novo Serviço`/`Editar Serviço` seguem o mesmo padrao de idioma nos botoes, placeholders e mensagens operacionais.
+
 Uso recomendado:
 - preencha `Tipo Equipamento` com o tipo principal (ex.: `Smartphone`, `Notebook`, `Desktop`);
 - use `Diverso` quando o servico puder ser aplicado em mais de um tipo.

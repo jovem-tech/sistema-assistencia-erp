@@ -32,6 +32,24 @@ Exemplo: `OS26040010`.
 
 ## Listagem de OS (`/os`)
 
+### Correcao de 27/04/2026
+
+- a busca global da listagem voltou a exibir o placeholder corretamente em pt-BR;
+- o carregamento da grade foi protegido contra reinicializacao dupla do DataTables;
+- o script da listagem passou a ser recarregado com controle de versao por alteracao real do arquivo, evitando persistencia de cache antigo no navegador;
+- o modal de alteracao de status tambem recebeu nova normalizacao dos textos renderizados dinamicamente;
+- as abas, labels e mensagens fixas do modal de alteracao de status e do painel de orcamento foram revisadas novamente em pt-BR para remover caracteres quebrados em equipamento, historico e comunicacao;
+- a tela deixou de disparar o alerta `Cannot reinitialise DataTable` ao abrir `/os`.
+
+### Estabilidade da tela
+
+Na release `2.16.5`, a listagem, a edicao e a visualizacao da OS passaram por um restauro tecnico apos uma rodada de auditoria textual em pt-BR:
+
+- a rota `/os` deixou de cair em erro `500`;
+- a tela `/os/editar/{id}` voltou a abrir com o formulario completo;
+- a tela `/os/visualizar/{id}` voltou a carregar os blocos de contexto, timeline e documentos sem `ParseError`;
+- textos legados com caracteres quebrados foram normalizados em labels, botoes, avisos e mensagens operacionais do modulo.
+
 ### O que a listagem mostra
 
 - foto do equipamento;
@@ -101,6 +119,7 @@ Comportamento pratico:
 - a aba `Gerenciamento do Orcamento` concentra o resumo e as acoes de criar, editar ou visualizar o orcamento;
 - o modal continua respeitando o fluxo permitido para troca de status;
 - os procedimentos inseridos passam a registrar automaticamente data/hora e tecnico atual da OS;
+- os labels visiveis do modal foram padronizados em pt-BR, incluindo `Ações rápidas`, `Solução e diagnóstico`, `Gerenciamento do Orçamento`, `Histórico e progresso` e `Últimas movimentações`;
 - ao abrir `Editar orcamento` ou `Visualizar`, a janela do orcamento sobe na frente do modal de status para evitar sobreposicao invertida;
 - quando o orcamento e salvo em modo embed, o resumo dentro do modal de status e atualizado automaticamente;
 - quando o cliente responde o orcamento pelo link publico, o contexto comercial da ordem volta sincronizado assim que a notificacao em tempo real chega ao ERP.
@@ -149,6 +168,7 @@ Comportamento atual:
 - o modal não fecha pela tecla `ESC`;
 - o fechamento manual fica restrito ao botão `X`;
 - ao clicar no `X`, o sistema alerta que existe um registro de ordem de serviço em andamento e que o preenchimento não salvo será perdido.
+- esse alerta de confirmação agora sobe acima do modal iframe e do backdrop, evitando ficar escondido atrás da janela `Nova OS`.
 
 ## Abertura de nova OS
 
@@ -212,6 +232,7 @@ Regras práticas:
 - o select `Status` da edicao exibe todos os status operacionais cadastrados, permitindo ajustes fora da trilha curta do fluxo quando a equipe precisar corrigir a etapa manualmente;
 - a `Previsão de Entrega` não pode ficar anterior à `Data de Entrada`;
 - o dropdown `Prazo (dias)` passa a refletir novamente o prazo salvo ao reabrir a OS, calculando a diferenca entre `Data de Entrada` e `Previsão de Entrega`;
+- os labels, dicas, placeholders e mensagens auxiliares da tela /os/editar/{id} passaram por uma varredura complementar de pt-BR/UTF-8, cobrindo cliente, tecnico, acessorios, checklist, camera, diagnostico e resumo lateral;
 - pendências opcionais da recepção não bloqueiam mais o salvamento da edição.
 
 ### Aba `Fotos`
@@ -261,6 +282,7 @@ As abas principais são:
 - `Orçamento`
 - `Diagnóstico`
 - `Fotos`
+- `Documentos`
 - `Valores`
 
 ### Aba `Informações`
@@ -273,6 +295,10 @@ Ela mostra:
 - checklist de entrada;
 - status atual da OS;
 - status do orçamento vinculado, quando existir.
+
+Tambem foi aplicada revisao de labels em pt-BR/UTF-8 na lateral e na timeline, cobrindo `Histórico e Progresso`, `Recepção`, `Diagnóstico`, `Orçamento`, `Execução`, `Interrupção`, `Concluído`, `Últimas movimentações`, `Previsão` e `Conclusão`.
+
+Nesta mesma rodada, a navegacao por abas, o resumo de contexto, os blocos do orcamento vinculado e os textos auxiliares da visualizacao tambem receberam normalizacao complementar em pt-BR/UTF-8.
 
 Importante:
 
@@ -313,6 +339,105 @@ Ela pode reunir:
 - fotos da entrada;
 - fotos de acessórios;
 - fotos de checklist, quando houver.
+
+### Aba `Documentos`
+
+Concentra o gerenciamento e o envio dos PDFs da ordem sem sair da visualizacao.
+
+Ela foi organizada em tres cards:
+
+- `Documentos PDF`, para gerar novas versoes e baixar os arquivos ja emitidos;
+- `Enviar por WhatsApp`, para usar template, mensagem manual e anexar um PDF opcional da OS, com geracao automatica do consolidado de impressao quando nenhum PDF salvo for escolhido;
+- `Enviar por E-mail`, para escolher um PDF gerado, definir destino, assunto e mensagem antes do envio.
+
+Regras praticas:
+
+- o envio por e-mail exige ao menos um PDF previamente gerado para a OS;
+- o e-mail usa a configuracao SMTP cadastrada no ERP;
+- o campo de destino ja tenta preencher automaticamente com o e-mail do cliente;
+- ao lado do download, cada PDF gerado agora tambem oferece `Visualizar`, abrindo o arquivo inline em modal;
+- quando o tipo escolhido for `Orcamento`, a OS reutiliza exatamente o PDF oficial emitido pelo modulo `Orcamentos`, sem gerar uma segunda versao paralela do documento;
+- o PDF oficial de `Orcamento` inclui o link/botao de aprovacao publica do cliente no proprio arquivo;
+- quando a OS ainda nao possui orcamento vinculado e o operador tenta gerar o PDF de `Orcamento`, a tela informa isso por SweetAlert2 e pode abrir imediatamente o modal de elaboracao do orcamento;
+- os envios de `Orcamento` por `WhatsApp` e `E-mail` seguem as mesmas regras do modulo `Orcamentos`, incluindo bloqueio por status comercial quando necessario;
+- quando nenhum PDF salvo da OS e selecionado no envio por `WhatsApp`, o sistema gera automaticamente um PDF consolidado no mesmo padrao visual da impressao `A4`;
+- os PDFs continuam centralizados em `public/uploads/os_documentos/OS_<numero_os>/`.
+
+### Impressao consolidada da OS
+
+O botao `Imprimir`, no topo da visualizacao da OS, passou a abrir um dropdown com dois formatos:
+
+- `Folha A4`
+- `Bobina 80mm`
+
+Ao escolher um formato, o sistema abre um modal de pre-visualizacao antes da impressao final.
+
+Nesse modal, o operador pode:
+
+- revisar o documento consolidado da OS antes de imprimir;
+- alternar entre `A4` e `80mm` sem sair da tela;
+- decidir se deseja incluir ou nao as fotos;
+- abrir a pre-visualizacao em nova guia;
+- enviar o mesmo PDF por WhatsApp com mensagem personalizada.
+
+Conteudo do documento consolidado:
+
+- dados do cliente;
+- dados do equipamento;
+- status, fluxo, datas e tecnico;
+- relato, diagnostico, solucao e procedimentos;
+- checklist de entrada;
+- acessorios e estado fisico;
+- itens e servicos lancados;
+- resumo financeiro completo;
+- orcamento vinculado, quando existir;
+- notas complementares da OS.
+
+Regras das fotos:
+
+- no formato `A4`, quando a opcao `Incluir fotos` estiver ativa, a foto principal de perfil do equipamento aparece ao lado esquerdo do bloco de equipamento;
+- as demais fotos entram ao final do documento agrupadas por tipo, como `entrada`, `acessorios`, `perfil`, alem de outros grupos tecnicos existentes na OS, quando houver;
+- no formato `80mm`, a impressao prioriza a leitura em rolagem continua e mantem as fotos na galeria final.
+- para evitar perda de imagem no PDF final, as fotos usadas na impressao consolidada passam a ser incorporadas diretamente ao documento no momento da geracao.
+
+Organizacao visual do A4:
+
+- o nome e os dados da empresa ocupam toda a faixa superior do documento;
+- logo abaixo, o card principal da OS ocupa toda a largura disponivel e destaca numero, badges, datas e identificacao operacional da ordem;
+- na sequencia, os dados do cliente aparecem em uma secao dedicada;
+- logo abaixo, as informacoes do equipamento ocupam toda a linha;
+- quando `Incluir fotos` estiver ativo, a foto principal do equipamento aparece ao lado esquerdo desse bloco tecnico;
+- a secao `Tecnico responsavel` permanece em bloco proprio, separada das informacoes de cliente e equipamento;
+- no `A4`, a primeira pagina prioriza esse bloco-resumo inicial com empresa, identificacao da OS, cliente, equipamento com foto e tecnico responsavel;
+- a segunda pagina passa a abrir em `Relato do cliente & Diagnostico tecnico`;
+- ainda na segunda pagina, o documento segue com `Checklist de Entrada`, `Itens e Servicos Lancados na OS`, `Resumo Financeiro` e `Orcamento Vinculado`, quando existirem;
+- a terceira pagina passa a ser reservada para `Fotos Anexadas`, separando a galeria final do conteudo tecnico e financeiro;
+- o rodape do `A4` passa a mostrar a paginacao da propria pre-visualizacao em `Pagina X de Y`, alinhada com a divisao explicita das folhas no navegador;
+- no PDF efetivamente gerado e enviado, a contagem do rodape e recalculada apos o render final para refletir o total real de paginas do arquivo;
+- paginas sem conteudo util deixam de ser geradas no PDF final; a folha `Fotos Anexadas` so entra quando existirem imagens validas para renderizacao;
+- o `Resumo financeiro` fica imediatamente acima da secao `Orcamento vinculado`.
+- a estrutura visual do documento foi simplificada em blocos e tabelas mais estaveis, para manter a mesma organizacao tanto na pre-visualizacao quanto no PDF efetivamente enviado.
+
+Envio por WhatsApp a partir da impressao:
+
+- o modal usa os templates cadastrados em `Gestao de Conhecimento -> Templates WhatsApp` como base de mensagem;
+- o texto pode ser editado antes do envio;
+- o PDF enviado respeita exatamente o formato e a opcao de fotos selecionados na pre-visualizacao.
+- a camada visual do documento consolidado foi reforcada para manter blocos, cores e cards tanto na pre-visualizacao quanto no PDF final enviado ao cliente.
+
+### Modelos de PDF e templates de WhatsApp
+
+Os tipos documentais da OS, exceto `Orcamento`, agora podem ser administrados pela equipe:
+
+- menu: `Gestao de Conhecimento -> Modelos PDF`
+- menu: `Gestao de Conhecimento -> Templates WhatsApp`
+
+Na pratica, isso permite:
+
+- criar novos tipos como contrato, garantia, laudo complementar e termos internos;
+- editar o HTML base dos PDFs da OS com placeholders de cliente, equipamento, datas, status e valores;
+- ativar ou desativar tipos documentais sem alterar codigo;
+- criar e revisar templates padrao de mensagem para os envios por WhatsApp.
 
 ### Aba `Valores`
 

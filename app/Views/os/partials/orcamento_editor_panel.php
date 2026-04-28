@@ -48,45 +48,45 @@ $orcamentoActionTitle = '';
 $orcamentoActionButtonClass = 'btn btn-primary btn-sm';
 $orcamentoActionIcon = 'bi bi-receipt-cutoff';
 $editButtonTitle = $orcamentoLocked
-    ? 'Abrir a tela de edicao do orcamento. Se o status atual bloquear edicao direta, o modulo orienta a revisao adequada.'
-    : 'Editar o orcamento vinculado a esta OS sem sair da tela.';
+    ? 'Abrir a tela de edição do orçamento. Se o status atual bloquear edição direta, o módulo orienta a revisão adequada.'
+    : 'Editar o orçamento vinculado a esta OS sem sair da tela.';
 
 if ($hasItensOrcamento) {
     if ($hasOrcamentoVinculado && $canEditOrcamento && !$orcamentoLocked) {
-        $orcamentoActionLabel = 'Editar orcamento';
+        $orcamentoActionLabel = 'Editar orçamento';
         $orcamentoActionModalUrl = $orcamentoEditModalUrl;
         $orcamentoActionUrl = $orcamentoEditUrl;
-        $orcamentoActionTitle = 'Editar o orcamento vinculado a esta OS sem sair da tela.';
+        $orcamentoActionTitle = 'Editar o orçamento vinculado a esta OS sem sair da tela.';
         $orcamentoActionButtonClass = 'btn btn-primary btn-sm';
         $orcamentoActionIcon = 'bi bi-pencil-square';
     } elseif ($hasOrcamentoVinculado && $canViewOrcamento) {
-        $orcamentoActionLabel = 'Visualizar orcamento';
+        $orcamentoActionLabel = 'Visualizar orçamento';
         $orcamentoActionModalUrl = $orcamentoViewModalUrl;
         $orcamentoActionUrl = $orcamentoViewUrl;
-        $orcamentoActionTitle = 'Visualizar o orcamento vinculado a esta OS.';
+        $orcamentoActionTitle = 'Visualizar o orçamento vinculado a esta OS.';
         $orcamentoActionButtonClass = 'btn btn-outline-primary btn-sm';
         $orcamentoActionIcon = 'bi bi-eye';
     }
 } else {
     if ($hasOrcamentoVinculado && $canEditOrcamento && !$orcamentoLocked) {
-        $orcamentoActionLabel = 'Lancar itens no orcamento';
+        $orcamentoActionLabel = 'Lançar itens no orçamento';
         $orcamentoActionModalUrl = $orcamentoEditModalUrl;
         $orcamentoActionUrl = $orcamentoEditUrl;
-        $orcamentoActionTitle = 'Abrir o orcamento vinculado para inserir pecas, servicos e pacotes.';
+        $orcamentoActionTitle = 'Abrir o orçamento vinculado para inserir peças, serviços e pacotes.';
         $orcamentoActionButtonClass = 'btn btn-primary btn-sm';
         $orcamentoActionIcon = 'bi bi-plus-circle';
     } elseif (!$hasOrcamentoVinculado && $canCreateOrcamento) {
-        $orcamentoActionLabel = 'Criar orcamento';
+        $orcamentoActionLabel = 'Criar orçamento';
         $orcamentoActionModalUrl = $orcamentoCreateModalUrl;
         $orcamentoActionUrl = $orcamentoCreateUrl;
-        $orcamentoActionTitle = 'Abrir um novo orcamento ja vinculado a esta OS.';
+        $orcamentoActionTitle = 'Abrir um novo orçamento já vinculado a esta OS.';
         $orcamentoActionButtonClass = 'btn btn-primary btn-sm';
         $orcamentoActionIcon = 'bi bi-plus-circle';
     } elseif ($hasOrcamentoVinculado && $canViewOrcamento) {
-        $orcamentoActionLabel = 'Visualizar orcamento';
+        $orcamentoActionLabel = 'Visualizar orçamento';
         $orcamentoActionModalUrl = $orcamentoViewModalUrl;
         $orcamentoActionUrl = $orcamentoViewUrl;
-        $orcamentoActionTitle = 'Visualizar o orcamento vinculado a esta OS.';
+        $orcamentoActionTitle = 'Visualizar o orçamento vinculado a esta OS.';
         $orcamentoActionButtonClass = 'btn btn-outline-primary btn-sm';
         $orcamentoActionIcon = 'bi bi-eye';
     }
@@ -99,12 +99,12 @@ if ($hasItensOrcamento) {
             <div class="card-header os-tab-card-header py-3 d-flex flex-column flex-lg-row justify-content-between gap-3">
                 <div>
                     <strong>
-                        <i class="bi bi-box-seam me-2 text-primary"></i><?= $isStatusModalContext ? 'Gerenciamento do Orcamento' : 'Pecas e Orcamento' ?>
+                        <i class="bi bi-box-seam me-2 text-primary"></i><?= $isStatusModalContext ? 'Gerenciamento do Orçamento' : 'Peças e Orçamento' ?>
                     </strong>
                     <small class="text-muted ms-2">
                         <?= $isStatusModalContext
-                            ? 'Itens vinculados ao orcamento desta OS, sem sair da alteracao de status.'
-                            : 'Itens vinculados ao orcamento desta OS, sem sair da edicao.' ?>
+                            ? 'Itens vinculados ao orçamento desta OS, sem sair da alteração de status.'
+                            : 'Itens vinculados ao orçamento desta OS, sem sair da edição.' ?>
                     </small>
                 </div>
                 <div class="d-flex flex-wrap gap-2 justify-content-start justify-content-lg-end">
@@ -122,29 +122,29 @@ if ($hasItensOrcamento) {
                         </button>
                     <?php endif; ?>
 
-                    <?php if ($hasOrcamentoVinculado && $canEditOrcamento && $orcamentoEditModalUrl !== '' && !in_array($orcamentoActionLabel, ['Editar orcamento', 'Lancar itens no orcamento'], true)): ?>
+                    <?php if ($hasOrcamentoVinculado && $canEditOrcamento && $orcamentoEditModalUrl !== '' && !in_array($orcamentoActionLabel, ['Editar orçamento', 'Lançar itens no orçamento'], true)): ?>
                         <button
                             type="button"
                             class="btn btn-outline-primary btn-sm"
                             data-os-orcamento-modal-url="<?= esc($orcamentoEditModalUrl) ?>"
-                            data-os-orcamento-modal-title="Editar orcamento"
+                            data-os-orcamento-modal-title="Editar orçamento"
                             data-os-frame-modal-url="<?= esc($orcamentoEditModalUrl) ?>"
-                            data-os-frame-modal-title="Editar orcamento"
+                            data-os-frame-modal-title="Editar orçamento"
                             title="<?= esc($editButtonTitle) ?>"
                         >
-                            <i class="bi bi-pencil-square me-1"></i>Editar orcamento
+                            <i class="bi bi-pencil-square me-1"></i>Editar orçamento
                         </button>
                     <?php endif; ?>
 
-                    <?php if ($hasOrcamentoVinculado && $canViewOrcamento && $orcamentoViewModalUrl !== '' && $orcamentoActionLabel !== 'Visualizar orcamento'): ?>
+                    <?php if ($hasOrcamentoVinculado && $canViewOrcamento && $orcamentoViewModalUrl !== '' && $orcamentoActionLabel !== 'Visualizar orçamento'): ?>
                         <button
                             type="button"
                             class="btn btn-outline-secondary btn-sm"
                             data-os-orcamento-modal-url="<?= esc($orcamentoViewModalUrl) ?>"
-                            data-os-orcamento-modal-title="Visualizar orcamento"
+                            data-os-orcamento-modal-title="Visualizar orçamento"
                             data-os-frame-modal-url="<?= esc($orcamentoViewModalUrl) ?>"
-                            data-os-frame-modal-title="Visualizar orcamento"
-                            title="Abrir o orcamento vinculado em modo de consulta."
+                            data-os-frame-modal-title="Visualizar orçamento"
+                            title="Abrir o orçamento vinculado em modo de consulta."
                         >
                             <i class="bi bi-eye me-1"></i>Visualizar
                         </button>
@@ -155,16 +155,16 @@ if ($hasItensOrcamento) {
                 <?php if (!$hasOrcamentoVinculado): ?>
                     <div class="os-empty-state p-4 border rounded text-center">
                         <i class="bi bi-receipt display-6 text-muted opacity-50"></i>
-                        <h6 class="mt-3 mb-2">Nenhum orcamento vinculado</h6>
+                        <h6 class="mt-3 mb-2">Nenhum orçamento vinculado</h6>
                         <p class="text-muted small mb-0">
                             <?= $isStatusModalContext
-                                ? 'Crie um orcamento para inserir pecas, servicos, pacotes ou outros itens deste atendimento sem sair deste modal.'
-                                : 'Crie um orcamento para inserir pecas, servicos, pacotes ou outros itens deste atendimento.' ?>
+                                ? 'Crie um orçamento para inserir peças, serviços, pacotes ou outros itens deste atendimento sem sair deste modal.'
+                                : 'Crie um orçamento para inserir peças, serviços, pacotes ou outros itens deste atendimento.' ?>
                         </p>
                     </div>
                 <?php else: ?>
                     <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
-                        <span class="badge text-bg-light border">Orcamento <?= esc((string) ($orcamentoVinculado['numero'] ?? ('#' . (int) ($orcamentoVinculado['id'] ?? 0)))) ?></span>
+                        <span class="badge text-bg-light border">Orçamento <?= esc((string) ($orcamentoVinculado['numero'] ?? ('#' . (int) ($orcamentoVinculado['id'] ?? 0)))) ?></span>
                         <?php if ($orcamentoStatusLabel !== ''): ?>
                             <span class="badge text-bg-primary"><?= esc($orcamentoStatusLabel) ?></span>
                         <?php endif; ?>
@@ -177,13 +177,13 @@ if ($hasItensOrcamento) {
 
                     <?php if ($orcamentoLocked): ?>
                         <div class="alert alert-light border small mb-3">
-                            Este orcamento esta bloqueado para edicao direta pelo status atual. Quando precisar apenas consultar, use o botao de visualizacao.
+                            Este orçamento está bloqueado para edição direta pelo status atual. Quando precisar apenas consultar, use o botão de visualização.
                         </div>
                     <?php endif; ?>
 
                     <?php if (empty($orcamentoItensResumo['groups'])): ?>
                         <div class="alert alert-info border-0 shadow-sm mb-3">
-                            Nenhum item foi inserido neste orcamento ainda.
+                            Nenhum item foi inserido neste orçamento ainda.
                         </div>
                     <?php else: ?>
                         <div class="row g-3 mb-3">
@@ -214,18 +214,18 @@ if ($hasItensOrcamento) {
                             <thead>
                                 <tr>
                                     <th>Tipo</th>
-                                    <th>Descricao</th>
+                                    <th>Descrição</th>
                                     <th>Qtd</th>
                                     <th>Valor Unit.</th>
                                     <th>Desconto</th>
-                                    <th>Acrescimo</th>
+                                    <th>Acréscimo</th>
                                     <th>Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php if (empty($orcamentoItensResumo['items'])): ?>
                                     <tr>
-                                        <td colspan="7" class="text-center py-4 text-muted">Nenhum item cadastrado neste orcamento.</td>
+                                        <td colspan="7" class="text-center py-4 text-muted">Nenhum item cadastrado neste orçamento.</td>
                                     </tr>
                                 <?php else: ?>
                                     <?php foreach ($orcamentoItensResumo['items'] as $itemOrcamento): ?>
@@ -235,7 +235,7 @@ if ($hasItensOrcamento) {
                                                     <?= esc((string) ($itemOrcamento['tipo_item_label'] ?? ucwords((string) ($itemOrcamento['tipo_item'] ?? 'item')))) ?>
                                                 </span>
                                             </td>
-                                            <td data-label="Descricao">
+                                            <td data-label="Descrição">
                                                 <div><?= esc((string) ($itemOrcamento['descricao'] ?? '-')) ?></div>
                                                 <?php if (!empty($itemOrcamento['observacoes'])): ?>
                                                     <small class="text-muted d-block mt-1"><?= esc((string) $itemOrcamento['observacoes']) ?></small>
@@ -244,7 +244,7 @@ if ($hasItensOrcamento) {
                                             <td data-label="Qtd"><?= esc((string) ($itemOrcamento['quantidade'] ?? 0)) ?></td>
                                             <td data-label="Valor Unit."><?= esc(formatMoney($itemOrcamento['valor_unitario'] ?? 0)) ?></td>
                                             <td data-label="Desconto"><?= esc(formatMoney($itemOrcamento['desconto'] ?? 0)) ?></td>
-                                            <td data-label="Acrescimo"><?= esc(formatMoney($itemOrcamento['acrescimo'] ?? 0)) ?></td>
+                                            <td data-label="Acréscimo"><?= esc(formatMoney($itemOrcamento['acrescimo'] ?? 0)) ?></td>
                                             <td data-label="Total"><strong><?= esc(formatMoney($itemOrcamento['total'] ?? 0)) ?></strong></td>
                                         </tr>
                                     <?php endforeach; ?>

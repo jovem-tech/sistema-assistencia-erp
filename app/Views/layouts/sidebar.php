@@ -94,10 +94,12 @@
 
             <?php if (canModule('defeitos') || canModule('os')): ?>
             <?php
-            $isConhecimentoActive = str_starts_with(uri_string(), 'equipamentosdefeitos')
+            $isConhecimentoActive = str_starts_with(uri_string(), 'equipamentosdefeitos') 
                 || str_starts_with(uri_string(), 'defeitosrelatados')
                 || str_starts_with(uri_string(), 'osworkflow')
-                || str_starts_with(uri_string(), 'checklists');
+                || str_starts_with(uri_string(), 'checklists')
+                || str_starts_with(uri_string(), 'conhecimento/modelos-pdf')
+                || str_starts_with(uri_string(), 'conhecimento/templates-whatsapp');
             ?>
             <li class="nav-item">
                 <a class="nav-link <?= $isConhecimentoActive ? 'active' : 'collapsed' ?>" data-bs-toggle="collapse" href="#conhecimentoSubmenu" role="button">
@@ -145,6 +147,16 @@
                         <li class="nav-item">
                             <a class="nav-link <?= str_starts_with(uri_string(), 'checklists/saida') ? 'active' : '' ?>" href="<?= base_url('checklists/saida') ?>">
                                 <i class="bi bi-box-arrow-right"></i><span>Checklist de Saída</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'conhecimento/modelos-pdf') ? 'active' : '' ?>" href="<?= base_url('conhecimento/modelos-pdf') ?>">
+                                <i class="bi bi-file-earmark-richtext"></i><span>Modelos PDF</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= str_starts_with(uri_string(), 'conhecimento/templates-whatsapp') ? 'active' : '' ?>" href="<?= base_url('conhecimento/templates-whatsapp') ?>">
+                                <i class="bi bi-chat-square-dots"></i><span>Templates WhatsApp</span>
                             </a>
                         </li>
                         <?php endif; ?>

@@ -19,7 +19,7 @@ class Servicos extends BaseController
     public function index()
     {
         $data = [
-            'title'    => 'Servicos',
+            'title'    => 'Serviços',
             'servicos' => $this->model->orderBy('nome', 'ASC')->findAll(),
         ];
         return view('servicos/index', $data);
@@ -28,7 +28,7 @@ class Servicos extends BaseController
     public function create()
     {
         $data = [
-            'title' => 'Novo Servico',
+            'title' => 'Novo Serviço',
             'tiposEquipamento' => $this->loadTiposEquipamentoOptions(),
         ];
         return view('servicos/form', $data);
@@ -60,20 +60,20 @@ class Servicos extends BaseController
 
         $this->model->insert($dados);
 
-        LogModel::registrar('servico_criado', 'Servico cadastrado: ' . ($dados['nome'] ?? '')); 
+        LogModel::registrar('servico_criado', 'Serviço cadastrado: ' . ($dados['nome'] ?? '')); 
 
-        return redirect()->to('/servicos')->with('success', 'Servico cadastrado com sucesso!');
+        return redirect()->to('/servicos')->with('success', 'Serviço cadastrado com sucesso!');
     }
 
     public function edit($id)
     {
         $servico = $this->model->find($id);
         if (! $servico) {
-            return redirect()->to('/servicos')->with('error', 'Servico nao encontrado.');
+            return redirect()->to('/servicos')->with('error', 'Serviço não encontrado.');
         }
 
         $data = [
-            'title'   => 'Editar Servico',
+            'title'   => 'Editar Serviço',
             'servico' => $servico,
             'tiposEquipamento' => $this->loadTiposEquipamentoOptions(),
         ];
@@ -105,9 +105,9 @@ class Servicos extends BaseController
 
         $this->model->update($id, $dados);
 
-        LogModel::registrar('servico_atualizado', 'Servico atualizado ID: ' . $id);
+        LogModel::registrar('servico_atualizado', 'Serviço atualizado ID: ' . $id);
 
-        return redirect()->to('/servicos')->with('success', 'Servico atualizado com sucesso!');
+        return redirect()->to('/servicos')->with('success', 'Serviço atualizado com sucesso!');
     }
 
     public function delete($id)
@@ -115,17 +115,17 @@ class Servicos extends BaseController
         $servico = $this->model->find($id);
         if ($servico) {
             $this->model->delete($id);
-            LogModel::registrar('servico_excluido', 'Servico excluido: ' . ($servico['nome'] ?? ''));
+            LogModel::registrar('servico_excluido', 'Serviço excluído: ' . ($servico['nome'] ?? ''));
         }
 
-        return redirect()->to('/servicos')->with('success', 'Servico excluido com sucesso!');
+        return redirect()->to('/servicos')->with('success', 'Serviço excluído com sucesso!');
     }
 
     public function encerrar($id)
     {
         $servico = $this->model->find($id);
         if (! $servico) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Servico nao encontrado.']);
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Serviço não encontrado.']);
         }
 
         $this->model->update($id, [
@@ -133,9 +133,9 @@ class Servicos extends BaseController
             'encerrado_em' => date('Y-m-d H:i:s'),
         ]);
 
-        LogModel::registrar('servico_encerrado', 'Servico encerrado: ' . ($servico['nome'] ?? ''));
+        LogModel::registrar('servico_encerrado', 'Serviço encerrado: ' . ($servico['nome'] ?? ''));
 
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Servico encerrado com sucesso!']);
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Serviço encerrado com sucesso!']);
     }
 
     public function exportCsv()
@@ -151,7 +151,7 @@ class Servicos extends BaseController
         $f = fopen('php://output', 'w');
         fputs($f, "\xEF\xBB\xBF");
 
-        fputcsv($f, ['ID', 'Nome', 'Descricao', 'Tipo Equipamento', 'Valor Padrao', 'Tempo Padrao (h)', 'Custo Direto Padrao', 'Status'], ';');
+        fputcsv($f, ['ID', 'Nome', 'Descrição', 'Tipo de Equipamento', 'Valor Padrão', 'Tempo Padrão (h)', 'Custo Direto Padrão', 'Status'], ';');
 
         foreach ($servicos as $s) {
             fputcsv($f, [
@@ -182,8 +182,8 @@ class Servicos extends BaseController
         fputs($f, "\xEF\xBB\xBF");
 
         fputcsv($f, ['nome', 'descricao', 'tipo_equipamento', 'valor', 'tempo_padrao_horas', 'custo_direto_padrao'], ';');
-        fputcsv($f, ['Troca de Tela', 'Substituicao completa do display frontal', 'Smartphone', '450,00', '1,00', '20,00'], ';');
-        fputcsv($f, ['Limpeza Interna', 'Desmontagem e higienizacao de componentes', 'Notebook', '120,50', '0,80', '8,00'], ';');
+        fputcsv($f, ['Troca de Tela', 'Substituição completa do display frontal', 'Smartphone', '450,00', '1,00', '20,00'], ';');
+        fputcsv($f, ['Limpeza Interna', 'Desmontagem e higienização de componentes', 'Notebook', '120,50', '0,80', '8,00'], ';');
 
         fclose($f);
         exit;
@@ -195,7 +195,7 @@ class Servicos extends BaseController
 
         $file = $this->request->getFile('arquivo_csv');
         if (! $file || ! $file->isValid() || $file->getExtension() !== 'csv') {
-            return redirect()->to('/servicos')->with('error', 'Arquivo invalido. Envie um arquivo CSV.');
+            return redirect()->to('/servicos')->with('error', 'Arquivo inválido. Envie um arquivo CSV.');
         }
 
         $filepath = $file->getTempName();
@@ -215,7 +215,7 @@ class Servicos extends BaseController
 
         $headers = fgetcsv($fileStream, 1000, $delimiter);
         if (! $headers) {
-            return redirect()->to('/servicos')->with('error', 'CSV vazio ou invalido.');
+            return redirect()->to('/servicos')->with('error', 'CSV vazio ou inválido.');
         }
         $headers = array_map('trim', $headers);
 
@@ -263,9 +263,9 @@ class Servicos extends BaseController
 
         fclose($fileStream);
 
-        LogModel::registrar('servicos_importacao', "Importacao CSV de servicos: $importedCount cadastrados, $errorCount falhas.");
+        LogModel::registrar('servicos_importacao', "Importação CSV de serviços: $importedCount cadastrados, $errorCount falhas.");
 
-        $msg = "Importacao concluida: $importedCount servico(s) cadastrado(s).";
+        $msg = "Importação concluída: $importedCount serviço(s) cadastrado(s).";
         if ($errorCount > 0) {
             $msg .= " $errorCount registros falharam por falta de nome ou erro de formato.";
         }

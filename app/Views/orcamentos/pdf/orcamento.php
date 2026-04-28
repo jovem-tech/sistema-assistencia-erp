@@ -1,16 +1,12 @@
 <!doctype html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <title><?= esc($tituloDocumento ?? 'Orçamento') ?></title>
-<?= view('orcamentos/pdf/_styles') ?>
+<?= view('pdf/_styles') ?>
 <style>
     .doc-header { border-bottom-color: #0ea5e9; }
-    .doc-title { color: #0f172a; }
-    .doc-subtitle { color: #64748b; }
-    .grid .label { background: #f8fafc; }
-    .table th { background: #f1f5f9; }
-    .highlight { background: #ecfeff; border: 1px solid #bae6fd; border-radius: 8px; padding: 8px; }
+    .highlight-box { border-color: #bae6fd; background: #f0f9ff; }
 </style>
 </head>
 <body>
@@ -19,8 +15,8 @@ $orcamento = $orcamento ?? [];
 $itens = $itens ?? [];
 $tipoOrcamento = (string) ($orcamento['tipo_orcamento'] ?? 'previo');
 $tipoResumo = $tipoOrcamento === 'assistencia'
-    ? 'Orçamento com equipamento ja recebido em assistencia e submetido a analise.'
-    : 'Orçamento previo com estimativa inicial, sujeito a confirmacao apos a entrada do equipamento.';
+    ? 'Orçamento com equipamento já recebido em assistência e submetido à análise.'
+    : 'Orçamento prévio com estimativa inicial, sujeito à confirmação após a entrada do equipamento.';
 $clienteNome = trim((string) ($orcamento['cliente_nome'] ?? ''));
 if ($clienteNome === '') {
     $clienteNome = (string) ($orcamento['cliente_nome_avulso'] ?? 'Cliente eventual');
@@ -28,7 +24,7 @@ if ($clienteNome === '') {
 $numero = (string) ($orcamento['numero'] ?? '#');
 $linkPublico = !empty($orcamento['token_publico']) ? base_url('orcamento/' . $orcamento['token_publico']) : '';
 ?>
-<?= view('orcamentos/pdf/_branding', [
+<?= view('pdf/_branding', [
     'branding' => $branding ?? [],
     'tituloDocumento' => $tituloDocumento ?? 'Orçamento',
     'documentoReferencia' => $numero,
@@ -47,46 +43,46 @@ $linkPublico = !empty($orcamento['token_publico']) ? base_url('orcamento/' . $or
             <td><?= esc((string) ($orcamento['telefone_contato'] ?? '-')) ?></td>
         </tr>
         <tr>
-            <td class="label">Email</td>
+            <td class="label">E-mail</td>
             <td><?= esc((string) ($orcamento['email_contato'] ?? '-')) ?></td>
             <td class="label">OS vinculada</td>
             <td><?= esc((string) ($orcamento['numero_os'] ?? '-')) ?></td>
         </tr>
         <tr>
             <td class="label">Tipo</td>
-            <td><?= esc($tipoOrcamento === 'assistencia' ? 'Com equipamento na assistencia' : 'Previo') ?></td>
+            <td><?= esc($tipoOrcamento === 'assistencia' ? 'Com equipamento na assistência' : 'Prévio') ?></td>
             <td class="label">Versão</td>
             <td><?= esc((string) ($orcamento['versao'] ?? 1)) ?></td>
         </tr>
         <tr>
             <td class="label">Validade</td>
             <td><?= esc(formatDate($orcamento['validade_data'] ?? null)) ?></td>
-            <td class="label">Prazo execucao</td>
+            <td class="label">Prazo de execução</td>
             <td><?= esc((string) ($orcamento['prazo_execucao'] ?? '-')) ?></td>
         </tr>
     </table>
 
-    <div class="highlight" style="margin-bottom: 10px;">
+    <div class="highlight-box">
         <?= esc($tipoResumo) ?>
     </div>
 
-    <div class="section-title">Itens do orcamento</div>
+    <div class="section-title">Itens do orçamento</div>
     <table class="table">
         <thead>
             <tr>
                 <th>Tipo</th>
                 <th>Descrição</th>
                 <th>Qtd</th>
-                <th>Valor unitario</th>
+                <th>Valor unitário</th>
                 <th>Desconto</th>
-                <th>Acrescimo</th>
+                <th>Acréscimo</th>
                 <th>Total</th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($itens)): ?>
                 <tr>
-                    <td colspan="7" class="muted">Nenhum item cadastrado neste orcamento.</td>
+                    <td colspan="7" class="muted">Nenhum item cadastrado neste orçamento.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($itens as $item): ?>
@@ -117,7 +113,7 @@ $linkPublico = !empty($orcamento['token_publico']) ? base_url('orcamento/' . $or
             <td><?= esc(formatMoney($orcamento['desconto'] ?? 0)) ?></td>
         </tr>
         <tr>
-            <td class="label">Acrescimo</td>
+            <td class="label">Acréscimo</td>
             <td><?= esc(formatMoney($orcamento['acrescimo'] ?? 0)) ?></td>
             <td class="label">Total final</td>
             <td><strong><?= esc(formatMoney($orcamento['total'] ?? 0)) ?></strong></td>
@@ -125,30 +121,32 @@ $linkPublico = !empty($orcamento['token_publico']) ? base_url('orcamento/' . $or
     </table>
 
     <?php if (!empty($orcamento['condicoes'])): ?>
-        <div class="section-title">Condicoes</div>
+        <div class="section-title">Condições</div>
         <div><?= nl2br(esc((string) $orcamento['condicoes'])) ?></div>
     <?php endif; ?>
 
     <?php if (!empty($orcamento['observacoes'])): ?>
-        <div class="section-title">Observacoes</div>
+        <div class="section-title">Observações</div>
         <div><?= nl2br(esc((string) $orcamento['observacoes'])) ?></div>
     <?php endif; ?>
 
     <?php if ($linkPublico !== ''): ?>
-        <div class="section-title">Aprovacao online</div>
-        <div class="highlight">
-            O cliente pode aprovar ou rejeitar pelo link: <?= esc($linkPublico) ?>
+        <div class="section-title">Aprovação online</div>
+        <div class="highlight-box">
+            O cliente pode aprovar ou rejeitar o orçamento pelo link abaixo.
+            <br>
+            <a class="cta-button" href="<?= esc($linkPublico) ?>">Abrir link de aprovação do orçamento</a>
+            <div style="margin-top:10px; font-size:10px; color:#64748b;"><?= esc($linkPublico) ?></div>
         </div>
     <?php endif; ?>
 
     <div class="footer">
         <?php if ($tipoOrcamento === 'previo'): ?>
-            A aprovacao deste orcamento previo registra a concordancia com a estimativa inicial e pode exigir nova autorizacao caso a analise técnica altere valores ou itens.
+            A aprovação deste orçamento prévio registra a concordância com a estimativa inicial e pode exigir nova autorização caso a análise técnica altere valores ou itens.
         <?php else: ?>
-            A aprovacao deste orcamento autoriza a execucao dos itens descritos neste documento para o equipamento ja recebido em assistencia.
+            A aprovação deste orçamento autoriza a execução dos itens descritos neste documento para o equipamento já recebido em assistência.
         <?php endif; ?>
     </div>
 </div>
 </body>
 </html>
-

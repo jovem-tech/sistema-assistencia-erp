@@ -48,7 +48,7 @@ class Orcamento extends BaseController
     {
         $orcamento = $this->findByToken((string) $token);
         if (!$orcamento) {
-            return $this->response->setStatusCode(404)->setBody('Orcamento nao encontrado ou link expirado.');
+            return $this->response->setStatusCode(404)->setBody('Orçamento não encontrado ou link expirado.');
         }
 
         $orcamentoStatus = (string) ($orcamento['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
@@ -85,7 +85,7 @@ class Orcamento extends BaseController
         $token = (string) $token;
         $orcamento = $this->findByToken($token);
         if (!$orcamento) {
-            return $this->response->setStatusCode(404)->setBody('Orcamento nao encontrado ou link expirado.');
+            return $this->response->setStatusCode(404)->setBody('Orçamento não encontrado ou link expirado.');
         }
 
         $statusAtual = (string) ($orcamento['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
@@ -96,7 +96,7 @@ class Orcamento extends BaseController
             OrcamentoModel::STATUS_RASCUNHO,
         ], true)) {
             return redirect()->to('/orcamento/' . $token)
-                ->with('error', 'Este orcamento nao permite mais aprovacao pelo link publico.');
+                ->with('error', 'Este orçamento não permite mais aprovação pelo link público.');
         }
 
         $tipoOrcamento = $this->orcamentoModel->normalizeTipo(
@@ -130,9 +130,9 @@ class Orcamento extends BaseController
             $statusAprovacao,
             null,
             $isPrevio
-                ? 'Orcamento previo aprovado via link publico (pendente de abertura de OS)'
-                : 'Orcamento de assistencia aprovado via link publico',
-            'publico'
+                ? 'Orçamento prévio aprovado via link público (pendente de abertura de OS)'
+                : 'Orçamento de assistência aprovado via link público',
+            'público'
         );
 
         if ($isPrevio) {
@@ -154,8 +154,8 @@ class Orcamento extends BaseController
         return redirect()->to('/orcamento/' . $token)->with(
             'success',
             $isPrevio
-                ? 'Estimativa inicial aprovada com sucesso. Agora ela esta pendente de abertura de OS para analise tecnica.'
-                : 'Orcamento aprovado com sucesso.'
+                ? 'Estimativa inicial aprovada com sucesso. Agora ela está pendente de abertura de OS para análise técnica.'
+                : 'Orçamento aprovado com sucesso.'
         );
     }
 
@@ -164,7 +164,7 @@ class Orcamento extends BaseController
         $token = (string) $token;
         $orcamento = $this->findByToken($token);
         if (!$orcamento) {
-            return $this->response->setStatusCode(404)->setBody('Orcamento nao encontrado ou link expirado.');
+            return $this->response->setStatusCode(404)->setBody('Orçamento não encontrado ou link expirado.');
         }
 
         $statusAtual = (string) ($orcamento['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
@@ -175,7 +175,7 @@ class Orcamento extends BaseController
             OrcamentoModel::STATUS_RASCUNHO,
         ], true)) {
             return redirect()->to('/orcamento/' . $token)
-                ->with('error', 'Este orcamento nao permite mais rejeicao pelo link publico.');
+                ->with('error', 'Este orçamento não permite mais rejeição pelo link público.');
         }
 
         $motivo = trim((string) $this->request->getPost('resposta_cliente'));
@@ -205,19 +205,19 @@ class Orcamento extends BaseController
             $statusAtual,
             OrcamentoModel::STATUS_REJEITADO,
             null,
-            'Rejeitado via link publico',
-            'publico'
+            'Rejeitado via link público',
+            'público'
         );
         $this->notifyStaffAboutPublicBudgetStatusChange($orcamento, $statusAtual, OrcamentoModel::STATUS_REJEITADO);
 
-        return redirect()->to('/orcamento/' . $token)->with('success', 'Rejeicao registrada com sucesso.');
+        return redirect()->to('/orcamento/' . $token)->with('success', 'Rejeição registrada com sucesso.');
     }
 
     public function visualizarPacote($token)
     {
         $token = trim((string) $token);
         if ($token === '') {
-            return $this->response->setStatusCode(404)->setBody('Oferta de pacote nao encontrada.');
+            return $this->response->setStatusCode(404)->setBody('Oferta de pacote não encontrada.');
         }
 
         if ($this->isPacoteOfertaModuleReady()) {
@@ -234,7 +234,7 @@ class Orcamento extends BaseController
     {
         $token = trim((string) $token);
         if ($token === '') {
-            return $this->response->setStatusCode(404)->setBody('Oferta de pacote nao encontrada.');
+            return $this->response->setStatusCode(404)->setBody('Oferta de pacote não encontrada.');
         }
 
         if ($this->isPacoteOfertaModuleReady()) {
@@ -251,13 +251,13 @@ class Orcamento extends BaseController
     public function visualizarOfertaPacote($token)
     {
         if (!$this->isPacoteOfertaModuleReady()) {
-            return $this->response->setStatusCode(404)->setBody('Modulo de ofertas dinamicas nao inicializado.');
+            return $this->response->setStatusCode(404)->setBody('Módulo de ofertas dinâmicas não inicializado.');
         }
 
         $this->refreshPacotesOfertasIfExpired();
         $oferta = $this->pacoteOfertaModel->findByTokenWithContext((string) $token);
         if (!$oferta) {
-            return $this->response->setStatusCode(404)->setBody('Oferta de pacote nao encontrada ou expirou.');
+            return $this->response->setStatusCode(404)->setBody('Oferta de pacote não encontrada ou expirada.');
         }
 
         $niveis = $this->findPacoteNiveisAtivos((int) ($oferta['pacote_servico_id'] ?? 0));
@@ -276,19 +276,19 @@ class Orcamento extends BaseController
     public function escolherOfertaPacote($token)
     {
         if (!$this->isPacoteOfertaModuleReady()) {
-            return $this->response->setStatusCode(404)->setBody('Modulo de ofertas dinamicas nao inicializado.');
+            return $this->response->setStatusCode(404)->setBody('Módulo de ofertas dinâmicas não inicializado.');
         }
 
         $this->refreshPacotesOfertasIfExpired();
         $token = trim((string) $token);
         $oferta = $this->pacoteOfertaModel->findByTokenWithContext($token);
         if (!$oferta) {
-            return $this->response->setStatusCode(404)->setBody('Oferta de pacote nao encontrada ou expirou.');
+            return $this->response->setStatusCode(404)->setBody('Oferta de pacote não encontrada ou expirada.');
         }
 
         if (!$this->canChoosePacoteOferta($oferta)) {
             return redirect()->to('/pacote/oferta/' . $token)
-                ->with('error', 'Esta oferta nao permite nova escolha.');
+                ->with('error', 'Esta oferta não permite nova escolha.');
         }
 
         $nivelEscolhido = trim((string) $this->request->getPost('nivel'));
@@ -438,8 +438,8 @@ class Orcamento extends BaseController
         }
 
         $success = $orcamentoId > 0
-            ? 'Escolha registrada com sucesso. O pacote foi aplicado automaticamente no orcamento.'
-            : 'Escolha registrada com sucesso. Agora a equipe pode aplicar este pacote no orcamento.';
+            ? 'Escolha registrada com sucesso. O pacote foi aplicado automaticamente no orçamento.'
+            : 'Escolha registrada com sucesso. Agora a equipe pode aplicar este pacote no orçamento.';
         return redirect()->to('/pacote/oferta/' . $token)
             ->with('success', $success);
     }
@@ -686,9 +686,9 @@ class Orcamento extends BaseController
 
         $title = match ($statusNovo) {
             OrcamentoModel::STATUS_APROVADO,
-            OrcamentoModel::STATUS_PENDENTE_OS => 'Orcamento aprovado pelo cliente',
-            OrcamentoModel::STATUS_REJEITADO => 'Orcamento rejeitado pelo cliente',
-            default => 'Orcamento respondido pelo cliente',
+            OrcamentoModel::STATUS_PENDENTE_OS => 'Orçamento aprovado pelo cliente',
+            OrcamentoModel::STATUS_REJEITADO => 'Orçamento rejeitado pelo cliente',
+            default => 'Orçamento respondido pelo cliente',
         };
 
         $bodyParts = [];
@@ -696,7 +696,7 @@ class Orcamento extends BaseController
             $bodyParts[] = $clienteNome;
         }
         if ($numero !== '') {
-            $bodyParts[] = 'orcamento ' . $numero;
+            $bodyParts[] = 'orçamento ' . $numero;
         }
         if ($numeroOs !== '') {
             $bodyParts[] = 'OS #' . $numeroOs;
@@ -706,7 +706,7 @@ class Orcamento extends BaseController
         if ($body !== '') {
             $body .= ' | status: ' . $statusLabel . '.';
         } else {
-            $body = 'O cliente respondeu o orcamento pelo link publico.';
+            $body = 'O cliente respondeu o orçamento pelo link público.';
         }
 
         $payload = [
@@ -718,7 +718,7 @@ class Orcamento extends BaseController
             'status_anterior' => $statusAnterior,
             'cliente_nome' => $clienteNome !== '' ? $clienteNome : null,
             'numero_os' => $numeroOs !== '' ? $numeroOs : null,
-            'origem' => 'link_publico',
+            'origem' => 'link_público',
         ];
 
         $targets = [];

@@ -3,9 +3,9 @@
 <?= $this->section('content') ?>
 
 <div class="page-header d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0"><i class="bi bi-gear-wide-connected me-2"></i>Servicos</h2>
+    <h2 class="mb-0"><i class="bi bi-gear-wide-connected me-2"></i>Serviços</h2>
     <div>
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('servicos')" title="Ajuda sobre Servicos">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('servicos')" title="Ajuda sobre Serviços">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <?php if (can('servicos', 'exportar')): ?>
@@ -20,7 +20,7 @@
         <?php endif; ?>
         <?php if (can('servicos', 'criar')): ?>
         <a href="<?= base_url('servicos/novo') ?>" class="btn btn-primary btn-glow">
-            <i class="bi bi-plus-lg me-1"></i>Novo Servico
+            <i class="bi bi-plus-lg me-1"></i>Novo Serviço
         </a>
         <?php endif; ?>
     </div>
@@ -34,11 +34,11 @@
                     <tr>
                         <th width="50">ID</th>
                         <th>Nome</th>
-                        <th>Descricao</th>
-                        <th>Tipo Equipamento</th>
-                        <th>Valor Padrao</th>
+                        <th>Descrição</th>
+                        <th>Tipo de Equipamento</th>
+                        <th>Valor Padrão</th>
                         <th>Status</th>
-                        <th width="170" class="text-center">Acoes</th>
+                        <th width="170" class="text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,15 +46,15 @@
                     <tr>
                         <td data-label="ID"><?= (int) ($s['id'] ?? 0) ?></td>
                         <td data-label="Nome"><strong><?= esc((string) ($s['nome'] ?? '')) ?></strong></td>
-                        <td data-label="Descricao"><?= esc(substr((string) ($s['descricao'] ?? ''), 0, 70)) ?><?= strlen((string) ($s['descricao'] ?? '')) > 70 ? '...' : '' ?></td>
-                        <td data-label="Tipo Equipamento"><?= esc((string) ($s['tipo_equipamento'] ?? 'Diverso')) ?></td>
-                        <td data-label="Valor Padrao"><?= formatMoney((float) ($s['valor'] ?? 0)) ?></td>
+                        <td data-label="Descrição"><?= esc(substr((string) ($s['descricao'] ?? ''), 0, 70)) ?><?= strlen((string) ($s['descricao'] ?? '')) > 70 ? '...' : '' ?></td>
+                        <td data-label="Tipo de Equipamento"><?= esc((string) ($s['tipo_equipamento'] ?? 'Diverso')) ?></td>
+                        <td data-label="Valor Padrão"><?= formatMoney((float) ($s['valor'] ?? 0)) ?></td>
                         <td data-label="Status">
                             <span class="badge <?= ($s['status'] ?? '') === 'ativo' ? 'bg-success' : 'bg-secondary' ?>">
                                 <?= esc(ucfirst((string) ($s['status'] ?? 'inativo'))) ?>
                             </span>
                         </td>
-                        <td data-label="Acoes" class="text-center">
+                        <td data-label="Ações" class="text-center">
                             <div class="action-btns">
                                 <?php if (can('servicos', 'editar') && ($s['status'] ?? '') === 'ativo'): ?>
                                 <a href="<?= base_url('servicos/editar/' . $s['id']) ?>" class="btn btn-sm btn-outline-secondary" title="Editar">
@@ -87,7 +87,7 @@
     <div class="modal-dialog">
         <div class="modal-content card-custom">
             <div class="modal-header border-bottom">
-                <h5 class="modal-title" id="importModalLabel"><i class="bi bi-cloud-arrow-up me-2"></i>Importar Servicos (CSV)</h5>
+                <h5 class="modal-title" id="importModalLabel"><i class="bi bi-cloud-arrow-up me-2"></i>Importar Serviços (CSV)</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="<?= base_url('servicos/importar') ?>" method="POST" enctype="multipart/form-data">
@@ -95,7 +95,7 @@
                 <div class="modal-body">
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle-fill me-2"></i>
-                        Baixe o modelo CSV, preencha e envie para importar servicos em lote.
+                        Baixe o modelo CSV, preencha e envie para importar serviços em lote.
                     </div>
 
                     <div class="text-center mb-4">
@@ -112,7 +112,7 @@
                 <div class="modal-footer border-top">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-success btn-glow">
-                        <i class="bi bi-upload me-2"></i>Iniciar Importacao
+                        <i class="bi bi-upload me-2"></i>Iniciar Importação
                     </button>
                 </div>
             </form>

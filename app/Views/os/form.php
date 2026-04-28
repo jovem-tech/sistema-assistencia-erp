@@ -4,7 +4,7 @@ $tipos  = $tipos  ?? [];
 $marcas = $marcas ?? [];
 $relatosRapidos = $relatosRapidos ?? [];
 $statusGrouped = $statusGrouped ?? [];
-$statusDefault = $statusDefault ?? ($isEdit ? (string)($os['status'] ?? 'triagem') : 'triagem');
+$statusDefault = $statusDefault ?? ($isEdit ? (string) ($os['status'] ?? 'triagem') : 'triagem');
 
 $statusFlat = [];
 foreach ($statusGrouped as $macro => $items) {
@@ -424,7 +424,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
     }
 }
 
-/* SweetAlert2 deve sempre ficar acima dos modais tecnicos da OS (checklist/camera/crop). */
+/* SweetAlert2 deve sempre ficar acima dos modais tecnicos da OS (checklist/câmera/crop). */
 .swal2-container {
     z-index: 2600 !important;
 }
@@ -442,7 +442,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
     <?php endif; ?>
 </div>
 
-<!-- LAYOUT PRINCIPAL: SIDEBAR (foto) + CONTEÚDO -->
+<!-- LAYOUT PRINCIPAL: SIDEBAR (foto) + CONTE?DO -->
 <div class="os-form-page">
 <div class="row g-4 ds-split-layout align-items-start" style="align-items: flex-start;">
 
@@ -565,7 +565,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Checklist de entrada</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoEstadoFisico" class="os-summary-value">Nao preenchido</span>
+                                <span id="resumoEstadoFisico" class="os-summary-value">Não preenchido</span>
                                 <span id="statusEstadoFisico" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
@@ -595,7 +595,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
         </div>
     </div>
 
-    <!-- ÁREA PRINCIPAL DO FORMULÁRIO -->
+    <!-- ?REA PRINCIPAL DO FORMUL?RIO -->
     <div class="col-12 col-xl-8 col-xxl-9 ds-split-main align-self-start" id="formCol" style="align-self: flex-start;">
         <div class="card glass-card os-form-shell h-auto" style="height: auto;">
             <div class="card-body" style="height: auto;">
@@ -711,24 +711,24 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                         </select>
                                         <?php if (!$isEdit && $isOrigemCentralWhatsapp && $clienteSelecionadoNoForm <= 0): ?>
                                         <div class="form-text text-warning">
-                                            Este contato ainda nao esta vinculado ao cadastro de clientes. Selecione o cliente para abrir a OS.
+                                            Este contato ainda não está vinculado ao cadastro de clientes. Selecione o cliente para abrir a OS.
                                         </div>
                                         <?php endif; ?>
                                     </div>
                                     <div class="col-12 col-xl-4 os-cliente-tech-col os-cliente-tech-col--tecnico">
                                         <div class="os-inline-label">
                                             <label for="tecnicoResponsavelSelect" class="form-label mb-0">
-                                                <span>Tecnico Responsavel</span>
+                                                <span>Técnico Responsável</span>
                                             </label>
                                         </div>
                                         <select name="tecnico_id" id="tecnicoResponsavelSelect" class="form-select">
-                                            <option value="">Nao atribuido</option>
+                                            <option value="">Não atribuído</option>
                                             <?php foreach ($tecnicos as $t): ?>
                                             <option value="<?= $t['id'] ?>" <?= ($tecnicoSelecionadoNoForm !== '' && $tecnicoSelecionadoNoForm === (string) $t['id']) ? 'selected' : '' ?>><?= esc($t['nome']) ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                         <small class="text-muted d-block mt-2 os-cliente-tech-helper">
-                                            Defina o tecnico responsavel pela OS.
+                                            Defina o técnico responsável pela OS.
                                         </small>
                                     </div>
                                 </div>
@@ -738,7 +738,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <i class="bi bi-card-text me-1"></i>Resumo do cliente selecionado
                                 </div>
                                 <div class="os-client-card" id="clienteInfoCard">
-                                    <div class="os-client-card__empty" id="clienteInfoEmpty">Selecione um cliente para visualizar nome, telefone e endereco de atendimento.</div>
+                                    <div class="os-client-card__empty" id="clienteInfoEmpty">Selecione um cliente para visualizar nome, telefone e endereço de atendimento.</div>
                                     <div class="os-client-card__content d-none" id="clienteInfoContent">
                                         <div class="os-client-card__name" id="clienteInfoNome">-</div>
                                         <div class="os-client-card__meta-list">
@@ -756,7 +756,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <i class="bi bi-laptop me-1"></i>Equipamento em atendimento
                                 </div>
                                 <div class="os-tab-helper">
-                                    Escolha o aparelho do cliente e registre as condicoes tecnicas observadas na entrada.
+                                    Escolha o aparelho do cliente e registre as condições t?cnicas observadas na entrada.
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-12">
@@ -844,7 +844,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                 <div class="col-12 col-xxl-6">
                                     <div class="os-data-section os-equip-acessorios-section mb-4 h-100">
                                         <div class="os-data-section-title">
-                                            <i class="bi bi-box-seam me-1"></i>Acessorios e Componentes (na entrada)
+                                            <i class="bi bi-box-seam me-1"></i>Acessórios e Componentes (na entrada)
                                         </div>
                                         <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100 os-equip-panel-card">
                                             <div class="d-flex flex-wrap gap-2 mb-2">
@@ -855,11 +855,11 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="bolsa">+ Bolsa notebook</button>
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="cabo">+ Cabo</button>
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="carregador">+ Carregador</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acessorio</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acess?rio</button>
                                             </div>
                                             <div class="form-check form-switch mb-3">
                                                 <input class="form-check-input" type="checkbox" id="acessoriosSemItens" name="acessorios_sem_itens" value="1" <?= old('acessorios_sem_itens') ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="acessoriosSemItens">Equipamento recebido sem acessorios</label>
+                                                <label class="form-check-label" for="acessoriosSemItens">Equipamento recebido sem acessórios</label>
                                             </div>
                                             <div id="acessoriosQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
                                                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -868,13 +868,13 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                                 </div>
                                                 <div id="acessoriosQuickFields" class="row g-2"></div>
                                                 <div id="acessoriosQuickPhotosBlock" class="mt-3 border rounded p-2 bg-white">
-                                                    <div class="small fw-semibold text-uppercase text-muted mb-2">Fotos do acessorio</div>
+                                                    <div class="small fw-semibold text-uppercase text-muted mb-2">Fotos do acess?rio</div>
                                                     <div class="d-flex flex-wrap gap-2">
                                                         <button type="button" class="btn btn-sm btn-outline-info" id="acessoriosQuickAddFoto">
                                                             <i class="bi bi-images me-1"></i>Galeria
                                                         </button>
                                                         <button type="button" class="btn btn-sm btn-outline-primary" id="acessoriosQuickAddFotoCamera">
-                                                            <i class="bi bi-camera-fill me-1"></i>Camera
+                                                            <i class="bi bi-câmera-fill me-1"></i>Câmera
                                                         </button>
                                                     </div>
                                                     <div id="acessoriosQuickPhotosHint" class="small text-muted mt-2">Adicione fotos antes de salvar o item.</div>
@@ -886,7 +886,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                                 </div>
                                             </div>
                                             <div id="acessoriosList" class="list-group"></div>
-                                            <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acessorios comuns.</small>
+                                            <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acessórios comuns.</small>
                                             <textarea name="acessorios" id="acessoriosInput" class="d-none"><?= $isEdit ? esc($os['acessorios'] ?? '') : old('acessorios') ?></textarea>
                                             <input type="hidden" name="acessorios_data" id="acessoriosDataInput">
                                             <input type="file" id="acessoriosPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
@@ -904,7 +904,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <i class="bi bi-chat-left-text me-1"></i>Relato do cliente
                                 </div>
                                 <div class="os-tab-helper">
-                                    Registre o que foi informado na entrada antes de detalhar o equipamento e as condicoes tecnicas.
+                                    Registre o que foi informado na entrada antes de detalhar o equipamento e as condições t?cnicas.
                                 </div>
                                 <label for="relatoClienteInput" class="form-label">Relato do Cliente <span class="os-required-mark" aria-hidden="true">*</span></label>
                                 <?php if (!$isEdit): ?>
@@ -943,17 +943,17 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                             <?php endforeach; ?>
                                         <?php else: ?>
                                             <span class="text-muted small">
-                                                Nenhum relato rapido ativo. Cadastre em
+                                                Nenhum relato r?pido ativo. Cadastre em
                                                 <a href="<?= base_url('defeitosrelatados') ?>">Defeitos Relatados</a>.
                                             </span>
                                         <?php endif; ?>
                                     </div>
-                                    <small class="text-muted d-block mt-2">Escolha a categoria e clique em um item rapido para inserir no relato.</small>
+                                    <small class="text-muted d-block mt-2">Escolha a categoria e clique em um item r?pido para inserir no relato.</small>
                                 </div>
                                 <?php endif; ?>
                                 <textarea name="relato_cliente" id="relatoClienteInput" class="form-control" rows="6"><?= esc($relatoClienteValue) ?></textarea>
                                 <?php if (!$isEdit): ?>
-                                <small class="text-muted d-block mt-2">Voce pode complementar manualmente o relato a qualquer momento.</small>
+                                <small class="text-muted d-block mt-2">Voc? pode complementar manualmente o relato a qualquer momento.</small>
                                 <?php endif; ?>
                             </div>
 
@@ -965,7 +965,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                 <div class="border rounded-3 p-3 bg-white bg-opacity-10">
                                     <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
                                         <div class="small text-muted" id="defeitosHelperText">
-                                            Selecione os defeitos que se aplicam ao diagnostico atual.
+                                            Selecione os defeitos que se aplicam ao diagnóstico atual.
                                         </div>
                                         <button type="button" class="btn btn-outline-primary btn-sm" id="btnAdicionarDefeitosComuns" disabled>
                                             <i class="bi bi-plus-circle me-1"></i>Adicionar defeitos comuns
@@ -1008,7 +1008,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <i class="bi bi-calendar-check me-1"></i>Dados Operacionais
                                 </div>
                                 <div class="os-tab-helper">
-                                    Gerencie prioridade, datas, garantia e status operacional sem misturar esse fluxo com cadastro, relato e diagnostico.
+                                    Gerencie prioridade, datas, garantia e status operacional sem misturar esse fluxo com cadastro, relato e diagnóstico.
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-md-3">
@@ -1025,7 +1025,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                         <input type="datetime-local" name="data_entrada" class="form-control" value="<?= esc($dataEntradaInputValue) ?>" required>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label">Previsao de Entrega</label>
+                                        <label class="form-label">Previsão de Entrega</label>
                                         <select id="prazoEntregaSelect" class="form-select mb-2">
                                             <option value="" <?= $prazoEntregaSelecionado === '' ? 'selected' : '' ?>>Prazo (dias)</option>
                                             <?php foreach ($prazoEntregaPresets as $prazoDias => $prazoLabel): ?>
@@ -1060,17 +1060,17 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                             <?php else: ?>
                                                 <?php $currStatus = $statusSelecionado; ?>
                                                 <option value="triagem" <?= $currStatus === 'triagem' ? 'selected' : '' ?>>Triagem</option>
-                                                <option value="diagnostico" <?= $currStatus === 'diagnostico' ? 'selected' : '' ?>>Diagnostico Tecnico</option>
-                                                <option value="aguardando_orcamento" <?= $currStatus === 'aguardando_orcamento' ? 'selected' : '' ?>>Aguardando Orcamento</option>
-                                                <option value="aguardando_autorizacao" <?= $currStatus === 'aguardando_autorizacao' ? 'selected' : '' ?>>Aguardando Autorizacao</option>
-                                                <option value="reparo_execucao" <?= $currStatus === 'reparo_execucao' ? 'selected' : '' ?>>Em Execucao</option>
+                                                <option value="diagnostico" <?= $currStatus === 'diagnostico' ? 'selected' : '' ?>>Diagnóstico Técnico</option>
+                                                <option value="aguardando_orcamento" <?= $currStatus === 'aguardando_orcamento' ? 'selected' : '' ?>>Aguardando Orçamento</option>
+                                                <option value="aguardando_autorizacao" <?= $currStatus === 'aguardando_autorizacao' ? 'selected' : '' ?>>Aguardando Autorização</option>
+                                                <option value="reparo_execucao" <?= $currStatus === 'reparo_execucao' ? 'selected' : '' ?>>Em Execução</option>
                                                 <option value="reparado_disponivel_loja" <?= $currStatus === 'reparado_disponivel_loja' ? 'selected' : '' ?>>Pronto para retirada</option>
                                                 <option value="entregue_reparado" <?= $currStatus === 'entregue_reparado' ? 'selected' : '' ?>>Entregue</option>
                                                 <option value="cancelado" <?= $currStatus === 'cancelado' ? 'selected' : '' ?>>Cancelado</option>
                                             <?php endif; ?>
                                         </select>
                                         <?php if ($isEdit): ?>
-                                        <small class="text-muted d-block mt-2">A edicao permite ajustar qualquer status operacional cadastrado para esta OS.</small>
+                                        <small class="text-muted d-block mt-2">A edição permite ajustar qualquer status operacional cadastrado para esta OS.</small>
                                         <?php endif; ?>
                                     </div>
                                     <?php if ($isEdit): ?>
@@ -1109,7 +1109,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                                 <textarea name="procedimentos_executados" id="procedimentosExecutadosInput" class="d-none"><?= esc($os['procedimentos_executados'] ?? '') ?></textarea>
                                                 <div id="procedimentosExecutadosLista" class="d-flex flex-column gap-2"></div>
                                                 <small class="text-muted d-block mt-2">
-                                                    Cada inserção registra automaticamente data/hora e técnico selecionado.
+                                                    Cada inseráo registra automaticamente data/hora e técnico selecionado.
                                                 </small>
                                             </div>
                                         </div>
@@ -1168,7 +1168,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             </select>
                             <?php if (!$isEdit && $isOrigemCentralWhatsapp && $clienteSelecionadoNoForm <= 0): ?>
                             <div class="form-text text-warning">
-                                Este contato ainda nao esta vinculado ao cadastro de clientes. Selecione o cliente para abrir a OS.
+                                Este contato ainda não está vinculado ao cadastro de clientes. Selecione o cliente para abrir a OS.
                             </div>
                             <?php endif; ?>
                         </div>
@@ -1199,7 +1199,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     data-senha_acesso="<?= esc($eq['senha_acesso'] ?? '') ?>"
                                     data-estado_fisico="<?= esc($eq['estado_fisico'] ?? '') ?>"
                                     data-acessorios="<?= esc($eq['acessorios'] ?? '') ?>"
-                                    <?= $os['equipamento_id'] == $eq['id'] ? 'selected' : '' ?>>
+                                    <?= ((int) ($os['equipamento_id'] ?? 0) === (int) ($eq['id'] ?? 0)) ? 'selected' : '' ?>>
                                     <?= esc(($eq['marca_nome'] ?? $eq['marca'] ?? '') . ' ' . ($eq['modelo_nome'] ?? $eq['modelo'] ?? '') . ' (' . ($eq['tipo_nome'] ?? $eq['tipo'] ?? '') . ')') ?>
                                 </option>
                                 <?php endforeach; endif; ?>
@@ -1274,10 +1274,10 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                 <?php else: ?>
                                     <?php $currStatus = (string) ($os['status'] ?? $statusDefault); ?>
                                     <option value="triagem" <?= $currStatus === 'triagem' ? 'selected' : '' ?>>Triagem</option>
-                                    <option value="diagnostico" <?= $currStatus === 'diagnostico' ? 'selected' : '' ?>>Diagnostico Tecnico</option>
-                                    <option value="aguardando_orcamento" <?= $currStatus === 'aguardando_orcamento' ? 'selected' : '' ?>>Aguardando Orcamento</option>
-                                    <option value="aguardando_autorizacao" <?= $currStatus === 'aguardando_autorizacao' ? 'selected' : '' ?>>Aguardando Autorizacao</option>
-                                    <option value="reparo_execucao" <?= $currStatus === 'reparo_execucao' ? 'selected' : '' ?>>Em Execucao</option>
+                                    <option value="diagnostico" <?= $currStatus === 'diagnostico' ? 'selected' : '' ?>>Diagnóstico Técnico</option>
+                                    <option value="aguardando_orcamento" <?= $currStatus === 'aguardando_orcamento' ? 'selected' : '' ?>>Aguardando Orçamento</option>
+                                    <option value="aguardando_autorizacao" <?= $currStatus === 'aguardando_autorizacao' ? 'selected' : '' ?>>Aguardando Autorização</option>
+                                    <option value="reparo_execucao" <?= $currStatus === 'reparo_execucao' ? 'selected' : '' ?>>Em Execução</option>
                                     <option value="reparado_disponivel_loja" <?= $currStatus === 'reparado_disponivel_loja' ? 'selected' : '' ?>>Pronto para retirada</option>
                                     <option value="entregue_reparado" <?= $currStatus === 'entregue_reparado' ? 'selected' : '' ?>>Entregue</option>
                                     <option value="cancelado" <?= $currStatus === 'cancelado' ? 'selected' : '' ?>>Cancelado</option>
@@ -1350,7 +1350,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="bolsa">+ Bolsa notebook</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="cabo">+ Cabo</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="carregador">+ Carregador</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acessório</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acess?rio</button>
                                 </div>
                                 <div class="form-check form-switch mb-3">
                                     <input class="form-check-input" type="checkbox" id="acessoriosSemItensLegacy" name="acessorios_sem_itens_legacy" value="1" <?= old('acessorios_sem_itens_legacy') ? 'checked' : '' ?>>
@@ -1403,7 +1403,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <span class="text-muted small">
-                                            Nenhum relato rápido ativo. Cadastre em
+                                            Nenhum relato r?pido ativo. Cadastre em
                                             <a href="<?= base_url('defeitosrelatados') ?>">Defeitos Relatados</a>.
                                         </span>
                                     <?php endif; ?>
@@ -1413,7 +1413,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             <?php endif; ?>
                             <textarea name="relato_cliente" id="relatoClienteInput" class="form-control" rows="6"><?= $isEdit ? esc($os['relato_cliente']) : old('relato_cliente') ?></textarea>
                             <?php if (!$isEdit): ?>
-                            <small class="text-muted d-block mt-2">Você pode complementar manualmente o relato a qualquer momento.</small>
+                            <small class="text-muted d-block mt-2">Voc? pode complementar manualmente o relato a qualquer momento.</small>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -1424,7 +1424,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             <div class="card" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;">
                                 <div class="card-header py-2" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.1);">
                                     <strong><i class="bi bi-bug me-2 text-warning"></i>Defeitos Comuns do Tipo de Equipamento</strong>
-                                    <small class="text-muted ms-2">(opcional ? selecione os que se aplicam)</small>
+                                    <small class="text-muted ms-2">(opcional ?? selecione os que se aplicam)</small>
                                 </div>
                                 <div class="card-body" id="defeitosContainer">
                                     <span class="text-muted small">Selecione o equipamento para carregar os defeitos...</span>
@@ -1442,15 +1442,15 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                     <div class="card os-tab-card os-photo-card">
                         <div class="card-header os-tab-card-header py-3 d-flex flex-column flex-md-row justify-content-between gap-2">
                             <div>
-                                <strong><i class="bi bi-camera me-2 text-info"></i>Fotos de Entrada do Equipamento</strong>
-                                <small class="text-muted ms-2">(opcional: acessórios, estado físico, placa interna, etc.)</small>
+                                <strong><i class="bi bi-câmera me-2 text-info"></i>Fotos de Entrada do Equipamento</strong>
+                                <small class="text-muted ms-2">(opcional: acessórios, estado f?sico, placa interna, etc.)</small>
                             </div>
                             <div class="os-photo-card-actions d-flex justify-content-center justify-content-md-end gap-2 flex-wrap">
                                 <button type="button" class="btn btn-outline-light btn-sm d-none" id="btnFotosEscolher">
                                     <i class="bi bi-folder2-open me-1"></i>Escolher Arquivos
                                 </button>
                                 <button type="button" class="btn btn-primary btn-sm" id="btnFotosEntradaCamera">
-                                    <i class="bi bi-camera-fill me-1"></i>Capturar Foto
+                                    <i class="bi bi-câmera-fill me-1"></i>Capturar Foto
                                 </button>
                                 <button type="button" class="btn btn-outline-secondary btn-sm" id="btnFotosEntradaGaleria">
                                     <i class="bi bi-images me-1"></i>Abrir Galeria
@@ -1523,7 +1523,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     'pix' => 'Pix',
                                     'cartao_credito' => 'Cartão de Crédito',
                                     'cartao_debito' => 'Cartão de Débito',
-                                    'transferencia' => 'Transferência',
+                                    'transferencia' => 'Transfer?ncia',
                                     'boleto' => 'Boleto',
                                 ];
                                 foreach ($formas as $val => $label): ?>
@@ -1594,7 +1594,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="osBudgetEditorModalTitle">Orcamento da OS</h5>
+                <h5 class="modal-title" id="osBudgetEditorModalTitle">Orçamento da OS</h5>
                 <button type="button" class="btn-close ms-auto" id="osBudgetEditorModalCloseBtn" aria-label="Fechar"></button>
             </div>
             <div class="modal-body p-0 position-relative">
@@ -1602,7 +1602,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                     <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
                     <span>Carregando orcamento...</span>
                 </div>
-                <iframe id="osBudgetEditorModalFrame" title="Orcamento da OS" class="dashboard-os-modal-frame" src="about:blank"></iframe>
+                <iframe id="osBudgetEditorModalFrame" title="Orçamento da OS" class="dashboard-os-modal-frame" src="about:blank"></iframe>
             </div>
         </div>
     </div>
@@ -1615,7 +1615,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
         <div class="modal-content glass-card">
             <div class="modal-header border-bottom">
                 <h5 class="modal-title">
-                    <i class="bi bi-person-plus text-warning me-2"></i>Cadastro Rápido de Cliente
+                    <i class="bi bi-person-plus text-warning me-2"></i>Cadastro R?pido de Cliente
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
@@ -1633,7 +1633,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             <input type="text" name="telefone1" class="form-control mask-telefone" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label text-muted">Email (Opcional)</label>
+                            <label class="form-label text-muted">E-mail (Opcional)</label>
                             <input type="email" name="email" class="form-control">
                         </div>
                         <div class="col-md-6">
@@ -1658,7 +1658,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             <input type="text" name="endereco" class="form-control js-logradouro">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label text-muted">Nº</label>
+                            <label class="form-label text-muted">N?</label>
                             <input type="text" name="numero" class="form-control js-numero">
                         </div>
                         <div class="col-md-5">
@@ -1710,7 +1710,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             <button class="nav-link small py-1" id="m-cor-tab" data-bs-toggle="tab" data-bs-target="#m-cor-pane" type="button" role="tab"><i class="bi bi-palette me-1"></i>Cor</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link small py-1" id="m-foto-tab" data-bs-toggle="tab" data-bs-target="#m-foto-pane" type="button" role="tab"><i class="bi bi-camera me-1"></i>Foto</button>
+                            <button class="nav-link small py-1" id="m-foto-tab" data-bs-toggle="tab" data-bs-target="#m-foto-pane" type="button" role="tab"><i class="bi bi-câmera me-1"></i>Foto</button>
                         </li>
                     </ul>
 
@@ -1754,8 +1754,8 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <input type="hidden" name="modelo_nome_ext" id="novoEquipModeloNomeExt">
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
-                                    <label class="form-label mb-1 small fw-bold">Nº de Série</label>
-                                    <input type="text" name="numero_serie" class="form-control form-control-sm" placeholder="IMEI ou Série">
+                                    <label class="form-label mb-1 small fw-bold">N? de S?rie</label>
+                                    <input type="text" name="numero_serie" class="form-control form-control-sm" placeholder="IMEI ou S?rie">
                                 </div>
                                 <div class="col-12 text-start mt-2">
                                     <div class="ds-password-field" id="novoEquipSenhaBoxOS">
@@ -1787,13 +1787,13 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     </div>
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
-                                    <label class="form-label mb-1 small fw-bold text-muted">Estado Físico</label>
-                                    <textarea name="estado_fisico" class="form-control form-control-sm" rows="2" placeholder="Ex: Tela riscada..."></textarea>
+                                    <label class="form-label mb-1 small fw-bold text-muted">Estado F?sico</label>
+                                    <textarea name="estado_fisico" class="form-control form-control-sm" rows="2" placeholder="Ex.: Tela riscada..."></textarea>
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
                                     <label class="form-label mb-1 small fw-bold text-muted d-flex justify-content-between">
                                         Acessórios
-                                        <span style="font-size:0.6rem;">+ Rápido</span>
+                                        <span style="font-size:0.6rem;">+ R?pido</span>
                                     </label>
                                     <textarea name="acessorios" id="textareaAcessoriosOS" class="form-control form-control-sm mb-1" rows="2" placeholder="Cabos, capas..."></textarea>
                                     <div class="d-flex flex-wrap gap-1">
@@ -1849,7 +1849,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                         <div class="tab-pane fade text-center py-2" id="m-foto-pane" role="tabpanel">
                             <div class="d-flex justify-content-center gap-2 mb-3">
                                 <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" id="btnAbrirCamera">
-                                    <i class="bi bi-camera me-1"></i>Tirar Foto
+                                    <i class="bi bi-câmera me-1"></i>Tirar Foto
                                 </button>
                                 <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="btnAbrirGaleria">
                                     <i class="bi bi-images me-1"></i>Galeria
@@ -1894,7 +1894,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <input type="text" id="inputNovaMarcaOS" class="form-control" placeholder="Ex: Samsung, Apple...">
+                <input type="text" id="inputNovaMarcaOS" class="form-control" placeholder="Ex.: Samsung, Apple...">
                 <div id="errorNovaMarcaOS" class="text-danger small mt-2 d-none"></div>
             </div>
             <div class="modal-footer border-top">
@@ -1921,18 +1921,18 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                     <label class="form-label fw-bold mb-1">Nome do Modelo *</label>
                     <div class="position-relative">
                         <input type="text" id="inputNovoModeloOS" class="form-control"
-                               placeholder="Ex: Galaxy S24, iPhone 15, Moto G84..."
+                               placeholder="Ex.: Galaxy S24, iPhone 15, Moto G84..."
                                autocomplete="off">
                         <div id="spinnerNovoModeloOS" class="position-absolute top-50 end-0 translate-middle-y me-2 d-none">
                             <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                         </div>
                     </div>
-                    <!-- Dropdown de sugestões -->
+                    <!-- Dropdown de sugestáes -->
                     <div id="sugestoesNovoModeloOS" class="list-group shadow-lg mt-1 d-none"
                          style="max-height: 220px; overflow-y: auto; border-radius: 8px; z-index: 9999; position: relative;"></div>
                     <div class="form-text mt-1">
                         <i class="bi bi-globe2 me-1 text-info"></i>
-                        Digite 3+ caracteres para ver sugestões da internet
+                        Digite 3+ caracteres para ver sugestáes da internet
                     </div>
                 </div>
                 <div id="errorNovoModeloOS" class="text-danger small mt-2 d-none"></div>
@@ -1948,12 +1948,12 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
 </div>
 
 
-<!-- ===== MODAL: CÂMERA (AUXILIAR) ===== -->
+<!-- ===== MODAL: C?MERA (AUXILIAR) ===== -->
 <div class="modal fade" id="modalCamera" tabindex="-1" style="z-index: 2250;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-card border-0 shadow-lg">
             <div class="modal-header border-bottom border-light">
-                <h5 class="modal-title"><i class="bi bi-camera me-2 text-warning"></i>Capturar Foto</h5>
+                <h5 class="modal-title"><i class="bi bi-câmera me-2 text-warning"></i>Capturar Foto</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center p-0 overflow-hidden bg-black" style="min-height: 300px;">
@@ -2149,7 +2149,7 @@ function cloneChecklistEntradaState(state) {
         resumo: {
             preenchido: Boolean(state.resumo?.preenchido),
             total_discrepancias: Number(state.resumo?.total_discrepancias || 0),
-            label: String(state.resumo?.label || 'Checklist nao preenchido'),
+            label: String(state.resumo?.label || 'Checklist não preenchido'),
             variant: String(state.resumo?.variant || 'secondary')
         },
         itens: Array.isArray(state.itens)
@@ -2202,7 +2202,7 @@ function normalizeChecklistEntradaPayload(payload, tipoEquipamentoNomeFallback =
         resumo: {
             preenchido: false,
             total_discrepancias: 0,
-            label: 'Checklist nao preenchido',
+            label: 'Checklist não preenchido',
             variant: 'secondary'
         },
         itens: []
@@ -2252,7 +2252,7 @@ function normalizeChecklistEntradaPayload(payload, tipoEquipamentoNomeFallback =
         normalized.resumo = {
             preenchido: Boolean(payload.resumo.preenchido),
             total_discrepancias: Number(payload.resumo.total_discrepancias || 0),
-            label: String(payload.resumo.label || 'Checklist nao preenchido'),
+            label: String(payload.resumo.label || 'Checklist não preenchido'),
             variant: String(payload.resumo.variant || 'secondary')
         };
     } else {
@@ -2297,7 +2297,7 @@ function computeChecklistResumo(state) {
     return {
         preenchido: true,
         total_discrepancias: totalDiscrepancias,
-        label: totalDiscrepancias === 1 ? '1 discrepancia' : `${totalDiscrepancias} discrepancias`,
+        label: totalDiscrepancias === 1 ? '1 discrepância' : `${totalDiscrepancias} discrepâncias`,
         variant: 'warning'
     };
 }
@@ -2331,20 +2331,20 @@ function updateChecklistInlineSummary() {
     } else if (!checklistEntradaCommitted?.possuiModelo) {
         statusVariantClass = 'os-checklist-status-unavailable';
         statusIcon = 'bi-slash-circle';
-        statusTitle = 'Checklist indisponivel para este tipo de equipamento';
-        statusInfo = 'Nao ha modelo configurado para este equipamento em Gestao de Conhecimento.';
+        statusTitle = 'Checklist indisponível para este tipo de equipamento';
+        statusInfo = 'Não há modelo configurado para este equipamento em Gestão de Conhecimento.';
     } else if (checklistEntradaCommitted.resumo.preenchido && totalDiscrepancias <= 0) {
         statusVariantClass = 'os-checklist-status-success';
         statusIcon = 'bi-check-circle-fill';
-        statusTitle = 'Checklist concluido: tudo OK';
-        statusInfo = 'Todos os itens foram verificados sem discrepancias.';
+        statusTitle = 'Checklist conclu?do: tudo OK';
+        statusInfo = 'Todos os itens foram verificados sem discrepâncias.';
     } else if (checklistEntradaCommitted.resumo.preenchido && totalDiscrepancias > 0) {
         statusVariantClass = 'os-checklist-status-warning';
         statusIcon = 'bi-exclamation-triangle-fill';
-        statusTitle = 'Checklist concluido com discrepancias';
+        statusTitle = 'Checklist conclu?do com discrepâncias';
         statusInfo = totalDiscrepancias === 1
-            ? '1 item foi marcado com discrepancia. Reabra o checklist para revisar.'
-            : `${totalDiscrepancias} itens foram marcados com discrepancia. Reabra o checklist para revisar.`;
+            ? '1 item foi marcado com discrepância. Reabra o checklist para revisar.'
+            : `${totalDiscrepancias} itens foram marcados com discrepância. Reabra o checklist para revisar.`;
     }
 
     if (checklistEntradaBadge) {
@@ -2399,11 +2399,11 @@ function buildLegacyEstadoFisicoFromChecklist(state) {
     if (!state?.possuiModelo) {
         return '';
     }
-    const discrepancias = (state.itens || []).filter((item) => item.status === 'discrepancia');
+    const discrepâncias = (state.itens || []).filter((item) => item.status === 'discrepancia');
     if (!discrepancias.length) {
         return 'Sem avarias aparentes';
     }
-    return discrepancias
+    return discrepâncias
         .map((item) => item.descricao)
         .filter((desc) => String(desc || '').trim() !== '')
         .join('\n');
@@ -2525,7 +2525,7 @@ function getChecklistResumoState() {
     const resumo = checklistEntradaCommitted?.resumo || computeChecklistResumo(checklistEntradaCommitted || {});
     return {
         ok: !checklistEntradaCommitted?.possuiModelo || Boolean(resumo.preenchido),
-        label: String(resumo.label || 'Checklist nao preenchido')
+        label: String(resumo.label || 'Checklist não preenchido')
     };
 }
 
@@ -2618,7 +2618,7 @@ function renderChecklistEntradaModal() {
     if (!checklistEntradaDraft?.possuiModelo) {
         checklistEntradaModalAlert.classList.remove('d-none');
         checklistEntradaModalAlert.classList.add('alert-warning');
-        checklistEntradaModalAlert.textContent = 'Nao existe checklist cadastrado para este tipo de equipamento.';
+        checklistEntradaModalAlert.textContent = 'Não existe checklist cadastrado para este tipo de equipamento.';
         checklistEntradaModalMeta.textContent = '';
         if (checklistEntradaModalResumo) {
             checklistEntradaModalResumo.textContent = 'Sem modelo configurado';
@@ -2647,20 +2647,20 @@ function renderChecklistEntradaModal() {
                 </div>
                 <div class="checklist-status-actions">
                     <button type="button" class="btn btn-sm checklist-status-btn ${status === 'ok' ? 'btn-success' : 'btn-outline-success'}" data-checklist-status="ok">OK</button>
-                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'discrepancia' ? 'btn-warning' : 'btn-outline-warning'}" data-checklist-status="discrepancia">Discrepancia</button>
-                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'nao_verificado' ? 'btn-secondary' : 'btn-outline-secondary'}" data-checklist-status="nao_verificado">Nao verificado</button>
+                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'discrepancia' ? 'btn-warning' : 'btn-outline-warning'}" data-checklist-status="discrepancia">Discrep?ncia</button>
+                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'nao_verificado' ? 'btn-secondary' : 'btn-outline-secondary'}" data-checklist-status="nao_verificado">Não verificado</button>
                 </div>
             </div>
             <div class="mt-2 ${precisaObs ? '' : 'd-none'}" data-checklist-observacao-wrap>
-                <label class="form-label form-label-sm mb-1">Observacao da discrepancia</label>
-                <textarea class="form-control form-control-sm" rows="2" data-checklist-observacao placeholder="Descreva a divergencia encontrada...">${escapeEquipamentoHtml(item.observacao || '')}</textarea>
+                <label class="form-label form-label-sm mb-1">Observação da discrepância</label>
+                <textarea class="form-control form-control-sm" rows="2" data-checklist-observacao placeholder="Descreva a diverg?ncia encontrada...">${escapeEquipamentoHtml(item.observacao || '')}</textarea>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2">
                 <button type="button" class="btn btn-outline-secondary btn-sm" data-checklist-action="galeria">
                     <i class="bi bi-image me-1"></i>Galeria
                 </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-checklist-action="camera">
-                    <i class="bi bi-camera me-1"></i>Camera
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-checklist-action="câmera">
+                    <i class="bi bi-câmera me-1"></i>Câmera
                 </button>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2" data-checklist-photos></div>
@@ -2680,7 +2680,7 @@ function renderChecklistEntradaModal() {
 function openChecklistEntradaModal() {
     const equipamentoSelecionado = document.getElementById('equipamentoSelect')?.value || '';
     if (!equipamentoSelecionado) {
-        showWarningDialog('Selecione o equipamento antes de preencher o checklist.', 'Checklist indisponivel');
+        showWarningDialog('Selecione o equipamento antes de preencher o checklist.', 'Checklist indisponível');
         return;
     }
 
@@ -2759,7 +2759,7 @@ async function loadChecklistEntradaMeta(equipamentoId, optionEl = null) {
         }
 
         if (!response.ok || !payload?.ok) {
-            throw new Error(payload?.message || 'Nao foi possivel carregar o checklist.');
+            throw new Error(payload?.message || 'Não foi possível carregar o checklist.');
         }
 
         checklistEntradaCommitted = normalizeChecklistEntradaPayload(payload.data || null, getSelectedEquipamentoTipoNome(optionEl));
@@ -2862,7 +2862,7 @@ checklistEntradaModalList?.addEventListener('click', (event) => {
         return;
     }
 
-    if (action === 'camera') {
+    if (action === 'câmera') {
         checklistEntradaCropItemId = String(item.id);
         checklistEntradaCropQueue = [];
         openCameraCapture({ type: 'checklist_entrada', entryId: String(item.id) });
@@ -2939,7 +2939,7 @@ if (typeof $.fn.select2 !== 'undefined') {
         allowClear: true,
         width: '100%'
     }).on('select2:open', function() {
-        // Adiciona um listener para detectar quando o usuário pressiona Enter na busca vazia
+        // Adiciona um listener para detectar quando o usu?rio pressiona Enter na busca vazia
         // ou quando não há resultados. Mas vamos focar no botão fixo.
     });
 
@@ -2981,15 +2981,15 @@ function buildEquipamentoIdentity(meta) {
     const serie = String(meta.numero_serie || meta.serie || '').trim();
     const imei = String(meta.imei || '').trim();
     if (serie && imei) {
-        return `Nº série: ${serie} | IMEI: ${imei}`;
+        return `N? s?rie: ${serie} | IMEI: ${imei}`;
     }
     if (serie) {
-        return `Nº série: ${serie}`;
+        return `N? s?rie: ${serie}`;
     }
     if (imei) {
         return `IMEI: ${imei}`;
     }
-    return 'Sem número de série ou IMEI';
+    return 'Sem número de s?rie ou IMEI';
 }
 
 function buildEquipamentoFallback(meta) {
@@ -3170,8 +3170,8 @@ function renderClienteInfoCard(clienteId) {
     emptyState.classList.add('d-none');
     content.classList.remove('d-none');
     nomeEl.textContent = meta.nome;
-    telefoneEl.textContent = meta.telefone || 'Telefone nao informado';
-    enderecoEl.textContent = meta.endereco || 'Endereco nao informado';
+    telefoneEl.textContent = meta.telefone || 'Telefone não informado';
+    enderecoEl.textContent = meta.endereco || 'Endereço não informado';
     telefoneWrap.classList.toggle('d-none', !meta.telefone);
     enderecoWrap.classList.toggle('d-none', !meta.endereco);
 }
@@ -3201,7 +3201,7 @@ function initClienteOsSelect2() {
     return true;
 }
 
-// Inicializa a instância do modal uma unica vez para evitar conflitos de backdrop
+// Inicializa a inst?ncia do modal uma unica vez para evitar conflitos de backdrop
 let modalClienteInstance;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -3326,7 +3326,7 @@ if (btnNovoCliente) {
         e.stopPropagation();
         document.getElementById('formNovoClienteAjax').reset();
         document.getElementById('modalNovoClienteId').value = '';
-        document.querySelector('#modalNovoCliente .modal-title').innerHTML = '<i class="bi bi-person-plus text-warning me-2"></i>Cadastro Rápido de Cliente';
+        document.querySelector('#modalNovoCliente .modal-title').innerHTML = '<i class="bi bi-person-plus text-warning me-2"></i>Cadastro R?pido de Cliente';
         document.getElementById('btnSalvarNovoCliente').innerHTML = '<i class="bi bi-check-lg me-1"></i>Cadastrar Cliente';
         document.getElementById('modalClienteErrors')?.classList.add('d-none');
         modalClienteInstance?.show();
@@ -3546,9 +3546,9 @@ function updateResumo() {
     document.getElementById('resumoTecnico').textContent = tecnicoText;
     document.getElementById('resumoEntrada').textContent = _formatDateTime(entradaInp?.value);
     document.getElementById('resumoPrevisao').textContent = _formatDate(previsaoInp?.value);
-    const semAcessorios = acessoriosVal.toLowerCase() === 'sem acessorios';
+    const semAcessorios = acessoriosVal.toLowerCase() === 'sem acessórios';
     document.getElementById('resumoRelato').textContent = relatoVal ? 'Preenchido' : 'Vazio';
-    document.getElementById('resumoAcessorios').textContent = semAcessorios ? 'Sem acessorios' : (acessoriosVal ? 'Informado' : 'Nao informado');
+    document.getElementById('resumoAcessorios').textContent = semAcessorios ? 'Sem acessórios' : (acessoriosVal ? 'Informado' : 'Não informado');
     document.getElementById('resumoEstadoFisico').textContent = checklistResumo.label;
 
     const prioridadeBadgeClass = {
@@ -3646,12 +3646,12 @@ function formatProcedimentoTimestamp(date = new Date()) {
 function getTecnicoLabelForProcedimento() {
     const tecnicoSel = document.querySelector('select[name="tecnico_id"]');
     if (!tecnicoSel || !tecnicoSel.value) {
-        return 'Nao atribuido';
+        return 'Não atribuído';
     }
 
     const selected = tecnicoSel.options[tecnicoSel.selectedIndex];
     const label = String(selected?.textContent || '').trim();
-    return label || 'Nao atribuido';
+    return label || 'Não atribuído';
 }
 
 function renderProcedimentosExecutadosList(items) {
@@ -3698,7 +3698,7 @@ function inserirProcedimentoExecutado() {
 
     const tecnicoNome = getTecnicoLabelForProcedimento();
     const stamp = formatProcedimentoTimestamp(new Date());
-    const linha = `[${procedimentoBase} - ${stamp} - tecnico: ${tecnicoNome}]`;
+    const linha = `[${procedimentoBase} - ${stamp} - técnico: ${tecnicoNome}]`;
     const items = parseProcedimentosExecutados(procedimentosExecutadosInput.value);
     items.push(linha);
     syncProcedimentosExecutadosList(items);
@@ -3824,7 +3824,7 @@ function getClosestAccessoryColorName(hex) {
             best = color;
         }
     });
-    return best?.name || normalizedHex;
+    return bestá.name || normalizedHex;
 }
 
 function formatAccessoryColorValue(hex) {
@@ -3842,7 +3842,7 @@ function composeAccessoryText(base, detail = '') {
 const acessoriosConfig = {
     chip: {
         title: 'Chip',
-        fields: [{ name: 'chip_digits', label: 'Últimos 6 dígitos do chip', placeholder: '123456', max: 6 }],
+        fields: [{ name: 'chip_digits', label: '?ltimos 6 d?gitos do chip', placeholder: '123456', max: 6 }],
         format: values => composeAccessoryText('Chip', values.chip_digits ? ('final ' + values.chip_digits) : '')
     },
     capinha: {
@@ -3902,9 +3902,9 @@ const acessoriosConfig = {
         format: values => composeAccessoryText('Carregador', values.tipo_equip)
     },
     outro: {
-        title: 'Outro acessório',
-        fields: [{ name: 'descricao', label: 'Descrição', placeholder: 'Ex: cabo adaptador' }],
-        format: values => `${values.descricao || 'Outro acessório'}`
+        title: 'Outro acess?rio',
+        fields: [{ name: 'descricao', label: 'Descrição', placeholder: 'Ex.: cabo adaptador' }],
+        format: values => `${values.descricao || 'Outro acess?rio'}`
     }
 };
 
@@ -4123,8 +4123,8 @@ function renderAcessoriosList() {
             <div class="d-flex justify-content-between align-items-center">
                 <span class="fw-semibold">${cleanText}</span>
                 <div class="d-flex gap-1">
-                    <button type="button" class="btn btn-outline-info btn-sm btn-add-foto" data-entry="${entry.id}"><i class="bi bi-camera"></i> Adicionar foto</button>
-                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-camera" data-entry="${entry.id}"><i class="bi bi-camera-video"></i> Câmera</button>
+                    <button type="button" class="btn btn-outline-info btn-sm btn-add-foto" data-entry="${entry.id}"><i class="bi bi-câmera"></i> Adicionar foto</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-câmera" data-entry="${entry.id}"><i class="bi bi-câmera-video"></i> Câmera</button>
                     <button type="button" class="btn btn-outline-secondary btn-sm btn-edit-acessorio" data-index="${index}"><i class="bi bi-pencil"></i></button>
                     <button type="button" class="btn btn-outline-danger btn-sm btn-remove-acessorio" data-index="${index}"><i class="bi bi-trash"></i></button>
                 </div>
@@ -4573,7 +4573,7 @@ document.addEventListener('click', event => {
     if (editBtn) handleEditAcessorio({ currentTarget: editBtn });
     const addPhotoBtn = event.target.closest('.btn-add-foto');
     if (addPhotoBtn) openAcessorioPhotoInput(addPhotoBtn.dataset.entry);
-    const addPhotoCameraBtn = event.target.closest('.btn-add-foto-camera');
+    const addPhotoCameraBtn = event.target.closest('.btn-add-foto-câmera');
     if (addPhotoCameraBtn) openAcessorioCameraCapture(addPhotoCameraBtn.dataset.entry);
     const removePhotoBtn = event.target.closest('.btn-remove-foto-accessorio');
     if (removePhotoBtn) handleRemovePhoto({ currentTarget: removePhotoBtn });
@@ -4583,7 +4583,7 @@ document.addEventListener('click', event => {
     if (editEstadoBtn) handleEditEstadoFisico({ currentTarget: editEstadoBtn });
     const addEstadoPhotoBtn = event.target.closest('.btn-add-foto-estado');
     if (addEstadoPhotoBtn) openEstadoFisicoPhotoInput(addEstadoPhotoBtn.dataset.entry);
-    const addEstadoPhotoCameraBtn = event.target.closest('.btn-add-foto-camera-estado');
+    const addEstadoPhotoCameraBtn = event.target.closest('.btn-add-foto-câmera-estado');
     if (addEstadoPhotoCameraBtn) openEstadoFisicoCameraCapture(addEstadoPhotoCameraBtn.dataset.entry);
     const removeEstadoPhotoBtn = event.target.closest('.btn-remove-foto-estado');
     if (removeEstadoPhotoBtn) handleRemoveEstadoFisicoPhoto({ currentTarget: removeEstadoPhotoBtn });
@@ -4593,37 +4593,37 @@ acessoriosPhotoInput?.addEventListener('change', handlePhotoInputChange);
 const estadoFisicoConfig = {
     tela_trincada: {
         title: 'Tela trincada',
-        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: canto superior direito' }],
+        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex.: canto superior direito' }],
         format: values => composeAccessoryText('Tela trincada', values.detalhe)
     },
     arranhoes: {
         title: 'Arranhoes',
-        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: tampa e lateral' }],
+        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex.: tampa e lateral' }],
         format: values => composeAccessoryText('Arranhoes', values.detalhe)
     },
     carcaca_quebrada: {
         title: 'Carcaca quebrada',
-        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: quina inferior' }],
+        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex.: quina inferior' }],
         format: values => composeAccessoryText('Carcaca quebrada', values.detalhe)
     },
     vidro_traseiro_quebrado: {
         title: 'Vidro traseiro quebrado',
-        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: fissura central' }],
+        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex.: fissura central' }],
         format: values => composeAccessoryText('Vidro traseiro quebrado', values.detalhe)
     },
     amassado: {
         title: 'Amassado',
-        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex: lateral esquerda' }],
+        fields: [{ name: 'detalhe', label: 'Detalhe (opcional)', placeholder: 'Ex.: lateral esquerda' }],
         format: values => composeAccessoryText('Amassado', values.detalhe)
     },
     botao_quebrado: {
         title: 'Botao quebrado',
-        fields: [{ name: 'detalhe', label: 'Qual botao?', placeholder: 'Ex: power' }],
+        fields: [{ name: 'detalhe', label: 'Qual botão?', placeholder: 'Ex.: power' }],
         format: values => composeAccessoryText('Botao quebrado', values.detalhe)
     },
     outro: {
         title: 'Outro dano',
-        fields: [{ name: 'descricao', label: 'Descricao', placeholder: 'Ex: camera traseira quebrada' }],
+        fields: [{ name: 'descricao', label: 'Descrição', placeholder: 'Ex.: câmera traseira quebrada' }],
         format: values => values.descricao || 'Outro dano'
     }
 };
@@ -4807,8 +4807,8 @@ function renderEstadoFisicoList() {
             <div class="d-flex justify-content-between align-items-center">
                 <span class="fw-semibold">${entry.text}</span>
                 <div class="d-flex gap-1">
-                    <button type="button" class="btn btn-outline-info btn-sm btn-add-foto-estado" data-entry="${entry.id}"><i class="bi bi-camera"></i> Adicionar foto</button>
-                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-camera-estado" data-entry="${entry.id}"><i class="bi bi-camera-video"></i> Câmera</button>
+                    <button type="button" class="btn btn-outline-info btn-sm btn-add-foto-estado" data-entry="${entry.id}"><i class="bi bi-câmera"></i> Adicionar foto</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-câmera-estado" data-entry="${entry.id}"><i class="bi bi-câmera-video"></i> Câmera</button>
                     <button type="button" class="btn btn-outline-secondary btn-sm btn-edit-estado" data-index="${index}"><i class="bi bi-pencil"></i></button>
                     <button type="button" class="btn btn-outline-danger btn-sm btn-remove-estado" data-index="${index}"><i class="bi bi-trash"></i></button>
                 </div>
@@ -5249,7 +5249,7 @@ function _applyPendingDefeitos() {
     }
 }
 
-// Rascunho automático para nova OS
+// Rascunho autom?tico para nova OS
 if (!isEdit) {
     const draftData = _loadDraft();
     const draftAlert = document.getElementById('osDraftAlert');
@@ -5383,7 +5383,7 @@ if (formOs) {
         toggleOsSubmitLoading(true);
         formOs.dataset.bypassValidation = '1';
         localStorage.removeItem(DRAFT_KEY);
-        _setResumoRascunho('Nao salvo');
+        _setResumoRascunho('Não salvo');
         window.setTimeout(() => formOs.submit(), 0);
     };
 
@@ -5417,10 +5417,10 @@ if (formOs) {
         ];
 
         const optionalChecks = [
-            { selector: 'input[name="data_previsao"]', label: 'Previsao de Entrega', tabBtnId: 'tab-relato-btn', isMissing: (el) => !el?.value },
+            { selector: 'input[name="data_previsao"]', label: 'Previsão de Entrega', tabBtnId: 'tab-relato-btn', isMissing: (el) => !el?.value },
             {
                 selector: '#acessoriosSemItens',
-                label: 'Acessorios/Componentes',
+                label: 'Acessórios/Componentes',
                 tabBtnId: 'tab-equipamento-btn',
                 isMissing: () => !isAcessoriosSemItensChecked() && !((acessoriosInput?.value || '').trim())
             },
@@ -5947,7 +5947,7 @@ if (equipSelect) {
     }
 }
 
-// Atualiza resumo e rascunho conforme alterações no formulário
+// Atualiza resumo e rascunho conforme alterações no formul?rio
 ['input', 'change'].forEach(evt => {
     document.querySelector('textarea[name="acessorios"]')?.addEventListener(evt, () => {
         updateResumo();
@@ -6067,7 +6067,7 @@ function processNextFotoEntradaCrop() {
     }
     const nextFile = fotosEntradaCropQueue.shift();
     if (nextFile.size > (osFotoMaxSizeMb * 1024 * 1024)) {
-        showWarningDialog(`Cada foto deve ter no maximo ${osFotoMaxSizeMb}MB.`);
+        showWarningDialog(`Cada foto deve ter no m?ximo ${osFotoMaxSizeMb}MB.`);
         processNextFotoEntradaCrop();
         return;
     }
@@ -6145,7 +6145,7 @@ async function deleteExistingEntradaPhoto(fotoId) {
         syncCsrfHashFromPayload(payload);
 
         if (!response.ok || !payload || payload.success !== true) {
-            throw new Error(payload?.message || 'Nao foi possivel excluir a foto de entrada.');
+            throw new Error(payload?.message || 'Não foi possível excluir a foto de entrada.');
         }
 
         const refreshedFotos = Array.isArray(payload.fotos)
@@ -6171,7 +6171,7 @@ async function deleteExistingEntradaPhoto(fotoId) {
         osFotosExistingData.splice(0, osFotosExistingData.length, ...previousFotos);
         renderExistingFotos();
         updatePhotoState();
-        showWarningDialog(error?.message || 'Nao foi possivel excluir a foto.', 'Falha na exclusao');
+        showWarningDialog(error?.message || 'Não foi possível excluir a foto.', 'Falha na exclusão');
     }
 }
 
@@ -6296,7 +6296,7 @@ function openOsBudgetEditorModal(url, title) {
     clearOsBudgetEditorTimeout();
     setOsBudgetEditorLoading(true);
     if (osBudgetEditorModalTitle) {
-        osBudgetEditorModalTitle.textContent = title || 'Orcamento da OS';
+        osBudgetEditorModalTitle.textContent = title || 'Orçamento da OS';
     }
     osBudgetEditorModalFrame.src = 'about:blank';
     osBudgetEditorModal.show();
@@ -6336,7 +6336,7 @@ async function refreshOsBudgetSummary(options = {}) {
         });
         const payload = await response.json();
         if (!response.ok || !payload || payload.ok !== true) {
-            throw new Error(payload?.message || 'Nao foi possivel atualizar o resumo do orcamento.');
+            throw new Error(payload?.message || 'Não foi possível atualizar o resumo do orçamento.');
         }
 
         osBudgetSummaryPanel.innerHTML = payload.html || '';
@@ -6344,7 +6344,7 @@ async function refreshOsBudgetSummary(options = {}) {
         if (options.successMessage && window.Swal && typeof window.Swal.fire === 'function') {
             Swal.fire({
                 icon: 'success',
-                title: 'Orcamento atualizado',
+                title: 'Orçamento atualizado',
                 text: options.successMessage,
                 timer: 1800,
                 showConfirmButton: false,
@@ -6365,7 +6365,7 @@ document.addEventListener('click', function(event) {
     event.preventDefault();
     openOsBudgetEditorModal(
         modalTrigger.getAttribute('data-os-orcamento-modal-url') || '',
-        modalTrigger.getAttribute('data-os-orcamento-modal-title') || 'Orcamento da OS'
+        modalTrigger.getAttribute('data-os-orcamento-modal-title') || 'Orçamento da OS'
     );
 });
 
@@ -6413,7 +6413,7 @@ window.addEventListener('message', async function(event) {
         });
         osBudgetEditorModal?.hide();
     } catch (error) {
-        showWarningDialog(error?.message || 'Nao foi possivel atualizar o resumo do orcamento.', 'Falha ao sincronizar');
+        showWarningDialog(error?.message || 'Não foi possível atualizar o resumo do orçamento.', 'Falha ao sincronizar');
     }
 });
 
@@ -6839,7 +6839,7 @@ async function reloadModalEquipFotosExistentes() {
             }, fotos);
         }
     } catch (_) {
-        showWarningDialog('Nao foi possivel atualizar a lista de fotos do equipamento.', 'Falha ao atualizar');
+        showWarningDialog('Não foi possível atualizar a lista de fotos do equipamento.', 'Falha ao atualizar');
     }
 }
 
@@ -7009,7 +7009,7 @@ modalNovoEquipamentoEl?.addEventListener('hidden.bs.modal', () => {
     resetNovoEquipModalForm();
 });
 
-// --- Cadastro Rápido de Marcas e Modelos (Dentro da OS) ---
+// --- Cadastro R?pido de Marcas e Modelos (Dentro da OS) ---
 const modalNovaMarca = new bootstrap.Modal(document.getElementById('modalNovaMarcaOS'));
 const modalNovoModelo = new bootstrap.Modal(document.getElementById('modalNovoModeloOS'));
 
@@ -7018,7 +7018,7 @@ document.getElementById('btnNovoModeloOS')?.addEventListener('click', () => {
     const marcaId = $('#novoEquipMarca').val();
     if (!marcaId) { showWarningDialog('Selecione uma marca primeiro!'); return; }
     
-    // Mostra o nome da marca no modal para conferência
+    // Mostra o nome da marca no modal para confer?ncia
     const marcaNome = $('#novoEquipMarca option:selected').text();
     document.getElementById('displayMarcaOS').value = marcaNome;
     
@@ -7101,8 +7101,8 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
             const header = document.createElement('div');
             header.className = 'list-group-item list-group-item-secondary py-1 px-3';
             header.style.cssText = 'font-size:0.7rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; pointer-events:none;';
-            const icon = group.text.includes('Cadastrados') ? '✓' : '•';
-            header.textContent = icon + ' ' + group.text.replace(/^[✓•]\s+/, '');
+            const icon = group.text.includes('Cadastrados') ? '?' : '?';
+            header.textContent = icon + ' ' + group.text.replace(/^[?]\s+/, '');
             sugestoesBox.appendChild(header);
 
             // Itens do grupo
@@ -7207,7 +7207,7 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
 })();
 
 
-// Lógica de Cores no Modal (Igual ao cadastro de equipamentos)
+// L?gica de Cores no Modal (Igual ao cadastro de equipamentos)
 // ===========================================================
 // SELETOR DE COR PROFISSIONAL (OS Modal)
 // ===========================================================
@@ -7221,7 +7221,7 @@ const PROFESSIONAL_COLORS_OS = [
     { category: 'Azuis e Marinhos', colors: [
         { hex: '#191970', name: 'Azul Meia-Noite' }, { hex: '#000080', name: 'Azul Marinho' }, { hex: '#0000FF', name: 'Azul Puro' },
         { hex: '#4169E1', name: 'Azul Real' }, { hex: '#1E90FF', name: 'Azul Céu' }, { hex: '#87CEEB', name: 'Azul Celeste' },
-        { hex: '#5F9EA0', name: 'Azul Petróleo' },
+        { hex: '#5F9EA0', name: 'Azul Petr?leo' },
     ]},
     { category: 'Verdes e Mentas', colors: [
         { hex: '#006400', name: 'Verde Escuro' }, { hex: '#2E8B57', name: 'Verde Floresta' }, { hex: '#008000', name: 'Verde Puro' },
@@ -7235,9 +7235,9 @@ const PROFESSIONAL_COLORS_OS = [
         { hex: '#DAA520', name: 'Dourado' }, { hex: '#FFD700', name: 'Dourado Vivo' }, { hex: '#FFFF00', name: 'Amarelo' },
         { hex: '#F5F5DC', name: 'Bege' }, { hex: '#FFF8DC', name: 'Marfim' },
     ]},
-    { category: 'Roxos, Pinks e Lilás', colors: [
-        { hex: '#4B0082', name: 'Índigo' }, { hex: '#2D1B69', name: 'Violeta' }, { hex: '#800080', name: 'Roxo Puro' },
-        { hex: '#DA70D6', name: 'Lilás' }, { hex: '#FF1493', name: 'Pink' }, { hex: '#AA336A', name: 'Rose Gold' },
+    { category: 'Roxos, Pinks e Lil?s', colors: [
+        { hex: '#4B0082', name: '?ndigo' }, { hex: '#2D1B69', name: 'Violeta' }, { hex: '#800080', name: 'Roxo Puro' },
+        { hex: '#DA70D6', name: 'Lil?s' }, { hex: '#FF1493', name: 'Pink' }, { hex: '#AA336A', name: 'Rose Gold' },
     ]},
 ];
 
@@ -7268,7 +7268,7 @@ window.updateColorUIOS = function(hex, name) {
     const normalizedHex = normalizeHexColorOS(hex);
     const isEmpty = normalizedHex === '';
     const safeHex = isEmpty ? '#E9ECEF' : normalizedHex;
-    const safeName = isEmpty ? 'Cor n?o selecionada' : name;
+    const safeName = isEmpty ? 'Cor não selecionada' : name;
     
     const rgb = hexToRgbOS(safeHex);
     const rgbStr = rgb ? `${rgb.r},${rgb.g},${rgb.b}` : '';
@@ -7482,7 +7482,7 @@ function detectDominantColorOS(sourceCanvas) {
     }
 }
 
-// --- LÓGICA DE ACESSÓRIOS (MODAL OS) ---
+// --- L?GICA DE ACESS?RIOS (MODAL OS) ---
 $(document).on('click', '.btn-quick-acessorio-os', function() {
     const value = $(this).text().replace('+ ', '').trim();
     const textarea = $('#textareaAcessoriosOS');
@@ -7511,7 +7511,7 @@ $('#btnAcceptColorOS').click(function() {
     }, 1500);
 });
 
-// --- Lógica de Câmera, Galeria e Cropper ---
+// --- L?gica de Câmera, Galeria e Cropper ---
 const modalCameraEl  = document.getElementById('modalCamera');
 const modalCropEl    = document.getElementById('modalCropEquip');
 const CHECKLIST_MODAL_Z_INDEX = 2150;
@@ -7549,7 +7549,7 @@ const imgToCrop      = document.getElementById('imgToCrop');
 let streamCamera     = null;
 let cropper          = null;
 let cropContext      = { type: 'equipamento' };
-let cameraCaptureContext = { type: 'equipamento', entryId: null };
+let câmeraCaptureContext = { type: 'equipamento', entryId: null };
 let cropperUnavailableWarned = false;
 let cropModalFailureWarned = false;
 let activeCropToken = 0;
@@ -7634,11 +7634,11 @@ document.getElementById('btnAbrirGaleria')?.addEventListener('click', () => novo
 
 async function openCameraCapture(context = { type: 'equipamento', entryId: null }) {
     closeImageModalIfOpen();
-    cameraCaptureContext = context;
+    câmeraCaptureContext = context;
     try {
         if (!navigator.mediaDevices?.getUserMedia) {
             console.error('[OS Nova] navigator.mediaDevices.getUserMedia indisponivel');
-            showWarningDialog('Este dispositivo ou navegador nao permite acesso a camera.', 'Camera indisponivel');
+            showWarningDialog('Este dispositivo ou navegador não permite acesso à câmera.', 'Câmera indisponível');
             return;
         }
 
@@ -7652,7 +7652,7 @@ async function openCameraCapture(context = { type: 'equipamento', entryId: null 
             videoCamera.srcObject = streamCamera;
             const playPromise = videoCamera.play?.();
             if (playPromise && typeof playPromise.catch === 'function') {
-                playPromise.catch(err => console.error('[OS Nova] falha ao iniciar preview da camera', err));
+                playPromise.catch(err => console.error('[OS Nova] falha ao iniciar preview da câmera', err));
             }
         }
 
@@ -7664,11 +7664,11 @@ async function openCameraCapture(context = { type: 'equipamento', entryId: null 
         try {
             bootstrap.Modal.getInstance(modalCameraEl)?.dispose();
         } catch (error) {
-            console.error('[OS Nova] falha ao descartar instancia anterior do modal da camera', error);
+            console.error('[OS Nova] falha ao descartar instancia anterior do modal da câmera', error);
         }
 
-        const cameraModalInstance = modalCameraEl ? new bootstrap.Modal(modalCameraEl) : null;
-        cameraModalInstance?.show();
+        const câmeraModalInstance = modalCameraEl ? new bootstrap.Modal(modalCameraEl) : null;
+        câmeraModalInstance?.show();
         window.setTimeout(() => elevateLatestBackdrop(CAMERA_MODAL_Z_INDEX - 10), 80);
 
         window.setTimeout(() => {
@@ -7676,17 +7676,17 @@ async function openCameraCapture(context = { type: 'equipamento', entryId: null 
             if (modalCameraEl.classList.contains('show') && window.getComputedStyle(modalCameraEl).display !== 'none') {
                 return;
             }
-            console.error('[OS Nova] modal da camera nao abriu corretamente', {
+            console.error('[OS Nova] modal da câmera nao abriu corretamente', {
                 context,
                 display: modalCameraEl.style.display,
                 computedDisplay: window.getComputedStyle(modalCameraEl).display,
                 classes: modalCameraEl.className
             });
-            showWarningDialog('Nao foi possivel abrir a interface da camera. Tente pela galeria enquanto ajustamos este fluxo.', 'Falha ao abrir camera');
+            showWarningDialog('Não foi possível abrir a interface da câmera. Tente pela galeria enquanto ajustamos este fluxo.', 'Falha ao abrir câmera');
         }, 1000);
     } catch (err) {
-        console.error('[OS Nova] falha ao acessar camera', err);
-        showWarningDialog('Nao foi possivel acessar a camera: ' + err.message, 'Camera indisponivel');
+        console.error('[OS Nova] falha ao acessar câmera', err);
+        showWarningDialog('Não foi possível acessar a câmera: ' + err.message, 'Câmera indisponível');
     }
 }
 
@@ -7699,7 +7699,7 @@ modalCameraEl?.addEventListener('shown.bs.modal', () => {
         modalCameraEl.style.zIndex = String(CAMERA_MODAL_Z_INDEX);
     }
     elevateLatestBackdrop(CAMERA_MODAL_Z_INDEX - 10);
-    console.info('[OS Nova] modal da camera exibido com sucesso');
+    console.info('[OS Nova] modal da câmera exibido com sucesso');
 });
 
 modalCameraEl?.addEventListener('hidden.bs.modal', () => {
@@ -7710,22 +7710,22 @@ modalCameraEl?.addEventListener('hidden.bs.modal', () => {
     if (videoCamera) {
         videoCamera.srcObject = null;
     }
-    if (cameraCaptureContext.type === 'acessorio' && cropContext.type !== 'acessorio') {
+    if (câmeraCaptureContext.type === 'acessorio' && cropContext.type !== 'acessorio') {
         acessorioCropEntryId = null;
         acessorioCropQueue = [];
     }
-    if (cameraCaptureContext.type === 'estado_fisico' && cropContext.type !== 'estado_fisico') {
+    if (câmeraCaptureContext.type === 'estado_fisico' && cropContext.type !== 'estado_fisico') {
         estadoFisicoCropEntryId = null;
         estadoFisicoCropQueue = [];
     }
-    if (cameraCaptureContext.type === 'checklist_entrada' && cropContext.type !== 'checklist_entrada') {
+    if (câmeraCaptureContext.type === 'checklist_entrada' && cropContext.type !== 'checklist_entrada') {
         checklistEntradaCropItemId = null;
         checklistEntradaCropQueue = [];
     }
-    if (cameraCaptureContext.type === 'entrada' && cropContext.type !== 'entrada') {
+    if (câmeraCaptureContext.type === 'entrada' && cropContext.type !== 'entrada') {
         fotosEntradaCropQueue = [];
     }
-    cameraCaptureContext = { type: 'equipamento', entryId: null };
+    câmeraCaptureContext = { type: 'equipamento', entryId: null };
     scheduleModalCleanup();
 });
 
@@ -7737,7 +7737,7 @@ function setCropContext(context = { type: 'equipamento' }) {
         } else if (cropContext.type === 'estado_fisico') {
             modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto do Estado Fisico';
         } else if (cropContext.type === 'checklist_entrada') {
-            modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto da Discrepancia';
+            modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto da Discrep?ncia';
         } else if (cropContext.type === 'entrada') {
             modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto de Entrada da OS';
         } else {
@@ -7776,7 +7776,7 @@ function isCropModalVisible() {
 function appendBlobToCurrentPhotoContext(blob, canvas) {
     if (!blob) {
         console.error('[OS Nova] blob vazio ao anexar foto', cropContext);
-        showWarningDialog('Nao foi possivel gerar a imagem selecionada.');
+        showWarningDialog('Não foi possível gerar a imagem selecionada.');
         return;
     }
 
@@ -7916,7 +7916,7 @@ function fallbackCropperFromSource(source, context, warnMessage = null) {
         const ctx = canvas.getContext('2d');
         if (!ctx) {
             console.error('[OS Nova] Canvas nao disponivel no fallback de imagem', context);
-            showWarningDialog('Nao foi possivel processar a imagem selecionada.');
+            showWarningDialog('Não foi possível processar a imagem selecionada.');
             hideModalSafe(modalCrop, '#modalCropEquip');
             return;
         }
@@ -7926,7 +7926,7 @@ function fallbackCropperFromSource(source, context, warnMessage = null) {
     };
     img.onerror = () => {
         console.error('[OS Nova] erro ao carregar imagem no fallback visual', context);
-        showWarningDialog('Nao foi possivel carregar a imagem para envio.');
+        showWarningDialog('Não foi possível carregar a imagem para envio.');
         hideModalSafe(modalCrop, '#modalCropEquip');
     };
     img.src = source;
@@ -8065,8 +8065,8 @@ document.getElementById('btnRotateRight')?.addEventListener('click', () => {
 btnCapturar?.addEventListener('click', () => {
     const context = canvasCamera.getContext('2d');
     if (!context || !videoCamera) {
-        console.error('[OS Nova] camera indisponivel para captura');
-        showWarningDialog('Nao foi possivel capturar a foto pela camera.', 'Camera indisponivel');
+        console.error('[OS Nova] câmera indisponivel para captura');
+        showWarningDialog('Não foi possível capturar a foto pela câmera.', 'Câmera indisponível');
         return;
     }
     canvasCamera.width  = videoCamera.videoWidth || 1280;
@@ -8075,25 +8075,25 @@ btnCapturar?.addEventListener('click', () => {
     
     const dataUrl = canvasCamera.toDataURL('image/jpeg');
     hideModalSafe(bootstrap.Modal.getOrCreateInstance(modalCameraEl), '#modalCamera');
-    if (cameraCaptureContext.type === 'acessorio' && cameraCaptureContext.entryId) {
-        acessorioCropEntryId = cameraCaptureContext.entryId;
+    if (câmeraCaptureContext.type === 'acessorio' && câmeraCaptureContext.entryId) {
+        acessorioCropEntryId = câmeraCaptureContext.entryId;
         acessorioCropQueue = [];
         openCropper(dataUrl, { type: 'acessorio' });
         return;
     }
-    if (cameraCaptureContext.type === 'estado_fisico' && cameraCaptureContext.entryId) {
-        estadoFisicoCropEntryId = cameraCaptureContext.entryId;
+    if (câmeraCaptureContext.type === 'estado_fisico' && câmeraCaptureContext.entryId) {
+        estadoFisicoCropEntryId = câmeraCaptureContext.entryId;
         estadoFisicoCropQueue = [];
         openCropper(dataUrl, { type: 'estado_fisico' });
         return;
     }
-    if (cameraCaptureContext.type === 'checklist_entrada' && cameraCaptureContext.entryId) {
-        checklistEntradaCropItemId = String(cameraCaptureContext.entryId);
+    if (câmeraCaptureContext.type === 'checklist_entrada' && câmeraCaptureContext.entryId) {
+        checklistEntradaCropItemId = String(câmeraCaptureContext.entryId);
         checklistEntradaCropQueue = [];
         openCropper(dataUrl, { type: 'checklist_entrada' });
         return;
     }
-    if (cameraCaptureContext.type === 'entrada') {
+    if (câmeraCaptureContext.type === 'entrada') {
         openCropper(dataUrl, { type: 'entrada' });
         return;
     }
@@ -8217,7 +8217,7 @@ if (btnConfirmCropOriginal && btnConfirmCropOriginal.parentNode) {
 
         if (!canvas) {
             console.error('[OS Nova] getCroppedCanvas retornou vazio', cropContext);
-            showWarningDialog('Nao foi possivel preparar a imagem selecionada.');
+            showWarningDialog('Não foi possível preparar a imagem selecionada.');
             return;
         }
 
@@ -8275,7 +8275,7 @@ async function deleteModalEquipFotoExistente(fotoId) {
         });
         const res = await response.json();
         if (!res || res.success !== true) {
-            throw new Error(res?.message || 'Nao foi possivel excluir a foto.');
+            throw new Error(res?.message || 'Não foi possível excluir a foto.');
         }
 
         if (Array.isArray(res.fotos)) {
@@ -8301,7 +8301,7 @@ async function deleteModalEquipFotoExistente(fotoId) {
         renderModalEquipFotosExistentes(previousFotos);
         renderNovoEquipFotosNovas();
         syncSidebarFotosFromModal(previousFotos);
-        showWarningDialog(error?.message || 'Nao foi possivel excluir a foto.', 'Falha na exclusao');
+        showWarningDialog(error?.message || 'Não foi possível excluir a foto.', 'Falha na exclusão');
     }
 }
 
@@ -8334,7 +8334,7 @@ async function definirModalEquipFotoPrincipal(fotoId) {
         });
         const res = await response.json();
         if (!res || res.success !== true) {
-            throw new Error(res?.message || 'Nao foi possivel definir a foto principal.');
+            throw new Error(res?.message || 'Não foi possível definir a foto principal.');
         }
 
         const fotos = Array.isArray(res.fotos) ? res.fotos : [];
@@ -8344,7 +8344,7 @@ async function definirModalEquipFotoPrincipal(fotoId) {
         renderNovoEquipFotosNovas();
         syncSidebarFotosFromModal(fotos);
     } catch (error) {
-        showWarningDialog(error?.message || 'Nao foi possivel definir a foto principal.', 'Falha ao atualizar');
+        showWarningDialog(error?.message || 'Não foi possível definir a foto principal.', 'Falha ao atualizar');
     }
 }
 
@@ -8388,7 +8388,7 @@ document.addEventListener('click', async function(event) {
     renderNovoEquipFotosNovas();
 });
 
-// --- Select2 Híbrido: Modelos via API ---
+// --- Select2 H?brido: Modelos via API ---
 function initModeloSelect2() {
     var modeloSel = $('#novoEquipModelo');
 
@@ -8402,7 +8402,7 @@ function initModeloSelect2() {
         placeholder: 'Busque ou selecione o modelo...',
         allowClear: true,
         dropdownParent: $('#modalNovoEquipamento'),
-            tags: true, // HABILITA EDIÇÃO E NOVAS TAGS LIVRES
+            tags: true, // HABILITA EDI?O E NOVAS TAGS LIVRES
         createTag: function(params) {
             var term = $.trim(params.term);
             if (term === '') return null;
@@ -8466,7 +8466,7 @@ function initModeloSelect2() {
     }).on('select2:select', function (e) {
         var data = e.params.data;
         // Armazena o nome real do modelo externo para auto-cadastro no backend
-        // Se for newTag, já vai salvar pelo próprio texto sendo o ID
+        // Se for newTag, já vai salvar pelo pr?prio texto sendo o ID
         if (data.id && String(data.id).indexOf('EXT|') === 0) {
             $('#novoEquipModeloNomeExt').val(data.text);
         } else {
@@ -8714,7 +8714,7 @@ function renderDefeitosSelecionadosCard() {
     if (!totalCatalogados) {
         container.innerHTML = '<span class="text-muted small">Selecione o equipamento para carregar os defeitos...</span>';
         if (defeitosHelperText) {
-            defeitosHelperText.textContent = 'Selecione os defeitos que se aplicam ao diagnostico atual.';
+            defeitosHelperText.textContent = 'Selecione os defeitos que se aplicam ao diagnóstico atual.';
         }
         return;
     }
@@ -8897,7 +8897,7 @@ function carregarDefeitos(tipoId) {
         }
         container.innerHTML = '<span class="text-muted small">Selecione o equipamento para carregar os defeitos...</span>';
         if (defeitosHelperText) {
-            defeitosHelperText.textContent = 'Selecione os defeitos que se aplicam ao diagnostico atual.';
+            defeitosHelperText.textContent = 'Selecione os defeitos que se aplicam ao diagnóstico atual.';
         }
         updateResumo();
         return;
@@ -8920,7 +8920,7 @@ function carregarDefeitos(tipoId) {
                 modalDefeitosComunsBody.innerHTML = `<span class="text-muted small">Nenhum defeito comum cadastrado para este tipo. <a href="${BASE_URL}equipamentosdefeitos" target="_blank">Cadastrar defeitos</a></span>`;
             }
             if (modalDefeitosHint) {
-                modalDefeitosHint.textContent = 'Nao existem defeitos comuns cadastrados para o tipo selecionado.';
+                modalDefeitosHint.textContent = 'Não existem defeitos comuns cadastrados para o tipo selecionado.';
             }
             if (btnAdicionarDefeitosComuns) btnAdicionarDefeitosComuns.disabled = true;
             updateResumo();

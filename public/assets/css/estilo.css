@@ -652,6 +652,10 @@ a:hover {
     z-index: 1039;
 }
 
+.swal2-container {
+    z-index: 20000 !important;
+}
+
 /* ---- Main Content ---- */
 .main-content {
     margin-left: var(--sidebar-width);

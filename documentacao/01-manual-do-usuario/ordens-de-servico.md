@@ -86,6 +86,25 @@ Na prática:
 - a condução manual do reparo passa a prevalecer depois que a OS sai da fase inicial de execução;
 - a coluna `Status` não deve mascarar o status real da OS com o status sugerido do orçamento.
 
+### Modal `Atualizar prazos da OS`
+
+Ao clicar sobre a coluna de datas na listagem `/os`, o sistema abre um modal rápido para ajuste da previsão.
+
+Campos e regras atuais:
+
+- `Data de entrada`: exibida como referência operacional e enviada pelo sistema como base de comparação;
+- `Atalho de prazo`: ajuda a recalcular rapidamente a `Previsão`;
+- `Previsão`: campo principal da alteração;
+- `Entrega`: somente leitura, preservada para o fluxo correto de encerramento;
+- `Motivo da alteração`: obrigatório e registrado no histórico da OS;
+- `Autorização administrativa`: aparece somente para perfis que não são administradores.
+
+Na prática:
+
+- não é mais necessário adivinhar por que o backend recusou a alteração;
+- quando o usuário não for administrador, o próprio modal passa a pedir `administrador` e `senha`;
+- o histórico técnico da OS registra o motivo informado junto com a alteração de prazo.
+
 ### Atualizacao automatica do status do orcamento
 
 Quando a resposta do cliente acontece pelo link publico do orcamento:
@@ -123,6 +142,9 @@ Comportamento pratico:
 - ao abrir `Editar orcamento` ou `Visualizar`, a janela do orcamento sobe na frente do modal de status para evitar sobreposicao invertida;
 - quando o orcamento e salvo em modo embed, o resumo dentro do modal de status e atualizado automaticamente;
 - quando o cliente responde o orcamento pelo link publico, o contexto comercial da ordem volta sincronizado assim que a notificacao em tempo real chega ao ERP.
+- quando o orcamento vinculado estiver `Convertido`, a acao `Editar orcamento` continua disponivel para ajustes diretos no mesmo registro, sem obrigar a abrir apenas em modo de consulta.
+- se esse orcamento `Convertido` for alterado, o sistema abre nova rodada comercial no mesmo registro e volta o status do orcamento para `Reenviar orcamento`, refletindo novamente a dependencia de autorizacao do cliente.
+- depois que esse reenvio e efetivamente disparado ao cliente, o status comercial deixa `Reenviar orcamento` e passa para `Aguardando aprovacao`, mantendo a OS na leitura de espera por autorizacao.
 
 ### Largura e leitura da tabela
 

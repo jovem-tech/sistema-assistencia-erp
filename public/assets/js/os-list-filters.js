@@ -1321,6 +1321,10 @@
         const datesModalPreset = document.getElementById('osDatesModalPreset');
         const datesModalPrevisao = document.getElementById('osDatesModalPrevisao');
         const datesModalEntrega = document.getElementById('osDatesModalEntrega');
+        const datesModalMotivo = document.getElementById('osDatesModalMotivo');
+        const datesModalAdminApprovalWrap = document.getElementById('osDatesModalAdminApprovalWrap');
+        const datesModalAdminUser = document.getElementById('osDatesModalAdminUser');
+        const datesModalAdminPass = document.getElementById('osDatesModalAdminPass');
         const datesModalEntradaAtual = document.getElementById('osDatesModalEntradaAtual');
         const datesModalPrevisaoAtual = document.getElementById('osDatesModalPrevisaoAtual');
         const datesModalEntregaAtual = document.getElementById('osDatesModalEntregaAtual');
@@ -1618,6 +1622,9 @@
             datesModalPreset && (datesModalPreset.disabled = Boolean(isLoading));
             datesModalPrevisao && (datesModalPrevisao.disabled = Boolean(isLoading));
             datesModalEntrega && (datesModalEntrega.disabled = Boolean(isLoading));
+            datesModalMotivo && (datesModalMotivo.disabled = Boolean(isLoading));
+            datesModalAdminUser && (datesModalAdminUser.disabled = Boolean(isLoading));
+            datesModalAdminPass && (datesModalAdminPass.disabled = Boolean(isLoading));
         };
 
         const setBudgetModalSubmitLabel = () => {
@@ -1680,7 +1687,10 @@
         const hydrateDatesModal = (payload) => {
             const osMeta = payload?.os || {};
             const datesMeta = payload?.dates || {};
+            const securityMeta = payload?.security || {};
             const entryBaseValue = String(datesMeta?.data_entrada || '').trim();
+            const deliveryValue = String(datesMeta?.data_entrega || '').trim();
+            const requiresAdminApproval = Boolean(securityMeta?.requires_admin_approval);
 
             datesModalNumero && (datesModalNumero.textContent = osMeta?.numero_os ? `#${osMeta.numero_os}` : '-');
             datesModalBadges && (datesModalBadges.innerHTML = [
@@ -1691,16 +1701,26 @@
             datesModalClientName && (datesModalClientName.textContent = String(osMeta?.cliente_nome || '').trim() || '-');
             datesModalEquipmentName && (datesModalEquipmentName.textContent = String(osMeta?.equipamento_nome || '').trim() || '-');
             datesModalElement && (datesModalElement.dataset.entryBase = entryBaseValue);
+            datesModalElement && (datesModalElement.dataset.deliveryValue = deliveryValue);
             datesModalEntrada && (datesModalEntrada.value = String(datesMeta?.data_entrada_label || '-'));
             datesModalPrevisao && (datesModalPrevisao.value = String(datesMeta?.data_previsao || '').trim());
             datesModalEntrega && (datesModalEntrega.value = String(datesMeta?.data_entrega_label || '-'));
             datesModalPreset && (datesModalPreset.value = '');
+            datesModalMotivo && (datesModalMotivo.value = '');
+            datesModalAdminUser && (datesModalAdminUser.value = '');
+            datesModalAdminPass && (datesModalAdminPass.value = '');
+            if (datesModalAdminApprovalWrap) {
+                datesModalAdminApprovalWrap.classList.toggle('d-none', !requiresAdminApproval);
+            }
             datesModalEntradaAtual && (datesModalEntradaAtual.textContent = String(datesMeta?.data_entrada_label || '-'));
             datesModalPrevisaoAtual && (datesModalPrevisaoAtual.textContent = String(datesMeta?.data_previsao_label || '-'));
             datesModalEntregaAtual && (datesModalEntregaAtual.textContent = String(datesMeta?.data_entrega_label || '-'));
             datesModalPrazoDias && (datesModalPrazoDias.textContent = Number.isFinite(Number(datesMeta?.prazo_dias))
                 ? `${Number(datesMeta.prazo_dias)} dia(s)`
                 : '-');
+            if (datesModalElement) {
+                datesModalElement.dataset.requiresAdminApproval = requiresAdminApproval ? '1' : '0';
+            }
         };
 
         const openDatesModal = async (osId) => {
@@ -1714,8 +1734,14 @@
             datesModalClientName && (datesModalClientName.textContent = '-');
             datesModalEquipmentName && (datesModalEquipmentName.textContent = '-');
             datesModalElement && (datesModalElement.dataset.entryBase = '');
+            datesModalElement && (datesModalElement.dataset.deliveryValue = '');
+            datesModalElement && (datesModalElement.dataset.requiresAdminApproval = '0');
             datesModalEntrada && (datesModalEntrada.value = '-');
             datesModalEntrega && (datesModalEntrega.value = '-');
+            datesModalMotivo && (datesModalMotivo.value = '');
+            datesModalAdminUser && (datesModalAdminUser.value = '');
+            datesModalAdminPass && (datesModalAdminPass.value = '');
+            datesModalAdminApprovalWrap?.classList.add('d-none');
             datesModalEntradaAtual && (datesModalEntradaAtual.textContent = '-');
             datesModalPrevisaoAtual && (datesModalPrevisaoAtual.textContent = '-');
             datesModalEntregaAtual && (datesModalEntregaAtual.textContent = '-');
@@ -2846,8 +2872,44 @@
                 return;
             }
 
+            const motivoAlteracao = String(datesModalMotivo?.value || '').trim();
+            const requiresAdminApproval = datesModalElement?.dataset.requiresAdminApproval === '1';
+            const adminUsuario = String(datesModalAdminUser?.value || '').trim();
+            const adminSenha = String(datesModalAdminPass?.value || '');
+
+            if (!motivoAlteracao) {
+                if (window.Swal) {
+                    await window.Swal.fire({
+                        icon: 'warning',
+                        title: 'Motivo obrigatorio',
+                        text: 'Informe o motivo da alteracao das datas antes de salvar.',
+                    });
+                }
+                datesModalMotivo?.focus();
+                return;
+            }
+
+            if (requiresAdminApproval && (!adminUsuario || !adminSenha)) {
+                if (window.Swal) {
+                    await window.Swal.fire({
+                        icon: 'warning',
+                        title: 'Autorizacao obrigatoria',
+                        text: 'Informe usuario e senha de um administrador para autorizar esta alteracao.',
+                    });
+                }
+                (datesModalAdminUser && !adminUsuario ? datesModalAdminUser : datesModalAdminPass)?.focus();
+                return;
+            }
+
             const formData = new window.FormData();
+            formData.append('data_entrada', datesModalElement?.dataset.entryBase || '');
             formData.append('data_previsao', datesModalPrevisao?.value || '');
+            formData.append('data_entrega', datesModalElement?.dataset.deliveryValue || '');
+            formData.append('motivo_alteracao', motivoAlteracao);
+            if (requiresAdminApproval) {
+                formData.append('admin_usuario', adminUsuario);
+                formData.append('admin_senha', adminSenha);
+            }
 
             if (config.csrfTokenKey && config.csrfTokenValue) {
                 formData.append(config.csrfTokenKey, config.csrfTokenValue);

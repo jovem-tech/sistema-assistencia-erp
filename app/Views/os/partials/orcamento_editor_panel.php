@@ -34,7 +34,7 @@ $orcamentoViewModalUrl = $orcamentoViewUrl !== '' ? ($orcamentoViewUrl . '?embed
 
 $orcamentoStatus = trim((string) ($orcamentoVinculado['status'] ?? ''));
 $orcamentoStatusLabel = $orcamentoStatus !== ''
-    ? ($orcamentoStatusLabels[$orcamentoStatus] ?? ucfirst(str_replace('_', ' ', $orcamentoStatus)))
+    ? ((string) ($orcamentoVinculado['status_label'] ?? ($orcamentoStatusLabels[$orcamentoStatus] ?? ucfirst(str_replace('_', ' ', $orcamentoStatus)))))
     : '';
 $orcamentoTipo = trim((string) ($orcamentoVinculado['tipo_orcamento'] ?? ''));
 $orcamentoTipoLabel = $orcamentoTipo !== ''

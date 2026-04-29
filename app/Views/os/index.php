@@ -203,8 +203,8 @@ if ($statusClosedSelected !== '') {
                     <div class="row g-3">
                         <div class="col-12 col-xxl-3 col-xl-4 col-md-6">
                             <label class="form-label" for="osFilterStatusScopeDesktop">Status geral</label>
-                            <select id="osFilterStatusScopeDesktop" data-filter-field="status_scope" class="form-select js-os-select2" data-placeholder="Padr�o: ordens abertas">
-                                <option value="">Padr�o: ordens abertas</option>
+                            <select id="osFilterStatusScopeDesktop" data-filter-field="status_scope" class="form-select js-os-select2" data-placeholder="Padrão: ordens abertas">
+                                <option value="">Padrão: ordens abertas</option>
                                 <option value="all" <?= $statusScope === 'all' ? 'selected' : '' ?>>Todos os status</option>
                             </select>
                             <div class="form-text">Use aqui quando quiser consultar abertas e fechadas na mesma fila.</div>
@@ -370,8 +370,8 @@ if ($statusClosedSelected !== '') {
 
                     <div class="col-12">
                         <label class="form-label" for="osFilterStatusScopeMobile">Status geral</label>
-                        <select id="osFilterStatusScopeMobile" data-filter-field="status_scope" class="form-select js-os-select2" data-placeholder="Padr�o: ordens abertas">
-                            <option value="">Padr�o: ordens abertas</option>
+                        <select id="osFilterStatusScopeMobile" data-filter-field="status_scope" class="form-select js-os-select2" data-placeholder="Padrão: ordens abertas">
+                            <option value="">Padrão: ordens abertas</option>
                             <option value="all" <?= $statusScope === 'all' ? 'selected' : '' ?>>Todos os status</option>
                         </select>
                         <div class="form-text">Amplia a consulta para abertas + fechadas na mesma listagem.</div>
@@ -694,6 +694,47 @@ if ($statusClosedSelected !== '') {
                                         <label class="form-label" for="osDatesModalEntrega">Entrega</label>
                                         <input type="text" class="form-control" id="osDatesModalEntrega" value="-" readonly disabled>
                                         <div class="form-text">A data de entrega é controlada automaticamente pela mudança de status correta da OS.</div>
+                                    </div>
+
+                                    <div class="os-status-modal-section">
+                                        <label class="form-label" for="osDatesModalMotivo">Motivo da alteracao <span class="text-danger">*</span></label>
+                                        <textarea
+                                            class="form-control"
+                                            id="osDatesModalMotivo"
+                                            name="motivo_alteracao"
+                                            rows="3"
+                                            placeholder="Explique por que o prazo desta OS esta sendo alterado."
+                                        ></textarea>
+                                        <div class="form-text">Esse motivo e registrado no historico operacional da OS.</div>
+                                    </div>
+
+                                    <div class="os-status-modal-section d-none" id="osDatesModalAdminApprovalWrap">
+                                        <div class="os-status-modal-section-title">Autorizacao administrativa</div>
+                                        <div class="small text-muted mb-3">Informe um administrador para autorizar esta alteracao de prazo.</div>
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label" for="osDatesModalAdminUser">Administrador</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="osDatesModalAdminUser"
+                                                    name="admin_usuario"
+                                                    autocomplete="username"
+                                                    placeholder="Nome ou e-mail do administrador"
+                                                >
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label" for="osDatesModalAdminPass">Senha do administrador</label>
+                                                <input
+                                                    type="password"
+                                                    class="form-control"
+                                                    id="osDatesModalAdminPass"
+                                                    name="admin_senha"
+                                                    autocomplete="current-password"
+                                                    placeholder="Digite a senha do administrador"
+                                                >
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="os-dates-status-note">

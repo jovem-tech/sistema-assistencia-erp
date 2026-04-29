@@ -895,6 +895,7 @@ class Os extends BaseController
             OrcamentoModel::STATUS_PENDENTE_ENVIO,
             OrcamentoModel::STATUS_ENVIADO,
             OrcamentoModel::STATUS_AGUARDANDO,
+            OrcamentoModel::STATUS_REENVIAR,
             OrcamentoModel::STATUS_AGUARDANDO_PACOTE,
             OrcamentoModel::STATUS_PACOTE_APROVADO,
             OrcamentoModel::STATUS_PENDENTE,
@@ -917,6 +918,13 @@ class Os extends BaseController
 
         if (in_array($orcamentoStatus, $this->resolveOpenOrcamentoStatuses(), true)) {
             return 'aguardando_autorizacao';
+        }
+
+        if (in_array($orcamentoStatus, [
+            OrcamentoModel::STATUS_REJEITADO,
+            OrcamentoModel::STATUS_CANCELADO,
+        ], true)) {
+            return 'cancelado';
         }
 
         return null;
@@ -1002,7 +1010,8 @@ class Os extends BaseController
             $eligibleOsIds = [];
             foreach ($currentOsRows as $row) {
                 $currentStatus = trim((string) ($row['status'] ?? ''));
-                if ($statusFlowService->hasAdvancedPast($currentStatus, (string) $targetStatus)) {
+                $forceStatusReset = $targetStatus === 'cancelado';
+                if (!$forceStatusReset && $statusFlowService->hasAdvancedPast($currentStatus, (string) $targetStatus)) {
                     continue;
                 }
 
@@ -1016,18 +1025,22 @@ class Os extends BaseController
 
             $estadoFluxo = $statusFlowService->resolveEstadoFluxo((string) $targetStatus);
 
-            $db->table('os')
+            $builder = $db->table('os')
                 ->whereIn('id', $eligibleOsIds)
-                ->where('status <>', (string) $targetStatus)
-                ->groupStart()
+                ->where('status <>', (string) $targetStatus);
+
+            if ($targetStatus !== 'cancelado') {
+                $builder->groupStart()
                     ->where('estado_fluxo IS NULL', null, false)
                     ->orWhereNotIn('estado_fluxo', ['encerrado', 'cancelado'])
-                ->groupEnd()
-                ->update([
-                    'status' => (string) $targetStatus,
-                    'estado_fluxo' => $estadoFluxo,
-                    'status_atualizado_em' => date('Y-m-d H:i:s'),
-                ]);
+                ->groupEnd();
+            }
+
+            $builder->update([
+                'status' => (string) $targetStatus,
+                'estado_fluxo' => $estadoFluxo,
+                'status_atualizado_em' => date('Y-m-d H:i:s'),
+            ]);
         }
     }
 
@@ -1057,11 +1070,11 @@ class Os extends BaseController
         }
 
         $statusList = $this->resolveOpenOrcamentoStatuses();
-        $statusLabels = (new OrcamentoModel())->statusLabels();
+        $orcamentoModel = new OrcamentoModel();
         $openStatusMap = array_fill_keys($statusList, true);
 
         $orcamentos = $db->table('orcamentos')
-            ->select('id, os_id, numero, status, total, created_at')
+            ->select('id, os_id, numero, status, versao, total, created_at')
             ->whereIn('os_id', $osIds)
             ->orderBy('created_at', 'DESC')
             ->orderBy('id', 'DESC')
@@ -1079,7 +1092,7 @@ class Os extends BaseController
                 'id' => (int) ($orcamento['id'] ?? 0),
                 'numero' => (string) ($orcamento['numero'] ?? ''),
                 'status' => $status,
-                'status_label' => $statusLabels[$status] ?? ucfirst(str_replace('_', ' ', $status ?: 'rascunho')),
+                'status_label' => $orcamentoModel->resolveStatusLabelFromRecord($orcamento),
                 'os_status_sugerido' => $this->resolveManagedOsStatusFromOrcamentoStatus($status),
                 'total' => array_key_exists('total', $orcamento) ? (float) $orcamento['total'] : null,
                 'created_at' => (string) ($orcamento['created_at'] ?? ''),
@@ -1111,7 +1124,7 @@ class Os extends BaseController
         $statusList = $this->resolveOpenOrcamentoStatuses();
 
         $orcamento = $db->table('orcamentos')
-            ->select('id, os_id, numero, status, created_at')
+            ->select('id, os_id, numero, status, versao, created_at')
             ->where('os_id', $osId)
             ->whereIn('status', $statusList)
             ->orderBy('created_at', 'DESC')
@@ -1123,11 +1136,14 @@ class Os extends BaseController
             return null;
         }
 
+        $orcamentoModel = new OrcamentoModel();
+
         return [
             'id' => (int) ($orcamento['id'] ?? 0),
             'os_id' => (int) ($orcamento['os_id'] ?? 0),
             'numero' => (string) ($orcamento['numero'] ?? ''),
             'status' => (string) ($orcamento['status'] ?? ''),
+            'status_label' => $orcamentoModel->resolveStatusLabelFromRecord($orcamento),
             'created_at' => (string) ($orcamento['created_at'] ?? ''),
         ];
     }
@@ -1144,7 +1160,7 @@ class Os extends BaseController
         }
 
         $orcamento = $db->table('orcamentos')
-            ->select('orcamentos.id, orcamentos.os_id, orcamentos.numero, orcamentos.status, orcamentos.tipo_orcamento, orcamentos.subtotal, orcamentos.desconto, orcamentos.acrescimo, orcamentos.total, orcamentos.validade_data, orcamentos.prazo_execucao, orcamentos.created_at, orcamentos.updated_at, orcamentos.enviado_em, orcamentos.aprovado_em, orcamentos.rejeitado_em, orcamentos.cancelado_em, orcamentos.telefone_contato, orcamentos.email_contato, orcamentos.token_publico, clientes.nome_razao as cliente_nome')
+            ->select('orcamentos.id, orcamentos.os_id, orcamentos.numero, orcamentos.versao, orcamentos.status, orcamentos.tipo_orcamento, orcamentos.subtotal, orcamentos.desconto, orcamentos.acrescimo, orcamentos.total, orcamentos.validade_data, orcamentos.prazo_execucao, orcamentos.created_at, orcamentos.updated_at, orcamentos.enviado_em, orcamentos.aprovado_em, orcamentos.rejeitado_em, orcamentos.cancelado_em, orcamentos.telefone_contato, orcamentos.email_contato, orcamentos.token_publico, clientes.nome_razao as cliente_nome')
             ->join('clientes', 'clientes.id = orcamentos.cliente_id', 'left')
             ->where('os_id', $osId)
             ->orderBy('created_at', 'DESC')
@@ -1165,8 +1181,9 @@ class Os extends BaseController
             'id' => (int) ($orcamento['id'] ?? 0),
             'os_id' => (int) ($orcamento['os_id'] ?? 0),
             'numero' => (string) ($orcamento['numero'] ?? ''),
+            'versao' => (int) ($orcamento['versao'] ?? 1),
             'status' => $status,
-            'status_label' => $orcamentoModel->statusLabels()[$status] ?? ucfirst(str_replace('_', ' ', $status ?: 'rascunho')),
+            'status_label' => $orcamentoModel->resolveStatusLabelFromRecord($orcamento),
             'tipo_orcamento' => $tipo,
             'tipo_label' => $orcamentoModel->tipoLabels()[$tipo] ?? ucfirst(str_replace('_', ' ', $tipo ?: 'assistencia')),
             'subtotal' => (float) ($orcamento['subtotal'] ?? 0),
@@ -1685,6 +1702,7 @@ class Os extends BaseController
             OrcamentoModel::STATUS_PENDENTE_ENVIO => 'bg-secondary',
             OrcamentoModel::STATUS_ENVIADO => 'bg-primary',
             OrcamentoModel::STATUS_AGUARDANDO => 'bg-info text-dark',
+            OrcamentoModel::STATUS_REENVIAR => 'bg-warning text-dark',
             OrcamentoModel::STATUS_AGUARDANDO_PACOTE => 'bg-primary',
             OrcamentoModel::STATUS_PACOTE_APROVADO => 'bg-success',
             OrcamentoModel::STATUS_PENDENTE => 'bg-warning text-dark',
@@ -2073,9 +2091,21 @@ class Os extends BaseController
         }
 
         try {
-            $entrada = $this->normalizeNullableDateTimeInput((string) $this->request->getPost('data_entrada'));
-            $previsao = $this->normalizeNullableDateInput((string) $this->request->getPost('data_previsao'));
-            $entrega = $this->normalizeNullableDateInput((string) $this->request->getPost('data_entrega'));
+            $entradaInput = trim((string) $this->request->getPost('data_entrada'));
+            $previsaoInput = trim((string) $this->request->getPost('data_previsao'));
+            $entregaInput = trim((string) $this->request->getPost('data_entrega'));
+
+            if ($entradaInput === '') {
+                $entradaInput = (string) ($os['data_entrada'] ?? $os['data_abertura'] ?? '');
+            }
+
+            if ($entregaInput === '') {
+                $entregaInput = (string) ($os['data_entrega'] ?? '');
+            }
+
+            $entrada = $this->normalizeNullableDateTimeInput($entradaInput);
+            $previsao = $this->normalizeNullableDateInput($previsaoInput);
+            $entrega = $this->normalizeNullableDateInput($entregaInput);
         } catch (\InvalidArgumentException $e) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,

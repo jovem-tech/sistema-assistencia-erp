@@ -166,6 +166,14 @@ class OrcamentoService
                 OrcamentoModel::STATUS_RASCUNHO,
                 OrcamentoModel::STATUS_CANCELADO,
             ],
+            OrcamentoModel::STATUS_REENVIAR => [
+                OrcamentoModel::STATUS_AGUARDANDO,
+                OrcamentoModel::STATUS_APROVADO,
+                OrcamentoModel::STATUS_PENDENTE_OS,
+                OrcamentoModel::STATUS_PACOTE_APROVADO,
+                OrcamentoModel::STATUS_REJEITADO,
+                OrcamentoModel::STATUS_CANCELADO,
+            ],
             OrcamentoModel::STATUS_VENCIDO => [
                 OrcamentoModel::STATUS_AGUARDANDO,
                 OrcamentoModel::STATUS_AGUARDANDO_PACOTE,
@@ -179,18 +187,25 @@ class OrcamentoService
             OrcamentoModel::STATUS_PACOTE_APROVADO => [
                 OrcamentoModel::STATUS_APROVADO,
                 OrcamentoModel::STATUS_PENDENTE_OS,
+                OrcamentoModel::STATUS_REENVIAR,
                 OrcamentoModel::STATUS_CONVERTIDO,
                 OrcamentoModel::STATUS_CANCELADO,
             ],
             OrcamentoModel::STATUS_APROVADO => [
-                OrcamentoModel::STATUS_CONVERTIDO,
-            ],
-            OrcamentoModel::STATUS_PENDENTE_OS => [
-                OrcamentoModel::STATUS_APROVADO,
+                OrcamentoModel::STATUS_REENVIAR,
                 OrcamentoModel::STATUS_CONVERTIDO,
                 OrcamentoModel::STATUS_CANCELADO,
             ],
-            OrcamentoModel::STATUS_CONVERTIDO => [],
+            OrcamentoModel::STATUS_PENDENTE_OS => [
+                OrcamentoModel::STATUS_APROVADO,
+                OrcamentoModel::STATUS_REENVIAR,
+                OrcamentoModel::STATUS_CONVERTIDO,
+                OrcamentoModel::STATUS_CANCELADO,
+            ],
+            OrcamentoModel::STATUS_CONVERTIDO => [
+                OrcamentoModel::STATUS_REENVIAR,
+                OrcamentoModel::STATUS_CANCELADO,
+            ],
         ];
 
         return in_array($statusNovo, $map[$statusAnterior] ?? [], true);

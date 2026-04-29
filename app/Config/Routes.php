@@ -120,6 +120,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('clientes/novo',             'Clientes::create',           ['filter' => 'permission:clientes:criar']);
     $routes->post('clientes/salvar',          'Clientes::store',            ['filter' => 'permission:clientes:criar']);
     $routes->post('clientes/salvar_ajax',     'Clientes::salvar_ajax',      ['filter' => 'permission:clientes:criar']);
+    $routes->post('clientes/atualizar_ajax/(:num)', 'Clientes::atualizar_ajax/$1', ['filter' => 'permission:clientes:editar']);
     $routes->get('clientes/editar/(:num)',    'Clientes::edit/$1',          ['filter' => 'permission:clientes:editar']);
     $routes->post('clientes/atualizar/(:num)','Clientes::update/$1',        ['filter' => 'permission:clientes:editar']);
     $routes->get('clientes/excluir/(:num)',   'Clientes::delete/$1',        ['filter' => 'permission:clientes:excluir']);
@@ -127,6 +128,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('clientes/buscar',           'Clientes::search',           ['filter' => 'permission:clientes:visualizar']);
     $routes->get('clientes/consultar-cnpj',   'Clientes::consultarCnpj',    ['filter' => 'permission:clientes:visualizar']);
     $routes->get('clientes/json/(:num)',      'Clientes::getJson/$1',       ['filter' => 'permission:clientes:visualizar']);
+    $routes->get('clientes/json-edicao/(:num)', 'Clientes::getJson/$1',     ['filter' => 'permission:clientes:editar']);
     $routes->post('clientes/importar',        'Clientes::importCsv',        ['filter' => 'permission:clientes:importar']);
     $routes->get('clientes/modelo-csv',       'Clientes::downloadCsvTemplate', ['filter' => 'permission:clientes:importar']);
 

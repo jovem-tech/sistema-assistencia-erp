@@ -72,6 +72,23 @@ Na release `2.16.5`, o modulo passou por uma recuperacao estrutural apos uma sub
 - paginacao server-side;
 - leitura combinada de OS, cliente, equipamento, prazo e orcamento.
 
+### Ajuste rapido de prazos na listagem
+
+Fluxo tecnico atual do modal `Atualizar prazos da OS`:
+
+- payload de contexto: `GET /os/prazos-meta/{osId}`;
+- submissao AJAX: `POST /os/prazos-ajax/{osId}`;
+- view do modal: `app/Views/os/index.php`;
+- JavaScript principal: `public/assets/js/os-list-filters.js`;
+- controller de persistencia: `app/Controllers/Os.php::updateDatesAjax()`.
+
+Regra consolidada na release `2.16.34`:
+
+- o frontend passou a exibir o campo `motivo_alteracao` diretamente no modal;
+- quando `requires_admin_approval = true` vier no payload, o modal passa a mostrar `admin_usuario` e `admin_senha`;
+- o JavaScript envia `data_entrada`, `data_previsao`, `data_entrega`, `motivo_alteracao` e, quando necessario, as credenciais do administrador;
+- o backend passou a usar `data_entrada` e `data_entrega` atuais da OS como fallback, reduzindo fragilidade caso algum campo nao viaje no POST.
+
 ### Escopo operacional da listagem
 
 - a abertura da tela aplica implicitamente o recorte de OS abertas definido em `OsStatusFlowService::getListOpenStatusCodes()`;
@@ -98,14 +115,30 @@ Regra tecnica consolidada:
 
 - orcamento em ciclo comercial ativo vinculado a OS:
   - OS sugerida/atualizada para `aguardando_autorizacao`;
+- orcamento `reenviar_orcamento`:
+  - a OS volta para `aguardando_autorizacao`, mesmo que o registro ja tenha sido aprovado antes, porque existe nova rodada de validacao com o cliente;
 - orcamento `aprovado` ou `convertido`:
   - OS sugerida/atualizada para `aguardando_reparo`.
+- orcamento `rejeitado` ou `cancelado`:
+  - a OS e sincronizada para `cancelado`.
 
 Regra complementar obrigatoria:
 
 - essa sincronizacao automatica nao pode rebaixar uma OS que ja avancou manualmente para etapas posteriores do reparo, como `reparo_execucao`, `aguardando_peca`, `testes_operacionais`, `testes_finais`, `reparo_concluido` e similares;
 - o orcamento continua definindo o ponto de entrada do fluxo tecnico, mas nao sobrescreve fases mais avancadas ja confirmadas pela equipe;
 - na DataTable `/os`, o status principal renderizado deve sempre refletir `os.status` e `os.estado_fluxo` reais; o status do orcamento permanece apenas como badge auxiliar e nao pode substituir visualmente a OS.
+
+Excecao intencional da release `2.16.18`:
+
+- quando o orcamento entra em `reenviar_orcamento`, `rejeitado` ou `cancelado`, a sincronizacao pode forcar o retorno para `aguardando_autorizacao` ou `cancelado` mesmo que a OS ja tenha avancado antes, porque nesses casos o documento comercial foi reaberto ou encerrado e a OS precisa refletir esse novo bloqueio operacional.
+
+Ajuste pratico consolidado na release `2.16.25`:
+
+- quando a OS ja estiver `cancelado` e o orcamento for reenviado ao cliente, a sincronizacao tambem pode reabrir a OS ao detectar estados comerciais ativos como `pendente_envio`, `enviado`, `aguardando_resposta`, `reenviar_orcamento`, `aguardando_pacote` ou `pendente`;
+- com isso, a OS deixa o estado `cancelado` e volta para `aguardando_autorizacao` assim que uma nova rodada comercial valida e ativa for colocada novamente em circulacao.
+- na release `2.16.26`, o mesmo comportamento passou a cobrir a aprovacao final da rodada revisada: se o orcamento aprovado ainda encontrar a OS em `cancelado`, a sincronizacao remove esse bloqueio e leva a OS para `aguardando_reparo`.
+- na release `2.16.28`, esse mesmo ciclo passou a valer tambem para orcamentos originalmente `convertidos` que sofrerem edicao: ao serem alterados, eles retornam para `reenviar_orcamento` e a OS volta a depender de autorizacao do cliente no mesmo fluxo comercial.
+- na release `2.16.29`, depois do disparo real ao cliente, o orcamento revisado deixa `reenviar_orcamento` e passa para `aguardando_resposta` com label `Aguardando aprovacao`, preservando a leitura de que a OS segue esperando autorizacao.
 
 Tambem foi aplicado fallback de valor:
 
@@ -150,6 +183,21 @@ O modal foi protegido para evitar perda acidental de preenchimento:
 Mensagem exibida:
 
 - existe um registro de ordem de servico em andamento;
+
+## Edicao rapida do cliente dentro da OS
+
+Nas releases `2.16.22` e `2.16.23`, a aba `Cliente` do formulario de OS passou a manter e estabilizar um botao dedicado `Editar` ao lado do seletor principal de cliente.
+
+Comportamento operacional:
+
+- o botao fica visivel para perfis com permissao `clientes:editar`;
+- sem cliente selecionado, ele aparece desabilitado para manter a descoberta da acao sem causar erro;
+- com cliente selecionado, o clique abre imediatamente o modal rapido de cliente dentro do proprio formulario da OS;
+- a hidratacao detalhada do cliente usa `GET /clientes/json-edicao/{id}`, rota liberada para o mesmo perfil com permissao de editar;
+- se a leitura detalhada falhar, o modal continua aberto com aviso contextual, em vez de bloquear silenciosamente a acao;
+- na release `2.16.24`, o JavaScript da aba deixou de quebrar durante a sincronizacao do checklist de entrada, o que restaurou a inicializacao do botao `Editar` no fluxo real da tela;
+- o fechamento do modal de cliente tambem passou a controlar o foco explicitamente, evitando o warning de acessibilidade ligado a `aria-hidden` no Bootstrap;
+- ao salvar a alteracao, o nome do Select2, o card `Resumo do cliente selecionado` e o estado atual da OS sao sincronizados no mesmo contexto, sem reload da pagina.
 - o preenchimento nao salvo sera perdido.
 - o SweetAlert2 de confirmacao agora recebe promocao de camada e fica acima do modal iframe e do respectivo backdrop.
 
@@ -188,6 +236,7 @@ Ao salvar o modal de status:
 
 - o resumo de orcamento do modal usa `view('os/partials/orcamento_editor_panel', [..., 'orcamentoContext' => 'status_modal'])`;
 - os botoes do card passaram a expor `data-os-frame-modal-url`, abrindo `Criar`, `Editar` ou `Visualizar orcamento` no iframe modal da listagem;
+- na release `2.16.27`, orcamentos com status `convertido` deixaram de ser tratados como bloqueados no card embutido, mantendo a acao `Editar orcamento` disponivel no mesmo fluxo da OS;
 - o helper `bindIframeModal()` da listagem agora promove esse iframe modal para uma camada acima do `#osStatusModal`, ajustando modal + backdrop para evitar que o orcamento fique atras da troca de status;
 - quando o orcamento e salvo em modo embed, o `postMessage` `os:orcamento-updated` faz a listagem recarregar e hidrata novamente o contexto do modal de status, preservando o rascunho local quando possivel;
 - quando o cliente responde esse mesmo orcamento pelo link publico, a reidratacao tambem pode acontecer via notificacao em tempo real da navbar.

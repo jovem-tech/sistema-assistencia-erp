@@ -237,6 +237,16 @@ class Clientes extends BaseController
 
     public function salvar_ajax()
     {
+        return $this->persistClienteAjax(null);
+    }
+
+    public function atualizar_ajax($id)
+    {
+        return $this->persistClienteAjax((int) $id);
+    }
+
+    private function persistClienteAjax(?int $forcedId = null)
+    {
         $rules = [
             'nome_razao' => 'required|min_length[3]',
             'telefone1'  => 'required',
@@ -250,7 +260,7 @@ class Clientes extends BaseController
         }
 
         $dados = $this->normalizeClientePayload((array) $this->request->getPost());
-        $id = $this->request->getPost('id');
+        $id = $forcedId ?: (int) ($this->request->getPost('id') ?? 0);
         
         try {
             if (!empty($id)) {

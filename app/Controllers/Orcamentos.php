@@ -902,41 +902,80 @@ class Orcamentos extends BaseController
             OrcamentoModel::STATUS_PENDENTE_ENVIO,
             OrcamentoModel::STATUS_ENVIADO,
             OrcamentoModel::STATUS_AGUARDANDO,
+            OrcamentoModel::STATUS_REENVIAR,
             OrcamentoModel::STATUS_AGUARDANDO_PACOTE,
             OrcamentoModel::STATUS_PACOTE_APROVADO,
             OrcamentoModel::STATUS_PENDENTE => 'aguardando_autorizacao',
+            OrcamentoModel::STATUS_REJEITADO,
+            OrcamentoModel::STATUS_CANCELADO => 'cancelado',
             default => null,
         };
         if ($targetStatus === null) {
             return;
         }
 
+        $forceStatusReset = in_array($orcamentoStatus, [
+            OrcamentoModel::STATUS_REENVIAR,
+            OrcamentoModel::STATUS_REJEITADO,
+            OrcamentoModel::STATUS_CANCELADO,
+        ], true);
+
         $currentOs = $db->table('os')
-            ->select('status')
+            ->select('status, estado_fluxo')
             ->where('id', $osId)
             ->get()
             ->getFirstRow('array');
 
         $statusFlowService = new OsStatusFlowService();
         $currentStatus = trim((string) ($currentOs['status'] ?? ''));
-        if ($statusFlowService->hasAdvancedPast($currentStatus, $targetStatus)) {
+        $currentEstadoFluxo = trim((string) ($currentOs['estado_fluxo'] ?? ''));
+        $osEstaCancelada = $currentStatus === 'cancelado' || $currentEstadoFluxo === 'cancelado';
+        $shouldReopenCancelledLinkedOs = $osEstaCancelada && (
+            (
+                $targetStatus === 'aguardando_autorizacao'
+                && in_array($orcamentoStatus, [
+                    OrcamentoModel::STATUS_PENDENTE_ENVIO,
+                    OrcamentoModel::STATUS_ENVIADO,
+                    OrcamentoModel::STATUS_AGUARDANDO,
+                    OrcamentoModel::STATUS_REENVIAR,
+                    OrcamentoModel::STATUS_AGUARDANDO_PACOTE,
+                    OrcamentoModel::STATUS_PACOTE_APROVADO,
+                    OrcamentoModel::STATUS_PENDENTE,
+                ], true)
+            )
+            || (
+                $targetStatus === 'aguardando_reparo'
+                && in_array($orcamentoStatus, [
+                    OrcamentoModel::STATUS_APROVADO,
+                    OrcamentoModel::STATUS_CONVERTIDO,
+                ], true)
+            )
+        );
+        if ($shouldReopenCancelledLinkedOs) {
+            $forceStatusReset = true;
+        }
+        if (!$forceStatusReset && $statusFlowService->hasAdvancedPast($currentStatus, $targetStatus)) {
             return;
         }
 
         $estadoFluxo = $statusFlowService->resolveEstadoFluxo($targetStatus);
 
-        $db->table('os')
+        $builder = $db->table('os')
             ->where('id', $osId)
-            ->where('status <>', $targetStatus)
-            ->groupStart()
+            ->where('status <>', $targetStatus);
+
+        if (!$forceStatusReset) {
+            $builder->groupStart()
                 ->where('estado_fluxo IS NULL', null, false)
                 ->orWhereNotIn('estado_fluxo', ['encerrado', 'cancelado'])
-            ->groupEnd()
-            ->update([
-                'status' => $targetStatus,
-                'estado_fluxo' => $estadoFluxo,
-                'status_atualizado_em' => date('Y-m-d H:i:s'),
-            ]);
+            ->groupEnd();
+        }
+
+        $builder->update([
+            'status' => $targetStatus,
+            'estado_fluxo' => $estadoFluxo,
+            'status_atualizado_em' => date('Y-m-d H:i:s'),
+        ]);
     }
     public function show($id)
     {
@@ -956,8 +995,11 @@ class Orcamentos extends BaseController
         $lastPdfEnvio = $this->envioModel->latestByCanal((int) $id, 'pdf', 'gerado');
         $lastPdfRelative = trim((string) ($lastPdfEnvio['documento_path'] ?? ''));
         $lastPdfUrl = '';
-        if ($lastPdfRelative !== '' && is_file(FCPATH . ltrim($lastPdfRelative, '/\\'))) {
-            $lastPdfUrl = base_url($lastPdfRelative);
+        if ($lastPdfRelative !== '') {
+            $lastPdfPath = FCPATH . ltrim($lastPdfRelative, '/\\');
+            if ($this->isPdfDocumentCurrent($orcamento, $lastPdfEnvio, $lastPdfPath)) {
+                $lastPdfUrl = base_url($lastPdfRelative);
+            }
         }
         $this->refreshPacotesOfertasIfExpired();
         $pacotesOfertas = $this->loadPacotesOfertasByOrcamento((int) $id);
@@ -966,6 +1008,7 @@ class Orcamentos extends BaseController
             $pacotesOfertas,
             (int) ($pacoteOfertaPrincipal['id'] ?? 0)
         );
+        $equipamentoView = $this->buildShowEquipamentoData($orcamento);
         $statusAtual = (string) ($orcamento['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
         $statusOptions = $this->buildShowStatusOptions($statusAtual);
         return view('orcamentos/show', [
@@ -973,6 +1016,8 @@ class Orcamentos extends BaseController
             'orcamento' => $orcamento,
             'itens' => $itens,
             'historico' => $historico,
+            'histÃ³rico' => $historico,
+            'histÃƒÂ³rico' => $historico,
             'envios' => $envios,
             'aprovacoes' => $aprovacoes,
             'statusLabels' => $this->orcamentoModel->statusLabels(),
@@ -983,6 +1028,7 @@ class Orcamentos extends BaseController
             'lastPdfUrl' => $lastPdfUrl,
             'pacoteOfertaPrincipal' => $pacoteOfertaPrincipal,
             'pacotesOfertasHistorico' => $pacotesOfertasHistorico,
+            'equipamentoView' => $equipamentoView,
             'layout' => $isEmbedded ? 'layouts/embed' : 'layouts/main',
             'isEmbedded' => $isEmbedded,
         ]);
@@ -1289,6 +1335,7 @@ class Orcamentos extends BaseController
         if ($contatoValidationError !== null) {
             return redirect()->back()->withInput()->with('error', $contatoValidationError);
         }
+        $currentItems = $this->itemModel->byOrcamento($orcamentoId);
         $itens = $this->extractItensPayload();
         $pacoteOfertaIntent = $allowEmbeddedLockedEdit
             ? $this->buildEmbeddedLockedPacoteIntent($statusAnterior)
@@ -1329,9 +1376,42 @@ class Orcamentos extends BaseController
                 $requestedStatus = OrcamentoModel::STATUS_AGUARDANDO_PACOTE;
             }
         }
-        $payload['status'] = $allowEmbeddedLockedEdit
+        $resolvedStatus = $allowEmbeddedLockedEdit
             ? $statusAnterior
             : $this->resolveApprovedStatus(array_merge($current, $payload), $requestedStatus);
+        $changeMessages = $this->collectOrcamentoChangeMessages(
+            $current,
+            array_merge($current, $payload, ['status' => $resolvedStatus]),
+            $currentItems,
+            $itens,
+            $isPacoteBased
+        );
+        $requestedReapproval = $resolvedStatus === OrcamentoModel::STATUS_REENVIAR;
+        $shouldMoveToReapproval = !$allowEmbeddedLockedEdit
+            && $this->orcamentoModel->requiresReapprovalAfterEdit($statusAnterior)
+            && (
+                $requestedReapproval
+                || (
+                    !empty($changeMessages)
+                    && in_array($resolvedStatus, [
+                        $statusAnterior,
+                        OrcamentoModel::STATUS_APROVADO,
+                        OrcamentoModel::STATUS_PENDENTE_OS,
+                        OrcamentoModel::STATUS_PACOTE_APROVADO,
+                    ], true)
+                )
+            );
+
+        if ($shouldMoveToReapproval) {
+            $payload['versao'] = max(2, ((int) ($current['versao'] ?? 1)) + 1);
+            $payload['status'] = OrcamentoModel::STATUS_REENVIAR;
+            $payload['token_expira_em'] = date('Y-m-d H:i:s', strtotime('+30 days'));
+            $payload = array_merge($payload, $this->buildReapprovalResetColumns());
+        } else {
+            $payload['versao'] = max(1, (int) ($current['versao'] ?? 1));
+            $payload['status'] = $resolvedStatus;
+        }
+
         $payload = array_merge($payload, $this->statusTimestampColumns($payload['status'], $now, $current));
         $autoOfertaResult = ['warning' => null, 'error' => null];
         $statusNovo = (string) $payload['status'];
@@ -1364,14 +1444,21 @@ class Orcamentos extends BaseController
             }
         }
         $this->recalculateOrcamentoTotals($orcamentoId);
-        if ($statusAnterior !== $statusNovo) {
+        $orcamentoAtualizado = $this->orcamentoModel->find($orcamentoId) ?? array_merge($current, $payload, ['id' => $orcamentoId]);
+        $historyObservation = $this->buildOrcamentoHistoryObservation(
+            $changeMessages,
+            $statusAnterior,
+            $statusNovo,
+            (int) ($orcamentoAtualizado['versao'] ?? $payload['versao'] ?? 1)
+        );
+        if ($statusAnterior !== $statusNovo || $historyObservation !== null) {
             $this->orcamentoService->registrarHistoricoStatus(
                 $this->historicoModel,
                 $orcamentoId,
                 $statusAnterior,
                 $statusNovo,
                 $usuarioId > 0 ? $usuarioId : null,
-                'Status alterado na edicao do orcamento',
+                $historyObservation ?? 'Status alterado na edicao do orcamento',
                 'interno'
             );
         }
@@ -1387,6 +1474,12 @@ class Orcamentos extends BaseController
         if (!empty($autoOfertaResult['warning'])) {
             $successMessage .= ' ' . (string) $autoOfertaResult['warning'];
         }
+        if ($shouldMoveToReapproval) {
+            $successMessage = 'Orcamento atualizado e marcado para reenviar aprovacao ao cliente.';
+            if (!empty($autoOfertaResult['warning'])) {
+                $successMessage .= ' ' . (string) $autoOfertaResult['warning'];
+            }
+        }
         $this->syncLinkedOsByOrcamentoStatus(
             (int) ($payload['os_id'] ?? $current['os_id'] ?? 0),
             $statusNovo
@@ -1401,65 +1494,8 @@ class Orcamentos extends BaseController
         if (!$source) {
             return redirect()->to('/orcamentos')->with('error', 'Orcamento nao encontrado para revisao.');
         }
-        if (!$this->canCreateRevision($source)) {
-            return redirect()->to($this->orcamentoShowUrl($orcamentoId))
-                ->with('error', 'A revisao so pode ser criada a partir de um orcamento consolidado e ainda nao convertido.');
-        }
-
-        $usuarioId = (int) (session()->get('user_id') ?? 0);
-        $revisionBaseId = $this->resolveRevisionBaseId($source);
-        $novaVersao = $this->nextRevisionVersion($revisionBaseId);
-        $sourceItens = $this->itemModel->byOrcamento($orcamentoId);
-        $payload = $this->buildRevisionPayload($source, $revisionBaseId, $novaVersao, $usuarioId > 0 ? $usuarioId : null);
-
-        $this->orcamentoModel->db->transStart();
-        $this->orcamentoModel->insert($payload);
-        $revisionId = (int) $this->orcamentoModel->getInsertID();
-        if ($revisionId <= 0) {
-            $this->orcamentoModel->db->transRollback();
-            return redirect()->to($this->orcamentoShowUrl($orcamentoId))
-                ->with('error', 'Nao foi possivel criar a revisao deste orcamento.');
-        }
-
-        $revisionNumero = $this->orcamentoService->ensureNumero($this->orcamentoModel, $revisionId);
-        foreach ($sourceItens as $item) {
-            unset($item['id'], $item['created_at'], $item['updated_at']);
-            $item['orcamento_id'] = $revisionId;
-            $this->itemModel->insert($item);
-        }
-
-        $this->orcamentoService->registrarHistoricoStatus(
-            $this->historicoModel,
-            $revisionId,
-            null,
-            OrcamentoModel::STATUS_RASCUNHO,
-            $usuarioId > 0 ? $usuarioId : null,
-            'Revisao criada a partir do orcamento ' . (string) ($source['numero'] ?? ('#' . $orcamentoId)) . '.',
-            'interno'
-        );
-        $this->orcamentoService->registrarHistoricoStatus(
-            $this->historicoModel,
-            $orcamentoId,
-            (string) ($source['status'] ?? OrcamentoModel::STATUS_RASCUNHO),
-            (string) ($source['status'] ?? OrcamentoModel::STATUS_RASCUNHO),
-            $usuarioId > 0 ? $usuarioId : null,
-            'Revisao v' . $novaVersao . ' criada: ' . ($revisionNumero !== '' ? $revisionNumero : ('#' . $revisionId)) . '.',
-            'interno'
-        );
-        $this->orcamentoModel->db->transComplete();
-
-        if (!$this->orcamentoModel->db->transStatus()) {
-            return redirect()->to($this->orcamentoShowUrl($orcamentoId))
-                ->with('error', 'Falha ao concluir a criacao da revisao.');
-        }
-
-        LogModel::registrar(
-            'orcamento_revisao_criada',
-            'Revisao v' . $novaVersao . ' criada para o orcamento ID ' . $orcamentoId . ' (novo ID ' . $revisionId . ').'
-        );
-
-        return redirect()->to($this->withEmbedQuery('/orcamentos/editar/' . $revisionId))
-            ->with('success', 'Revisao criada com sucesso. Ajuste os dados e envie a nova autorizacao ao cliente.');
+        return redirect()->to($this->withEmbedQuery('/orcamentos/editar/' . $orcamentoId))
+            ->with('warning', 'A revisao agora acontece no proprio orcamento. Ajuste este registro e o sistema abrira uma nova rodada de aprovacao quando houver alteracoes.');
     }
     public function updateStatus($id)
     {
@@ -1491,6 +1527,16 @@ class Orcamentos extends BaseController
             'status' => $statusNovo,
             'atualizado_por' => $usuarioId > 0 ? $usuarioId : null,
         ];
+        $historyObservation = 'Status alterado manualmente';
+        if ($statusNovo === OrcamentoModel::STATUS_REENVIAR
+            && $this->orcamentoModel->requiresReapprovalAfterEdit($statusAnterior)
+        ) {
+            $novaVersao = max(2, ((int) ($orcamento['versao'] ?? 1)) + 1);
+            $update['versao'] = $novaVersao;
+            $update['token_expira_em'] = date('Y-m-d H:i:s', strtotime('+30 days'));
+            $update = array_merge($update, $this->buildReapprovalResetColumns());
+            $historyObservation = 'Versao ' . $novaVersao . ' aberta para reenviar aprovacao ao cliente.';
+        }
         $update = array_merge($update, $this->statusTimestampColumns($statusNovo, $now, $orcamento));
         $this->orcamentoModel->update($orcamentoId, $update);
         $this->orcamentoService->registrarHistoricoStatus(
@@ -1499,7 +1545,7 @@ class Orcamentos extends BaseController
             $statusAnterior,
             $statusNovo,
             $usuarioId > 0 ? $usuarioId : null,
-            'Status alterado manualmente',
+            $historyObservation,
             'interno'
         );
         if ($this->isConsolidatedStatus($statusNovo)) {
@@ -1510,7 +1556,10 @@ class Orcamentos extends BaseController
             (int) ($orcamento['os_id'] ?? 0),
             $statusNovo
         );
-        return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('success', 'Status atualizado com sucesso.');
+        $successMessage = $statusNovo === OrcamentoModel::STATUS_REENVIAR
+            ? 'Status atualizado. O orcamento precisa ser reenviado para nova aprovacao.'
+            : 'Status atualizado com sucesso.';
+        return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('success', $successMessage);
     }
     public function runAutomation()
     {
@@ -1941,6 +1990,7 @@ class Orcamentos extends BaseController
             OrcamentoModel::STATUS_PENDENTE_ENVIO,
             OrcamentoModel::STATUS_ENVIADO,
             OrcamentoModel::STATUS_AGUARDANDO,
+            OrcamentoModel::STATUS_REENVIAR,
             OrcamentoModel::STATUS_REJEITADO,
             OrcamentoModel::STATUS_VENCIDO,
         ], true)) {
@@ -2050,6 +2100,7 @@ class Orcamentos extends BaseController
             }
         }
         $orcamento['status'] = $status;
+        $orcamento['status_label'] = $this->orcamentoModel->resolveStatusLabelFromRecord($orcamento);
 
         return $orcamento;
     }
@@ -2163,12 +2214,23 @@ class Orcamentos extends BaseController
         string $contexto,
         bool $forceGenerate = false
     ): array {
+        $orcamentoMeta = $this->orcamentoModel
+            ->select('id, versao, updated_at')
+            ->where('id', $orcamentoId)
+            ->first();
+        if (!$orcamentoMeta) {
+            return [
+                'ok' => false,
+                'message' => 'Orcamento nao encontrado para preparar o PDF.',
+            ];
+        }
+
         if (!$forceGenerate) {
             $latest = $this->envioModel->latestByCanal($orcamentoId, 'pdf', 'gerado');
             $relative = trim((string) ($latest['documento_path'] ?? ''));
             if ($relative !== '') {
                 $fullPath = FCPATH . ltrim($relative, '/\\');
-                if (is_file($fullPath)) {
+                if ($this->isPdfDocumentCurrent($orcamentoMeta, $latest, $fullPath)) {
                     return [
                         'ok' => true,
                         'path' => $fullPath,
@@ -2216,6 +2278,63 @@ class Orcamentos extends BaseController
             'generated' => true,
         ];
     }
+
+    /**
+     * @param array<string,mixed> $orcamento
+     * @param array<string,mixed>|null $latestEnvio
+     */
+    private function isPdfDocumentCurrent(array $orcamento, ?array $latestEnvio, string $filePath): bool
+    {
+        if ($latestEnvio === null || $filePath === '' || !is_file($filePath)) {
+            return false;
+        }
+
+        $orcamentoVersao = max(1, (int) ($orcamento['versao'] ?? 1));
+        $arquivoVersao = $this->extractPdfVersionFromFilePath($filePath);
+        if ($arquivoVersao !== null && $arquivoVersao < $orcamentoVersao) {
+            return false;
+        }
+
+        $orcamentoAtualizadoEm = $this->normalizeDateTimeForComparison($orcamento['updated_at'] ?? null);
+        $pdfGeradoEm = $this->normalizeDateTimeForComparison(
+            $latestEnvio['enviado_em']
+                ?? $latestEnvio['updated_at']
+                ?? $latestEnvio['created_at']
+                ?? null
+        );
+
+        if ($orcamentoAtualizadoEm !== null && $pdfGeradoEm !== null && $orcamentoAtualizadoEm > $pdfGeradoEm) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function extractPdfVersionFromFilePath(string $filePath): ?int
+    {
+        $base = basename($filePath);
+        if (preg_match('/orcamento_v(\d+)\.pdf$/i', $base, $matches) !== 1) {
+            return null;
+        }
+
+        $versao = (int) ($matches[1] ?? 0);
+        return $versao > 0 ? $versao : null;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function normalizeDateTimeForComparison($value): ?int
+    {
+        $text = trim((string) $value);
+        if ($text === '') {
+            return null;
+        }
+
+        $timestamp = strtotime($text);
+        return $timestamp === false ? null : $timestamp;
+    }
+
     private function startEnvioTrace(
         int $orcamentoId,
         string $canal,
@@ -2741,15 +2860,7 @@ class Orcamentos extends BaseController
      */
     private function canEditLockedOrcamentoFromOsEmbed(array $orcamento): bool
     {
-        if (!$this->isEmbedRequest()) {
-            return false;
-        }
-
-        if ((int) ($orcamento['os_id'] ?? 0) <= 0) {
-            return false;
-        }
-
-        return $this->orcamentoModel->isLockedStatus((string) ($orcamento['status'] ?? ''));
+        return false;
     }
     /**
      * @return array<string,mixed>
@@ -4329,6 +4440,58 @@ class Orcamentos extends BaseController
         }
         return $manual;
     }
+    /**
+     * @return array<string,mixed>
+     */
+    private function buildShowEquipamentoData(array $orcamento): array
+    {
+        $lookup = $this->buildEquipamentoLookupInitial($orcamento);
+        $manual = $this->resolveEquipamentoManualContext($orcamento);
+
+        $tipoId = (int) ($manual['tipo_id'] ?? 0);
+        $marcaId = (int) ($manual['marca_id'] ?? 0);
+        $modeloId = (int) ($manual['modelo_id'] ?? 0);
+
+        $tipoNome = trim((string) ($lookup['tipo_nome'] ?? ''));
+        $marcaNome = trim((string) ($lookup['marca_nome'] ?? ''));
+        $modeloNome = trim((string) ($lookup['modelo_nome'] ?? ''));
+
+        if ($tipoNome === '' && $tipoId > 0) {
+            $tipo = (new EquipamentoTipoModel())->find($tipoId);
+            $tipoNome = trim((string) ($tipo['nome'] ?? ''));
+        }
+        if ($marcaNome === '' && $marcaId > 0) {
+            $marca = (new EquipamentoMarcaModel())->find($marcaId);
+            $marcaNome = trim((string) ($marca['nome'] ?? ''));
+        }
+        if ($modeloNome === '' && $modeloId > 0) {
+            $modelo = (new EquipamentoModeloModel())->find($modeloId);
+            $modeloNome = trim((string) ($modelo['nome'] ?? ''));
+        }
+
+        $marcaModelo = trim($marcaNome . ' ' . $modeloNome);
+        $corNome = trim((string) ($manual['cor'] ?? ''));
+        $identificacao = trim(implode(' | ', array_filter([
+            $tipoNome,
+            $marcaModelo,
+            $corNome !== '' ? ('Cor: ' . $corNome) : '',
+        ])));
+
+        return [
+            'equipamento_id' => (int) ($orcamento['equipamento_id'] ?? 0) ?: null,
+            'tipo_id' => $tipoId > 0 ? $tipoId : null,
+            'marca_id' => $marcaId > 0 ? $marcaId : null,
+            'modelo_id' => $modeloId > 0 ? $modeloId : null,
+            'tipo_nome' => $tipoNome,
+            'marca_nome' => $marcaNome,
+            'modelo_nome' => $modeloNome,
+            'cor' => $corNome,
+            'cor_hex' => trim((string) ($manual['cor_hex'] ?? '')),
+            'cor_rgb' => trim((string) ($manual['cor_rgb'] ?? '')),
+            'foto_url' => trim((string) ($lookup['foto_url'] ?? '')),
+            'identificacao' => $identificacao,
+        ];
+    }
     private function applyEquipamentoSnapshotFromId(array &$payload, int $equipamentoId): void
     {
         if ($equipamentoId <= 0) {
@@ -5266,6 +5429,161 @@ class Orcamentos extends BaseController
             $payload[$field] = $value;
         }
         return $payload;
+    }
+
+    /**
+     * @param array<string,mixed> $current
+     * @param array<string,mixed> $payload
+     * @param array<int, array<string,mixed>> $currentItems
+     * @param array<int, array<string,mixed>> $newItems
+     * @return array<int, string>
+     */
+    private function collectOrcamentoChangeMessages(
+        array $current,
+        array $payload,
+        array $currentItems,
+        array $newItems,
+        bool $isPacoteBased
+    ): array {
+        $messages = [];
+        $fieldLabels = [
+            'tipo_orcamento' => 'tipo de orcamento',
+            'cliente_id' => 'cliente',
+            'contato_id' => 'contato',
+            'cliente_nome_avulso' => 'cliente avulso',
+            'telefone_contato' => 'telefone',
+            'email_contato' => 'email',
+            'os_id' => 'OS vinculada',
+            'equipamento_id' => 'equipamento',
+            'titulo' => 'titulo',
+            'validade_dias' => 'validade',
+            'prazo_execucao' => 'prazo de execucao',
+            'observacoes' => 'observacoes',
+            'condicoes' => 'condicoes',
+            'desconto' => 'desconto',
+            'acrescimo' => 'acrescimo',
+        ];
+
+        foreach ($fieldLabels as $field => $label) {
+            $currentValue = $this->normalizeHistoryValue($current[$field] ?? null);
+            $newValue = $this->normalizeHistoryValue($payload[$field] ?? null);
+            if ($currentValue !== $newValue) {
+                $messages[] = $label;
+            }
+        }
+
+        $currentPacoteBased = in_array((string) ($current['status'] ?? ''), [
+            OrcamentoModel::STATUS_AGUARDANDO_PACOTE,
+            OrcamentoModel::STATUS_PACOTE_APROVADO,
+        ], true);
+        if ($currentPacoteBased !== $isPacoteBased) {
+            $messages[] = 'fluxo de pacote';
+        }
+
+        if ($this->buildOrcamentoItemsSignature($currentItems) !== $this->buildOrcamentoItemsSignature($newItems)) {
+            $messages[] = 'itens do orcamento';
+        }
+
+        $currentTotal = round((float) ($current['total'] ?? 0), 2);
+        $newTotal = round((float) ($payload['total'] ?? $currentTotal), 2);
+        if (abs($currentTotal - $newTotal) > 0.009) {
+            $messages[] = 'total de ' . $this->formatHistoryMoney($currentTotal) . ' para ' . $this->formatHistoryMoney($newTotal);
+        }
+
+        return array_values(array_unique($messages));
+    }
+
+    /**
+     * @param array<int, array<string,mixed>> $items
+     */
+    private function buildOrcamentoItemsSignature(array $items): string
+    {
+        $normalized = [];
+        foreach ($items as $item) {
+            $normalized[] = [
+                'tipo_item' => trim((string) ($item['tipo_item'] ?? '')),
+                'referencia_id' => (int) ($item['referencia_id'] ?? 0),
+                'descricao' => trim((string) ($item['descricao'] ?? '')),
+                'quantidade' => round((float) ($item['quantidade'] ?? 0), 4),
+                'valor_unitario' => round((float) ($item['valor_unitario'] ?? 0), 2),
+                'desconto' => round((float) ($item['desconto'] ?? 0), 2),
+                'acrescimo' => round((float) ($item['acrescimo'] ?? 0), 2),
+                'total' => round((float) ($item['total'] ?? 0), 2),
+                'observacoes' => trim((string) ($item['observacoes'] ?? '')),
+            ];
+        }
+
+        return md5(json_encode($normalized, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '[]');
+    }
+
+    /**
+     * @param array<int, string> $changeMessages
+     */
+    private function buildOrcamentoHistoryObservation(
+        array $changeMessages,
+        string $statusAnterior,
+        string $statusNovo,
+        int $versaoAtual = 1
+    ): ?string {
+        $changeMessages = array_values(array_unique(array_filter(array_map(
+            static fn (string $message): string => trim($message),
+            $changeMessages
+        ))));
+
+        if ($statusNovo === OrcamentoModel::STATUS_REENVIAR && $statusAnterior !== OrcamentoModel::STATUS_REENVIAR) {
+            $base = 'Versao ' . max(1, $versaoAtual) . ' aberta para reenviar aprovacao ao cliente';
+        } elseif ($statusAnterior !== $statusNovo) {
+            $base = 'Status alterado manualmente';
+        } elseif (!empty($changeMessages)) {
+            $base = 'Alteracoes salvas no proprio orcamento';
+        } else {
+            return null;
+        }
+
+        if (!empty($changeMessages)) {
+            $base .= ': ' . implode('; ', $changeMessages);
+        }
+
+        return rtrim($base, '. ') . '.';
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private function buildReapprovalResetColumns(): array
+    {
+        return [
+            'aprovado_em' => null,
+            'rejeitado_em' => null,
+            'cancelado_em' => null,
+            'motivo_rejeicao' => null,
+            'enviado_em' => null,
+        ];
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function normalizeHistoryValue($value): string
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        if (is_bool($value)) {
+            return $value ? '1' : '0';
+        }
+
+        if (is_numeric($value)) {
+            return number_format((float) $value, 4, '.', '');
+        }
+
+        return strtolower(trim((string) $value));
+    }
+
+    private function formatHistoryMoney(float $value): string
+    {
+        return 'R$ ' . number_format($value, 2, ',', '.');
     }
 
     private function extractNumericId($value): int

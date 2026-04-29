@@ -17,13 +17,14 @@ class OrcamentoModel extends Model
     public const STATUS_PACOTE_APROVADO = 'pacote_aprovado';
     public const STATUS_PENDENTE = 'pendente';
     public const STATUS_APROVADO = 'aprovado';
+    public const STATUS_REENVIAR = 'reenviar_orcamento';
     public const STATUS_PENDENTE_OS = 'pendente_abertura_os';
     public const STATUS_REJEITADO = 'rejeitado';
     public const STATUS_VENCIDO = 'vencido';
     public const STATUS_CANCELADO = 'cancelado';
     public const STATUS_CONVERTIDO = 'convertido';
 
-    protected $table      = 'orcamentos';
+    protected $table = 'orcamentos';
     protected $primaryKey = 'id';
     protected $returnType = 'array';
     protected $useTimestamps = true;
@@ -75,17 +76,18 @@ class OrcamentoModel extends Model
     public function statusLabels(): array
     {
         return [
-            self::STATUS_RASCUNHO  => 'Rascunho',
-            self::STATUS_PENDENTE_ENVIO => 'Pendente de envio para aprovação do cliente',
-            self::STATUS_ENVIADO   => 'Enviado',
-            self::STATUS_AGUARDANDO => 'Aguardando resposta',
-            self::STATUS_AGUARDANDO_PACOTE => 'Aguardando escolha/aprovação do pacote',
+            self::STATUS_RASCUNHO => 'Rascunho',
+            self::STATUS_PENDENTE_ENVIO => 'Pendente de envio para aprovacao do cliente',
+            self::STATUS_ENVIADO => 'Enviado',
+            self::STATUS_AGUARDANDO => 'Aguardando aprovacao',
+            self::STATUS_AGUARDANDO_PACOTE => 'Aguardando escolha/aprovacao do pacote',
             self::STATUS_PACOTE_APROVADO => 'Pacote escolhido e aprovado',
             self::STATUS_PENDENTE => 'Pendente (sem retorno do pacote)',
-            self::STATUS_APROVADO  => 'Aprovado',
+            self::STATUS_APROVADO => 'Aprovado',
+            self::STATUS_REENVIAR => 'Reenviar orcamento',
             self::STATUS_PENDENTE_OS => 'Aprovado (pendente de OS)',
             self::STATUS_REJEITADO => 'Rejeitado',
-            self::STATUS_VENCIDO   => 'Vencido',
+            self::STATUS_VENCIDO => 'Vencido',
             self::STATUS_CANCELADO => 'Cancelado',
             self::STATUS_CONVERTIDO => 'Convertido',
         ];
@@ -94,8 +96,8 @@ class OrcamentoModel extends Model
     public function tipoLabels(): array
     {
         return [
-            self::TIPO_PREVIO => 'Orçamento prévio',
-            self::TIPO_ASSISTENCIA => 'Orçamento com equipamento na assistência',
+            self::TIPO_PREVIO => 'Orcamento previo',
+            self::TIPO_ASSISTENCIA => 'Orcamento com equipamento na assistencia',
         ];
     }
 
@@ -120,6 +122,40 @@ class OrcamentoModel extends Model
 
     public function isLockedStatus(string $status): bool
     {
-        return in_array($status, [self::STATUS_APROVADO, self::STATUS_PENDENTE_OS, self::STATUS_PACOTE_APROVADO, self::STATUS_CONVERTIDO], true);
+        return false;
+    }
+
+    public function requiresReapprovalAfterEdit(string $status): bool
+    {
+        return in_array($status, [
+            self::STATUS_APROVADO,
+            self::STATUS_PENDENTE_OS,
+            self::STATUS_PACOTE_APROVADO,
+            self::STATUS_CONVERTIDO,
+        ], true);
+    }
+
+    /**
+     * @param array<string, mixed> $orcamento
+     */
+    public function resolveStatusLabelFromRecord(array $orcamento): string
+    {
+        $status = trim((string) ($orcamento['status'] ?? self::STATUS_RASCUNHO));
+        $versao = max(1, (int) ($orcamento['versao'] ?? 1));
+
+        if ($status === self::STATUS_APROVADO && $versao > 1) {
+            return $this->formatApprovalRoundLabel($versao);
+        }
+
+        if ($status === self::STATUS_PENDENTE_OS && $versao > 1) {
+            return $this->formatApprovalRoundLabel($versao) . ' (pendente de OS)';
+        }
+
+        return $this->statusLabels()[$status] ?? ucfirst(str_replace('_', ' ', $status));
+    }
+
+    public function formatApprovalRoundLabel(int $versao): string
+    {
+        return max(1, $versao) . 'ª aprovacao';
     }
 }

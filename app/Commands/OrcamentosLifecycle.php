@@ -21,9 +21,8 @@ class OrcamentosLifecycle extends BaseCommand
 
         CLI::write('Automacao de orcamentos executada com sucesso.', 'green');
         CLI::write('- Orcamentos vencidos: ' . (int) ($summary['orcamentos_vencidos'] ?? 0));
-        CLI::write('- Follow-ups aguardando resposta: ' . (int) ($summary['followups_aguardando'] ?? 0));
+        CLI::write('- Follow-ups aguardando aprovacao: ' . (int) ($summary['followups_aguardando'] ?? 0));
         CLI::write('- Follow-ups de vencidos: ' . (int) ($summary['followups_vencidos'] ?? 0));
         CLI::write('- Follow-ups pendente de OS: ' . (int) ($summary['followups_pendente_os'] ?? 0));
     }
 }
-

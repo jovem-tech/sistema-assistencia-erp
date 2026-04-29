@@ -113,6 +113,66 @@ Quando uma ordem de servico vinculada usa a aba `Documentos` para gerar ou envia
 
 Tambem foi aplicada uma revisao complementar de pt-BR/UTF-8 nas telas de formulario e visualizacao do modulo `Orcamentos`, cobrindo avisos de vinculo com OS, blocos de resumo, labels de acompanhamento e mensagens de orientacao ao operador.
 
+## Edicao de orcamento convertido
+
+O status `Convertido` deixou de bloquear a edicao do orcamento.
+
+Na pratica:
+
+- o botao `Editar` continua disponivel na tela `Visualizar Orcamento` quando o registro estiver `Convertido`;
+- o mesmo comportamento vale para o painel de orcamento embutido dentro da OS;
+- os ajustes continuam sendo salvos no mesmo `orcamento`, sem criar uma revisao automatica so por causa desse status;
+- quando a edicao alterar efetivamente o conteudo comercial do orcamento convertido, o sistema abre nova rodada de aprovacao no mesmo registro;
+- nesse caso, o status sai de `Convertido` e volta para `Reenviar orcamento`, com nova versao e necessidade de reenvio ao cliente.
+
+## Status apos reenvio
+
+O status `Reenviar orcamento` agora funciona apenas como etapa preparatoria.
+
+Na pratica:
+
+- depois que o orcamento revisado e realmente enviado ao cliente por WhatsApp ou e-mail, ele deixa `Reenviar orcamento`;
+- o registro passa automaticamente para `Aguardando aprovacao`;
+- esse estado indica que o documento ja saiu para o cliente e esta pendente de retorno/aprovacao.
+
+## Visualizacao em abas
+
+A tela `Visualizar Orcamento` foi reorganizada em abas para reduzir rolagem longa e separar melhor os contextos comercial, operacional e financeiro.
+
+As abas atuais sao:
+
+- `Dados do cliente`: nome, telefones, email, OS vinculada, conversa e contato de atendimento;
+- `Dados do equipamento`: foto principal, tipo, marca, modelo, cor e identificacao consolidada;
+- `Dados operacionais`: contexto do tipo de orcamento, status, origem, versao, conversao, prazo, observacoes, condicoes e controle manual de status;
+- `Pacotes de servico`: oferta dinamica principal, link publico da oferta e historico tecnico das ofertas anteriores;
+- `Envio do orcamento`: PDF, envio por WhatsApp e envio por e-mail;
+- `Orcamento`: itens lancados, historico de status e rastreabilidade;
+- `Financeiro do orcamento`: subtotal, desconto, acrescimo, total final e link publico do documento.
+
+Na pratica:
+
+- o operador encontra cada bloco sem precisar alternar entre cards espalhados na pagina;
+- o financeiro deixa de dividir espaco com o resumo operacional no topo;
+- as abas seguem o padrao do design system em linha unica e ajustam o tamanho dos rotulos conforme a largura da tela, mantendo todas visiveis sem exibir barra de rolagem nessa view.
+
+## Formulario em abas
+
+As telas `Novo Orcamento` e `Editar Orcamento` tambem passaram a usar abas no formulario principal.
+
+Abas atuais:
+
+- `Dados do cliente`
+- `Dados do equipamento`
+- `Dados operacionais`
+- `Pacotes de servico`
+- `Orcamento e financeiro`
+
+Na pratica:
+
+- os campos foram mantidos nos mesmos blocos funcionais, mas agora separados por contexto;
+- o fluxo de adicionar itens e recalculo financeiro continua o mesmo, agora concentrado em uma unica aba para evitar troca desnecessaria no fechamento da proposta;
+- a navegacao horizontal das abas foi preparada para uso em telas pequenas, sem depender de rolagem vertical longa para chegar ao financeiro.
+
 ## Ajuda rapida
 
 O botao `Ajuda`, no topo do formulario, abre esta pagina pelo atalho `openDocPage('orcamentos')`.

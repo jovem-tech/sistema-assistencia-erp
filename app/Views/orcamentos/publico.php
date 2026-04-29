@@ -20,6 +20,8 @@ $statusLabels = $statusLabels ?? [];
 $tipoLabels = $tipoLabels ?? [];
 $status = (string) ($orcamento['status'] ?? 'rascunho');
 $tipoOrcamento = (string) ($orcamento['tipo_orcamento'] ?? 'previo');
+$statusDisplayLabel = (string) ($orcamento['status_label'] ?? ($statusLabels[$status] ?? ucfirst($status)));
+$statusLabels[$status] = $statusDisplayLabel;
 $clienteNome = trim((string) ($orcamento['cliente_nome'] ?? ''));
 if ($clienteNome === '') {
     $clienteNome = (string) ($orcamento['cliente_nome_avulso'] ?? 'Cliente');
@@ -41,7 +43,7 @@ if ($clienteNome === '') {
                     <div class="text-muted">Cliente: <?= esc($clienteNome) ?></div>
                     <div class="small text-muted mt-1">Tipo: <?= esc($tipoLabels[$tipoOrcamento] ?? ucfirst($tipoOrcamento)) ?></div>
                 </div>
-                <span class="badge bg-secondary"><?= esc($statusLabels[$status] ?? ucfirst($status)) ?></span>
+                <span class="badge bg-secondary"><?= esc($statusDisplayLabel) ?></span>
             </div>
 
             <?php if ($tipoOrcamento === 'previo'): ?>

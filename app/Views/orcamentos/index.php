@@ -10,6 +10,7 @@ $statusBadgeMap = [
     'pendente_envio' => 'bg-secondary-subtle text-secondary-emphasis',
     'enviado' => 'bg-primary',
     'aguardando_resposta' => 'bg-info text-dark',
+    'reenviar_orcamento' => 'bg-warning text-dark',
     'aguardando_pacote' => 'bg-primary-subtle text-primary-emphasis',
     'pacote_aprovado' => 'bg-success-subtle text-success-emphasis',
     'pendente' => 'bg-warning text-dark',
@@ -122,6 +123,7 @@ $statusBadgeMap = [
                         <?php
                         $status = (string) ($orcamento['status'] ?? 'rascunho');
                         $statusClass = $statusBadgeMap[$status] ?? 'bg-secondary';
+                        $statusDisplayLabel = (string) ($orcamento['status_label'] ?? ($statusLabels[$status] ?? ucfirst($status)));
                         $tipoCode = (string) ($orcamento['tipo_orcamento'] ?? 'previo');
                         $clienteNome = trim((string) ($orcamento['cliente_nome'] ?? ''));
                         if ($clienteNome === '') {
@@ -154,7 +156,7 @@ $statusBadgeMap = [
                                 <?= !empty($vinculos) ? esc(implode(' | ', $vinculos)) : '-' ?>
                             </td>
                             <td data-label="Status">
-                                <span class="badge <?= esc($statusClass) ?>"><?= esc($statusLabels[$status] ?? ucfirst($status)) ?></span>
+                                <span class="badge <?= esc($statusClass) ?>"><?= esc($statusDisplayLabel) ?></span>
                             </td>
                             <td data-label="Validade"><?= esc(formatDate($orcamento['validade_data'] ?? null)) ?></td>
                             <td data-label="Total" class="fw-semibold"><?= esc(formatMoney($orcamento['total'] ?? 0)) ?></td>

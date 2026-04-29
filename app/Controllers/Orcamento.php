@@ -71,6 +71,7 @@ class Orcamento extends BaseController
             (string) ($orcamento['tipo_orcamento'] ?? ''),
             (int) ($orcamento['os_id'] ?? 0)
         );
+        $orcamento['status_label'] = $this->orcamentoModel->resolveStatusLabelFromRecord($orcamento);
         $itens = $this->itemModel->byOrcamento((int) ($orcamento['id'] ?? 0));
         return view('orcamentos/publico', [
             'orcamento' => $orcamento,
@@ -94,6 +95,7 @@ class Orcamento extends BaseController
             OrcamentoModel::STATUS_ENVIADO,
             OrcamentoModel::STATUS_AGUARDANDO,
             OrcamentoModel::STATUS_RASCUNHO,
+            OrcamentoModel::STATUS_REENVIAR,
         ], true)) {
             return redirect()->to('/orcamento/' . $token)
                 ->with('error', 'Este orçamento não permite mais aprovação pelo link público.');
@@ -173,6 +175,7 @@ class Orcamento extends BaseController
             OrcamentoModel::STATUS_ENVIADO,
             OrcamentoModel::STATUS_AGUARDANDO,
             OrcamentoModel::STATUS_RASCUNHO,
+            OrcamentoModel::STATUS_REENVIAR,
         ], true)) {
             return redirect()->to('/orcamento/' . $token)
                 ->with('error', 'Este orçamento não permite mais rejeição pelo link público.');
@@ -207,6 +210,10 @@ class Orcamento extends BaseController
             null,
             'Rejeitado via link público',
             'público'
+        );
+        $this->syncLinkedOsByOrcamentoStatus(
+            (int) ($orcamento['os_id'] ?? 0),
+            OrcamentoModel::STATUS_REJEITADO
         );
         $this->notifyStaffAboutPublicBudgetStatusChange($orcamento, $statusAtual, OrcamentoModel::STATUS_REJEITADO);
 
@@ -624,9 +631,12 @@ class Orcamento extends BaseController
             OrcamentoModel::STATUS_PENDENTE_ENVIO,
             OrcamentoModel::STATUS_ENVIADO,
             OrcamentoModel::STATUS_AGUARDANDO,
+            OrcamentoModel::STATUS_REENVIAR,
             OrcamentoModel::STATUS_AGUARDANDO_PACOTE,
             OrcamentoModel::STATUS_PACOTE_APROVADO,
             OrcamentoModel::STATUS_PENDENTE => 'aguardando_autorizacao',
+            OrcamentoModel::STATUS_REJEITADO,
+            OrcamentoModel::STATUS_CANCELADO => 'cancelado',
             default => null,
         };
         if ($targetStatus === null) {
@@ -639,31 +649,66 @@ class Orcamento extends BaseController
         }
 
         $currentOs = $db->table('os')
-            ->select('status')
+            ->select('status, estado_fluxo')
             ->where('id', $osId)
             ->get()
             ->getFirstRow('array');
 
         $statusFlowService = new OsStatusFlowService();
         $currentStatus = trim((string) ($currentOs['status'] ?? ''));
-        if ($statusFlowService->hasAdvancedPast($currentStatus, $targetStatus)) {
+        $forceStatusReset = in_array($orcamentoStatus, [
+            OrcamentoModel::STATUS_REENVIAR,
+            OrcamentoModel::STATUS_REJEITADO,
+            OrcamentoModel::STATUS_CANCELADO,
+        ], true);
+        $currentEstadoFluxo = trim((string) ($currentOs['estado_fluxo'] ?? ''));
+        $osEstaCancelada = $currentStatus === 'cancelado' || $currentEstadoFluxo === 'cancelado';
+        $shouldReopenCancelledLinkedOs = $osEstaCancelada && (
+            (
+                $targetStatus === 'aguardando_autorizacao'
+                && in_array($orcamentoStatus, [
+                    OrcamentoModel::STATUS_PENDENTE_ENVIO,
+                    OrcamentoModel::STATUS_ENVIADO,
+                    OrcamentoModel::STATUS_AGUARDANDO,
+                    OrcamentoModel::STATUS_REENVIAR,
+                    OrcamentoModel::STATUS_AGUARDANDO_PACOTE,
+                    OrcamentoModel::STATUS_PACOTE_APROVADO,
+                    OrcamentoModel::STATUS_PENDENTE,
+                ], true)
+            )
+            || (
+                $targetStatus === 'aguardando_reparo'
+                && in_array($orcamentoStatus, [
+                    OrcamentoModel::STATUS_APROVADO,
+                    OrcamentoModel::STATUS_CONVERTIDO,
+                ], true)
+            )
+        );
+        if ($shouldReopenCancelledLinkedOs) {
+            $forceStatusReset = true;
+        }
+        if (!$forceStatusReset && $statusFlowService->hasAdvancedPast($currentStatus, $targetStatus)) {
             return;
         }
 
         $estadoFluxo = $statusFlowService->resolveEstadoFluxo($targetStatus);
 
-        $db->table('os')
+        $builder = $db->table('os')
             ->where('id', $osId)
-            ->where('status <>', $targetStatus)
-            ->groupStart()
+            ->where('status <>', $targetStatus);
+
+        if (!$forceStatusReset) {
+            $builder->groupStart()
                 ->where('estado_fluxo IS NULL', null, false)
                 ->orWhereNotIn('estado_fluxo', ['encerrado', 'cancelado'])
-            ->groupEnd()
-            ->update([
-                'status' => $targetStatus,
-                'estado_fluxo' => $estadoFluxo,
-                'status_atualizado_em' => date('Y-m-d H:i:s'),
-            ]);
+            ->groupEnd();
+        }
+
+        $builder->update([
+            'status' => $targetStatus,
+            'estado_fluxo' => $estadoFluxo,
+            'status_atualizado_em' => date('Y-m-d H:i:s'),
+        ]);
     }
 
     /**
@@ -681,8 +726,7 @@ class Orcamento extends BaseController
         $numero = trim((string) ($orcamento['numero'] ?? ''));
         $numeroOs = trim((string) ($orcamento['numero_os'] ?? ''));
         $clienteNome = trim((string) ($orcamento['cliente_nome'] ?? $orcamento['cliente_nome_avulso'] ?? ''));
-        $statusLabels = $this->orcamentoModel->statusLabels();
-        $statusLabel = $statusLabels[$statusNovo] ?? ucfirst(str_replace('_', ' ', $statusNovo));
+        $statusLabel = $this->orcamentoModel->resolveStatusLabelFromRecord(array_merge($orcamento, ['status' => $statusNovo]));
 
         $title = match ($statusNovo) {
             OrcamentoModel::STATUS_APROVADO,
@@ -795,6 +839,12 @@ class Orcamento extends BaseController
             ->groupEnd();
 
         $row = $builder->first();
-        return $row ?: null;
+        if (!$row) {
+            return null;
+        }
+
+        $row['status_label'] = $this->orcamentoModel->resolveStatusLabelFromRecord($row);
+
+        return $row;
     }
 }

@@ -87,7 +87,11 @@ class OrcamentoLifecycleService
     private function processExpiredOrcamentos(string $today, ?int $usuarioId, array &$summary): int
     {
         $rows = $this->orcamentoModel
-            ->whereIn('status', [OrcamentoModel::STATUS_ENVIADO, OrcamentoModel::STATUS_AGUARDANDO])
+            ->whereIn('status', [
+                OrcamentoModel::STATUS_ENVIADO,
+                OrcamentoModel::STATUS_AGUARDANDO,
+                OrcamentoModel::STATUS_REENVIAR,
+            ])
             ->where('validade_data IS NOT NULL', null, false)
             ->where('validade_data <', $today)
             ->findAll(1000);
@@ -147,7 +151,11 @@ class OrcamentoLifecycleService
     private function processAguardandoFollowups(string $today, ?int $usuarioId): int
     {
         $rows = $this->orcamentoModel
-            ->whereIn('status', [OrcamentoModel::STATUS_AGUARDANDO, OrcamentoModel::STATUS_AGUARDANDO_PACOTE])
+            ->whereIn('status', [
+                OrcamentoModel::STATUS_AGUARDANDO,
+                OrcamentoModel::STATUS_REENVIAR,
+                OrcamentoModel::STATUS_AGUARDANDO_PACOTE,
+            ])
             ->where('validade_data IS NOT NULL', null, false)
             ->where('validade_data >=', $today)
             ->findAll(1000);
@@ -177,10 +185,14 @@ class OrcamentoLifecycleService
                 $origin,
                 $statusAtual === OrcamentoModel::STATUS_AGUARDANDO_PACOTE
                     ? ('Follow-up do pacote no orcamento ' . $numero)
-                    : ('Follow-up do orcamento ' . $numero),
+                    : ($statusAtual === OrcamentoModel::STATUS_REENVIAR
+                        ? ('Follow-up do orcamento revisado ' . $numero)
+                        : ('Follow-up do orcamento ' . $numero)),
                 $statusAtual === OrcamentoModel::STATUS_AGUARDANDO_PACOTE
                     ? ('Orcamento ' . $numero . ' aguarda escolha/aprovacao do nivel do pacote pelo cliente.')
-                    : ('Orcamento ' . $numero . ' segue aguardando resposta do cliente.'),
+                    : ($statusAtual === OrcamentoModel::STATUS_REENVIAR
+                        ? ('Orcamento ' . $numero . ' foi revisado e precisa ser reenviado ao cliente para nova aprovacao.')
+                        : ('Orcamento ' . $numero . ' segue aguardando aprovacao do cliente.')),
                 date('Y-m-d H:i:s', $schedule),
                 $usuarioId
             );

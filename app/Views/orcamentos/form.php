@@ -106,6 +106,29 @@ if (empty($itens)) {
                 </div>
             </div>
 
+            <div class="orc-form-tabs-wrap mb-3">
+                <ul class="nav nav-pills orc-form-tabs" id="orcamentoFormTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="orc-tab-cliente-tab" data-bs-toggle="pill" data-bs-target="#orc-tab-cliente" type="button" role="tab" aria-controls="orc-tab-cliente" aria-selected="true">Dados do cliente</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="orc-tab-equipamento-tab" data-bs-toggle="pill" data-bs-target="#orc-tab-equipamento" type="button" role="tab" aria-controls="orc-tab-equipamento" aria-selected="false">Dados do equipamento</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="orc-tab-operacional-tab" data-bs-toggle="pill" data-bs-target="#orc-tab-operacional" type="button" role="tab" aria-controls="orc-tab-operacional" aria-selected="false">Dados operacionais</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="orc-tab-pacotes-tab" data-bs-toggle="pill" data-bs-target="#orc-tab-pacotes" type="button" role="tab" aria-controls="orc-tab-pacotes" aria-selected="false">Pacotes de servico</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="orc-tab-orcamento-tab" data-bs-toggle="pill" data-bs-target="#orc-tab-orcamento" type="button" role="tab" aria-controls="orc-tab-orcamento" aria-selected="false">Orcamento e financeiro</button>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tab-content orc-form-tab-content" id="orcamentoFormTabContent">
+                <div class="tab-pane fade show active" id="orc-tab-cliente" role="tabpanel" aria-labelledby="orc-tab-cliente-tab" tabindex="0">
+
             <div class="card border-0 shadow-sm mb-3 orc-section-card">
                 <div class="card-header bg-transparent border-0 pb-0">
                     <h5 class="mb-0">Dados do Cliente</h5>
@@ -179,6 +202,9 @@ if (empty($itens)) {
                     </div>
                 </div>
             </div>
+                </div>
+
+                <div class="tab-pane fade" id="orc-tab-equipamento" role="tabpanel" aria-labelledby="orc-tab-equipamento-tab" tabindex="0">
 
             <?php
             $equipTipoSelecionado = (int) ($equipamentoManual['tipo_id'] ?? 0);
@@ -369,6 +395,9 @@ if (empty($itens)) {
                     </div>
                 </div>
             </div>
+                </div>
+
+                <div class="tab-pane fade" id="orc-tab-operacional" role="tabpanel" aria-labelledby="orc-tab-operacional-tab" tabindex="0">
 
             <div class="card border-0 shadow-sm mb-4 orc-section-card">
                 <div class="card-header bg-transparent border-0 pb-0">
@@ -487,6 +516,9 @@ if (empty($itens)) {
                     </div>
                 </div>
             </div>
+                </div>
+
+                <div class="tab-pane fade" id="orc-tab-pacotes" role="tabpanel" aria-labelledby="orc-tab-pacotes-tab" tabindex="0">
 
             <?php if ($pacoteOfertaModuleReady): ?>
                 <div class="card border-0 shadow-sm mb-3 orc-section-card" id="orcPacotebfertaCard">
@@ -612,7 +644,21 @@ if (empty($itens)) {
                         </fieldset>
                     </div>
                 </div>
+            <?php else: ?>
+                <div class="card border-0 shadow-sm mb-3 orc-section-card">
+                    <div class="card-header bg-transparent border-0 pb-0">
+                        <h5 class="mb-0">Pacotes de servico</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-light border mb-0">
+                            O modulo de oferta dinamica de pacote nao esta disponivel neste contexto.
+                        </div>
+                    </div>
+                </div>
             <?php endif; ?>
+                </div>
+
+                <div class="tab-pane fade" id="orc-tab-orcamento" role="tabpanel" aria-labelledby="orc-tab-orcamento-tab" tabindex="0">
 
             <div class="card border-0 shadow-sm mb-3 orc-section-card" id="orcSecaoItens">
                 <div class="card-header bg-transparent border-0 pb-0">
@@ -726,6 +772,8 @@ if (empty($itens)) {
                             <textarea class="form-control" name="motivo_rejeicao" rows="3"><?= esc((string) ($orcamento['motivo_rejeicao'] ?? '')) ?></textarea>
                         </div>
                     </div>
+                </div>
+            </div>
                 </div>
             </div>
 
@@ -4818,6 +4866,35 @@ if (empty($itens)) {
     font-size: 1rem;
     font-weight: 700;
 }
+.orc-form-tabs-wrap {
+    margin-bottom: 1rem;
+}
+.orc-form-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: .75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: .35rem;
+    scrollbar-width: thin;
+}
+.orc-form-tabs .nav-link {
+    white-space: nowrap;
+    border-radius: 999px;
+    border: 1px solid rgba(108, 99, 255, .18);
+    padding: .72rem 1rem;
+    color: #4b5563;
+    background: rgba(255, 255, 255, .86);
+    font-weight: 600;
+}
+.orc-form-tabs .nav-link.active {
+    background: linear-gradient(135deg, #6c63ff, #4f46e5);
+    color: #fff;
+    box-shadow: 0 14px 26px rgba(79, 70, 229, .18);
+}
+.orc-form-tab-content > .tab-pane {
+    min-height: 240px;
+}
 .orc-manual-locked .row.g-3 {
     opacity: .75;
 }
@@ -4891,6 +4968,13 @@ if (empty($itens)) {
     height: 36px;
 }
 @media (max-width: 430px) {
+    .orc-form-tabs {
+        gap: .5rem;
+    }
+    .orc-form-tabs .nav-link {
+        padding: .65rem .85rem;
+        font-size: .86rem;
+    }
     .orc-draft-alert .d-flex.flex-wrap.gap-2 {
         width: 100%;
     }
@@ -4945,11 +5029,19 @@ if (empty($itens)) {
     }
 }
 @media (max-width: 390px) {
+    .orc-form-tabs .nav-link {
+        font-size: .82rem;
+        padding: .6rem .78rem;
+    }
     #orcamentoItensTable tbody td::before {
         min-width: 80px;
     }
 }
 @media (max-width: 360px) {
+    .orc-form-tabs .nav-link {
+        font-size: .8rem;
+        padding: .56rem .72rem;
+    }
     #orcamentoItensTable tbody td {
         padding: .55rem .6rem;
     }
@@ -4962,6 +5054,9 @@ if (empty($itens)) {
     }
 }
 @media (max-width: 320px) {
+    .orc-form-tabs .nav-link {
+        font-size: .76rem;
+    }
     #orcamentoItensTable tbody td {
         gap: .5rem;
         padding: .5rem;

@@ -1,7 +1,7 @@
 ﻿# Historico de Versoes do Sistema
 
-Atualizado em: 28/04/2026  
-Versao atual oficial: `2.16.17`
+Atualizado em: 29/04/2026  
+Versao atual oficial: `2.16.38`
 
 ## Observacao sobre o App Mobile/PWA
 
@@ -20,6 +20,149 @@ Estado documental atual do app:
 - documentacao exclusiva aprofundada em 04/04/2026
 
 ## Release ERP + App
+
+### 29/04/2026 - v2.16.38 / app 0.4.2
+- reforcada a responsividade das abas da tela `Visualizar Orcamento` para manter todos os destinos visiveis dentro da largura da tela, sem quebra de linha e sem barra de rolagem aparente;
+- `app/Views/orcamentos/show.php` passou a distribuir as abas com largura fluida e a trocar os rotulos completos por versoes curtas ou micro em breakpoints menores;
+- o componente continua seguindo o design system com linha unica, mas agora evita que as ultimas abas fiquem cortadas em viewports compactos;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.38`.
+
+### 29/04/2026 - v2.16.37 / app 0.4.2
+- ocultada a barra de rolagem horizontal visivel das abas da tela `Visualizar Orcamento`, mantendo o componente em linha unica no padrao do design system;
+- reforcado o override local em `app/Views/orcamentos/show.php` para superar a regra global `ds-tabs-scroll` sem remover a navegacao horizontal quando ela for necessaria;
+- eliminado o espacamento inferior herdado do trilho de scroll, deixando a navegacao mais limpa visualmente;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.37`.
+
+### 29/04/2026 - v2.16.36 / app 0.4.2
+- realinhada a navegacao da tela `Visualizar Orcamento` ao design system do projeto, removendo a quebra em multiplas linhas das abas;
+- `app/Views/orcamentos/show.php` passou a usar `nav-tabs nav-fill ds-tabs-scroll`, no mesmo padrao ja empregado em outras telas do ERP;
+- as abas continuam responsivas, mas agora preservam linha unica com scroll horizontal do componente em vez de empilhar em grade;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.36`.
+
+### 29/04/2026 - v2.16.35 / app 0.4.2
+- melhorada a responsividade das abas da tela `Visualizar Orcamento` para evitar barra de rolagem horizontal;
+- `app/Views/orcamentos/show.php` passou a distribuir as abas em grade responsiva, com duas colunas em telas compactas e uma coluna em `<= 360px`;
+- os rotulos das abas agora aceitam quebra de linha controlada e largura total do botao, preservando leitura e toque em mobile;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.35`.
+
+### 29/04/2026 - v2.16.34 / app 0.4.2
+- corrigido o modal `Atualizar prazos da OS` na listagem `/os`, que estava falhando por exigir `motivo_alteracao` sem oferecer campo na interface;
+- `app/Views/os/index.php` passou a exibir `Motivo da alteracao` e, quando necessario, a area de `Autorizacao administrativa`;
+- `public/assets/js/os-list-filters.js` passou a enviar motivo, data de entrada, data de entrega e credenciais administrativas no fluxo AJAX de prazos;
+- `app/Controllers/Os.php` ganhou fallback para reutilizar as datas atuais da OS quando o POST vier incompleto, deixando o endpoint mais resiliente;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.34`.
+
+### 29/04/2026 - v2.16.33 / app 0.4.2
+- complementada a tela `Visualizar Orcamento` com a aba dedicada `Envio do orcamento`, separando PDF, WhatsApp e e-mail da aba de itens;
+- `app/Views/orcamentos/show.php` passou a exibir a navegacao `Envio do orcamento` entre `Pacotes de servico` e `Orcamento`;
+- a aba `Orcamento` ficou focada em itens, historico de status e rastreabilidade, enquanto o disparo ao cliente ganhou contexto proprio;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.33`.
+
+### 29/04/2026 - v2.16.32 / app 0.4.2
+- refinado o formulario `Novo Orcamento` e `Editar Orcamento` para unificar `Orcamento` e `Financeiro do orcamento` em uma unica aba;
+- `app/Views/orcamentos/form.php` passou a exibir a navegacao `Orcamento e financeiro`, mantendo os cards de itens e totalizacao no mesmo `tab-pane`;
+- o ajuste reduz troca de abas no fechamento comercial sem alterar IDs, calculos ou o comportamento de salvar;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.32`.
+
+### 29/04/2026 - v2.16.31 / app 0.4.2
+- reorganizado o formulario `Novo Orcamento` e `Editar Orcamento` em abas para separar cliente, equipamento, dados operacionais, pacotes de servico, itens do orcamento e financeiro;
+- `app/Views/orcamentos/form.php` passou a usar `nav-pills` horizontais com suporte a scroll em mobile, mantendo os mesmos IDs e hooks do JavaScript existente;
+- a aba `Pacotes de servico` agora tambem exibe estado vazio quando o modulo de oferta dinamica nao estiver ativo naquele contexto;
+- a organizacao visual reduz a rolagem longa do formulario sem alterar o fluxo de salvar, recalcular itens, vincular OS ou detectar oferta de pacote;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.31`.
+
+### 29/04/2026 - v2.16.30 / app 0.4.2
+- reorganizada a tela `Visualizar Orcamento` em abas para separar cliente, equipamento, dados operacionais, pacotes de servico, orcamento e financeiro;
+- `app/Views/orcamentos/show.php` ganhou um card de visao geral no topo e uma navegacao por abas com suporte responsivo a telas compactas;
+- o backend passou a fornecer `equipamentoView` consolidado em `app/Controllers/Orcamentos.php`, permitindo exibir tipo, marca, modelo, cor e foto principal em uma aba dedicada;
+- os fluxos ja existentes de PDF, WhatsApp, e-mail, historico de status e rastreabilidade foram preservados dentro da nova organizacao visual;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.30`.
+
+### 29/04/2026 - v2.16.29 / app 0.4.2
+- ajustado o pos-envio do orcamento revisado para que `reenviar_orcamento` funcione apenas como estado preparatorio antes do disparo ao cliente;
+- depois de enviar por WhatsApp ou e-mail, o backend agora move o registro para `aguardando_resposta`, exibido ao operador com a label `Aguardando aprovacao`;
+- `app/Controllers/Orcamentos.php` passou a considerar `STATUS_REENVIAR` no `markAsDispatched()`, evitando que o status fique preso em `Reenviar orcamento` apos o envio real;
+- a terminologia visivel do status de espera foi alinhada em `app/Models/OrcamentoModel.php` e nos textos auxiliares do lifecycle;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.29`.
+
+### 29/04/2026 - v2.16.28 / app 0.4.2
+- complementada a regra de reenvio para que orcamentos com status `convertido` tambem abram nova rodada de aprovacao quando sofrerem edicao com mudancas relevantes;
+- `app/Models/OrcamentoModel.php` passou a incluir `convertido` em `requiresReapprovalAfterEdit()`;
+- `app/Services/OrcamentoService.php` passou a aceitar a transicao `convertido -> reenviar_orcamento`, destravando o salvamento da nova rodada;
+- com isso, um orcamento convertido editado volta para `reenviar_orcamento`, incrementa a `versao` e reutiliza o mesmo registro para nova autorizacao do cliente;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.28`.
+
+### 29/04/2026 - v2.16.27 / app 0.4.2
+- liberada a edicao direta de orcamentos com status `convertido`, tanto na tela `Visualizar Orcamento` quanto no painel de orcamento embutido da OS;
+- `app/Models/OrcamentoModel.php` deixou de marcar `convertido` como status travado para o formulario;
+- `app/Views/orcamentos/show.php` voltou a exibir o botao `Editar` nesse estado e manteve o aviso contextual de que os ajustes continuam no mesmo registro;
+- a operacao passa a permitir correcao de conteudo em orcamentos ja convertidos sem criar revisao automatica nem abrir apenas modo de consulta;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.27`.
+
+### 29/04/2026 - v2.16.26 / app 0.4.2
+- complementada a sincronizacao entre Orcamentos e OS para o caso em que a OS ainda permanecia `cancelado` mesmo depois da nova aprovacao do cliente;
+- alem da reabertura em `aguardando_autorizacao`, o backend agora tambem retira a OS de `cancelado` quando o orcamento revisado chega a `aprovado` ou `convertido`;
+- com isso, uma OS cancelada vinculada a um orcamento em `2ª aprovacao`, `3ª aprovacao` ou rodada equivalente volta a seguir corretamente para `aguardando_reparo`;
+- o ajuste foi aplicado em `app/Controllers/Orcamentos.php` e `app/Controllers/Orcamento.php`, cobrindo fluxo interno e resposta pelo link publico;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.26`.
+
+### 29/04/2026 - v2.16.25 / app 0.4.2
+- corrigida a sincronizacao entre Orcamentos e OS para o caso pratico em que uma OS ja estava `cancelado`, mas o orcamento foi alterado e reenviado ao cliente;
+- a reabertura da OS agora tambem acontece quando o orcamento entra novamente em estados comerciais ativos de autorizacao, como `pendente_envio`, `enviado`, `aguardando_resposta`, `reenviar_orcamento`, `aguardando_pacote` e `pendente`;
+- com isso, a OS vinculada volta de `cancelado` para `aguardando_autorizacao` assim que uma nova rodada comercial valida for recolocada em andamento;
+- o ajuste foi aplicado em `app/Controllers/Orcamentos.php` e `app/Controllers/Orcamento.php`, cobrindo tanto envio interno quanto resposta por link publico;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.25`.
+
+### 28/04/2026 - v2.16.24 / app 0.4.2
+- corrigido o erro JavaScript `discrepancias is not defined` na sincronizacao legada do checklist de entrada da OS;
+- esse erro interrompia a execucao do script da tela `/os/editar/{id}` antes do bind do botao `Editar` do cliente, fazendo a acao parecer inoperante;
+- a funcao `buildLegacyEstadoFisicoFromChecklist()` passou a usar identificador ASCII consistente, restaurando a inicializacao completa da aba `Cliente`;
+- o fechamento do modal rapido de cliente tambem passou a mover o foco para fora da janela antes do `dismiss`, reduzindo o warning de `aria-hidden` com elemento descendente focado;
+- a documentacao funcional do fluxo de edicao rapida do cliente foi atualizada para registrar o hotfix de runtime;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.24`.
+
+### 28/04/2026 - v2.16.23 / app 0.4.2
+- corrigido o fluxo do botao `Editar` na aba `Cliente` da OS, que podia nao abrir modal algum mesmo com cliente selecionado;
+- o modal de edicao agora abre imediatamente com os dados ja disponiveis no Select2 e depois complementa os campos por AJAX;
+- foi criada a rota `GET /clientes/json-edicao/{id}` com permissao `clientes:editar`, evitando dependencia indevida da permissao de visualizacao para carregar o cliente no contexto da OS;
+- em falhas de leitura detalhada, o modal permanece aberto e exibe aviso contextual, sem deixar o operador com a impressao de clique sem efeito;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.23`.
+
+### 28/04/2026 - v2.16.22 / app 0.4.2
+- a aba `Cliente` do formulario de OS passou a manter um botao `Editar` visivel ao lado do seletor principal, habilitando a edicao do cliente em modal no mesmo fluxo de atendimento;
+- o botao permanece desabilitado quando nao existe cliente selecionado e passa a abrir o modal rapido assim que um cliente valido esta vinculado na OS;
+- foi criada a rota `POST /clientes/atualizar_ajax/{id}` para separar a atualizacao rapida em modal do endpoint de criacao, respeitando a permissao `clientes:editar`;
+- apos salvar o cliente pelo modal, o Select2 da OS e o resumo do cliente continuam sendo atualizados sem refresh manual;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.22`.
+
+### 28/04/2026 - v2.16.21 / app 0.4.2
+- corrigida a exibicao do card `Historico de status` na tela `Visualizar Orcamento`, que podia mostrar `Sem historico de status` mesmo com registros existentes em `orcamento_status_historico`;
+- a view `app/Views/orcamentos/show.php` voltou a mapear corretamente o array de timeline carregado pelo controller;
+- a documentacao funcional do modulo de Orcamentos foi sincronizada com a correcao do painel de historico;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.21`.
+
+### 28/04/2026 - v2.16.20 / app 0.4.2
+- o modulo de Orcamentos passou a validar se o ultimo PDF gerado ainda corresponde ao estado atual do orcamento antes de reutilizar o arquivo em download, envio por e-mail ou envio por WhatsApp;
+- quando o orcamento estiver mais novo que o PDF registrado, o sistema agora regenera o documento automaticamente para refletir status, versao, itens, valores e demais alteracoes recentes;
+- o atalho `Baixar ultimo arquivo` da tela de visualizacao deixa de aparecer quando o arquivo salvo estiver defasado em relacao ao orcamento atual;
+- a documentacao funcional do modulo foi sincronizada com essa regra de regeneracao automatica;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.20`.
+
+### 28/04/2026 - v2.16.19 / app 0.4.2
+- corrigida a excecao `Undefined variable $currentItems` no fluxo `Orcamentos::update()`, que podia quebrar a edicao de orcamentos durante a nova logica de reaprovacao no mesmo registro;
+- o snapshot dos itens atuais do orcamento voltou a ser carregado no ponto correto da atualizacao, permitindo comparar alteracoes e abrir a rodada `reenviar_orcamento` sem erro de execucao;
+- a documentacao do modulo de Orcamentos foi sincronizada com a estabilizacao do fluxo;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.19`.
+
+### 28/04/2026 - v2.16.18 / app 0.4.2
+- o modulo de Orcamentos deixou de criar um novo registro de revisao quando um orcamento aprovado precisa ser alterado e reenviado ao cliente;
+- a nova rodada comercial passou a acontecer no mesmo `orcamentos.id`, com historico salvo em `orcamento_status_historico` e incremento de `versao` apenas quando o documento sai de um estado aprovado para nova aprovacao;
+- foi criado o status `reenviar_orcamento`, usado para orcamentos aprovados que sofreram alteracoes e precisam de nova validacao do cliente;
+- quando a nova rodada e aprovada, o sistema passou a expor label dinamica no status, como `2ª aprovacao` e `3ª aprovacao`, mantendo o mesmo registro;
+- a resposta publica do cliente agora aceita esse novo ciclo de reaprovacao sem exigir novo token ou duplicacao do orcamento;
+- a OS vinculada passa a voltar para `aguardando_autorizacao` quando o orcamento entra em `reenviar_orcamento`, vai para `cancelado` quando o cliente rejeita e segue para `aguardando_reparo` quando o cliente aprova;
+- as telas `Orcamentos`, `Orcamento publico` e os badges auxiliares de `/os` foram ajustados para refletir a nova nomenclatura e o novo fluxo;
+- versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.18`.
 
 ### 28/04/2026 - v2.16.17 / app 0.4.2
 - o dropdown `Imprimir` da visualizacao da OS passou a tratar `Bobina 80mm` como fluxo direto, abrindo o documento termico ja com disparo automatico da caixa de dialogo de impressao do sistema operacional;

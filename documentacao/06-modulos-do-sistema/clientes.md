@@ -77,6 +77,45 @@ Arquivo principal: `app/Controllers/Clientes.php`
 - O card de resumo do cliente e a listagem pai em modo embed sao sincronizados sem refresh completo.
 - O cadastro rapido e o formulario principal compartilham o mesmo comportamento automatico de CEP.
 
+## Integracao n8n por telefone
+
+O novo workflow `documentacao/10-deploy/n8n/atendimento-clientes-whatsapp-ai-clientes.json` consulta a tabela `clientes` pelo telefone recebido no WhatsApp.
+
+Campos considerados na busca:
+
+- `telefone1`
+- `telefone2`
+- `telefone_contato`
+
+Campos usados para montar contexto da resposta:
+
+- `id`
+- `nome_razao`
+- `email`
+- `nome_contato`
+- `cidade`
+- `uf`
+- `observacoes`
+
+Regra operacional:
+
+- o telefone inbound e normalizado em digitos;
+- o workflow compara tanto o numero com DDI `55` quanto a versao sem DDI;
+- se nao houver cliente localizado, a IA deve pedir o nome completo antes de prosseguir o atendimento.
+
+## Integracao com Evolution e Central de Mensagens
+
+Mesmo quando o provider direto do ERP for `evolution`, a tabela `clientes` continua sendo a referencia operacional para:
+- localizar cadastro por telefone;
+- sugerir `cliente_id` na conversa WhatsApp;
+- vincular OS aberta mais recente do cliente;
+- enriquecer atendimento humano ou IA com nome, cidade, UF e observacoes.
+
+Regra de busca consolidada:
+- o parser da Central normaliza o telefone para digitos;
+- o lookup do cliente considera equivalencia pratica entre numero salvo com `55` e sem `55`;
+- quando a Evolution informar o mesmo contato via app oficial ou webhook externo, a thread continua ligada ao mesmo cliente desde que o telefone coincida.
+
 ## Edicao rapida a partir da OS
 
 Nas releases `2.16.22` e `2.16.23`, o formulario de OS passou a expor e estabilizar o botao `Editar` ao lado do seletor de cliente sempre que o perfil possui permissao de editar clientes.

@@ -17,6 +17,7 @@ use App\Models\WhatsappInboundModel;
 use App\Services\ChatbotService;
 use App\Services\Mobile\MobileNotificationService;
 use App\Services\Mobile\MobilePermissionService;
+use App\Services\WhatsApp\EvolutionApiProvider;
 use CodeIgniter\HTTP\Files\UploadedFile;
 
 class CentralMensagensService
@@ -156,12 +157,15 @@ class CentralMensagensService
             'sent_by_me',
             'sentByMe',
             'self',
+            'key.fromMe',
             'data.from_me',
             'data.fromMe',
             'data.outbound',
             'data.is_outbound',
             'data.sent_by_me',
             'data.self',
+            'data.key.fromMe',
+            'data.data.key.fromMe',
         ]);
         if ($explicit !== null) {
             return $explicit;
@@ -297,6 +301,13 @@ class CentralMensagensService
             return null;
         }
 
+        $provider = trim($provider);
+        if ($provider === 'evolution_api') {
+            $provider = 'evolution';
+        } elseif ($provider === 'local_node') {
+            $provider = 'api_whats_local';
+        }
+
         $isOutbound = $this->inferOutboundFromPayload($payload);
 
         $from = $this->payloadPathString($payload, [
@@ -312,6 +323,9 @@ class CentralMensagensService
             'contact.phone',
             'contact.number',
             'contact.jid',
+            'key.remoteJid',
+            'participant',
+            'key.participant',
             'data.from',
             'data.sender',
             'data.remetente',
@@ -324,6 +338,11 @@ class CentralMensagensService
             'data.contact.phone',
             'data.contact.number',
             'data.contact.jid',
+            'data.key.remoteJid',
+            'data.participant',
+            'data.key.participant',
+            'data.data.key.remoteJid',
+            'data.data.participant',
         ]);
         $to = $this->payloadPathString($payload, [
             'to',
@@ -331,11 +350,14 @@ class CentralMensagensService
             'destinatario',
             'phone_to',
             'target',
+            'key.remoteJid',
             'data.to',
             'data.recipient',
             'data.destinatario',
             'data.phone_to',
             'data.target',
+            'data.key.remoteJid',
+            'data.data.key.remoteJid',
         ]);
 
         $phoneRef = $isOutbound ? $to : $from;
@@ -349,6 +371,9 @@ class CentralMensagensService
                 'telefone',
                 'phone',
                 'jid',
+                'key.remoteJid',
+                'participant',
+                'key.participant',
                 'contact.phone',
                 'contact.number',
                 'data.chat_id',
@@ -359,8 +384,13 @@ class CentralMensagensService
                 'data.telefone',
                 'data.phone',
                 'data.jid',
+                'data.key.remoteJid',
+                'data.participant',
+                'data.key.participant',
                 'data.contact.phone',
                 'data.contact.number',
+                'data.data.key.remoteJid',
+                'data.data.participant',
             ]);
         }
 
@@ -372,6 +402,16 @@ class CentralMensagensService
             'conteudo',
             'caption',
             'description',
+            'message.conversation',
+            'message.extendedTextMessage.text',
+            'message.imageMessage.caption',
+            'message.videoMessage.caption',
+            'message.documentMessage.caption',
+            'message.documentWithCaptionMessage.message.documentMessage.caption',
+            'message.buttonsResponseMessage.selectedDisplayText',
+            'message.listResponseMessage.title',
+            'message.listResponseMessage.singleSelectReply.selectedRowId',
+            'message.templateButtonReplyMessage.selectedDisplayText',
             'content.text',
             'content.message',
             'data.message',
@@ -381,18 +421,42 @@ class CentralMensagensService
             'data.conteudo',
             'data.caption',
             'data.description',
+            'data.message.conversation',
+            'data.message.extendedTextMessage.text',
+            'data.message.imageMessage.caption',
+            'data.message.videoMessage.caption',
+            'data.message.documentMessage.caption',
+            'data.message.documentWithCaptionMessage.message.documentMessage.caption',
+            'data.message.buttonsResponseMessage.selectedDisplayText',
+            'data.message.listResponseMessage.title',
+            'data.message.listResponseMessage.singleSelectReply.selectedRowId',
+            'data.message.templateButtonReplyMessage.selectedDisplayText',
             'data.content.text',
             'data.content.message',
+            'data.data.message.conversation',
+            'data.data.message.extendedTextMessage.text',
         ]);
         $mimeType = strtolower($this->payloadPathString($payload, [
             'media_mime_type',
             'mime_type',
             'mime',
             'mimetype',
+            'message.imageMessage.mimetype',
+            'message.videoMessage.mimetype',
+            'message.audioMessage.mimetype',
+            'message.documentMessage.mimetype',
+            'message.documentWithCaptionMessage.message.documentMessage.mimetype',
             'data.media_mime_type',
             'data.mime_type',
             'data.mime',
             'data.mimetype',
+            'data.message.imageMessage.mimetype',
+            'data.message.videoMessage.mimetype',
+            'data.message.audioMessage.mimetype',
+            'data.message.documentMessage.mimetype',
+            'data.message.documentWithCaptionMessage.message.documentMessage.mimetype',
+            'data.data.message.imageMessage.mimetype',
+            'data.data.message.documentMessage.mimetype',
         ]));
         $mediaBase64 = $this->payloadPathString($payload, [
             'media_base64',
@@ -409,12 +473,17 @@ class CentralMensagensService
             'filename',
             'file_name',
             'name',
+            'message.documentMessage.fileName',
+            'message.documentWithCaptionMessage.message.documentMessage.fileName',
             'media.filename',
             'data.media_filename',
             'data.filename',
             'data.file_name',
             'data.name',
             'data.media.filename',
+            'data.message.documentMessage.fileName',
+            'data.message.documentWithCaptionMessage.message.documentMessage.fileName',
+            'data.data.message.documentMessage.fileName',
         ]);
         $tipoConteudoPayload = strtolower($this->payloadPathString($payload, [
             'tipo_conteudo',
@@ -426,6 +495,9 @@ class CentralMensagensService
             'data.message_type',
             'data.media_type',
         ]));
+        if ($tipoConteudoPayload === '') {
+            $tipoConteudoPayload = $this->inferStructuredMessageType($payload);
+        }
         $hasMedia = $this->payloadPathBool($payload, [
             'has_media',
             'hasMedia',
@@ -433,7 +505,7 @@ class CentralMensagensService
             'data.has_media',
             'data.hasMedia',
             'data.media',
-        ]) === true || $mediaBase64 !== '' || $mimeType !== '';
+        ]) === true || $mediaBase64 !== '' || $mimeType !== '' || in_array($tipoConteudoPayload, ['imagem', 'video', 'audio', 'ptt', 'voice_note', 'pdf', 'arquivo'], true);
 
         if ($hasMedia && $message !== '') {
             $messageCompact = preg_replace('/\s+/', '', $message) ?? '';
@@ -587,9 +659,20 @@ class CentralMensagensService
 
         $cliente = $this->findClienteByPhone($phone);
         $clienteId = $cliente ? (int) $cliente['id'] : null;
-        $osId = $clienteId ? $this->findOpenOsByCliente($clienteId) : null;
         $profileName = $this->extractProfileNameFromPayload($payload);
-        $nomeContato = $cliente['nome_razao'] ?? $profileName ?? null;
+        $remoteJid = $this->extractRemoteJidFromPayload($payload);
+        $contato = $this->resolveContatoByPhone($phone, $profileName, $clienteId, [
+            'remote_jid' => $remoteJid,
+        ]);
+        if ($provider === 'evolution' && $contato) {
+            $contato = $this->syncEvolutionContatoAvatar($contato, $phone, $remoteJid);
+        }
+        if (!$clienteId && $contato && (int) ($contato['cliente_id'] ?? 0) > 0) {
+            $clienteId = (int) $contato['cliente_id'];
+            $cliente = $this->clienteModel->find($clienteId);
+        }
+        $osId = $clienteId ? $this->findOpenOsByCliente($clienteId) : null;
+        $nomeContato = $cliente['nome_razao'] ?? $profileName ?? ($contato['nome'] ?? $contato['whatsapp_nome_perfil'] ?? null);
         $conversa = $this->resolveConversationForOutgoing($phone, $clienteId, $osId, $provider, $nomeContato);
         $conversaId = (int) ($conversa['id'] ?? 0) ?: null;
         $mediaSaved = $hasMedia ? $this->saveInboundMedia($mediaBase64, $mimeType, $mediaFilename, $phone) : null;
@@ -662,7 +745,10 @@ class CentralMensagensService
                 'ultima_mensagem_em' => date('Y-m-d H:i:s'),
                 'primeira_mensagem_em' => (empty($conversa['primeira_mensagem_em']) ? date('Y-m-d H:i:s') : $conversa['primeira_mensagem_em']),
             ];
-            if (!$isOutbound) {
+            if ($isOutbound) {
+                $updateConversa['automacao_ativa'] = 0;
+                $updateConversa['aguardando_humano'] = 1;
+            } else {
                 $updateConversa['nao_lidas'] = (int) ($conversa['nao_lidas'] ?? 0) + 1;
                 if ($statusAtualConversa === 'resolvida') {
                     $updateConversa['status'] = 'aberta';
@@ -838,9 +924,16 @@ class CentralMensagensService
         ]);
 
         if ($conversaId) {
-            $this->conversaModel->update($conversaId, [
+            $isBot = !empty($payload['enviada_por_bot']);
+            $updateConversa = [
                 'ultima_mensagem_em' => date('Y-m-d H:i:s'),
-            ]);
+            ];
+            if (!empty($payload['ok']) && !$isBot) {
+                $updateConversa['automacao_ativa'] = 0;
+                $updateConversa['aguardando_humano'] = 1;
+            }
+
+            $this->conversaModel->update($conversaId, $updateConversa);
         }
 
         $this->registerCrmMensagem([
@@ -1193,6 +1286,10 @@ class CentralMensagensService
     private function syncGatewayHistoryIfNeeded(bool $force = false): int
     {
         $provider = trim((string) get_config('whatsapp_direct_provider', get_config('whatsapp_provider', 'menuia')));
+        if ($provider === 'evolution') {
+            return $this->syncEvolutionHistoryIfNeeded($force);
+        }
+
         if (!in_array($provider, ['api_whats_local', 'local_node', 'api_whats_linux'], true)) {
             return 0;
         }
@@ -1302,6 +1399,309 @@ class CentralMensagensService
         return $count;
     }
 
+    private function syncEvolutionHistoryIfNeeded(bool $force = false): int
+    {
+        $baseUrl = trim((string) get_config('whatsapp_evolution_url', ''));
+        $apiKey = trim((string) get_config('whatsapp_evolution_apikey', ''));
+        $instance = trim((string) get_config('whatsapp_evolution_instance', ''));
+        $timeout = max(5, (int) get_config('whatsapp_evolution_timeout', 20));
+
+        if ($baseUrl === '' || $apiKey === '' || $instance === '') {
+            return 0;
+        }
+
+        $syncCacheKey = 'cm_evolution_history_sync_at';
+        $cursorCacheKey = 'cm_evolution_history_last_ts';
+        $now = time();
+        $lastProcessedTs = 0;
+
+        try {
+            $cache = cache();
+            if ($cache) {
+                $lastProcessedTs = (int) ($cache->get($cursorCacheKey) ?? 0);
+                $lastSyncAt = (int) ($cache->get($syncCacheKey) ?? 0);
+                if (!$force && $lastSyncAt > 0 && ($now - $lastSyncAt) < 12) {
+                    return 0;
+                }
+                $cache->save($syncCacheKey, $now, 30);
+            }
+        } catch (\Throwable $e) {
+            // segue sem cache caso o servico esteja indisponivel
+        }
+
+        try {
+            $provider = new EvolutionApiProvider($baseUrl, $apiKey, $instance, $timeout);
+            $result = $provider->fetchChats();
+        } catch (\Throwable $e) {
+            log_message('warning', 'CentralMensagens evolution sync falhou: ' . $e->getMessage());
+            return 0;
+        }
+
+        if (empty($result['ok'])) {
+            return 0;
+        }
+
+        $response = $result['response'] ?? [];
+        $chats = [];
+        if (is_array($response)) {
+            if (array_is_list($response)) {
+                $chats = $response;
+            } elseif (isset($response['items']) && is_array($response['items'])) {
+                $chats = $response['items'];
+            }
+        }
+
+        if (empty($chats)) {
+            return 0;
+        }
+
+        $candidateChats = array_values(array_filter($chats, fn ($chat) => is_array($chat) && $this->isEvolutionSyncCandidate($chat)));
+        usort($candidateChats, function (array $a, array $b): int {
+            $aTs = $this->extractEvolutionChatTimestamp($a);
+            $bTs = $this->extractEvolutionChatTimestamp($b);
+            return $bTs <=> $aTs;
+        });
+
+        $candidateChats = array_slice($candidateChats, 0, $force ? 80 : 35);
+        if (empty($candidateChats)) {
+            return 0;
+        }
+
+        $thresholdTs = $force
+            ? ($now - 86400)
+            : max($now - 21600, $lastProcessedTs > 0 ? ($lastProcessedTs - 180) : 0);
+
+        $highestProcessedTs = $lastProcessedTs;
+        $count = 0;
+
+        foreach ($candidateChats as $chat) {
+            $messageTs = $this->extractEvolutionChatTimestamp($chat);
+            if (!$force && $messageTs > 0 && $messageTs < $thresholdTs) {
+                continue;
+            }
+
+            $payload = $this->buildEvolutionPayloadFromChat($chat);
+            if ($payload === null) {
+                continue;
+            }
+
+            $messageId = trim((string) ($payload['message_id'] ?? ''));
+            if ($messageId !== '' && $this->hasMessageAlreadyRegistered('evolution', $messageId)) {
+                if ($messageTs > $highestProcessedTs) {
+                    $highestProcessedTs = $messageTs;
+                }
+                continue;
+            }
+
+            $registered = $this->registerInboundFromPayload($payload, 'evolution');
+            if ($registered) {
+                $count++;
+            }
+
+            if ($messageTs > $highestProcessedTs) {
+                $highestProcessedTs = $messageTs;
+            }
+        }
+
+        if ($highestProcessedTs > 0) {
+            try {
+                $cache = cache();
+                if ($cache) {
+                    $cache->save($cursorCacheKey, $highestProcessedTs, 86400 * 7);
+                }
+            } catch (\Throwable $e) {
+                // segue sem cache persistido
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * @param array<string,mixed> $chat
+     */
+    private function isEvolutionSyncCandidate(array $chat): bool
+    {
+        $lastMessage = $chat['lastMessage'] ?? null;
+        if (!is_array($lastMessage) || empty($lastMessage)) {
+            return false;
+        }
+
+        $key = is_array($lastMessage['key'] ?? null) ? $lastMessage['key'] : [];
+        $remoteJid = trim((string) (
+            $key['remoteJidAlt']
+            ?? $chat['remoteJidAlt']
+            ?? $key['remoteJid']
+            ?? $chat['remoteJid']
+            ?? ''
+        ));
+        if ($remoteJid === '') {
+            return false;
+        }
+
+        $normalized = strtolower($remoteJid);
+        if (
+            str_contains($normalized, '@g.us')
+            || str_contains($normalized, 'status@broadcast')
+            || str_contains($normalized, '@newsletter')
+            || str_contains($normalized, '@broadcast')
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array<string,mixed> $chat
+     */
+    private function extractEvolutionChatTimestamp(array $chat): int
+    {
+        $lastMessage = is_array($chat['lastMessage'] ?? null) ? $chat['lastMessage'] : [];
+        $timestamp = (int) ($lastMessage['messageTimestamp'] ?? 0);
+        if ($timestamp > 0) {
+            return $timestamp;
+        }
+
+        $updatedAt = trim((string) ($chat['updatedAt'] ?? ''));
+        if ($updatedAt !== '') {
+            $parsed = strtotime($updatedAt);
+            if ($parsed !== false) {
+                return (int) $parsed;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * @param array<string,mixed> $chat
+     * @return array<string,mixed>|null
+     */
+    private function buildEvolutionPayloadFromChat(array $chat): ?array
+    {
+        $lastMessage = is_array($chat['lastMessage'] ?? null) ? $chat['lastMessage'] : null;
+        if (!$lastMessage) {
+            return null;
+        }
+
+        $key = is_array($lastMessage['key'] ?? null) ? $lastMessage['key'] : [];
+        $messageId = trim((string) ($key['id'] ?? $lastMessage['id'] ?? ''));
+        if ($messageId === '') {
+            return null;
+        }
+
+        $remoteJid = trim((string) (
+            $key['remoteJidAlt']
+            ?? $chat['remoteJidAlt']
+            ?? $key['remoteJid']
+            ?? $chat['remoteJid']
+            ?? ''
+        ));
+        if ($remoteJid === '') {
+            return null;
+        }
+
+        $fromMe = (bool) ($key['fromMe'] ?? false);
+        $messageType = trim((string) ($lastMessage['messageType'] ?? 'conversation'));
+        $messageBody = is_array($lastMessage['message'] ?? null) ? $lastMessage['message'] : [];
+        $text = $this->extractEvolutionMessageText($messageBody);
+        if ($text === '') {
+            $text = $this->fallbackEvolutionMessageLabel($messageType);
+        }
+
+        $payload = [
+            'message_id' => $messageId,
+            'from_me' => $fromMe,
+            'fromMe' => $fromMe,
+            'key' => [
+                'id' => $messageId,
+                'fromMe' => $fromMe,
+                'remoteJid' => $remoteJid,
+            ],
+            'phone' => $remoteJid,
+            'jid' => $remoteJid,
+            'message' => $text,
+            'text' => $text,
+            'type' => $messageType,
+            'message_type' => $messageType,
+            'pushName' => trim((string) ($lastMessage['pushName'] ?? $chat['pushName'] ?? $chat['profileName'] ?? '')),
+            'profilePicUrl' => trim((string) ($chat['profilePicUrl'] ?? '')),
+            'messageTimestamp' => (int) ($lastMessage['messageTimestamp'] ?? 0),
+            'source' => trim((string) ($lastMessage['source'] ?? '')),
+        ];
+
+        if (!empty($key['participant'])) {
+            $payload['key']['participant'] = trim((string) $key['participant']);
+        }
+
+        if ($fromMe) {
+            $payload['to'] = $remoteJid;
+        } else {
+            $payload['from'] = $remoteJid;
+        }
+
+        return $payload;
+    }
+
+    /**
+     * @param array<string,mixed> $message
+     */
+    private function extractEvolutionMessageText(array $message): string
+    {
+        return $this->payloadPathString($message, [
+            'conversation',
+            'extendedTextMessage.text',
+            'imageMessage.caption',
+            'videoMessage.caption',
+            'documentMessage.caption',
+            'documentWithCaptionMessage.message.documentMessage.caption',
+            'buttonsResponseMessage.selectedDisplayText',
+            'listResponseMessage.title',
+            'listResponseMessage.singleSelectReply.selectedRowId',
+            'templateButtonReplyMessage.selectedDisplayText',
+        ], '');
+    }
+
+    private function fallbackEvolutionMessageLabel(string $messageType): string
+    {
+        $normalized = strtolower(trim($messageType));
+
+        return match (true) {
+            str_contains($normalized, 'image') => '[Imagem recebida]',
+            str_contains($normalized, 'video') => '[Video recebido]',
+            str_contains($normalized, 'audio') || str_contains($normalized, 'ptt') || str_contains($normalized, 'voice') => '[Audio recebido]',
+            str_contains($normalized, 'document') => '[Documento recebido]',
+            str_contains($normalized, 'sticker') => '[Sticker recebido]',
+            str_contains($normalized, 'poll') => '[Atualizacao de enquete]',
+            default => '',
+        };
+    }
+
+    private function hasMessageAlreadyRegistered(string $provider, string $messageId): bool
+    {
+        if ($messageId === '') {
+            return false;
+        }
+
+        $existing = $this->mensagemModel
+            ->where('provider', $provider)
+            ->where('provider_message_id', $messageId)
+            ->orderBy('id', 'DESC')
+            ->first();
+
+        if ($existing) {
+            return true;
+        }
+
+        $existing = $this->mensagemModel
+            ->where('provider_message_id', $messageId)
+            ->orderBy('id', 'DESC')
+            ->first();
+
+        return $existing !== null;
+    }
+
     private function findClienteByPhone(string $phone): ?array
     {
         $digits = preg_replace('/\D+/', '', $phone) ?? '';
@@ -1323,7 +1723,7 @@ class CentralMensagensService
             ->first();
     }
 
-    private function resolveContatoByPhone(string $phone, ?string $nomeContato = null, ?int $clienteId = null): ?array
+    private function resolveContatoByPhone(string $phone, ?string $nomeContato = null, ?int $clienteId = null, array $meta = []): ?array
     {
         if (!$this->contatoModel->db->tableExists('contatos')) {
             return null;
@@ -1335,9 +1735,22 @@ class CentralMensagensService
         }
 
         $safeNome = $this->sanitizeProfileName($nomeContato);
+        $remoteJid = $this->normalizeRemoteJid($meta['remote_jid'] ?? null);
         $now = date('Y-m-d H:i:s');
+        $supportsRemoteJid = $this->contatoModel->db->fieldExists('whatsapp_remote_jid', 'contatos');
+        $supportsAvatarUrl = $this->contatoModel->db->fieldExists('whatsapp_avatar_url', 'contatos');
+        $supportsAvatarSyncedAt = $this->contatoModel->db->fieldExists('whatsapp_avatar_synced_em', 'contatos');
 
-        $contato = $this->contatoModel->findByPhone($normalized);
+        $contato = null;
+        if ($supportsRemoteJid && $remoteJid !== '') {
+            $contato = $this->contatoModel
+                ->where('whatsapp_remote_jid', $remoteJid)
+                ->first();
+        }
+
+        if (!$contato) {
+            $contato = $this->contatoModel->findByPhone($normalized);
+        }
         if (!$contato) {
             $suffix = substr($normalized, -11);
             if ($suffix !== '' && $suffix !== $normalized) {
@@ -1360,7 +1773,7 @@ class CentralMensagensService
             if ($safeNome && empty($contato['nome'])) {
                 $updates['nome'] = $safeNome;
             }
-            if ($safeNome && empty($contato['whatsapp_nome_perfil'])) {
+            if ($safeNome && trim((string) ($contato['whatsapp_nome_perfil'] ?? '')) !== $safeNome) {
                 $updates['whatsapp_nome_perfil'] = $safeNome;
             }
             if (
@@ -1375,6 +1788,18 @@ class CentralMensagensService
             }
             if (empty($contato['telefone_normalizado'])) {
                 $updates['telefone_normalizado'] = $normalized;
+            }
+            if ($supportsRemoteJid && $remoteJid !== '' && trim((string) ($contato['whatsapp_remote_jid'] ?? '')) !== $remoteJid) {
+                $updates['whatsapp_remote_jid'] = $remoteJid;
+            }
+            if ($supportsAvatarUrl && array_key_exists('avatar_url', $meta) && trim((string) ($meta['avatar_url'] ?? '')) === '') {
+                $updates['whatsapp_avatar_url'] = null;
+            }
+            if ($supportsAvatarUrl && !empty($meta['avatar_url'])) {
+                $updates['whatsapp_avatar_url'] = trim((string) $meta['avatar_url']);
+            }
+            if ($supportsAvatarSyncedAt && array_key_exists('avatar_synced_em', $meta) && !empty($meta['avatar_synced_em'])) {
+                $updates['whatsapp_avatar_synced_em'] = (string) $meta['avatar_synced_em'];
             }
 
             if (!empty($updates)) {
@@ -1392,6 +1817,15 @@ class CentralMensagensService
             'origem' => 'whatsapp',
             'ultimo_contato_em' => $now,
         ];
+        if ($supportsRemoteJid && $remoteJid !== '') {
+            $insertPayload['whatsapp_remote_jid'] = $remoteJid;
+        }
+        if ($supportsAvatarUrl && !empty($meta['avatar_url'])) {
+            $insertPayload['whatsapp_avatar_url'] = trim((string) $meta['avatar_url']);
+        }
+        if ($supportsAvatarSyncedAt && !empty($meta['avatar_synced_em'])) {
+            $insertPayload['whatsapp_avatar_synced_em'] = (string) $meta['avatar_synced_em'];
+        }
 
         if ($clienteId) {
             $insertPayload = $this->contatoModel->buildClienteConvertidoPayload($clienteId, $insertPayload);
@@ -1406,6 +1840,190 @@ class CentralMensagensService
         }
 
         return $this->contatoModel->find($insertId);
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     */
+    private function inferStructuredMessageType(array $payload): string
+    {
+        $message = $this->payloadPathValue($payload, ['message', 'data.message', 'data.data.message'], []);
+        if (!is_array($message) || $message === []) {
+            return '';
+        }
+
+        if (isset($message['imageMessage'])) {
+            return 'imagem';
+        }
+        if (isset($message['videoMessage'])) {
+            return 'video';
+        }
+        if (isset($message['audioMessage'])) {
+            $audio = $message['audioMessage'];
+            if (is_array($audio) && !empty($audio['ptt'])) {
+                return 'audio';
+            }
+            return 'audio';
+        }
+        if (isset($message['stickerMessage'])) {
+            return 'sticker';
+        }
+        if (isset($message['documentMessage']) || isset($message['documentWithCaptionMessage'])) {
+            $mimeType = strtolower($this->payloadPathString($payload, [
+                'message.documentMessage.mimetype',
+                'message.documentWithCaptionMessage.message.documentMessage.mimetype',
+                'data.message.documentMessage.mimetype',
+                'data.message.documentWithCaptionMessage.message.documentMessage.mimetype',
+                'data.data.message.documentMessage.mimetype',
+            ]));
+
+            return $mimeType === 'application/pdf' ? 'pdf' : 'arquivo';
+        }
+        if (isset($message['locationMessage']) || isset($message['liveLocationMessage'])) {
+            return 'localizacao';
+        }
+        if (isset($message['contactMessage']) || isset($message['contactsArrayMessage'])) {
+            return 'contato';
+        }
+        if (
+            isset($message['buttonsResponseMessage'])
+            || isset($message['listResponseMessage'])
+            || isset($message['templateButtonReplyMessage'])
+            || isset($message['conversation'])
+            || isset($message['extendedTextMessage'])
+        ) {
+            return 'texto';
+        }
+
+        return '';
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     */
+    private function extractRemoteJidFromPayload(array $payload): ?string
+    {
+        $raw = $this->payloadPathString($payload, [
+            'remoteJid',
+            'jid',
+            'chat_id',
+            'key.remoteJid',
+            'data.remoteJid',
+            'data.jid',
+            'data.chat_id',
+            'data.key.remoteJid',
+            'data.data.key.remoteJid',
+        ]);
+
+        return $this->normalizeRemoteJid($raw);
+    }
+
+    /**
+     * @param mixed $raw
+     */
+    private function normalizeRemoteJid($raw): string
+    {
+        if (!is_scalar($raw)) {
+            return '';
+        }
+
+        $value = trim((string) $raw);
+        if ($value === '') {
+            return '';
+        }
+
+        if (str_contains($value, '@')) {
+            return $value;
+        }
+
+        $digits = preg_replace('/\D+/', '', $value) ?? '';
+        if ($digits === '') {
+            return '';
+        }
+
+        return $digits . '@s.whatsapp.net';
+    }
+
+    /**
+     * @param array<string,mixed> $contato
+     * @return array<string,mixed>
+     */
+    private function syncEvolutionContatoAvatar(array $contato, string $phone, ?string $remoteJid = null): array
+    {
+        if ((string) get_config('whatsapp_evolution_sync_avatar', '1') !== '1') {
+            return $contato;
+        }
+        if (!$this->contatoModel->db->fieldExists('whatsapp_avatar_url', 'contatos')) {
+            return $contato;
+        }
+
+        $baseUrl = trim((string) get_config('whatsapp_evolution_url', ''));
+        $apiKey = trim((string) get_config('whatsapp_evolution_apikey', ''));
+        $instance = trim((string) get_config('whatsapp_evolution_instance', ''));
+        if ($baseUrl === '' || $apiKey === '' || $instance === '') {
+            return $contato;
+        }
+
+        $contatoId = (int) ($contato['id'] ?? 0);
+        if ($contatoId <= 0) {
+            return $contato;
+        }
+
+        $lastSyncedAt = trim((string) ($contato['whatsapp_avatar_synced_em'] ?? ''));
+        $hasAvatar = trim((string) ($contato['whatsapp_avatar_url'] ?? '')) !== '';
+        if ($lastSyncedAt !== '' && $hasAvatar) {
+            $lastTs = strtotime($lastSyncedAt);
+            if ($lastTs !== false && (time() - $lastTs) < 21600) {
+                return $contato;
+            }
+        }
+
+        try {
+            $provider = new EvolutionApiProvider(
+                $baseUrl,
+                $apiKey,
+                $instance,
+                max(5, (int) get_config('whatsapp_evolution_timeout', 20))
+            );
+            $result = $provider->fetchProfilePictureUrl($remoteJid ?: $phone);
+            if (empty($result['ok'])) {
+                return $contato;
+            }
+
+            $response = is_array($result['response'] ?? null) ? $result['response'] : [];
+            $avatarUrl = trim((string) (
+                $response['profilePictureUrl']
+                ?? $response['profilePicUrl']
+                ?? $response['pictureUrl']
+                ?? $response['url']
+                ?? $response['response']['profilePictureUrl']
+                ?? $response['response']['profilePicUrl']
+                ?? $response['response']['url']
+                ?? ''
+            ));
+
+            $update = [
+                'whatsapp_avatar_synced_em' => date('Y-m-d H:i:s'),
+            ];
+            if ($remoteJid !== null && $this->contatoModel->db->fieldExists('whatsapp_remote_jid', 'contatos')) {
+                $normalizedRemoteJid = $this->normalizeRemoteJid($remoteJid);
+                if ($normalizedRemoteJid !== '' && trim((string) ($contato['whatsapp_remote_jid'] ?? '')) !== $normalizedRemoteJid) {
+                    $update['whatsapp_remote_jid'] = $normalizedRemoteJid;
+                }
+            }
+            if ($avatarUrl !== '') {
+                $update['whatsapp_avatar_url'] = $avatarUrl;
+            }
+
+            if (!empty($update)) {
+                $this->contatoModel->update($contatoId, $update);
+                return $this->contatoModel->find($contatoId) ?: $contato;
+            }
+        } catch (\Throwable $e) {
+            log_message('warning', 'CentralMensagensService avatar evolution: ' . $e->getMessage());
+        }
+
+        return $contato;
     }
 
     private function findOpenOsByCliente(int $clienteId): ?int
@@ -1468,6 +2086,8 @@ class CentralMensagensService
             $payload['data']['contact']['name'] ?? null,
             $payload['data']['contact']['display_name'] ?? null,
             $payload['data']['contact']['profile_name'] ?? null,
+            $payload['data']['data']['pushName'] ?? null,
+            $payload['data']['data']['notifyName'] ?? null,
         ];
 
         foreach ($candidates as $candidate) {
@@ -1941,7 +2561,7 @@ class CentralMensagensService
 
         $title = 'Nova mensagem de ' . $nomeContato;
         $body = $this->buildMobileInboundPreview($mensagem, $tipoConteudo, $mediaFilename);
-        $route = '/conversas/' . $conversaId;
+        $route = '/atendimento-whatsapp?conversa_id=' . $conversaId;
 
         $payload = [
             'conversa_id' => $conversaId,

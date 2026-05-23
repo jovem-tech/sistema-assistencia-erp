@@ -216,7 +216,7 @@
                             >
                                 <i class="bi bi-chat-left-text me-1"></i>Conversas
                             </button>
-                            <div class="cm-thread-avatar">
+                            <div class="cm-thread-avatar" id="threadAvatar">
                                 <i class="bi bi-person-circle"></i>
                             </div>
                             <div class="min-w-0">
@@ -544,6 +544,7 @@ window.CM_CFG = {
     autoSyncSeconds: <?= (int) ($autoSyncSeconds ?? 15) ?>,
     slaPrimeiraRespostaMin: <?= (int) ($slaPrimeiraRespostaMin ?? 60) ?>,
     endpointConversas: '<?= parse_url(base_url('atendimento-whatsapp/conversas'), PHP_URL_PATH) ?: '/atendimento-whatsapp/conversas' ?>',
+    endpointConversasStream: '<?= parse_url(base_url('atendimento-whatsapp/conversas/stream'), PHP_URL_PATH) ?: '/atendimento-whatsapp/conversas/stream' ?>',
     endpointConversaPrefix: '<?= parse_url(base_url('atendimento-whatsapp/conversa'), PHP_URL_PATH) ?: '/atendimento-whatsapp/conversa' ?>',
     endpointConversaNovasPrefix: '<?= parse_url(base_url('atendimento-whatsapp/conversa-novas'), PHP_URL_PATH) ?: '/atendimento-whatsapp/conversa-novas' ?>',
     endpointCadastrarContatoPrefix: '<?= parse_url(base_url('atendimento-whatsapp/conversa'), PHP_URL_PATH) ?: '/atendimento-whatsapp/conversa' ?>',

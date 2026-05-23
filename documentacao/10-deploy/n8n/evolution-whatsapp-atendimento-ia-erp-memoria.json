@@ -1,0 +1,543 @@
+{
+  "name": "Evolution WhatsApp IA + ERP | Memoria",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "evolution-whatsapp-atendimento-ia-memoria",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Entrada Evolution IA",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        320
+      ],
+      "webhookId": "evolution-whatsapp-atendimento-ia-memoria"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const envelope = ($json.body && typeof $json.body === 'object') ? $json.body : $json;\nconst data = (envelope.data && typeof envelope.data === 'object') ? envelope.data : envelope;\n\nfunction readPath(obj, path) {\n  return path.split('.').reduce((acc, key) => {\n    if (acc && typeof acc === 'object' && key in acc) return acc[key];\n    return undefined;\n  }, obj);\n}\n\nfunction pick(obj, paths, fallback = '') {\n  for (const path of paths) {\n    const value = readPath(obj, path);\n    if (value !== undefined && value !== null && String(value).trim() !== '') {\n      return String(value).trim();\n    }\n  }\n  return fallback;\n}\n\nfunction pickBool(obj, paths, fallback = false) {\n  for (const path of paths) {\n    const value = readPath(obj, path);\n    if (typeof value === 'boolean') return value;\n    if (value === 1 || value === '1') return true;\n    if (typeof value === 'string') {\n      const normalized = value.trim().toLowerCase();\n      if (['true', 'yes', 'sim', 'on'].includes(normalized)) return true;\n      if (['false', 'no', 'nao', 'off'].includes(normalized)) return false;\n    }\n  }\n  return fallback;\n}\n\nfunction normalizePhone(value) {\n  const base = String(value || '').replace(/@.+$/g, '').replace(/\\D+/g, '');\n  if (!base) return '';\n  return base.startsWith('55') ? base : `55${base}`;\n}\n\nfunction normalizeSqlPhone(fieldName) {\n  return `REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(${fieldName}, ''), '(', ''), ')', ''), '-', ''), ' ', ''), '+', '')`;\n}\n\nfunction detectStructuredMessageType(payload) {\n  const checks = [\n    ['message.audioMessage', 'audio'],\n    ['message.ptvMessage', 'video'],\n    ['message.videoMessage', 'video'],\n    ['message.imageMessage.caption', 'imagem'],\n    ['message.imageMessage', 'imagem'],\n    ['message.documentMessage.caption', 'arquivo'],\n    ['message.documentMessage', 'arquivo'],\n    ['message.documentWithCaptionMessage.message.documentMessage', 'arquivo'],\n    ['message.stickerMessage', 'imagem'],\n    ['message.contactMessage', 'contato'],\n    ['message.contactsArrayMessage', 'contato'],\n    ['message.locationMessage', 'localizacao'],\n    ['message.liveLocationMessage', 'localizacao'],\n    ['message.reactionMessage', 'reacao']\n  ];\n\n  for (const [path, type] of checks) {\n    const value = readPath(payload, path);\n    if (value && typeof value === 'object') {\n      return type;\n    }\n    if (typeof value === 'string' && value.trim() !== '') {\n      return type;\n    }\n  }\n\n  return 'texto';\n}\n\nconst companyName = 'Jovem Tech';\nconst erpWebhookUrl = 'https://sistema.jovemtech.eco.br/webhooks/whatsapp';\nconst erpWebhookToken = 'COLE_O_TOKEN_WEBHOOK_ERP';\nconst erpOrigin = 'https://sistema.jovemtech.eco.br';\n\nconst evolutionBaseUrl = 'https://evo.jovemtech.eco.br';\nconst evolutionApiKey = 'COLE_A_API_KEY_DA_EVOLUTION';\nconst evolutionInstance = 'chatwoot';\n\nconst rawEventName = pick(envelope, ['event', 'type', 'webhookEvent', 'trigger'], '');\nconst eventName = rawEventName.toUpperCase();\nconst normalizedEventName = eventName.replace(/\\./g, '_');\nconst instanceName = pick(envelope, ['instance', 'instanceName', 'sender'], evolutionInstance);\nconst remoteJid = pick(data, [\n  'key.remoteJid',\n  'remoteJid',\n  'jid',\n  'chatId',\n  'from',\n  'sender',\n  'phone',\n  'number'\n], '');\nconst participant = pick(data, ['participant', 'key.participant'], '');\nconst pushName = pick(data, ['pushName', 'contact.pushName', 'contact.name'], '');\nconst fromMe = pickBool(data, ['key.fromMe', 'fromMe'], false);\nconst isGroup = /@g\\.us$/i.test(remoteJid);\nconst phone = normalizePhone(remoteJid || pick(data, ['from', 'sender', 'phone', 'number'], ''));\nconst phoneNoCountry = phone.replace(/^55/, '');\nconst memorySessionKey = remoteJid || phone;\nconst messageKeyId = pick(data, ['key.id', 'id'], '');\nconst deliveryStatus = pick(data, ['status'], '');\n\nconst text = pick(data, [\n  'message.conversation',\n  'message.extendedTextMessage.text',\n  'message.imageMessage.caption',\n  'message.videoMessage.caption',\n  'message.documentMessage.caption',\n  'message.documentWithCaptionMessage.message.documentMessage.caption',\n  'message.buttonsResponseMessage.selectedDisplayText',\n  'message.listResponseMessage.title',\n  'message.listResponseMessage.singleSelectReply.selectedRowId',\n  'message.templateButtonReplyMessage.selectedDisplayText',\n  'body',\n  'text',\n  'message'\n], '');\n\nconst normalizedText = text\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '')\n  .toLowerCase()\n  .trim();\n\nconst messageType = detectStructuredMessageType(data);\nconst hasMedia = messageType !== 'texto';\nconst hasMessageContent = text !== '' || hasMedia;\nconst isInboundEvent = normalizedEventName === 'MESSAGES_UPSERT';\nconst isManualTestPayload = normalizedEventName === '' && !fromMe && !isGroup && phone !== '' && text !== '';\nconst shouldProcess = (isInboundEvent || isManualTestPayload) && !fromMe && !isGroup && phone !== '' && hasMessageContent;\nconst shouldReply = shouldProcess;\n\nconst phoneValuesSql = [phone, phoneNoCountry]\n  .filter((value, index, array) => value && array.indexOf(value) === index)\n  .map((value) => `'${value.replace(/'/g, \"''\")}'`)\n  .join(', ');\n\nconst phoneWhere = [\n  normalizeSqlPhone('c.telefone1'),\n  normalizeSqlPhone('c.telefone2'),\n  normalizeSqlPhone('c.telefone_contato')\n].map((expr) => `${expr} IN (${phoneValuesSql || \"''\"})`).join(' OR ');\n\nconst historicoPhoneWhere = [\n  `${normalizeSqlPhone('c.telefone')} IN (${phoneValuesSql || \"''\"})`,\n  `${normalizeSqlPhone('m.telefone')} IN (${phoneValuesSql || \"''\"})`\n].join(' OR ');\n\nconst clienteLookupSql = `\nSELECT *\nFROM (\n  SELECT\n    1 AS cliente_encontrado,\n    c.id,\n    c.nome_razao,\n    c.email,\n    c.telefone1,\n    c.telefone2,\n    c.nome_contato,\n    c.telefone_contato,\n    c.cidade,\n    c.uf,\n    c.observacoes\n  FROM clientes c\n  WHERE ${phoneWhere}\n  ORDER BY c.id DESC\n  LIMIT 1\n) cliente\nUNION ALL\nSELECT\n  0 AS cliente_encontrado,\n  NULL AS id,\n  NULL AS nome_razao,\n  NULL AS email,\n  NULL AS telefone1,\n  NULL AS telefone2,\n  NULL AS nome_contato,\n  NULL AS telefone_contato,\n  NULL AS cidade,\n  NULL AS uf,\n  NULL AS observacoes\nFROM DUAL\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM clientes c\n  WHERE ${phoneWhere}\n  LIMIT 1\n)\nLIMIT 1;\n`.trim();\n\nconst historicoLookupSql = `\nSELECT *\nFROM (\n  SELECT\n    m.id,\n    m.created_at,\n    m.direcao,\n    m.tipo_mensagem,\n    m.tipo_conteudo,\n    m.mensagem,\n    COALESCE(m.enviada_por_bot, 0) AS enviada_por_bot,\n    CASE\n      WHEN m.direcao = 'inbound' THEN 'cliente'\n      WHEN COALESCE(m.enviada_por_bot, 0) = 1 THEN 'bot'\n      WHEN m.tipo_mensagem = 'outbound_externo' OR m.tipo_mensagem LIKE '%externo%' THEN 'humano_app'\n      ELSE 'humano_erp'\n    END AS origem_resumida\n  FROM mensagens_whatsapp m\n  LEFT JOIN conversas_whatsapp c ON c.id = m.conversa_id\n  WHERE ${historicoPhoneWhere}\n  ORDER BY m.id DESC\n  LIMIT 8\n) historico\nUNION ALL\nSELECT\n  NULL AS id,\n  NULL AS created_at,\n  NULL AS direcao,\n  NULL AS tipo_mensagem,\n  NULL AS tipo_conteudo,\n  NULL AS mensagem,\n  0 AS enviada_por_bot,\n  NULL AS origem_resumida\nFROM DUAL\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM mensagens_whatsapp m\n  LEFT JOIN conversas_whatsapp c ON c.id = m.conversa_id\n  WHERE ${historicoPhoneWhere}\n  LIMIT 1\n);\n`.trim();\n\nconst erpPayload = {\n  provider: 'evolution',\n  source: 'evolution',\n  event: rawEventName || eventName,\n  instance: instanceName,\n  push_name: pushName,\n  participant,\n  from_me: fromMe,\n  has_media: hasMedia,\n  normalized_phone: phone,\n  normalized_text: text,\n  detected_type: messageType,\n  message_key_id: messageKeyId,\n  delivery_status: deliveryStatus,\n  n8n_workflow: 'evolution-whatsapp-atendimento-ia-memoria',\n  n8n_received_at: new Date().toISOString(),\n  ...envelope\n};\n\nreturn {\n  ...$json,\n  source: envelope,\n  data,\n  eventName,\n  normalizedEventName,\n  instanceName,\n  companyName,\n  normalizedPhone: phone,\n  phoneNoCountry,\n  remoteJid,\n  memorySessionKey,\n  messageKeyId,\n  deliveryStatus,\n  pushName,\n  participant,\n  receivedText: text,\n  normalizedText,\n  messageType,\n  hasMedia,\n  fromMe,\n  isGroup,\n  shouldProcess,\n  shouldReply,\n  erpWebhookUrl,\n  erpWebhookToken,\n  erpOrigin,\n  evolutionBaseUrl,\n  evolutionApiKey,\n  evolutionInstance,\n  clienteLookupSql,\n  historicoLookupSql,\n  erpPayload\n};"
+      },
+      "id": "2",
+      "name": "Normalizar Evolution e Credenciais",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-should-process",
+              "leftValue": "={{ $json.shouldProcess }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3",
+      "name": "Inbound Elegivel?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        780,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Normalizar Evolution e Credenciais').item.json.erpWebhookUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Webhook-Token",
+              "value": "={{ $('Normalizar Evolution e Credenciais').item.json.erpWebhookToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Normalizar Evolution e Credenciais').item.json.erpPayload }}"
+      },
+      "id": "4",
+      "name": "Espelhar Evento no ERP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1040,
+        220
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $('Normalizar Evolution e Credenciais').item.json.clienteLookupSql }}",
+        "options": {}
+      },
+      "id": "5",
+      "name": "Buscar Cliente ERP",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        1290,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $('Normalizar Evolution e Credenciais').item.json.historicoLookupSql }}",
+        "options": {}
+      },
+      "id": "6",
+      "name": "Buscar Historico Conversa ERP",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        1540,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ Number($('Buscar Cliente ERP').first().json.id || 0) > 0 ? `\nSELECT\n  os.id,\n  os.numero_os,\n  os.numero_os_legado,\n  os.status,\n  os.estado_fluxo,\n  os.data_abertura,\n  os.data_previsao,\n  os.data_conclusao,\n  os.valor_total,\n  os.valor_final,\n  os.relato_cliente,\n  os.diagnostico_tecnico,\n  os.garantia_dias,\n  os.garantia_validade,\n  e.numero_serie,\n  e.imei,\n  e.cor\nFROM os\nLEFT JOIN equipamentos e ON os.equipamento_id = e.id\nWHERE os.cliente_id = ${Number($('Buscar Cliente ERP').first().json.id || 0)}\nORDER BY os.data_abertura DESC\nLIMIT 5;\n` : 'SELECT NULL AS id, NULL AS numero_os, NULL AS numero_os_legado, NULL AS status, NULL AS estado_fluxo, NULL AS data_abertura, NULL AS data_previsao, NULL AS data_conclusao, NULL AS valor_total, NULL AS valor_final, NULL AS relato_cliente, NULL AS diagnostico_tecnico, NULL AS garantia_dias, NULL AS garantia_validade, NULL AS numero_serie, NULL AS imei, NULL AS cor FROM DUAL WHERE 1=0;' }}",
+        "options": {}
+      },
+      "id": "18",
+      "name": "Buscar OS ERP",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        1660,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const base = $('Normalizar Evolution e Credenciais').first().json;\nconst cliente = $('Buscar Cliente ERP').first().json || {};\nconst historicoRows = $('Buscar Historico Conversa ERP').all().map((item) => item.json || {});\nconst osRows = $('Buscar OS ERP').all().map((item) => item.json || {});\nconst clienteEncontrado = Number(cliente.cliente_encontrado || 0) === 1 && !!cliente.id;\n\nfunction firstName(value) {\n  return String(value || '').trim().split(/\\s+/).filter(Boolean)[0] || '';\n}\n\nconst profileFirstName = firstName(base.pushName);\nconst cadastroFirstName = firstName(cliente.nome_razao);\nconst nameConflict = profileFirstName !== '' && cadastroFirstName !== '' && profileFirstName.toLowerCase() !== cadastroFirstName.toLowerCase();\nconst preferredGreetingName = nameConflict ? (profileFirstName || cadastroFirstName) : (cadastroFirstName || profileFirstName);\n\nconst clienteResumo = clienteEncontrado\n  ? [\n      `ID: ${cliente.id}`,\n      `Nome do cadastro ERP: ${cliente.nome_razao || '-'}`,\n      `Email: ${cliente.email || '-'}`,\n      `Telefone1: ${cliente.telefone1 || '-'}`,\n      `Telefone2: ${cliente.telefone2 || '-'}`,\n      `Contato: ${cliente.nome_contato || '-'}`,\n      `Telefone do contato: ${cliente.telefone_contato || '-'}`,\n      `Cidade/UF: ${(cliente.cidade || '-') + '/' + (cliente.uf || '-')}`,\n      `Observacoes: ${cliente.observacoes || '-'}`\n    ].join('\\n')\n  : 'Cliente nao localizado por telefone na tabela clientes.';\n\nconst historicoUtil = historicoRows\n  .filter((row) => row && row.id && String(row.mensagem || '').trim() !== '')\n  .sort((a, b) => Number(a.id) - Number(b.id))\n  .slice(-8);\n\nconst historicoFormatado = historicoUtil.length > 0\n  ? historicoUtil.map((row) => {\n      const momento = String(row.created_at || '').replace('T', ' ').slice(0, 16) || '-';\n      const origem = String(row.origem_resumida || row.direcao || 'desconhecido');\n      const texto = String(row.mensagem || '').replace(/\\s+/g, ' ').trim().slice(0, 280);\n      return `${momento} | ${origem}: ${texto}`;\n    }).join('\\n')\n  : 'Sem historico recente da conversa no ERP.';\n\nconst osUtil = osRows\n  .filter((row) => row && row.id)\n  .sort((a, b) => String(b.data_abertura || '').localeCompare(String(a.data_abertura || '')))\n  .slice(0, 5);\n\nconst osResumo = osUtil.length > 0\n  ? osUtil.map((row) => {\n      const numero = row.numero_os || row.numero_os_legado || row.id;\n      const equipamento = [row.numero_serie ? `serie:${row.numero_serie}` : '', row.imei ? `imei:${row.imei}` : '', row.cor ? `cor:${row.cor}` : ''].filter(Boolean).join(' | ');\n      return [\n        `OS ${numero}`,\n        `status:${row.status || '-'}`,\n        `fluxo:${row.estado_fluxo || '-'}`,\n        `abertura:${String(row.data_abertura || '').replace('T', ' ').slice(0, 16) || '-'}`,\n        `previsao:${row.data_previsao || '-'}`,\n        `valor_final:${row.valor_final ?? '-'}`,\n        `valor_total:${row.valor_total ?? '-'}`,\n        `garantia:${row.garantia_dias ?? '-'} dias`,\n        equipamento || 'equipamento: -',\n        `relato:${String(row.relato_cliente || '-').replace(/\\s+/g, ' ').trim().slice(0, 180)}`,\n        `diagnostico:${String(row.diagnostico_tecnico || '-').replace(/\\s+/g, ' ').trim().slice(0, 180)}`\n      ].join(' | ');\n    }).join('\\n')\n  : 'Nenhuma ordem de servico localizada para este cliente.';\n\nconst systemMessage = [\n  `Voce e a atendente virtual da ${base.companyName}.`,\n  'Fale como uma pessoa real no WhatsApp: natural, calorosa, objetiva e profissional.',\n  'Use memoria e contexto para continuar a conversa de onde ela parou.',\n  'Nao trate cada mensagem como um primeiro contato quando houver historico recente.',\n  'Nao repita perguntas ja respondidas no historico ou no cadastro do ERP.',\n  'Nao invente dados de OS, orcamento, valores, prazos, laudos ou qualquer informacao operacional que nao esteja no contexto.',\n  'Se a pergunta do cliente for sobre conserto, aparelho, andamento, status, valor ou previsao, use primeiro o resumo de OS abaixo antes de responder.',\n  'Se nao houver OS no contexto, diga isso com clareza e siga o atendimento sem inventar resultados.',\n  'Se a pessoa mandar respostas curtas como ok, sim, nao, testei, deu certo ou ainda nao, interprete isso com base no historico recente.',\n  'Evite respostas roboticas ou genericas demais.',\n  'Quando a conversa ja estiver em andamento, nao repita saudacao completa; va direto ao ponto ou use uma abertura curta.',\n  'Se houver divergencia entre o nome do perfil do WhatsApp e o nome do cadastro do ERP, nao trate nenhum dos dois como certeza absoluta; prefira linguagem neutra ou o primeiro nome mais seguro, sem insistir em nome errado.',\n  'Faca no maximo uma pergunta objetiva por vez.',\n  'A resposta deve ser curta, pronta para envio por WhatsApp, sem markdown.'\n].join(' ');\n\nconst agentInput = [\n  `Evento Evolution: ${base.normalizedEventName || base.eventName || '-'}`,\n  `Telefone normalizado: ${base.normalizedPhone || '-'}`,\n  `Nome de perfil WhatsApp: ${base.pushName || '-'}`,\n  `Primeiro nome sugerido para saudacao: ${preferredGreetingName || '-'}`,\n  `Existe divergencia entre nome do perfil e nome do cadastro: ${nameConflict ? 'sim' : 'nao'}`,\n  `Cliente encontrado: ${clienteEncontrado ? 'sim' : 'nao'}`,\n  `Tipo da mensagem: ${base.messageType || 'texto'}`,\n  `Mensagem mais recente do cliente: ${base.receivedText || '(sem texto)'}`,\n  'Contexto do cliente:',\n  clienteResumo,\n  'Historico recente da conversa no ERP:',\n  historicoFormatado,\n  'Ordens de servico recentes no ERP:',\n  osResumo,\n  'Responda agora ao cliente, considerando memoria e continuidade real da conversa.'\n].join('\\n\\n');\n\nreturn [{\n  json: {\n    ...base,\n    clienteEncontrado,\n    cliente,\n    clienteResumo,\n    historicoFormatado,\n    historicoCount: historicoUtil.length,\n    osResumo,\n    osCount: osUtil.length,\n    nameConflict,\n    preferredGreetingName,\n    openaiSystemMessage: systemMessage,\n    agentInput\n  }\n}];"
+      },
+      "id": "7",
+      "name": "Montar Contexto IA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1790,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.agentInput }}",
+        "options": {
+          "systemMessage": "={{ $json.openaiSystemMessage }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        2040,
+        220
+      ],
+      "id": "8",
+      "name": "Agente IA Humanizado"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1920,
+        460
+      ],
+      "id": "9",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.memorySessionKey }}",
+        "tableName": "n8n_chat_memory_evolution_erp",
+        "contextWindowLength": 40
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        2160,
+        460
+      ],
+      "id": "10",
+      "name": "Memoria Postgres"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const ctx = $('Montar Contexto IA').first().json;\nconst raw = String($json.output || '').trim();\n\nfunction sanitize(text) {\n  return String(text || '')\n    .replace(/[*_`#>]+/g, '')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nfunction splitLongSentence(sentence, maxLen = 260) {\n  const parts = [];\n  let remaining = sentence.trim();\n\n  while (remaining.length > maxLen) {\n    const slice = remaining.slice(0, maxLen + 1);\n    let breakAt = Math.max(slice.lastIndexOf('. '), slice.lastIndexOf('! '), slice.lastIndexOf('? '));\n    if (breakAt < 100) {\n      breakAt = Math.max(slice.lastIndexOf('; '), slice.lastIndexOf(': '), slice.lastIndexOf(', '));\n    }\n    if (breakAt < 100) {\n      breakAt = slice.lastIndexOf(' ');\n    }\n    if (breakAt < 60) {\n      breakAt = maxLen;\n    }\n\n    parts.push(remaining.slice(0, breakAt + 1).trim());\n    remaining = remaining.slice(breakAt + 1).trim();\n  }\n\n  if (remaining) {\n    parts.push(remaining);\n  }\n\n  return parts;\n}\n\nfunction buildBlocks(text, maxLen = 260) {\n  const cleaned = sanitize(text);\n  if (!cleaned) {\n    return [];\n  }\n\n  const sentences = cleaned.split(/(?<=[.!?])\\s+/).filter(Boolean);\n  const blocks = [];\n  let current = '';\n\n  for (const sentence of sentences) {\n    if (sentence.length > maxLen) {\n      const expanded = splitLongSentence(sentence, maxLen);\n      for (const part of expanded) {\n        if (!current) {\n          current = part;\n          continue;\n        }\n        if ((current + ' ' + part).length <= maxLen) {\n          current += ' ' + part;\n        } else {\n          blocks.push(current.trim());\n          current = part;\n        }\n      }\n      continue;\n    }\n\n    if (!current) {\n      current = sentence;\n    } else if ((current + ' ' + sentence).length <= maxLen) {\n      current += ' ' + sentence;\n    } else {\n      blocks.push(current.trim());\n      current = sentence;\n    }\n  }\n\n  if (current) {\n    blocks.push(current.trim());\n  }\n\n  const normalizedBlocks = blocks.length > 0 ? blocks : [cleaned];\n  if (normalizedBlocks.length <= 3) {\n    return normalizedBlocks;\n  }\n\n  const limited = normalizedBlocks.slice(0, 2);\n  limited.push(normalizedBlocks.slice(2).join(' '));\n  return limited;\n}\n\nlet aiReply = sanitize(raw);\nconst saudacaoNome = ctx.nameConflict ? '' : (ctx.preferredGreetingName || '');\n\nif (aiReply === '') {\n  if (ctx.hasMedia && !ctx.receivedText) {\n    aiReply = `Recebi seu anexo na ${ctx.companyName}. Vou registrar aqui e seguir com o atendimento.`;\n  } else if (ctx.clienteEncontrado && saudacaoNome) {\n    aiReply = `Oi, ${saudacaoNome}. Vi sua mensagem agora. Como posso te ajudar por aqui?`;\n  } else if (ctx.clienteEncontrado) {\n    aiReply = `Oi. Vi sua mensagem agora e localizei seu cadastro na ${ctx.companyName}. Como posso te ajudar por aqui?`;\n  } else {\n    aiReply = `Oi. Recebi sua mensagem na ${ctx.companyName}, mas ainda nao localizei cadastro por este numero. Pode me informar seu nome completo para eu continuar o atendimento?`;\n  }\n}\n\nconst outputBlocks = buildBlocks(aiReply, 260);\n\nreturn {\n  ...ctx,\n  aiRawResponse: $json,\n  aiReply,\n  outputBlocks\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2290,
+        220
+      ],
+      "id": "11",
+      "name": "Preparar Resposta Final"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "outputBlocks",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2520,
+        220
+      ],
+      "id": "12",
+      "name": "Separar Blocos"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2740,
+        220
+      ],
+      "id": "13",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Preparar Resposta Final').first().json.evolutionBaseUrl + '/message/sendText/' + $('Preparar Resposta Final').first().json.evolutionInstance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "apikey",
+              "value": "={{ $('Preparar Resposta Final').first().json.evolutionApiKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { number: $('Preparar Resposta Final').first().json.normalizedPhone, text: $json.outputBlocks } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        2970,
+        120
+      ],
+      "id": "14",
+      "name": "Enviar Resposta Evolution"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3200,
+        220
+      ],
+      "id": "15",
+      "name": "Aguardar 2 Segundos",
+      "webhookId": "evolution-whatsapp-atendimento-ia-memoria-wait"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, workflow: 'evolution-whatsapp-atendimento-ia-memoria', event: $('Preparar Resposta Final').item.json.normalizedEventName || $('Preparar Resposta Final').item.json.eventName, replied: true, phone: $('Preparar Resposta Final').item.json.normalizedPhone, clienteEncontrado: $('Preparar Resposta Final').item.json.clienteEncontrado, historicoCount: $('Preparar Resposta Final').item.json.historicoCount, response: $('Preparar Resposta Final').item.json.aiReply } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "16",
+      "name": "Responder Webhook com IA",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2970,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, workflow: 'evolution-whatsapp-atendimento-ia-memoria', event: $json.normalizedEventName || $json.eventName, processed: $json.shouldProcess, replied: false, phone: $json.normalizedPhone, response: $json.shouldProcess ? 'Evento recebido sem resposta automatica.' : 'Evento ignorado pelo workflow (nao e inbound elegivel).' } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "17",
+      "name": "Responder Webhook sem Envio",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1040,
+        420
+      ]
+    }
+  ],
+  "connections": {
+    "Entrada Evolution IA": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Evolution e Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Evolution e Credenciais": {
+      "main": [
+        [
+          {
+            "node": "Inbound Elegivel?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inbound Elegivel?": {
+      "main": [
+        [
+          {
+            "node": "Espelhar Evento no ERP",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder Webhook sem Envio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Espelhar Evento no ERP": {
+      "main": [
+        [
+          {
+            "node": "Buscar Cliente ERP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Cliente ERP": {
+      "main": [
+        [
+          {
+            "node": "Buscar Historico Conversa ERP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Historico Conversa ERP": {
+      "main": [
+        [
+          {
+            "node": "Buscar OS ERP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar OS ERP": {
+      "main": [
+        [
+          {
+            "node": "Montar Contexto IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montar Contexto IA": {
+      "main": [
+        [
+          {
+            "node": "Agente IA Humanizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente IA Humanizado",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memoria Postgres": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente IA Humanizado",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente IA Humanizado": {
+      "main": [
+        [
+          {
+            "node": "Preparar Resposta Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Resposta Final": {
+      "main": [
+        [
+          {
+            "node": "Separar Blocos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar Blocos": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Responder Webhook com IA",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar Resposta Evolution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Resposta Evolution": {
+      "main": [
+        [
+          {
+            "node": "Aguardar 2 Segundos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar 2 Segundos": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f89d4908-2b67-45e5-a7d4-6f56evolutionmem",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {}
+}

@@ -98,7 +98,8 @@ Quando o orcamento e enviado ao cliente com link de aprovacao:
 - a aprovacao publica muda o status comercial para `Aprovado` ou `Pendente de abertura de OS`, conforme o tipo do orcamento;
 - a rejeicao publica muda o status para `Rejeitado`;
 - a equipe do ERP recebe notificacao interna no sino da navbar, ao lado da foto do perfil;
-- ao clicar nessa notificacao, o ERP abre a rota correta da listagem de OS ou da visualizacao do orcamento, conforme o contexto da proposta;
+- ao clicar nessa notificacao, o ERP mostra um modal com o teor completo da atualizacao;
+- se houver tela vinculada (ex.: conversa ou OS relacionada), o modal permite abrir a rota correta do ERP sob confirmacao do operador;
 - se houver uma OS vinculada, a listagem `/os` atualiza automaticamente o badge comercial do orcamento, sem exigir recarga manual da pagina;
 
 ## Reuso do PDF oficial dentro da OS

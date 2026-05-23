@@ -1,6 +1,6 @@
 # Rotas Internas (ERP + CRM + Mensageria)
 
-Atualizado em 26/04/2026 para a release `2.15.17`.
+Atualizado em 03/05/2026 para a release `2.16.41`.
 
 ## API Mobile/PWA (v1)
 
@@ -103,6 +103,7 @@ Notas de sessao:
 | GET | `/notificacoes/stream` | Stream SSE autenticado para deltas em tempo real da navbar | `auth` |
 | POST | `/notificacoes/lida/{id}` | Marcar uma notificacao da navbar como lida | `auth` |
 | POST | `/notificacoes/lidas` | Marcar todas as notificacoes da navbar como lidas | `auth` |
+| POST | `/notificacoes/limpar-lidas` | Remover do inbox web as notificacoes ja lidas do usuario atual | `auth` |
 
 Notas do fluxo web:
 
@@ -113,7 +114,9 @@ Notas do fluxo web:
   - `notifications`
   - `cursor.after_id`
   - `unread_count`
-- o frontend da navbar usa fallback de polling quando `EventSource` nao estiver disponivel ou quando o stream cair.
+- o frontend da navbar usa fallback de polling quando `EventSource` nao estiver disponivel ou quando o stream cair;
+- o clique no item do feed abre um modal com o teor da notificacao e so navega para a conversa vinculada quando houver confirmacao do operador;
+- rotas legadas de conversa (`/conversas/{id}`) sao normalizadas para `/atendimento-whatsapp?conversa_id={id}` no backend e no frontend.
 
 ## ERP - Dashboard
 
@@ -483,6 +486,7 @@ Query params suportados em `GET /crm/metricas-marketing`:
 | GET | `/atendimento-whatsapp/metricas` | Dashboard de metricas da central |
 | GET | `/atendimento-whatsapp/configuracoes` | Parametros operacionais da central |
 | GET | `/atendimento-whatsapp/conversas` | Lista de conversas (filtros) |
+| GET | `/atendimento-whatsapp/conversas/stream` | Stream SSE da fila lateral de conversas (cursor + snapshot) |
 | GET | `/atendimento-whatsapp/conversa/{id}` | Thread + contexto cliente/OS (JSON para AJAX da central) |
 | GET | `/atendimento-whatsapp/conversa/{id}/novas` | Atualizacao incremental da thread (after_id) |
 | GET | `/atendimento-whatsapp/conversa/{id}/stream` | Stream SSE da thread em tempo quase real (mensagens e ping) |
@@ -507,7 +511,9 @@ Query params suportados em `GET /crm/metricas-marketing`:
 
 Notas de resposta:
 - `GET /atendimento-whatsapp/conversas` retorna metadados da ultima mensagem para UX estilo WhatsApp (`ultima_mensagem_texto`, `ultima_mensagem_tipo`, `ultima_mensagem_direcao`, `ultima_mensagem_bot`).
+- `GET /atendimento-whatsapp/conversas` tambem pode retornar `contato_avatar_url` quando o contato ja estiver sincronizado com avatar WhatsApp.
 - `GET /atendimento-whatsapp/conversa/{id}` retorna `unread_before` para permitir separador visual de nao lidas na thread antes de marcar como lida.
+- `GET /atendimento-whatsapp/conversa/{id}` pode enriquecer a conversa com `contato_nome`, `contato_perfil_nome` e `contato_avatar_url`.
 - quando `GET /atendimento-whatsapp/conversa/{id}` for acessado diretamente no navegador sem `AJAX`, o controller redireciona para `GET /atendimento-whatsapp?conversa_id={id}` para abrir a interface completa da central em vez de expor JSON cru.
 - mensagens com anexo podem retornar metadados de disponibilidade de arquivo:
   - `arquivo_disponivel` (`1` disponivel, `0` ausente no disco)
@@ -516,11 +522,15 @@ Notas de resposta:
 - `GET /atendimento-whatsapp/conversa/{id}/novas` retorna apenas mensagens com `id > after_id`, sem recarregar toda a thread.
 - `GET /atendimento-whatsapp/conversas` e `GET /atendimento-whatsapp/conversa/{id}/novas` priorizam processamento rapido da fila local inbound (sem sync pesado de historico em toda chamada), para manter polling responsivo.
 - `GET /atendimento-whatsapp/conversa/{id}` segue o mesmo principio de resposta rapida, sem execucao de sync pesado no caminho critico.
+- `GET /atendimento-whatsapp/conversas/stream` suporta:
+  - `probe=1` (pre-check em JSON)
+  - `handshake=1` (validacao de `Content-Type: text/event-stream`)
+  - `after_cursor` (stream incremental da fila a partir do ultimo snapshot conhecido)
 - `GET /atendimento-whatsapp/conversa/{id}/stream` suporta:
   - `probe=1` (pre-check em JSON)
   - `handshake=1` (validacao de `Content-Type: text/event-stream`)
   - `after_id` (stream incremental a partir do ultimo id)
-- Endpoints operacionais da Central (`conversas`, `conversa`, `novas`, `stream`, `enviar`, `vincular-os`, `atualizar-meta`, `sync-inbound`, `conversa/{id}/cadastrar-contato`) seguem envelope padrao:
+- Endpoints operacionais da Central (`conversas`, `conversas/stream`, `conversa`, `novas`, `stream`, `enviar`, `vincular-os`, `atualizar-meta`, `sync-inbound`, `conversa/{id}/cadastrar-contato`) seguem envelope padrao:
   - sucesso: `{ ok: true, status, code, ... }`
   - erro: `{ ok: false, status, code, message }`
 - Padrao de observabilidade por endpoint:
@@ -531,6 +541,7 @@ Notas de resposta:
   - usa `503` com `code = CM_ENVIO_PROVIDER_UNAVAILABLE` quando o provider/gateway estiver inacessivel, indisponivel ou mal configurado
   - devolve mensagem operacional amigavel para a UI, mantendo o detalhe tecnico apenas no contexto de log
   - libera lock de sessao antes da chamada ao provider para reduzir bloqueio concorrente com polling da mesma thread
+  - quando o envio humano for confirmado, a thread passa para `aguardando_humano=1` e `automacao_ativa=0`
 - `POST /atendimento-whatsapp/conversa/{id}/cadastrar-contato`:
   - body: `nome` (opcional)
   - sucesso: `CM_CONTATO_LINKED_OK`
@@ -558,6 +569,12 @@ Notas de resposta:
 
 Configuracoes gerais relevantes persistidas em `POST /configuracoes/salvar`:
 - `sessao_inatividade_minutos`: timeout configuravel de inatividade da sessao (5 a 1440 minutos)
+- `whatsapp_direct_provider`: aceita `menuia`, `evolution`, `api_whats_local`, `api_whats_linux` e `webhook`
+- `whatsapp_evolution_url`
+- `whatsapp_evolution_apikey`
+- `whatsapp_evolution_instance`
+- `whatsapp_evolution_timeout`
+- `whatsapp_evolution_sync_avatar`
 
 ## Busca Global
 
@@ -592,9 +609,27 @@ Payload inbound aceito (resumo):
 - `media_mime_type`
 - `media_filename`
 - `media_base64` (quando encaminhado pelo gateway local)
+- `key.remoteJid`
+- `key.participant`
+- `pushName`
+- `message.conversation`
+- `message.extendedTextMessage.text`
+- `message.imageMessage.caption`
+- `message.videoMessage.caption`
+- `message.documentMessage.caption`
+- `message.documentMessage.fileName`
 
 Observacao:
 - quando `self_check=true` (ou header `X-Webhook-Self-Check: 1`), o endpoint valida token/rota e retorna sucesso sem gravar mensagem inbound.
+- um workflow n8n pode usar essa mesma rota para espelhar mensagens recebidas por canais externos antes de responder ao cliente, preservando a Central de Mensagens do ERP como trilha oficial.
+- aliases de provider normalizados pela Central:
+  - `evolution_api` -> `evolution`
+  - `local_node` -> `api_whats_local`
+- o projeto agora possui duas referencias n8n para esse espelhamento:
+  - `documentacao/10-deploy/n8n/atendimento-clientes-whatsapp.json`
+  - `documentacao/10-deploy/n8n/atendimento-clientes-whatsapp-ai-clientes.json`
+  - `documentacao/10-deploy/n8n/evolution-whatsapp-atendimento-ia-erp.json`
+- no fluxo recomendado com Evolution, o webhook da instancia deve apontar primeiro para o n8n, e o n8n usa `POST /webhooks/whatsapp` para manter o ERP como historico oficial.
 
 ## Gateway Node (`whatsapp-api/server.js`)
 
@@ -631,6 +666,10 @@ Fluxo inbound local -> ERP:
 - em `GET /sync-chat-history`, quando `FORWARD_INBOUND_MEDIA_ENABLED=1`, o gateway tambem tenta baixar e incluir midia no payload historico
 - token opcional via header `X-Webhook-Token: ERP_WEBHOOK_TOKEN`
 - se houver falha de loopback local, o gateway tenta fallback automatico entre `localhost` e `127.0.0.1` para o webhook ERP.
+
+Orquestracao n8n suportada:
+- um workflow n8n externo pode consumir mensagens de outro provedor, enviar copia para `POST /webhooks/whatsapp` e reutilizar `POST /create-message` para responder pelo gateway oficial;
+- referencia entregue no projeto: `documentacao/10-deploy/n8n/atendimento-clientes-whatsapp.json`.
 
 ## Formato padrao de resposta
 

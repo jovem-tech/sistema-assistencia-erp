@@ -8,6 +8,7 @@
     const workspaceEl = document.getElementById('cmWorkspace');
     const listEl = document.getElementById('conversaList');
     const threadMessages = document.getElementById('threadMessages');
+    const threadAvatar = document.getElementById('threadAvatar');
     const threadTitle = document.getElementById('threadTitle');
     const threadSubtitle = document.getElementById('threadSubtitle');
     const threadStatusBadge = document.getElementById('threadStatusBadge');
@@ -123,6 +124,7 @@
         currentConversaId: null,
         currentList: [],
         listSignature: '',
+        listCursor: '',
         renderedActiveConversationId: null,
         mensagens: [],
         latestMessageId: 0,
@@ -135,6 +137,12 @@
         lastInboundSyncAt: 0,
         lastInboundSyncCount: 0,
         filterDebounceTimer: null,
+        listStreamSource: null,
+        listStreamReady: false,
+        listStreamOpenedAt: 0,
+        listStreamRetryTimer: null,
+        listStreamProbeBlockedUntil: 0,
+        listStreamDisabledUntil: 0,
         streamSource: null,
         streamForConversaId: null,
         streamReady: false,
@@ -565,7 +573,9 @@
         return false;
     };
 
+    const isAnyRealtimeLive = () => state.streamReady || state.listStreamReady;
     const sseStorageKey = 'cm:sse-disabled-until';
+    const listSseStorageKey = 'cm:list-sse-disabled-until';
     const syncSseDisableFromStorage = () => {
         try {
             const stored = Number(window.sessionStorage.getItem(sseStorageKey) || 0);
@@ -587,6 +597,29 @@
         }
         if (reason) {
             console.warn('[CentralMensagens] SSE temporariamente desativado:', reason);
+        }
+    };
+    const syncListSseDisableFromStorage = () => {
+        try {
+            const stored = Number(window.sessionStorage.getItem(listSseStorageKey) || 0);
+            if (Number.isFinite(stored) && stored > state.listStreamDisabledUntil) {
+                state.listStreamDisabledUntil = stored;
+            }
+        } catch (error) {
+            // sessionStorage pode estar indisponivel; segue sem persistencia.
+        }
+    };
+    const disableListSseTemporarily = (ms, reason) => {
+        const until = Date.now() + Math.max(5000, Number(ms || 0));
+        state.listStreamDisabledUntil = Math.max(state.listStreamDisabledUntil, until);
+        state.listStreamProbeBlockedUntil = Math.max(state.listStreamProbeBlockedUntil, until);
+        try {
+            window.sessionStorage.setItem(listSseStorageKey, String(state.listStreamDisabledUntil));
+        } catch (error) {
+            // Ignora erro de armazenamento.
+        }
+        if (reason) {
+            console.warn('[CentralMensagens] SSE da fila temporariamente desativado:', reason);
         }
     };
 
@@ -641,6 +674,51 @@
         const first = parts[0]?.[0] || '';
         const second = parts[1]?.[0] || '';
         return (first + second).trim().toUpperCase() || clean.substring(0, 2).toUpperCase();
+    };
+
+    const resolveAvatarUrl = (...values) => {
+        for (const value of values) {
+            const url = String(value || '').trim();
+            if (url) {
+                return url;
+            }
+        }
+        return '';
+    };
+
+    const renderAvatarMarkup = (name, avatarUrl, shellClass) => {
+        const safeClass = shellClass ? ` ${shellClass}` : '';
+        const safeName = String(name || '').trim();
+        const safeUrl = resolveAvatarUrl(avatarUrl);
+        if (safeUrl) {
+            return `<div class="${safeClass.trim()}"><img src="${escapeHtml(safeUrl)}" alt="${escapeHtml(safeName || 'Contato')}" loading="lazy"></div>`;
+        }
+
+        const initials = firstInitial(safeName || 'Contato');
+        return `<div class="${safeClass.trim()}">${escapeHtml(initials)}</div>`;
+    };
+
+    const updateThreadAvatar = (conversa, contexto = null) => {
+        if (!threadAvatar) {
+            return;
+        }
+
+        const nome = conversa?.cliente_nome
+            || conversa?.contato_nome
+            || conversa?.contato_perfil_nome
+            || contexto?.contato?.nome
+            || contexto?.contato?.whatsapp_nome_perfil
+            || conversa?.nome_contato
+            || conversa?.telefone
+            || 'Conversa';
+        const avatarUrl = resolveAvatarUrl(
+            conversa?.contato_avatar_url,
+            contexto?.contato?.whatsapp_avatar_url
+        );
+
+        threadAvatar.innerHTML = avatarUrl
+            ? `<img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(nome)}" loading="lazy">`
+            : '<i class="bi bi-person-circle"></i>';
     };
 
     const normalizeStatusLabel = (value) => {
@@ -866,7 +944,7 @@
         state.filterDebounceTimer = setTimeout(() => {
             state.filterDebounceTimer = null;
             updateFilterFeedback();
-            safeLoadConversas(true);
+            refreshConversationListRealtime(true, { resetCursor: true });
         }, Math.max(120, delay));
     };
 
@@ -914,7 +992,7 @@
         });
     };
 
-    const applyQuickFilter = (filterKey) => {
+    const applyQuickFilter = async (filterKey) => {
         const key = String(filterKey || '').trim().toLowerCase();
         if (filtroQ) filtroQ.value = '';
         if (filtroStatus) filtroStatus.value = '';
@@ -937,7 +1015,7 @@
         }
 
         updateFilterFeedback();
-        safeLoadConversas(true);
+        await refreshConversationListRealtime(true, { resetCursor: true });
     };
 
     const updateFilterFeedback = () => {
@@ -1293,6 +1371,16 @@
         }
         state.authRedirectInProgress = true;
         stopPollingLoop();
+        if (typeof closeConversationListStream === 'function') {
+            closeConversationListStream();
+        } else if (state.listStreamSource) {
+            try {
+                state.listStreamSource.close();
+            } catch (error) {
+                // Ignora falha no fechamento forcado.
+            }
+            state.listStreamSource = null;
+        }
         if (typeof closeMessageStream === 'function') {
             closeMessageStream();
         } else if (state.streamSource) {
@@ -1439,7 +1527,7 @@
         const slaEstourado = unread > 0 && diffMs > (slaPrimeiraRespostaMin * 60 * 1000);
         const subtitle = [item.telefone, item.numero_os ? ('OS ' + item.numero_os) : null].filter(Boolean).join(' | ');
         const statusLabel = normalizeStatusLabel(item.status || 'aberta');
-        const avatar = firstInitial(nome);
+        const avatarMarkup = renderAvatarMarkup(nome, item.contato_avatar_url, 'cm-conversa-avatar');
         const hasDraft = readDraftForConversation(item.id).trim() !== '';
 
         const lastDirection = String(item.ultima_mensagem_direcao || '').toLowerCase();
@@ -1482,7 +1570,7 @@
             <div class="cm-conversa-item ${isActive ? 'active' : ''}" data-id="${item.id}" role="button" tabindex="0" aria-selected="${isActive ? 'true' : 'false'}" aria-label="Abrir conversa de ${escapeHtml(nome)}">
                 <div class="cm-conversa-head">
                     <div class="cm-conversa-main">
-                        <div class="cm-conversa-avatar">${escapeHtml(avatar)}</div>
+                        ${avatarMarkup}
                         <div class="min-w-0 flex-grow-1">
                             <div class="cm-conversa-title">${escapeHtml(nome)}</div>
                             <div class="cm-conversa-subtitle">${escapeHtml(subtitle || 'Sem telefone/OS vinculada')}</div>
@@ -1687,6 +1775,28 @@
         }
     };
 
+    const applyConversationListSnapshot = (items, options) => {
+        const opts = options || {};
+        const sortedItems = sortConversasByRecency(Array.isArray(items) ? items : []);
+        const signature = computeListSignature(sortedItems);
+        const shouldRender =
+            signature !== state.listSignature
+            || state.renderedActiveConversationId !== state.currentConversaId
+            || !!opts.forceRender;
+
+        state.currentList = sortedItems;
+        state.listSignature = signature;
+        state.listCursor = String(opts.cursor || state.listCursor || signature || '');
+        state.lastConversaListSyncAt = Date.now();
+
+        if (shouldRender) {
+            renderConversaList(sortedItems, opts.preserveScrollTop);
+        }
+
+        setRealtimeBadge(isAnyRealtimeLive() ? 'live' : 'polling', new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
+        return sortedItems;
+    };
+
     const loadConversas = async (silent) => {
         const preserveScroll = listEl.scrollTop;
         updateFilterFeedback();
@@ -1698,21 +1808,11 @@
         const url = cfg.endpointConversas + '?' + query;
 
         const data = await getJson(url);
-        const items = sortConversasByRecency(data.items || []);
-        const signature = computeListSignature(items);
-        const shouldRender =
-            signature !== state.listSignature
-            || state.renderedActiveConversationId !== state.currentConversaId
-            || !silent;
-
-        state.currentList = items;
-        state.listSignature = signature;
-        state.lastConversaListSyncAt = Date.now();
-        if (shouldRender) {
-            renderConversaList(items, preserveScroll);
-        }
-        setRealtimeBadge(state.streamReady ? 'live' : 'polling', new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
-        return items;
+        return applyConversationListSnapshot(data.items || [], {
+            preserveScrollTop: preserveScroll,
+            cursor: data.cursor || '',
+            forceRender: !silent,
+        });
     };
 
     const safeLoadConversas = async (silent) => {
@@ -1728,6 +1828,196 @@
             `;
             return [];
         }
+    };
+
+    const closeConversationListStream = () => {
+        if (state.listStreamRetryTimer) {
+            clearTimeout(state.listStreamRetryTimer);
+            state.listStreamRetryTimer = null;
+        }
+        if (state.listStreamSource) {
+            state.listStreamSource.close();
+        }
+        state.listStreamSource = null;
+        state.listStreamReady = false;
+        state.listStreamOpenedAt = 0;
+        if (!state.authRedirectInProgress && !state.streamReady) {
+            setRealtimeBadge('polling');
+        }
+    };
+
+    const scheduleConversationListStreamReconnect = () => {
+        if (state.listStreamRetryTimer) {
+            clearTimeout(state.listStreamRetryTimer);
+            state.listStreamRetryTimer = null;
+        }
+        const now = Date.now();
+        const delay = now < state.listStreamProbeBlockedUntil ? 6000 : 1800;
+        state.listStreamRetryTimer = setTimeout(() => {
+            state.listStreamRetryTimer = null;
+            if (!document.hidden) {
+                startConversationListStream();
+            }
+        }, delay);
+    };
+
+    const startConversationListStream = async () => {
+        closeConversationListStream();
+        if (!sseEnabledByConfig || !('EventSource' in window) || !cfg.endpointConversasStream) {
+            return;
+        }
+
+        syncListSseDisableFromStorage();
+        if (Date.now() < state.listStreamDisabledUntil) {
+            return;
+        }
+        if (Date.now() < state.listStreamProbeBlockedUntil) {
+            return;
+        }
+
+        const endpointUrl = resolveEndpointUrl(cfg.endpointConversasStream);
+        if (!endpointUrl) {
+            return;
+        }
+
+        const filters = currentFilters();
+        const probeUrl = endpointUrl + '?' + toQueryString({
+            ...filters,
+            probe: 1,
+            _: Date.now(),
+        });
+
+        try {
+            await getJson(probeUrl);
+        } catch (error) {
+            state.listStreamReady = false;
+            state.listStreamProbeBlockedUntil = Date.now() + 30000;
+            console.warn('[CentralMensagens] stream da fila indisponivel, mantendo polling da lista.', error);
+            return;
+        }
+
+        const handshakeUrl = endpointUrl + '?' + toQueryString({
+            ...filters,
+            handshake: 1,
+            after_cursor: state.listCursor || '',
+            _: Date.now(),
+        });
+
+        try {
+            const handshakeResponse = await fetch(handshakeUrl, {
+                cache: 'no-store',
+                headers: {
+                    Accept: 'text/event-stream',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+            const contentType = String(handshakeResponse.headers.get('content-type') || '').toLowerCase();
+            if (!handshakeResponse.ok || contentType.indexOf('text/event-stream') === -1) {
+                disableListSseTemporarily(10 * 60 * 1000, 'handshake da fila sem text/event-stream (' + contentType + ')');
+                throw new Error('Endpoint SSE da fila retornou tipo invalido: ' + contentType);
+            }
+            await handshakeResponse.text();
+        } catch (error) {
+            state.listStreamReady = false;
+            state.listStreamProbeBlockedUntil = Date.now() + 60 * 1000;
+            console.warn('[CentralMensagens] handshake SSE da fila falhou, mantendo polling da lista.', error);
+            return;
+        }
+
+        const streamUrl = endpointUrl + '?' + toQueryString({
+            ...filters,
+            after_cursor: state.listCursor || '',
+            _: Date.now(),
+        });
+
+        const source = new EventSource(streamUrl);
+        state.listStreamSource = source;
+        state.listStreamOpenedAt = Date.now();
+
+        source.addEventListener('ready', () => {
+            state.listStreamReady = true;
+            state.listStreamProbeBlockedUntil = 0;
+            state.listStreamDisabledUntil = 0;
+            setRealtimeBadge('live');
+            try {
+                window.sessionStorage.removeItem(listSseStorageKey);
+            } catch (error) {
+                // Ignora erro de armazenamento.
+            }
+        });
+
+        source.addEventListener('conversas', (event) => {
+            let payload = {};
+            try {
+                payload = JSON.parse(event.data || '{}');
+            } catch (error) {
+                return;
+            }
+            applyConversationListSnapshot(payload.items || [], {
+                preserveScrollTop: listEl.scrollTop,
+                cursor: payload.cursor || '',
+                forceRender: false,
+            });
+        });
+
+        source.addEventListener('ping', (event) => {
+            try {
+                const payload = JSON.parse(event.data || '{}');
+                if (payload.cursor) {
+                    state.listCursor = String(payload.cursor);
+                }
+            } catch (error) {
+                // Ping sem payload util; segue normalmente.
+            }
+        });
+
+        source.addEventListener('error', () => {
+            const openedAgoMs = Date.now() - Number(state.listStreamOpenedAt || Date.now());
+            if (!state.listStreamReady && openedAgoMs < 4000) {
+                disableListSseTemporarily(15 * 60 * 1000, 'stream da fila abortado antes de ready (possivel MIME/text-html)');
+            }
+            state.listStreamReady = false;
+            state.listStreamProbeBlockedUntil = Math.max(Date.now() + 25000, state.listStreamDisabledUntil);
+            if (!state.streamReady) {
+                setRealtimeBadge('warn');
+            }
+            if (state.listStreamSource === source) {
+                source.close();
+                state.listStreamSource = null;
+            }
+            console.warn('[CentralMensagens] stream SSE da fila interrompido, fallback para polling.');
+            scheduleConversationListStreamReconnect();
+        });
+
+        source.addEventListener('close', () => {
+            if (state.listStreamSource === source) {
+                source.close();
+                state.listStreamSource = null;
+            }
+            state.listStreamReady = false;
+            if (!state.streamReady) {
+                setRealtimeBadge('polling');
+            }
+            scheduleConversationListStreamReconnect();
+        });
+    };
+
+    const restartConversationListStream = async (options) => {
+        const opts = options || {};
+        closeConversationListStream();
+        if (opts.resetCursor) {
+            state.listCursor = '';
+        }
+        if (!document.hidden) {
+            await startConversationListStream();
+        }
+    };
+
+    const refreshConversationListRealtime = async (silent, options) => {
+        const opts = options || {};
+        const items = await safeLoadConversas(silent);
+        await restartConversationListStream({ resetCursor: !!opts.resetCursor });
+        return items;
     };
 
     const closeMessageStream = () => {
@@ -1934,6 +2224,7 @@
             || 'Conversa';
         const responsavel = String(conversa?.responsavel_nome || '').trim();
         const telefone = String(conversa?.telefone || '').trim();
+        updateThreadAvatar(conversa, state.currentContext);
         threadTitle.textContent = nome;
         threadSubtitle.textContent = [telefone, responsavel ? ('ResponsÃ¡vel: ' + responsavel) : 'NÃ£o atribuÃ­da']
             .filter(Boolean)
@@ -3713,6 +4004,9 @@
                 detail: error?.message || error,
             });
             state.currentContext = null;
+            if (threadAvatar) {
+                threadAvatar.innerHTML = '<i class="bi bi-person-circle"></i>';
+            }
             threadTitle.textContent = 'Falha ao abrir conversa';
             threadSubtitle.textContent = '';
             applyThreadStatusBadge('arquivada');
@@ -4355,16 +4649,17 @@
     const shutdownRuntime = () => {
         stopPollingLoop();
         stopInboundAutoSync();
+        closeConversationListStream();
         closeMessageStream();
         clearFilterDebounce();
     };
 
     const bindStaticEvents = () => {
-        btnFiltrar?.addEventListener('click', () => {
+        btnFiltrar?.addEventListener('click', async () => {
             updateFilterFeedback();
-            safeLoadConversas(true);
+            await refreshConversationListRealtime(true, { resetCursor: true });
         });
-        btnLimparFiltros?.addEventListener('click', () => {
+        btnLimparFiltros?.addEventListener('click', async () => {
             if (filtroQ) filtroQ.value = '';
             if (filtroStatus) filtroStatus.value = '';
             if (filtroResponsavel) filtroResponsavel.value = '';
@@ -4373,29 +4668,29 @@
             if (filtroOsAberta) filtroOsAberta.checked = false;
             if (filtroClientesNovos) filtroClientesNovos.checked = false;
             updateFilterFeedback();
-            safeLoadConversas(true);
+            await refreshConversationListRealtime(true, { resetCursor: true });
         });
         quickFilterButtons.forEach((btn) => {
-            btn.addEventListener('click', (event) => {
+            btn.addEventListener('click', async (event) => {
                 event.preventDefault();
-                applyQuickFilter(btn.getAttribute('data-cm-quick-filter') || 'all');
+                await applyQuickFilter(btn.getAttribute('data-cm-quick-filter') || 'all');
             });
         });
         filtroQ?.addEventListener('input', () => {
             scheduleFilterRefresh(280);
         });
-        filtroQ?.addEventListener('keydown', (event) => {
+        filtroQ?.addEventListener('keydown', async (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
                 clearFilterDebounce();
                 updateFilterFeedback();
-                safeLoadConversas(true);
+                await refreshConversationListRealtime(true, { resetCursor: true });
             }
         });
         [filtroStatus, filtroResponsavel, filtroTag, filtroNaoLidas, filtroOsAberta, filtroClientesNovos].forEach((el) => {
-            el?.addEventListener('change', () => {
+            el?.addEventListener('change', async () => {
                 updateFilterFeedback();
-                safeLoadConversas(true);
+                await refreshConversationListRealtime(true, { resetCursor: true });
             });
         });
 
@@ -4758,7 +5053,7 @@
 
         let items = [];
         try {
-            items = await safeLoadConversas(false);
+            items = await refreshConversationListRealtime(false, { resetCursor: true });
         } catch (error) {
             setRealtimeBadge('warn');
             listEl.innerHTML = `
@@ -4787,14 +5082,16 @@
     bootstrapCentral();
     startPolling();
     startInboundAutoSync();
-    document.addEventListener('visibilitychange', () => {
+    document.addEventListener('visibilitychange', async () => {
         if (document.hidden) {
+            closeConversationListStream();
             closeMessageStream();
             return;
         }
         if (!document.hidden) {
             pollTick();
             syncInbound({ silent: true, trigger: 'visibility' });
+            await restartConversationListStream();
             if (state.currentConversaId && !state.streamSource) {
                 startMessageStream();
             }

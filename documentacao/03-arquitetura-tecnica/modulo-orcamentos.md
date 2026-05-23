@@ -124,12 +124,13 @@ Na camada web, a navbar passa a consumir esse mesmo inbox por meio de `app/Contr
 - `GET /notificacoes/stream`
 - `POST /notificacoes/lida/{id}`
 - `POST /notificacoes/lidas`
+- `POST /notificacoes/limpar-lidas`
 
 O endpoint `stream` usa `text/event-stream` com autenticacao de sessao, cursor `after_id`, eventos `delta/ping/end` e fallback de polling no frontend quando SSE nao estiver disponivel.
 
 ### Resolucao de rota da notificacao
 
-O campo `rota_destino` das notificacoes desse fluxo passou a ser persistido com `site_url(...)` no backend.
+O campo `rota_destino` das notificacoes desse fluxo passou a ser persistido e normalizado para a URL canonica da Central (`/atendimento-whatsapp?conversa_id={id}`) quando o alvo for uma conversa WhatsApp.
 
 No frontend, `public/assets/js/navbar-notifications.js` tambem normaliza rotas antigas que ainda venham com prefixo `/`, convertendo-as para o contexto correto do ERP antes da navegacao.
 
@@ -138,6 +139,12 @@ Com isso, o clique na notificacao continua funcional mesmo em ambientes com:
 - `index.php` habilitado;
 - aplicacao publicada em subdiretorio;
 - itens antigos ainda gravados com caminho absoluto da raiz do host.
+
+Fluxo atual de UX:
+
+- o clique no item do sino marca a notificacao como lida;
+- em seguida o ERP abre um modal SweetAlert2 com titulo, corpo e metadados operacionais da notificacao;
+- se existir rota vinculada, o modal oferece `Abrir conversa` para navegar somente sob confirmacao do operador.
 
 ### Reflexo na listagem de OS
 

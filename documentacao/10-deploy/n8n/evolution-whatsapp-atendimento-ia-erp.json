@@ -1,0 +1,405 @@
+{
+  "name": "Evolution WhatsApp IA + ERP",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "evolution-whatsapp-atendimento-ia",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Entrada Evolution IA",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        260,
+        320
+      ],
+      "webhookId": "evolution-whatsapp-atendimento-ia"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const envelope = ($json.body && typeof $json.body === 'object') ? $json.body : $json;\nconst data = (envelope.data && typeof envelope.data === 'object') ? envelope.data : envelope;\n\nfunction readPath(obj, path) {\n  return path.split('.').reduce((acc, key) => {\n    if (acc && typeof acc === 'object' && key in acc) return acc[key];\n    return undefined;\n  }, obj);\n}\n\nfunction pick(obj, paths, fallback = '') {\n  for (const path of paths) {\n    const value = readPath(obj, path);\n    if (value !== undefined && value !== null && String(value).trim() !== '') {\n      return String(value).trim();\n    }\n  }\n  return fallback;\n}\n\nfunction pickBool(obj, paths, fallback = false) {\n  for (const path of paths) {\n    const value = readPath(obj, path);\n    if (typeof value === 'boolean') return value;\n    if (value === 1 || value === '1') return true;\n    if (typeof value === 'string') {\n      const normalized = value.trim().toLowerCase();\n      if (['true', 'yes', 'sim', 'on'].includes(normalized)) return true;\n      if (['false', 'no', 'nao', 'off'].includes(normalized)) return false;\n    }\n  }\n  return fallback;\n}\n\nfunction normalizePhone(value) {\n  const base = String(value || '').replace(/@.+$/g, '').replace(/\\D+/g, '');\n  if (!base) return '';\n  return base.startsWith('55') ? base : `55${base}`;\n}\n\nfunction normalizeSqlPhone(fieldName) {\n  return `REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(${fieldName}, ''), '(', ''), ')', ''), '-', ''), ' ', ''), '+', '')`;\n}\n\nfunction detectStructuredMessageType(payload) {\n  const checks = [\n    ['message.audioMessage', 'audio'],\n    ['message.ptvMessage', 'video'],\n    ['message.videoMessage', 'video'],\n    ['message.imageMessage.caption', 'imagem'],\n    ['message.imageMessage', 'imagem'],\n    ['message.documentMessage.caption', 'arquivo'],\n    ['message.documentMessage', 'arquivo'],\n    ['message.documentWithCaptionMessage.message.documentMessage', 'arquivo'],\n    ['message.stickerMessage', 'imagem'],\n    ['message.contactMessage', 'contato'],\n    ['message.contactsArrayMessage', 'contato'],\n    ['message.locationMessage', 'localizacao'],\n    ['message.liveLocationMessage', 'localizacao'],\n    ['message.reactionMessage', 'reacao']\n  ];\n\n  for (const [path, type] of checks) {\n    const value = readPath(payload, path);\n    if (value && typeof value === 'object') {\n      return type;\n    }\n    if (typeof value === 'string' && value.trim() !== '') {\n      return type;\n    }\n  }\n\n  return 'texto';\n}\n\nconst companyName = 'Jovem Tech';\nconst erpWebhookUrl = 'https://sistema.jovemtech.eco.br/webhooks/whatsapp';\nconst erpWebhookToken = 'COLE_O_TOKEN_WEBHOOK_ERP';\nconst erpOrigin = 'https://sistema.jovemtech.eco.br';\n\nconst evolutionBaseUrl = 'https://evo.jovemtech.eco.br';\nconst evolutionApiKey = 'COLE_A_API_KEY_DA_EVOLUTION';\nconst evolutionInstance = 'chatwoot';\n\nconst openaiApiKey = 'COLE_OPENAI_API_KEY';\nconst openaiModel = 'gpt-4.1-mini';\n\nconst rawEventName = pick(envelope, ['event', 'type', 'webhookEvent', 'trigger'], '');\nconst eventName = rawEventName.toUpperCase();\nconst normalizedEventName = eventName.replace(/\\./g, '_');\nconst instanceName = pick(envelope, ['instance', 'instanceName', 'sender'], evolutionInstance);\nconst remoteJid = pick(data, [\n  'key.remoteJid',\n  'remoteJid',\n  'jid',\n  'chatId',\n  'from',\n  'sender',\n  'phone',\n  'number'\n], '');\nconst participant = pick(data, ['participant', 'key.participant'], '');\nconst pushName = pick(data, ['pushName', 'contact.pushName', 'contact.name'], '');\nconst fromMe = pickBool(data, ['key.fromMe', 'fromMe'], false);\nconst isGroup = /@g\\.us$/i.test(remoteJid);\nconst phone = normalizePhone(remoteJid || pick(data, ['from', 'sender', 'phone', 'number'], ''));\nconst phoneNoCountry = phone.replace(/^55/, '');\n\nconst text = pick(data, [\n  'message.conversation',\n  'message.extendedTextMessage.text',\n  'message.imageMessage.caption',\n  'message.videoMessage.caption',\n  'message.documentMessage.caption',\n  'message.documentWithCaptionMessage.message.documentMessage.caption',\n  'message.buttonsResponseMessage.selectedDisplayText',\n  'message.listResponseMessage.title',\n  'message.listResponseMessage.singleSelectReply.selectedRowId',\n  'message.templateButtonReplyMessage.selectedDisplayText',\n  'body',\n  'text',\n  'message'\n], '');\n\nconst normalizedText = text\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '')\n  .toLowerCase()\n  .trim();\n\nconst messageType = detectStructuredMessageType(data);\nconst hasMedia = messageType !== 'texto';\nconst isInboundEvent = normalizedEventName === 'MESSAGES_UPSERT';\nconst isManualTestPayload = normalizedEventName === '' && !fromMe && !isGroup && phone !== '' && text !== '';\nconst shouldProcess = (isInboundEvent || isManualTestPayload) && !fromMe && !isGroup && phone !== '';\nconst shouldReply = shouldProcess;\n\nconst phoneValuesSql = [phone, phoneNoCountry]\n  .filter((value, index, array) => value && array.indexOf(value) === index)\n  .map((value) => `'${value.replace(/'/g, \"''\")}'`)\n  .join(', ');\n\nconst phoneWhere = [\n  normalizeSqlPhone('c.telefone1'),\n  normalizeSqlPhone('c.telefone2'),\n  normalizeSqlPhone('c.telefone_contato')\n].map((expr) => `${expr} IN (${phoneValuesSql || \"''\"})`).join(' OR ');\n\nconst historicoPhoneWhere = [\n  `${normalizeSqlPhone('c.telefone')} IN (${phoneValuesSql || \"''\"})`,\n  `${normalizeSqlPhone('m.telefone')} IN (${phoneValuesSql || \"''\"})`\n].join(' OR ');\n\nconst clienteLookupSql = `\nSELECT *\nFROM (\n  SELECT\n    1 AS cliente_encontrado,\n    c.id,\n    c.nome_razao,\n    c.email,\n    c.telefone1,\n    c.telefone2,\n    c.nome_contato,\n    c.telefone_contato,\n    c.cidade,\n    c.uf,\n    c.observacoes\n  FROM clientes c\n  WHERE ${phoneWhere}\n  ORDER BY c.id DESC\n  LIMIT 1\n) cliente\nUNION ALL\nSELECT\n  0 AS cliente_encontrado,\n  NULL AS id,\n  NULL AS nome_razao,\n  NULL AS email,\n  NULL AS telefone1,\n  NULL AS telefone2,\n  NULL AS nome_contato,\n  NULL AS telefone_contato,\n  NULL AS cidade,\n  NULL AS uf,\n  NULL AS observacoes\nFROM DUAL\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM clientes c\n  WHERE ${phoneWhere}\n  LIMIT 1\n)\nLIMIT 1;\n`.trim();\n\nconst historicoLookupSql = `\nSELECT *\nFROM (\n  SELECT\n    m.id,\n    m.created_at,\n    m.direcao,\n    m.tipo_mensagem,\n    m.tipo_conteudo,\n    m.mensagem,\n    COALESCE(m.enviada_por_bot, 0) AS enviada_por_bot,\n    CASE\n      WHEN m.direcao = 'inbound' THEN 'cliente'\n      WHEN COALESCE(m.enviada_por_bot, 0) = 1 THEN 'bot'\n      WHEN m.tipo_mensagem = 'outbound_externo' OR m.tipo_mensagem LIKE '%externo%' THEN 'humano_app'\n      ELSE 'humano_erp'\n    END AS origem_resumida\n  FROM mensagens_whatsapp m\n  LEFT JOIN conversas_whatsapp c ON c.id = m.conversa_id\n  WHERE ${historicoPhoneWhere}\n  ORDER BY m.id DESC\n  LIMIT 12\n) historico\nUNION ALL\nSELECT\n  NULL AS id,\n  NULL AS created_at,\n  NULL AS direcao,\n  NULL AS tipo_mensagem,\n  NULL AS tipo_conteudo,\n  NULL AS mensagem,\n  0 AS enviada_por_bot,\n  NULL AS origem_resumida\nFROM DUAL\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM mensagens_whatsapp m\n  LEFT JOIN conversas_whatsapp c ON c.id = m.conversa_id\n  WHERE ${historicoPhoneWhere}\n  LIMIT 1\n);\n`.trim();\n\nconst erpPayload = {\n  provider: 'evolution',\n  source: 'evolution',\n  event: rawEventName || eventName,\n  instance: instanceName,\n  push_name: pushName,\n  participant,\n  from_me: fromMe,\n  has_media: hasMedia,\n  normalized_phone: phone,\n  normalized_text: text,\n  detected_type: messageType,\n  n8n_workflow: 'evolution-whatsapp-atendimento-ia',\n  n8n_received_at: new Date().toISOString(),\n  ...envelope\n};\n\nreturn {\n  ...$json,\n  source: envelope,\n  data,\n  eventName,\n  normalizedEventName,\n  instanceName,\n  companyName,\n  normalizedPhone: phone,\n  phoneNoCountry,\n  remoteJid,\n  pushName,\n  participant,\n  receivedText: text,\n  normalizedText,\n  messageType,\n  hasMedia,\n  fromMe,\n  isGroup,\n  shouldProcess,\n  shouldReply,\n  erpWebhookUrl,\n  erpWebhookToken,\n  erpOrigin,\n  evolutionBaseUrl,\n  evolutionApiKey,\n  evolutionInstance,\n  openaiApiKey,\n  openaiModel,\n  clienteLookupSql,\n  historicoLookupSql,\n  erpPayload\n};"
+      },
+      "id": "2",
+      "name": "Normalizar Evolution e Credenciais",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Normalizar Evolution e Credenciais').item.json.erpWebhookUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Webhook-Token",
+              "value": "={{ $('Normalizar Evolution e Credenciais').item.json.erpWebhookToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Normalizar Evolution e Credenciais').item.json.erpPayload }}"
+      },
+      "id": "3",
+      "name": "Espelhar Evento no ERP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        860,
+        320
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $('Normalizar Evolution e Credenciais').item.json.clienteLookupSql }}",
+        "options": {}
+      },
+      "id": "4",
+      "name": "Buscar Cliente ERP",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        1120,
+        320
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "COLE_O_ID_DA_CREDENCIAL_MYSQL",
+          "name": "COLE_O_NOME_DA_CREDENCIAL_MYSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $('Normalizar Evolution e Credenciais').item.json.historicoLookupSql }}",
+        "options": {}
+      },
+      "id": "12",
+      "name": "Buscar Historico Conversa ERP",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        1250,
+        320
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "COLE_O_ID_DA_CREDENCIAL_MYSQL",
+          "name": "COLE_O_NOME_DA_CREDENCIAL_MYSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const base = $('Normalizar Evolution e Credenciais').first().json;\nconst cliente = $('Buscar Cliente ERP').first().json || {};\nconst historicoRows = $('Buscar Historico Conversa ERP').all().map((item) => item.json || {});\nconst clienteEncontrado = Number(cliente.cliente_encontrado || 0) === 1 && !!cliente.id;\n\nfunction firstName(value) {\n  return String(value || '').trim().split(/\\s+/).filter(Boolean)[0] || '';\n}\n\nconst profileFirstName = firstName(base.pushName);\nconst cadastroFirstName = firstName(cliente.nome_razao);\nconst nameConflict = profileFirstName !== '' && cadastroFirstName !== '' && profileFirstName.toLowerCase() !== cadastroFirstName.toLowerCase();\nconst preferredGreetingName = nameConflict ? (profileFirstName || cadastroFirstName) : (cadastroFirstName || profileFirstName);\n\nconst clienteResumo = clienteEncontrado\n  ? [\n      `ID: ${cliente.id}`,\n      `Nome do cadastro ERP: ${cliente.nome_razao || '-'}`,\n      `Email: ${cliente.email || '-'}`,\n      `Telefone1: ${cliente.telefone1 || '-'}`,\n      `Telefone2: ${cliente.telefone2 || '-'}`,\n      `Contato: ${cliente.nome_contato || '-'}`,\n      `Telefone do contato: ${cliente.telefone_contato || '-'}`,\n      `Cidade/UF: ${(cliente.cidade || '-') + '/' + (cliente.uf || '-')}`,\n      `Observacoes: ${cliente.observacoes || '-'}`\n    ].join('\\n')\n  : 'Cliente nao localizado por telefone na tabela clientes.';\n\nconst historicoUtil = historicoRows\n  .filter((row) => row && row.id && String(row.mensagem || '').trim() !== '')\n  .sort((a, b) => Number(a.id) - Number(b.id))\n  .slice(-10);\n\nconst historicoFormatado = historicoUtil.length > 0\n  ? historicoUtil.map((row) => {\n      const momento = String(row.created_at || '').replace('T', ' ').slice(0, 16) || '-';\n      const origem = String(row.origem_resumida || row.direcao || 'desconhecido');\n      const texto = String(row.mensagem || '').replace(/\\s+/g, ' ').trim().slice(0, 280);\n      return `${momento} | ${origem}: ${texto}`;\n    }).join('\\n')\n  : 'Sem historico recente da conversa no ERP.';\n\nconst openaiInstructions = [\n  `Voce e a atendente virtual da ${base.companyName}.`,\n  'Responda em portugues do Brasil, de forma objetiva, calorosa, natural e profissional.',\n  'Continue a conversa de onde ela parou. Nao trate cada mensagem como se fosse o primeiro contato quando houver historico recente.',\n  'Leia o historico recente antes de responder e preserve fatos ja informados, como nome, problema, equipamento, numero de OS, orcamento e combinados.',\n  'Nunca invente dados de OS, orcamento, valores, prazos ou historico tecnico.',\n  'Nao repita saudacao completa em toda mensagem. Use saudacao curta ou va direto ao ponto quando a conversa ja estiver em andamento.',\n  'Nao peca novamente informacoes que ja estejam claras no historico ou no cadastro.',\n  'Se a ultima mensagem do cliente for curta, como ok, teste, testei, sim, nao, deu certo ou ainda nao, interprete isso dentro do contexto do historico em vez de reiniciar o atendimento.',\n  'Se faltar informacao, faca apenas uma pergunta objetiva por vez.',\n  'Se houver divergencia entre o nome do perfil do WhatsApp e o nome do cadastro do ERP, nao trate nenhum dos dois como certeza absoluta; prefira saudacao neutra ou o primeiro nome mais seguro, sem chamar a pessoa pelo nome errado com conviccao.',\n  'Se o cliente nao for encontrado, diga que nao localizou cadastro por este numero e peca nome completo.',\n  'Se a pessoa pedir status de OS e voce so tiver os dados de cadastro, informe que localizou o cadastro mas ainda precisa consultar a OS.',\n  'Se a mensagem vier sem texto e com anexo, reconheca o recebimento do anexo com resposta curta.',\n  'A resposta deve ser curta, pronta para envio por WhatsApp, sem markdown e sem listas longas.'\n].join(' ');\n\nconst openaiInput = [\n  `Evento Evolution: ${base.normalizedEventName || base.eventName || '-'}`,\n  `Telefone normalizado: ${base.normalizedPhone || '-'}`,\n  `Nome de perfil WhatsApp: ${base.pushName || '-'}`,\n  `Primeiro nome sugerido para saudacao: ${preferredGreetingName || '-'}`,\n  `Existe divergencia entre nome do perfil e nome do cadastro: ${nameConflict ? 'sim' : 'nao'}`,\n  `Cliente encontrado: ${clienteEncontrado ? 'sim' : 'nao'}`,\n  `Tipo da mensagem: ${base.messageType || 'texto'}`,\n  `Mensagem mais recente do cliente: ${base.receivedText || '(sem texto)'}`,\n  'Contexto do cliente:',\n  clienteResumo,\n  'Historico recente da conversa no ERP:',\n  historicoFormatado\n].join('\\n\\n');\n\nreturn {\n  ...base,\n  clienteEncontrado,\n  cliente,\n  clienteResumo,\n  historicoFormatado,\n  historicoCount: historicoUtil.length,\n  nameConflict,\n  preferredGreetingName,\n  openaiInstructions,\n  openaiInput\n};"
+      },
+      "id": "5",
+      "name": "Montar Contexto IA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1510,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $json.openaiApiKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { model: $json.openaiModel, instructions: $json.openaiInstructions, input: $json.openaiInput } }}",
+        "options": {}
+      },
+      "id": "6",
+      "name": "Agente IA OpenAI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1640,
+        320
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const ctx = $('Montar Contexto IA').first().json;\nconst response = $json || {};\n\nfunction extractOutputText(payload) {\n  if (typeof payload.output_text === 'string' && payload.output_text.trim() !== '') {\n    return payload.output_text.trim();\n  }\n\n  if (Array.isArray(payload.output)) {\n    for (const item of payload.output) {\n      if (item && item.type === 'message' && Array.isArray(item.content)) {\n        for (const contentItem of item.content) {\n          if (typeof contentItem?.text === 'string' && contentItem.text.trim() !== '') {\n            return contentItem.text.trim();\n          }\n          if (typeof contentItem?.output_text === 'string' && contentItem.output_text.trim() !== '') {\n            return contentItem.output_text.trim();\n          }\n        }\n      }\n    }\n  }\n\n  return '';\n}\n\nlet aiReply = extractOutputText(response);\nconst saudacaoNome = ctx.nameConflict ? '' : (ctx.preferredGreetingName || '');\n\nif (aiReply === '') {\n  if (ctx.hasMedia && !ctx.receivedText) {\n    aiReply = `Recebi seu anexo na ${ctx.companyName}. Vou registrar aqui e seguir com o atendimento.`;\n  } else if (ctx.clienteEncontrado && saudacaoNome) {\n    aiReply = `Oi, ${saudacaoNome}. Vi sua mensagem agora. Como posso te ajudar por aqui?`;\n  } else if (ctx.clienteEncontrado) {\n    aiReply = `Oi. Vi sua mensagem agora e localizei seu cadastro na ${ctx.companyName}. Como posso te ajudar por aqui?`;\n  } else {\n    aiReply = `Oi. Recebi sua mensagem na ${ctx.companyName}, mas ainda nao localizei cadastro por este numero. Pode me informar seu nome completo para eu continuar o atendimento?`;\n  }\n}\n\nreturn {\n  ...ctx,\n  aiRawResponse: response,\n  aiReply,\n  evolutionPayload: {\n    number: ctx.normalizedPhone,\n    text: aiReply\n  }\n};"
+      },
+      "id": "7",
+      "name": "Preparar Resposta Final",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-should-reply",
+              "leftValue": "={{ $json.shouldReply }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8",
+      "name": "Deve Responder?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2160,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.evolutionBaseUrl + '/message/sendText/' + $json.evolutionInstance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "apikey",
+              "value": "={{ $json.evolutionApiKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.evolutionPayload }}",
+        "options": {}
+      },
+      "id": "9",
+      "name": "Enviar Resposta Evolution",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        2430,
+        220
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, workflow: 'evolution-whatsapp-atendimento-ia', event: $('Preparar Resposta Final').item.json.eventName, replied: true, phone: $('Preparar Resposta Final').item.json.normalizedPhone, clienteEncontrado: $('Preparar Resposta Final').item.json.clienteEncontrado, response: $('Preparar Resposta Final').item.json.aiReply } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "10",
+      "name": "Responder Webhook com IA",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2700,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, workflow: 'evolution-whatsapp-atendimento-ia', event: $json.eventName, processed: $json.shouldProcess, replied: false, phone: $json.normalizedPhone, response: $json.shouldProcess ? 'Evento recebido sem resposta automatica.' : 'Evento ignorado pelo workflow (nao e inbound elegivel).' } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "11",
+      "name": "Responder Webhook sem Envio",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2430,
+        420
+      ]
+    }
+  ],
+  "connections": {
+    "Entrada Evolution IA": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Evolution e Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Evolution e Credenciais": {
+      "main": [
+        [
+          {
+            "node": "Espelhar Evento no ERP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Espelhar Evento no ERP": {
+      "main": [
+        [
+          {
+            "node": "Buscar Cliente ERP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Cliente ERP": {
+      "main": [
+        [
+          {
+            "node": "Buscar Historico Conversa ERP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Historico Conversa ERP": {
+      "main": [
+        [
+          {
+            "node": "Montar Contexto IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montar Contexto IA": {
+      "main": [
+        [
+          {
+            "node": "Agente IA OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente IA OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Preparar Resposta Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Resposta Final": {
+      "main": [
+        [
+          {
+            "node": "Deve Responder?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deve Responder?": {
+      "main": [
+        [
+          {
+            "node": "Enviar Resposta Evolution",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder Webhook sem Envio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Resposta Evolution": {
+      "main": [
+        [
+          {
+            "node": "Responder Webhook com IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "87f1437a-1c03-4c56-ae7d-794cd39c0a2d",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {}
+}

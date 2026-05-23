@@ -1,6 +1,6 @@
 # Roadmap - Funcionalidades Planejadas
 
-Atualizado em 03/04/2026.
+Atualizado em 21/05/2026.
 
 ## Concluido (fundacao pre-CRM + CRM operacional inicial)
 - fluxo de OS por macrofases com transicoes validas
@@ -35,6 +35,11 @@ Atualizado em 03/04/2026.
 - refinamento de templates por tipo de cliente/etapa
 - evolucao do painel de contexto da conversa para multi-OS
 - automacao por horario/SLA em camadas (regra + fila)
+- estudo e especificacao oficial do modulo financeiro gerencial:
+  - `DRE` por competencia
+  - `fluxo de caixa realizado` por movimento
+  - `fluxo de caixa projetado` por vencimento
+  - documento base: `09-roadmap/estudo-dre-fluxo-de-caixa.md`
 - extensao mobile/PWA paralela do ERP:
   - API interna v1 em CodeIgniter 4
   - auth mobile por token

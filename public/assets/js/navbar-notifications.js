@@ -34,12 +34,14 @@
         const badgeElement = document.getElementById('navbarNotificationCount');
         const metaElement = document.getElementById('navbarNotificationMeta');
         const markAllButton = document.getElementById('navbarNotificationMarkAll');
+        const clearReadButton = document.getElementById('navbarNotificationClearRead');
         const dropdownToggle = root.querySelector('.navbar-notification-toggle');
 
         const feedUrl = String(root.dataset.feedUrl || '').trim();
         const streamUrl = String(root.dataset.streamUrl || '').trim();
         const readUrlBase = String(root.dataset.readUrlBase || '').trim();
         const readAllUrl = String(root.dataset.readAllUrl || '').trim();
+        const clearReadUrl = String(root.dataset.clearReadUrl || '').trim();
         const baseUrl = String(root.dataset.baseUrl || window.location.origin + '/').trim();
         const appUrl = String(root.dataset.appUrl || baseUrl || window.location.origin + '/').trim();
 
@@ -82,6 +84,9 @@
             badgeElement.textContent = String(state.unreadCount);
             badgeElement.classList.toggle('d-none', state.unreadCount <= 0);
             markAllButton && (markAllButton.disabled = state.unreadCount <= 0);
+            clearReadButton && (clearReadButton.disabled = !state.items.some(function (item) {
+                return !!item?.lida_em;
+            }));
             updateMetaLabel();
         }
 
@@ -120,6 +125,68 @@
             } catch (error) {
                 console.error('[NavbarNotifications] rota de notificacao invalida.', error);
                 return '';
+            }
+        }
+
+        function findNotificationById(notificationId) {
+            const id = Number(notificationId || 0);
+            if (id <= 0) {
+                return null;
+            }
+
+            return state.items.find(function (item) {
+                return Number(item?.id || 0) === id;
+            }) || null;
+        }
+
+        function buildNotificationMetaHtml(item) {
+            const payload = item?.payload && typeof item.payload === 'object' ? item.payload : {};
+            const rows = [];
+
+            if (payload.conversa_id) {
+                rows.push('<div><strong>Conversa:</strong> #' + escapeHtml(payload.conversa_id) + '</div>');
+            }
+            if (payload.os_id) {
+                rows.push('<div><strong>OS:</strong> #' + escapeHtml(payload.os_id) + '</div>');
+            }
+            if (payload.cliente_id) {
+                rows.push('<div><strong>Cliente:</strong> #' + escapeHtml(payload.cliente_id) + '</div>');
+            }
+            if (item?.created_at) {
+                rows.push('<div><strong>Recebida em:</strong> ' + escapeHtml(resolveNotificationTimeLabel(item)) + '</div>');
+            }
+
+            return rows.length > 0
+                ? '<div class="text-start small text-muted mt-3">' + rows.join('') + '</div>'
+                : '';
+        }
+
+        async function openNotificationModal(item, route) {
+            if (!window.Swal || typeof window.Swal.fire !== 'function') {
+                if (route) {
+                    window.location.href = route;
+                }
+                return;
+            }
+
+            const html = '' +
+                '<div class="text-start">' +
+                    '<div class="mb-2">' + escapeHtml(String(item?.corpo || 'Sem detalhes adicionais.')) + '</div>' +
+                    buildNotificationMetaHtml(item) +
+                '</div>';
+
+            const result = await window.Swal.fire({
+                icon: 'info',
+                title: String(item?.titulo || 'Notificacao'),
+                html: html,
+                showCancelButton: !!route,
+                confirmButtonText: route ? 'Abrir conversa' : 'Fechar',
+                cancelButtonText: 'Fechar',
+                reverseButtons: true,
+            });
+
+            if (result.isConfirmed && route) {
+                window.location.href = route;
             }
         }
 
@@ -319,6 +386,37 @@
             renderList();
         }
 
+        async function clearRead() {
+            if (!clearReadUrl) {
+                return;
+            }
+
+            const response = await window.fetch(clearReadUrl, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+            const payload = await response.json();
+            if (!response.ok || payload?.ok !== true) {
+                throw new Error(payload?.message || 'Falha ao limpar notificacoes lidas.');
+            }
+
+            state.items = state.items.filter(function (item) {
+                return !item?.lida_em;
+            });
+            if (typeof payload?.unread_count === 'number') {
+                state.unreadCount = Math.max(0, Number(payload.unread_count || 0));
+            } else {
+                state.unreadCount = state.items.filter(function (item) {
+                    return !item?.lida_em;
+                }).length;
+            }
+            renderList();
+            return payload;
+        }
+
         function stopFallbackPolling() {
             if (!state.fallbackTimer) {
                 return;
@@ -443,15 +541,19 @@
 
             const notificationId = Number(itemButton.getAttribute('data-notification-id') || 0);
             const route = String(itemButton.getAttribute('data-notification-route') || '').trim();
+            const item = findNotificationById(notificationId);
 
             markAsRead(notificationId)
                 .catch(function (error) {
                     console.error('[NavbarNotifications] Falha ao marcar notificacao como lida.', error);
                 })
                 .finally(function () {
-                    if (route) {
-                        window.location.href = route;
-                    }
+                    openNotificationModal(item, route).catch(function (error) {
+                        console.error('[NavbarNotifications] Falha ao abrir modal de notificacao.', error);
+                        if (route) {
+                            window.location.href = route;
+                        }
+                    });
                 });
         });
 
@@ -460,6 +562,19 @@
         console.error('[NavbarNotifications] Falha ao marcar notificações como lidas.', error);
                 if (window.DSFeedback && typeof window.DSFeedback.error === 'function') {
             window.DSFeedback.error('Notificações', error?.message || 'Não foi possível marcar as notificações como lidas.');
+                }
+            });
+        });
+
+        clearReadButton?.addEventListener('click', function () {
+            clearRead().then(function (payload) {
+                if (window.DSFeedback && typeof window.DSFeedback.success === 'function') {
+                    window.DSFeedback.success('Notificações', 'Notificações lidas removidas: ' + String(payload?.deleted || 0) + '.');
+                }
+            }).catch(function (error) {
+                console.error('[NavbarNotifications] Falha ao limpar notificações lidas.', error);
+                if (window.DSFeedback && typeof window.DSFeedback.error === 'function') {
+                    window.DSFeedback.error('Notificações', error?.message || 'Não foi possível limpar as notificações lidas.');
                 }
             });
         });

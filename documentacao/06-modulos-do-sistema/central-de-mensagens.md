@@ -1,6 +1,6 @@
 # Modulo: Central de Mensagens (Central de Atendimento Inteligente 24h)
 
-Atualizado em 08/04/2026 (integracao Orcamentos fase 3).
+Atualizado em 03/05/2026 (Evolution API omnichannel + avatar + sync local).
 
 ## Objetivo
 Transformar o WhatsApp operacional em uma central unica de atendimento integrada ao ERP + CRM, com:
@@ -9,6 +9,107 @@ Transformar o WhatsApp operacional em uma central unica de atendimento integrada
 - automacao de resposta por intencao (chatbot)
 - fila de atendimento humano
 - metricas operacionais de atendimento
+
+## Inbox dinamica estilo Chatwoot (03/05/2026 - v2.16.40)
+
+Foi adicionada uma camada de atualizacao dinamica para a fila de conversas, aproximando o comportamento da inbox do fluxo usado em centrais como o Chatwoot.
+
+O que mudou:
+
+- a lista lateral de conversas ganhou stream proprio por SSE em `GET /atendimento-whatsapp/conversas/stream`;
+- a thread continua com stream dedicado em `GET /atendimento-whatsapp/conversa/{id}/stream`;
+- filtros da fila (`q`, `status`, `responsavel_id`, `tag_id`, `nao_lidas`, `com_os_aberta`, `clientes_novos`) agora reiniciam o stream da lista com novo cursor, evitando ficar presa em snapshot antigo;
+- ao ocultar a aba, o frontend fecha os streams; ao voltar, reabre a fila e a thread sem exigir reload da pagina;
+- quando o ambiente ainda nao possui todos os campos novos de avatar/contato, a listagem cai para `NULL as ...` de forma defensiva em vez de quebrar com `500`.
+
+Comportamento operacional:
+
+- a lista lateral passa a receber reordenacao e preview mais rapidamente, sem depender apenas do polling completo;
+- o fallback de polling permanece ativo quando o SSE estiver indisponivel ou quando o handshake retornar MIME invalido;
+- o badge de tempo real considera fila e thread: se qualquer stream estiver vivo, a UI permanece em `Tempo real`.
+
+### Fallback local para Evolution sem webhook publico
+
+Quando o ERP roda em `localhost`, a Evolution hospedada em VPS normalmente nao consegue disparar webhook direto para a maquina local. Para esse cenario:
+
+- a Central passou a executar sincronizacao ativa da Evolution durante `syncInboundQueue()` quando o provider direto estiver em `evolution`;
+- a reconciliacao usa os chats recentes da instancia e reaproveita `provider_message_id` para evitar duplicidade;
+- mensagens do cliente e mensagens enviadas fora do ERP (`fromMe=true`, por exemplo pelo app oficial) passam a alimentar a mesma thread local;
+- a rota AJAX da fila (`/atendimento-whatsapp/conversas`) e o stream da fila (`/atendimento-whatsapp/conversas/stream`) agora rodam `syncInboundSafe()` antes de gerar o snapshot, deixando a mudanca visivel na busca, na lista lateral e nas notificacoes assim que houver novidade recente.
+
+Resultado esperado no ambiente local:
+
+- novas mensagens entram na lista lateral mesmo sem webhook remoto apontando para `localhost`;
+- o contador de nao lidas sobe no ERP apos o sync ativo;
+- notificacoes internas passam a refletir as novas entradas porque o inbound volta a ser registrado no fluxo oficial da Central.
+
+Arquivos tecnicos impactados:
+
+- `app/Controllers/CentralMensagens.php`
+- `app/Config/Routes.php`
+- `app/Views/central_mensagens/index.php`
+- `public/assets/js/central-mensagens.js`
+
+## Notificacoes web da navbar (03/05/2026 - v2.16.41)
+
+O inbox do sino passou a se comportar de forma mais segura e operacional:
+
+- o clique em uma notificacao abre um modal SweetAlert2 com o teor completo da mensagem;
+- quando a notificacao estiver vinculada a uma conversa WhatsApp, o modal oferece a acao `Abrir conversa`;
+- rotas legadas como `/conversas/{id}` sao normalizadas automaticamente para a URL canonica `GET /atendimento-whatsapp?conversa_id={id}`;
+- o dropdown agora possui duas acoes de manutencao:
+  - `Marcar todas`
+  - `Limpar lidas`
+
+Arquivos tecnicos impactados:
+
+- `app/Controllers/Notificacoes.php`
+- `app/Services/Mobile/MobileNotificationService.php`
+- `app/Services/CentralMensagensService.php`
+- `public/assets/js/navbar-notifications.js`
+- `app/Views/layouts/navbar.php`
+
+## Omnichannel com Evolution API
+
+Arquitetura operacional consolidada:
+
+`Cliente -> WhatsApp -> Evolution API -> ERP Central -> (bot/IA, atendente ERP ou app oficial)`
+
+O que muda na operacao:
+- a conversa continua unica dentro do ERP, mesmo quando o atendente responde pelo app oficial do WhatsApp;
+- mensagens capturadas pela Evolution com `fromMe=true` entram na Central como outbound externo;
+- toda resposta humana bem-sucedida pausa a automacao (`automacao_ativa = 0` e `aguardando_humano = 1`);
+- a thread pode exibir avatar real do contato quando a sincronizacao da Evolution estiver habilitada.
+
+Campos adicionais sincronizados na Central:
+- `contatos.whatsapp_nome_perfil`
+- `contatos.whatsapp_remote_jid`
+- `contatos.whatsapp_avatar_url`
+- `contatos.whatsapp_avatar_synced_em`
+
+### Papel da Central quando existir n8n no meio
+
+Quando a automacao estiver orquestrada por n8n:
+
+- a Central do ERP nao precisa ser a camada de IA;
+- ela continua sendo a inbox operacional e o historico oficial;
+- o n8n recebe o inbound da Evolution, consulta o ERP/banco e decide se responde;
+- a Central e o app oficial ficam livres para resposta humana e visualizacao da mesma conversa.
+
+Fluxo recomendado:
+
+`Cliente -> WhatsApp -> Evolution -> n8n -> ERP -> (resposta automatica ou atendimento humano)`
+
+Na pratica:
+
+- a resposta automatica sai pelo n8n usando a Evolution;
+- a resposta humana pode sair pelo ERP ou pelo app oficial;
+- todas as saidas precisam continuar refletidas na Evolution/ERP para manter thread unica.
+
+Impacto visual:
+- a lista de conversas pode renderizar foto do contato;
+- o cabecalho da thread tambem passa a refletir avatar quando disponivel;
+- quando nao houver avatar, o fallback continua sendo a inicial do nome.
 
 ## Integracao com Orcamentos (08/04/2026 - fase 3)
 
@@ -700,6 +801,21 @@ Para reduzir refresh bruto e manter chat quase em tempo real:
 Objetivo tecnico da validacao previa:
 - evitar tentativas repetidas de SSE quando o endpoint retorna HTML (erro de MIME `text/html` no browser)
 - manter atualizacao de mensagens funcional mesmo com indisponibilidade temporaria de stream
+
+#### Atualizacao fluida da inbox (fila lateral)
+
+Para deixar a lista de conversas mais proxima de uma central em tempo real:
+
+- stream SSE da fila: `GET /atendimento-whatsapp/conversas/stream`
+- validacao previa por `probe` e `handshake` antes de abrir `EventSource`
+- parametro `after_cursor` para reduzir payload quando a fila nao mudou
+- fallback automatico para polling da lista quando o stream da fila estiver indisponivel
+
+Objetivo tecnico:
+
+- evitar refresh bruto da inbox a cada tick;
+- reduzir flicker em busca/filtros;
+- manter a lista lateral sincronizada com inbound, outbound humano e outbound do bot.
 
 Comportamento implementado:
 - polling automatico por configuracao (`central_mensagens_auto_sync_interval`)

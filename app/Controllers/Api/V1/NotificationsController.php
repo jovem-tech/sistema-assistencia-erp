@@ -49,7 +49,7 @@ class NotificationsController extends BaseApiController
                     'tipo_evento' => (string) ($row['tipo_evento'] ?? ''),
                     'titulo' => (string) ($row['titulo'] ?? ''),
                     'corpo' => (string) ($row['corpo'] ?? ''),
-                    'rota_destino' => $row['rota_destino'] ?? null,
+                    'rota_destino' => self::normalizeDestinationRoute($row['rota_destino'] ?? null, $payload),
                     'payload' => $payload,
                     'lida_em' => $row['lida_em'] ?? null,
                     'created_at' => $row['created_at'] ?? null,
@@ -227,8 +227,30 @@ class NotificationsController extends BaseApiController
             'api_whats_local' => 'Gateway local (Windows)',
             'api_whats_linux' => 'Gateway Linux (VPS)',
             'menuia' => 'Menuia',
+            'evolution' => 'Evolution API',
             'webhook' => 'Webhook',
             default => $provider,
         };
+    }
+
+    /**
+     * @param mixed $route
+     * @param array<string,mixed>|null $payload
+     */
+    private static function normalizeDestinationRoute($route, ?array $payload = null): ?string
+    {
+        $value = trim((string) $route);
+        $conversaId = (int) ($payload['conversa_id'] ?? 0);
+
+        if ($value !== '' && preg_match('#^/?conversas/(\d+)$#', $value, $matches)) {
+            $conversaId = (int) ($matches[1] ?? 0);
+            $value = '';
+        }
+
+        if ($conversaId > 0) {
+            return '/atendimento-whatsapp?conversa_id=' . $conversaId;
+        }
+
+        return $value !== '' ? $value : null;
     }
 }

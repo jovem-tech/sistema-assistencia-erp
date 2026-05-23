@@ -9,6 +9,7 @@ $notificationFeedUrl = site_url('notificacoes/navbar-feed');
 $notificationStreamUrl = site_url('notificacoes/stream');
 $notificationReadBaseUrl = site_url('notificacoes/lida');
 $notificationReadAllUrl = site_url('notificacoes/lidas');
+$notificationClearReadUrl = site_url('notificacoes/limpar-lidas');
 $notificationAppUrl = rtrim(site_url(), '/') . '/';
 ?>
 <nav class="top-navbar">
@@ -145,6 +146,7 @@ $notificationAppUrl = rtrim(site_url(), '/') . '/';
             data-stream-url="<?= esc($notificationStreamUrl) ?>"
             data-read-url-base="<?= esc($notificationReadBaseUrl) ?>"
             data-read-all-url="<?= esc($notificationReadAllUrl) ?>"
+            data-clear-read-url="<?= esc($notificationClearReadUrl) ?>"
             data-base-url="<?= esc(base_url()) ?>"
             data-app-url="<?= esc($notificationAppUrl) ?>"
         >
@@ -164,9 +166,14 @@ $notificationAppUrl = rtrim(site_url(), '/') . '/';
                         <strong>Notificacoes</strong>
                         <small id="navbarNotificationMeta">Sincronizando...</small>
                     </div>
-                    <button type="button" class="btn btn-link btn-sm navbar-notification-mark-all" id="navbarNotificationMarkAll">
-                        Marcar todas
-                    </button>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-link btn-sm navbar-notification-mark-all" id="navbarNotificationClearRead">
+                            Limpar lidas
+                        </button>
+                        <button type="button" class="btn btn-link btn-sm navbar-notification-mark-all" id="navbarNotificationMarkAll">
+                            Marcar todas
+                        </button>
+                    </div>
                 </div>
                 <div class="navbar-notification-list" id="navbarNotificationList">
                     <div class="navbar-notification-empty">Carregando notificacoes...</div>

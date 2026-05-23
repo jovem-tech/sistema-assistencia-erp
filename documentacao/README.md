@@ -1,15 +1,15 @@
 # Documentacao - Sistema de Assistencia Tecnica
 
 > Jovem Tech  
-> ERP atual: `2.16.5`
+> ERP atual: `2.16.41`
 > App mobile/PWA: `0.4.2`  
-> Atualizado em `27/04/2026`
+> Atualizado em `21/05/2026`
 
 ## Objetivo
 
 Este diretorio concentra a documentacao funcional, tecnica e operacional do ERP da assistencia tecnica.
 
-O indice abaixo foi revisado para refletir a release `2.16.5`, com destaque para o restauro da rota `/os` apos um conjunto de parse errors introduzidos durante a auditoria de pt-BR, para a retomada da edicao e da visualizacao de OS sem erro `500`, para a limpeza adicional de labels e mensagens legadas em `Ordens de Servico` e para a normalizacao complementar do menu lateral do ERP.
+O indice abaixo foi revisado para refletir a linha atual `2.16.41`, incluindo a trilha oficial dos workflows n8n de atendimento WhatsApp, a referencia por etapas da Jovem Tech e a consolidacao das notas tecnicas mais recentes do modulo de comunicacao.
 
 ## Estrutura
 
@@ -41,17 +41,22 @@ O indice abaixo foi revisado para refletir a release `2.16.5`, com destaque para
 
 - Modulo OS: `06-modulos-do-sistema/ordens-de-servico.md`
 - Modulo Orcamentos: `06-modulos-do-sistema/orcamentos.md`
+- Modulo WhatsApp e automacoes conversacionais: `06-modulos-do-sistema/whatsapp.md`
+- Planejamento financeiro gerencial (DRE + fluxo de caixa): `09-roadmap/estudo-dre-fluxo-de-caixa.md`
 - Arquitetura do modulo de orcamentos: `03-arquitetura-tecnica/modulo-orcamentos.md`
 - Estrutura de pastas: `03-arquitetura-tecnica/estrutura-de-pastas.md`
 - Fluxo Git multiambiente: `10-deploy/fluxo-git-multiambiente.md`
 - Guia rapido do fluxo 4 ambientes: `10-deploy/guia-rapido-fluxo-4-ambientes.md`
 - PDF do guia rapido 4 ambientes: `10-deploy/guia-rapido-fluxo-4-ambientes.pdf`
+- Deploy Docker Swarm no Contabo: `10-deploy/docker-swarm-contabo.md`
+- Workflow n8n por etapas da Jovem Tech: `07-novas-implementacoes/2026-05-07-workflow-n8n-jovem-tech-etapas-atendimento.md`
 
 ### Versao e release atual
 
 - Historico oficial de versoes do ERP: `07-novas-implementacoes/historico-de-versoes.md`
 - Release atual: `07-novas-implementacoes/2026-04-27-release-v2.16.5-restauro-os-ptbr-listagem.md`
 - Registro da release anterior na VPS: `10-deploy/2026-04-23-atualizacao-vps-release-v2.15.0.md`
+- Nota tecnica de containerizacao Docker/Swarm: `07-novas-implementacoes/2026-05-04-deploy-docker-swarm-contabo.md`
 
 ### App mobile/PWA
 
@@ -87,7 +92,8 @@ O indice abaixo foi revisado para refletir a release `2.16.5`, com destaque para
 - quando o cliente aprova ou rejeita o orcamento pelo link publico, o ERP passa a criar notificacao interna para usuarios com permissao de visualizar `OS` ou `Orcamentos`;
 - a navbar ganhou um sino ao lado do perfil com feed autenticado, stream SSE e fallback por polling para exibir essas notificacoes sem recarregar a pagina;
 - a listagem `/os` agora escuta o evento `orcamento.public_status_changed`, recarrega a grade automaticamente e atualiza o contexto do modal de status quando ele estiver aberto;
-- o clique na notificacao da navbar passou a abrir a rota correta do ERP mesmo em ambientes com `index.php` e subdiretorio, sem cair em `404 Not Found`;
+- o clique na notificacao da navbar agora abre um modal com o teor completo da notificacao e so navega para a conversa/rota de destino quando o operador confirmar, evitando `404` por rotas legadas;
+- o dropdown do sino ganhou a acao `Limpar lidas`, removendo rapidamente do feed as notificacoes ja processadas pelo operador;
 - a visualizacao `/os/visualizar/{id}` passou a concentrar geracao/listagem de PDFs e envios por `WhatsApp` e `e-mail` dentro da nova aba `Documentos`;
 - o backend da OS ganhou a rota `POST /os/email/{id}/enviar`, usando `ErpMailService` para anexar um PDF ja gerado da ordem;
 - o tipo `Orcamento` dentro da aba `Documentos` passou a reutilizar exatamente o PDF oficial emitido por `Orcamentos`, incluindo o link/botao de aprovacao publica no documento;
@@ -105,7 +111,8 @@ O indice abaixo foi revisado para refletir a release `2.16.5`, com destaque para
 - a listagem `/os` deixou de retornar `500` depois da restauracao sintatica de `app/Controllers/Os.php`, `app/Views/os/index.php`, `app/Views/os/form.php` e `app/Views/os/show.php`;
 - a pagina de edicao e a visualizacao da OS receberam nova limpeza de labels, avisos e mensagens em pt-BR, reduzindo exibicao de textos legados com `?` no lugar de acentos;
 - o menu lateral voltou a exibir corretamente rotulos como `Ordens de Servico`, `Servicos`, `Estoque de Pecas` e `Gestao de Conhecimento` em ambientes afetados por texto mojibake;
-- indice principal sincronizado com a release `2.16.5` e com a nova nota tecnica de restauro da listagem `/os`.
+- indice principal sincronizado com a release `2.16.5` e com a nova nota tecnica de restauro da listagem `/os`;
+- incluido o estudo oficial de implementacao do financeiro gerencial com `DRE`, `fluxo de caixa realizado` e `fluxo de caixa projetado`.
 
 ## Regra editorial
 
@@ -116,3 +123,12 @@ Sempre que houver nova release do ERP:
 3. atualizar o historico oficial em `07-novas-implementacoes/historico-de-versoes.md`;
 4. publicar a nota tecnica da release;
 5. registrar a atualizacao de VPS em `10-deploy/`, quando aplicavel.
+
+## Deploy em container
+
+Para ambiente Contabo com Docker Swarm + Traefik, use:
+
+- `10-deploy/docker-swarm-contabo.md`
+- `docker/swarm/contabo-stack.yml`
+- `docker/swarm/contabo.env.example`
+- `scripts/docker/deploy-contabo-swarm.sh`

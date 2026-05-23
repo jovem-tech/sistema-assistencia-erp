@@ -1,0 +1,383 @@
+{
+  "name": "Atendimento Clientes WhatsApp IA + Clientes",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-atendimento-clientes-ai",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Entrada WhatsApp IA",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        260,
+        320
+      ],
+      "webhookId": "whatsapp-atendimento-clientes-ai"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const source = ($json.body && typeof $json.body === 'object') ? $json.body : $json;\n\nfunction readPath(obj, path) {\n  return path.split('.').reduce((acc, key) => {\n    if (acc && typeof acc === 'object' && key in acc) return acc[key];\n    return undefined;\n  }, obj);\n}\n\nfunction pick(obj, paths, fallback = '') {\n  for (const path of paths) {\n    const value = readPath(obj, path);\n    if (value !== undefined && value !== null && String(value).trim() !== '') {\n      return String(value).trim();\n    }\n  }\n  return fallback;\n}\n\nfunction pickBool(obj, paths, fallback = false) {\n  for (const path of paths) {\n    const value = readPath(obj, path);\n    if (typeof value === 'boolean') return value;\n    if (value === 1 || value === '1') return true;\n    if (typeof value === 'string') {\n      const normalized = value.trim().toLowerCase();\n      if (['true', 'yes', 'sim', 'on'].includes(normalized)) return true;\n      if (['false', 'no', 'nao', 'off'].includes(normalized)) return false;\n    }\n  }\n  return fallback;\n}\n\nfunction normalizePhone(phone) {\n  const digits = String(phone || '').replace(/\\D+/g, '');\n  if (!digits) return '';\n  return digits.startsWith('55') ? digits : `55${digits}`;\n}\n\nfunction normalizeSqlPhone(fieldName) {\n  return `REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(${fieldName}, ''), '(', ''), ')', ''), '-', ''), ' ', ''), '+', '')`;\n}\n\nconst companyName = 'Sua Assistencia Tecnica';\nconst erpWebhookUrl = 'https://sistema.seudominio.com/webhooks/whatsapp';\nconst erpWebhookToken = 'COLE_O_TOKEN_WEBHOOK_ERP';\nconst erpOrigin = 'https://sistema.seudominio.com';\n\nconst menuiaUrl = 'https://chatbot.menuia.com/api';\nconst menuiaAppKey = 'COLE_O_APPKEY_MENUIA';\nconst menuiaAuthKey = 'COLE_O_AUTHKEY_MENUIA';\n\nconst openaiApiKey = 'COLE_OPENAI_API_KEY';\nconst openaiModel = 'gpt-4.1-mini';\n\nconst phone = normalizePhone(pick(source, [\n  'from',\n  'sender',\n  'phone',\n  'telefone',\n  'number',\n  'author',\n  'chat_id',\n  'jid',\n  'data.from',\n  'data.sender',\n  'data.phone',\n  'data.telefone',\n  'data.number',\n  'contact.phone',\n  'contact.number',\n  'data.contact.phone',\n  'data.contact.number'\n]));\n\nconst text = pick(source, [\n  'message',\n  'mensagem',\n  'text',\n  'body',\n  'caption',\n  'conteudo',\n  'data.message',\n  'data.mensagem',\n  'data.text',\n  'data.body',\n  'data.caption',\n  'data.conteudo'\n], '');\n\nconst normalizedText = text\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '')\n  .toLowerCase()\n  .trim();\n\nconst hasMedia = pickBool(source, ['has_media', 'hasMedia', 'data.has_media', 'data.hasMedia'], false);\nconst fromMe = pickBool(source, ['from_me', 'fromMe', 'data.from_me', 'data.fromMe'], false);\nconst selfCheck = pickBool(source, ['self_check', 'data.self_check'], false);\nconst shouldReply = !fromMe && !selfCheck && phone !== '';\nconst phoneNoCountry = phone.replace(/^55/, '');\n\nconst phoneValuesSql = [phone, phoneNoCountry]\n  .filter((value, index, array) => value && array.indexOf(value) === index)\n  .map((value) => `'${value.replace(/'/g, \"''\")}'`)\n  .join(', ');\n\nconst phoneWhere = [\n  normalizeSqlPhone('c.telefone1'),\n  normalizeSqlPhone('c.telefone2'),\n  normalizeSqlPhone('c.telefone_contato')\n].map((expr) => `${expr} IN (${phoneValuesSql || \"''\"})`).join(' OR ');\n\nconst clienteLookupSql = `\nSELECT *\nFROM (\n  SELECT\n    1 AS cliente_encontrado,\n    c.id,\n    c.nome_razao,\n    c.email,\n    c.telefone1,\n    c.telefone2,\n    c.nome_contato,\n    c.telefone_contato,\n    c.cidade,\n    c.uf,\n    c.observacoes\n  FROM clientes c\n  WHERE ${phoneWhere}\n  ORDER BY c.id DESC\n  LIMIT 1\n) cliente\nUNION ALL\nSELECT\n  0 AS cliente_encontrado,\n  NULL AS id,\n  NULL AS nome_razao,\n  NULL AS email,\n  NULL AS telefone1,\n  NULL AS telefone2,\n  NULL AS nome_contato,\n  NULL AS telefone_contato,\n  NULL AS cidade,\n  NULL AS uf,\n  NULL AS observacoes\nFROM DUAL\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM clientes c\n  WHERE ${phoneWhere}\n  LIMIT 1\n)\nLIMIT 1;\n`.trim();\n\nconst erpPayload = {\n  ...(typeof source === 'object' ? source : { raw: String(source) }),\n  n8n_workflow: 'atendimento-clientes-whatsapp-ai',\n  n8n_received_at: new Date().toISOString(),\n  normalized_phone: phone,\n  normalized_text: text,\n  has_media: hasMedia,\n  detected_intent: normalizedText\n};\n\nreturn {\n  ...$json,\n  source,\n  companyName,\n  normalizedPhone: phone,\n  phoneNoCountry,\n  receivedText: text,\n  normalizedText,\n  hasMedia,\n  fromMe,\n  selfCheck,\n  shouldReply,\n  erpWebhookUrl,\n  erpWebhookToken,\n  erpOrigin,\n  menuiaUrl,\n  menuiaAppKey,\n  menuiaAuthKey,\n  openaiApiKey,\n  openaiModel,\n  clienteLookupSql,\n  erpPayload\n};"
+      },
+      "id": "2",
+      "name": "Normalizar Entrada e Credenciais",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Normalizar Entrada e Credenciais').item.json.erpWebhookUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Webhook-Token",
+              "value": "={{ $('Normalizar Entrada e Credenciais').item.json.erpWebhookToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Normalizar Entrada e Credenciais').item.json.erpPayload }}"
+      },
+      "id": "3",
+      "name": "Espelhar Inbound no ERP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        820,
+        320
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $('Normalizar Entrada e Credenciais').item.json.clienteLookupSql }}",
+        "options": {}
+      },
+      "id": "4",
+      "name": "Buscar Cliente no Banco",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        1090,
+        320
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "COLE_O_ID_DA_CREDENCIAL_MYSQL",
+          "name": "COLE_O_NOME_DA_CREDENCIAL_MYSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const base = $('Normalizar Entrada e Credenciais').first().json;\nconst cliente = $json || {};\nconst clienteEncontrado = Number(cliente.cliente_encontrado || 0) === 1 && !!cliente.id;\n\nconst clienteResumo = clienteEncontrado\n  ? [\n      `ID: ${cliente.id}`,\n      `Nome: ${cliente.nome_razao || '-'}`,\n      `Email: ${cliente.email || '-'}`,\n      `Telefone1: ${cliente.telefone1 || '-'}`,\n      `Telefone2: ${cliente.telefone2 || '-'}`,\n      `Contato: ${cliente.nome_contato || '-'}`,\n      `Telefone do contato: ${cliente.telefone_contato || '-'}`,\n      `Cidade/UF: ${(cliente.cidade || '-') + '/' + (cliente.uf || '-')}`,\n      `Observacoes: ${cliente.observacoes || '-'}`\n    ].join('\\n')\n  : 'Cliente nao localizado por telefone na tabela clientes.';\n\nconst openaiInstructions = [\n  `Voce e a atendente virtual da ${base.companyName}.`,\n  'Responda em portugues do Brasil, de forma objetiva, simpatica e profissional.',\n  'Use apenas o contexto fornecido pelo banco e pela mensagem recebida.',\n  'Nunca invente dados de OS, orcamento, valores, prazos ou historico tecnico.',\n  'Se o cliente for encontrado, use o nome dele quando fizer sentido.',\n  'Se o cliente nao for encontrado, diga que nao localizou cadastro por este numero e peca nome completo.',\n  'Se a pessoa pedir status de OS e so houver cadastro do cliente, informe que localizou o cadastro mas ainda precisa consultar a OS.',\n  'A resposta deve ser curta, pronta para envio por WhatsApp, sem markdown e sem listas longas.'\n].join(' ');\n\nconst openaiInput = [\n  `Mensagem recebida: ${base.receivedText || '(sem texto)'}`,\n  `Telefone normalizado: ${base.normalizedPhone || '-'}`,\n  `Cliente encontrado: ${clienteEncontrado ? 'sim' : 'nao'}`,\n  'Contexto do cliente:',\n  clienteResumo\n].join('\\n\\n');\n\nreturn {\n  ...base,\n  clienteEncontrado,\n  cliente,\n  clienteResumo,\n  openaiInstructions,\n  openaiInput\n};"
+      },
+      "id": "5",
+      "name": "Montar Contexto IA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $json.openaiApiKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { model: $json.openaiModel, instructions: $json.openaiInstructions, input: $json.openaiInput } }}",
+        "options": {}
+      },
+      "id": "6",
+      "name": "Agente IA OpenAI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1620,
+        320
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const ctx = $('Montar Contexto IA').first().json;\nconst response = $json || {};\n\nfunction extractOutputText(payload) {\n  if (typeof payload.output_text === 'string' && payload.output_text.trim() !== '') {\n    return payload.output_text.trim();\n  }\n\n  if (Array.isArray(payload.output)) {\n    for (const item of payload.output) {\n      if (item && item.type === 'message' && Array.isArray(item.content)) {\n        for (const contentItem of item.content) {\n          if (typeof contentItem?.text === 'string' && contentItem.text.trim() !== '') {\n            return contentItem.text.trim();\n          }\n          if (typeof contentItem?.output_text === 'string' && contentItem.output_text.trim() !== '') {\n            return contentItem.output_text.trim();\n          }\n        }\n      }\n    }\n  }\n\n  return '';\n}\n\nlet aiReply = extractOutputText(response);\n\nif (aiReply === '') {\n  aiReply = ctx.clienteEncontrado\n    ? `Oi, ${ctx.cliente.nome_razao || 'tudo bem'}? Localizei seu cadastro na ${ctx.companyName}. Pode me dizer em que ponto eu posso te ajudar agora?`\n    : `Oi. Recebi sua mensagem na ${ctx.companyName}, mas ainda nao localizei cadastro por este numero. Pode me informar seu nome completo para eu continuar o atendimento?`;\n}\n\nreturn {\n  ...ctx,\n  aiRawResponse: response,\n  aiReply,\n  menuiaPayload: {\n    to: `+${ctx.normalizedPhone}`,\n    appkey: ctx.menuiaAppKey,\n    authkey: ctx.menuiaAuthKey,\n    message: aiReply,\n    licence: 'hugocursos',\n    sandbox: 'false'\n  }\n};"
+      },
+      "id": "7",
+      "name": "Preparar Resposta Final",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1880,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-should-reply",
+              "leftValue": "={{ $json.shouldReply }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8",
+      "name": "Deve Responder?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2140,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.menuiaUrl + '/create-message' }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "={{ $json.menuiaPayload.to }}"
+            },
+            {
+              "name": "appkey",
+              "value": "={{ $json.menuiaPayload.appkey }}"
+            },
+            {
+              "name": "authkey",
+              "value": "={{ $json.menuiaPayload.authkey }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.menuiaPayload.message }}"
+            },
+            {
+              "name": "licence",
+              "value": "={{ $json.menuiaPayload.licence }}"
+            },
+            {
+              "name": "sandbox",
+              "value": "={{ $json.menuiaPayload.sandbox }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9",
+      "name": "Enviar Resposta Menuia IA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        2410,
+        220
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, workflow: 'atendimento-clientes-whatsapp-ai', replied: true, phone: $('Preparar Resposta Final').item.json.normalizedPhone, clienteEncontrado: $('Preparar Resposta Final').item.json.clienteEncontrado, response: $('Preparar Resposta Final').item.json.aiReply } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "10",
+      "name": "Responder Webhook com IA",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2680,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, workflow: 'atendimento-clientes-whatsapp-ai', replied: false, phone: $json.normalizedPhone, response: 'Evento recebido sem resposta automatica.' } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "11",
+      "name": "Responder Webhook sem Envio",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2410,
+        420
+      ]
+    }
+  ],
+  "connections": {
+    "Entrada WhatsApp IA": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Entrada e Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Entrada e Credenciais": {
+      "main": [
+        [
+          {
+            "node": "Espelhar Inbound no ERP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Espelhar Inbound no ERP": {
+      "main": [
+        [
+          {
+            "node": "Buscar Cliente no Banco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Cliente no Banco": {
+      "main": [
+        [
+          {
+            "node": "Montar Contexto IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montar Contexto IA": {
+      "main": [
+        [
+          {
+            "node": "Agente IA OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente IA OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Preparar Resposta Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Resposta Final": {
+      "main": [
+        [
+          {
+            "node": "Deve Responder?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deve Responder?": {
+      "main": [
+        [
+          {
+            "node": "Enviar Resposta Menuia IA",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder Webhook sem Envio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Resposta Menuia IA": {
+      "main": [
+        [
+          {
+            "node": "Responder Webhook com IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0f7e8c41-2dd3-4c38-a78a-62f5eb2fa901",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {}
+}

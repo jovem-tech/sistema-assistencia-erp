@@ -96,10 +96,11 @@ $routes->group('api/v1', static function ($routes) {
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 // -- Dashboard (todos os autenticados) -----------------------------------
     $routes->get('sessao/heartbeat', 'Sessao::heartbeat');
-    $routes->get('notificacoes/navbar-feed', 'Notificacoes::navbarFeed');
-    $routes->get('notificacoes/stream', 'Notificacoes::stream');
-    $routes->post('notificacoes/lida/(:num)', 'Notificacoes::markAsRead/$1');
-    $routes->post('notificacoes/lidas', 'Notificacoes::markAllRead');
+$routes->get('notificacoes/navbar-feed', 'Notificacoes::navbarFeed');
+$routes->get('notificacoes/stream', 'Notificacoes::stream');
+$routes->post('notificacoes/lida/(:num)', 'Notificacoes::markAsRead/$1');
+$routes->post('notificacoes/lidas', 'Notificacoes::markAllRead');
+$routes->post('notificacoes/limpar-lidas', 'Notificacoes::clearRead');
     $routes->get('dashboard',   'Admin::index', ['filter' => 'permission:dashboard:visualizar']);
     $routes->get('admin/stats', 'Admin::stats', ['filter' => 'permission:dashboard:visualizar']);
     // -- Perfil (proprio usuario) -----------------------------------------
@@ -240,6 +241,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('atendimento-mobile',                      'AtendimentoMobile::index',                ['filter' => 'permission:clientes:visualizar']);
     $routes->get('atendimento-whatsapp',                    'CentralMensagens::index',                       ['filter' => 'permission:clientes:visualizar']);
     $routes->get('atendimento-whatsapp/conversas',          'CentralMensagens::conversas',                   ['filter' => 'permission:clientes:visualizar']);
+    $routes->get('atendimento-whatsapp/conversas/stream',   'CentralMensagens::conversasStream',             ['filter' => 'permission:clientes:visualizar']);
     $routes->get('atendimento-whatsapp/conversa/(:num)',    'CentralMensagens::conversa/$1',                 ['filter' => 'permission:clientes:visualizar']);
 $routes->get('atendimento-whatsapp/conversa/(:num)/novas', 'CentralMensagens::conversaNovas/$1',         ['filter' => 'permission:clientes:visualizar']);
 $routes->get('atendimento-whatsapp/conversa/(:num)/stream', 'CentralMensagens::conversaStream/$1',       ['filter' => 'permission:clientes:visualizar']);
@@ -275,6 +277,7 @@ $routes->post('atendimento-whatsapp/sync-inbound',      'CentralMensagens::syncI
     // Alias legado para compatibilidade interna/links antigos
     $routes->get('central-mensagens',                       'CentralMensagens::index',                       ['filter' => 'permission:clientes:visualizar']);
     $routes->get('central-mensagens/conversas',             'CentralMensagens::conversas',                   ['filter' => 'permission:clientes:visualizar']);
+    $routes->get('central-mensagens/conversas/stream',      'CentralMensagens::conversasStream',             ['filter' => 'permission:clientes:visualizar']);
     $routes->get('central-mensagens/conversa/(:num)',       'CentralMensagens::conversa/$1',                 ['filter' => 'permission:clientes:visualizar']);
 $routes->get('central-mensagens/conversa/(:num)/novas', 'CentralMensagens::conversaNovas/$1',            ['filter' => 'permission:clientes:visualizar']);
 $routes->get('central-mensagens/conversa/(:num)/stream', 'CentralMensagens::conversaStream/$1',          ['filter' => 'permission:clientes:visualizar']);

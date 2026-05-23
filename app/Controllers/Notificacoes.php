@@ -210,6 +210,45 @@ class Notificacoes extends BaseController
         ]);
     }
 
+    public function clearRead()
+    {
+        $userId = $this->currentUserId();
+        if ($userId <= 0) {
+            return $this->response
+                ->setStatusCode(401)
+                ->setJSON([
+                    'ok' => false,
+                    'message' => 'Usuario nao autenticado.',
+                ]);
+        }
+
+        $readRows = $this->notificationModel
+            ->select('id')
+            ->where('usuario_id', $userId)
+            ->where('lida_em !=', null)
+            ->findAll();
+
+        $deleted = 0;
+        foreach ($readRows as $row) {
+            $id = (int) ($row['id'] ?? 0);
+            if ($id > 0 && $this->notificationModel->delete($id)) {
+                $deleted++;
+            }
+        }
+
+        $unreadCount = (int) $this->notificationModel
+            ->where('usuario_id', $userId)
+            ->where('lida_em', null)
+            ->countAllResults();
+
+        return $this->response->setJSON([
+            'ok' => true,
+            'deleted' => $deleted,
+            'unread_count' => $unreadCount,
+            'csrfHash' => csrf_hash(),
+        ]);
+    }
+
     private function currentUserId(): int
     {
         return (int) (session()->get('user_id') ?? 0);
@@ -234,10 +273,31 @@ class Notificacoes extends BaseController
             'tipo_evento' => (string) ($row['tipo_evento'] ?? ''),
             'titulo' => (string) ($row['titulo'] ?? ''),
             'corpo' => (string) ($row['corpo'] ?? ''),
-            'rota_destino' => $row['rota_destino'] ?? null,
+            'rota_destino' => $this->normalizeDestinationRoute($row['rota_destino'] ?? null, $payload),
             'payload' => $payload,
             'lida_em' => $row['lida_em'] ?? null,
             'created_at' => $row['created_at'] ?? null,
         ];
+    }
+
+    /**
+     * @param mixed $route
+     * @param array<string,mixed>|null $payload
+     */
+    private function normalizeDestinationRoute($route, ?array $payload = null): ?string
+    {
+        $value = trim((string) $route);
+        $conversaId = (int) ($payload['conversa_id'] ?? 0);
+
+        if ($value !== '' && preg_match('#^/?conversas/(\d+)$#', $value, $matches)) {
+            $conversaId = (int) ($matches[1] ?? 0);
+            $value = '';
+        }
+
+        if ($conversaId > 0) {
+            return site_url('atendimento-whatsapp') . '?conversa_id=' . $conversaId;
+        }
+
+        return $value !== '' ? $value : null;
     }
 }

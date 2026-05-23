@@ -39,6 +39,28 @@ class OsStatusFlowService
         'descartado',
     ];
 
+    private const CONCLUSAO_STATUS_CODES = [
+        'reparo_concluido',
+        'reparado_disponivel_loja',
+        'garantia_concluida',
+        'irreparavel',
+        'irreparavel_disponivel_loja',
+        'reparo_recusado',
+        'entregue_pagamento_pendente',
+    ];
+
+    private const ENTREGA_STATUS_CODES = [
+        'entregue_reparado',
+        'devolvido_sem_reparo',
+        'entregue_pagamento_pendente',
+    ];
+
+    private const PRAZO_CONCLUSAO_FLOW_STATES = [
+        'pronto',
+        'encerrado',
+        'cancelado',
+    ];
+
     private OsStatusModel $statusModel;
     private OsStatusTransicaoModel $transicaoModel;
     private OsStatusHistoricoModel $historicoModel;
@@ -69,6 +91,35 @@ class OsStatusFlowService
     public function getListClosedStatusCodes(): array
     {
         return self::LIST_CLOSED_STATUS_CODES;
+    }
+
+    public static function shouldSetConclusaoDate(string $statusCode): bool
+    {
+        return in_array(strtolower(trim($statusCode)), self::CONCLUSAO_STATUS_CODES, true);
+    }
+
+    public static function shouldSetEntregaDate(string $statusCode): bool
+    {
+        return in_array(strtolower(trim($statusCode)), self::ENTREGA_STATUS_CODES, true);
+    }
+
+    public static function shouldFreezePrazoOnConclusao(string $statusCode, string $estadoFluxo = ''): bool
+    {
+        $statusCode = strtolower(trim($statusCode));
+        $estadoFluxo = strtolower(trim($estadoFluxo));
+
+        return self::shouldSetConclusaoDate($statusCode)
+            || in_array($estadoFluxo, self::PRAZO_CONCLUSAO_FLOW_STATES, true);
+    }
+
+    public static function shouldUpdateGarantiaValidade(string $statusCode): bool
+    {
+        return in_array(strtolower(trim($statusCode)), [
+            'reparo_concluido',
+            'reparado_disponivel_loja',
+            'garantia_concluida',
+            'entregue_pagamento_pendente',
+        ], true);
     }
 
     public function getListClosedFilterOptions(): array
@@ -210,12 +261,19 @@ class OsStatusFlowService
             'status_atualizado_em' => date('Y-m-d H:i:s'),
         ];
 
-        if (in_array($novoStatus, ['reparo_concluido', 'reparado_disponivel_loja', 'garantia_concluida'], true)) {
+        if (self::shouldSetConclusaoDate($novoStatus) && empty($os['data_conclusao'])) {
             $updateData['data_conclusao'] = date('Y-m-d H:i:s');
-            $updateData['garantia_validade'] = date('Y-m-d', strtotime('+' . ($os['garantia_dias'] ?? 90) . ' days'));
         }
 
-        if (in_array($novoStatus, ['entregue_reparado', 'devolvido_sem_reparo'], true)) {
+        if (self::shouldUpdateGarantiaValidade($novoStatus)) {
+            $garantiaDias = max(0, (int) ($os['garantia_dias'] ?? 90));
+            $conclusaoBase = (string) ($updateData['data_conclusao'] ?? $os['data_conclusao'] ?? '');
+            if ($conclusaoBase !== '') {
+                $updateData['garantia_validade'] = date('Y-m-d', strtotime(date('Y-m-d', strtotime($conclusaoBase)) . ' +' . $garantiaDias . ' days'));
+            }
+        }
+
+        if (self::shouldSetEntregaDate($novoStatus) && empty($os['data_entrega'])) {
             $updateData['data_entrega'] = date('Y-m-d H:i:s');
         }
 

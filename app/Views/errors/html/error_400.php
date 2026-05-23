@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title><?= lang('Errors.badRequest') ?></title>
 
+    <link rel="icon" href="<?= base_url('favicon.ico') ?>">
     <style>
         div.logo {
             height: 200px;

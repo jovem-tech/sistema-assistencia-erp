@@ -1,0 +1,1050 @@
+﻿{
+    "name":  "Evolution WhatsApp IA + ERP | V3 Atendimento Seguro",
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "httpMethod":  "POST",
+                                         "path":  "evolution-whatsapp-atendimento-ia-v3",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "1",
+                      "name":  "Entrada Evolution V3",
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2,
+                      "position":  [
+                                       240,
+                                       360
+                                   ],
+                      "webhookId":  "evolution-whatsapp-atendimento-ia-v3"
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForEachItem",
+                                         "jsCode":  "const envelope = ($json.body \u0026\u0026 typeof $json.body === \u0027object\u0027) ? $json.body : $json;\nconst data = (envelope.data \u0026\u0026 typeof envelope.data === \u0027object\u0027) ? envelope.data : envelope;\n\nfunction readPath(obj, path) {\n  return path.split(\u0027.\u0027).reduce((acc, key) =\u003e {\n    if (acc \u0026\u0026 typeof acc === \u0027object\u0027 \u0026\u0026 key in acc) return acc[key];\n    return undefined;\n  }, obj);\n}\n\nfunction pick(obj, paths, fallback = \u0027\u0027) {\n  for (const path of paths) {\n    const value = readPath(obj, path);\n    if (value !== undefined \u0026\u0026 value !== null \u0026\u0026 String(value).trim() !== \u0027\u0027) {\n      return String(value).trim();\n    }\n  }\n  return fallback;\n}\n\nfunction pickBool(obj, paths, fallback = false) {\n  for (const path of paths) {\n    const value = readPath(obj, path);\n    if (typeof value === \u0027boolean\u0027) return value;\n    if (value === 1 || value === \u00271\u0027) return true;\n    if (typeof value === \u0027string\u0027) {\n      const normalized = value.trim().toLowerCase();\n      if ([\u0027true\u0027, \u0027yes\u0027, \u0027sim\u0027, \u0027on\u0027].includes(normalized)) return true;\n      if ([\u0027false\u0027, \u0027no\u0027, \u0027nao\u0027, \u0027off\u0027].includes(normalized)) return false;\n    }\n  }\n  return fallback;\n}\n\nfunction normalizePhone(value) {\n  const base = String(value || \u0027\u0027).replace(/@.+$/g, \u0027\u0027).replace(/\\D+/g, \u0027\u0027);\n  if (!base) return \u0027\u0027;\n  return base.startsWith(\u002755\u0027) ? base : \u002755\u0027 + base;\n}\n\nfunction normalizeSqlPhone(fieldName) {\n  return \"REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(\" + fieldName + \", \u0027\u0027), \u0027(\u0027, \u0027\u0027), \u0027)\u0027, \u0027\u0027), \u0027-\u0027, \u0027\u0027), \u0027 \u0027, \u0027\u0027), \u0027+\u0027, \u0027\u0027)\";\n}\n\nfunction detectStructuredMessageType(payload) {\n  const checks = [\n    [\u0027message.audioMessage\u0027, \u0027audio\u0027],\n    [\u0027message.ptvMessage\u0027, \u0027video\u0027],\n    [\u0027message.videoMessage\u0027, \u0027video\u0027],\n    [\u0027message.imageMessage.caption\u0027, \u0027imagem\u0027],\n    [\u0027message.imageMessage\u0027, \u0027imagem\u0027],\n    [\u0027message.documentMessage.caption\u0027, \u0027arquivo\u0027],\n    [\u0027message.documentMessage\u0027, \u0027arquivo\u0027],\n    [\u0027message.documentWithCaptionMessage.message.documentMessage\u0027, \u0027arquivo\u0027],\n    [\u0027message.stickerMessage\u0027, \u0027imagem\u0027],\n    [\u0027message.contactMessage\u0027, \u0027contato\u0027],\n    [\u0027message.contactsArrayMessage\u0027, \u0027contato\u0027],\n    [\u0027message.locationMessage\u0027, \u0027localizacao\u0027],\n    [\u0027message.liveLocationMessage\u0027, \u0027localizacao\u0027],\n    [\u0027message.reactionMessage\u0027, \u0027reacao\u0027]\n  ];\n\n  for (const [path, type] of checks) {\n    const value = readPath(payload, path);\n    if (value \u0026\u0026 typeof value === \u0027object\u0027) return type;\n    if (typeof value === \u0027string\u0027 \u0026\u0026 value.trim() !== \u0027\u0027) return type;\n  }\n\n  return \u0027texto\u0027;\n}\n\nfunction extractGoogleDriveFileId(value) {\n  const input = String(value || \u0027\u0027).trim();\n  if (!input) return \u0027\u0027;\n  const patterns = [\n    /\\/d\\/([a-zA-Z0-9_-]{20,})/,\n    /[?\u0026]id=([a-zA-Z0-9_-]{20,})/,\n    /^([a-zA-Z0-9_-]{20,})$/\n  ];\n  for (const pattern of patterns) {\n    const match = input.match(pattern);\n    if (match \u0026\u0026 match[1]) return match[1];\n  }\n  return \u0027\u0027;\n}\n\nconst companyName = \u0027Jovem Tech\u0027;\nconst erpWebhookUrl = \u0027https://sistema.jovemtech.eco.br/webhooks/whatsapp\u0027;\nconst erpWebhookToken = \u0027COLE_O_TOKEN_WEBHOOK_ERP\u0027;\nconst erpOrigin = \u0027https://sistema.jovemtech.eco.br\u0027;\n\nconst evolutionBaseUrl = \u0027https://evo.jovemtech.eco.br\u0027;\nconst evolutionApiKey = \u0027COLE_A_API_KEY_DA_EVOLUTION\u0027;\nconst evolutionInstance = \u0027chatwoot\u0027;\n\nconst googleSheetsSpreadsheetId = \u0027COLE_O_SPREADSHEET_ID\u0027;\nconst googleSheetsSheetName = \u0027LeadsDia\u0027;\nconst driveKnowledgeFileSource = \u0027COLE_A_URL_OU_FILE_ID_DA_BASE_INSTITUCIONAL_NO_GOOGLE_DRIVE\u0027;\nconst driveKnowledgeFileId = extractGoogleDriveFileId(driveKnowledgeFileSource);\nconst driveToolWorkflowId = \u0027COLE_O_WORKFLOW_ID_TOOL_BASE_INSTITUCIONAL_DRIVE_V3\u0027;\nconst externalTechnicalSearchEnabled = true;\nconst technicalSearchProvider = \u0027brave_search\u0027;\n\nconst institutionAddress = \u0027Rua Comandante Resende Rocha, 88 - Balneario das Conchas - Sao Pedro da Aldeia/RJ\u0027;\nconst institutionPhone = \u0027(22) 99719-6876\u0027;\nconst institutionPixKey = \u0027COLE_A_CHAVE_PIX\u0027;\nconst institutionPixName = \u0027Jovem Tech\u0027;\nconst institutionBusinessHours = \u0027Segunda a sexta, das 09:00 as 22:00 | sabados, domingos e feriados, das 09:00 as 16:00\u0027;\nconst institutionSupportEmail = \u0027jovemtech.assistencia@gmail.com\u0027;\n\nconst rawEventName = pick(envelope, [\u0027event\u0027, \u0027type\u0027, \u0027webhookEvent\u0027, \u0027trigger\u0027], \u0027\u0027);\nconst eventName = rawEventName.toUpperCase();\nconst normalizedEventName = eventName.replace(/\\./g, \u0027_\u0027);\nconst instanceName = pick(envelope, [\u0027instance\u0027, \u0027instanceName\u0027, \u0027sender\u0027], evolutionInstance);\nconst remoteJid = pick(data, [\u0027key.remoteJid\u0027, \u0027remoteJid\u0027, \u0027jid\u0027, \u0027chatId\u0027, \u0027from\u0027, \u0027sender\u0027, \u0027phone\u0027, \u0027number\u0027], \u0027\u0027);\nconst participant = pick(data, [\u0027participant\u0027, \u0027key.participant\u0027], \u0027\u0027);\nconst pushName = pick(data, [\u0027pushName\u0027, \u0027contact.pushName\u0027, \u0027contact.name\u0027], \u0027\u0027);\nconst fromMe = pickBool(data, [\u0027key.fromMe\u0027, \u0027fromMe\u0027], false);\nconst isGroup = /@g\\.us$/i.test(remoteJid);\nconst phone = normalizePhone(remoteJid || pick(data, [\u0027from\u0027, \u0027sender\u0027, \u0027phone\u0027, \u0027number\u0027], \u0027\u0027));\nconst phoneNoCountry = phone.replace(/^55/, \u0027\u0027);\nconst memorySessionKey = remoteJid || phone;\nconst messageKeyId = pick(data, [\u0027key.id\u0027, \u0027id\u0027], \u0027\u0027);\nconst deliveryStatus = pick(data, [\u0027status\u0027], \u0027\u0027);\n\nconst text = pick(data, [\n  \u0027message.conversation\u0027,\n  \u0027message.extendedTextMessage.text\u0027,\n  \u0027message.imageMessage.caption\u0027,\n  \u0027message.videoMessage.caption\u0027,\n  \u0027message.documentMessage.caption\u0027,\n  \u0027message.documentWithCaptionMessage.message.documentMessage.caption\u0027,\n  \u0027message.buttonsResponseMessage.selectedDisplayText\u0027,\n  \u0027message.listResponseMessage.title\u0027,\n  \u0027message.listResponseMessage.singleSelectReply.selectedRowId\u0027,\n  \u0027message.templateButtonReplyMessage.selectedDisplayText\u0027,\n  \u0027body\u0027,\n  \u0027text\u0027,\n  \u0027message\u0027\n], \u0027\u0027);\n\nconst normalizedText = text.normalize(\u0027NFD\u0027).replace(/[\\u0300-\\u036f]/g, \u0027\u0027).toLowerCase().trim();\nconst messageType = detectStructuredMessageType(data);\nconst hasMedia = messageType !== \u0027texto\u0027;\nconst hasMessageContent = text !== \u0027\u0027 || hasMedia;\nconst isInboundEvent = normalizedEventName === \u0027MESSAGES_UPSERT\u0027;\nconst isManualTestPayload = normalizedEventName === \u0027\u0027 \u0026\u0026 !fromMe \u0026\u0026 !isGroup \u0026\u0026 phone !== \u0027\u0027 \u0026\u0026 text !== \u0027\u0027;\nconst shouldProcess = (isInboundEvent || isManualTestPayload) \u0026\u0026 !fromMe \u0026\u0026 !isGroup \u0026\u0026 phone !== \u0027\u0027 \u0026\u0026 hasMessageContent;\nconst shouldReply = shouldProcess;\n\nconst phoneValuesSql = [phone, phoneNoCountry]\n  .filter((value, index, array) =\u003e value \u0026\u0026 array.indexOf(value) === index)\n  .map((value) =\u003e \"\u0027\" + value.replace(/\u0027/g, \"\u0027\u0027\") + \"\u0027\")\n  .join(\u0027, \u0027);\n\nconst phoneWhereCliente = [\n  normalizeSqlPhone(\u0027c.telefone1\u0027),\n  normalizeSqlPhone(\u0027c.telefone2\u0027),\n  normalizeSqlPhone(\u0027c.telefone_contato\u0027)\n].map((expr) =\u003e expr + \" IN (\" + (phoneValuesSql || \"\u0027\u0027\") + \")\").join(\u0027 OR \u0027);\n\nconst phoneWhereConversa = normalizeSqlPhone(\u0027c.telefone\u0027) + \" IN (\" + (phoneValuesSql || \"\u0027\u0027\") + \")\";\nconst phoneWhereMensagem = normalizeSqlPhone(\u0027m.telefone\u0027) + \" IN (\" + (phoneValuesSql || \"\u0027\u0027\") + \")\";\n\nconst clienteLookupSql = `\nSELECT *\nFROM (\n  SELECT\n    1 AS cliente_encontrado,\n    c.id,\n    c.nome_razao,\n    c.email,\n    c.telefone1,\n    c.telefone2,\n    c.nome_contato,\n    c.telefone_contato,\n    c.cep,\n    c.endereco,\n    c.numero,\n    c.complemento,\n    c.bairro,\n    c.cidade,\n    c.uf,\n    c.observacoes\n  FROM clientes c\n  WHERE ${phoneWhereCliente}\n  ORDER BY c.id DESC\n  LIMIT 1\n) cliente\nUNION ALL\nSELECT\n  0 AS cliente_encontrado,\n  NULL AS id,\n  NULL AS nome_razao,\n  NULL AS email,\n  NULL AS telefone1,\n  NULL AS telefone2,\n  NULL AS nome_contato,\n  NULL AS telefone_contato,\n  NULL AS cep,\n  NULL AS endereco,\n  NULL AS numero,\n  NULL AS complemento,\n  NULL AS bairro,\n  NULL AS cidade,\n  NULL AS uf,\n  NULL AS observacoes\nFROM DUAL\nWHERE NOT EXISTS (\n  SELECT 1 FROM clientes c WHERE ${phoneWhereCliente} LIMIT 1\n)\nLIMIT 1;\n`.trim();\n\nconst conversaLookupSql = `\nSELECT\n  c.id,\n  c.status,\n  c.responsavel_id,\n  c.os_id_principal,\n  c.automacao_ativa,\n  c.aguardando_humano,\n  c.prioridade,\n  c.nome_contato,\n  c.nao_lidas,\n  c.ultima_mensagem_em\nFROM conversas_whatsapp c\nWHERE ${phoneWhereConversa}\nORDER BY c.ultima_mensagem_em DESC, c.id DESC\nLIMIT 1;\n`.trim();\n\nconst historicoLookupSql = `\nSELECT *\nFROM (\n  SELECT\n    m.id,\n    m.created_at,\n    m.direcao,\n    m.tipo_mensagem,\n    m.tipo_conteudo,\n    m.mensagem,\n    COALESCE(m.enviada_por_bot, 0) AS enviada_por_bot,\n    CASE\n      WHEN m.direcao = \u0027inbound\u0027 THEN \u0027cliente\u0027\n      WHEN COALESCE(m.enviada_por_bot, 0) = 1 THEN \u0027bot\u0027\n      WHEN m.tipo_mensagem = \u0027outbound_externo\u0027 OR m.tipo_mensagem LIKE \u0027%externo%\u0027 THEN \u0027humano_app\u0027\n      ELSE \u0027humano_erp\u0027\n    END AS origem_resumida\n  FROM mensagens_whatsapp m\n  LEFT JOIN conversas_whatsapp c ON c.id = m.conversa_id\n  WHERE ${phoneWhereConversa} OR ${phoneWhereMensagem}\n  ORDER BY m.id DESC\n  LIMIT 10\n) historico\nUNION ALL\nSELECT NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL\nFROM DUAL\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM mensagens_whatsapp m\n  LEFT JOIN conversas_whatsapp c ON c.id = m.conversa_id\n  WHERE ${phoneWhereConversa} OR ${phoneWhereMensagem}\n  LIMIT 1\n);\n`.trim();\n\nconst erpPayload = {\n  provider: \u0027evolution\u0027,\n  source: \u0027evolution\u0027,\n  event: rawEventName || eventName,\n  instance: instanceName,\n  push_name: pushName,\n  participant,\n  from_me: fromMe,\n  has_media: hasMedia,\n  normalized_phone: phone,\n  normalized_text: text,\n  detected_type: messageType,\n  message_key_id: messageKeyId,\n  delivery_status: deliveryStatus,\n  n8n_workflow: \u0027evolution-whatsapp-atendimento-ia-v3\u0027,\n  n8n_received_at: new Date().toISOString(),\n  ...envelope\n};\n\nreturn {\n  ...$json,\n  source: envelope,\n  data,\n  eventName,\n  normalizedEventName,\n  instanceName,\n  companyName,\n  normalizedPhone: phone,\n  phoneNoCountry,\n  remoteJid,\n  memorySessionKey,\n  messageKeyId,\n  deliveryStatus,\n  pushName,\n  participant,\n  receivedText: text,\n  normalizedText,\n  messageType,\n  hasMedia,\n  fromMe,\n  isGroup,\n  shouldProcess,\n  shouldReply,\n  erpWebhookUrl,\n  erpWebhookToken,\n  erpOrigin,\n  evolutionBaseUrl,\n  evolutionApiKey,\n  evolutionInstance,\n  clienteLookupSql,\n  conversaLookupSql,\n  historicoLookupSql,\n  googleSheetsSpreadsheetId,\n  googleSheetsSheetName,\n  driveKnowledgeFileSource,\n  driveKnowledgeFileId,\n  driveToolWorkflowId,\n  externalTechnicalSearchEnabled,\n  technicalSearchProvider,\n  institutionAddress,\n  institutionPhone,\n  institutionPixKey,\n  institutionPixName,\n  institutionBusinessHours,\n  institutionSupportEmail,\n  erpPayload\n};"
+                                     },
+                      "id":  "2",
+                      "name":  "Normalizar Entrada e Config V3",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       520,
+                                       360
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  2
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "cond-should-process",
+                                                                                   "leftValue":  "={{ $json.shouldProcess }}",
+                                                                                   "rightValue":  true,
+                                                                                   "operator":  {
+                                                                                                    "type":  "boolean",
+                                                                                                    "operation":  "true",
+                                                                                                    "singleValue":  true
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "3",
+                      "name":  "Inbound Elegivel?",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       760,
+                                       360
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={{ { ok: true, workflow: \u0027evolution-whatsapp-atendimento-ia-v3\u0027, event: $json.normalizedEventName || $json.eventName, processed: $json.shouldProcess, replied: false, phone: $json.normalizedPhone, response: \u0027Evento ignorado pelo workflow (nao e inbound elegivel).\u0027 } }}",
+                                         "options":  {
+                                                         "responseCode":  200
+                                                     }
+                                     },
+                      "id":  "4",
+                      "name":  "Responder Webhook Ignorado",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.4,
+                      "position":  [
+                                       980,
+                                       520
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "={{ $(\u0027Normalizar Entrada e Config V3\u0027).item.json.erpWebhookUrl }}",
+                                         "sendHeaders":  true,
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "Accept",
+                                                                                         "value":  "application/json"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "X-Webhook-Token",
+                                                                                         "value":  "={{ $(\u0027Normalizar Entrada e Config V3\u0027).item.json.erpWebhookToken }}"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ $(\u0027Normalizar Entrada e Config V3\u0027).item.json.erpPayload }}"
+                                     },
+                      "id":  "5",
+                      "name":  "Espelhar Evento no ERP",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.2,
+                      "position":  [
+                                       1000,
+                                       240
+                                   ],
+                      "continueOnFail":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "executeQuery",
+                                         "query":  "={{ $(\u0027Normalizar Entrada e Config V3\u0027).item.json.clienteLookupSql }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "6",
+                      "name":  "Buscar Cliente ERP",
+                      "type":  "n8n-nodes-base.mySql",
+                      "typeVersion":  2.4,
+                      "position":  [
+                                       1240,
+                                       240
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForEachItem",
+                                         "jsCode":  "const base = $(\u0027Normalizar Entrada e Config V3\u0027).first().json;\nconst cliente = $json || {};\n\nfunction firstName(value) {\n  return String(value || \u0027\u0027).trim().split(/\\s+/).filter(Boolean)[0] || \u0027\u0027;\n}\n\nfunction regexIntent(text) {\n  const normalized = String(text || \u0027\u0027);\n  if (/\\b(pdf|segunda via|2 via|orcamento em pdf|os em pdf|comprovante)\\b/.test(normalized)) return \u0027pdf\u0027;\n  if (/\\b(os|ordem de servico|status da os|acompanhar)\\b/.test(normalized)) return \u0027os\u0027;\n  if (/\\b(orcamento|valor|preco|aprovar orcamento)\\b/.test(normalized)) return \u0027orcamento\u0027;\n  if (/\\b(equipamento|celular|iphone|samsung|notebook|tablet|aparelho|serial|imei)\\b/.test(normalized)) return \u0027equipamento\u0027;\n  if (/\\b(endereco|telefone|pix|horario|localizacao|onde fica|garantia|politica)\\b/.test(normalized)) return \u0027institucional\u0027;\n  if (/\\b(defeito|placa|bateria|tela|reparo|manutencao|tecnico|processador|memoria|windows|android|ios|iphone|tecnologia|como funciona|o que significa)\\b/.test(normalized)) return \u0027tecnica\u0027;\n  if (/\\b(atendente|humano|pessoa|falar com alguem)\\b/.test(normalized)) return \u0027humano\u0027;\n  if (/\\b(oi|ola|bom dia|boa tarde|boa noite)\\b/.test(normalized)) return \u0027saudacao\u0027;\n  return \u0027continuidade\u0027;\n}\n\nfunction localDateParts(date) {\n  return {\n    date: new Intl.DateTimeFormat(\u0027en-CA\u0027, { timeZone: \u0027America/Fortaleza\u0027 }).format(date),\n    time: new Intl.DateTimeFormat(\u0027pt-BR\u0027, {\n      timeZone: \u0027America/Fortaleza\u0027,\n      hour: \u00272-digit\u0027,\n      minute: \u00272-digit\u0027,\n      second: \u00272-digit\u0027,\n      hour12: false,\n    }).format(date),\n  };\n}\n\nconst clienteEncontrado = Number(cliente.cliente_encontrado || 0) === 1 \u0026\u0026 !!cliente.id;\nconst profileFirstName = firstName(base.pushName);\nconst cadastroFirstName = firstName(cliente.nome_razao);\nconst contatoFirstName = firstName(cliente.nome_contato);\nconst normalizedProfile = profileFirstName.toLowerCase();\nconst normalizedCadastro = cadastroFirstName.toLowerCase();\nconst normalizedContato = contatoFirstName.toLowerCase();\n\nlet identityStatus = \u0027nao_confirmado\u0027;\nlet identityReason = \u0027cliente_nao_localizado\u0027;\nif (clienteEncontrado) {\n  if (normalizedProfile \u0026\u0026 (normalizedProfile === normalizedCadastro || normalizedProfile === normalizedContato)) {\n    identityStatus = \u0027confirmado\u0027;\n    identityReason = \u0027telefone_e_primeiro_nome_conferem\u0027;\n  } else if (!normalizedProfile) {\n    identityStatus = \u0027provavel\u0027;\n    identityReason = \u0027telefone_confere_mas_nome_nao_veio\u0027;\n  } else {\n    identityStatus = \u0027provavel\u0027;\n    identityReason = \u0027telefone_confere_mas_nome_diverge\u0027;\n  }\n}\n\nconst preferredGreetingName = cadastroFirstName || contatoFirstName || profileFirstName || \u0027\u0027;\nconst initialIntentHint = regexIntent(base.normalizedText || \u0027\u0027);\nconst initialSensitiveTopicHint = [\u0027os\u0027, \u0027orcamento\u0027, \u0027equipamento\u0027, \u0027pdf\u0027].includes(initialIntentHint);\nconst initialTechnicalHint = base.externalTechnicalSearchEnabled === true \u0026\u0026 initialIntentHint === \u0027tecnica\u0027;\nconst technicalSearchQuery = [base.receivedText, preferredGreetingName, clienteEncontrado ? cliente.nome_razao : \u0027\u0027]\n  .filter(Boolean)\n  .join(\u0027 - \u0027)\n  .trim();\n\nconst clienteId = Number(cliente.id || 0);\nconst localNow = localDateParts(new Date());\nconst leadDailyKey = `${localNow.date}_${base.normalizedPhone}`;\n\nconst equipamentosLookupSql = clienteId \u003e 0 ? `\nSELECT\n  e.id,\n  tipos.nome AS tipo,\n  marcas.nome AS marca,\n  modelos.nome AS modelo,\n  e.cor,\n  e.numero_serie,\n  e.imei,\n  e.observacoes,\n  e.created_at\nFROM equipamentos e\nLEFT JOIN equipamentos_tipos tipos ON tipos.id = e.tipo_id\nLEFT JOIN equipamentos_marcas marcas ON marcas.id = e.marca_id\nLEFT JOIN equipamentos_modelos modelos ON modelos.id = e.modelo_id\nLEFT JOIN equipamento_clientes ec ON ec.equipamento_id = e.id\nWHERE e.cliente_id = ${clienteId} OR ec.cliente_id = ${clienteId}\nGROUP BY e.id\nORDER BY e.created_at DESC\nLIMIT 5;\n`.trim() : \u0027SELECT NULL AS id, NULL AS tipo, NULL AS marca, NULL AS modelo, NULL AS cor, NULL AS numero_serie, NULL AS imei, NULL AS observacoes, NULL AS created_at FROM DUAL WHERE 1=0;\u0027;\n\nconst osLookupSql = clienteId \u003e 0 ? `\nSELECT\n  os.id,\n  os.numero_os,\n  os.numero_os_legado,\n  os.status,\n  os.estado_fluxo,\n  os.data_abertura,\n  os.data_previsao,\n  os.data_conclusao,\n  os.valor_final,\n  os.relato_cliente,\n  os.diagnostico_tecnico,\n  tipos.nome AS equip_tipo,\n  marcas.nome AS equip_marca,\n  modelos.nome AS equip_modelo,\n  equipamentos.numero_serie AS equip_serie,\n  equipamentos.imei AS equip_imei\nFROM os\nLEFT JOIN equipamentos ON equipamentos.id = os.equipamento_id\nLEFT JOIN equipamentos_tipos tipos ON tipos.id = equipamentos.tipo_id\nLEFT JOIN equipamentos_marcas marcas ON marcas.id = equipamentos.marca_id\nLEFT JOIN equipamentos_modelos modelos ON modelos.id = equipamentos.modelo_id\nWHERE os.cliente_id = ${clienteId}\nORDER BY os.created_at DESC\nLIMIT 5;\n`.trim() : \u0027SELECT NULL AS id, NULL AS numero_os, NULL AS numero_os_legado, NULL AS status, NULL AS estado_fluxo, NULL AS data_abertura, NULL AS data_previsao, NULL AS data_conclusao, NULL AS valor_final, NULL AS relato_cliente, NULL AS diagnostico_tecnico, NULL AS equip_tipo, NULL AS equip_marca, NULL AS equip_modelo, NULL AS equip_serie, NULL AS equip_imei FROM DUAL WHERE 1=0;\u0027;\n\nconst orcamentosLookupSql = clienteId \u003e 0 ? `\nSELECT\n  o.id,\n  o.numero,\n  o.status,\n  o.total,\n  o.validade_data,\n  o.titulo,\n  o.os_id,\n  o.equipamento_id,\n  o.enviado_em,\n  o.aprovado_em,\n  o.rejeitado_em,\n  os.numero_os,\n  tipos.nome AS equip_tipo,\n  marcas.nome AS equip_marca,\n  modelos.nome AS equip_modelo\nFROM orcamentos o\nLEFT JOIN os ON os.id = o.os_id\nLEFT JOIN equipamentos e ON e.id = o.equipamento_id\nLEFT JOIN equipamentos_tipos tipos ON tipos.id = e.tipo_id\nLEFT JOIN equipamentos_marcas marcas ON marcas.id = e.marca_id\nLEFT JOIN equipamentos_modelos modelos ON modelos.id = e.modelo_id\nWHERE o.cliente_id = ${clienteId}\nORDER BY o.created_at DESC\nLIMIT 5;\n`.trim() : \u0027SELECT NULL AS id, NULL AS numero, NULL AS status, NULL AS total, NULL AS validade_data, NULL AS titulo, NULL AS os_id, NULL AS equipamento_id, NULL AS enviado_em, NULL AS aprovado_em, NULL AS rejeitado_em, NULL AS numero_os, NULL AS equip_tipo, NULL AS equip_marca, NULL AS equip_modelo FROM DUAL WHERE 1=0;\u0027;\n\nreturn {\n  ...base,\n  cliente,\n  clienteEncontrado,\n  identityStatus,\n  identityReason,\n  preferredGreetingName,\n  initialIntentHint,\n  initialSensitiveTopicHint,\n  initialTechnicalHint,\n  technicalSearchQuery,\n  equipamentosLookupSql,\n  osLookupSql,\n  orcamentosLookupSql,\n  lead_daily_key: leadDailyKey,\n  lead_date: localNow.date,\n  lead_time: localNow.time,\n  lead_name: base.pushName || cliente.nome_razao || \u0027\u0027,\n  lead_phone: base.normalizedPhone,\n  lead_cliente_encontrado: clienteEncontrado ? \u0027sim\u0027 : \u0027nao\u0027,\n  lead_identity_status: identityStatus,\n  lead_subject: base.receivedText || base.messageType || \u0027mensagem\u0027\n};"
+                                     },
+                      "id":  "7",
+                      "name":  "Identidade + Consultas + Lead Diario",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       1480,
+                                       240
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "appendOrUpdate",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "={{ $(\u0027Identidade + Consultas + Lead Diario\u0027).first().json.googleSheetsSpreadsheetId }}",
+                                                            "mode":  "id"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "={{ $(\u0027Identidade + Consultas + Lead Diario\u0027).first().json.googleSheetsSheetName }}",
+                                                           "mode":  "name"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "matchingColumns":  [
+                                                                                 "lead_daily_key"
+                                                                             ],
+                                                         "value":  {
+                                                                       "lead_daily_key":  "={{ $json.lead_daily_key }}",
+                                                                       "data":  "={{ $json.data }}",
+                                                                       "hora":  "={{ $json.hora }}",
+                                                                       "nome_whatsapp":  "={{ $json.nome_whatsapp }}",
+                                                                       "telefone":  "={{ $json.telefone }}",
+                                                                       "cliente_encontrado":  "={{ $json.cliente_encontrado }}",
+                                                                       "identity_status":  "={{ $json.identity_status }}",
+                                                                       "assunto":  "={{ $json.assunto }}"
+                                                                   }
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "8",
+                      "name":  "Registrar Lead Diario Sheets",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.5,
+                      "position":  [
+                                       1720,
+                                       120
+                                   ],
+                      "continueOnFail":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "executeQuery",
+                                         "query":  "={{ $(\u0027Normalizar Entrada e Config V3\u0027).first().json.conversaLookupSql }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "9",
+                      "name":  "Buscar Conversa ERP",
+                      "type":  "n8n-nodes-base.mySql",
+                      "typeVersion":  2.4,
+                      "position":  [
+                                       1720,
+                                       240
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  2
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "leftValue":  "={{ Number($json.aguardando_humano || 0) === 1 || Number($json.automacao_ativa || 1) === 0 }}",
+                                                                                   "rightValue":  true,
+                                                                                   "operator":  {
+                                                                                                    "type":  "boolean",
+                                                                                                    "operation":  "true",
+                                                                                                    "singleValue":  true
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "10",
+                      "name":  "Humano Assumiu?",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       1960,
+                                       240
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={{ { ok: true, workflow: \u0027evolution-whatsapp-atendimento-ia-v3\u0027, processed: true, replied: false, phone: $(\u0027Normalizar Entrada e Config V3\u0027).first().json.normalizedPhone, response: \u0027Conversa aguardando atendimento humano.\u0027 } }}",
+                                         "options":  {
+                                                         "responseCode":  200
+                                                     }
+                                     },
+                      "id":  "11",
+                      "name":  "Responder Webhook Humano",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.4,
+                      "position":  [
+                                       2200,
+                                       380
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "executeQuery",
+                                         "query":  "={{ $(\u0027Normalizar Entrada e Config V3\u0027).first().json.historicoLookupSql }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "12",
+                      "name":  "Buscar Historico Recente ERP",
+                      "type":  "n8n-nodes-base.mySql",
+                      "typeVersion":  2.4,
+                      "position":  [
+                                       2200,
+                                       120
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "executeQuery",
+                                         "query":  "={{ $(\u0027Identidade + Consultas + Lead Diario\u0027).first().json.equipamentosLookupSql }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "13",
+                      "name":  "Buscar Equipamentos ERP",
+                      "type":  "n8n-nodes-base.mySql",
+                      "typeVersion":  2.4,
+                      "position":  [
+                                       2440,
+                                       120
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "executeQuery",
+                                         "query":  "={{ $(\u0027Identidade + Consultas + Lead Diario\u0027).first().json.osLookupSql }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "14",
+                      "name":  "Buscar OS ERP",
+                      "type":  "n8n-nodes-base.mySql",
+                      "typeVersion":  2.4,
+                      "position":  [
+                                       2680,
+                                       120
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "executeQuery",
+                                         "query":  "={{ $(\u0027Identidade + Consultas + Lead Diario\u0027).first().json.orcamentosLookupSql }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "15",
+                      "name":  "Buscar Orcamentos ERP",
+                      "type":  "n8n-nodes-base.mySql",
+                      "typeVersion":  2.4,
+                      "position":  [
+                                       2920,
+                                       120
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForAllItems",
+                                         "jsCode":  "function safeNodeAllJson(name) {\n  try {\n    return $(name).all().map((item) =\u003e item.json || {});\n  } catch (error) {\n    return [];\n  }\n}\n\nfunction compact(text, max = 220) {\n  return String(text || \u0027\u0027).replace(/\\s+/g, \u0027 \u0027).trim().slice(0, max);\n}\n\nconst base = $(\u0027Identidade + Consultas + Lead Diario\u0027).first().json;\nconst historicoRows = safeNodeAllJson(\u0027Buscar Historico Recente ERP\u0027)\n  .filter((row) =\u003e row \u0026\u0026 row.id \u0026\u0026 String(row.mensagem || \u0027\u0027).trim() !== \u0027\u0027)\n  .sort((a, b) =\u003e Number(a.id) - Number(b.id))\n  .slice(-6);\n\nconst historicoFormatado = historicoRows.length \u003e 0\n  ? historicoRows.map((row) =\u003e `${row.origem_resumida || \u0027-\u0027}: ${compact(row.mensagem, 180)}`).join(\u0027\\n\u0027)\n  : \u0027Sem historico recente relevante.\u0027;\n\nconst clienteNome = (base.cliente \u0026\u0026 base.cliente.nome_razao) ? base.cliente.nome_razao : \u0027-\u0027;\nconst clienteContato = (base.cliente \u0026\u0026 base.cliente.nome_contato) ? base.cliente.nome_contato : \u0027-\u0027;\n\nconst triageSystemMessage = [\n  \u0027Voce e um agente de triagem e seguranca para atendimento WhatsApp.\u0027,\n  \u0027Sua funcao e classificar a intencao da mensagem, avaliar se o tema e tecnico e dizer se a resposta precisa validar identidade antes de compartilhar dados operacionais.\u0027,\n  \u0027Considere o status de identidade ja calculado como base forte de seguranca.\u0027,\n  \u0027Nunca seja permissivo com dados de OS, orcamento, equipamento ou segunda via quando a identidade nao estiver confirmada.\u0027,\n  \u0027Responda SOMENTE com JSON puro, sem markdown, sem texto extra.\u0027,\n  \u0027Formato exato: {\"intentCategory\":\"saudacao|continuidade|os|orcamento|equipamento|pdf|institucional|tecnica|humano\",\"isTechnical\":true|false,\"needsSensitiveValidation\":true|false,\"triageReason\":\"texto curto\"}\u0027\n].join(\u0027 \u0027);\n\nconst triageInput = [\n  `Empresa: ${base.companyName || \u0027-\u0027}`,\n  `Mensagem atual: ${base.receivedText || \u0027(sem texto)\u0027}`,\n  `Texto normalizado: ${base.normalizedText || \u0027-\u0027}`,\n  `Nome no perfil do WhatsApp: ${base.pushName || \u0027-\u0027}`,\n  `Cliente encontrado no ERP: ${base.clienteEncontrado ? \u0027sim\u0027 : \u0027nao\u0027}`,\n  `Nome do cliente no ERP: ${clienteNome}`,\n  `Nome de contato no ERP: ${clienteContato}`,\n  `Identity status base: ${base.identityStatus || \u0027nao_confirmado\u0027}`,\n  `Motivo do status base: ${base.identityReason || \u0027-\u0027}`,\n  `Sugestao inicial por regra local: ${base.initialIntentHint || \u0027continuidade\u0027}`,\n  `Tema sensivel inicial: ${base.initialSensitiveTopicHint ? \u0027sim\u0027 : \u0027nao\u0027}`,\n  `Indicio tecnico inicial: ${base.initialTechnicalHint ? \u0027sim\u0027 : \u0027nao\u0027}`,\n  \u0027Historico resumido recente:\u0027,\n  historicoFormatado\n].join(\u0027\\n\\n\u0027);\n\nreturn [{\n  json: {\n    ...base,\n    triageSystemMessage,\n    triageInput\n  }\n}];"
+                                     },
+                      "id":  "16",
+                      "name":  "Montar Prompt Triagem IA V3",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       3160,
+                                       120
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "={{ $json.triageInput }}",
+                                         "options":  {
+                                                         "systemMessage":  "={{ $json.triageSystemMessage }}"
+                                                     }
+                                     },
+                      "id":  "17",
+                      "name":  "Agente IA Triagem e Seguranca",
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  1.8,
+                      "position":  [
+                                       3400,
+                                       120
+                                   ],
+                      "continueOnFail":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "model":  {
+                                                       "__rl":  true,
+                                                       "value":  "gpt-4.1-mini",
+                                                       "mode":  "list",
+                                                       "cachedResultName":  "gpt-4.1-mini"
+                                                   },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "18",
+                      "name":  "OpenAI Chat Model Triagem",
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       3320,
+                                       380
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForEachItem",
+                                         "jsCode":  "function extractJson(raw) {\n  const text = String(raw || \u0027\u0027).trim();\n  if (!text) return null;\n  const candidates = [];\n  candidates.push(text);\n  const fenced = text.match(/```(?:json)?\\s*([\\s\\S]*?)```/i);\n  if (fenced \u0026\u0026 fenced[1]) candidates.push(fenced[1].trim());\n  const start = text.indexOf(\u0027{\u0027);\n  const end = text.lastIndexOf(\u0027}\u0027);\n  if (start \u003e= 0 \u0026\u0026 end \u003e start) candidates.push(text.slice(start, end + 1));\n  for (const candidate of candidates) {\n    try {\n      return JSON.parse(candidate);\n    } catch (error) {\n      continue;\n    }\n  }\n  return null;\n}\n\nconst base = $(\u0027Montar Prompt Triagem IA V3\u0027).first().json;\nconst rawOutput = typeof $json.output === \u0027string\u0027 ? $json.output : JSON.stringify($json);\nconst parsed = extractJson(rawOutput) || {};\nconst allowedIntents = [\u0027saudacao\u0027, \u0027continuidade\u0027, \u0027os\u0027, \u0027orcamento\u0027, \u0027equipamento\u0027, \u0027pdf\u0027, \u0027institucional\u0027, \u0027tecnica\u0027, \u0027humano\u0027];\nconst fallbackIntent = String(base.initialIntentHint || \u0027continuidade\u0027);\nconst parsedIntent = String(parsed.intentCategory || \u0027\u0027).trim().toLowerCase();\nconst intentCategory = allowedIntents.includes(parsedIntent) ? parsedIntent : fallbackIntent;\nconst isTechnical = parsed.isTechnical === true || intentCategory === \u0027tecnica\u0027;\nconst sensitiveTopics = [\u0027os\u0027, \u0027orcamento\u0027, \u0027equipamento\u0027, \u0027pdf\u0027];\nconst localNeedsValidation = sensitiveTopics.includes(intentCategory) \u0026\u0026 base.identityStatus !== \u0027confirmado\u0027;\nconst needsSensitiveValidation = parsed.needsSensitiveValidation === true || localNeedsValidation;\nconst technicalSearchEnabled = base.externalTechnicalSearchEnabled === true \u0026\u0026 isTechnical;\n\nreturn {\n  ...base,\n  triageRawResponse: $json,\n  triageRawText: rawOutput,\n  triageReason: String(parsed.triageReason || \u0027\u0027).trim() || \u0027triagem_sem_motivo_explicito\u0027,\n  intentCategory,\n  isTechnical,\n  needsSensitiveValidation,\n  technicalSearchEnabled,\n  shouldEscalateHuman: intentCategory === \u0027humano\u0027\n};"
+                                     },
+                      "id":  "19",
+                      "name":  "Interpretar Triagem IA V3",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       3640,
+                                       120
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "name":  "buscar_base_institucional_drive",
+                                         "description":  "Use quando precisar consultar a base institucional oficial da assistencia no Google Drive para responder sobre endereco, horarios, pix, garantias, politicas, procedimentos internos e informacoes da empresa.",
+                                         "workflowId":  {
+                                                            "__rl":  true,
+                                                            "mode":  "id",
+                                                            "value":  "={{ $(\u0027Normalizar Entrada e Config V3\u0027).first().json.driveToolWorkflowId }}"
+                                                        },
+                                         "workflowInputs":  {
+                                                                "schema":  [
+                                                                               {
+                                                                                   "id":  "question",
+                                                                                   "displayName":  "question",
+                                                                                   "required":  false,
+                                                                                   "defaultMatch":  false,
+                                                                                   "display":  true,
+                                                                                   "canBeUsedToMatch":  true,
+                                                                                   "type":  "string"
+                                                                               },
+                                                                               {
+                                                                                   "id":  "driveFileId",
+                                                                                   "displayName":  "driveFileId",
+                                                                                   "required":  false,
+                                                                                   "defaultMatch":  false,
+                                                                                   "display":  true,
+                                                                                   "canBeUsedToMatch":  true,
+                                                                                   "type":  "string"
+                                                                               },
+                                                                               {
+                                                                                   "id":  "companyName",
+                                                                                   "displayName":  "companyName",
+                                                                                   "required":  false,
+                                                                                   "defaultMatch":  false,
+                                                                                   "display":  true,
+                                                                                   "canBeUsedToMatch":  true,
+                                                                                   "type":  "string"
+                                                                               }
+                                                                           ],
+                                                                "value":  {
+                                                                              "question":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027question\u0027, `Pergunta do cliente que deve ser respondida com apoio da base institucional oficial do Google Drive.`, \u0027string\u0027) }}",
+                                                                              "driveFileId":  "={{ $(\u0027Normalizar Entrada e Config V3\u0027).first().json.driveKnowledgeFileId }}",
+                                                                              "companyName":  "={{ $(\u0027Normalizar Entrada e Config V3\u0027).first().json.companyName }}"
+                                                                          }
+                                                            }
+                                     },
+                      "id":  "20",
+                      "name":  "Tool | Base Institucional Drive",
+                      "type":  "@n8n/n8n-nodes-langchain.toolWorkflow",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       5200,
+                                       500
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForAllItems",
+                                         "jsCode":  "function safeNodeFirstJson(name) {\n  try {\n    return $(name).first().json || {};\n  } catch (error) {\n    return {};\n  }\n}\n\nfunction safeNodeAllJson(name) {\n  try {\n    return $(name).all().map((item) =\u003e item.json || {});\n  } catch (error) {\n    return [];\n  }\n}\n\nfunction firstName(value) {\n  return String(value || \u0027\u0027).trim().split(/\\s+/).filter(Boolean)[0] || \u0027\u0027;\n}\n\nfunction compact(text, max = 2400) {\n  return String(text || \u0027\u0027).replace(/\\s+/g, \u0027 \u0027).trim().slice(0, max);\n}\n\nconst base = safeNodeFirstJson(\u0027Interpretar Triagem IA V3\u0027);\nconst conversa = safeNodeFirstJson(\u0027Buscar Conversa ERP\u0027);\nconst historicoRows = safeNodeAllJson(\u0027Buscar Historico Recente ERP\u0027)\n  .filter((row) =\u003e row \u0026\u0026 row.id \u0026\u0026 String(row.mensagem || \u0027\u0027).trim() !== \u0027\u0027)\n  .sort((a, b) =\u003e Number(a.id) - Number(b.id))\n  .slice(-8);\nconst equipamentosRows = safeNodeAllJson(\u0027Buscar Equipamentos ERP\u0027).filter((row) =\u003e row \u0026\u0026 row.id);\nconst osRows = safeNodeAllJson(\u0027Buscar OS ERP\u0027).filter((row) =\u003e row \u0026\u0026 row.id);\nconst orcRows = safeNodeAllJson(\u0027Buscar Orcamentos ERP\u0027).filter((row) =\u003e row \u0026\u0026 row.id);\n\nconst cliente = base.cliente || {};\nconst canShareSensitive = base.identityStatus === \u0027confirmado\u0027 \u0026\u0026 base.needsSensitiveValidation !== true;\nconst clienteEncontrado = base.clienteEncontrado === true;\nconst preferredGreetingName = base.preferredGreetingName || firstName(base.pushName) || \u0027\u0027;\n\nconst historicoFormatado = historicoRows.length \u003e 0\n  ? historicoRows.map((row) =\u003e `${String(row.created_at || \u0027\u0027).replace(\u0027T\u0027, \u0027 \u0027).slice(0, 16)} | ${row.origem_resumida}: ${compact(row.mensagem, 240)}`).join(\u0027\\n\u0027)\n  : \u0027Sem historico recente da conversa no ERP.\u0027;\n\nconst equipamentosResumo = equipamentosRows.length \u003e 0\n  ? equipamentosRows.map((row) =\u003e `${row.marca || \u0027-\u0027} ${row.modelo || \u0027-\u0027} (${row.tipo || \u0027-\u0027}) serie:${row.numero_serie || \u0027-\u0027} imei:${row.imei || \u0027-\u0027}`).join(\u0027\\n\u0027)\n  : \u0027Nenhum equipamento localizado.\u0027;\n\nconst osResumo = osRows.length \u003e 0\n  ? osRows.map((row) =\u003e `OS ${row.numero_os || row.numero_os_legado || row.id} | status:${row.status || \u0027-\u0027} | fluxo:${row.estado_fluxo || \u0027-\u0027} | valor:${row.valor_final || \u0027-\u0027} | equipamento:${[row.equip_marca, row.equip_modelo].filter(Boolean).join(\u0027 \u0027) || \u0027-\u0027}`).join(\u0027\\n\u0027)\n  : \u0027Nenhuma OS localizada.\u0027;\n\nconst orcResumo = orcRows.length \u003e 0\n  ? orcRows.map((row) =\u003e `Orcamento ${row.numero || row.id} | status:${row.status || \u0027-\u0027} | total:${row.total || \u0027-\u0027} | validade:${row.validade_data || \u0027-\u0027} | equipamento:${[row.equip_marca, row.equip_modelo].filter(Boolean).join(\u0027 \u0027) || \u0027-\u0027}`).join(\u0027\\n\u0027)\n  : \u0027Nenhum orcamento localizado.\u0027;\n\nconst safeOperationalContext = canShareSensitive ? [\n  \u0027Dados do cliente autorizados para uso na resposta:\u0027,\n  `Cliente: ${cliente.nome_razao || \u0027-\u0027}`,\n  `Email: ${cliente.email || \u0027-\u0027}`,\n  `Telefone1: ${cliente.telefone1 || \u0027-\u0027}`,\n  `Telefone2: ${cliente.telefone2 || \u0027-\u0027}`,\n  `Endereco: ${[cliente.endereco, cliente.numero, cliente.complemento, cliente.bairro, cliente.cidade, cliente.uf].filter(Boolean).join(\u0027, \u0027) || \u0027-\u0027}`,\n  \u0027Equipamentos:\u0027,\n  equipamentosResumo,\n  \u0027Ordens de servico:\u0027,\n  osResumo,\n  \u0027Orcamentos:\u0027,\n  orcResumo\n].join(\u0027\\n\\n\u0027) : \u0027Nao use nem revele dados operacionais sensiveis do ERP nesta resposta. Se o cliente pedir OS, orcamento, equipamento ou segunda via, peca validacao segura antes de prosseguir.\u0027;\n\nconst toolGuidance = [\n  \u0027Tool buscar_base_institucional_drive: use quando a pergunta for sobre endereco, horarios, PIX, garantia, politicas, procedimentos da assistencia ou qualquer conteudo institucional guardado no Google Drive oficial.\u0027,\n  \u0027Tool Brave Search: use somente para perguntas tecnicas gerais, causas provaveis, explicacoes sobre defeitos e tecnologia. Nunca use Brave Search para dados operacionais do ERP.\u0027,\n  \u0027Nao existe busca automatica de PDF/segunda via nesta versao. Se o cliente pedir PDF, seja transparente e oriente que a equipe vai conferir o documento correto apos a validacao necessaria.\u0027\n].join(\u0027 \u0027);\n\nconst systemMessage = [\n  `Voce e a atendente virtual da ${base.companyName}.`,\n  \u0027Fale como uma pessoa real no WhatsApp: natural, clara, acolhedora e profissional.\u0027,\n  \u0027Continue a conversa considerando historico recente e memoria.\u0027,\n  \u0027Nao trate toda mensagem como inicio de atendimento.\u0027,\n  \u0027Nao invente dados de OS, orcamento, equipamento, PDF ou dados pessoais.\u0027,\n  \u0027Se needsSensitiveValidation for verdadeiro, sua primeira resposta deve pedir confirmacao de identidade de forma objetiva, sem entregar qualquer dado do ERP.\u0027,\n  toolGuidance,\n  \u0027No maximo uma pergunta objetiva por vez.\u0027,\n  \u0027Sem markdown. Resposta curta e natural, pronta para WhatsApp.\u0027\n].join(\u0027 \u0027);\n\nconst agentInput = [\n  `Evento: ${base.normalizedEventName || base.eventName || \u0027-\u0027}`,\n  `Telefone normalizado: ${base.normalizedPhone || \u0027-\u0027}`,\n  `Nome no perfil WhatsApp: ${base.pushName || \u0027-\u0027}`,\n  `Nome preferido para abordagem: ${preferredGreetingName || \u0027-\u0027}`,\n  `Cliente encontrado: ${clienteEncontrado ? \u0027sim\u0027 : \u0027nao\u0027}`,\n  `Identity status: ${base.identityStatus || \u0027nao_confirmado\u0027}`,\n  `Intent detectada: ${base.intentCategory || \u0027continuidade\u0027}`,\n  `Needs sensitive validation: ${base.needsSensitiveValidation ? \u0027sim\u0027 : \u0027nao\u0027}`,\n  `Pergunta tecnica: ${base.isTechnical ? \u0027sim\u0027 : \u0027nao\u0027}`,\n  `Motivo da triagem: ${base.triageReason || \u0027-\u0027}`,\n  `Mensagem atual do cliente: ${base.receivedText || \u0027(sem texto)\u0027}`,\n  `Conversa atual no ERP: status=${conversa.status || \u0027-\u0027}, aguardando_humano=${conversa.aguardando_humano ?? \u0027-\u0027}, automacao_ativa=${conversa.automacao_ativa ?? \u0027-\u0027}`,\n  \u0027Historico recente da conversa:\u0027,\n  historicoFormatado,\n  \u0027Contexto operacional do ERP:\u0027,\n  safeOperationalContext,\n  `Google Drive institucional configurado via fileId: ${base.driveKnowledgeFileId || \u0027nao_configurado\u0027}`,\n  `Brave Search habilitado para tecnico: ${base.technicalSearchEnabled ? \u0027sim\u0027 : \u0027nao\u0027}`,\n  \u0027Responda ao cliente de forma util e segura, sem vazar informacoes de outro cliente.\u0027\n].join(\u0027\\n\\n\u0027);\n\nreturn [{\n  json: {\n    ...base,\n    conversa,\n    historicoCount: historicoRows.length,\n    equipmentCount: equipamentosRows.length,\n    osCount: osRows.length,\n    orcamentoCount: orcRows.length,\n    openaiSystemMessage: systemMessage,\n    agentInput,\n    canShareSensitive\n  }\n}];"
+                                     },
+                      "id":  "24",
+                      "name":  "Montar Contexto IA V3",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       4600,
+                                       240
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "={{ $json.agentInput }}",
+                                         "options":  {
+                                                         "systemMessage":  "={{ $json.openaiSystemMessage }}"
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  1.8,
+                      "position":  [
+                                       4840,
+                                       240
+                                   ],
+                      "id":  "25",
+                      "name":  "Agente IA Humanizado V3"
+                  },
+                  {
+                      "parameters":  {
+                                         "model":  {
+                                                       "__rl":  true,
+                                                       "value":  "gpt-4.1-mini",
+                                                       "mode":  "list",
+                                                       "cachedResultName":  "gpt-4.1-mini"
+                                                   },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       4720,
+                                       500
+                                   ],
+                      "id":  "26",
+                      "name":  "OpenAI Chat Model"
+                  },
+                  {
+                      "parameters":  {
+                                         "sessionIdType":  "customKey",
+                                         "sessionKey":  "={{ $json.memorySessionKey }}",
+                                         "tableName":  "n8n_chat_memory_evolution_erp_v3",
+                                         "contextWindowLength":  50
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       4960,
+                                       500
+                                   ],
+                      "id":  "27",
+                      "name":  "Memoria Postgres"
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForEachItem",
+                                         "jsCode":  "const ctx = $(\u0027Montar Contexto IA V3\u0027).first().json;\nconst raw = String($json.output || \u0027\u0027).trim();\n\nfunction sanitize(text) {\n  return String(text || \u0027\u0027).replace(/[*_`#\u003e]+/g, \u0027\u0027).replace(/\\s+/g, \u0027 \u0027).trim();\n}\n\nfunction splitLongSentence(sentence, maxLen = 260) {\n  const parts = [];\n  let remaining = sentence.trim();\n  while (remaining.length \u003e maxLen) {\n    const slice = remaining.slice(0, maxLen + 1);\n    let breakAt = Math.max(slice.lastIndexOf(\u0027. \u0027), slice.lastIndexOf(\u0027! \u0027), slice.lastIndexOf(\u0027? \u0027));\n    if (breakAt \u003c 100) breakAt = Math.max(slice.lastIndexOf(\u0027; \u0027), slice.lastIndexOf(\u0027: \u0027), slice.lastIndexOf(\u0027, \u0027));\n    if (breakAt \u003c 100) breakAt = slice.lastIndexOf(\u0027 \u0027);\n    if (breakAt \u003c 60) breakAt = maxLen;\n    parts.push(remaining.slice(0, breakAt + 1).trim());\n    remaining = remaining.slice(breakAt + 1).trim();\n  }\n  if (remaining) parts.push(remaining);\n  return parts;\n}\n\nfunction buildBlocks(text, maxLen = 260) {\n  const cleaned = sanitize(text);\n  if (!cleaned) return [];\n  const sentences = cleaned.split(/(?\u003c=[.!?])\\s+/).filter(Boolean);\n  const blocks = [];\n  let current = \u0027\u0027;\n  for (const sentence of sentences) {\n    if (sentence.length \u003e maxLen) {\n      const expanded = splitLongSentence(sentence, maxLen);\n      for (const part of expanded) {\n        if (!current) {\n          current = part;\n        } else if ((current + \u0027 \u0027 + part).length \u003c= maxLen) {\n          current += \u0027 \u0027 + part;\n        } else {\n          blocks.push(current.trim());\n          current = part;\n        }\n      }\n      continue;\n    }\n    if (!current) {\n      current = sentence;\n    } else if ((current + \u0027 \u0027 + sentence).length \u003c= maxLen) {\n      current += \u0027 \u0027 + sentence;\n    } else {\n      blocks.push(current.trim());\n      current = sentence;\n    }\n  }\n  if (current) blocks.push(current.trim());\n  const normalizedBlocks = blocks.length \u003e 0 ? blocks : [cleaned];\n  if (normalizedBlocks.length \u003c= 3) return normalizedBlocks;\n  return [normalizedBlocks[0], normalizedBlocks[1], normalizedBlocks.slice(2).join(\u0027 \u0027)];\n}\n\nlet aiReply = sanitize(raw);\nconst nome = ctx.preferredGreetingName || \u0027\u0027;\n\nif (aiReply === \u0027\u0027) {\n  if (ctx.needsSensitiveValidation) {\n    aiReply = nome\n      ? `Oi, ${nome}. Antes de te passar esse dado, preciso confirmar sua identidade. Me confirma seu nome completo, por favor.`\n      : \u0027Oi. Antes de te passar esse dado, preciso confirmar sua identidade. Me confirma seu nome completo, por favor.\u0027;\n  } else if (ctx.intentCategory === \u0027pdf\u0027) {\n    aiReply = \u0027Recebi seu pedido de segunda via. Vou registrar isso aqui e orientar a equipe para conferir o documento correto pra voce.\u0027;\n  } else if (ctx.hasMedia \u0026\u0026 !ctx.receivedText) {\n    aiReply = `Recebi seu anexo na ${ctx.companyName}. Vou registrar aqui e seguir com o atendimento.`;\n  } else if (ctx.clienteEncontrado \u0026\u0026 nome) {\n    aiReply = `Oi, ${nome}. Vi sua mensagem agora. Como posso te ajudar por aqui?`;\n  } else {\n    aiReply = `Oi. Recebi sua mensagem na ${ctx.companyName}. Como posso te ajudar por aqui?`;\n  }\n}\n\nconst outputBlocks = buildBlocks(aiReply, 260);\nreturn {\n  ...ctx,\n  aiRawResponse: $json,\n  finalReply: aiReply,\n  outputBlocks,\n  replyMode: \u0027ai\u0027\n};"
+                                     },
+                      "id":  "28",
+                      "name":  "Preparar Resposta Final V3",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       5080,
+                                       240
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "fieldToSplitOut":  "outputBlocks",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.splitOut",
+                      "typeVersion":  1,
+                      "position":  [
+                                       5320,
+                                       240
+                                   ],
+                      "id":  "29",
+                      "name":  "Separar Blocos"
+                  },
+                  {
+                      "parameters":  {
+                                         "batchSize":  1,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.splitInBatches",
+                      "typeVersion":  3,
+                      "position":  [
+                                       5560,
+                                       240
+                                   ],
+                      "id":  "30",
+                      "name":  "Loop Over Items"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "={{ $(\u0027Normalizar Entrada e Config V3\u0027).first().json.evolutionBaseUrl + \u0027/message/sendText/\u0027 + $(\u0027Normalizar Entrada e Config V3\u0027).first().json.evolutionInstance }}",
+                                         "sendHeaders":  true,
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "Accept",
+                                                                                         "value":  "application/json"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "apikey",
+                                                                                         "value":  "={{ $(\u0027Normalizar Entrada e Config V3\u0027).first().json.evolutionApiKey }}"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ { number: $(\u0027Normalizar Entrada e Config V3\u0027).first().json.normalizedPhone, text: $json.outputBlocks } }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.2,
+                      "position":  [
+                                       5800,
+                                       140
+                                   ],
+                      "id":  "31",
+                      "name":  "Enviar Resposta Evolution"
+                  },
+                  {
+                      "parameters":  {
+                                         "amount":  2
+                                     },
+                      "type":  "n8n-nodes-base.wait",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       6040,
+                                       240
+                                   ],
+                      "id":  "32",
+                      "name":  "Aguardar 2 Segundos",
+                      "webhookId":  "evolution-whatsapp-atendimento-ia-v3-wait"
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={{ { ok: true, workflow: \u0027evolution-whatsapp-atendimento-ia-v3\u0027, event: $(\u0027Normalizar Entrada e Config V3\u0027).first().json.normalizedEventName || $(\u0027Normalizar Entrada e Config V3\u0027).first().json.eventName, replied: true, phone: $(\u0027Normalizar Entrada e Config V3\u0027).first().json.normalizedPhone, clienteEncontrado: $(\u0027Identidade + Consultas + Lead Diario\u0027).first().json.clienteEncontrado, identityStatus: $(\u0027Identidade + Consultas + Lead Diario\u0027).first().json.identityStatus, intentCategory: $(\u0027Identidade + Consultas + Lead Diario\u0027).first().json.intentCategory, response: $(\u0027Separar Blocos\u0027).first().json.finalReply || $(\u0027Separar Blocos\u0027).first().json.aiReply } }}",
+                                         "options":  {
+                                                         "responseCode":  200
+                                                     }
+                                     },
+                      "id":  "33",
+                      "name":  "Responder Webhook com IA",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.4,
+                      "position":  [
+                                       5800,
+                                       340
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "lead_daily_key",
+                                                                                     "name":  "lead_daily_key",
+                                                                                     "value":  "={{ $json.lead_daily_key }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "data",
+                                                                                     "name":  "data",
+                                                                                     "value":  "={{ $json.lead_date }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "hora",
+                                                                                     "name":  "hora",
+                                                                                     "value":  "={{ $json.lead_time }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "nome_whatsapp",
+                                                                                     "name":  "nome_whatsapp",
+                                                                                     "value":  "={{ $json.lead_name }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "telefone",
+                                                                                     "name":  "telefone",
+                                                                                     "value":  "={{ $json.lead_phone }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "cliente_encontrado",
+                                                                                     "name":  "cliente_encontrado",
+                                                                                     "value":  "={{ $json.lead_cliente_encontrado }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "identity_status",
+                                                                                     "name":  "identity_status",
+                                                                                     "value":  "={{ $json.lead_identity_status }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "assunto",
+                                                                                     "name":  "assunto",
+                                                                                     "value":  "={{ $json.lead_subject }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+                                                         "includeOtherFields":  false
+                                                     }
+                                     },
+                      "id":  "leadSheetSet",
+                      "name":  "Preparar Linha Lead Diario Sheets",
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       760,
+                                       120
+                                   ]
+                  }
+              ],
+    "connections":  {
+                        "Entrada Evolution V3":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Normalizar Entrada e Config V3",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "Normalizar Entrada e Config V3":  {
+                                                               "main":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "Inbound Elegivel?",
+                                                                                    "type":  "main",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                                           },
+                        "Inbound Elegivel?":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "Espelhar Evento no ERP",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ],
+                                                               [
+                                                                   {
+                                                                       "node":  "Responder Webhook Ignorado",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Espelhar Evento no ERP":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "Buscar Cliente ERP",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "Buscar Cliente ERP":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Identidade + Consultas + Lead Diario",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Identidade + Consultas + Lead Diario":  {
+                                                                     "main":  [
+                                                                                  {
+                                                                                      "node":  "Preparar Linha Lead Diario Sheets",
+                                                                                      "type":  "main",
+                                                                                      "index":  0
+                                                                                  },
+                                                                                  {
+                                                                                      "node":  "Buscar Conversa ERP",
+                                                                                      "type":  "main",
+                                                                                      "index":  0
+                                                                                  }
+                                                                              ]
+                                                                 },
+                        "Buscar Conversa ERP":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Humano Assumiu?",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Humano Assumiu?":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "Buscar Historico Recente ERP",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ],
+                                                             [
+                                                                 {
+                                                                     "node":  "Responder Webhook Humano",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "Buscar Historico Recente ERP":  {
+                                                             "main":  [
+                                                                          [
+                                                                              {
+                                                                                  "node":  "Buscar Equipamentos ERP",
+                                                                                  "type":  "main",
+                                                                                  "index":  0
+                                                                              }
+                                                                          ]
+                                                                      ]
+                                                         },
+                        "Buscar Equipamentos ERP":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "Buscar OS ERP",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "Buscar OS ERP":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Buscar Orcamentos ERP",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Buscar Orcamentos ERP":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Montar Prompt Triagem IA V3",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "Montar Contexto IA V3":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Agente IA Humanizado V3",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "OpenAI Chat Model":  {
+                                                  "ai_languageModel":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "Agente IA Humanizado V3",
+                                                                                   "type":  "ai_languageModel",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                              },
+                        "Memoria Postgres":  {
+                                                 "ai_memory":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Agente IA Humanizado V3",
+                                                                           "type":  "ai_memory",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                             },
+                        "Agente IA Humanizado V3":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "Preparar Resposta Final V3",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "Preparar Resposta Final V3":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "Separar Blocos",
+                                                                                "type":  "main",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "Separar Blocos":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Loop Over Items",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Loop Over Items":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "Enviar Resposta Evolution",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ],
+                                                             [
+                                                                 {
+                                                                     "node":  "Responder Webhook com IA",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "Enviar Resposta Evolution":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "Aguardar 2 Segundos",
+                                                                               "type":  "main",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "Aguardar 2 Segundos":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Loop Over Items",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Preparar Linha Lead Diario Sheets":  {
+                                                                  "main":  [
+                                                                               [
+                                                                                   {
+                                                                                       "node":  "Registrar Lead Diario Sheets",
+                                                                                       "type":  "main",
+                                                                                       "index":  0
+                                                                                   }
+                                                                               ]
+                                                                           ]
+                                                              },
+                        "Montar Prompt Triagem IA V3":  {
+                                                            "main":  [
+                                                                         [
+                                                                             {
+                                                                                 "node":  "Agente IA Triagem e Seguranca",
+                                                                                 "type":  "main",
+                                                                                 "index":  0
+                                                                             }
+                                                                         ]
+                                                                     ]
+                                                        },
+                        "Agente IA Triagem e Seguranca":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "Interpretar Triagem IA V3",
+                                                                                   "type":  "main",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          },
+                        "OpenAI Chat Model Triagem":  {
+                                                          "ai_languageModel":  [
+                                                                                   [
+                                                                                       {
+                                                                                           "node":  "Agente IA Triagem e Seguranca",
+                                                                                           "type":  "ai_languageModel",
+                                                                                           "index":  0
+                                                                                       }
+                                                                                   ]
+                                                                               ]
+                                                      },
+                        "Interpretar Triagem IA V3":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "Montar Contexto IA V3",
+                                                                               "type":  "main",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "Tool | Base Institucional Drive":  {
+                                                                "ai_tool":  [
+                                                                                [
+                                                                                    {
+                                                                                        "node":  "Agente IA Humanizado V3",
+                                                                                        "type":  "ai_tool",
+                                                                                        "index":  0
+                                                                                    }
+                                                                                ]
+                                                                            ]
+                                                            },
+                        "Brave Search":  {
+                                             "ai_tool":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "Agente IA Humanizado V3",
+                                                                     "type":  "ai_tool",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                         }
+                    },
+    "active":  false,
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate"
+                 },
+    "versionId":  "evolution-v3-atendimento-seguro-2026-05-04-triagem-drive",
+    "meta":  {
+                 "templateCredsSetupCompleted":  false
+             },
+    "pinData":  {
+
+                }
+}

@@ -641,126 +641,13 @@ class CentralMensagens extends BaseController
 
         try {
             $this->releaseSessionLock();
-
-            $q = trim((string) $this->request->getGet('q'));
-            $status = trim((string) $this->request->getGet('status'));
-            $somenteNaoLidas = (string) $this->request->getGet('nao_lidas') === '1';
-            $osAbertas = (string) $this->request->getGet('com_os_aberta') === '1';
-            $clientesNovos = (string) $this->request->getGet('clientes_novos') === '1';
-            $responsavelId = (int) ($this->request->getGet('responsavel_id') ?? 0);
-            $tagId = (int) ($this->request->getGet('tag_id') ?? 0);
-            $limit = min(300, max(20, (int) ($this->request->getGet('limit') ?? 120)));
-
-            $model = new ConversaWhatsappModel();
-            $mensagensTableExists = $model->db->tableExists('mensagens_whatsapp');
-            $contatosTableExists = $model->db->tableExists('contatos');
-            $contatosStatusFieldExists = $contatosTableExists && $model->db->fieldExists('status_relacionamento', 'contatos');
-            $contatosSelect = $contatosTableExists
-                ? (
-                    'contatos.id as contato_id,
-                    contatos.nome as contato_nome,
-                    contatos.whatsapp_nome_perfil as contato_perfil_nome,
-                    contatos.cliente_id as contato_cliente_id,
-                    ' . ($contatosStatusFieldExists
-                        ? 'contatos.status_relacionamento as contato_status_relacionamento'
-                        : 'NULL as contato_status_relacionamento')
-                )
-                : 'NULL as contato_id,
-                    NULL as contato_nome,
-                    NULL as contato_perfil_nome,
-                    NULL as contato_cliente_id,
-                    NULL as contato_status_relacionamento';
-            $ultimaMovimentacaoSelect = $mensagensTableExists
-                ? '(SELECT COALESCE(mw.recebida_em, mw.enviada_em, mw.created_at) FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_movimentacao_em'
-                : 'NULL as ultima_movimentacao_em';
-
-            $builder = $model
-                ->select(
-                    'conversas_whatsapp.*, clientes.nome_razao as cliente_nome, os.numero_os, os.estado_fluxo, usuarios.nome as responsavel_nome,
-                    ' . $contatosSelect
-                    . ($mensagensTableExists ? ',
-                    (SELECT mw.id FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_id,
-                    (SELECT mw.mensagem FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_texto,
-                    (SELECT mw.tipo_conteudo FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_tipo,
-                    (SELECT mw.direcao FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_direcao,
-                    (SELECT mw.tipo_mensagem FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_tipo_mensagem,
-                    (SELECT mw.enviada_por_bot FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_bot' : ',
-                    0 as ultima_mensagem_id,
-                    NULL as ultima_mensagem_texto,
-                    NULL as ultima_mensagem_tipo,
-                    NULL as ultima_mensagem_direcao,
-                    NULL as ultima_mensagem_tipo_mensagem,
-                    NULL as ultima_mensagem_bot')
-                    . ',
-                    ' . $ultimaMovimentacaoSelect
-                )
-                ->join('clientes', 'clientes.id = conversas_whatsapp.cliente_id', 'left')
-                ->join('os', 'os.id = conversas_whatsapp.os_id_principal', 'left')
-                ->join('usuarios', 'usuarios.id = conversas_whatsapp.responsavel_id', 'left');
-            if ($contatosTableExists) {
-                $builder->join('contatos', 'contatos.id = conversas_whatsapp.contato_id', 'left');
-            }
-
-            if ($q !== '') {
-                $builder->groupStart();
-                $builder
-                    ->like('conversas_whatsapp.telefone', $q)
-                    ->orLike('conversas_whatsapp.nome_contato', $q)
-                    ->orLike('clientes.nome_razao', $q)
-                    ->orLike('os.numero_os', $q);
-                if ($contatosTableExists) {
-                    $builder
-                        ->orLike('contatos.nome', $q)
-                        ->orLike('contatos.whatsapp_nome_perfil', $q);
-                }
-                $builder->groupEnd();
-            }
-            if ($status !== '') {
-                $builder->where('conversas_whatsapp.status', $status);
-            }
-            if ($somenteNaoLidas) {
-                $builder->where('conversas_whatsapp.nao_lidas >', 0);
-            }
-            if ($osAbertas) {
-                $builder->where('os.estado_fluxo IS NOT NULL', null, false)
-                    ->whereNotIn('os.estado_fluxo', ['encerrado', 'cancelado']);
-            }
-            if ($clientesNovos) {
-                $builder->where('conversas_whatsapp.cliente_id IS NULL', null, false);
-                if ($contatosTableExists) {
-                    $builder->where('contatos.cliente_id IS NULL', null, false);
-                }
-            }
-            if ($responsavelId > 0) {
-                $builder->where('conversas_whatsapp.responsavel_id', $responsavelId);
-            }
-            if ($tagId > 0 && $model->db->tableExists('conversa_tags')) {
-                $builder->join('conversa_tags', 'conversa_tags.conversa_id = conversas_whatsapp.id', 'inner')
-                    ->where('conversa_tags.tag_id', $tagId);
-            }
-
-            $items = $builder
-                ->orderBy('COALESCE(ultima_movimentacao_em, conversas_whatsapp.ultima_mensagem_em, conversas_whatsapp.updated_at, conversas_whatsapp.created_at)', 'DESC', false)
-                ->orderBy('ultima_mensagem_id', 'DESC')
-                ->orderBy('conversas_whatsapp.id', 'DESC')
-                ->findAll($limit);
-
-            foreach ($items as &$item) {
-                $ultimaMovimentacao = trim((string) ($item['ultima_movimentacao_em'] ?? ''));
-                if ($ultimaMovimentacao !== '') {
-                    $item['ultima_mensagem_em'] = $ultimaMovimentacao;
-                    continue;
-                }
-
-                if (empty($item['ultima_mensagem_em'])) {
-                    $item['ultima_mensagem_em'] = $item['updated_at'] ?? ($item['created_at'] ?? null);
-                }
-            }
-            unset($item);
+            $this->syncInboundSafe();
+            $snapshot = $this->buildConversationListSnapshot($this->resolveConversationListFilters());
 
             return $this->apiSuccess('CM_CONVERSAS_LIST_OK', [
-                'items' => $items,
-                'count' => count($items),
+                'items' => $snapshot['items'],
+                'count' => count($snapshot['items']),
+                'cursor' => $snapshot['cursor'],
             ]);
         } catch (Throwable $e) {
             return $this->apiError(
@@ -826,6 +713,12 @@ class CentralMensagens extends BaseController
             $conversa = $conversaModel->find($id);
             $mensagens = (new MensagemWhatsappModel())->byConversa($id, 500);
             $contexto = $this->buildConversaContext($conversa);
+            $contatoContexto = is_array($contexto['contato'] ?? null) ? $contexto['contato'] : [];
+            if (!empty($contatoContexto)) {
+                $conversa['contato_nome'] = $contatoContexto['nome'] ?? ($conversa['contato_nome'] ?? null);
+                $conversa['contato_perfil_nome'] = $contatoContexto['whatsapp_nome_perfil'] ?? ($conversa['contato_perfil_nome'] ?? null);
+                $conversa['contato_avatar_url'] = $contatoContexto['whatsapp_avatar_url'] ?? ($conversa['contato_avatar_url'] ?? null);
+            }
 
             return $this->apiSuccess('CM_CONVERSA_THREAD_OK', [
                 'conversa' => $conversa,
@@ -1763,6 +1656,205 @@ class CentralMensagens extends BaseController
     }
 
     /**
+     * @return array{
+     *   q:string,
+     *   status:string,
+     *   nao_lidas:bool,
+     *   com_os_aberta:bool,
+     *   clientes_novos:bool,
+     *   responsavel_id:int,
+     *   tag_id:int,
+     *   limit:int
+     * }
+     */
+    private function resolveConversationListFilters(): array
+    {
+        return [
+            'q' => trim((string) $this->request->getGet('q')),
+            'status' => trim((string) $this->request->getGet('status')),
+            'nao_lidas' => (string) $this->request->getGet('nao_lidas') === '1',
+            'com_os_aberta' => (string) $this->request->getGet('com_os_aberta') === '1',
+            'clientes_novos' => (string) $this->request->getGet('clientes_novos') === '1',
+            'responsavel_id' => (int) ($this->request->getGet('responsavel_id') ?? 0),
+            'tag_id' => (int) ($this->request->getGet('tag_id') ?? 0),
+            'limit' => min(300, max(20, (int) ($this->request->getGet('limit') ?? 120))),
+        ];
+    }
+
+    /**
+     * @param array{
+     *   q:string,
+     *   status:string,
+     *   nao_lidas:bool,
+     *   com_os_aberta:bool,
+     *   clientes_novos:bool,
+     *   responsavel_id:int,
+     *   tag_id:int,
+     *   limit:int
+     * } $filters
+     * @return array{items:array<int,array<string,mixed>>,cursor:string}
+     */
+    private function buildConversationListSnapshot(array $filters): array
+    {
+        $model = new ConversaWhatsappModel();
+        $mensagensTableExists = $model->db->tableExists('mensagens_whatsapp');
+        $contatosTableExists = $model->db->tableExists('contatos');
+        $contatosPerfilFieldExists = $contatosTableExists && $model->db->fieldExists('whatsapp_nome_perfil', 'contatos');
+        $contatosAvatarFieldExists = $contatosTableExists && $model->db->fieldExists('whatsapp_avatar_url', 'contatos');
+        $contatosClienteFieldExists = $contatosTableExists && $model->db->fieldExists('cliente_id', 'contatos');
+        $contatosStatusFieldExists = $contatosTableExists && $model->db->fieldExists('status_relacionamento', 'contatos');
+        $contatosSelect = $contatosTableExists
+            ? (
+                'contatos.id as contato_id,
+                contatos.nome as contato_nome,
+                ' . ($contatosPerfilFieldExists ? 'contatos.whatsapp_nome_perfil as contato_perfil_nome' : 'NULL as contato_perfil_nome') . ',
+                ' . ($contatosAvatarFieldExists ? 'contatos.whatsapp_avatar_url as contato_avatar_url' : 'NULL as contato_avatar_url') . ',
+                ' . ($contatosClienteFieldExists ? 'contatos.cliente_id as contato_cliente_id' : 'NULL as contato_cliente_id') . ',
+                ' . ($contatosStatusFieldExists
+                    ? 'contatos.status_relacionamento as contato_status_relacionamento'
+                    : 'NULL as contato_status_relacionamento')
+            )
+            : 'NULL as contato_id,
+                NULL as contato_nome,
+                NULL as contato_perfil_nome,
+                NULL as contato_avatar_url,
+                NULL as contato_cliente_id,
+                NULL as contato_status_relacionamento';
+        $ultimaMovimentacaoSelect = $mensagensTableExists
+            ? '(SELECT COALESCE(mw.recebida_em, mw.enviada_em, mw.created_at) FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_movimentacao_em'
+            : 'NULL as ultima_movimentacao_em';
+
+        $builder = $model
+            ->select(
+                'conversas_whatsapp.*, clientes.nome_razao as cliente_nome, os.numero_os, os.estado_fluxo, usuarios.nome as responsavel_nome,
+                ' . $contatosSelect
+                . ($mensagensTableExists ? ',
+                (SELECT mw.id FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_id,
+                (SELECT mw.mensagem FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_texto,
+                (SELECT mw.tipo_conteudo FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_tipo,
+                (SELECT mw.direcao FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_direcao,
+                (SELECT mw.tipo_mensagem FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_tipo_mensagem,
+                (SELECT mw.enviada_por_bot FROM mensagens_whatsapp mw WHERE mw.conversa_id = conversas_whatsapp.id ORDER BY mw.id DESC LIMIT 1) as ultima_mensagem_bot' : ',
+                0 as ultima_mensagem_id,
+                NULL as ultima_mensagem_texto,
+                NULL as ultima_mensagem_tipo,
+                NULL as ultima_mensagem_direcao,
+                NULL as ultima_mensagem_tipo_mensagem,
+                NULL as ultima_mensagem_bot')
+                . ',
+                ' . $ultimaMovimentacaoSelect
+            )
+            ->join('clientes', 'clientes.id = conversas_whatsapp.cliente_id', 'left')
+            ->join('os', 'os.id = conversas_whatsapp.os_id_principal', 'left')
+            ->join('usuarios', 'usuarios.id = conversas_whatsapp.responsavel_id', 'left');
+
+        if ($contatosTableExists) {
+            $builder->join('contatos', 'contatos.id = conversas_whatsapp.contato_id', 'left');
+        }
+
+        $q = trim((string) ($filters['q'] ?? ''));
+        $status = trim((string) ($filters['status'] ?? ''));
+        $somenteNaoLidas = !empty($filters['nao_lidas']);
+        $osAbertas = !empty($filters['com_os_aberta']);
+        $clientesNovos = !empty($filters['clientes_novos']);
+        $responsavelId = (int) ($filters['responsavel_id'] ?? 0);
+        $tagId = (int) ($filters['tag_id'] ?? 0);
+        $limit = min(300, max(20, (int) ($filters['limit'] ?? 120)));
+
+        if ($q !== '') {
+            $builder->groupStart();
+            $builder
+                ->like('conversas_whatsapp.telefone', $q)
+                ->orLike('conversas_whatsapp.nome_contato', $q)
+                ->orLike('clientes.nome_razao', $q)
+                ->orLike('os.numero_os', $q);
+            if ($contatosTableExists) {
+                $builder->orLike('contatos.nome', $q);
+                if ($contatosPerfilFieldExists) {
+                    $builder->orLike('contatos.whatsapp_nome_perfil', $q);
+                }
+            }
+            $builder->groupEnd();
+        }
+
+        if ($status !== '') {
+            $builder->where('conversas_whatsapp.status', $status);
+        }
+        if ($somenteNaoLidas) {
+            $builder->where('conversas_whatsapp.nao_lidas >', 0);
+        }
+        if ($osAbertas) {
+            $builder->where('os.estado_fluxo IS NOT NULL', null, false)
+                ->whereNotIn('os.estado_fluxo', ['encerrado', 'cancelado']);
+        }
+        if ($clientesNovos) {
+            $builder->where('conversas_whatsapp.cliente_id IS NULL', null, false);
+            if ($contatosTableExists && $contatosClienteFieldExists) {
+                $builder->where('contatos.cliente_id IS NULL', null, false);
+            }
+        }
+        if ($responsavelId > 0) {
+            $builder->where('conversas_whatsapp.responsavel_id', $responsavelId);
+        }
+        if ($tagId > 0 && $model->db->tableExists('conversa_tags')) {
+            $builder->join('conversa_tags', 'conversa_tags.conversa_id = conversas_whatsapp.id', 'inner')
+                ->where('conversa_tags.tag_id', $tagId);
+        }
+
+        $items = $builder
+            ->orderBy('COALESCE(ultima_movimentacao_em, conversas_whatsapp.ultima_mensagem_em, conversas_whatsapp.updated_at, conversas_whatsapp.created_at)', 'DESC', false)
+            ->orderBy('ultima_mensagem_id', 'DESC')
+            ->orderBy('conversas_whatsapp.id', 'DESC')
+            ->findAll($limit);
+
+        foreach ($items as &$item) {
+            $ultimaMovimentacao = trim((string) ($item['ultima_movimentacao_em'] ?? ''));
+            if ($ultimaMovimentacao !== '') {
+                $item['ultima_mensagem_em'] = $ultimaMovimentacao;
+                continue;
+            }
+
+            if (empty($item['ultima_mensagem_em'])) {
+                $item['ultima_mensagem_em'] = $item['updated_at'] ?? ($item['created_at'] ?? null);
+            }
+        }
+        unset($item);
+
+        return [
+            'items' => $items,
+            'cursor' => $this->computeConversationListCursor($items),
+        ];
+    }
+
+    /**
+     * @param array<int,array<string,mixed>> $items
+     */
+    private function computeConversationListCursor(array $items): string
+    {
+        if ($items === []) {
+            return sha1('empty');
+        }
+
+        $signature = array_map(static function (array $item): array {
+            return [
+                'id' => (int) ($item['id'] ?? 0),
+                'status' => (string) ($item['status'] ?? ''),
+                'nao_lidas' => (int) ($item['nao_lidas'] ?? 0),
+                'responsavel_id' => (int) ($item['responsavel_id'] ?? 0),
+                'prioridade' => (string) ($item['prioridade'] ?? ''),
+                'automacao_ativa' => (int) ($item['automacao_ativa'] ?? 0),
+                'aguardando_humano' => (int) ($item['aguardando_humano'] ?? 0),
+                'ultima_mensagem_id' => (int) ($item['ultima_mensagem_id'] ?? 0),
+                'ultima_mensagem_em' => (string) ($item['ultima_mensagem_em'] ?? ''),
+                'ultima_mensagem_texto' => (string) ($item['ultima_mensagem_texto'] ?? ''),
+                'updated_at' => (string) ($item['updated_at'] ?? ''),
+            ];
+        }, $items);
+
+        return sha1((string) json_encode($signature, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    }
+
+    /**
      * @param array<string,mixed> $conversa
      * @return array<string,mixed>
      */
@@ -1950,6 +2042,124 @@ class CentralMensagens extends BaseController
         } catch (\Throwable $e) {
             // segue sem interromper o endpoint quando nao for possivel liberar lock da sessao.
         }
+    }
+
+    public function conversasStream()
+    {
+        @ini_set('display_errors', '0');
+        if (function_exists('session')) {
+            try {
+                session()->close();
+            } catch (Throwable $e) {
+                // segue mesmo sem conseguir fechar sessao explicitamente.
+            }
+        }
+
+        $enableSse = (string) get_config('central_mensagens_sse_enabled', '0') === '1';
+        $endpoint = 'conversas_stream';
+
+        if ((string) ($this->request->getGet('probe') ?? '') === '1') {
+            return $this->apiSuccess('CM_CONVERSAS_STREAM_PROBE_OK', [
+                'sse_enabled' => $enableSse,
+                'message' => $enableSse
+                    ? 'SSE disponivel para a fila de conversas.'
+                    : 'SSE desabilitado por configuracao. Usando polling incremental.',
+            ]);
+        }
+
+        if (!$enableSse) {
+            return $this->apiError(
+                'CM_CONVERSAS_STREAM_DISABLED',
+                'SSE desabilitado por configuracao.',
+                409,
+                [
+                    'endpoint' => $endpoint,
+                    'sse_enabled' => false,
+                ]
+            );
+        }
+
+        try {
+            $this->syncInboundSafe();
+            $filters = $this->resolveConversationListFilters();
+            $snapshot = $this->buildConversationListSnapshot($filters);
+        } catch (Throwable $e) {
+            $this->observeEndpointFailure(
+                'CM_CONVERSAS_STREAM_ERROR',
+                500,
+                'Falha ao carregar stream da fila de conversas.',
+                [
+                    'endpoint' => $endpoint,
+                ],
+                $e
+            );
+
+            $errorPayload = json_encode([
+                'ok' => false,
+                'code' => 'CM_CONVERSAS_STREAM_ERROR',
+                'status' => 500,
+                'message' => 'Falha ao carregar stream da fila de conversas.',
+            ], JSON_UNESCAPED_UNICODE);
+
+            $errorBody = "retry: 5000\n";
+            $errorBody .= "event: error\n";
+            $errorBody .= 'data: ' . $errorPayload . "\n\n";
+            $errorBody .= "event: close\n";
+            $errorBody .= "data: {\"ok\":false}\n\n";
+
+            return $this->response
+                ->setStatusCode(200)
+                ->setHeader('Content-Type', 'text/event-stream; charset=UTF-8')
+                ->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+                ->setHeader('Pragma', 'no-cache')
+                ->setHeader('Expires', '0')
+                ->setHeader('X-Accel-Buffering', 'no')
+                ->setBody($errorBody);
+        }
+
+        $afterCursor = trim((string) ($this->request->getGet('after_cursor') ?? ''));
+        $readyPayload = json_encode([
+            'ok' => true,
+            'ts' => date('c'),
+            'handshake' => (string) ($this->request->getGet('handshake') ?? '') === '1',
+            'cursor' => $snapshot['cursor'],
+        ], JSON_UNESCAPED_UNICODE);
+
+        $body = "retry: 3000\n";
+        $body .= "event: ready\n";
+        $body .= 'data: ' . $readyPayload . "\n\n";
+
+        if ($afterCursor !== $snapshot['cursor']) {
+            $payload = json_encode([
+                'ok' => true,
+                'cursor' => $snapshot['cursor'],
+                'count' => count($snapshot['items']),
+                'items' => $snapshot['items'],
+            ], JSON_UNESCAPED_UNICODE);
+
+            $body .= "event: conversas\n";
+            $body .= 'data: ' . $payload . "\n\n";
+        } else {
+            $pingPayload = json_encode([
+                'ts' => date('c'),
+                'cursor' => $snapshot['cursor'],
+            ], JSON_UNESCAPED_UNICODE);
+
+            $body .= "event: ping\n";
+            $body .= 'data: ' . $pingPayload . "\n\n";
+        }
+
+        $body .= "event: close\n";
+        $body .= "data: {\"ok\":true}\n\n";
+
+        return $this->response
+            ->setStatusCode(200)
+            ->setHeader('Content-Type', 'text/event-stream; charset=UTF-8')
+            ->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->setHeader('Pragma', 'no-cache')
+            ->setHeader('Expires', '0')
+            ->setHeader('X-Accel-Buffering', 'no')
+            ->setBody($body);
     }
 
     private function syncInboundSafe(): void

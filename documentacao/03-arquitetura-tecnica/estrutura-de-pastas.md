@@ -249,3 +249,26 @@ Caracteristicas:
 - logs em `whatsapp-api/logs/gateway.log`
 - sessao persistente em `.wwebjs_auth`
 - execucao recomendada com PM2
+
+## Camada de containerizacao Docker/Swarm
+
+Blocos adicionados para deploy em host com Traefik:
+
+- `Dockerfile`
+- `.dockerignore`
+- `docker/runtime/`
+  - `entrypoint.sh`
+  - `php.ini`
+  - `vhost.conf`
+- `docker/swarm/`
+  - `contabo-stack.yml`
+  - `contabo.env.example`
+- `scripts/docker/`
+  - `deploy-contabo-swarm.sh`
+
+Responsabilidades:
+
+- `Dockerfile`: build da imagem PHP/Apache do ERP;
+- `docker/runtime/entrypoint.sh`: gera `.env`, ajusta permissoes, aguarda banco e executa migrations;
+- `docker/swarm/contabo-stack.yml`: define os servicos `app` e `db`, volumes e labels do Traefik;
+- `scripts/docker/deploy-contabo-swarm.sh`: padroniza `docker build` + `docker stack deploy`.

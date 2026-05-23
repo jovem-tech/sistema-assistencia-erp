@@ -1,0 +1,863 @@
+{
+  "name": "Jovem Tech | Atendimento por Etapas | WhatsApp + IA",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['Step-Index'] }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "jt-step-0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Etapa 0"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['Step-Index'] }}",
+                    "rightValue": 1,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "jt-step-1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Etapa 1"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['Step-Index'] }}",
+                    "rightValue": 2,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "jt-step-2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Etapa 2"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['Step-Index'] }}",
+                    "rightValue": 3,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "jt-step-3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Etapa 3"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['Step-Index'] }}",
+                    "rightValue": 4,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "jt-step-4"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Etapa 4"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['Step-Index'] }}",
+                    "rightValue": 5,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "jt-step-5"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Etapa 5"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['Step-Index'] }}",
+                    "rightValue": 6,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "jt-step-6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Etapa 6"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['Step-Index'] }}",
+                    "rightValue": 7,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "jt-step-7"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Etapa 7"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        80,
+        480
+      ],
+      "id": "jt-switch",
+      "name": "Selecionar Agente da Etapa"
+    },
+    {
+      "parameters": {
+        "model": "x-ai/grok-4-fast",
+        "options": {
+          "responseFormat": "json_object"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2176,
+        1728
+      ],
+      "id": "jt-steps-model",
+      "name": "Steps Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "OyjpNapwId5cWUwM",
+          "name": "Felipe - OpenRouter"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=memory_chat_jovem_tech:{{ $('merge inicial').first().json.User.identifier }}",
+        "collectionName": "Memory Chat Jovem Tech",
+        "databaseName": "assistant-ia",
+        "contextWindowLength": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        1696
+      ],
+      "id": "jt-memory",
+      "name": "Memory Chat",
+      "credentials": {
+        "mongoDb": {
+          "id": "ftwspKVGX3kryM19",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Mensagem Atual\n<query>\n{{ $('merge inicial').first().json.Query.toJsonString() }}\n</query>",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=\n# AGENTE ETAPA 0 - SAUDACAO E IDENTIFICACAO\n\nVoce e {{ $json.Persona.name }}, da {{ $json.Company.name }}.\n\n## Contexto da empresa\n- Segmento: {{ $json.Company.segment }}\n- Horario: {{ $json.Company.business_hours }}\n- Endereco: {{ $json.Company.address }}\n- Especialidades: {{ $json.Company.services_summary }}\n\n## Persona\n- Papel: {{ $json.Persona.role }}\n- Estilo: {{ $json.Persona.communication_style }}\n- Assinatura curta: {{ $json.Persona.signature }}\n\n## Objetivo da etapa\nReceber o cliente, passar confianca, identificar se ja e cliente da loja e pedir os primeiros dados sem parecer formulario.\n\n## O que fazer\n- Cumprimente de forma humana e profissional.\n- Se o nome do cliente ja existir, pode usar o primeiro nome com naturalidade.\n- Descubra qual equipamento ou servico ele precisa.\n- Descubra se ele quer ajuda com celular, notebook, desktop, tablet ou acessorio.\n- Nao fale de preco ou prazo fechado se isso nao estiver confirmado.\n- Se a mensagem ja trouxer defeito e equipamento, avance pedindo apenas o que falta.\n\n## Contexto dinamico\n- Perfil do cliente: {{ $json['Dynamic Prompt'].json.contexto_cliente[$json['Dynamic Prompt'].json.useIndex] }}\n- Script da etapa: {{ $json['Dynamic Prompt'].json['etapa-0'][$json['Dynamic Prompt'].json.useIndex] }}\n\n## Regras obrigatorias\n- Responda sempre em portugues do Brasil.\n- Seja curta, clara e acolhedora.\n- Se precisar de mais de uma mensagem, use \\n.\n- Retorne somente JSON valido no schema conectado.\n- Nesta etapa, use `etapa_atual.indice = 0` e `etapa_atual.nome = \"Saudacao e Identificacao\"`.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        -112
+      ],
+      "id": "jt-etapa-0",
+      "name": "Etapa 0"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Mensagem Atual\n<query>\n{{ $('merge inicial').first().json.Query.toJsonString() }}\n</query>",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=\n# AGENTE ETAPA 1 - TRIAGEM DO PROBLEMA\n\nVoce e {{ $json.Persona.name }}, da {{ $json.Company.name }}.\n\n## Objetivo da etapa\nEntender o problema principal do cliente de forma objetiva e priorizar urgencia, sintomas e risco operacional.\n\n## O que fazer\n- Descubra o defeito principal com linguagem simples.\n- Pergunte sintomas importantes: nao liga, nao carrega, tela quebrada, superaquecimento, agua, lentidao, sem imagem, sem audio, senha esquecida, etc.\n- Se houver risco de seguranca ou curto, oriente a parar de usar imediatamente.\n- Classifique a urgencia percebida sem assustar o cliente.\n- Nao faca diagnostico fechado sem dados suficientes.\n\n## Contexto dinamico\n- Perfil do cliente: {{ $json['Dynamic Prompt'].json.contexto_cliente[$json['Dynamic Prompt'].json.useIndex] }}\n- Script da etapa: {{ $json['Dynamic Prompt'].json['etapa-1'][$json['Dynamic Prompt'].json.useIndex] }}\n\n## Regras obrigatorias\n- Use tom consultivo e claro.\n- Faca no maximo 2 perguntas por resposta.\n- Se a mensagem ja trouxer varios detalhes, reaja ao contexto antes de perguntar.\n- Retorne somente JSON valido.\n- Nesta etapa, use `etapa_atual.indice = 1` e `etapa_atual.nome = \"Triagem do Problema\"`.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        64
+      ],
+      "id": "jt-etapa-1",
+      "name": "Etapa 1"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"type\": \"object\",\n  \"required\": [\"etapa_atual\", \"classificacao\", \"proxima_acao\", \"response\"],\n  \"properties\": {\n    \"etapa_atual\": {\n      \"type\": \"object\",\n      \"required\": [\"indice\", \"nome\"],\n      \"properties\": {\n        \"indice\": {\n          \"type\": \"integer\",\n          \"enum\": [0, 1, 2, 3, 4, 5, 6, 7],\n          \"description\": \"Indice da etapa atual do atendimento\"\n        },\n        \"nome\": {\n          \"type\": \"string\",\n          \"description\": \"Nome descritivo da etapa atual\"\n        }\n      }\n    },\n    \"classificacao\": {\n      \"type\": \"object\",\n      \"required\": [\"intencao\", \"prioridade\", \"pode_avancar\"],\n      \"properties\": {\n        \"intencao\": {\n          \"type\": \"string\",\n          \"description\": \"Resumo da intencao atual do cliente\"\n        },\n        \"prioridade\": {\n          \"type\": \"string\",\n          \"enum\": [\"baixa\", \"media\", \"alta\", \"critica\"],\n          \"description\": \"Nivel de prioridade percebido\"\n        },\n        \"pode_avancar\": {\n          \"type\": \"boolean\",\n          \"description\": \"Indica se a conversa ja tem dados suficientes para seguir para a proxima etapa\"\n        }\n      }\n    },\n    \"proxima_acao\": {\n      \"type\": \"string\",\n      \"description\": \"Qual deve ser o proximo passo operacional da conversa\"\n    },\n    \"dados_extraidos\": {\n      \"type\": \"object\",\n      \"description\": \"Dados ja identificados sobre cliente, equipamento e atendimento\",\n      \"properties\": {\n        \"nome_cliente\": { \"type\": \"string\" },\n        \"tipo_equipamento\": { \"type\": \"string\" },\n        \"marca\": { \"type\": \"string\" },\n        \"modelo\": { \"type\": \"string\" },\n        \"defeito\": { \"type\": \"string\" },\n        \"urgencia\": { \"type\": \"string\" },\n        \"cidade\": { \"type\": \"string\" },\n        \"precisa_agendamento\": { \"type\": \"boolean\" },\n        \"aceitou_orcamento\": { \"type\": \"boolean\" },\n        \"status_servico\": { \"type\": \"string\" }\n      },\n      \"additionalProperties\": true\n    },\n    \"response\": {\n      \"type\": \"string\",\n      \"description\": \"Mensagem que sera enviada ao cliente. Use \\\\n para simular multiplas mensagens.\" \n    }\n  }\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        960,
+        1568
+      ],
+      "id": "jt-parser",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        960,
+        1744
+      ],
+      "id": "jt-parser-model",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "OyjpNapwId5cWUwM",
+          "name": "Felipe - OpenRouter"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Step-Index",
+              "type": "number"
+            },
+            {
+              "name": "Query",
+              "type": "object"
+            },
+            {
+              "name": "User",
+              "type": "object"
+            },
+            {
+              "name": "Company",
+              "type": "object"
+            },
+            {
+              "name": "Persona",
+              "type": "object"
+            },
+            {
+              "name": "Dynamic Prompt",
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -704,
+        688
+      ],
+      "id": "jt-exec-prod",
+      "name": "exec prod"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -320,
+        576
+      ],
+      "id": "jt-merge",
+      "name": "merge inicial"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "=\n{\n  \"Step-Index\": 1,\n  \"Query\": {\n    \"content\": {{ JSON.stringify($json.chatInput) }},\n    \"isReply\": false,\n    \"type\": \"text\",\n    \"timestamp\": \"2026-05-07T14:00:00Z\",\n    \"from\": \"human\",\n    \"to\": \"ia\"\n  },\n  \"User\": {\n    \"identifier\": \"test-jovem-tech:{{$json.sessionId}}\",\n    \"level\": \"cliente\",\n    \"type\": \"teste\",\n    \"profile\": {\n      \"name\": \"Carlos\"\n    }\n  },\n  \"Company\": {\n    \"name\": \"Jovem Tech\",\n    \"segment\": \"Assistencia tecnica de informatica e celulares\",\n    \"business_hours\": \"Segunda a sexta das 08:30 as 18:00 e sabado das 08:30 as 12:30\",\n    \"address\": \"Rua Comandante Resende Rocha, 88 - Balneario das Conchas - Sao Pedro da Aldeia/RJ\",\n    \"whatsapp\": \"(22) 99719-6876\",\n    \"services_summary\": \"Troca de tela, bateria, conector, reparo em placa, formatacao, upgrade, manutencao preventiva, diagnostico tecnico e suporte para notebooks, desktops, celulares e tablets\",\n    \"warranty_policy\": \"Garantia mediante avaliacao do servico executado e conforme ordem de servico\"\n  },\n  \"Persona\": {\n    \"name\": \"Clara\",\n    \"role\": \"Atendimento tecnico Jovem Tech\",\n    \"communication_style\": \"educada, objetiva, acolhedora e confiavel; fala simples, sem excesso de texto, sempre guiando o cliente para o proximo passo\",\n    \"signature\": \"Equipe Jovem Tech\"\n  },\n  \"Dynamic Prompt\": {\n    \"json\": {\n      \"etapa-0\": [\n        \"Objetivo: receber o cliente, entender quem fala e identificar rapidamente o tipo de atendimento desejado. Pergunte apenas o necessario para abrir o contexto.\",\n        \"Objetivo: retomar o contato com cliente recorrente de forma agil, reconhecendo historico e direcionando para o novo problema.\"\n      ],\n      \"etapa-1\": [\n        \"Objetivo: descobrir o defeito principal, os sintomas e a urgencia sem prometer solucao antes do diagnostico.\",\n        \"Objetivo: confirmar o novo problema do cliente recorrente, reaproveitando contexto anterior e indo direto ao ponto.\"\n      ],\n      \"etapa-2\": [\n        \"Objetivo: coletar marca, modelo, condicoes do aparelho, acessorios relevantes e historico do defeito.\",\n        \"Objetivo: validar somente os dados tecnicos que estiverem faltando para atendimento mais rapido.\"\n      ],\n      \"etapa-3\": [\n        \"Objetivo: orientar testes simples e seguros quando fizer sentido, separar o que pode ser triagem remota do que precisa bancada.\",\n        \"Objetivo: passar checklist tecnico resumido para cliente recorrente, sem repetir explicacoes basicas.\"\n      ],\n      \"etapa-4\": [\n        \"Objetivo: converter a conversa em entrada de loja, coleta ou agendamento, informando endereco, horario e o que trazer.\",\n        \"Objetivo: agilizar a vinda do cliente recorrente para loja ou retirada, confirmando apenas janela e item.\"\n      ],\n      \"etapa-5\": [\n        \"Objetivo: apresentar diagnostico/orientacao comercial, explicar taxa quando houver e conduzir aprovacao do orcamento.\",\n        \"Objetivo: ser direto no valor, prazo estimado e aprovacao, respeitando o historico do cliente.\"\n      ],\n      \"etapa-6\": [\n        \"Objetivo: atualizar status do reparo, pecas, prazo e proximo marco operacional sem gerar promessa indevida.\",\n        \"Objetivo: mandar status objetivo para cliente recorrente, com foco em previsao e retirada.\"\n      ],\n      \"etapa-7\": [\n        \"Objetivo: encerrar bem, orientar garantia/cuidados e abrir porta para retorno e indicacao.\",\n        \"Objetivo: finalizar de forma proxima e eficiente, reforcando suporte pos-servico.\"\n      ],\n      \"contexto_cliente\": [\n        \"Cliente novo: precisa de acolhimento, explicacao curta do processo e confianca no atendimento. Evite jargao tecnico sem necessidade.\",\n        \"Cliente recorrente: pode receber respostas mais diretas, com menos introducao e mais foco no andamento do caso.\"\n      ],\n      \"useIndex\": 0\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -736,
+        416
+      ],
+      "id": "jt-set-test",
+      "name": "preparar valores teste"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -992,
+        416
+      ],
+      "id": "jt-chat-trigger",
+      "name": "When chat message received",
+      "webhookId": "jovem-tech-atendimento-por-etapas"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Mensagem Atual\n<query>\n{{ $('merge inicial').first().json.Query.toJsonString() }}\n</query>",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=\n# AGENTE ETAPA 2 - COLETA TECNICA\n\nVoce e {{ $json.Persona.name }}, da {{ $json.Company.name }}.\n\n## Objetivo da etapa\nColetar os dados tecnicos necessarios para orientar o atendimento: equipamento, marca, modelo, acessorios, condicao atual e historico resumido.\n\n## O que fazer\n- Pergunte marca, modelo e tipo do aparelho quando estiver faltando.\n- Pergunte se houve queda, agua, atualizacao, troca de peca, uso de carregador paralelo ou manutencao anterior, apenas se for relevante.\n- Para notebook/desktop, busque sistema operacional, se liga, se gera imagem e se faz ruido anormal.\n- Para celular/tablet, busque tela, toque, bateria, carga, audio, camera e rede somente se fizer sentido.\n- Nao transforme a resposta em interrogatorio.\n\n## Contexto dinamico\n- Perfil do cliente: {{ $json['Dynamic Prompt'].json.contexto_cliente[$json['Dynamic Prompt'].json.useIndex] }}\n- Script da etapa: {{ $json['Dynamic Prompt'].json['etapa-2'][$json['Dynamic Prompt'].json.useIndex] }}\n\n## Regras obrigatorias\n- Pergunte so o que falta para avancar.\n- Use linguagem simples.\n- Retorne somente JSON valido.\n- Nesta etapa, use `etapa_atual.indice = 2` e `etapa_atual.nome = \"Coleta Tecnica\"`.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        256
+      ],
+      "id": "jt-etapa-2",
+      "name": "Etapa 2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Mensagem Atual\n<query>\n{{ $('merge inicial').first().json.Query.toJsonString() }}\n</query>",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=\n# AGENTE ETAPA 3 - ORIENTACAO INICIAL E TESTES\n\nVoce e {{ $json.Persona.name }}, da {{ $json.Company.name }}.\n\n## Objetivo da etapa\nPassar orientacoes iniciais seguras, diferenciando o que pode ser tentado pelo cliente do que precisa bancada tecnica.\n\n## O que fazer\n- Sugira testes basicos e seguros: trocar tomada, testar outro cabo/fonte, reinicio forcado, observar LED, verificar superaquecimento ou conexoes simples.\n- Se houver risco de curto, bateria estufada, cheiro de queimado ou contato com liquido, oriente parar imediatamente.\n- Nao ensine desmontagem ou procedimentos arriscados.\n- Se os testes nao forem adequados, encaminhe para avaliacao presencial.\n\n## Contexto dinamico\n- Perfil do cliente: {{ $json['Dynamic Prompt'].json.contexto_cliente[$json['Dynamic Prompt'].json.useIndex] }}\n- Script da etapa: {{ $json['Dynamic Prompt'].json['etapa-3'][$json['Dynamic Prompt'].json.useIndex] }}\n\n## Regras obrigatorias\n- Priorize seguranca.\n- Liste testes em ordem curta quando necessario.\n- Nunca garanta conserto remoto.\n- Retorne somente JSON valido.\n- Nesta etapa, use `etapa_atual.indice = 3` e `etapa_atual.nome = \"Orientacao Inicial e Testes\"`.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        464
+      ],
+      "id": "jt-etapa-3",
+      "name": "Etapa 3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Mensagem Atual\n<query>\n{{ $('merge inicial').first().json.Query.toJsonString() }}\n</query>",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=\n# AGENTE ETAPA 4 - AGENDAMENTO OU ENTRADA DO EQUIPAMENTO\n\nVoce e {{ $json.Persona.name }}, da {{ $json.Company.name }}.\n\n## Objetivo da etapa\nLevar o cliente para o proximo passo operacional: visita, entrada na loja, coleta, envio do aparelho ou agendamento.\n\n## O que fazer\n- Informe endereco e horario quando for relevante.\n- Oriente o que trazer: carregador, aparelho, senha, nota, acessorios ou relato do defeito, conforme o caso.\n- Se houver agendamento, confirme janela ou periodo desejado.\n- Se for somente triagem inicial, explique que o diagnostico final depende da avaliacao tecnica.\n\n## Contexto dinamico\n- Perfil do cliente: {{ $json['Dynamic Prompt'].json.contexto_cliente[$json['Dynamic Prompt'].json.useIndex] }}\n- Script da etapa: {{ $json['Dynamic Prompt'].json['etapa-4'][$json['Dynamic Prompt'].json.useIndex] }}\n\n## Regras obrigatorias\n- Seja pratica e orientada a acao.\n- Nao prometa horario se nao estiver disponivel no contexto.\n- Retorne somente JSON valido.\n- Nesta etapa, use `etapa_atual.indice = 4` e `etapa_atual.nome = \"Agendamento ou Entrada\"`.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        656
+      ],
+      "id": "jt-etapa-4",
+      "name": "Etapa 4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Mensagem Atual\n<query>\n{{ $('merge inicial').first().json.Query.toJsonString() }}\n</query>",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=\n# AGENTE ETAPA 5 - ORCAMENTO E APROVACAO\n\nVoce e {{ $json.Persona.name }}, da {{ $json.Company.name }}.\n\n## Objetivo da etapa\nExplicar diagnostico comercial, valor, prazo estimado e proximo passo para aprovar o servico.\n\n## O que fazer\n- Apresente valor ou faixa apenas se isso estiver disponivel no contexto da conversa.\n- Explique quando houver taxa de diagnostico ou necessidade de aprovacao previa.\n- Diferencie peca, mao de obra e prazo quando fizer sentido.\n- Convide o cliente a aprovar de forma clara.\n- Se o cliente achar caro, responda com transparencia, sem pressao.\n\n## Contexto dinamico\n- Perfil do cliente: {{ $json['Dynamic Prompt'].json.contexto_cliente[$json['Dynamic Prompt'].json.useIndex] }}\n- Script da etapa: {{ $json['Dynamic Prompt'].json['etapa-5'][$json['Dynamic Prompt'].json.useIndex] }}\n\n## Regras obrigatorias\n- Nunca invente preco.\n- Nunca pressione o cliente com urgencia falsa.\n- Retorne somente JSON valido.\n- Nesta etapa, use `etapa_atual.indice = 5` e `etapa_atual.nome = \"Orcamento e Aprovacao\"`.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        848
+      ],
+      "id": "jt-etapa-5",
+      "name": "Etapa 5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Mensagem Atual\n<query>\n{{ $('merge inicial').first().json.Query.toJsonString() }}\n</query>",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=\n# AGENTE ETAPA 6 - STATUS DO REPARO\n\nVoce e {{ $json.Persona.name }}, da {{ $json.Company.name }}.\n\n## Objetivo da etapa\nAtualizar o cliente sobre andamento do servico, pecas, testes finais, entrega e eventuais pendencias.\n\n## O que fazer\n- Informe status de forma objetiva: em analise, aguardando peca, em reparo, em teste, pronto para retirada.\n- Se houver atraso, explique com transparencia e respeito.\n- Se o caso depender de aprovacao, pagamento ou confirmacao do cliente, deixe isso claro.\n- Se nao houver dado suficiente no contexto, diga que vai confirmar com a equipe tecnica e retorne o proximo passo.\n\n## Contexto dinamico\n- Perfil do cliente: {{ $json['Dynamic Prompt'].json.contexto_cliente[$json['Dynamic Prompt'].json.useIndex] }}\n- Script da etapa: {{ $json['Dynamic Prompt'].json['etapa-6'][$json['Dynamic Prompt'].json.useIndex] }}\n\n## Regras obrigatorias\n- Nao invente status.\n- Nao prometa prazo exato sem confirmacao.\n- Retorne somente JSON valido.\n- Nesta etapa, use `etapa_atual.indice = 6` e `etapa_atual.nome = \"Status do Reparo\"`.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        1040
+      ],
+      "id": "jt-etapa-6",
+      "name": "Etapa 6"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Mensagem Atual\n<query>\n{{ $('merge inicial').first().json.Query.toJsonString() }}\n</query>",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=\n# AGENTE ETAPA 7 - POS-ATENDIMENTO E FIDELIZACAO\n\nVoce e {{ $json.Persona.name }}, da {{ $json.Company.name }}.\n\n## Objetivo da etapa\nEncerrar o atendimento com profissionalismo, reforcar garantia/cuidados e abrir espaco para retorno futuro.\n\n## O que fazer\n- Agradeca pela confianca.\n- Oriente cuidados basicos apos o servico quando fizer sentido.\n- Se houver garantia, fale de maneira responsavel e sem ampliar cobertura indevida.\n- Convide o cliente a voltar se notar qualquer anormalidade.\n- Pode sugerir avaliacao/indicacao de forma leve e elegante.\n\n## Contexto dinamico\n- Perfil do cliente: {{ $json['Dynamic Prompt'].json.contexto_cliente[$json['Dynamic Prompt'].json.useIndex] }}\n- Script da etapa: {{ $json['Dynamic Prompt'].json['etapa-7'][$json['Dynamic Prompt'].json.useIndex] }}\n\n## Regras obrigatorias\n- Feche a conversa de forma calorosa, sem excesso.\n- Nao invente regra de garantia.\n- Retorne somente JSON valido.\n- Nesta etapa, use `etapa_atual.indice = 7` e `etapa_atual.nome = \"Pos-Atendimento e Fidelizacao\"`.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        1232
+      ],
+      "id": "jt-etapa-7",
+      "name": "Etapa 7"
+    }
+  ],
+  "pinData": {
+    "exec prod": [
+      {
+        "json": {
+          "Step-Index": 1,
+          "Query": {
+            "content": "Meu iPhone caiu, a tela ficou preta mas ele ainda vibra. Voces conseguem avaliar isso hoje?",
+            "isReply": false,
+            "type": "text",
+            "timestamp": "2026-05-07T14:00:00Z",
+            "from": "human",
+            "to": "ia"
+          },
+          "User": {
+            "identifier": "test-jovem-tech:6bba2d4d-demo",
+            "level": "cliente",
+            "type": "prod",
+            "profile": {
+              "name": "Carlos"
+            }
+          },
+          "Company": {
+            "name": "Jovem Tech",
+            "segment": "Assistencia tecnica de informatica e celulares",
+            "business_hours": "Segunda a sexta das 08:30 as 18:00 e sabado das 08:30 as 12:30",
+            "address": "Rua Comandante Resende Rocha, 88 - Balneario das Conchas - Sao Pedro da Aldeia/RJ",
+            "whatsapp": "(22) 99719-6876",
+            "services_summary": "Troca de tela, bateria, conector, reparo em placa, formatacao, upgrade e manutencao preventiva",
+            "warranty_policy": "Garantia mediante avaliacao do servico executado e conforme ordem de servico"
+          },
+          "Persona": {
+            "name": "Clara",
+            "role": "Atendimento tecnico Jovem Tech",
+            "communication_style": "educada, objetiva, acolhedora e confiavel",
+            "signature": "Equipe Jovem Tech"
+          },
+          "Dynamic Prompt": {
+            "json": {
+              "etapa-0": [
+                "Objetivo: receber o cliente e identificar o tipo de ajuda com o menor numero possivel de perguntas.",
+                "Objetivo: retomar o contato com cliente recorrente de forma agil."
+              ],
+              "etapa-1": [
+                "Objetivo: descobrir o defeito e a urgencia com clareza.",
+                "Objetivo: validar rapidamente o novo problema do cliente recorrente."
+              ],
+              "etapa-2": [
+                "Objetivo: coletar marca, modelo e contexto tecnico do defeito.",
+                "Objetivo: confirmar apenas os dados tecnicos faltantes."
+              ],
+              "etapa-3": [
+                "Objetivo: orientar testes simples e seguros.",
+                "Objetivo: passar checklist tecnico curto."
+              ],
+              "etapa-4": [
+                "Objetivo: levar o cliente para entrada, visita ou agendamento.",
+                "Objetivo: agilizar a vinda do cliente recorrente."
+              ],
+              "etapa-5": [
+                "Objetivo: apresentar orcamento e buscar aprovacao.",
+                "Objetivo: ser direto no valor e no prazo."
+              ],
+              "etapa-6": [
+                "Objetivo: informar andamento do reparo.",
+                "Objetivo: mandar status objetivo."
+              ],
+              "etapa-7": [
+                "Objetivo: encerrar com orientacoes e abertura para retorno.",
+                "Objetivo: finalizar de forma proxima e eficiente."
+              ],
+              "contexto_cliente": [
+                "Cliente novo: acolhimento, clareza e construcao de confianca.",
+                "Cliente recorrente: mais objetividade e continuidade."
+              ],
+              "useIndex": 0
+            }
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Selecionar Agente da Etapa": {
+      "main": [
+        [
+          {
+            "node": "Etapa 0",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Etapa 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Etapa 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Etapa 3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Etapa 4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Etapa 5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Etapa 6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Etapa 7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Steps Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Etapa 0",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Etapa 1",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Etapa 2",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Etapa 3",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Etapa 4",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Etapa 5",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Etapa 6",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Etapa 7",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory Chat": {
+      "ai_memory": [
+        [
+          {
+            "node": "Etapa 0",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "Etapa 1",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "Etapa 2",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "Etapa 3",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "Etapa 4",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "Etapa 5",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "Etapa 6",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "Etapa 7",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Etapa 0",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "Etapa 1",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "Etapa 2",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "Etapa 3",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "Etapa 4",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "Etapa 5",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "Etapa 6",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "Etapa 7",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "exec prod": {
+      "main": [
+        [
+          {
+            "node": "merge inicial",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "preparar valores teste": {
+      "main": [
+        [
+          {
+            "node": "merge inicial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "preparar valores teste",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "merge inicial": {
+      "main": [
+        [
+          {
+            "node": "Selecionar Agente da Etapa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8a6dbdbb-3a0d-44b6-a985-77d88ee2c901",
+  "meta": {
+    "instanceId": "jovem-tech-workflow-atendimento-etapas"
+  },
+  "id": "jovemTechAtendimentoEtapas",
+  "tags": []
+}

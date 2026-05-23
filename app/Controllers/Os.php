@@ -485,7 +485,9 @@ class Os extends BaseController
             os.data_abertura,
             os.data_entrada,
             os.data_previsao,
+            os.data_conclusao,
             os.data_entrega,
+            os.status_atualizado_em,
             os.relato_cliente,
             os.valor_final,
             clientes.nome_razao as cliente_nome,
@@ -1651,21 +1653,32 @@ class Os extends BaseController
         $entradaRaw = !empty($row['data_entrada']) ? (string) $row['data_entrada'] : (string) ($row['data_abertura'] ?? '');
         $previsaoRaw = trim((string) ($row['data_previsao'] ?? ''));
         $entregaRaw = trim((string) ($row['data_entrega'] ?? ''));
+        $conclusaoRaw = $this->resolveConclusaoDisplayDate($row);
+        $prazoReferenceRaw = $this->resolvePrazoReferenceEndDate($row);
 
         $entrada = $entradaRaw !== '' ? date('d/m/Y', strtotime($entradaRaw)) : '-';
         $prazoLabel = '<span class="text-muted">-</span>';
+        $conclusaoLabel = '<span class="text-muted">-</span>';
         $entregaLabel = '<span class="text-muted">-</span>';
 
         if ($previsaoRaw !== '') {
-            $prazoClass = $this->resolvePrazoClass($previsaoRaw, $entregaRaw);
-            $prazoText = $this->buildPrazoIndicatorText($entradaRaw, $previsaoRaw, $entregaRaw);
+            $prazoClass = $this->resolvePrazoClass($previsaoRaw, $prazoReferenceRaw);
+            $prazoText = $this->buildPrazoIndicatorText($entradaRaw, $previsaoRaw, $prazoReferenceRaw);
             $prazoLabel = '<span class="os-date-indicator ' . esc($prazoClass) . '">' . esc($prazoText) . '</span>';
         }
 
+        if ($conclusaoRaw !== '') {
+            $conclusaoClass = $this->resolveConclusaoClass($previsaoRaw, $conclusaoRaw);
+            $conclusaoFormatted = date('d/m/Y', strtotime($conclusaoRaw));
+            $conclusaoLabel = $conclusaoClass !== 'is-muted'
+                ? '<span class="os-date-indicator ' . esc($conclusaoClass) . '">' . esc($conclusaoFormatted) . '</span>'
+                : esc($conclusaoFormatted);
+        }
+
         if ($entregaRaw !== '') {
-            $entregaClass = (!empty($previsaoRaw) && strtotime($entregaRaw) > strtotime($previsaoRaw))
-                ? 'is-danger'
-                : 'is-success';
+            $entregaBase = strtotime(date('Y-m-d', strtotime($entregaRaw)));
+            $previsaoBase = $previsaoRaw !== '' ? strtotime(date('Y-m-d', strtotime($previsaoRaw))) : false;
+            $entregaClass = ($previsaoBase !== false && $entregaBase > $previsaoBase) ? 'is-danger' : 'is-success';
             $entregaLabel = '<span class="os-date-indicator ' . esc($entregaClass) . '">' . esc(date('d/m/Y', strtotime($entregaRaw))) . '</span>';
         }
 
@@ -1673,6 +1686,7 @@ class Os extends BaseController
             '<div class="os-dates-cell">',
             '<div class="os-date-line"><span class="os-date-label">Entrada:</span><span class="os-date-value">' . esc($entrada) . '</span></div>',
             '<div class="os-date-line"><span class="os-date-label">Prazo:</span><span class="os-date-value">' . $prazoLabel . '</span></div>',
+            '<div class="os-date-line"><span class="os-date-label">Conclus&atilde;o:</span><span class="os-date-value">' . $conclusaoLabel . '</span></div>',
             '<div class="os-date-line"><span class="os-date-label">Entrega:</span><span class="os-date-value">' . $entregaLabel . '</span></div>',
             '</div>',
         ]);
@@ -1751,14 +1765,54 @@ class Os extends BaseController
         return '<button type="button" class="btn btn-link p-0 text-start os-status-trigger" data-os-status-action data-os-id="' . (int) ($row['id'] ?? 0) . '" data-os-numero="' . esc((string) ($row['numero_os'] ?? '')) . '" title="Alterar status da OS">' . $content . '<span class="os-status-trigger-hint"><i class="bi bi-arrow-left-right me-1"></i>Alterar status</span></button>';
     }
 
-    private function resolvePrazoClass(string $previsaoRaw, string $entregaRaw): string
+    private function resolvePrazoReferenceEndDate(array $row): string
+    {
+        $entregaRaw = trim((string) ($row['data_entrega'] ?? ''));
+        if ($entregaRaw !== '') {
+            return $entregaRaw;
+        }
+
+        $status = (string) ($row['status'] ?? '');
+        $estadoFluxo = (string) ($row['estado_fluxo'] ?? '');
+        if (!OsStatusFlowService::shouldFreezePrazoOnConclusao($status, $estadoFluxo)) {
+            return '';
+        }
+
+        $conclusaoRaw = $this->resolveConclusaoDisplayDate($row);
+        if ($conclusaoRaw !== '') {
+            return $conclusaoRaw;
+        }
+
+        return '';
+    }
+
+    private function resolveConclusaoDisplayDate(array $row): string
+    {
+        $conclusaoRaw = trim((string) ($row['data_conclusao'] ?? ''));
+        if ($conclusaoRaw !== '') {
+            return $conclusaoRaw;
+        }
+
+        $status = (string) ($row['status'] ?? '');
+        $estadoFluxo = (string) ($row['estado_fluxo'] ?? '');
+        if (!OsStatusFlowService::shouldFreezePrazoOnConclusao($status, $estadoFluxo)) {
+            return '';
+        }
+
+        return trim((string) ($row['status_atualizado_em'] ?? ''));
+    }
+
+    private function resolvePrazoClass(string $previsaoRaw, string $prazoReferenceRaw): string
     {
         if ($previsaoRaw === '') {
             return 'is-muted';
         }
 
-        if ($entregaRaw !== '') {
-            return strtotime($entregaRaw) > strtotime($previsaoRaw) ? 'is-danger' : 'is-success';
+        if ($prazoReferenceRaw !== '') {
+            $previsaoBase = strtotime(date('Y-m-d', strtotime($previsaoRaw)));
+            $prazoReferenceBase = strtotime(date('Y-m-d', strtotime($prazoReferenceRaw)));
+
+            return $prazoReferenceBase > $previsaoBase ? 'is-danger' : 'is-success';
         }
 
         $today = strtotime(date('Y-m-d'));
@@ -1776,6 +1830,22 @@ class Os extends BaseController
         }
 
         return 'is-success';
+    }
+
+    private function resolveConclusaoClass(string $previsaoRaw, string $conclusaoRaw): string
+    {
+        if ($conclusaoRaw === '') {
+            return 'is-muted';
+        }
+
+        if ($previsaoRaw === '') {
+            return 'is-muted';
+        }
+
+        $previsaoBase = strtotime(date('Y-m-d', strtotime($previsaoRaw)));
+        $conclusaoBase = strtotime(date('Y-m-d', strtotime($conclusaoRaw)));
+
+        return $conclusaoBase > $previsaoBase ? 'is-danger' : 'is-success';
     }
 
     private function calculatePrazoDays(string $entradaRaw, string $previsaoRaw): ?int
@@ -1812,7 +1882,7 @@ class Os extends BaseController
         return max(0, (int) round(($endBase - $startBase) / 86400));
     }
 
-    private function buildPrazoIndicatorText(string $entradaRaw, string $previsaoRaw, string $entregaRaw): string
+    private function buildPrazoIndicatorText(string $entradaRaw, string $previsaoRaw, string $prazoReferenceRaw): string
     {
         $previsaoLabel = date('d/m/Y', strtotime($previsaoRaw));
         $prazoDays = $this->calculatePrazoDays($entradaRaw, $previsaoRaw);
@@ -1820,8 +1890,8 @@ class Os extends BaseController
             ? ($prazoDays . ' dia' . ($prazoDays === 1 ? '' : 's'))
             : 'Sem prazo';
 
-        if ($entregaRaw !== '') {
-            $delayDays = $this->calculateElapsedDays($previsaoRaw, $entregaRaw);
+        if ($prazoReferenceRaw !== '') {
+            $delayDays = $this->calculateElapsedDays($previsaoRaw, $prazoReferenceRaw);
             if ($delayDays !== null && $delayDays > 0) {
                 return 'Atraso de ' . $delayDays . ' dia' . ($delayDays === 1 ? '' : 's') . ' - ' . $previsaoLabel;
             }
@@ -3354,13 +3424,19 @@ class Os extends BaseController
             $dados['estado_fluxo'] = $statusService->resolveEstadoFluxo($statusNovo);
             $dados['status_atualizado_em'] = date('Y-m-d H:i:s');
 
-            if (in_array($statusNovo, ['reparo_concluido', 'reparado_disponivel_loja', 'garantia_concluida'], true)) {
+            if (OsStatusFlowService::shouldSetConclusaoDate($statusNovo) && empty($osAnterior['data_conclusao'])) {
                 $dados['data_conclusao'] = date('Y-m-d H:i:s');
-                $garantiaDias = (int) ($dados['garantia_dias'] ?? $osAnterior['garantia_dias'] ?? 90);
-                $dados['garantia_validade'] = date('Y-m-d', strtotime('+' . max(0, $garantiaDias) . ' days'));
             }
 
-            if (in_array($statusNovo, ['entregue_reparado', 'devolvido_sem_reparo'], true)) {
+            if (OsStatusFlowService::shouldUpdateGarantiaValidade($statusNovo)) {
+                $garantiaDias = (int) ($dados['garantia_dias'] ?? $osAnterior['garantia_dias'] ?? 90);
+                $conclusaoBase = (string) ($dados['data_conclusao'] ?? $osAnterior['data_conclusao'] ?? '');
+                if ($conclusaoBase !== '') {
+                    $dados['garantia_validade'] = date('Y-m-d', strtotime(date('Y-m-d', strtotime($conclusaoBase)) . ' +' . max(0, $garantiaDias) . ' days'));
+                }
+            }
+
+            if (OsStatusFlowService::shouldSetEntregaDate($statusNovo) && empty($osAnterior['data_entrega'])) {
                 $dados['data_entrega'] = date('Y-m-d H:i:s');
             }
         }

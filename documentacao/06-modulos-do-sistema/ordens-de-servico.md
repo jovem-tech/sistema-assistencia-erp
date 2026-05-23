@@ -309,6 +309,9 @@ Na configuracao atual:
 - `N OS` usa largura fixa por caracteres (`ch`) para seguir o numero operacional;
 - `Cliente` usa preview backend com ate `3 linhas` de `3 palavras`, segue a maior linha efetivamente renderizada na pagina atual, recebeu reducao da folga direita por ajuste conjunto de `padding-right` e `paddingOffset` e agora centraliza o texto dentro da celula clicavel;
 - `Equipamento` deixou de usar largura fixa e agora combina `Tipo`, `Marca` e `Modelo` com medicao no frontend baseada na maior palavra operacional visivel da pagina;
+- `Datas` continua lendo `data_entrada`, `data_previsao` e `data_entrega`, mas agora tambem consulta `data_conclusao` e `status_atualizado_em` para congelar o atraso quando a manutencao ja estiver encerrada;
+- a mesma celula `Datas` passa a renderizar a linha `Conclusao` quando houver encerramento operacional, preservando `Entrega` como marco separado de retirada/devolucao;
+- o badge `Atrasado ha X dias` fica restrito a OS realmente em andamento; quando a manutencao ja terminou fora do prazo, o texto passa para `Atraso de X dias`, usando `data_conclusao` como referencia e `status_atualizado_em` apenas como fallback visual para legados sem conclusao persistida;
 - `Valor Total` continua autoajustada pela maior celula da pagina atual via medicao no frontend;
 - `Relato` deixou de renderizar o texto integral na grade e passou a exibir um preview de ate `9 palavras` distribuidas em `3 linhas` de `3 palavras`, com tooltip nativo no hover para leitura completa.
 

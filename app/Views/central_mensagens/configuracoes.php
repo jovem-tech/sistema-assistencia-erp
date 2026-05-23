@@ -28,7 +28,7 @@
             <div class="col-sm-6 col-lg-3">
                 <label class="form-label form-label-sm">Provider padrao</label>
                 <select class="form-select form-select-sm" name="central_mensagens_default_provider">
-                    <?php foreach (['api_whats_local', 'api_whats_linux', 'menuia'] as $provider): ?>
+                    <?php foreach (['api_whats_local', 'api_whats_linux', 'menuia', 'evolution'] as $provider): ?>
                         <option value="<?= esc($provider) ?>" <?= ($config['central_mensagens_default_provider'] ?? '') === $provider ? 'selected' : '' ?>>
                             <?= esc($provider) ?>
                         </option>

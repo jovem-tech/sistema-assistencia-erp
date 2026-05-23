@@ -1,6 +1,6 @@
 # Modulo: Contatos (Agenda de Relacionamento)
 
-Atualizado em 20/03/2026.
+Atualizado em 03/05/2026.
 
 ## Objetivo tecnico
 Separar **agenda de contatos** do cadastro formal de **clientes** para evitar conversao precoce de leads.
@@ -28,6 +28,9 @@ Campos relevantes:
 - `telefone_normalizado` (unique)
 - `email`
 - `whatsapp_nome_perfil`
+- `whatsapp_remote_jid`
+- `whatsapp_avatar_url`
+- `whatsapp_avatar_synced_em`
 - `origem`
 - `status_relacionamento` (`lead_novo`, `lead_qualificado`, `cliente_convertido`)
 - `engajamento_status` (`ativo`, `em_risco`, `inativo`)
@@ -45,6 +48,12 @@ Relacionamentos:
 ## Integracao com Central de Mensagens
 Endpoint operacional:
 - `POST /atendimento-whatsapp/conversa/{id}/cadastrar-contato`
+
+Sincronismo automatico adicional com Evolution API:
+- o parser inbound tenta localizar o contato por `telefone_normalizado`;
+- quando houver `remoteJid`, ele tambem pode ser salvo em `whatsapp_remote_jid`;
+- quando habilitado em configuracoes, o ERP consulta a foto do perfil e atualiza `whatsapp_avatar_url`;
+- `whatsapp_avatar_synced_em` registra a ultima tentativa bem-sucedida de sincronizacao do avatar.
 
 Comportamento:
 - valida permissao de escrita (`clientes:criar` ou `clientes:editar`)
@@ -105,6 +114,9 @@ Aplicado por:
 - `CentralMensagens::cadastrarContatoConversa()`
 - `ChatbotService::sincronizarNomeNoContato()` (qualificacao automatica)
 - `Os::sincronizarOrigemWhatsappNaAbertura()` (conversao operacional)
+
+Observacao operacional:
+- responder pelo app oficial do WhatsApp nao cria um contato paralelo; o historico volta para a mesma thread se a Evolution enviar `remoteJid`/telefone da conversa.
 
 ## Beneficios operacionais
 - menor poluicao da base de clientes

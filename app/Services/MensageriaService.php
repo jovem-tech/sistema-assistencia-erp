@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Services\WhatsApp\EvolutionApiProvider;
 use App\Services\WhatsApp\LocalGatewayProvider;
 use App\Services\WhatsApp\MenuiaProvider;
 use App\Services\WhatsApp\NullProvider;
@@ -25,11 +26,24 @@ class MensageriaService
             $providerName = 'menuia';
         }
 
+        if ($providerName === 'evolution_api') {
+            $providerName = 'evolution';
+        }
+
         if ($providerName === 'menuia') {
             return new MenuiaProvider(
                 (string) $this->cfg('whatsapp_menuia_url', $overrides, 'https://chatbot.menuia.com/api'),
                 (string) $this->cfg('whatsapp_menuia_authkey', $overrides, ''),
                 (string) $this->cfg('whatsapp_menuia_appkey', $overrides, '')
+            );
+        }
+
+        if ($providerName === 'evolution') {
+            return new EvolutionApiProvider(
+                (string) $this->cfg('whatsapp_evolution_url', $overrides, 'http://127.0.0.1:8080'),
+                (string) $this->cfg('whatsapp_evolution_apikey', $overrides, ''),
+                (string) $this->cfg('whatsapp_evolution_instance', $overrides, ''),
+                (int) $this->cfg('whatsapp_evolution_timeout', $overrides, 20)
             );
         }
 

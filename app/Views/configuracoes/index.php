@@ -7,13 +7,21 @@ $directProvider = (string) ($configs['whatsapp_direct_provider'] ?? 'menuia');
 if ($directProvider === 'local_node') {
     $directProvider = 'api_whats_local';
 }
-if (!in_array($directProvider, ['menuia', 'api_whats_local', 'api_whats_linux', 'webhook'], true)) {
+if ($directProvider === 'evolution_api') {
+    $directProvider = 'evolution';
+}
+if (!in_array($directProvider, ['menuia', 'evolution', 'api_whats_local', 'api_whats_linux', 'webhook'], true)) {
     $directProvider = 'api_whats_local';
 }
 
 $menuiaUrl = trim((string) ($configs['whatsapp_menuia_url'] ?? 'https://chatbot.menuia.com/api'));
 $menuiaAuth = trim((string) ($configs['whatsapp_menuia_authkey'] ?? ''));
 $menuiaApp = trim((string) ($configs['whatsapp_menuia_appkey'] ?? ''));
+$evolutionUrl = trim((string) ($configs['whatsapp_evolution_url'] ?? 'http://127.0.0.1:8080'));
+$evolutionApiKey = trim((string) ($configs['whatsapp_evolution_apikey'] ?? ''));
+$evolutionInstance = trim((string) ($configs['whatsapp_evolution_instance'] ?? ''));
+$evolutionTimeout = trim((string) ($configs['whatsapp_evolution_timeout'] ?? '20'));
+$evolutionSyncAvatar = (string) ($configs['whatsapp_evolution_sync_avatar'] ?? '1') === '1';
 $localNodeUrl = trim((string) ($configs['whatsapp_local_node_url'] ?? 'http://127.0.0.1:3001'));
 $localNodeToken = trim((string) ($configs['whatsapp_local_node_token'] ?? ''));
 $linuxNodeUrl = trim((string) ($configs['whatsapp_linux_node_url'] ?? 'http://127.0.0.1:3001'));
@@ -26,13 +34,22 @@ $lastCheckSignature = trim((string) ($configs['whatsapp_last_check_signature'] ?
 $menuiaCredentialSignature = ($menuiaUrl !== '' && $menuiaApp !== '' && $menuiaAuth !== '')
     ? strtolower($menuiaUrl) . '|' . $menuiaApp . '|' . $menuiaAuth
     : '';
+$evolutionCredentialSignature = ($evolutionUrl !== '' && $evolutionApiKey !== '' && $evolutionInstance !== '')
+    ? strtolower(rtrim($evolutionUrl, '/')) . '|' . $evolutionApiKey . '|' . $evolutionInstance
+    : '';
 $menuiaStatusMatchesCurrentCredentials = $menuiaCredentialSignature !== ''
     && $lastCheckSignature !== ''
     && hash_equals($lastCheckSignature, $menuiaCredentialSignature);
+$evolutionStatusMatchesCurrentCredentials = $evolutionCredentialSignature !== ''
+    && $lastCheckSignature !== ''
+    && hash_equals($lastCheckSignature, $evolutionCredentialSignature);
 
 $statusOk = false;
 if ($enabled && $directProvider === 'menuia') {
     $statusOk = $menuiaAuth !== '' && $menuiaApp !== '';
+}
+if ($enabled && $directProvider === 'evolution') {
+    $statusOk = $evolutionUrl !== '' && $evolutionApiKey !== '' && $evolutionInstance !== '';
 }
 if ($enabled && $directProvider === 'api_whats_local') {
     $statusOk = $localNodeUrl !== '' && $localNodeToken !== '';
@@ -71,6 +88,20 @@ if (!$enabled) {
     $realtimeBadgeClass = 'bg-warning text-dark';
     $realtimeBadgeText = 'Menuia não validada';
     $realtimeBadgeTitle = 'As credenciais estão preenchidas, mas a conexão ainda não foi validada.';
+} elseif ($directProvider === 'evolution' && $lastCheckProvider === 'evolution' && $evolutionStatusMatchesCurrentCredentials) {
+    if ($lastCheckStatus === 'success') {
+        $realtimeBadgeClass = 'bg-success';
+        $realtimeBadgeText = 'Evolution conectada';
+        $realtimeBadgeTitle = trim('Ãšltima validaÃ§Ã£o: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
+    } elseif ($lastCheckStatus === 'error') {
+        $realtimeBadgeClass = 'bg-danger';
+        $realtimeBadgeText = 'Erro Evolution';
+        $realtimeBadgeTitle = trim('Ãšltima validaÃ§Ã£o: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
+    }
+} elseif ($directProvider === 'evolution' && $statusOk) {
+    $realtimeBadgeClass = 'bg-warning text-dark';
+    $realtimeBadgeText = 'Evolution nÃ£o validada';
+    $realtimeBadgeTitle = 'A URL, API key e instÃ¢ncia foram preenchidas, mas a conexÃ£o ainda nÃ£o foi validada.';
 } elseif ($directProvider === 'webhook') {
     $realtimeBadgeClass = 'bg-dark';
     $realtimeBadgeText = 'Provider externo';
@@ -322,6 +353,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                             <label class="form-label text-muted">Canal Direto</label>
                             <select class="form-select" name="whatsapp_direct_provider" id="whatsapp_direct_provider">
                                 <option value="menuia" <?= $directProvider === 'menuia' ? 'selected' : '' ?>>Menuia</option>
+                                <option value="evolution" <?= $directProvider === 'evolution' ? 'selected' : '' ?>>Evolution API</option>
                                 <option value="api_whats_local" <?= $directProvider === 'api_whats_local' ? 'selected' : '' ?>>API Local (Windows)</option>
                                 <option value="api_whats_linux" <?= $directProvider === 'api_whats_linux' ? 'selected' : '' ?>>API Linux (VPS)</option>
                                 <option value="webhook" <?= $directProvider === 'webhook' ? 'selected' : '' ?>>Webhook Genérico</option>
@@ -360,6 +392,37 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                         <div class="col-md-6 mb-3 config-menuia">
                             <label class="form-label text-muted">Authkey (Menuia)</label>
                             <input type="password" class="form-control" name="whatsapp_menuia_authkey" id="whatsapp_menuia_authkey" value="<?= esc($menuiaAuth) ?>">
+                        </div>
+
+                        <div class="col-md-4 mb-3 config-evolution d-none">
+                            <label class="form-label text-muted">URL Evolution</label>
+                            <input type="text" class="form-control" name="whatsapp_evolution_url" id="whatsapp_evolution_url" value="<?= esc($evolutionUrl) ?>" placeholder="https://evolution.seudominio.com">
+                        </div>
+                        <div class="col-md-4 mb-3 config-evolution d-none">
+                            <label class="form-label text-muted">API Key (Evolution)</label>
+                            <input type="password" class="form-control" name="whatsapp_evolution_apikey" id="whatsapp_evolution_apikey" value="<?= esc($evolutionApiKey) ?>">
+                        </div>
+                        <div class="col-md-4 mb-3 config-evolution d-none">
+                            <label class="form-label text-muted">InstÃ¢ncia Evolution</label>
+                            <input type="text" class="form-control" name="whatsapp_evolution_instance" id="whatsapp_evolution_instance" value="<?= esc($evolutionInstance) ?>" placeholder="assistencia-jovemtech">
+                        </div>
+                        <div class="col-md-4 mb-3 config-evolution d-none">
+                            <label class="form-label text-muted">Timeout Evolution (s)</label>
+                            <input type="number" min="5" max="90" class="form-control" name="whatsapp_evolution_timeout" id="whatsapp_evolution_timeout" value="<?= esc($evolutionTimeout) ?>">
+                        </div>
+                        <div class="col-md-8 mb-3 config-evolution d-none">
+                            <label class="form-label text-muted">Sincronismo da Central</label>
+                            <div class="form-control d-flex flex-column gap-2 py-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="whatsapp_evolution_sync_avatar" id="whatsapp_evolution_sync_avatar" value="1" <?= $evolutionSyncAvatar ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="whatsapp_evolution_sync_avatar">
+                                        Atualizar automaticamente nome de perfil, remote JID e avatar na Central de Mensagens
+                                    </label>
+                                </div>
+                                <small class="text-muted">
+                                    Configure a Evolution como camada oficial de transporte do WhatsApp. Os eventos inbound e outbound podem alimentar a central do ERP e o n8n sem perder o histÃ³rico quando o atendente responder pelo app oficial.
+                                </small>
+                            </div>
                         </div>
 
                         <div class="col-12 mb-3 config-api_whats_local d-none">
@@ -664,6 +727,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
     const localQrPlaceholder = byId('localQrPlaceholder');
 
     const providerLabel = (provider) => {
+        if (provider === 'evolution') return 'Evolution API';
         if (provider === 'api_whats_linux') return 'API Linux (VPS)';
         if (provider === 'api_whats_local') return 'API Local (Windows)';
         return provider || '-';
@@ -679,6 +743,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
     const toggleProviders = () => {
         const provider = selectProvider?.value || 'menuia';
         document.querySelectorAll('.config-menuia').forEach((el) => el.classList.toggle('d-none', provider !== 'menuia'));
+        document.querySelectorAll('.config-evolution').forEach((el) => el.classList.toggle('d-none', provider !== 'evolution'));
         document.querySelectorAll('.config-webhook').forEach((el) => el.classList.toggle('d-none', provider !== 'webhook'));
         document.querySelectorAll('.config-api_whats_local').forEach((el) => el.classList.toggle('d-none', provider !== 'api_whats_local'));
         document.querySelectorAll('.config-api_whats_linux').forEach((el) => el.classList.toggle('d-none', provider !== 'api_whats_linux'));
@@ -727,6 +792,17 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
         return [normalizedUrl.toLowerCase(), appKey, authKey].join('|');
     };
 
+    const buildEvolutionSignature = (rawUrl, rawApiKey, rawInstance) => {
+        const normalizedUrl = String(rawUrl || '').trim().replace(/\/+$/, '');
+        const apiKey = String(rawApiKey || '').trim();
+        const instance = String(rawInstance || '').trim();
+        if (!normalizedUrl || !apiKey || !instance) {
+            return '';
+        }
+
+        return [normalizedUrl.toLowerCase(), apiKey, instance].join('|');
+    };
+
     const refreshExternalProviderBadges = () => {
         const provider = selectProvider?.value || 'menuia';
         const menuiaUrl = (document.getElementById('whatsapp_menuia_url')?.value || '').trim();
@@ -734,10 +810,19 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
         const menuiaAuth = (document.getElementById('whatsapp_menuia_authkey')?.value || '').trim();
         const menuiaConfigOk = menuiaUrl !== '' && menuiaApp !== '' && menuiaAuth !== '';
         const currentMenuiaSignature = buildMenuiaSignature(menuiaUrl, menuiaApp, menuiaAuth);
+        const evolutionUrl = (document.getElementById('whatsapp_evolution_url')?.value || '').trim();
+        const evolutionApiKey = (document.getElementById('whatsapp_evolution_apikey')?.value || '').trim();
+        const evolutionInstance = (document.getElementById('whatsapp_evolution_instance')?.value || '').trim();
+        const evolutionConfigOk = evolutionUrl !== '' && evolutionApiKey !== '' && evolutionInstance !== '';
+        const currentEvolutionSignature = buildEvolutionSignature(evolutionUrl, evolutionApiKey, evolutionInstance);
         const menuiaValidatedForCurrentConfig = providerState.provider === 'menuia'
             && providerState.signature !== ''
             && currentMenuiaSignature !== ''
             && providerState.signature === currentMenuiaSignature;
+        const evolutionValidatedForCurrentConfig = providerState.provider === 'evolution'
+            && providerState.signature !== ''
+            && currentEvolutionSignature !== ''
+            && providerState.signature === currentEvolutionSignature;
         const localConfigOk = ((document.getElementById('whatsapp_local_node_url')?.value || '').trim() !== '')
             && ((document.getElementById('whatsapp_local_node_token')?.value || '').trim() !== '');
         const linuxConfigOk = ((document.getElementById('whatsapp_linux_node_url')?.value || '').trim() !== '')
@@ -778,6 +863,40 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
             return;
         }
 
+        if (provider === 'evolution') {
+            setSimpleBadge(whatsConfigBadge, evolutionConfigOk ? 'bg-success' : 'bg-danger', evolutionConfigOk ? 'Credenciais OK' : 'Incompleto');
+            if (!providerState.enabled) {
+                setSimpleBadge(whatsRealtimeStatus, 'bg-secondary', 'Envio desabilitado', 'O envio de WhatsApp estÃ¡ desabilitado nas configuraÃ§Ãµes.');
+                setSimpleBadge(tabBadgeStatus, 'bg-secondary', 'Envio desabilitado');
+                return;
+            }
+
+            if (evolutionValidatedForCurrentConfig && providerState.status === 'success') {
+                const title = [providerState.checkedAt ? `Ãšltima validaÃ§Ã£o: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
+                setSimpleBadge(whatsRealtimeStatus, 'bg-success', 'Evolution conectada', title);
+                setSimpleBadge(tabBadgeStatus, 'bg-success', 'Evolution conectada');
+                return;
+            }
+
+            if (evolutionValidatedForCurrentConfig && providerState.status === 'error') {
+                const title = [providerState.checkedAt ? `Ãšltima validaÃ§Ã£o: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
+                setSimpleBadge(whatsRealtimeStatus, 'bg-danger', 'Erro Evolution', title);
+                setSimpleBadge(tabBadgeStatus, 'bg-danger', 'Erro Evolution');
+                return;
+            }
+
+            setSimpleBadge(
+                whatsRealtimeStatus,
+                evolutionConfigOk ? 'bg-warning text-dark' : 'bg-secondary',
+                evolutionConfigOk ? 'Evolution nÃ£o validada' : 'Evolution incompleta',
+                evolutionConfigOk
+                    ? 'A URL, API key e instÃ¢ncia foram preenchidas, mas a conexÃ£o ainda nÃ£o foi validada.'
+                    : 'Preencha URL, API key e instÃ¢ncia para testar a conexÃ£o.'
+            );
+            setSimpleBadge(tabBadgeStatus, evolutionConfigOk ? 'bg-warning text-dark' : 'bg-secondary', evolutionConfigOk ? 'NÃ£o validada' : 'Incompleta');
+            return;
+        }
+
         if (provider === 'webhook') {
             setSimpleBadge(whatsRealtimeStatus, 'bg-dark', 'Provider externo', 'Webhook externo selecionado.');
             setSimpleBadge(tabBadgeStatus, 'bg-dark', 'Provider externo');
@@ -795,7 +914,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
         toggleProviders();
         refreshExternalProviderBadges();
     });
-    document.querySelectorAll('#whatsapp_enabled, #whatsapp_menuia_url, #whatsapp_menuia_appkey, #whatsapp_menuia_authkey, #whatsapp_local_node_url, #whatsapp_local_node_token, #whatsapp_linux_node_url, #whatsapp_linux_node_token, #whatsapp_webhook_url').forEach((element) => {
+    document.querySelectorAll('#whatsapp_enabled, #whatsapp_menuia_url, #whatsapp_menuia_appkey, #whatsapp_menuia_authkey, #whatsapp_evolution_url, #whatsapp_evolution_apikey, #whatsapp_evolution_instance, #whatsapp_local_node_url, #whatsapp_local_node_token, #whatsapp_linux_node_url, #whatsapp_linux_node_token, #whatsapp_webhook_url').forEach((element) => {
         element?.addEventListener('input', () => {
             providerState.enabled = (document.getElementsByName('whatsapp_enabled')[0]?.value || '0') === '1';
             refreshExternalProviderBadges();
@@ -814,6 +933,10 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
         appkey: document.getElementById('whatsapp_menuia_appkey')?.value || '',
         authkey: document.getElementById('whatsapp_menuia_authkey')?.value || '',
         url: document.getElementById('whatsapp_menuia_url')?.value || '',
+        evolution_url: document.getElementById('whatsapp_evolution_url')?.value || '',
+        evolution_apikey: document.getElementById('whatsapp_evolution_apikey')?.value || '',
+        evolution_instance: document.getElementById('whatsapp_evolution_instance')?.value || '',
+        evolution_timeout: document.getElementById('whatsapp_evolution_timeout')?.value || '',
         webhook_url: document.getElementById('whatsapp_webhook_url')?.value || '',
         webhook_method: document.getElementById('whatsapp_webhook_method')?.value || 'POST',
         webhook_headers: document.getElementById('whatsapp_webhook_headers')?.value || '',
@@ -900,11 +1023,17 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
             providerState.status = 'success';
             providerState.message = data.message || 'Conexão validada com sucesso.';
             providerState.checkedAt = new Date().toLocaleString('pt-BR');
-            providerState.signature = buildMenuiaSignature(
-                document.getElementById('whatsapp_menuia_url')?.value || '',
-                document.getElementById('whatsapp_menuia_appkey')?.value || '',
-                document.getElementById('whatsapp_menuia_authkey')?.value || ''
-            );
+            providerState.signature = providerState.provider === 'evolution'
+                ? buildEvolutionSignature(
+                    document.getElementById('whatsapp_evolution_url')?.value || '',
+                    document.getElementById('whatsapp_evolution_apikey')?.value || '',
+                    document.getElementById('whatsapp_evolution_instance')?.value || ''
+                )
+                : buildMenuiaSignature(
+                    document.getElementById('whatsapp_menuia_url')?.value || '',
+                    document.getElementById('whatsapp_menuia_appkey')?.value || '',
+                    document.getElementById('whatsapp_menuia_authkey')?.value || ''
+                );
             refreshExternalProviderBadges();
             await fireSwal({ icon: 'success', title: 'Conexão validada', text: data.message || 'OK' });
         } catch (error) {
@@ -912,11 +1041,17 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
             providerState.status = 'error';
             providerState.message = error.message || 'Falha na validação do provider.';
             providerState.checkedAt = new Date().toLocaleString('pt-BR');
-            providerState.signature = buildMenuiaSignature(
-                document.getElementById('whatsapp_menuia_url')?.value || '',
-                document.getElementById('whatsapp_menuia_appkey')?.value || '',
-                document.getElementById('whatsapp_menuia_authkey')?.value || ''
-            );
+            providerState.signature = providerState.provider === 'evolution'
+                ? buildEvolutionSignature(
+                    document.getElementById('whatsapp_evolution_url')?.value || '',
+                    document.getElementById('whatsapp_evolution_apikey')?.value || '',
+                    document.getElementById('whatsapp_evolution_instance')?.value || ''
+                )
+                : buildMenuiaSignature(
+                    document.getElementById('whatsapp_menuia_url')?.value || '',
+                    document.getElementById('whatsapp_menuia_appkey')?.value || '',
+                    document.getElementById('whatsapp_menuia_authkey')?.value || ''
+                );
             refreshExternalProviderBadges();
             await fireSwal({ icon: 'error', title: 'Falha na conexão', text: error.message || 'Erro' });
         } finally {

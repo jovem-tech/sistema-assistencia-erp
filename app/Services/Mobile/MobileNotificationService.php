@@ -42,12 +42,14 @@ class MobileNotificationService
             return null;
         }
 
+        $normalizedRoute = $this->normalizeRoute($route, $payload);
+
         $id = (int) $this->notificationModel->insert([
             'usuario_id' => $usuarioId,
             'tipo_evento' => trim($eventType) !== '' ? trim($eventType) : 'system.info',
             'titulo' => trim($title) !== '' ? trim($title) : 'Atualizacao',
             'corpo' => trim($body) !== '' ? trim($body) : 'Voce tem uma nova atualizacao.',
-            'rota_destino' => $route !== null ? trim($route) : null,
+            'rota_destino' => $normalizedRoute,
             'payload_json' => !empty($payload) ? json_encode($payload, JSON_UNESCAPED_UNICODE) : null,
         ], true);
 
@@ -177,7 +179,7 @@ class MobileNotificationService
         $payload = [
             'title' => (string) ($notification['titulo'] ?? ''),
             'body' => (string) ($notification['corpo'] ?? ''),
-            'route' => trim((string) ($notification['rota_destino'] ?? '/conversas')) ?: '/conversas',
+            'route' => $this->normalizeRoute($notification['rota_destino'] ?? null, $this->decodePayloadJson((string) ($notification['payload_json'] ?? ''))) ?: '/atendimento-whatsapp',
             'payload' => $this->decodePayloadJson((string) ($notification['payload_json'] ?? '')),
         ];
 
@@ -201,5 +203,29 @@ class MobileNotificationService
 
         $decoded = json_decode($raw, true);
         return is_array($decoded) ? $decoded : null;
+    }
+
+    /**
+     * @param array<string,mixed>|null $payload
+     */
+    private function normalizeRoute(?string $route, ?array $payload = null): ?string
+    {
+        $value = trim((string) $route);
+        $conversaId = (int) ($payload['conversa_id'] ?? 0);
+
+        if ($value !== '' && preg_match('#^/?conversas/(\d+)$#', $value, $matches)) {
+            $conversaId = (int) ($matches[1] ?? 0);
+            $value = '';
+        }
+
+        if ($conversaId > 0) {
+            return '/atendimento-whatsapp?conversa_id=' . $conversaId;
+        }
+
+        if ($value === '') {
+            return null;
+        }
+
+        return $value;
     }
 }

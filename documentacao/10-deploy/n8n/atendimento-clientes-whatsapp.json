@@ -1,0 +1,240 @@
+{
+  "name": "Atendimento Clientes WhatsApp ERP",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-atendimento-clientes",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Entrada WhatsApp",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ],
+      "webhookId": "whatsapp-atendimento-clientes"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const source = ($json.body && typeof $json.body === 'object') ? $json.body : $json;\n\nfunction readPath(obj, path) {\n  return path.split('.').reduce((acc, key) => {\n    if (acc && typeof acc === 'object' && key in acc) return acc[key];\n    return undefined;\n  }, obj);\n}\n\nfunction pick(obj, paths, fallback = '') {\n  for (const path of paths) {\n    const value = readPath(obj, path);\n    if (value !== undefined && value !== null && String(value).trim() !== '') {\n      return String(value).trim();\n    }\n  }\n  return fallback;\n}\n\nfunction pickBool(obj, paths, fallback = false) {\n  for (const path of paths) {\n    const value = readPath(obj, path);\n    if (typeof value === 'boolean') return value;\n    if (value === 1 || value === '1') return true;\n    if (typeof value === 'string') {\n      const normalized = value.trim().toLowerCase();\n      if (['true', 'yes', 'sim', 'on'].includes(normalized)) return true;\n      if (['false', 'no', 'nao', 'off'].includes(normalized)) return false;\n    }\n  }\n  return fallback;\n}\n\nfunction normalizePhone(phone) {\n  const digits = String(phone || '').replace(/\\D+/g, '');\n  if (!digits) return '';\n  return digits.startsWith('55') ? digits : `55${digits}`;\n}\n\nconst companyName = 'Sua Assistencia Tecnica';\nconst erpWebhookUrl = 'https://erp.seudominio.com/webhooks/whatsapp';\nconst erpWebhookToken = 'ALTERAR_TOKEN_WEBHOOK';\nconst gatewayUrl = 'http://127.0.0.1:3001';\nconst gatewayToken = 'ALTERAR_TOKEN_GATEWAY';\nconst erpOrigin = 'https://erp.seudominio.com';\n\nconst phone = normalizePhone(pick(source, [\n  'from',\n  'sender',\n  'phone',\n  'telefone',\n  'number',\n  'author',\n  'chat_id',\n  'jid',\n  'data.from',\n  'data.sender',\n  'data.phone',\n  'data.telefone',\n  'data.number',\n  'contact.phone',\n  'contact.number',\n  'data.contact.phone',\n  'data.contact.number'\n]));\n\nconst text = pick(source, [\n  'message',\n  'mensagem',\n  'text',\n  'body',\n  'caption',\n  'conteudo',\n  'data.message',\n  'data.mensagem',\n  'data.text',\n  'data.body',\n  'data.caption',\n  'data.conteudo'\n], '');\n\nconst normalizedText = text\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '')\n  .toLowerCase()\n  .trim();\n\nconst hasMedia = pickBool(source, ['has_media', 'hasMedia', 'data.has_media', 'data.hasMedia'], false);\nconst fromMe = pickBool(source, ['from_me', 'fromMe', 'data.from_me', 'data.fromMe'], false);\nconst selfCheck = pickBool(source, ['self_check', 'data.self_check'], false);\n\nlet intent = 'fallback';\nif (/\\b(oi|ola|bom dia|boa tarde|boa noite|menu|inicio)\\b/.test(normalizedText)) {\n  intent = 'saudacao';\n} else if (/\\b(status|andamento|acompanhar|os|ordem)\\b/.test(normalizedText)) {\n  intent = 'status_os';\n} else if (/\\b(orcamento|orçamento|valor|preco|preço)\\b/.test(normalizedText)) {\n  intent = 'orcamento';\n} else if (/\\b(atendente|humano|pessoa|suporte|ajuda)\\b/.test(normalizedText)) {\n  intent = 'humano';\n} else if (/\\b(agendar|visita|coleta|retirada)\\b/.test(normalizedText)) {\n  intent = 'agendamento';\n} else if (hasMedia && normalizedText === '') {\n  intent = 'midia';\n}\n\nlet replyMessage = '';\nlet shouldReply = !fromMe && !selfCheck && phone !== '';\n\nif (shouldReply) {\n  switch (intent) {\n    case 'saudacao':\n      replyMessage = `Olá. Você falou com a ${companyName}.\\n\\nDigite uma opção:\\n1 - Consultar status da OS\\n2 - Solicitar orçamento\\n3 - Falar com um atendente`;\n      break;\n    case 'status_os':\n      replyMessage = `Perfeito. Envie o número da sua OS para eu localizar o andamento do atendimento.`;\n      break;\n    case 'orcamento':\n      replyMessage = `Certo. Envie o modelo do equipamento e o defeito informado para seguirmos com o orçamento.`;\n      break;\n    case 'humano':\n      replyMessage = `Tudo bem. Vou encaminhar sua mensagem para um atendente humano e seguimos por aqui.`;\n      break;\n    case 'agendamento':\n      replyMessage = `Recebido. Envie o melhor dia, turno e endereço para verificarmos a agenda.`;\n      break;\n    case 'midia':\n      replyMessage = `Recebi seu anexo. Vou registrar o material e seguir com o atendimento.`;\n      break;\n    default:\n      replyMessage = `Recebi sua mensagem. Em instantes seguimos o atendimento por aqui. Se preferir, envie o número da OS ou descreva o defeito do equipamento.`;\n      break;\n  }\n}\n\nconst erpPayload = {\n  ...(typeof source === 'object' ? source : { raw: String(source) }),\n  n8n_workflow: 'atendimento-clientes-whatsapp',\n  n8n_received_at: new Date().toISOString(),\n  normalized_phone: phone,\n  normalized_text: text,\n  detected_intent: intent\n};\n\nreturn [{\n  json: {\n    ...$json,\n    source,\n    normalizedPhone: phone,\n    receivedText: text,\n    normalizedText,\n    hasMedia,\n    fromMe,\n    selfCheck,\n    intent,\n    shouldReply,\n    replyMessage,\n    erpWebhookUrl,\n    erpWebhookToken,\n    gatewayUrl,\n    gatewayToken,\n    erpOrigin,\n    erpPayload,\n    gatewayPayload: {\n      to: phone,\n      number: phone,\n      message: replyMessage\n    }\n  }\n}];"
+      },
+      "id": "2",
+      "name": "Normalizar e Decidir",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.erpWebhookUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Webhook-Token",
+              "value": "={{ $json.erpWebhookToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.erpPayload }}"
+      },
+      "id": "3",
+      "name": "Espelhar Inbound no ERP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        780,
+        300
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.shouldReply }}"
+            }
+          ]
+        }
+      },
+      "id": "4",
+      "name": "Deve Responder?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.gatewayUrl + '/create-message' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Api-Token",
+              "value": "={{ $json.gatewayToken }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $json.gatewayToken }}"
+            },
+            {
+              "name": "X-ERP-Origin",
+              "value": "={{ $json.erpOrigin }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.gatewayPayload }}"
+      },
+      "id": "5",
+      "name": "Enviar Resposta no Gateway",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1290,
+        180
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, workflow: 'atendimento-clientes-whatsapp', intent: $json.intent, replied: true, phone: $json.normalizedPhone, response: $json.replyMessage } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "6",
+      "name": "Responder Webhook com Envio",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1540,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, workflow: 'atendimento-clientes-whatsapp', intent: $json.intent, replied: false, phone: $json.normalizedPhone, response: 'Sem auto resposta para este evento.' } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "7",
+      "name": "Responder Webhook sem Envio",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1290,
+        420
+      ]
+    }
+  ],
+  "connections": {
+    "Entrada WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Normalizar e Decidir",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar e Decidir": {
+      "main": [
+        [
+          {
+            "node": "Espelhar Inbound no ERP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Espelhar Inbound no ERP": {
+      "main": [
+        [
+          {
+            "node": "Deve Responder?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deve Responder?": {
+      "main": [
+        [
+          {
+            "node": "Enviar Resposta no Gateway",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder Webhook sem Envio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Resposta no Gateway": {
+      "main": [
+        [
+          {
+            "node": "Responder Webhook com Envio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c5bf6d2c-5f8d-4ea0-9f6c-1d3ab2f58f01",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {}
+}

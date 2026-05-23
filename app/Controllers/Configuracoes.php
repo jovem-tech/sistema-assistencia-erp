@@ -47,6 +47,9 @@ class Configuracoes extends BaseController
         $previousMenuiaUrl = $this->normalizeMenuiaUrl((string) get_config('whatsapp_menuia_url', 'https://chatbot.menuia.com/api'));
         $previousMenuiaApp = trim((string) get_config('whatsapp_menuia_appkey', ''));
         $previousMenuiaAuth = trim((string) get_config('whatsapp_menuia_authkey', ''));
+        $previousEvolutionUrl = $this->normalizeEvolutionUrl((string) get_config('whatsapp_evolution_url', 'http://127.0.0.1:8080'));
+        $previousEvolutionApiKey = trim((string) get_config('whatsapp_evolution_apikey', ''));
+        $previousEvolutionInstance = trim((string) get_config('whatsapp_evolution_instance', ''));
 
         if (array_key_exists('sessao_inatividade_minutos', $posts)) {
             $timeoutMinutes = (int) $posts['sessao_inatividade_minutos'];
@@ -59,6 +62,10 @@ class Configuracoes extends BaseController
 
         if (array_key_exists('whatsapp_menuia_url', $posts)) {
             $posts['whatsapp_menuia_url'] = $this->normalizeMenuiaUrl((string) $posts['whatsapp_menuia_url']);
+        }
+
+        if (array_key_exists('whatsapp_evolution_url', $posts)) {
+            $posts['whatsapp_evolution_url'] = $this->normalizeEvolutionUrl((string) $posts['whatsapp_evolution_url']);
         }
 
         if (array_key_exists('smtp_port', $posts)) {
@@ -146,6 +153,15 @@ class Configuracoes extends BaseController
         $nextMenuiaAuth = array_key_exists('whatsapp_menuia_authkey', $posts)
             ? trim((string) $posts['whatsapp_menuia_authkey'])
             : $previousMenuiaAuth;
+        $nextEvolutionUrl = array_key_exists('whatsapp_evolution_url', $posts)
+            ? (string) $posts['whatsapp_evolution_url']
+            : $previousEvolutionUrl;
+        $nextEvolutionApiKey = array_key_exists('whatsapp_evolution_apikey', $posts)
+            ? trim((string) $posts['whatsapp_evolution_apikey'])
+            : $previousEvolutionApiKey;
+        $nextEvolutionInstance = array_key_exists('whatsapp_evolution_instance', $posts)
+            ? trim((string) $posts['whatsapp_evolution_instance'])
+            : $previousEvolutionInstance;
 
         foreach ($posts as $chave => $valor) {
             if ($chave !== 'csrf_test_name') {
@@ -208,6 +224,9 @@ class Configuracoes extends BaseController
             $previousMenuiaUrl !== $nextMenuiaUrl
             || $previousMenuiaApp !== $nextMenuiaApp
             || $previousMenuiaAuth !== $nextMenuiaAuth
+            || $previousEvolutionUrl !== $nextEvolutionUrl
+            || $previousEvolutionApiKey !== $nextEvolutionApiKey
+            || $previousEvolutionInstance !== $nextEvolutionInstance
         ) {
             $this->clearWhatsAppConnectionStatus();
         }
@@ -542,6 +561,10 @@ class Configuracoes extends BaseController
             'whatsapp_menuia_url' => $this->normalizeMenuiaUrl((string) $this->request->getPost('url')),
             'whatsapp_menuia_authkey' => trim((string) $this->request->getPost('authkey')),
             'whatsapp_menuia_appkey' => trim((string) $this->request->getPost('appkey')),
+            'whatsapp_evolution_url' => $this->normalizeEvolutionUrl((string) $this->request->getPost('evolution_url')),
+            'whatsapp_evolution_apikey' => trim((string) $this->request->getPost('evolution_apikey')),
+            'whatsapp_evolution_instance' => trim((string) $this->request->getPost('evolution_instance')),
+            'whatsapp_evolution_timeout' => (int) ($this->request->getPost('evolution_timeout') ?: get_config('whatsapp_evolution_timeout', 20)),
             'whatsapp_local_node_url' => trim((string) ($this->request->getPost('local_url') ?: get_config('whatsapp_local_node_url', 'http://127.0.0.1:3001'))),
             'whatsapp_local_node_token' => trim((string) ($this->request->getPost('local_token') ?: get_config('whatsapp_local_node_token', ''))),
             'whatsapp_local_node_origin' => trim((string) ($this->request->getPost('local_origin') ?: get_config('whatsapp_local_node_origin', base_url('/')))),
@@ -577,6 +600,16 @@ class Configuracoes extends BaseController
         return $normalized;
     }
 
+    private function normalizeEvolutionUrl(string $url): string
+    {
+        $normalized = trim(rtrim($url, '/'));
+        if ($normalized === '') {
+            return 'http://127.0.0.1:8080';
+        }
+
+        return $normalized;
+    }
+
     private function persistWhatsAppConnectionStatus(string $provider, bool $success, string $message, array $overrides = []): void
     {
         $model = new ConfiguracaoModel();
@@ -592,7 +625,13 @@ class Configuracoes extends BaseController
                     (string) ($overrides['whatsapp_menuia_appkey'] ?? get_config('whatsapp_menuia_appkey', '')),
                     (string) ($overrides['whatsapp_menuia_authkey'] ?? get_config('whatsapp_menuia_authkey', ''))
                 )
-                : ''
+                : ($provider === 'evolution'
+                    ? $this->buildEvolutionCredentialSignature(
+                        (string) ($overrides['whatsapp_evolution_url'] ?? get_config('whatsapp_evolution_url', 'http://127.0.0.1:8080')),
+                        (string) ($overrides['whatsapp_evolution_apikey'] ?? get_config('whatsapp_evolution_apikey', '')),
+                        (string) ($overrides['whatsapp_evolution_instance'] ?? get_config('whatsapp_evolution_instance', ''))
+                    )
+                    : '')
         );
     }
 
@@ -617,6 +656,19 @@ class Configuracoes extends BaseController
         }
 
         return strtolower($normalizedUrl) . '|' . $normalizedAppKey . '|' . $normalizedAuthKey;
+    }
+
+    private function buildEvolutionCredentialSignature(string $url, string $apiKey, string $instance): string
+    {
+        $normalizedUrl = $this->normalizeEvolutionUrl($url);
+        $normalizedApiKey = trim($apiKey);
+        $normalizedInstance = trim($instance);
+
+        if ($normalizedUrl === '' || $normalizedApiKey === '' || $normalizedInstance === '') {
+            return '';
+        }
+
+        return strtolower($normalizedUrl) . '|' . $normalizedApiKey . '|' . $normalizedInstance;
     }
 
     private function callGateway(string $method, string $path, ?array $jsonBody = null, ?int $timeout = null, string $provider = ''): array
@@ -814,7 +866,7 @@ class Configuracoes extends BaseController
         if ($selected === 'local_node') {
             $selected = 'api_whats_local';
         }
-        if (!in_array($selected, ['api_whats_local', 'api_whats_linux', 'menuia', 'webhook'], true)) {
+        if (!in_array($selected, ['api_whats_local', 'api_whats_linux', 'menuia', 'webhook', 'evolution'], true)) {
             $selected = 'api_whats_local';
         }
 

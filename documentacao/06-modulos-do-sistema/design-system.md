@@ -179,7 +179,7 @@ Padroes globais adicionais para DataTables:
 - child rows responsivas com botao `+` e `-` para revelar colunas ocultas em larguras menores
 - colunas semanticas ricas para tabelas densas:
   - celula de equipamento com bloco `label + valor`
-  - celula de datas com indicadores visuais de prazo
+  - celula de datas com indicadores visuais de prazo, linha dedicada de `Conclusao` e congelamento do atraso em `data_conclusao` ou `data_entrega` quando a manutencao ja foi encerrada
   - badge clicavel de status abrindo modal contextual sem sair da listagem
 - wrappers de tabela (`card-body`, `table-responsive`, cards de listagem) devem usar `min-width: 0` para impedir overflow estrutural em notebook
 - barras de filtro desktop devem quebrar o grupo de acoes para uma nova linha em notebook antes de gerar scroll horizontal

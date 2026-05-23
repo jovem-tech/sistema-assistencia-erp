@@ -70,12 +70,21 @@ class RealtimeController extends BaseApiController
 
                 $payload = [
                     'notifications' => array_map(static function (array $row): array {
+                        $payload = null;
+                        $rawPayload = trim((string) ($row['payload_json'] ?? ''));
+                        if ($rawPayload !== '') {
+                            $decoded = json_decode($rawPayload, true);
+                            if (is_array($decoded)) {
+                                $payload = $decoded;
+                            }
+                        }
+
                         return [
                             'id' => (int) ($row['id'] ?? 0),
                             'tipo_evento' => (string) ($row['tipo_evento'] ?? ''),
                             'titulo' => (string) ($row['titulo'] ?? ''),
                             'corpo' => (string) ($row['corpo'] ?? ''),
-                            'rota_destino' => $row['rota_destino'] ?? null,
+                            'rota_destino' => self::normalizeDestinationRoute($row['rota_destino'] ?? null, $payload),
                             'created_at' => $row['created_at'] ?? null,
                         ];
                     }, $notifications),
@@ -105,6 +114,27 @@ class RealtimeController extends BaseApiController
         @ob_flush();
         @flush();
         exit;
+    }
+
+    /**
+     * @param mixed $route
+     * @param array<string,mixed>|null $payload
+     */
+    private static function normalizeDestinationRoute($route, ?array $payload = null): ?string
+    {
+        $value = trim((string) $route);
+        $conversaId = (int) ($payload['conversa_id'] ?? 0);
+
+        if ($value !== '' && preg_match('#^/?conversas/(\d+)$#', $value, $matches)) {
+            $conversaId = (int) ($matches[1] ?? 0);
+            $value = '';
+        }
+
+        if ($conversaId > 0) {
+            return '/atendimento-whatsapp?conversa_id=' . $conversaId;
+        }
+
+        return $value !== '' ? $value : null;
     }
 }
 

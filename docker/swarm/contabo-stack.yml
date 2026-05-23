@@ -1,0 +1,93 @@
+version: "3.9"
+
+services:
+  app:
+    image: ${APP_IMAGE}
+    environment:
+      APP_BASE_URL: https://${APP_HOST}/
+      APP_CSP_ENABLED: ${APP_CSP_ENABLED:-false}
+      APP_FORCE_HTTPS: ${APP_FORCE_HTTPS:-true}
+      APP_TIMEZONE: ${APP_TIMEZONE:-America/Fortaleza}
+      CI_ENVIRONMENT: ${CI_ENVIRONMENT:-production}
+      CLEAR_CACHE_ON_BOOT: ${CLEAR_CACHE_ON_BOOT:-true}
+      DATABASE_HOST: db
+      DATABASE_NAME: ${MYSQL_DATABASE}
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD}
+      DATABASE_PORT: 3306
+      DATABASE_USER: ${MYSQL_USER}
+      ENCRYPTION_KEY: ${APP_ENCRYPTION_KEY}
+      LEGACY_DATABASE_HOST: ${LEGACY_DATABASE_HOST}
+      LEGACY_DATABASE_NAME: ${LEGACY_DATABASE_NAME}
+      LEGACY_DATABASE_PASSWORD: ${LEGACY_DATABASE_PASSWORD}
+      LEGACY_DATABASE_PORT: ${LEGACY_DATABASE_PORT}
+      LEGACY_DATABASE_USER: ${LEGACY_DATABASE_USER}
+      LOGGER_THRESHOLD: ${LOGGER_THRESHOLD:-4}
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
+      WAIT_FOR_DB: ${WAIT_FOR_DB:-true}
+    networks:
+      - internal
+      - traefik-public
+    volumes:
+      - sistema_hml_public_uploads:/var/www/html/public/uploads
+      - sistema_hml_writable:/var/www/html/writable
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=${TRAEFIK_NETWORK:-traefik-public}
+        - traefik.http.middlewares.sistema-hml-https.redirectscheme.scheme=https
+        - traefik.http.routers.sistema-hml-web.entrypoints=web
+        - traefik.http.routers.sistema-hml-web.rule=Host(`${APP_HOST}`)
+        - traefik.http.routers.sistema-hml-web.middlewares=sistema-hml-https
+        - traefik.http.routers.sistema-hml-web.service=sistema-hml
+        - traefik.http.routers.sistema-hml-secure.entrypoints=websecure
+        - traefik.http.routers.sistema-hml-secure.rule=Host(`${APP_HOST}`)
+        - traefik.http.routers.sistema-hml-secure.tls=true
+        - traefik.http.routers.sistema-hml-secure.tls.certresolver=${TRAEFIK_CERTRESOLVER:-letsencrypt}
+        - traefik.http.routers.sistema-hml-secure.service=sistema-hml
+        - traefik.http.services.sistema-hml.loadbalancer.server.port=80
+
+  db:
+    image: mysql:8.0
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      TZ: ${APP_TIMEZONE:-America/Fortaleza}
+    networks:
+      - internal
+    volumes:
+      - sistema_hml_mysql:/var/lib/mysql
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+
+networks:
+  internal:
+    driver: overlay
+  traefik-public:
+    external: true
+    name: ${TRAEFIK_NETWORK:-traefik-public}
+
+volumes:
+  sistema_hml_mysql:
+  sistema_hml_public_uploads:
+  sistema_hml_writable:

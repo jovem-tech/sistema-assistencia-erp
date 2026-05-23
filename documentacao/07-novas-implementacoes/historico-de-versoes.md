@@ -1,7 +1,7 @@
 ﻿# Historico de Versoes do Sistema
 
-Atualizado em: 29/04/2026  
-Versao atual oficial: `2.16.38`
+Atualizado em: 19/05/2026  
+Versao atual oficial: `2.16.41`
 
 ## Observacao sobre o App Mobile/PWA
 
@@ -20,6 +20,33 @@ Estado documental atual do app:
 - documentacao exclusiva aprofundada em 04/04/2026
 
 ## Release ERP + App
+
+### 19/05/2026 - ajuste operacional da coluna `Datas` (em homologacao)
+- a listagem `/os` passou a interromper a contagem de atraso na `data_conclusao` quando a manutencao ja estiver encerrada, evitando que status como `Reparo Concluido`, `Reparado, Disponivel na Loja`, `Irreparavel` e `Reparo Recusado` continuem parecendo OS em execucao;
+- a mesma coluna passou a exibir a linha `Conclusao` para status conclusivos, separando explicitamente o fim tecnico da manutencao da `Entrega`;
+- quando a OS ja tiver `data_entrega`, o badge continua fechando o atraso pela entrega; quando faltar `data_conclusao` em registros legados ja encerrados, a interface usa `status_atualizado_em` apenas como fallback visual;
+- o backend de mudanca de status passou a preencher `data_conclusao` para estados de manutencao encerrada e a preservar a data original quando ela ja existir, evitando sobrescrever a conclusao real em transicoes posteriores;
+- o fluxo de status tambem passou a preencher `data_entrega` em `Entregue - Pendencia Financeira`, alinhando a coluna `Datas` com o significado operacional do status.
+
+### 03/05/2026 - v2.16.41 / app 0.4.2
+- o sino de notificacoes da navbar passou a abrir um modal SweetAlert2 com o teor completo da notificacao antes de qualquer navegacao;
+- o dropdown ganhou a acao `Limpar lidas`, removendo rapidamente do inbox web as notificacoes ja processadas pelo operador;
+- a geracao e a normalizacao de `rota_destino` foram alinhadas para a URL canonica da Central (`/atendimento-whatsapp?conversa_id={id}`), eliminando `404` por rotas legadas `/conversas/{id}`;
+- os endpoints web e mobile/PWA que devolvem notificacoes passaram a normalizar automaticamente essas rotas de conversa, mantendo compatibilidade com registros antigos;
+- foi registrada a referencia oficial do workflow n8n `Evolution -> IA -> ERP -> Evolution`, com JSON importavel e nota de implantacao para o desenho recomendado do WhatsApp automatizado;
+- a referencia do workflow Evolution + IA foi refinada para incluir historico recente de `mensagens_whatsapp` no prompt, reduzindo respostas sem memoria de contexto e saudacoes incoerentes;
+- a versao V2 com memoria (`evolution-whatsapp-atendimento-ia-erp-memoria.json`) foi ajustada para consolidar o historico do ERP em um unico contexto e limitar a saida automatica a no maximo 3 blocos, evitando rajadas de mensagens por inbound unico;
+- a mesma V2 com memoria passou a consultar diretamente as ordens de servico recentes da tabela `os` antes do agente responder, mantendo o fluxo simples e evitando depender de tool SQL acionada pela IA para buscar OS;
+- a referencia V3 `evolution-whatsapp-atendimento-ia-erp-v3.json` foi revisada para usar um agente de triagem dedicado, gravacao de lead em horario local (`America/Fortaleza`), base institucional por tool real de Google Drive e sem automacao de busca PDF nesta etapa;
+- o repositorio passou a incluir tambem o subworkflow `evolution-whatsapp-atendimento-ia-v3-tool-base-institucional-drive.json`, usado como tool do agente principal para consultar a base oficial da assistencia no Google Drive;
+- o repositorio passou a incluir trilha oficial de deploy do ERP em Docker Swarm para Contabo, com `Dockerfile`, stack do Traefik, volumes persistentes e script de publicacao do stack;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.16.41`.
+
+### 03/05/2026 - v2.16.40 / app 0.4.2
+- a Central de Mensagens local passou a sincronizar ativamente a Evolution API quando o provider direto estiver em `evolution`, evitando depender apenas de webhook remoto inacessivel ao `localhost`;
+- o backend agora consulta os chats recentes da instancia Evolution, reconcilia `lastMessage` com `provider_message_id` e injeta inbound/outbound externo na thread da Central sem duplicar mensagens ja processadas;
+- a listagem `/atendimento-whatsapp/conversas` e o stream da fila passaram a disparar `syncInboundSafe()` antes do snapshot, tornando as novas mensagens perceptiveis no ambiente local durante polling, SSE e busca por filtros;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.16.40`, corrigindo o rodape local que ainda exibia `2.16.38`.
 
 ### 29/04/2026 - v2.16.38 / app 0.4.2
 - reforcada a responsividade das abas da tela `Visualizar Orcamento` para manter todos os destinos visiveis dentro da largura da tela, sem quebra de linha e sem barra de rolagem aparente;

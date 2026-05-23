@@ -86,6 +86,23 @@ Na prática:
 - a condução manual do reparo passa a prevalecer depois que a OS sai da fase inicial de execução;
 - a coluna `Status` não deve mascarar o status real da OS com o status sugerido do orçamento.
 
+### Leitura do prazo na coluna `Datas`
+
+O badge `Prazo` da listagem `/os` segue a seguinte regra operacional:
+
+- enquanto a manutencao ainda estiver em andamento, o texto `Atrasado ha X dias` continua sendo calculado em relacao a data atual;
+- quando a OS ja tiver sido entregue, o atraso deixa de ser acumulado e passa a considerar `data_entrega`;
+- quando a manutencao ja tiver sido concluida, mas a OS ainda nao tiver sido entregue, o atraso deixa de correr na data atual e passa a considerar `data_conclusao`;
+- quando a OS estiver em etapa conclusiva, a coluna passa a exibir tambem a linha `Conclusao`, separando visualmente a data em que a manutencao terminou da data de retirada/entrega;
+- se a OS legada estiver em status de manutencao encerrada, mas ainda sem `data_conclusao` preenchida, a listagem usa `status_atualizado_em` apenas como fallback visual para impedir atraso infinito.
+
+Na pratica:
+
+- `Reparo Concluido`, `Reparado, Disponivel na Loja`, `Irreparavel`, `Irreparavel, Disponivel para Retirada`, `Reparo Recusado` e equivalentes deixam de parecer manutencoes ainda em execucao;
+- a leitura fica no formato `Entrada`, `Prazo`, `Conclusao` e `Entrega`, quando houver conclusao operacional;
+- o texto `Atrasado ha X dias` fica reservado para OS realmente em andamento;
+- quando a manutencao terminou fora do prazo, o badge passa a mostrar `Atraso de X dias`, congelado na data de conclusao/entrega.
+
 ### Modal `Atualizar prazos da OS`
 
 Ao clicar sobre a coluna de datas na listagem `/os`, o sistema abre um modal rápido para ajuste da previsão.
@@ -115,7 +132,9 @@ Quando a resposta do cliente acontece pelo link publico do orcamento:
 - se o modal `Alterar status da OS` estiver aberto para a mesma ordem, o contexto do modal tambem e reidratado;
 - a navbar mostra uma notificacao nova no sino ao lado da foto do perfil;
 - ao abrir o dropdown, o operador ve qual orcamento foi respondido e qual foi o novo status comercial;
-- ao clicar na notificacao, o ERP abre a rota correta da tela de destino, sem sair para um caminho invalido fora do contexto do sistema.
+- ao clicar na notificacao, o ERP abre primeiro um modal com o teor da atualizacao;
+- se a notificacao possuir conversa ou tela vinculada, o modal oferece a acao `Abrir conversa`, levando o operador para a rota correta do ERP sem cair em caminho invalido;
+- o dropdown tambem oferece `Marcar todas` e `Limpar lidas` para organizar o inbox do sino sem recarregar a pagina.
 
 ### Modal `Alterar status da OS`
 

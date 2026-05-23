@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recuperar Senha - Assistência Técnica</title>
+    <?php $favicon = get_config('sistema_icone'); if ($favicon && file_exists('uploads/sistema/' . $favicon)): ?>
+    <link rel="icon" href="<?= base_url('uploads/sistema/' . $favicon) ?>">
+    <?php else: ?>
+    <link rel="icon" href="<?= base_url('favicon.ico') ?>">
+    <?php endif; ?>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">

@@ -1,0 +1,108 @@
+﻿{
+    "name":  "Evolution WhatsApp IA + ERP | Tool Base Institucional Drive V3",
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "workflowInputs":  {
+                                                                "values":  [
+                                                                               {
+                                                                                   "name":  "question"
+                                                                               },
+                                                                               {
+                                                                                   "name":  "driveFileId"
+                                                                               },
+                                                                               {
+                                                                                   "name":  "companyName"
+                                                                               }
+                                                                           ]
+                                                            }
+                                     },
+                      "id":  "driveToolTrigger",
+                      "name":  "Execute Sub-workflow Trigger",
+                      "type":  "n8n-nodes-base.executeWorkflowTrigger",
+                      "typeVersion":  1,
+                      "position":  [
+                                       240,
+                                       260
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "download",
+                                         "fileId":  {
+                                                        "__rl":  true,
+                                                        "mode":  "id",
+                                                        "value":  "={{ $json.driveFileId }}"
+                                                    },
+                                         "binaryPropertyName":  "data",
+                                         "options":  {
+                                                         "fileName":  "={{ `base_institucional_${$json.companyName || \"empresa\"}.txt` }}",
+                                                         "googleFileConversion":  {
+                                                                                      "conversion":  {
+                                                                                                         "docsToFormat":  "text/plain"
+                                                                                                     }
+                                                                                  }
+                                                     }
+                                     },
+                      "id":  "driveToolDownload",
+                      "name":  "Baixar Base do Google Drive",
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "position":  [
+                                       520,
+                                       260
+                                   ],
+                      "continueOnFail":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForEachItem",
+                                         "jsCode":  "function normalize(text) {\n  return String(text || \u0027\u0027).normalize(\u0027NFD\u0027).replace(/[\\u0300-\\u036f]/g, \u0027\u0027).toLowerCase();\n}\n\nconst question = String($json.question || \u0027\u0027).trim();\nconst driveFileId = String($json.driveFileId || \u0027\u0027).trim();\nconst raw = $binary \u0026\u0026 $binary.data \u0026\u0026 $binary.data.data\n  ? Buffer.from($binary.data.data, \u0027base64\u0027).toString(\u0027utf8\u0027)\n  : \u0027\u0027;\n\nif (!driveFileId) {\n  return [{ json: { response: \u0027A base institucional do Google Drive ainda nao foi configurada com um fileId valido.\u0027 } }];\n}\n\nconst content = raw.replace(/\\r/g, \u0027\u0027).trim();\nif (!content) {\n  return [{ json: { response: \u0027Nao consegui ler a base institucional oficial no Google Drive agora.\u0027 } }];\n}\n\nconst blocks = content\n  .split(/\\n{2,}/)\n  .map((block) =\u003e block.replace(/\\s+/g, \u0027 \u0027).trim())\n  .filter(Boolean);\n\nconst keywords = normalize(question).split(/\\W+/).filter((word) =\u003e word.length \u003e 2);\nconst scored = blocks\n  .map((block) =\u003e {\n    const hay = normalize(block);\n    let score = 0;\n    for (const keyword of keywords) {\n      if (hay.includes(keyword)) score += 1;\n    }\n    return { block, score };\n  })\n  .sort((a, b) =\u003e b.score - a.score || a.block.length - b.block.length);\n\nconst picked = (keywords.length \u003e 0 ? scored.filter((item) =\u003e item.score \u003e 0) : scored)\n  .slice(0, 5)\n  .map((item) =\u003e item.block);\n\nconst response = (picked.length \u003e 0 ? picked : blocks.slice(0, 5))\n  .join(\u0027\\n\\n\u0027)\n  .slice(0, 3500);\n\nreturn [{ json: { response } }];"
+                                     },
+                      "id":  "driveToolExtract",
+                      "name":  "Extrair Trechos da Base Institucional",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       820,
+                                       260
+                                   ]
+                  }
+              ],
+    "connections":  {
+                        "Execute Sub-workflow Trigger":  {
+                                                             "main":  [
+                                                                          [
+                                                                              {
+                                                                                  "node":  "Baixar Base do Google Drive",
+                                                                                  "type":  "main",
+                                                                                  "index":  0
+                                                                              }
+                                                                          ]
+                                                                      ]
+                                                         },
+                        "Baixar Base do Google Drive":  {
+                                                            "main":  [
+                                                                         [
+                                                                             {
+                                                                                 "node":  "Extrair Trechos da Base Institucional",
+                                                                                 "type":  "main",
+                                                                                 "index":  0
+                                                                             }
+                                                                         ]
+                                                                     ]
+                                                        }
+                    },
+    "active":  false,
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate"
+                 },
+    "versionId":  "evolution-v3-tool-base-drive-2026-05-04-triagem",
+    "meta":  {
+                 "templateCredsSetupCompleted":  false
+             },
+    "pinData":  {
+
+                }
+}

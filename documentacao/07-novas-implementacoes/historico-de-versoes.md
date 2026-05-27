@@ -1,7 +1,7 @@
 ﻿# Historico de Versoes do Sistema
 
-Atualizado em: 19/05/2026  
-Versao atual oficial: `2.16.41`
+Atualizado em: 27/05/2026  
+Versao atual oficial: `2.16.42`
 
 ## Observacao sobre o App Mobile/PWA
 
@@ -20,6 +20,13 @@ Estado documental atual do app:
 - documentacao exclusiva aprofundada em 04/04/2026
 
 ## Release ERP + App
+
+### 27/05/2026 - v2.16.42 / app 0.4.2
+- adicionada uma trilha oficial para integrar o ERP ao `Setup Vem Fazer`, reaproveitando Swarm, Traefik e a rede ja provisionados na VPS;
+- criado `scripts/docker/install-vemfazer-stack.sh` para clonar/atualizar o repositorio do ERP, gerar o env do stack, buildar a imagem localmente e publicar a stack com `docker stack deploy`;
+- criado `docker/swarm/setup-vemfazer-stack.yml`, com labels do Traefik parametrizadas por `STACK_SLUG`, e `docker/swarm/setup-vemfazer.env.example` para servir de baseline ao deploy;
+- criada documentacao dedicada em `documentacao/10-deploy/integracao-setup-vemfazer.md`, incluindo o snippet de menu para encaixar o ERP como opcao do `setup-vemfazer.sh`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.16.42`.
 
 ### 19/05/2026 - ajuste operacional da coluna `Datas` (em homologacao)
 - a listagem `/os` passou a interromper a contagem de atraso na `data_conclusao` quando a manutencao ja estiver encerrada, evitando que status como `Reparo Concluido`, `Reparado, Disponivel na Loja`, `Irreparavel` e `Reparo Recusado` continuem parecendo OS em execucao;

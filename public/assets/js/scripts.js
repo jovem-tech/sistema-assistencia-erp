@@ -1145,6 +1145,8 @@ function openDocPage(page) {
         'templates-whatsapp-os': '06-modulos-do-sistema/ordens-de-servico.md#templates-de-whatsapp-para-documentos',
         'deploy-vps': '10-deploy/manual-tecnico-oficial-vps-ubuntu-24-ci4.md',
         'deploy-vps-script': '10-deploy/scripts/install_erp.sh',
+        'deploy-vemfazer-setup': '10-deploy/integracao-setup-vemfazer.md',
+        'deploy-vemfazer-stack': '10-deploy/integracao-setup-vemfazer.md',
         'deploy-vps-guia': '10-deploy/linux-vps-deployment.md',
         'deploy-vps-atualizacao': '10-deploy/atualizacao-vps-sem-downtime.md',
         'deploy-vps-ubuntu26': '10-deploy/atualizacao-vps-sem-downtime.md',

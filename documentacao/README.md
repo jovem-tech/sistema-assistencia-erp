@@ -1,15 +1,15 @@
 # Documentacao - Sistema de Assistencia Tecnica
 
 > Jovem Tech  
-> ERP atual: `2.16.41`
+> ERP atual: `2.16.42`
 > App mobile/PWA: `0.4.2`  
-> Atualizado em `21/05/2026`
+> Atualizado em `27/05/2026`
 
 ## Objetivo
 
 Este diretorio concentra a documentacao funcional, tecnica e operacional do ERP da assistencia tecnica.
 
-O indice abaixo foi revisado para refletir a linha atual `2.16.41`, incluindo a trilha oficial dos workflows n8n de atendimento WhatsApp, a referencia por etapas da Jovem Tech e a consolidacao das notas tecnicas mais recentes do modulo de comunicacao.
+O indice abaixo foi revisado para refletir a linha atual `2.16.42`, incluindo a trilha oficial dos workflows n8n de atendimento WhatsApp, a referencia por etapas da Jovem Tech, a integracao do deploy com o Setup Vem Fazer e a consolidacao das notas tecnicas mais recentes do modulo de comunicacao.
 
 ## Estrutura
 
@@ -49,12 +49,13 @@ O indice abaixo foi revisado para refletir a linha atual `2.16.41`, incluindo a 
 - Guia rapido do fluxo 4 ambientes: `10-deploy/guia-rapido-fluxo-4-ambientes.md`
 - PDF do guia rapido 4 ambientes: `10-deploy/guia-rapido-fluxo-4-ambientes.pdf`
 - Deploy Docker Swarm no Contabo: `10-deploy/docker-swarm-contabo.md`
+- Integracao com o Setup Vem Fazer: `10-deploy/integracao-setup-vemfazer.md`
 - Workflow n8n por etapas da Jovem Tech: `07-novas-implementacoes/2026-05-07-workflow-n8n-jovem-tech-etapas-atendimento.md`
 
 ### Versao e release atual
 
 - Historico oficial de versoes do ERP: `07-novas-implementacoes/historico-de-versoes.md`
-- Release atual: `07-novas-implementacoes/2026-04-27-release-v2.16.5-restauro-os-ptbr-listagem.md`
+- Release atual: `07-novas-implementacoes/2026-05-27-release-v2.16.42-integracao-setup-vemfazer.md`
 - Registro da release anterior na VPS: `10-deploy/2026-04-23-atualizacao-vps-release-v2.15.0.md`
 - Nota tecnica de containerizacao Docker/Swarm: `07-novas-implementacoes/2026-05-04-deploy-docker-swarm-contabo.md`
 
@@ -111,7 +112,8 @@ O indice abaixo foi revisado para refletir a linha atual `2.16.41`, incluindo a 
 - a listagem `/os` deixou de retornar `500` depois da restauracao sintatica de `app/Controllers/Os.php`, `app/Views/os/index.php`, `app/Views/os/form.php` e `app/Views/os/show.php`;
 - a pagina de edicao e a visualizacao da OS receberam nova limpeza de labels, avisos e mensagens em pt-BR, reduzindo exibicao de textos legados com `?` no lugar de acentos;
 - o menu lateral voltou a exibir corretamente rotulos como `Ordens de Servico`, `Servicos`, `Estoque de Pecas` e `Gestao de Conhecimento` em ambientes afetados por texto mojibake;
-- indice principal sincronizado com a release `2.16.5` e com a nova nota tecnica de restauro da listagem `/os`;
+- indice principal sincronizado com a release `2.16.42` e com a nova trilha oficial de integracao do ERP ao `Setup Vem Fazer`;
+- o repositorio passou a incluir uma trilha oficial de integracao do ERP com o `Setup Vem Fazer`, com stack propria, env de referencia e instalador autonomo para publicar o ERP no Swarm ja existente;
 - incluido o estudo oficial de implementacao do financeiro gerencial com `DRE`, `fluxo de caixa realizado` e `fluxo de caixa projetado`.
 
 ## Regra editorial
@@ -129,6 +131,10 @@ Sempre que houver nova release do ERP:
 Para ambiente Contabo com Docker Swarm + Traefik, use:
 
 - `10-deploy/docker-swarm-contabo.md`
+- `10-deploy/integracao-setup-vemfazer.md`
 - `docker/swarm/contabo-stack.yml`
 - `docker/swarm/contabo.env.example`
+- `docker/swarm/setup-vemfazer-stack.yml`
+- `docker/swarm/setup-vemfazer.env.example`
 - `scripts/docker/deploy-contabo-swarm.sh`
+- `scripts/docker/install-vemfazer-stack.sh`

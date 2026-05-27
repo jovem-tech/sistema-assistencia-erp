@@ -1,6 +1,6 @@
 # Estrutura de Pastas (resumo tecnico)
 
-Atualizado em 03/04/2026 para a release `2.11.1`.
+Atualizado em 27/05/2026 para a release `2.16.42`.
 
 ```text
 sistema-assistencia/
@@ -263,12 +263,17 @@ Blocos adicionados para deploy em host com Traefik:
 - `docker/swarm/`
   - `contabo-stack.yml`
   - `contabo.env.example`
+  - `setup-vemfazer-stack.yml`
+  - `setup-vemfazer.env.example`
 - `scripts/docker/`
   - `deploy-contabo-swarm.sh`
+  - `install-vemfazer-stack.sh`
 
 Responsabilidades:
 
 - `Dockerfile`: build da imagem PHP/Apache do ERP;
 - `docker/runtime/entrypoint.sh`: gera `.env`, ajusta permissoes, aguarda banco e executa migrations;
 - `docker/swarm/contabo-stack.yml`: define os servicos `app` e `db`, volumes e labels do Traefik;
+- `docker/swarm/setup-vemfazer-stack.yml`: variante voltada ao ecossistema `Setup Vem Fazer`, com labels parametrizadas por `STACK_SLUG`;
 - `scripts/docker/deploy-contabo-swarm.sh`: padroniza `docker build` + `docker stack deploy`.
+- `scripts/docker/install-vemfazer-stack.sh`: clona/atualiza o ERP, grava o env do stack, builda a imagem local e publica a stack no Swarm ja provisionado.

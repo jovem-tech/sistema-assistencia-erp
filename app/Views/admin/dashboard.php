@@ -26,6 +26,7 @@ $resumoFinanceiroInicial = [
     'receitas' => (float) ($resumo_financeiro['receitas'] ?? 0),
     'despesas' => (float) ($resumo_financeiro['despesas'] ?? 0),
     'lucro' => (float) ($resumo_financeiro['lucro'] ?? 0),
+    'resultado_caixa' => (float) ($resumo_financeiro['resultado_caixa'] ?? $resumo_financeiro['lucro'] ?? 0),
     'pendentes' => (float) ($resumo_financeiro['pendentes'] ?? 0),
 ];
 ?>
@@ -115,7 +116,7 @@ $resumoFinanceiroInicial = [
                     </div>
                 </div>
                 <div class="stat-card-footer">
-                                <a href="<?= base_url('os') ?>"><i class="bi bi-arrow-right me-1"></i>Ver operação</a>
+                                <a href="<?= base_url('os') ?>"><i class="bi bi-arrow-right me-1"></i>Ver operaÃ§Ã£o</a>
                 </div>
             </div>
         </div>
@@ -126,8 +127,8 @@ $resumoFinanceiroInicial = [
             <div class="card glass-card ds-dashboard-main-chart-card">
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
-                        <h5 class="card-title mb-0"><i class="bi bi-graph-up-arrow me-2"></i>OS abertas por mes</h5>
-                            <small class="text-muted">Evolução de janeiro a dezembro de <span id="dashboardAnoRef"><?= $anoDashboard ?></span></small>
+                        <h5 class="card-title mb-0"><i class="bi bi-graph-up-arrow me-2"></i>OS abertas x entregues reparadas por mes</h5>
+                            <small class="text-muted">Comparativo mensal de janeiro a dezembro de <span id="dashboardAnoRef"><?= $anoDashboard ?></span></small>
                     </div>
                     <div class="ds-dashboard-year-filter">
                         <label class="small text-muted mb-0" for="dashboardAnoSelect">Ano</label>
@@ -187,7 +188,7 @@ $resumoFinanceiroInicial = [
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="ds-finance-kpi">
-                                <span>Lucro</span>
+                                <span>Resultado caixa</span>
                                 <strong id="financeLucro">R$ 0,00</strong>
                             </div>
                         </div>
@@ -207,13 +208,13 @@ $resumoFinanceiroInicial = [
         <div class="col-12">
             <div class="card glass-card h-100 ds-dashboard-table-card">
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <h5 class="card-title mb-0"><i class="bi bi-clock-history me-2"></i>Últimas Ordens de Serviço</h5>
+                            <h5 class="card-title mb-0"><i class="bi bi-clock-history me-2"></i>Ãšltimas Ordens de ServiÃ§o</h5>
                     <?php if (can('os', 'criar')): ?>
                         <button
                             type="button"
                             class="btn btn-glow btn-sm"
                             data-os-modal-url="<?= base_url('os/nova?embed=1') ?>"
-                                            data-os-modal-title="Nova Ordem de Serviço"
+                                            data-os-modal-title="Nova Ordem de ServiÃ§o"
                             data-os-open-full-url="<?= base_url('os/nova') ?>"
                         >
                             <i class="bi bi-plus-lg me-1"></i>Nova OS
@@ -230,7 +231,7 @@ $resumoFinanceiroInicial = [
                                     <th>Equipamento</th>
                                     <th>Status</th>
                                     <th>Data</th>
-                                    <th class="text-end">Ação</th>
+                                    <th class="text-end">AÃ§Ã£o</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -246,10 +247,10 @@ $resumoFinanceiroInicial = [
                                         <tr>
                                             <td data-label="No OS"><strong><?= esc($os['numero_os']) ?></strong></td>
                                             <td data-label="Cliente"><?= esc($os['cliente_nome']) ?></td>
-                                            <td data-label="Equipamento"><?= esc(trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))) ?></td>
+                                            <td data-label="Equipamento"><?= esc(equipamento_nome_exibicao($os)) ?></td>
                                             <td data-label="Status"><?= getStatusBadge($os['status']) ?></td>
                                             <td data-label="Data"><?= date('d/m/Y', strtotime($os['created_at'])) ?></td>
-                                        <td data-label="Ação" class="text-end">
+                                        <td data-label="AÃ§Ã£o" class="text-end">
                                                 <button
                                                     type="button"
                                                     class="btn btn-sm btn-outline-secondary"
@@ -289,7 +290,7 @@ $resumoFinanceiroInicial = [
                                         <th>Peca</th>
                                         <th>Qtd. atual</th>
                                         <th>Minimo</th>
-                                    <th class="text-end">Ação</th>
+                                    <th class="text-end">AÃ§Ã£o</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -321,7 +322,7 @@ $resumoFinanceiroInicial = [
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl modal-fullscreen-md-down">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="dashboardOsModalTitle">Ordem de Serviço</h5>
+                    <h5 class="modal-title" id="dashboardOsModalTitle">Ordem de ServiÃ§o</h5>
                     <div class="d-flex align-items-center gap-2 ms-auto">
                         <a href="#" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary d-none" id="dashboardOsModalOpenFull">
                             <i class="bi bi-box-arrow-up-right me-1"></i>Abrir pagina
@@ -367,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const macroLabels = {
         recepcao: 'Recepcao',
         diagnostico: 'Diagnostico',
-        orcamento: 'Orçamento',
+        orcamento: 'OrÃ§amento',
         execucao: 'Execucao',
         interrupcao: 'Interrupcao',
         qualidade: 'Qualidade',
@@ -424,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const data = financeData || {};
         const receitas = Number(data.receitas || 0);
         const despesas = Number(data.despesas || 0);
-        const lucro = Number(data.lucro || 0);
+        const lucro = Number(data.resultado_caixa ?? data.lucro ?? 0);
         const pendentes = Number(data.pendentes || 0);
 
         document.getElementById('financeReceitas').textContent = formatMoney(receitas);
@@ -519,6 +520,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const totals = series.map(function (item) {
             return Number(item.total || 0);
         });
+        const deliveredTotals = series.map(function (item) {
+            return Number(item.entregues_reparadas || 0);
+        });
         const isMobile = isMobileViewport();
         const isNarrowPhone = isNarrowPhoneViewport();
         const isUltraNarrow = isUltraNarrowViewport();
@@ -541,6 +545,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     pointRadius: isMobile ? 2 : 3,
                     pointHoverRadius: isMobile ? 4 : 5,
                     pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointHitRadius: 12,
+                }, {
+                    label: 'OS entregues reparadas',
+                    data: deliveredTotals.length ? deliveredTotals : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    borderColor: '#16a34a',
+                    backgroundColor: 'rgba(22, 163, 74, 0.12)',
+                    fill: false,
+                    tension: 0.35,
+                    pointRadius: isMobile ? 2 : 3,
+                    pointHoverRadius: isMobile ? 4 : 5,
+                    pointBackgroundColor: '#16a34a',
                     pointBorderColor: '#ffffff',
                     pointBorderWidth: 2,
                     pointHitRadius: 12,
@@ -605,7 +622,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const receitas = Number(financeData.receitas || 0);
         const despesas = Number(financeData.despesas || 0);
-        const lucro = Number(financeData.lucro || 0);
+        const lucro = Number(financeData.resultado_caixa ?? financeData.lucro ?? 0);
         const pendentes = Number(financeData.pendentes || 0);
         const data = [receitas, despesas, lucro, pendentes];
         const hasData = data.some(function (value) { return value > 0; });
@@ -613,8 +630,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const isNarrowPhone = isNarrowPhoneViewport();
         const isUltraNarrow = isUltraNarrowViewport();
         const labels = isUltraNarrow
-            ? ['Rec.', 'Desp.', 'Lucro', 'Pend.']
-            : ['Receitas', 'Despesas', 'Lucro', 'Pendentes'];
+            ? ['Rec.', 'Desp.', 'Caixa', 'Pend.']
+            : ['Receitas', 'Despesas', 'Resultado caixa', 'Pendentes'];
 
         if (chartFinanceiro) {
             chartFinanceiro.destroy();
@@ -765,7 +782,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (requestToken !== statsRequestToken) {
                     return;
                 }
-            console.error('[Dashboard] erro ao carregar métricas:', error);
+            console.error('[Dashboard] erro ao carregar mÃ©tricas:', error);
                 lastPayload = {
                     os_abertas_ano: [],
                     macro_count: [],
@@ -840,7 +857,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         clearLoadTimeout();
         setModalLoading(true);
-        modalTitle.textContent = title || 'Ordem de Serviço';
+        modalTitle.textContent = title || 'Ordem de ServiÃ§o';
         modalFrame.src = 'about:blank';
 
         if (fullUrl) {

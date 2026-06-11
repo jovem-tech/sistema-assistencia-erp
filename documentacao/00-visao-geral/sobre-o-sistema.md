@@ -6,7 +6,7 @@
 |---|---|
 | **Nome** | Sistema de Gestao de Assistencia Tecnica |
 | **Nome Comercial** | Jovem Tech ERP |
-| **Versao** | 2.1.0 (Marco 2026) |
+| **Versao** | 2.23.29 |
 | **Tipo** | ERP Web para Assistencia Tecnica |
 | **Ambiente** | XAMPP Local / VPS Ubuntu (Nginx + PHP-FPM) |
 
@@ -21,8 +21,13 @@ Sistema completo de gestao para assistencias tecnicas de eletronicos. Centraliza
 - Estoque de Pecas com movimentacoes
 - Servicos padronizados com valores
 - Financeiro (contas a pagar/receber)
+- Precificacao de pecas e servicos
+- Pacotes de servicos e ofertas comerciais
+- Checklists operacionais da OS
+- Central de Mensagens e automacoes WhatsApp
 - Relatorios gerenciais
 - Controle de acesso por grupos (RBAC)
+- App mobile/PWA como frente paralela de atendimento
 
 ---
 

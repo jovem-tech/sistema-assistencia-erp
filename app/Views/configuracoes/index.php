@@ -60,16 +60,16 @@ if ($enabled && $directProvider === 'api_whats_linux') {
 
 $whatsConfigBadgeClass = $statusOk ? 'bg-success' : 'bg-danger';
 $whatsConfigBadgeText = $statusOk
-    ? ($directProvider === 'menuia' ? 'Credenciais OK' : 'Configuração OK')
+    ? ($directProvider === 'menuia' ? 'Credenciais OK' : 'ConfiguraÃ§Ã£o OK')
     : 'Incompleto';
 
 $realtimeBadgeClass = 'bg-secondary';
-$realtimeBadgeText = 'Não validado';
-$realtimeBadgeTitle = 'Ainda não houve validação de conectividade para o provider atual.';
+$realtimeBadgeText = 'NÃ£o validado';
+$realtimeBadgeTitle = 'Ainda nÃ£o houve validaÃ§Ã£o de conectividade para o provider atual.';
 if (!$enabled) {
     $realtimeBadgeClass = 'bg-secondary';
     $realtimeBadgeText = 'Envio desabilitado';
-    $realtimeBadgeTitle = 'O envio de WhatsApp está desabilitado nas configurações.';
+    $realtimeBadgeTitle = 'O envio de WhatsApp estÃ¡ desabilitado nas configuraÃ§Ãµes.';
 } elseif (in_array($directProvider, ['api_whats_local', 'api_whats_linux'], true)) {
     $realtimeBadgeClass = 'bg-dark';
     $realtimeBadgeText = 'Provider local';
@@ -78,30 +78,30 @@ if (!$enabled) {
     if ($lastCheckStatus === 'success') {
         $realtimeBadgeClass = 'bg-success';
         $realtimeBadgeText = 'Menuia conectada';
-        $realtimeBadgeTitle = trim('Última validação: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
+        $realtimeBadgeTitle = trim('Ãšltima validaÃ§Ã£o: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
     } elseif ($lastCheckStatus === 'error') {
         $realtimeBadgeClass = 'bg-danger';
         $realtimeBadgeText = 'Erro Menuia';
-        $realtimeBadgeTitle = trim('Última validação: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
+        $realtimeBadgeTitle = trim('Ãšltima validaÃ§Ã£o: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
     }
 } elseif ($directProvider === 'menuia' && $statusOk) {
     $realtimeBadgeClass = 'bg-warning text-dark';
-    $realtimeBadgeText = 'Menuia não validada';
-    $realtimeBadgeTitle = 'As credenciais estão preenchidas, mas a conexão ainda não foi validada.';
+    $realtimeBadgeText = 'Menuia nÃ£o validada';
+    $realtimeBadgeTitle = 'As credenciais estÃ£o preenchidas, mas a conexÃ£o ainda nÃ£o foi validada.';
 } elseif ($directProvider === 'evolution' && $lastCheckProvider === 'evolution' && $evolutionStatusMatchesCurrentCredentials) {
     if ($lastCheckStatus === 'success') {
         $realtimeBadgeClass = 'bg-success';
         $realtimeBadgeText = 'Evolution conectada';
-        $realtimeBadgeTitle = trim('Ãšltima validaÃ§Ã£o: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
+        $realtimeBadgeTitle = trim('ÃƒÅ¡ltima validaÃƒÂ§ÃƒÂ£o: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
     } elseif ($lastCheckStatus === 'error') {
         $realtimeBadgeClass = 'bg-danger';
         $realtimeBadgeText = 'Erro Evolution';
-        $realtimeBadgeTitle = trim('Ãšltima validaÃ§Ã£o: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
+        $realtimeBadgeTitle = trim('ÃƒÅ¡ltima validaÃƒÂ§ÃƒÂ£o: ' . $lastCheckAt . ' - ' . $lastCheckMessage);
     }
 } elseif ($directProvider === 'evolution' && $statusOk) {
     $realtimeBadgeClass = 'bg-warning text-dark';
-    $realtimeBadgeText = 'Evolution nÃ£o validada';
-    $realtimeBadgeTitle = 'A URL, API key e instÃ¢ncia foram preenchidas, mas a conexÃ£o ainda nÃ£o foi validada.';
+    $realtimeBadgeText = 'Evolution nÃƒÂ£o validada';
+    $realtimeBadgeTitle = 'A URL, API key e instÃƒÂ¢ncia foram preenchidas, mas a conexÃƒÂ£o ainda nÃƒÂ£o foi validada.';
 } elseif ($directProvider === 'webhook') {
     $realtimeBadgeClass = 'bg-dark';
     $realtimeBadgeText = 'Provider externo';
@@ -119,7 +119,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
 
 <div class="row mb-4">
     <div class="col-12 d-flex justify-content-between align-items-center">
-        <h1 class="h3 mb-0">Configurações</h1>
+        <h1 class="h3 mb-0">ConfiguraÃ§Ãµes</h1>
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('configuracoes')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
@@ -134,7 +134,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
             <ul class="nav nav-tabs mb-4" id="configTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="aparencia-tab" data-bs-toggle="tab" data-bs-target="#tab-aparencia" type="button" role="tab">
-                        <i class="bi bi-palette me-2"></i>Aparência
+                        <i class="bi bi-palette me-2"></i>AparÃªncia
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -144,26 +144,26 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="sessao-tab" data-bs-toggle="tab" data-bs-target="#tab-sessao" type="button" role="tab">
-                        <i class="bi bi-shield-lock me-2"></i>Sessão e Segurança
+                        <i class="bi bi-shield-lock me-2"></i>SessÃ£o e SeguranÃ§a
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="precificacao-tab" data-bs-toggle="tab" data-bs-target="#tab-precificacao" type="button" role="tab">
-                        <i class="bi bi-calculator me-2"></i>Precificação
+                        <i class="bi bi-calculator me-2"></i>PrecificaÃ§Ã£o
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link d-flex align-items-center" id="integracoes-tab" data-bs-toggle="tab" data-bs-target="#tab-integracoes" type="button" role="tab">
-                        <i class="bi bi-whatsapp me-2"></i>Integrações
+                        <i class="bi bi-whatsapp me-2"></i>IntegraÃ§Ãµes
                         <span id="tabBadgeStatus" class="ms-2 badge bg-secondary" style="font-size: 0.65rem;">...</span>
                     </button>
                 </li>
             </ul>
 
             <div class="tab-content" id="configTabsContent">
-                <!-- Aba Aparência -->
+                <!-- Aba AparÃªncia -->
                 <div class="tab-pane fade show active" id="tab-aparencia" role="tabpanel">
-                    <h5 class="mb-3 border-bottom pb-2">Configurações Visuais</h5>
+                    <h5 class="mb-3 border-bottom pb-2">ConfiguraÃ§Ãµes Visuais</h5>
                     <div class="row mb-4">
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-muted">Tema do Sistema <span class="text-danger">*</span></label>
@@ -187,7 +187,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                             <label class="form-label text-muted">Logo de Fundo dos Documentos PDF</label>
                             <input type="file" class="form-control" name="pdf_logo_fundo" accept="image/png">
                             <small class="text-muted d-block mt-1">
-                                Use PNG sem fundo. O arquivo será salvo em <code>public/uploads/sistema</code> e usado como marca d'água em todos os PDFs.
+                                Use PNG sem fundo. O arquivo serÃ¡ salvo em <code>public/uploads/sistema</code> e usado como marca d'Ã¡gua em todos os PDFs.
                             </small>
                             <?php if (!empty($configs['pdf_logo_fundo'])): ?>
                                 <small class="text-muted d-block mt-1">Logo PDF atual: <?= esc($configs['pdf_logo_fundo']) ?></small>
@@ -201,10 +201,10 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                             <?php endif; ?>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Ícone da Aba do Navegador (Favicon)</label>
+                            <label class="form-label text-muted">Ãcone da Aba do Navegador (Favicon)</label>
                             <input type="file" class="form-control" name="sistema_icone" accept="image/png, image/jpeg, image/ico, image/x-icon">
                             <?php if (!empty($configs['sistema_icone'])): ?>
-                                <small class="text-muted d-block mt-1">Ícone atual: <?= esc($configs['sistema_icone']) ?></small>
+                                <small class="text-muted d-block mt-1">Ãcone atual: <?= esc($configs['sistema_icone']) ?></small>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -212,7 +212,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
 
                 <!-- Aba Empresa -->
                 <div class="tab-pane fade" id="tab-empresa" role="tabpanel">
-                    <h5 class="mb-3 border-bottom pb-2">Informações Jurídicas e Contato</h5>
+                    <h5 class="mb-3 border-bottom pb-2">InformaÃ§Ãµes JurÃ­dicas e Contato</h5>
                     <div class="row mb-4">
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-muted">Nome da Empresa</label>
@@ -231,18 +231,18 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                             <input type="email" class="form-control" name="empresa_email" value="<?= esc($configs['empresa_email'] ?? '') ?>">
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label text-muted">Endereço</label>
+                            <label class="form-label text-muted">EndereÃ§o</label>
                             <input type="text" class="form-control" name="empresa_endereco" value="<?= esc($configs['empresa_endereco'] ?? '') ?>">
                         </div>
                     </div>
                 </div>
 
-                <!-- Aba Sessão -->
+                <!-- Aba SessÃ£o -->
                 <div class="tab-pane fade" id="tab-sessao" role="tabpanel">
-                    <h5 class="mb-3 border-bottom pb-2">Sessão e Segurança Operacional</h5>
+                    <h5 class="mb-3 border-bottom pb-2">SessÃ£o e SeguranÃ§a Operacional</h5>
                     <div class="row mb-4">
                         <div class="col-lg-5 col-md-6 mb-3">
-                            <label class="form-label text-muted">Tempo máximo de inatividade (minutos)</label>
+                            <label class="form-label text-muted">Tempo mÃ¡ximo de inatividade (minutos)</label>
                             <input
                                 type="number"
                                 class="form-control"
@@ -253,7 +253,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                                 value="<?= esc($configs['sessao_inatividade_minutos'] ?? '30') ?>"
                             >
                             <small class="text-muted d-block mt-2">
-                                Após esse período sem atividade real, a sessão é encerrada e o sistema avisa claramente antes de o usuário perder tempo tentando salvar formulários.
+                                ApÃ³s esse perÃ­odo sem atividade real, a sessÃ£o Ã© encerrada e o sistema avisa claramente antes de o usuÃ¡rio perder tempo tentando salvar formulÃ¡rios.
                             </small>
                         </div>
                         <div class="col-lg-7 mb-3">
@@ -262,10 +262,10 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                                     <i class="bi bi-info-circle me-1"></i>Como o aviso funciona
                                 </div>
                                 <ul class="mb-0 ps-3">
-                                    <li>O frontend acompanha digitação, cliques, foco e interação com a tela.</li>
-                                    <li>Enquanto houver atividade, um heartbeat discreto mantém a sessão coerente com o timeout configurado.</li>
-                                    <li>Quando a sessão expira, um SweetAlert2 explica o motivo e redireciona para o login.</li>
-                                    <li>Se o usuário entrou com "Lembrar-me", a expiração por inatividade continua ignorada, como no fluxo atual.</li>
+                                    <li>O frontend acompanha digitaÃ§Ã£o, cliques, foco e interaÃ§Ã£o com a tela.</li>
+                                    <li>Enquanto houver atividade, um heartbeat discreto mantÃ©m a sessÃ£o coerente com o timeout configurado.</li>
+                                    <li>Quando a sessÃ£o expira, um SweetAlert2 explica o motivo e redireciona para o login.</li>
+                                    <li>Se o usuÃ¡rio entrou com "Lembrar-me", a expiraÃ§Ã£o por inatividade continua ignorada, como no fluxo atual.</li>
                                 </ul>
                             </div>
                         </div>
@@ -273,7 +273,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                 </div>
 
                 <div class="tab-pane fade" id="tab-precificacao" role="tabpanel">
-                    <h5 class="mb-3 border-bottom pb-2">Precificação de Peça Instalada</h5>
+                    <h5 class="mb-3 border-bottom pb-2">PrecificaÃ§Ã£o de PeÃ§a Instalada</h5>
                     <div class="row mb-4">
                         <div class="col-lg-3 col-md-6 mb-3">
                             <label class="form-label text-muted">Encargos operacionais (%)</label>
@@ -287,7 +287,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                                 value="<?= esc($precificacaoEncargos) ?>"
                             >
                             <small class="text-muted d-block mt-2">
-                                Ex.: mão de obra indireta, risco de garantia, testes e estrutura.
+                                Ex.: mÃ£o de obra indireta, risco de garantia, testes e estrutura.
                             </small>
                         </div>
                         <div class="col-lg-3 col-md-6 mb-3">
@@ -302,44 +302,44 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                                 value="<?= esc($precificacaoMargem) ?>"
                             >
                             <small class="text-muted d-block mt-2">
-                                Margem comercial aplicada após os encargos.
+                                Margem comercial aplicada apÃ³s os encargos.
                             </small>
                         </div>
                         <div class="col-lg-3 col-md-6 mb-3">
-                            <label class="form-label text-muted">Base de cálculo</label>
+                            <label class="form-label text-muted">Base de cÃ¡lculo</label>
                             <select class="form-select" name="precificacao_peca_base">
-                                <option value="custo" <?= $precificacaoBase === 'custo' ? 'selected' : '' ?>>Preço de custo da peça</option>
-                                <option value="venda" <?= $precificacaoBase === 'venda' ? 'selected' : '' ?>>Preço de venda cadastrado</option>
+                                <option value="custo" <?= $precificacaoBase === 'custo' ? 'selected' : '' ?>>PreÃ§o de custo da peÃ§a</option>
+                                <option value="venda" <?= $precificacaoBase === 'venda' ? 'selected' : '' ?>>PreÃ§o de venda cadastrado</option>
                             </select>
                         </div>
                         <div class="col-lg-3 col-md-6 mb-3">
-                            <label class="form-label text-muted">Piso mínimo pelo preço de venda</label>
+                            <label class="form-label text-muted">Piso mÃ­nimo pelo preÃ§o de venda</label>
                             <select class="form-select" name="precificacao_peca_respeitar_preco_venda">
-                                <option value="1" <?= $precificacaoRespeitarVenda ? 'selected' : '' ?>>Sim, nunca abaixo do preço de venda</option>
-                                <option value="0" <?= !$precificacaoRespeitarVenda ? 'selected' : '' ?>>Não, usar somente a fórmula</option>
+                                <option value="1" <?= $precificacaoRespeitarVenda ? 'selected' : '' ?>>Sim, nunca abaixo do preÃ§o de venda</option>
+                                <option value="0" <?= !$precificacaoRespeitarVenda ? 'selected' : '' ?>>NÃ£o, usar somente a fÃ³rmula</option>
                             </select>
                         </div>
                         <div class="col-12">
                             <div class="alert alert-info mb-0">
-                                <div class="fw-semibold mb-2"><i class="bi bi-info-circle me-1"></i>Fórmula aplicada nos itens de peça</div>
+                                <div class="fw-semibold mb-2"><i class="bi bi-info-circle me-1"></i>FÃ³rmula aplicada nos itens de peÃ§a</div>
                                 <p class="mb-2">
                                     Valor recomendado = <strong>base</strong> + encargos + margem.
                                 </p>
                                 <p class="mb-2">
-                                    Exemplo didático: base R$ 100, encargos 15% e margem 45% gera R$ 160,00.
+                                    Exemplo didÃ¡tico: base R$ 100, encargos 15% e margem 45% gera R$ 160,00.
                                 </p>
                                 <p class="mb-0">
-                                    No salvamento de orçamento e OS, o ERP aplica esse valor como piso mínimo da peça instalada e registra os metadados para análise real de mix e margem.
+                                    No salvamento de orÃ§amento e OS, o ERP aplica esse valor como piso mÃ­nimo da peÃ§a instalada e registra os metadados para anÃ¡lise real de mix e margem.
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Aba Integrações -->
+                <!-- Aba IntegraÃ§Ãµes -->
                 <div class="tab-pane fade" id="tab-integracoes" role="tabpanel">
                     <h5 class="mb-3 border-bottom pb-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <span>Configurações WhatsApp</span>
+                        <span>ConfiguraÃ§Ãµes WhatsApp</span>
                         <div class="d-flex gap-2 align-items-center">
                             <span id="whatsRealtimeStatus" class="badge <?= esc($realtimeBadgeClass) ?>" style="cursor: pointer;" title="<?= esc($realtimeBadgeTitle) ?>"><?= esc($realtimeBadgeText) ?></span>
                             <span class="badge <?= esc($whatsConfigBadgeClass) ?>" id="whatsConfigBadge">
@@ -356,7 +356,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                                 <option value="evolution" <?= $directProvider === 'evolution' ? 'selected' : '' ?>>Evolution API</option>
                                 <option value="api_whats_local" <?= $directProvider === 'api_whats_local' ? 'selected' : '' ?>>API Local (Windows)</option>
                                 <option value="api_whats_linux" <?= $directProvider === 'api_whats_linux' ? 'selected' : '' ?>>API Linux (VPS)</option>
-                                <option value="webhook" <?= $directProvider === 'webhook' ? 'selected' : '' ?>>Webhook Genérico</option>
+                                <option value="webhook" <?= $directProvider === 'webhook' ? 'selected' : '' ?>>Webhook GenÃ©rico</option>
                             </select>
                         </div>
                         <div class="col-md-3 mb-3">
@@ -369,7 +369,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                             <label class="form-label text-muted">Envio habilitado</label>
                             <select class="form-select" name="whatsapp_enabled">
                                 <option value="1" <?= ($configs['whatsapp_enabled'] ?? '0') === '1' ? 'selected' : '' ?>>Sim</option>
-                                <option value="0" <?= ($configs['whatsapp_enabled'] ?? '0') !== '1' ? 'selected' : '' ?>>Não</option>
+                                <option value="0" <?= ($configs['whatsapp_enabled'] ?? '0') !== '1' ? 'selected' : '' ?>>NÃ£o</option>
                             </select>
                         </div>
                         <div class="col-md-3 mb-3">
@@ -403,7 +403,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                             <input type="password" class="form-control" name="whatsapp_evolution_apikey" id="whatsapp_evolution_apikey" value="<?= esc($evolutionApiKey) ?>">
                         </div>
                         <div class="col-md-4 mb-3 config-evolution d-none">
-                            <label class="form-label text-muted">InstÃ¢ncia Evolution</label>
+                            <label class="form-label text-muted">InstÃƒÂ¢ncia Evolution</label>
                             <input type="text" class="form-control" name="whatsapp_evolution_instance" id="whatsapp_evolution_instance" value="<?= esc($evolutionInstance) ?>" placeholder="assistencia-jovemtech">
                         </div>
                         <div class="col-md-4 mb-3 config-evolution d-none">
@@ -420,7 +420,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                                     </label>
                                 </div>
                                 <small class="text-muted">
-                                    Configure a Evolution como camada oficial de transporte do WhatsApp. Os eventos inbound e outbound podem alimentar a central do ERP e o n8n sem perder o histÃ³rico quando o atendente responder pelo app oficial.
+                                    Configure a Evolution como camada oficial de transporte do WhatsApp. Os eventos inbound e outbound podem alimentar a central do ERP e o n8n sem perder o histÃƒÂ³rico quando o atendente responder pelo app oficial.
                                 </small>
                             </div>
                         </div>
@@ -478,7 +478,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                             <input type="text" class="form-control" name="whatsapp_webhook_url" id="whatsapp_webhook_url" value="<?= esc($configs['whatsapp_webhook_url'] ?? '') ?>">
                         </div>
                         <div class="col-md-4 mb-3 config-webhook d-none">
-                            <label class="form-label text-muted">Método</label>
+                            <label class="form-label text-muted">MÃ©todo</label>
                             <select class="form-select" name="whatsapp_webhook_method" id="whatsapp_webhook_method">
                                 <option value="POST" <?= ($configs['whatsapp_webhook_method'] ?? 'POST') === 'POST' ? 'selected' : '' ?>>POST</option>
                                 <option value="GET" <?= ($configs['whatsapp_webhook_method'] ?? 'POST') === 'GET' ? 'selected' : '' ?>>GET</option>
@@ -495,9 +495,9 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                         </div>
 
                         <div class="col-12 d-flex flex-wrap gap-2">
-                            <button type="button" class="btn btn-outline-primary" id="btnTestarConexaoWhats">Testar conexão</button>
+                            <button type="button" class="btn btn-outline-primary" id="btnTestarConexaoWhats">Testar conexÃ£o</button>
                             <button type="button" class="btn btn-outline-success" id="btnEnviarTesteWhats">Enviar mensagem de teste</button>
-                            <button type="button" class="btn btn-outline-warning" id="btnSelfCheckInboundWhats" title="Válida automaticamente status do gateway, token do webhook, URL inbound e alinhamento de origem ERP."><i class="bi bi-shield-check me-1"></i>Self-check inbound</button>
+                            <button type="button" class="btn btn-outline-warning" id="btnSelfCheckInboundWhats" title="VÃ¡lida automaticamente status do gateway, token do webhook, URL inbound e alinhamento de origem ERP."><i class="bi bi-shield-check me-1"></i>Self-check inbound</button>
                         </div>
                         <div class="col-12">
                             <small class="text-muted d-block mt-1">
@@ -510,8 +510,8 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                     <hr class="my-4">
 
                     <h5 class="mb-3 border-bottom pb-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <span>Configurações de E-mail (SMTP)</span>
-                        <span class="badge bg-secondary">Orçamentos + Recuperação de Senha</span>
+                        <span>ConfiguraÃ§Ãµes de E-mail (SMTP)</span>
+                        <span class="badge bg-secondary">OrÃ§amentos + RecuperaÃ§Ã£o de Senha</span>
                     </h5>
 
                     <div class="row mb-4">
@@ -539,7 +539,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Usuário SMTP</label>
+                            <label class="form-label text-muted">UsuÃ¡rio SMTP</label>
                             <input type="text" class="form-control" name="smtp_user" id="smtp_user" value="<?= esc($configs['smtp_user'] ?? '') ?>" placeholder="usuario@dominio.com">
                         </div>
                         <div class="col-md-6 mb-3">
@@ -550,11 +550,11 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-muted">E-mail remetente</label>
                             <input type="email" class="form-control" name="smtp_from_email" id="smtp_from_email" value="<?= esc($configs['smtp_from_email'] ?? '') ?>" placeholder="orcamentos@dominio.com">
-                            <small class="text-muted d-block mt-1">Opcional. Se ficar vazio, o ERP tenta usar `Empresa -> Email` e depois `Usuário SMTP`.</small>
+                            <small class="text-muted d-block mt-1">Opcional. Se ficar vazio, o ERP tenta usar `Empresa -> Email` e depois `UsuÃ¡rio SMTP`.</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-muted">Nome do remetente</label>
-                            <input type="text" class="form-control" name="smtp_from_name" id="smtp_from_name" value="<?= esc($configs['smtp_from_name'] ?? '') ?>" placeholder="Assistência Técnica">
+                            <input type="text" class="form-control" name="smtp_from_name" id="smtp_from_name" value="<?= esc($configs['smtp_from_name'] ?? '') ?>" placeholder="AssistÃªncia TÃ©cnica">
                             <small class="text-muted d-block mt-1">Opcional. Se ficar vazio, o ERP usa `Empresa -> Nome da Empresa`.</small>
                         </div>
 
@@ -562,8 +562,8 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                             <div class="alert alert-info mb-0 h-100">
                                 <div class="fw-semibold mb-2"><i class="bi bi-envelope-check me-1"></i>Como o ERP usa este canal</div>
                                 <ul class="mb-0 ps-3">
-                                    <li>Envio do orçamento por e-mail direto na tela do orçamento.</li>
-                                    <li>Recuperação de senha para usuários do sistema.</li>
+                                    <li>Envio do orÃ§amento por e-mail direto na tela do orÃ§amento.</li>
+                                    <li>RecuperaÃ§Ã£o de senha para usuÃ¡rios do sistema.</li>
                                     <li>Teste manual para validar host, porta, criptografia e remetente antes de operar.</li>
                                 </ul>
                             </div>
@@ -610,17 +610,17 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                             <span class="small text-muted">Status:</span>
                             <span id="gatewayStatusBadge" class="badge text-bg-secondary">-</span>
                         </div>
-                        <small class="text-muted">Última verificação: <span id="gatewayLastCheck">-</span></small>
+                        <small class="text-muted">Ãšltima verificaÃ§Ã£o: <span id="gatewayLastCheck">-</span></small>
                     </div>
 
                     <div class="row g-3 align-items-start">
                         <div class="col-lg-5 text-center">
-                            <p class="small text-muted mb-2">QR Code para autenticação</p>
+                            <p class="small text-muted mb-2">QR Code para autenticaÃ§Ã£o</p>
                             <div class="bg-light p-3 rounded border mx-auto" style="width:256px;height:256px;display:flex;align-items:center;justify-content:center;">
                                 <img id="localQrImage" src="" alt="QR" class="img-fluid d-none">
                                 <div id="localQrPlaceholder" class="text-muted small px-2">Aguardando QR Code...</div>
                             </div>
-                            <small id="gatewayQrHint" class="text-muted d-block mt-2">Escaneie o QR no WhatsApp para manter sessão ativa.</small>
+                            <small id="gatewayQrHint" class="text-muted d-block mt-2">Escaneie o QR no WhatsApp para manter sessÃ£o ativa.</small>
                         </div>
                         <div class="col-lg-7">
                             <div class="border rounded p-3 bg-light-subtle small">
@@ -629,7 +629,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                                     <strong id="gatewayAccountName">-</strong>
                                 </div>
                                 <div class="d-flex justify-content-between mt-1">
-                                    <span class="text-muted">Número:</span>
+                                    <span class="text-muted">NÃºmero:</span>
                                     <span id="gatewayAccountNumber">-</span>
                                 </div>
                                 <div class="d-flex justify-content-between mt-1">
@@ -638,15 +638,15 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                                 </div>
                                 <hr class="my-2">
                                 <div class="d-flex justify-content-between mt-1">
-                                    <span class="text-muted">Último ready:</span>
+                                    <span class="text-muted">Ãšltimo ready:</span>
                                     <span id="gatewayLastReady">-</span>
                                 </div>
                                 <div class="d-flex justify-content-between mt-1">
-                                    <span class="text-muted">Último erro:</span>
+                                    <span class="text-muted">Ãšltimo erro:</span>
                                     <span id="gatewayLastError">-</span>
                                 </div>
                                 <div class="d-flex justify-content-between mt-1">
-                                    <span class="text-muted">Sessão:</span>
+                                    <span class="text-muted">SessÃ£o:</span>
                                     <span id="gatewaySessionPath">-</span>
                                 </div>
                             </div>
@@ -660,13 +660,13 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                     <i class="bi bi-arrow-repeat me-1"></i>Atualizar status
                 </button>
                 <button type="button" class="btn btn-outline-danger d-none" id="btnLogoutLocal">
-                    <i class="bi bi-person-x me-1"></i>Desconectar / Trocar Número
+                    <i class="bi bi-person-x me-1"></i>Desconectar / Trocar NÃºmero
                 </button>
                 <button type="button" class="btn btn-success d-none" id="btnStartLocal">
                     <i class="bi bi-play-fill me-1"></i>Iniciar Servidor
                 </button>
                 <button type="button" class="btn btn-outline-warning" id="btnRestartLocal">
-                    <i class="bi bi-bootstrap-reboot me-1"></i>Reiniciar Inicialização
+                    <i class="bi bi-bootstrap-reboot me-1"></i>Reiniciar InicializaÃ§Ã£o
                 </button>
                 <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Fechar</button>
             </div>
@@ -706,7 +706,29 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
     };
     const emailTestUrl = '<?= base_url('configuracoes/email/enviar-teste') ?>';
 
-    const fireSwal = (opts) => window.DSFeedback.fire(opts || {});
+    const fireSwal = async (opts) => {
+        const activeElement = document.activeElement;
+        const shouldRestoreModalFocus = Boolean(modalEl?.contains(activeElement));
+        if (shouldRestoreModalFocus && typeof activeElement?.blur === 'function') {
+            activeElement.blur();
+        }
+
+        const result = await window.DSFeedback.fire({
+            returnFocus: false,
+            ...(opts || {}),
+        });
+
+        if (shouldRestoreModalFocus && modalEl?.classList.contains('show')) {
+            window.setTimeout(() => {
+                const focusTarget = modalEl.querySelector('[data-bs-dismiss="modal"], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href], [tabindex]:not([tabindex="-1"])');
+                if (typeof focusTarget?.focus === 'function') {
+                    focusTarget.focus({ preventScroll: true });
+                }
+            }, 40);
+        }
+
+        return result;
+    };
     const getCsrf = () => ({ name: 'csrf_test_name', value: (document.cookie.match(/(?:^|;\s*)csrf_cookie_name=([^;]+)/)?.[1] || '') });
     const byId = (id) => document.getElementById(id);
 
@@ -771,7 +793,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                 return 'https://chatbot.menuia.com/api';
             }
         } catch (error) {
-            // Mantém a tentativa original e deixa a validação do provider apontar o erro.
+            // MantÃ©m a tentativa original e deixa a validaÃ§Ã£o do provider apontar o erro.
         }
 
         if (!/\/api$/i.test(normalized)) {
@@ -832,20 +854,20 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
         if (provider === 'menuia') {
             setSimpleBadge(whatsConfigBadge, menuiaConfigOk ? 'bg-success' : 'bg-danger', menuiaConfigOk ? 'Credenciais OK' : 'Incompleto');
             if (!providerState.enabled) {
-                setSimpleBadge(whatsRealtimeStatus, 'bg-secondary', 'Envio desabilitado', 'O envio de WhatsApp está desabilitado nas configurações.');
+                setSimpleBadge(whatsRealtimeStatus, 'bg-secondary', 'Envio desabilitado', 'O envio de WhatsApp estÃ¡ desabilitado nas configuraÃ§Ãµes.');
                 setSimpleBadge(tabBadgeStatus, 'bg-secondary', 'Envio desabilitado');
                 return;
             }
 
             if (menuiaValidatedForCurrentConfig && providerState.status === 'success') {
-                const title = [providerState.checkedAt ? `Última validação: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
+                const title = [providerState.checkedAt ? `Ãšltima validaÃ§Ã£o: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
                 setSimpleBadge(whatsRealtimeStatus, 'bg-success', 'Menuia conectada', title);
                 setSimpleBadge(tabBadgeStatus, 'bg-success', 'Menuia conectada');
                 return;
             }
 
             if (menuiaValidatedForCurrentConfig && providerState.status === 'error') {
-                const title = [providerState.checkedAt ? `Última validação: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
+                const title = [providerState.checkedAt ? `Ãšltima validaÃ§Ã£o: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
                 setSimpleBadge(whatsRealtimeStatus, 'bg-danger', 'Erro Menuia', title);
                 setSimpleBadge(tabBadgeStatus, 'bg-danger', 'Erro Menuia');
                 return;
@@ -854,32 +876,32 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
             setSimpleBadge(
                 whatsRealtimeStatus,
                 menuiaConfigOk ? 'bg-warning text-dark' : 'bg-secondary',
-                menuiaConfigOk ? 'Menuia não validada' : 'Menuia incompleta',
+                menuiaConfigOk ? 'Menuia nÃ£o validada' : 'Menuia incompleta',
                 menuiaConfigOk
-                    ? 'As credenciais estão preenchidas, mas a conexão ainda não foi validada.'
-                    : 'Preencha URL, Appkey e Authkey para testar a conexão.'
+                    ? 'As credenciais estÃ£o preenchidas, mas a conexÃ£o ainda nÃ£o foi validada.'
+                    : 'Preencha URL, Appkey e Authkey para testar a conexÃ£o.'
             );
-            setSimpleBadge(tabBadgeStatus, menuiaConfigOk ? 'bg-warning text-dark' : 'bg-secondary', menuiaConfigOk ? 'Não validada' : 'Incompleta');
+            setSimpleBadge(tabBadgeStatus, menuiaConfigOk ? 'bg-warning text-dark' : 'bg-secondary', menuiaConfigOk ? 'NÃ£o validada' : 'Incompleta');
             return;
         }
 
         if (provider === 'evolution') {
             setSimpleBadge(whatsConfigBadge, evolutionConfigOk ? 'bg-success' : 'bg-danger', evolutionConfigOk ? 'Credenciais OK' : 'Incompleto');
             if (!providerState.enabled) {
-                setSimpleBadge(whatsRealtimeStatus, 'bg-secondary', 'Envio desabilitado', 'O envio de WhatsApp estÃ¡ desabilitado nas configuraÃ§Ãµes.');
+                setSimpleBadge(whatsRealtimeStatus, 'bg-secondary', 'Envio desabilitado', 'O envio de WhatsApp estÃƒÂ¡ desabilitado nas configuraÃƒÂ§ÃƒÂµes.');
                 setSimpleBadge(tabBadgeStatus, 'bg-secondary', 'Envio desabilitado');
                 return;
             }
 
             if (evolutionValidatedForCurrentConfig && providerState.status === 'success') {
-                const title = [providerState.checkedAt ? `Ãšltima validaÃ§Ã£o: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
+                const title = [providerState.checkedAt ? `ÃƒÅ¡ltima validaÃƒÂ§ÃƒÂ£o: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
                 setSimpleBadge(whatsRealtimeStatus, 'bg-success', 'Evolution conectada', title);
                 setSimpleBadge(tabBadgeStatus, 'bg-success', 'Evolution conectada');
                 return;
             }
 
             if (evolutionValidatedForCurrentConfig && providerState.status === 'error') {
-                const title = [providerState.checkedAt ? `Ãšltima validaÃ§Ã£o: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
+                const title = [providerState.checkedAt ? `ÃƒÅ¡ltima validaÃƒÂ§ÃƒÂ£o: ${providerState.checkedAt}` : '', providerState.message || ''].filter(Boolean).join(' - ');
                 setSimpleBadge(whatsRealtimeStatus, 'bg-danger', 'Erro Evolution', title);
                 setSimpleBadge(tabBadgeStatus, 'bg-danger', 'Erro Evolution');
                 return;
@@ -888,26 +910,26 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
             setSimpleBadge(
                 whatsRealtimeStatus,
                 evolutionConfigOk ? 'bg-warning text-dark' : 'bg-secondary',
-                evolutionConfigOk ? 'Evolution nÃ£o validada' : 'Evolution incompleta',
+                evolutionConfigOk ? 'Evolution nÃƒÂ£o validada' : 'Evolution incompleta',
                 evolutionConfigOk
-                    ? 'A URL, API key e instÃ¢ncia foram preenchidas, mas a conexÃ£o ainda nÃ£o foi validada.'
-                    : 'Preencha URL, API key e instÃ¢ncia para testar a conexÃ£o.'
+                    ? 'A URL, API key e instÃƒÂ¢ncia foram preenchidas, mas a conexÃƒÂ£o ainda nÃƒÂ£o foi validada.'
+                    : 'Preencha URL, API key e instÃƒÂ¢ncia para testar a conexÃƒÂ£o.'
             );
-            setSimpleBadge(tabBadgeStatus, evolutionConfigOk ? 'bg-warning text-dark' : 'bg-secondary', evolutionConfigOk ? 'NÃ£o validada' : 'Incompleta');
+            setSimpleBadge(tabBadgeStatus, evolutionConfigOk ? 'bg-warning text-dark' : 'bg-secondary', evolutionConfigOk ? 'NÃƒÂ£o validada' : 'Incompleta');
             return;
         }
 
         if (provider === 'webhook') {
             setSimpleBadge(whatsRealtimeStatus, 'bg-dark', 'Provider externo', 'Webhook externo selecionado.');
             setSimpleBadge(tabBadgeStatus, 'bg-dark', 'Provider externo');
-            setSimpleBadge(whatsConfigBadge, webhookConfigOk ? 'bg-success' : 'bg-danger', webhookConfigOk ? 'Configuração OK' : 'Incompleto');
+            setSimpleBadge(whatsConfigBadge, webhookConfigOk ? 'bg-success' : 'bg-danger', webhookConfigOk ? 'ConfiguraÃ§Ã£o OK' : 'Incompleto');
             return;
         }
 
         setSimpleBadge(whatsRealtimeStatus, 'bg-dark', 'Provider local', 'Clique para gerenciar o gateway local.');
         setSimpleBadge(tabBadgeStatus, 'bg-dark', 'Provider local');
         const currentLocalConfigOk = provider === 'api_whats_linux' ? linuxConfigOk : localConfigOk;
-        setSimpleBadge(whatsConfigBadge, currentLocalConfigOk ? 'bg-success' : 'bg-danger', currentLocalConfigOk ? 'Configuração OK' : 'Incompleto');
+        setSimpleBadge(whatsConfigBadge, currentLocalConfigOk ? 'bg-success' : 'bg-danger', currentLocalConfigOk ? 'ConfiguraÃ§Ã£o OK' : 'Incompleto');
     };
 
     selectProvider?.addEventListener('change', () => {
@@ -971,7 +993,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
         if (!emailDestino) {
             await fireSwal({
                 icon: 'warning',
-                title: 'E-mail de teste obrigatório',
+                title: 'E-mail de teste obrigatÃ³rio',
                 text: 'Informe um e-mail de destino para validar o canal SMTP.',
             });
             smtpTestEmailInput?.focus();
@@ -1001,11 +1023,11 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                 text: data.message || 'O ERP conseguiu processar o envio de teste.',
             });
         } catch (error) {
-            const detalhe = error?.payload?.error ? ` Detalhe técnico: ${error.payload.error}` : '';
+            const detalhe = error?.payload?.error ? ` Detalhe tÃ©cnico: ${error.payload.error}` : '';
             await fireSwal({
                 icon: 'error',
                 title: 'Falha no e-mail de teste',
-                text: `${error.message || 'Não foi possível enviar o e-mail de teste.'}${detalhe}`,
+                text: `${error.message || 'NÃ£o foi possÃ­vel enviar o e-mail de teste.'}${detalhe}`,
             });
         } finally {
             btnSendEmailTest.disabled = false;
@@ -1021,7 +1043,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
             const data = await postJson('<?= base_url('configuracoes/whatsapp/testar-conexao') ?>', providerPayload());
             providerState.provider = selectProvider?.value || 'menuia';
             providerState.status = 'success';
-            providerState.message = data.message || 'Conexão validada com sucesso.';
+            providerState.message = data.message || 'ConexÃ£o validada com sucesso.';
             providerState.checkedAt = new Date().toLocaleString('pt-BR');
             providerState.signature = providerState.provider === 'evolution'
                 ? buildEvolutionSignature(
@@ -1035,11 +1057,11 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                     document.getElementById('whatsapp_menuia_authkey')?.value || ''
                 );
             refreshExternalProviderBadges();
-            await fireSwal({ icon: 'success', title: 'Conexão validada', text: data.message || 'OK' });
+            await fireSwal({ icon: 'success', title: 'ConexÃ£o validada', text: data.message || 'OK' });
         } catch (error) {
             providerState.provider = selectProvider?.value || 'menuia';
             providerState.status = 'error';
-            providerState.message = error.message || 'Falha na validação do provider.';
+            providerState.message = error.message || 'Falha na validaÃ§Ã£o do provider.';
             providerState.checkedAt = new Date().toLocaleString('pt-BR');
             providerState.signature = providerState.provider === 'evolution'
                 ? buildEvolutionSignature(
@@ -1053,7 +1075,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                     document.getElementById('whatsapp_menuia_authkey')?.value || ''
                 );
             refreshExternalProviderBadges();
-            await fireSwal({ icon: 'error', title: 'Falha na conexão', text: error.message || 'Erro' });
+            await fireSwal({ icon: 'error', title: 'Falha na conexÃ£o', text: error.message || 'Erro' });
         } finally {
             btnTestConn.disabled = false;
             btnTestConn.innerHTML = originalHtml;
@@ -1063,13 +1085,13 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
     btnSendTest?.addEventListener('click', async () => {
         const phone = (byId('whatsapp_test_phone')?.value || '').trim();
         if (!phone) {
-            await fireSwal({ icon: 'warning', title: 'Telefone obrigatório', text: 'Informe o telefone de teste.' });
+            await fireSwal({ icon: 'warning', title: 'Telefone obrigatÃ³rio', text: 'Informe o telefone de teste.' });
             return;
         }
         const dataPrompt = (window.Swal && typeof window.Swal.fire === 'function')
-            ? await window.Swal.fire({ title: 'Mensagem de teste', input: 'textarea', showCancelButton: true, confirmButtonText: 'Enviar', cancelButtonText: 'Cancelar', inputValue: '[Teste de integração] Mensagem de teste enviada pelo ERP.' })
-            : { isConfirmed: true, value: '[Teste de integração] Mensagem de teste enviada pelo ERP.' };
-        
+            ? await window.Swal.fire({ title: 'Mensagem de teste', input: 'textarea', showCancelButton: true, confirmButtonText: 'Enviar', cancelButtonText: 'Cancelar', inputValue: '[Teste de integraÃ§Ã£o] Mensagem de teste enviada pelo ERP.' })
+            : { isConfirmed: true, value: '[Teste de integraÃ§Ã£o] Mensagem de teste enviada pelo ERP.' };
+
         if (!dataPrompt?.isConfirmed) return;
 
         const originalHtml = btnSendTest.innerHTML;
@@ -1091,7 +1113,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
         if (!['api_whats_local', 'api_whats_linux'].includes(provider)) {
             await fireSwal({
                 icon: 'warning',
-                title: 'Provider não compativel',
+                title: 'Provider nÃ£o compativel',
                 text: 'O self-check inbound exige API Local (Windows) ou API Linux (VPS).',
             });
             return;
@@ -1156,7 +1178,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
             await fireSwal({
                 icon: 'error',
                 title: 'Self-check inbound falhou',
-                html: `<div>${error.message || 'Falha na validação inbound.'}</div>${detailsHtml}`,
+                html: `<div>${error.message || 'Falha na validaÃ§Ã£o inbound.'}</div>${detailsHtml}`,
             });
         } finally {
             btnSelfCheckInbound.disabled = false;
@@ -1180,7 +1202,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
         const target = isGlobal ? whatsRealtimeStatus : gatewayStatusBadge;
         const navTabBadge = document.getElementById('tabBadgeStatus');
         if (!target) return;
-        
+
         const key = String(status || 'unknown').toLowerCase();
         const map = {
             connected: { cls: 'text-bg-success', label: 'Conectado', icon: 'bi-check-circle-fill' },
@@ -1189,12 +1211,12 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
             disconnected: { cls: 'text-bg-secondary', label: 'Desconectado', icon: 'bi-x-circle' },
             restarting: { cls: 'text-bg-primary', label: 'Reiniciando', icon: 'bi-arrow-repeat spin' },
             starting: { cls: 'text-bg-primary', label: 'Inicializando', icon: 'bi-hourglass-split' },
-            auth_failure: { cls: 'text-bg-danger', label: 'Falha de autenticação', icon: 'bi-exclamation-triangle' },
-            gateway_unreachable: { cls: 'text-bg-danger', label: 'Offline / Inacessível', icon: 'bi-plug' },
+            auth_failure: { cls: 'text-bg-danger', label: 'Falha de autenticaÃ§Ã£o', icon: 'bi-exclamation-triangle' },
+            gateway_unreachable: { cls: 'text-bg-danger', label: 'Offline / InacessÃ­vel', icon: 'bi-plug' },
             error: { cls: 'text-bg-danger', label: 'Erro', icon: 'bi-bug' },
         };
         const cfg = map[key] || { cls: 'text-bg-dark', label: status || 'desconhecido', icon: 'bi-question-circle' };
-        
+
         if (isGlobal) {
             target.className = 'badge ' + (cfg.cls.replace('text-bg-', 'bg-'));
             if (navTabBadge) {
@@ -1233,14 +1255,14 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
         const data = statusPayload?.data || {};
         const account = data?.account || {};
         const success = !!statusPayload?.success;
-        
+
         setPanelState();
         setGatewayStatusBadge(status);
-        
-        // Só mostramos erro se houver uma mensagem de erro real ou se a query falhou
+
+        // SÃ³ mostramos erro se houver uma mensagem de erro real ou se a query falhou
         let errorMsg = data?.last_error_message || '';
         if (!errorMsg && !success) {
-            errorMsg = statusPayload?.message || 'Gateway inacessível';
+            errorMsg = statusPayload?.message || 'Gateway inacessÃ­vel';
         }
         setGatewayError(errorMsg, !success || !!data?.last_error_message);
 
@@ -1265,13 +1287,13 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
 
         if (status === 'connected') {
             btnLogout?.classList.remove('d-none');
-            clearQr('Conectado. QR não necessário.');
+            clearQr('Conectado. QR nÃ£o necessÃ¡rio.');
             if (localQrImage) {
                 localQrImage.src = '<?= base_url('assets/img/sistema/whatsapp_connected_success.png') ?>';
                 localQrImage.classList.remove('d-none');
             }
             if (localQrPlaceholder) localQrPlaceholder.classList.add('d-none');
-            if (gatewayQrHint) gatewayQrHint.textContent = 'Sessão ativa e pronta para envio.';
+            if (gatewayQrHint) gatewayQrHint.textContent = 'SessÃ£o ativa e pronta para envio.';
         } else {
             btnLogout?.classList.add('d-none');
             if (hasQr && localQrImage && localQrPlaceholder) {
@@ -1280,21 +1302,21 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                 localQrPlaceholder.classList.add('d-none');
                 if (gatewayQrHint) gatewayQrHint.textContent = 'Escaneie o QR Code para autenticar o WhatsApp.';
             } else {
-                clearQr('QR indisponível no momento. Aguarde ou reinicie.');
-                if (gatewayQrHint) gatewayQrHint.textContent = 'Se o QR demorar, use Reiniciar Inicialização.';
+                clearQr('QR indisponÃ­vel no momento. Aguarde ou reinicie.');
+                if (gatewayQrHint) gatewayQrHint.textContent = 'Se o QR demorar, use Reiniciar InicializaÃ§Ã£o.';
             }
         }
 
-        // Resetar estados de carregamento manuais se o status for estável
+        // Resetar estados de carregamento manuais se o status for estÃ¡vel
         const stableStatuses = ['connected', 'awaiting_qr', 'disconnected', 'gateway_unreachable', 'error', 'auth_failure'];
         if (stableStatuses.includes(status)) {
             if (btnRestart && btnRestart.disabled) {
                 btnRestart.disabled = false;
-                btnRestart.innerHTML = '<i class="bi bi-bootstrap-reboot me-1"></i>Reiniciar Inicialização';
+                btnRestart.innerHTML = '<i class="bi bi-bootstrap-reboot me-1"></i>Reiniciar InicializaÃ§Ã£o';
             }
             if (btnLogout && btnLogout.disabled) {
                 btnLogout.disabled = false;
-                btnLogout.innerHTML = '<i class="bi bi-person-x me-1"></i>Desconectar / Trocar Número';
+                btnLogout.innerHTML = '<i class="bi bi-person-x me-1"></i>Desconectar / Trocar NÃºmero';
             }
             if (btnStart && btnStart.disabled) {
                 btnStart.disabled = false;
@@ -1314,7 +1336,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                 setPanelState();
                 setGatewayStatusBadge(statusPayload?.status || 'gateway_unreachable');
                 setGatewayError(statusPayload?.message || 'Falha ao consultar status do gateway.');
-                clearQr('Servidor inacessível.');
+                clearQr('Servidor inacessÃ­vel.');
                 if (gatewayQrHint) gatewayQrHint.textContent = 'Verifique URL/token/origem do gateway.';
                 updateButtons('gateway_unreachable');
                 return;
@@ -1327,16 +1349,16 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
                 if (q.ok && qrPayload?.success) {
                     setGatewayError('');
                 } else if (statusPayload?.status === 'awaiting_qr') {
-                    setGatewayError(qrPayload?.message || statusPayload?.message || 'QR ainda não gerado.');
+                    setGatewayError(qrPayload?.message || statusPayload?.message || 'QR ainda nÃ£o gerado.');
                 }
             }
             applyGatewayData(statusPayload, qrPayload);
         } catch (e) {
             setPanelState();
             setGatewayStatusBadge('gateway_unreachable');
-            setGatewayError(e?.message || 'Servidor do gateway inacessível.');
-            clearQr('Servidor inacessível.');
-            if (gatewayQrHint) gatewayQrHint.textContent = 'Confirme processo Node em execução e token correto.';
+            setGatewayError(e?.message || 'Servidor do gateway inacessÃ­vel.');
+            clearQr('Servidor inacessÃ­vel.');
+            if (gatewayQrHint) gatewayQrHint.textContent = 'Confirme processo Node em execuÃ§Ã£o e token correto.';
             updateButtons('gateway_unreachable');
             setGatewayStatusBadge('gateway_unreachable', true);
         }
@@ -1391,7 +1413,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
     btnRestart?.addEventListener('click', async () => {
         const conf = await fireSwal({
             title: 'Reiniciar Gateway?',
-            text: 'Deseja apenas reiniciar o processo ou também zerar os arquivos de sessão (limpeza profunda)? Zerar a sessão exigirá uma nova leitura de QR Code.',
+            text: 'Deseja apenas reiniciar o processo ou tambÃ©m zerar os arquivos de sessÃ£o (limpeza profunda)? Zerar a sessÃ£o exigirÃ¡ uma nova leitura de QR Code.',
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Limpeza Profunda (Zerar)',
@@ -1408,7 +1430,7 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
         // Note: Swal fire results: isConfirmed (confirmButton), isDenied (denyButton), isDismissed (cancelButton)
         // Wait, default Swal logic: isConfirmed=true (confirm), isDismissed=true e dismiss='cancel' (cancel), isDenied=true (deny)
         // Re-adjusting for clarity:
-        
+
         let cleanParam = false;
         if (conf.isConfirmed) cleanParam = true;  // Limpeza profunda
         else if (conf.isDismissed && conf.dismiss === 'cancel') cleanParam = false; // Apenas reiniciar
@@ -1423,16 +1445,16 @@ $precificacaoRespeitarVenda = (string) ($configs['precificacao_peca_respeitar_pr
             setGatewayError('');
             setTimeout(fetchStatus, 3000);
         } catch (error) {
-            await fireSwal({ icon: 'error', title: 'Falha no reinício', text: error.message || 'Erro ao reiniciar' });
+            await fireSwal({ icon: 'error', title: 'Falha no reinÃ­cio', text: error.message || 'Erro ao reiniciar' });
             btnRestart.disabled = false;
             btnRestart.innerHTML = originalHtml;
         }
     });
 
     btnLogout?.addEventListener('click', async () => {
-        const conf = await fireSwal({ title: 'Desconectar WhatsApp?', text: 'Isso irá encerrar a sessão atual e gerar um novo QR Code para vincular outro número. Tem certeza?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim, desconectar', cancelButtonText: 'Não' });
+        const conf = await fireSwal({ title: 'Desconectar WhatsApp?', text: 'Isso irÃ¡ encerrar a sessÃ£o atual e gerar um novo QR Code para vincular outro nÃºmero. Tem certeza?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim, desconectar', cancelButtonText: 'NÃ£o' });
         if (!conf.isConfirmed) return;
-        
+
         const originalHtml = btnLogout.innerHTML;
         try {
             btnLogout.disabled = true;

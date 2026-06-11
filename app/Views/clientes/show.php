@@ -1,6 +1,10 @@
 <?= $this->extend($layout ?? 'layouts/main') ?>
 
 <?= $this->section('content') ?>
+<?php
+$canViewCrm = function_exists('can') ? can('crm', 'visualizar') : true;
+$canViewWhatsapp = function_exists('can') ? can('atendimento_whatsapp', 'visualizar') : true;
+?>
 
 <div class="page-header">
     <h2><i class="bi bi-person me-2"></i><?= esc($cliente['nome_razao']) ?></h2>
@@ -31,7 +35,7 @@
             <div class="card-body">
                 <div class="detail-group">
                     <div class="detail-label">Tipo</div>
-                    <div class="detail-value"><?= $cliente['tipo_pessoa'] === 'fisica' ? 'Pessoa Física' : 'Pessoa Jurídica' ?></div>
+                    <div class="detail-value"><?= $cliente['tipo_pessoa'] === 'fisica' ? 'Pessoa FÃ­sica' : 'Pessoa JurÃ­dica' ?></div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">CPF/CNPJ</div>
@@ -49,13 +53,13 @@
                 <div class="detail-group">
                     <div class="detail-label">Contato Adicional</div>
                     <div class="detail-value">
-                        <?= esc($cliente['nome_contato'] ?? '') ?> 
+                        <?= esc($cliente['nome_contato'] ?? '') ?>
                         <?= !empty($cliente['telefone_contato']) ? ' - ' . esc($cliente['telefone_contato']) : '' ?>
                     </div>
                 </div>
                 <?php endif; ?>
                 <div class="detail-group">
-                    <div class="detail-label">Endereço</div>
+                    <div class="detail-label">EndereÃ§o</div>
                     <div class="detail-value">
                         <?= esc(($cliente['endereco'] ?? '') . ($cliente['numero'] ? ', ' . $cliente['numero'] : '')) ?>
                         <?= $cliente['complemento'] ? ' - ' . esc($cliente['complemento']) : '' ?><br>
@@ -65,7 +69,7 @@
                 </div>
                 <?php if (!empty($cliente['observacoes'])): ?>
                 <div class="detail-group">
-                    <div class="detail-label">Observações</div>
+                    <div class="detail-label">ObservaÃ§Ãµes</div>
                     <div class="detail-value"><?= nl2br(esc($cliente['observacoes'])) ?></div>
                 </div>
                 <?php endif; ?>
@@ -81,7 +85,7 @@
     <div class="col-md-8">
         <div class="card glass-card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0"><i class="bi bi-clipboard-check me-2"></i>Ordens de Serviço</h5>
+                <h5 class="card-title mb-0"><i class="bi bi-clipboard-check me-2"></i>Ordens de ServiÃ§o</h5>
                 <?php if (can('os', 'criar')): ?>
                 <a href="<?= base_url('os/nova?cliente_id=' . $cliente['id']) ?>" class="btn btn-glow btn-sm">
                     <i class="bi bi-plus-lg me-1"></i>Nova OS
@@ -93,7 +97,7 @@
                     <table class="table table-hover mb-0">
                         <thead>
                             <tr>
-                                <th>Nº OS</th>
+                                <th>NÂº OS</th>
                                 <th>Equipamento</th>
                                 <th>Status</th>
                                 <th>Data</th>
@@ -107,7 +111,7 @@
                             <?php else: foreach ($ordens as $os): ?>
                             <tr>
                                 <td><strong><?= esc($os['numero_os']) ?></strong></td>
-                                <td><?= esc($os['equip_marca'] . ' ' . $os['equip_modelo']) ?></td>
+                                <td><?= esc(equipamento_nome_exibicao($os)) ?></td>
                                 <td><?= getStatusBadge($os['status']) ?></td>
                                 <td><?= formatDate($os['created_at']) ?></td>
                                 <td><?= formatMoney($os['valor_final']) ?></td>
@@ -135,7 +139,7 @@
                                 <th>Tipo</th>
                                 <th>Marca</th>
                                 <th>Modelo</th>
-                                <th>Nº Série</th>
+                                <th>NÂº SÃ©rie</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -143,14 +147,54 @@
                             <?php if (empty($equipamentos)): ?>
                             <tr><td colspan="5" class="text-center py-3 text-muted">Nenhum equipamento cadastrado</td></tr>
                             <?php else: foreach ($equipamentos as $eq): ?>
-                            <tr>
+                            <?php $osAbertasCount = (int) ($eq['os_abertas_count'] ?? 0); ?>
+                            <?php $temOsAbertas = !empty($eq['is_encerrado']) ? false : $osAbertasCount > 0; ?>
+                            <tr data-equipment-row data-equipment-id="<?= (int) $eq['id'] ?>" data-equipment-open-os-count="<?= $osAbertasCount ?>">
                                 <td><?= getEquipTipo($eq['tipo_nome']) ?></td>
                                 <td><?= esc($eq['marca_nome']) ?></td>
-                                <td><?= esc($eq['modelo_nome']) ?></td>
+                                <td>
+                                    <div><?= esc($eq['modelo_nome']) ?></div>
+                                    <div
+                                        class="small mt-1<?= (!empty($eq['is_encerrado']) || $temOsAbertas) ? '' : ' d-none' ?>"
+                                        data-equipment-lifecycle-badge
+                                        data-equipment-lifecycle-context="list"
+                                        data-equipment-id="<?= (int) $eq['id'] ?>"
+                                        data-equipment-open-os-count="<?= $osAbertasCount ?>"
+                                    >
+                                        <?php if (!empty($eq['is_encerrado'])): ?>
+                                            <span class="badge text-bg-dark">Encerrado</span>
+                                            <?php if (!empty($eq['motivo_encerramento_label'])): ?>
+                                                <span class="small text-muted ms-1"><?= esc($eq['motivo_encerramento_label']) ?></span>
+                                            <?php endif; ?>
+                                        <?php elseif ($temOsAbertas): ?>
+                                            <span class="badge text-bg-warning text-dark"><?= $osAbertasCount ?> OS em andamento</span>
+                                            <span class="text-muted ms-2">Encerramento bloqueado</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
                                 <td><?= esc($eq['numero_serie'] ?? '-') ?></td>
                                 <td>
                                     <?php if (can('equipamentos', 'editar')): ?>
                                     <a href="<?= base_url('equipamentos/editar/' . $eq['id']) ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+                                    <span data-equipment-active-only data-equipment-id="<?= (int) $eq['id'] ?>" class="<?= !empty($eq['is_encerrado']) ? 'd-none' : '' ?>">
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-warning<?= $temOsAbertas ? ' disabled' : '' ?>"
+                                            title="<?= $temOsAbertas ? 'Bloqueado: ha ' . $osAbertasCount . ' OS em andamento' : 'Encerrar' ?>"
+                                            <?= $temOsAbertas ? 'disabled aria-disabled="true"' : '' ?>
+                                            data-equipment-id="<?= (int) $eq['id'] ?>"
+                                            data-equipment-open-os-count="<?= $osAbertasCount ?>"
+                                            onclick="confirmarEncerramento('equipamentos', <?= (int) $eq['id'] ?>, '<?= esc(csrf_token()) ?>', '<?= esc(csrf_hash()) ?>')"
+                                        ><i class="bi bi-archive"></i></button>
+                                    </span>
+                                    <span data-equipment-closed-only data-equipment-id="<?= (int) $eq['id'] ?>" class="<?= !empty($eq['is_encerrado']) ? '' : 'd-none' ?>">
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-success"
+                                            title="Voltar a operacao"
+                                            onclick="confirmarReativacao('equipamentos', <?= (int) $eq['id'] ?>, '<?= esc(csrf_token()) ?>', '<?= esc(csrf_hash()) ?>')"
+                                        ><i class="bi bi-arrow-clockwise"></i></button>
+                                    </span>
                                     <?php endif; ?>
                                 </td>
                             </tr>
@@ -161,19 +205,23 @@
             </div>
         </div>
 
+        <?php if ($canViewCrm || $canViewWhatsapp): ?>
         <div class="card glass-card mt-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0"><i class="bi bi-graph-up-arrow me-2"></i>CRM - Relacionamento</h5>
+                <h5 class="card-title mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Relacionamento e Atendimento</h5>
+                <?php if ($canViewCrm): ?>
                 <div class="d-flex gap-2">
                     <a href="<?= base_url('crm/timeline?cliente_id=' . $cliente['id']) ?>" class="btn btn-sm btn-outline-primary">
                         <i class="bi bi-clock-history me-1"></i>Timeline
                     </a>
                     <a href="<?= base_url('crm/interacoes?cliente_id=' . $cliente['id']) ?>" class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-chat-left-text me-1"></i>Interações
+                        <i class="bi bi-chat-left-text me-1"></i>InteraÃ§Ãµes
                     </a>
                 </div>
+                <?php endif; ?>
             </div>
             <div class="card-body">
+                <?php if ($canViewCrm): ?>
                 <div class="row g-2 mb-3">
                     <div class="col-12 col-md-4">
                         <div class="border rounded p-2 h-100">
@@ -183,7 +231,7 @@
                     </div>
                     <div class="col-12 col-md-4">
                         <div class="border rounded p-2 h-100">
-                    <div class="small text-muted">Interações CRM</div>
+                    <div class="small text-muted">InteraÃ§Ãµes CRM</div>
                             <div class="fs-5 fw-bold"><?= (int) ($crmResumo['interacoes'] ?? 0) ?></div>
                         </div>
                     </div>
@@ -233,6 +281,8 @@
                     </div>
                 </div>
 
+                <?php endif; ?>
+                <?php if ($canViewWhatsapp): ?>
                 <div class="border rounded p-2 mt-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h6 class="mb-0"><i class="bi bi-whatsapp me-1"></i>Conversas WhatsApp</h6>
@@ -249,8 +299,8 @@
                                     <tr>
                                         <th>Telefone</th>
                                         <th>Status</th>
-                            <th>Não lidas</th>
-                            <th>Última msg</th>
+                            <th>NÃ£o lidas</th>
+                            <th>Ãšltima msg</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -276,8 +326,10 @@
                         </div>
                     <?php endif; ?>
                 </div>
+                <?php endif; ?>
             </div>
         </div>
+        <?php endif; ?>
     </div>
 </div>
 

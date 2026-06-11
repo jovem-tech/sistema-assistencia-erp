@@ -343,7 +343,7 @@ class WhatsAppService
         $vars = [
             'numero_os' => $os['numero_os'] ?? '',
             'data_abertura' => !empty($os['data_abertura']) ? date('d/m/Y H:i', strtotime($os['data_abertura'])) : '',
-            'equipamento' => trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? '')),
+            'equipamento' => equipamento_nome_exibicao($os),
             'cliente' => $os['cliente_nome'] ?? '',
             'valor_final' => isset($os['valor_final']) ? formatMoney((float)$os['valor_final']) : 'R$ 0,00',
             'status' => $os['status'] ?? '',

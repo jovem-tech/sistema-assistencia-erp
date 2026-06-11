@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\AcessorioOsModel;
-use App\Models\EstadoFisicoOsModel;
 use App\Models\OsDocumentoModel;
 use App\Models\OsItemModel;
 use App\Models\OsModel;
@@ -31,32 +29,35 @@ class OsPdfService
         return $this->templateService->getTemplateOptions();
     }
 
-    public function gerar(int $osId, string $tipo, ?int $usuarioId = null): array
+    public function gerar(int $osId, string $tipo, ?int $usuarioId = null, array $options = []): array
     {
         if (!class_exists('Dompdf\\Dompdf')) {
             return [
                 'ok' => false,
-                'message' => 'Biblioteca Dompdf não instalada. Execute: composer require dompdf/dompdf:^2.0',
+                'message' => 'Biblioteca Dompdf nÃ£o instalada. Execute: composer require dompdf/dompdf:^2.0',
             ];
         }
 
         $os = $this->osModel->getComplete($osId);
         if (!$os) {
-            return ['ok' => false, 'message' => 'OS não encontrada para gerar PDF.'];
+            return ['ok' => false, 'message' => 'OS nÃ£o encontrada para gerar PDF.'];
         }
 
         $tipos = $this->tiposDisponiveis();
         if (!isset($tipos[$tipo])) {
-            return ['ok' => false, 'message' => 'Tipo de documento inválido.'];
+            return ['ok' => false, 'message' => 'Tipo de documento invÃ¡lido.'];
         }
 
         if ($tipo === 'orcamento') {
             return $this->gerarDocumentoOficialDeOrcamento($osId, $usuarioId);
         }
 
-        $payload = $this->buildPayload($osId);
+        $payload = $this->buildPayload($osId, $options);
         $template = $this->templateService->findByCode($tipo);
         $legacyViewPath = APPPATH . 'Views/os/pdf/' . $tipo . '.php';
+        $photoAnnexHtml = $tipo === 'abertura'
+            ? $this->buildPhotoAnnexHtml((array) ($payload['photo_groups'] ?? []), !empty($payload['include_photos']))
+            : '';
 
         if ($template !== null && trim((string) ($template['conteudo_html'] ?? '')) !== '') {
             $conteudoHtml = $this->templateService->renderTemplateHtml($template, $os, $payload);
@@ -66,6 +67,7 @@ class OsPdfService
                 'tituloDocumento' => $tipos[$tipo],
                 'geradoEm' => date('d/m/Y H:i:s'),
                 'conteudoHtml' => $conteudoHtml,
+                'fotosAnexadasHtml' => $photoAnnexHtml,
             ]);
         } elseif (is_file($legacyViewPath)) {
             $html = view('os/pdf/' . $tipo, [
@@ -187,12 +189,21 @@ class OsPdfService
         }
     }
 
-    private function buildPayload(int $osId): array
+    private function buildPayload(int $osId, array $options = []): array
     {
         $os = $this->osModel->getComplete($osId);
         $itens = $this->itemModel->getByOs($osId);
-        $acessorios = (new AcessorioOsModel())->where('os_id', $osId)->orderBy('id', 'ASC')->findAll();
-        $estadoFisico = (new EstadoFisicoOsModel())->where('os_id', $osId)->orderBy('id', 'ASC')->findAll();
+        $printContext = (new OsPrintService())->buildDocumentContext($osId, [
+            'format' => OsPrintService::FORMAT_A4,
+            'include_photos' => !empty($options['include_photos']),
+            'photo_groups' => (array) ($options['photo_groups'] ?? []),
+        ]) ?? [];
+        $acessorios = array_values((array) ($printContext['acessorios'] ?? []));
+        $estadoFisico = array_values((array) ($printContext['estadoFisico'] ?? []));
+        $checklistEntrada = is_array($printContext['checklistEntrada'] ?? null)
+            ? $printContext['checklistEntrada']
+            : null;
+        $photoGroups = array_values((array) ($printContext['photoGroups'] ?? []));
 
         $totais = [
             'servicos' => 0.0,
@@ -224,6 +235,9 @@ class OsPdfService
             'pecas' => $pecas,
             'acessorios' => $acessorios,
             'estado_fisico' => $estadoFisico,
+            'checklist_entrada' => $checklistEntrada,
+            'include_photos' => !empty($options['include_photos']),
+            'photo_groups' => $photoGroups,
             'totais' => $totais,
             'procedimentos_executados' => $procedimentosExecutados,
             'resumo_cobranca' => [
@@ -246,6 +260,38 @@ class OsPdfService
         ];
     }
 
+    private function buildPhotoAnnexHtml(array $photoGroups, bool $includePhotos): string
+    {
+        if (!$includePhotos) {
+            return '';
+        }
+
+        $renderableGroups = array_values(array_filter(array_map(
+            static function (array $group): ?array {
+                $photos = array_values(array_filter(
+                    (array) ($group['photos'] ?? []),
+                    static fn (array $photo): bool => !empty($photo['url'])
+                ));
+
+                if ($photos === []) {
+                    return null;
+                }
+
+                $group['photos'] = $photos;
+                return $group;
+            },
+            $photoGroups
+        )));
+
+        if ($renderableGroups === []) {
+            return '';
+        }
+
+        return view('os/pdf/_photo_annex', [
+            'photoGroups' => $renderableGroups,
+        ]);
+    }
+
     private function extractTextList(string $value): array
     {
         $parts = preg_split('/\r\n|\r|\n/', $value) ?: [];
@@ -266,7 +312,7 @@ class OsPdfService
             $parts[] = 'ate ' . $this->formatDateTimeLabel($garantiaValidade, false);
         }
 
-        return !empty($parts) ? implode(' | ', $parts) : 'Não informada';
+        return !empty($parts) ? implode(' | ', $parts) : 'NÃ£o informada';
     }
 
     private function formatDateTimeLabel(string $value, bool $withTime = true): string
@@ -317,7 +363,7 @@ class OsPdfService
             return [
                 'ok' => false,
                 'needs_budget' => true,
-                'message' => 'Crie primeiro um orçamento vinculado à OS para gerar este PDF.',
+                'message' => 'Crie primeiro um orÃ§amento vinculado Ã  OS para gerar este PDF.',
             ];
         }
 
@@ -332,7 +378,7 @@ class OsPdfService
             return [
                 'ok' => false,
                 'needs_budget' => true,
-                'message' => 'Crie primeiro um orçamento vinculado à OS para gerar este PDF.',
+                'message' => 'Crie primeiro um orÃ§amento vinculado Ã  OS para gerar este PDF.',
             ];
         }
 

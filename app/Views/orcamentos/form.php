@@ -1,4 +1,4 @@
-﻿<?= $this->extend($layout ?? 'layouts/main') ?>
+<?= $this->extend($layout ?? 'layouts/main') ?>
 
 <?= $this->section('content') ?>
 <?php
@@ -118,10 +118,10 @@ if (empty($itens)) {
                         <button class="nav-link" id="orc-tab-operacional-tab" data-bs-toggle="pill" data-bs-target="#orc-tab-operacional" type="button" role="tab" aria-controls="orc-tab-operacional" aria-selected="false">Dados operacionais</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="orc-tab-pacotes-tab" data-bs-toggle="pill" data-bs-target="#orc-tab-pacotes" type="button" role="tab" aria-controls="orc-tab-pacotes" aria-selected="false">Pacotes de servico</button>
+                        <button class="nav-link" id="orc-tab-pacotes-tab" data-bs-toggle="pill" data-bs-target="#orc-tab-pacotes" type="button" role="tab" aria-controls="orc-tab-pacotes" aria-selected="false">Pacotes de serviço</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="orc-tab-orcamento-tab" data-bs-toggle="pill" data-bs-target="#orc-tab-orcamento" type="button" role="tab" aria-controls="orc-tab-orcamento" aria-selected="false">Orcamento e financeiro</button>
+                        <button class="nav-link" id="orc-tab-orcamento-tab" data-bs-toggle="pill" data-bs-target="#orc-tab-orcamento" type="button" role="tab" aria-controls="orc-tab-orcamento" aria-selected="false">Orçamento e financeiro</button>
                     </li>
                 </ul>
             </div>
@@ -700,7 +700,13 @@ if (empty($itens)) {
                                         </td>
                                         <td data-label="Descrição">
                                             <div class="orc-item-desc">
-                                                <select class="form-select form-select-sm item-catalog-select d-none" data-placeholder="Buscar no catalogo..."></select>
+                                                <div class="orc-item-catalog-wrap">
+                                                    <select class="form-select form-select-sm item-catalog-select d-none" data-placeholder="Buscar no catalogo..."></select>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm btn-item-quick-create d-none" title="Cadastrar peça ou serviço sem sair do orçamento">
+                                                        <i class="bi bi-plus-lg"></i>
+                                                        <span class="orc-item-catalog-btn-label">Cadastrar</span>
+                                                    </button>
+                                                </div>
                                                 <input type="text" class="form-control form-control-sm item-descricao" name="item_descricao[]" value="<?= esc((string) ($item['descricao'] ?? '')) ?>">
                                                 <input type="hidden" class="item-referencia-id" name="item_referencia_id[]" value="<?= esc((string) ($item['referencia_id'] ?? '')) ?>">
                                             </div>
@@ -841,6 +847,97 @@ if (empty($itens)) {
     </div>
 </div>
 
+<div class="modal fade" id="modalCatalogoRapidoOrc" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content glass-card shadow-lg">
+            <div class="modal-header border-bottom">
+                <div>
+                    <h5 class="modal-title" id="labelModalCatalogoRapidoOrc">
+                        <i class="bi bi-box-seam text-primary me-2"></i>Cadastro rápido no orçamento
+                    </h5>
+                    <small class="text-muted">Cadastre a peça ou o serviço sem sair desta tela e aplique direto no item atual.</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <div id="orcCatalogoRapidoAlert" class="alert alert-info py-2 px-3 small mb-3">
+                    Preencha o cadastro rápido e o item será inserido imediatamente na linha atual do orçamento.
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold mb-1">Tipo do cadastro</label>
+                        <input type="text" id="orcCatalogoRapidoTipoLabel" class="form-control bg-transparent" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold mb-1">Tipo de equipamento</label>
+                        <input type="text" id="orcCatalogoRapidoTipoEquipamento" class="form-control" list="orcCatalogoRapidoTiposEquipamento" placeholder="Ex.: Smartphone, Notebook, diverso">
+                        <datalist id="orcCatalogoRapidoTiposEquipamento">
+                            <?php foreach (($itemQuickCreateTiposEquipamento ?? []) as $tipoEquipamentoQuick): ?>
+                                <option value="<?= esc((string) $tipoEquipamentoQuick) ?>"></option>
+                            <?php endforeach; ?>
+                        </datalist>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold mb-1">Nome *</label>
+                        <input type="text" id="orcCatalogoRapidoNome" class="form-control" placeholder="Ex.: Tela OLED, Troca de conector, Limpeza interna...">
+                    </div>
+                </div>
+
+                <div id="orcCatalogoRapidoCamposPeca" class="row g-3 mt-1 d-none">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold mb-1">Categoria</label>
+                        <input type="text" id="orcCatalogoRapidoCategoria" class="form-control" list="orcCatalogoRapidoCategoriasPeca" placeholder="Ex.: Tela, Bateria, Conector...">
+                        <datalist id="orcCatalogoRapidoCategoriasPeca">
+                            <?php foreach (($itemQuickCreateCategoriasPeca ?? []) as $categoriaPecaQuick): ?>
+                                <option value="<?= esc((string) $categoriaPecaQuick) ?>"></option>
+                            <?php endforeach; ?>
+                        </datalist>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <label class="form-label fw-semibold mb-1">Custo *</label>
+                        <input type="text" id="orcCatalogoRapidoPrecoCusto" class="form-control" inputmode="decimal" placeholder="0,00">
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <label class="form-label fw-semibold mb-1">Venda *</label>
+                        <input type="text" id="orcCatalogoRapidoPrecoVenda" class="form-control" inputmode="decimal" placeholder="0,00">
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <label class="form-label fw-semibold mb-1">Quantidade inicial</label>
+                        <input type="number" id="orcCatalogoRapidoQuantidadeAtual" class="form-control" min="0" step="1" value="0">
+                    </div>
+                </div>
+
+                <div id="orcCatalogoRapidoCamposServico" class="row g-3 mt-1 d-none">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold mb-1">Valor *</label>
+                        <input type="text" id="orcCatalogoRapidoValorServico" class="form-control" inputmode="decimal" placeholder="0,00">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold mb-1">Tempo padrão (h)</label>
+                        <input type="text" id="orcCatalogoRapidoTempoServico" class="form-control" inputmode="decimal" value="1,00">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold mb-1">Custo direto</label>
+                        <input type="text" id="orcCatalogoRapidoCustoDiretoServico" class="form-control" inputmode="decimal" value="0,00">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold mb-1">Descrição complementar</label>
+                        <textarea id="orcCatalogoRapidoDescricaoServico" class="form-control" rows="3" placeholder="Opcional: detalhes técnicos, escopo do serviço, compatibilidade..."></textarea>
+                    </div>
+                </div>
+
+                <div id="orcCatalogoRapidoErro" class="text-danger small mt-3 d-none"></div>
+            </div>
+            <div class="modal-footer border-top">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-glow" id="btnSalvarCatalogoRapidoOrc">
+                    <i class="bi bi-check-lg me-1"></i>Salvar e aplicar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->section('scripts') ?>
 <script>
 (function () {
@@ -946,14 +1043,34 @@ if (empty($itens)) {
     const displayMarcaOrc = document.getElementById('displayMarcaOrc');
     const errorNovaMarcaOrc = document.getElementById('errorNovaMarcaOrc');
     const errorNovoModeloOrc = document.getElementById('errorNovoModeloOrc');
+    const modalCatalogoRapidoEl = document.getElementById('modalCatalogoRapidoOrc');
+    const labelModalCatalogoRapidoOrc = document.getElementById('labelModalCatalogoRapidoOrc');
+    const orcCatalogoRapidoAlert = document.getElementById('orcCatalogoRapidoAlert');
+    const orcCatalogoRapidoTipoLabel = document.getElementById('orcCatalogoRapidoTipoLabel');
+    const orcCatalogoRapidoTipoEquipamento = document.getElementById('orcCatalogoRapidoTipoEquipamento');
+    const orcCatalogoRapidoNome = document.getElementById('orcCatalogoRapidoNome');
+    const orcCatalogoRapidoCamposPeca = document.getElementById('orcCatalogoRapidoCamposPeca');
+    const orcCatalogoRapidoCamposServico = document.getElementById('orcCatalogoRapidoCamposServico');
+    const orcCatalogoRapidoCategoria = document.getElementById('orcCatalogoRapidoCategoria');
+    const orcCatalogoRapidoPrecoCusto = document.getElementById('orcCatalogoRapidoPrecoCusto');
+    const orcCatalogoRapidoPrecoVenda = document.getElementById('orcCatalogoRapidoPrecoVenda');
+    const orcCatalogoRapidoQuantidadeAtual = document.getElementById('orcCatalogoRapidoQuantidadeAtual');
+    const orcCatalogoRapidoValorServico = document.getElementById('orcCatalogoRapidoValorServico');
+    const orcCatalogoRapidoTempoServico = document.getElementById('orcCatalogoRapidoTempoServico');
+    const orcCatalogoRapidoCustoDiretoServico = document.getElementById('orcCatalogoRapidoCustoDiretoServico');
+    const orcCatalogoRapidoDescricaoServico = document.getElementById('orcCatalogoRapidoDescricaoServico');
+    const orcCatalogoRapidoErro = document.getElementById('orcCatalogoRapidoErro');
+    const btnSalvarCatalogoRapidoOrc = document.getElementById('btnSalvarCatalogoRapidoOrc');
     const csrfTokenName = <?= json_encode(csrf_token()) ?>;
-    const csrfHashValue = <?= json_encode(csrf_hash()) ?>;
+    let csrfHashValue = <?= json_encode(csrf_hash()) ?>;
     const equipamentoMarcaSalvarUrl = <?= json_encode(base_url('equipamentosmarcas/salvar_ajax')) ?>;
     const equipamentoMarcaAtualizarBaseUrl = <?= json_encode(base_url('equipamentosmarcas/atualizar_ajax')) ?>;
     const equipamentoModeloSalvarUrl = <?= json_encode(base_url('equipamentosmodelos/salvar_ajax')) ?>;
     const equipamentoModeloAtualizarBaseUrl = <?= json_encode(base_url('equipamentosmodelos/atualizar_ajax')) ?>;
     const equipamentoModeloPorMarcaUrl = <?= json_encode(base_url('equipamentosmodelos/por-marca')) ?>;
     const itemCatalogUrl = <?= json_encode(base_url('orcamentos/item/catalogo')) ?>;
+    const estoqueSalvarAjaxUrl = <?= json_encode(base_url('estoque/salvar_ajax')) ?>;
+    const servicosSalvarAjaxUrl = <?= json_encode(base_url('servicos/salvar_ajax')) ?>;
     const currentOrcamentoId = <?= json_encode((int) ($orcamento['id'] ?? 0)) ?>;
     const pacoteOfertaModuleReady = <?= $pacoteOfertaModuleReady ? 'true' : 'false' ?>;
     const pacoteOfertaDetectUrl = <?= json_encode(base_url('orcamentos/pacotes/oferta/detectar')) ?>;
@@ -1016,6 +1133,20 @@ if (empty($itens)) {
     };
 
     const fixed = (value) => (Math.round((value + Number.EPSILON) * 100) / 100).toFixed(2);
+    const updateCsrfHash = (value) => {
+        const normalized = String(value || '').trim();
+        if (normalized) {
+            csrfHashValue = normalized;
+        }
+    };
+    const getItemTypeLabel = (tipo) => {
+        const normalized = String(tipo || '').toLowerCase();
+        if (normalized === 'peca') return 'Peça';
+        if (normalized === 'servico') return 'Serviço';
+        if (normalized === 'combo') return 'Combo';
+        if (normalized === 'avulso') return 'Avulso';
+        return 'Item';
+    };
 
     const recalcRow = (row) => {
         const qty = Math.max(0.01, toNumber(row.querySelector('.item-qty')?.value));
@@ -1217,6 +1348,37 @@ if (empty($itens)) {
         };
     };
 
+    const applyCatalogDataToRow = (row, item) => {
+        const descricaoInput = row.querySelector('.item-descricao');
+        const referenciaInput = row.querySelector('.item-referencia-id');
+        const valorUnitInput = row.querySelector('.item-unit');
+        const descricao = String(item?.descricao || item?.text || '').trim();
+
+        if (descricaoInput) {
+            descricaoInput.value = descricao;
+            descricaoInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        const referenciaId = resolveCatalogReferenciaId(item);
+        if (referenciaInput && referenciaId !== null) {
+            referenciaInput.value = String(referenciaId);
+        }
+
+        const valorUnitario = Number(item?.valor_unitario ?? NaN);
+        if (valorUnitInput && Number.isFinite(valorUnitario)) {
+            valorUnitInput.value = fixed(valorUnitario);
+        }
+
+        const pricingMeta = resolvePiecePricingMetaFromCatalogItem(item);
+        if (pricingMeta) {
+            setItemPricingMeta(row, pricingMeta);
+        } else {
+            clearItemPricingMeta(row);
+        }
+
+        recalcAll();
+    };
+
     const resolvePiecePricingMetaFromRow = (row) => {
         const tipoSelect = row.querySelector('[name="item_tipo[]"]');
         if (String(tipoSelect?.value || '').toLowerCase() !== 'peca') {
@@ -1336,8 +1498,6 @@ if (empty($itens)) {
         const catalogSelect = row.querySelector('.item-catalog-select');
         const tipoSelect = row.querySelector('[name="item_tipo[]"]');
         const descricaoInput = row.querySelector('.item-descricao');
-        const referenciaInput = row.querySelector('.item-referencia-id');
-        const valorUnitInput = row.querySelector('.item-unit');
 
         if (!catalogSelect || !tipoSelect || !descricaoInput) return;
         if (!hasSelect2()) {
@@ -1405,31 +1565,13 @@ if (empty($itens)) {
         $catalog.off('.orcItemCatalog');
         $catalog.on('select2:select.orcItemCatalog', (event) => {
             if (catalogSelect.dataset.suppressCatalogSync === '1') return;
-            const item = event?.params?.data || {};
-            const descricao = String(item?.descricao || item?.text || '').trim();
-            if (descricaoInput) {
-                descricaoInput.value = descricao;
-                descricaoInput.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-            const referenciaId = resolveCatalogReferenciaId(item);
-            if (referenciaInput && referenciaId !== null) {
-                referenciaInput.value = String(referenciaId);
-            }
-            const valorUnitario = Number(item?.valor_unitario ?? NaN);
-            if (valorUnitInput && Number.isFinite(valorUnitario)) {
-                valorUnitInput.value = fixed(valorUnitario);
-            }
-            const pricingMeta = resolvePiecePricingMetaFromCatalogItem(item);
-            if (pricingMeta) {
-                setItemPricingMeta(row, pricingMeta);
-            } else {
-                clearItemPricingMeta(row);
-            }
-            recalcAll();
+            applyCatalogDataToRow(row, event?.params?.data || {});
         });
 
         $catalog.on('select2:clear.orcItemCatalog', () => {
             if (catalogSelect.dataset.suppressCatalogSync === '1') return;
+            const referenciaInput = row.querySelector('.item-referencia-id');
+            const valorUnitInput = row.querySelector('.item-unit');
             if (descricaoInput) {
                 descricaoInput.value = '';
                 descricaoInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1445,15 +1587,166 @@ if (empty($itens)) {
         });
     };
 
+    const modalCatalogoRapido = modalCatalogoRapidoEl && window.bootstrap
+        ? new window.bootstrap.Modal(modalCatalogoRapidoEl)
+        : null;
+    let activeQuickCreateRow = null;
+    let activeQuickCreateTipo = '';
+
+    const clearQuickCreateError = () => {
+        if (!orcCatalogoRapidoErro) {
+            return;
+        }
+        orcCatalogoRapidoErro.textContent = '';
+        orcCatalogoRapidoErro.classList.add('d-none');
+    };
+
+    const setQuickCreateError = (message) => {
+        if (!orcCatalogoRapidoErro) {
+            return;
+        }
+        orcCatalogoRapidoErro.textContent = String(message || 'Não foi possível salvar este item.');
+        orcCatalogoRapidoErro.classList.remove('d-none');
+    };
+
+    const resetQuickCreateModal = () => {
+        clearQuickCreateError();
+        if (orcCatalogoRapidoTipoEquipamento) orcCatalogoRapidoTipoEquipamento.value = '';
+        if (orcCatalogoRapidoNome) orcCatalogoRapidoNome.value = '';
+        if (orcCatalogoRapidoCategoria) orcCatalogoRapidoCategoria.value = '';
+        if (orcCatalogoRapidoPrecoCusto) orcCatalogoRapidoPrecoCusto.value = '0,00';
+        if (orcCatalogoRapidoPrecoVenda) orcCatalogoRapidoPrecoVenda.value = '0,00';
+        if (orcCatalogoRapidoQuantidadeAtual) orcCatalogoRapidoQuantidadeAtual.value = '0';
+        if (orcCatalogoRapidoValorServico) orcCatalogoRapidoValorServico.value = '0,00';
+        if (orcCatalogoRapidoTempoServico) orcCatalogoRapidoTempoServico.value = '1,00';
+        if (orcCatalogoRapidoCustoDiretoServico) orcCatalogoRapidoCustoDiretoServico.value = '0,00';
+        if (orcCatalogoRapidoDescricaoServico) orcCatalogoRapidoDescricaoServico.value = '';
+    };
+
+    const setQuickCreateSubmitLoading = (enabled) => {
+        if (!btnSalvarCatalogoRapidoOrc) {
+            return;
+        }
+        if (enabled) {
+            if (!btnSalvarCatalogoRapidoOrc.dataset.originalHtml) {
+                btnSalvarCatalogoRapidoOrc.dataset.originalHtml = btnSalvarCatalogoRapidoOrc.innerHTML;
+            }
+            btnSalvarCatalogoRapidoOrc.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Salvando...';
+            btnSalvarCatalogoRapidoOrc.disabled = true;
+            return;
+        }
+
+        if (btnSalvarCatalogoRapidoOrc.dataset.originalHtml) {
+            btnSalvarCatalogoRapidoOrc.innerHTML = btnSalvarCatalogoRapidoOrc.dataset.originalHtml;
+        }
+        btnSalvarCatalogoRapidoOrc.disabled = false;
+    };
+
+    const fillQuickCreateTipoEquipamento = (row) => {
+        if (!orcCatalogoRapidoTipoEquipamento) {
+            return;
+        }
+        const currentValue = String(orcCatalogoRapidoTipoEquipamento.value || '').trim();
+        if (currentValue !== '') {
+            return;
+        }
+
+        const manualTipo = String(equipTipoSelect?.selectedOptions?.[0]?.textContent || '').trim();
+        const catalogTipo = String(row?.querySelector('.item-catalog-select')?.dataset?.tipoEquipamento || '').trim();
+        orcCatalogoRapidoTipoEquipamento.value = catalogTipo || manualTipo;
+    };
+
+    const openQuickCreateModal = async (row) => {
+        const tipo = String(row?.querySelector('[name="item_tipo[]"]')?.value || '').toLowerCase();
+        if (!['peca', 'servico'].includes(tipo)) {
+            await window.DSFeedback.warning(
+                'Selecione peça ou serviço',
+                'O cadastro rápido funciona apenas para itens do tipo peça ou serviço.',
+                { confirmButtonText: 'Entendi' }
+            );
+            return;
+        }
+
+        activeQuickCreateRow = row;
+        activeQuickCreateTipo = tipo;
+        resetQuickCreateModal();
+        if (labelModalCatalogoRapidoOrc) {
+            labelModalCatalogoRapidoOrc.innerHTML = tipo === 'peca'
+                ? '<i class="bi bi-box-seam text-primary me-2"></i>Cadastro rápido de peça'
+                : '<i class="bi bi-wrench-adjustable-circle text-primary me-2"></i>Cadastro rápido de serviço';
+        }
+        if (orcCatalogoRapidoTipoLabel) {
+            orcCatalogoRapidoTipoLabel.value = getItemTypeLabel(tipo);
+        }
+        if (orcCatalogoRapidoAlert) {
+            orcCatalogoRapidoAlert.textContent = tipo === 'peca'
+                ? 'Cadastre a peça e ela já será aplicada nesta linha com valor recomendado de peça instalada.'
+                : 'Cadastre o serviço e ele já será aplicado nesta linha com o valor configurado no catálogo.';
+        }
+        if (orcCatalogoRapidoCamposPeca) {
+            orcCatalogoRapidoCamposPeca.classList.toggle('d-none', tipo !== 'peca');
+        }
+        if (orcCatalogoRapidoCamposServico) {
+            orcCatalogoRapidoCamposServico.classList.toggle('d-none', tipo !== 'servico');
+        }
+        fillQuickCreateTipoEquipamento(row);
+        modalCatalogoRapido?.show();
+
+        window.setTimeout(() => {
+            orcCatalogoRapidoNome?.focus();
+        }, 120);
+    };
+
+    const applyQuickCreatedItemToRow = (row, item) => {
+        const catalogSelect = row?.querySelector('.item-catalog-select');
+        const tipo = String(row?.querySelector('[name="item_tipo[]"]')?.value || '').toLowerCase();
+        if (!row || !catalogSelect) {
+            return;
+        }
+
+        syncItemCatalogVisibility(row);
+        const jq = window.jQuery || window.$;
+        if (hasSelect2() && jq) {
+            const $catalog = jq(catalogSelect);
+            const optionValue = String(item?.id || '');
+            const optionText = String(item?.text || item?.descricao || '');
+            catalogSelect.dataset.suppressCatalogSync = '1';
+            let option = Array.from(catalogSelect.options || []).find((current) => current.value === optionValue);
+            if (!option) {
+                option = new Option(optionText, optionValue, true, true);
+                catalogSelect.appendChild(option);
+            }
+            option.text = optionText;
+            option.selected = true;
+            catalogSelect.dataset.tipoEquipamento = String(item?.tipo_equipamento || '');
+            $catalog.trigger('change');
+            delete catalogSelect.dataset.suppressCatalogSync;
+        }
+
+        applyCatalogDataToRow(row, item);
+        if (tipo === 'peca') {
+            enforcePieceMinimumPrice(row, false).catch((error) => {
+                console.error('[Orçamentos] Falha ao aplicar piso mínimo após cadastro rápido.', error);
+            });
+        }
+    };
+
     const syncItemCatalogVisibility = (row) => {
         const tipoSelect = row.querySelector('[name="item_tipo[]"]');
         const descricaoInput = row.querySelector('.item-descricao');
         const catalogSelect = row.querySelector('.item-catalog-select');
         const referenciaInput = row.querySelector('.item-referencia-id');
+        const quickCreateBtn = row.querySelector('.btn-item-quick-create');
 
         if (!tipoSelect || !descricaoInput || !catalogSelect) return;
         const tipo = String(tipoSelect.value || 'servico').toLowerCase();
         const isCatalog = ['peca', 'servico'].includes(tipo);
+
+        if (quickCreateBtn) {
+            quickCreateBtn.classList.toggle('d-none', !isCatalog);
+            quickCreateBtn.setAttribute('aria-label', `Cadastrar ${getItemTypeLabel(tipo).toLowerCase()} rapidamente`);
+            quickCreateBtn.title = `Cadastrar ${getItemTypeLabel(tipo).toLowerCase()} sem sair do orçamento`;
+        }
 
         if (isCatalog && hasSelect2()) {
             catalogSelect.classList.remove('d-none');
@@ -1527,6 +1820,14 @@ if (empty($itens)) {
                 recalcAll();
             });
         }
+        const quickCreateBtn = row.querySelector('.btn-item-quick-create');
+        if (quickCreateBtn) {
+            quickCreateBtn.addEventListener('click', () => {
+                openQuickCreateModal(row).catch((error) => {
+                    console.error('[Orçamentos] Falha ao abrir cadastro rápido do catálogo.', error);
+                });
+            });
+        }
         syncItemCatalogVisibility(row);
         hydrateRowPricingMeta(row);
         enforcePieceMinimumPrice(row, false).catch((error) => {
@@ -1548,7 +1849,13 @@ if (empty($itens)) {
             </td>
             <td data-label="Descrição">
                 <div class="orc-item-desc">
-                    <select class="form-select form-select-sm item-catalog-select d-none" data-placeholder="Buscar no catalogo..."></select>
+                    <div class="orc-item-catalog-wrap">
+                        <select class="form-select form-select-sm item-catalog-select d-none" data-placeholder="Buscar no catalogo..."></select>
+                        <button type="button" class="btn btn-outline-primary btn-sm btn-item-quick-create d-none" title="Cadastrar peça ou serviço sem sair do orçamento">
+                            <i class="bi bi-plus-lg"></i>
+                            <span class="orc-item-catalog-btn-label">Cadastrar</span>
+                        </button>
+                    </div>
                     <input type="text" class="form-control form-control-sm item-descricao" name="item_descricao[]">
                     <input type="hidden" class="item-referencia-id" name="item_referencia_id[]" value="">
                 </div>
@@ -4639,6 +4946,86 @@ if (empty($itens)) {
             }
         });
 
+        modalCatalogoRapidoEl?.addEventListener('hidden.bs.modal', () => {
+            activeQuickCreateRow = null;
+            activeQuickCreateTipo = '';
+            setQuickCreateSubmitLoading(false);
+            clearQuickCreateError();
+        });
+
+        btnSalvarCatalogoRapidoOrc?.addEventListener('click', async () => {
+            if (!activeQuickCreateRow || !['peca', 'servico'].includes(activeQuickCreateTipo)) {
+                setQuickCreateError('Linha de orçamento não encontrada para aplicar este cadastro.');
+                return;
+            }
+
+            const nome = normalizeName(orcCatalogoRapidoNome?.value || '');
+            if (!nome) {
+                setQuickCreateError(`Informe o nome da ${activeQuickCreateTipo === 'peca' ? 'peça' : 'serviço'}.`);
+                orcCatalogoRapidoNome?.focus();
+                return;
+            }
+
+            clearQuickCreateError();
+            setQuickCreateSubmitLoading(true);
+
+            const formData = new FormData();
+            formData.append('nome', nome);
+            formData.append('tipo_equipamento', normalizeName(orcCatalogoRapidoTipoEquipamento?.value || ''));
+            formData.append(csrfTokenName, csrfHashValue);
+
+            let requestUrl = servicosSalvarAjaxUrl;
+            if (activeQuickCreateTipo === 'peca') {
+                formData.append('categoria', normalizeName(orcCatalogoRapidoCategoria?.value || ''));
+                formData.append('preco_custo', String(orcCatalogoRapidoPrecoCusto?.value || '0'));
+                formData.append('preco_venda', String(orcCatalogoRapidoPrecoVenda?.value || '0'));
+                formData.append('quantidade_atual', String(orcCatalogoRapidoQuantidadeAtual?.value || '0'));
+                requestUrl = estoqueSalvarAjaxUrl;
+            } else {
+                formData.append('descricao', String(orcCatalogoRapidoDescricaoServico?.value || '').trim());
+                formData.append('valor', String(orcCatalogoRapidoValorServico?.value || '0'));
+                formData.append('tempo_padrao_horas', String(orcCatalogoRapidoTempoServico?.value || '1'));
+                formData.append('custo_direto_padrao', String(orcCatalogoRapidoCustoDiretoServico?.value || '0'));
+            }
+
+            try {
+                const response = await fetch(requestUrl, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData,
+                });
+                const result = await response.json().catch(() => ({}));
+                updateCsrfHash(result?.csrfHash);
+
+                if (!response.ok || !result?.success || !result?.item) {
+                    setQuickCreateError(normalizeName(result?.message || 'Não foi possível salvar este item agora.'));
+                    return;
+                }
+
+                applyQuickCreatedItemToRow(activeQuickCreateRow, result.item);
+                modalCatalogoRapido?.hide();
+
+                const successTitle = activeQuickCreateTipo === 'peca'
+                    ? 'Peça cadastrada e aplicada'
+                    : 'Serviço cadastrado e aplicado';
+                await window.DSFeedback.fire({
+                    icon: 'success',
+                    title: successTitle,
+                    text: 'O item já foi inserido na linha atual do orçamento.',
+                    timer: 1800,
+                    showConfirmButton: false,
+                    timerProgressBar: true,
+                    toast: true,
+                    position: 'top-end',
+                });
+            } catch (error) {
+                console.error('[Orçamentos] Falha ao salvar item via cadastro rápido.', error);
+                setQuickCreateError('Falha de comunicação ao salvar o item. Tente novamente.');
+            } finally {
+                setQuickCreateSubmitLoading(false);
+            }
+        });
+
         refreshMarcaSelect(initialMarca, initialModelo);
         buildColorCatalog();
         const initialHexColor = normalizeHex(equipCorHexInput?.value || equipCorPicker?.value || '');
@@ -4949,6 +5336,30 @@ if (empty($itens)) {
 .orc-color-item small {
     font-size: .7rem;
 }
+.orc-item-catalog-wrap {
+    display: flex;
+    align-items: stretch;
+    gap: .5rem;
+}
+.orc-item-catalog-wrap .item-catalog-select,
+.orc-item-catalog-wrap .select2 {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.btn-item-quick-create {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.orc-item-catalog-btn-label {
+    display: inline-block;
+}
+.orc-item-desc .item-descricao {
+    margin-top: .5rem;
+}
 .item-pricing-meta {
     display: block;
     margin-top: .35rem;
@@ -4998,6 +5409,13 @@ if (empty($itens)) {
     .orc-color-item {
         font-size: .78rem;
     }
+    .orc-item-catalog-wrap {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .btn-item-quick-create {
+        width: 100%;
+    }
     #orcamentoItensTable thead {
         display: none;
     }
@@ -5033,6 +5451,9 @@ if (empty($itens)) {
         font-size: .82rem;
         padding: .6rem .78rem;
     }
+    .orc-item-catalog-btn-label {
+        font-size: .78rem;
+    }
     #orcamentoItensTable tbody td::before {
         min-width: 80px;
     }
@@ -5052,6 +5473,15 @@ if (empty($itens)) {
     .orc-color-preview {
         min-height: 76px;
     }
+    .orc-item-catalog-btn-label {
+        font-size: .74rem;
+    }
+    #modalCatalogoRapidoOrc .modal-body,
+    #modalCatalogoRapidoOrc .modal-footer,
+    #modalCatalogoRapidoOrc .modal-header {
+        padding-left: .85rem;
+        padding-right: .85rem;
+    }
 }
 @media (max-width: 320px) {
     .orc-form-tabs .nav-link {
@@ -5064,6 +5494,9 @@ if (empty($itens)) {
     #orcamentoItensTable tbody td::before {
         min-width: 72px;
         font-size: .74rem;
+    }
+    .orc-item-catalog-btn-label {
+        font-size: .72rem;
     }
 }
 </style>

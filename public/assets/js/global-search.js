@@ -1,96 +1,107 @@
 /**
  * Global Search JS
- * Handles AJAX search, debounce, keyboard navigation and rendering.
+ * Handles AJAX search, debounce, keyboard navigation and rendering per wrapper.
  */
 class GlobalSearch {
-    constructor() {
-        this.$wrapper = document.querySelector('.navbar-search-wrapper');
-        this.$input = document.querySelector('.search-input');
-        this.$container = document.querySelector('.search-results-container');
-        this.$loading = document.querySelector('.search-loading-state');
-        this.$empty = document.querySelector('.search-empty-state');
-        this.$list = document.querySelector('.search-results-list');
-        this.$filterBtn = document.querySelector('.search-filter-btn');
-        this.$filterItems = document.querySelectorAll('.search-filter-menu .dropdown-item');
-        this.$filterLabel = document.querySelector('.filter-label');
+    constructor(wrapper) {
+        this.$wrapper = wrapper || document.querySelector('.navbar-search-wrapper');
+        this.$input = this.$wrapper?.querySelector('.search-input') || null;
+        this.$container = this.$wrapper?.querySelector('.search-results-container') || null;
+        this.$loading = this.$wrapper?.querySelector('.search-loading-state') || null;
+        this.$empty = this.$wrapper?.querySelector('.search-empty-state') || null;
+        this.$list = this.$wrapper?.querySelector('.search-results-list') || null;
+        this.$filterBtn = this.$wrapper?.querySelector('.search-filter-btn') || null;
+        this.$filterItems = this.$wrapper ? this.$wrapper.querySelectorAll('.search-filter-menu .dropdown-item') : [];
+        this.$filterLabel = this.$wrapper?.querySelector('.filter-label') || null;
         this.currentFilters = ['all'];
         this.timeout = null;
         this.baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
         this.selectedIndex = -1;
+        this.ready = Boolean(this.$wrapper && this.$input && this.$container && this.$list);
 
-        if (this.$input) {
+        if (this.ready) {
             this.init();
         }
     }
 
     init() {
-        // Evento de troca de filtro (Multi-seleção)
         this.$filterItems.forEach(item => {
             const checkbox = item.querySelector('input[type="checkbox"]');
-            
-            item.addEventListener('click', (e) => {
-                // Impede que o clique no label/checkbox dispare o evento duas vezes
-                if (e.target.tagName !== 'INPUT') {
-                    checkbox.checked = !checkbox.checked;
-                }
-                
+
+            if (!checkbox) {
+                return;
+            }
+
+            item.addEventListener('click', (event) => {
+                event.preventDefault();
+                checkbox.checked = !checkbox.checked;
+
                 const filter = item.getAttribute('data-filter');
-                
+
                 if (filter === 'all') {
-                    // Se selecionou "Tudo", desmarca os outros
                     this.currentFilters = ['all'];
-                    this.$filterItems.forEach(i => {
-                        const cb = i.querySelector('input[type="checkbox"]');
-                        if (i.getAttribute('data-filter') !== 'all') {
-                            cb.checked = false;
-                            i.classList.remove('active');
+                    this.$filterItems.forEach(filterItem => {
+                        const filterCheckbox = filterItem.querySelector('input[type="checkbox"]');
+
+                        if (!filterCheckbox) {
+                            return;
+                        }
+
+                        if (filterItem.getAttribute('data-filter') !== 'all') {
+                            filterCheckbox.checked = false;
+                            filterItem.classList.remove('active');
                         } else {
-                            cb.checked = true;
-                            i.classList.add('active');
+                            filterCheckbox.checked = true;
+                            filterItem.classList.add('active');
                         }
                     });
                 } else {
-                    // Se selecionou outro, desmarca "Tudo"
-                    const allItem = document.querySelector('.filter-all');
-                    const allCb = allItem.querySelector('input[type="checkbox"]');
-                    allCb.checked = false;
-                    allItem.classList.remove('active');
-                    
+                    const allItem = this.$wrapper.querySelector('.filter-all');
+                    const allCheckbox = allItem?.querySelector('input[type="checkbox"]');
+
+                    if (allCheckbox) {
+                        allCheckbox.checked = false;
+                    }
+
+                    allItem?.classList.remove('active');
+
                     if (checkbox.checked) {
                         item.classList.add('active');
+
                         if (!this.currentFilters.includes(filter)) {
                             this.currentFilters.push(filter);
                         }
                     } else {
                         item.classList.remove('active');
-                        this.currentFilters = this.currentFilters.filter(f => f !== filter);
+                        this.currentFilters = this.currentFilters.filter(currentFilter => currentFilter !== filter);
                     }
-                    
-                    // Remove 'all' se houver outros selecionados
-                    this.currentFilters = this.currentFilters.filter(f => f !== 'all');
-                    
-                    // Se não sobrou nada, volta para 'all'
+
+                    this.currentFilters = this.currentFilters.filter(currentFilter => currentFilter !== 'all');
+
                     if (this.currentFilters.length === 0) {
                         this.currentFilters = ['all'];
-                        allCb.checked = true;
-                        allItem.classList.add('active');
+
+                        if (allCheckbox) {
+                            allCheckbox.checked = true;
+                        }
+
+                        allItem?.classList.add('active');
                     }
                 }
-                
+
                 this.updateFilterLabel();
-                
-                // Se já houver termo, refaz a busca
+
                 const query = this.$input.value.trim();
+
                 if (query.length >= 2) {
                     this.performSearch(query);
                 }
             });
         });
 
-        // Evento de input com debounce
-        this.$input.addEventListener('input', (e) => {
+        this.$input.addEventListener('input', (event) => {
             clearTimeout(this.timeout);
-            const query = e.target.value.trim();
+            const query = event.target.value.trim();
 
             if (query.length < 2) {
                 this.hide();
@@ -100,37 +111,34 @@ class GlobalSearch {
             this.timeout = setTimeout(() => this.performSearch(query), 300);
         });
 
-        // Eventos de teclado (Navegação)
-        this.$input.addEventListener('keydown', (e) => {
+        this.$input.addEventListener('keydown', (event) => {
             const items = this.$list.querySelectorAll('.search-result-item');
-            
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
+
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
                 this.show();
                 this.selectedIndex = Math.min(this.selectedIndex + 1, items.length - 1);
                 this.updateSelection(items);
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
                 this.selectedIndex = Math.max(this.selectedIndex - 1, -1);
                 this.updateSelection(items);
-            } else if (e.key === 'Enter') {
+            } else if (event.key === 'Enter') {
                 if (this.selectedIndex > -1 && items[this.selectedIndex]) {
-                    e.preventDefault();
+                    event.preventDefault();
                     items[this.selectedIndex].click();
                 }
-            } else if (e.key === 'Escape') {
+            } else if (event.key === 'Escape') {
                 this.hide();
             }
         });
 
-        // Clique fora para fechar
-        document.addEventListener('click', (e) => {
-            if (!this.$wrapper.contains(e.target)) {
+        document.addEventListener('click', (event) => {
+            if (!this.$wrapper.contains(event.target)) {
                 this.hide();
             }
         });
 
-        // Mostrar ao focar se tiver texto
         this.$input.addEventListener('focus', () => {
             if (this.$input.value.trim().length >= 2) {
                 this.show();
@@ -139,11 +147,15 @@ class GlobalSearch {
     }
 
     updateFilterLabel() {
+        if (!this.$filterLabel) {
+            return;
+        }
+
         if (this.currentFilters.includes('all')) {
             this.$filterLabel.textContent = 'Tudo';
         } else if (this.currentFilters.length === 1) {
-            const item = document.querySelector(`.dropdown-item[data-filter="${this.currentFilters[0]}"]`);
-            this.$filterLabel.textContent = item.querySelector('.form-check-label').textContent.trim();
+            const item = this.$wrapper.querySelector(`.dropdown-item[data-filter="${this.currentFilters[0]}"]`);
+            this.$filterLabel.textContent = item?.querySelector('.form-check-label')?.textContent.trim() || 'Filtro';
         } else {
             this.$filterLabel.textContent = `${this.currentFilters.length} Filtros`;
         }
@@ -155,9 +167,13 @@ class GlobalSearch {
 
         try {
             const filters = this.currentFilters.join(',');
-            const response = await fetch(`${this.baseUrl}/api/busca-global?q=${encodeURIComponent(query)}&filter=${filters}`);
-            if (!response.ok) throw new Error('Falha na busca');
-            
+            const baseUrl = this.baseUrl.replace(/\/$/, '');
+            const response = await fetch(`${baseUrl}/api/busca-global?q=${encodeURIComponent(query)}&filter=${filters}`);
+
+            if (!response.ok) {
+                throw new Error('Falha na busca');
+            }
+
             const results = await response.json();
             this.renderResults(results);
         } catch (error) {
@@ -195,7 +211,10 @@ class GlobalSearch {
 
         for (const group in groupedResults) {
             const items = groupedResults[group];
-            if (items.length === 0) continue;
+
+            if (items.length === 0) {
+                continue;
+            }
 
             const groupHeader = document.createElement('div');
             groupHeader.className = 'search-group-title';
@@ -246,7 +265,10 @@ class GlobalSearch {
     }
 }
 
-// Inicializa a busca global quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
-    window.globalSearch = new GlobalSearch();
+    window.globalSearchInstances = Array.from(document.querySelectorAll('.navbar-search-wrapper'))
+        .map(wrapper => new GlobalSearch(wrapper))
+        .filter(instance => instance.ready);
+
+    window.globalSearch = window.globalSearchInstances[0] || null;
 });

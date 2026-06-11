@@ -12,123 +12,20 @@ $notificationReadAllUrl = site_url('notificacoes/lidas');
 $notificationClearReadUrl = site_url('notificacoes/limpar-lidas');
 $notificationAppUrl = rtrim(site_url(), '/') . '/';
 ?>
-<nav class="top-navbar">
+<nav class="top-navbar<?= $isOsListPage ? ' os-list-navbar' : '' ?>">
     <div class="navbar-left">
         <button class="btn btn-link mobile-toggle" id="mobileToggle">
             <i class="bi bi-list"></i>
         </button>
         <h4 class="page-title mb-0"><?= $title ?? '' ?></h4>
     </div>
-    
+
     <!-- Busca Global -->
-    <div class="navbar-search-wrapper">
-        <div class="search-input-group">
-            <div class="dropdown h-100">
-                <button class="btn btn-link search-filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                    <span class="filter-label d-none d-lg-inline">Tudo</span>
-                    <i class="bi bi-funnel d-lg-none"></i>
-                </button>
-                <ul class="dropdown-menu search-filter-menu p-2">
-                    <li>
-                        <a class="dropdown-item filter-all active" href="javascript:void(0)" data-filter="all">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="all" id="filter-all" checked>
-                                <label class="form-check-label w-100 cursor-pointer" for="filter-all">
-                                    <i class="bi bi-grid-fill me-2"></i>Tudo
-                                </label>
-                            </div>
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <a class="dropdown-item" href="javascript:void(0)" data-filter="os">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="os" id="filter-os">
-                                <label class="form-check-label w-100 cursor-pointer" for="filter-os">
-                                    <i class="bi bi-file-earmark-text me-2"></i>OS
-                                </label>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="javascript:void(0)" data-filter="os_legado">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="os_legado" id="filter-os-legado">
-                                <label class="form-check-label w-100 cursor-pointer" for="filter-os-legado">
-                                    <i class="bi bi-clock-history me-2"></i>OS Legado (número antigo)
-                                </label>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="javascript:void(0)" data-filter="clientes">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="clientes" id="filter-clientes">
-                                <label class="form-check-label w-100 cursor-pointer" for="filter-clientes">
-                                    <i class="bi bi-people me-2"></i>Clientes
-                                </label>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="javascript:void(0)" data-filter="whatsapp">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="whatsapp" id="filter-whatsapp">
-                                <label class="form-check-label w-100 cursor-pointer" for="filter-whatsapp">
-                                    <i class="bi bi-whatsapp me-2"></i>WhatsApp
-                                </label>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="javascript:void(0)" data-filter="equipamentos">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="equipamentos" id="filter-equipamentos">
-                                <label class="form-check-label w-100 cursor-pointer" for="filter-equipamentos">
-                                    <i class="bi bi-laptop me-2"></i>Equipamentos
-                                </label>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="javascript:void(0)" data-filter="servicos">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="servicos" id="filter-servicos">
-                                <label class="form-check-label w-100 cursor-pointer" for="filter-servicos">
-                                    <i class="bi bi-tools me-2"></i>Servi&ccedil;os
-                                </label>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="javascript:void(0)" data-filter="pecas">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="pecas" id="filter-pecas">
-                                <label class="form-check-label w-100 cursor-pointer" for="filter-pecas">
-                                    <i class="bi bi-box-seam me-2"></i>Pe&ccedil;as
-                                </label>
-                            </div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <i class="bi bi-search search-icon ms-2"></i>
-            <input type="text" class="search-input" placeholder="O que você procura? (inclui OS legado)" autocomplete="off">
-            <div class="search-results-container shadow-lg">
-                <div class="search-loading-state d-none">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Buscando...</span>
-                    </div>
-                </div>
-                <div class="search-empty-state d-none">
-                    <i class="bi bi-search"></i>
-                    <p>Nenhum resultado encontrado.</p>
-                </div>
-                <div class="search-results-list"></div>
-            </div>
-        </div>
-    </div>
-    
+    <?= view('layouts/partials/global_search', [
+        'searchIdSuffix' => 'navbar',
+        'searchWrapperClass' => 'navbar-search-desktop',
+    ]) ?>
+
     <div class="navbar-right">
         <!-- Quick Actions -->
         <div class="navbar-actions">
@@ -155,7 +52,7 @@ $notificationAppUrl = rtrim(site_url(), '/') . '/';
                 type="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
-                aria-label="Abrir notificacoes"
+                aria-label="Abrir NotificaÃ§Ãµes"
             >
                 <i class="bi bi-bell"></i>
                 <span class="navbar-notification-badge d-none" id="navbarNotificationCount">0</span>
@@ -163,7 +60,7 @@ $notificationAppUrl = rtrim(site_url(), '/') . '/';
             <div class="dropdown-menu dropdown-menu-end navbar-notification-menu p-0">
                 <div class="navbar-notification-header">
                     <div>
-                        <strong>Notificacoes</strong>
+                        <strong>NotificaÃ§Ãµes</strong>
                         <small id="navbarNotificationMeta">Sincronizando...</small>
                     </div>
                     <div class="d-flex align-items-center gap-2">
@@ -180,7 +77,7 @@ $notificationAppUrl = rtrim(site_url(), '/') . '/';
                 </div>
             </div>
         </div>
-        
+
         <!-- User Menu -->
         <div class="dropdown">
             <button class="btn btn-link user-dropdown" type="button" data-bs-toggle="dropdown">
@@ -191,7 +88,7 @@ $notificationAppUrl = rtrim(site_url(), '/') . '/';
                         <i class="bi bi-person-circle fs-4"></i>
                     <?php endif; ?>
                 </div>
-                <span class="d-none d-md-inline"><?= esc(session()->get('user_nome') ?? 'Usuário') ?></span>
+                <span class="d-none d-md-inline"><?= esc(session()->get('user_nome') ?? 'UsuÃ¡rio') ?></span>
                 <i class="bi bi-chevron-down ms-1"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">

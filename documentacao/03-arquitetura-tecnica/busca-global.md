@@ -18,7 +18,7 @@ Regra tecnica obrigatoria para catalogo operacional:
 
 ### 2. GlobalSearch Controller (`app/Controllers/GlobalSearch.php`)
 
-- expõe `GET /api/busca-global` para AJAX;
+- expÃµe `GET /api/busca-global` para AJAX;
 - valida termo minimo antes de consultar o service;
 - retorna payload JSON agrupado.
 
@@ -28,6 +28,13 @@ Regra tecnica obrigatoria para catalogo operacional:
 - gestao de filtros com selecao multipla;
 - navegacao por teclado (`ArrowUp`, `ArrowDown`, `Enter`, `Escape`);
 - renderizacao dinamica por grupo.
+
+### 4. Layout responsivo (`public/assets/css/global-search.css`)
+
+- a busca desktop continua usando dropdown absoluto ancorado ao campo;
+- no mobile/sidebar (`.sidebar-search-wrapper`), o bloco `search-input-group` passa a aceitar `flex-wrap`;
+- o painel `.search-results-container` do menu hamburger ocupa `100%` da largura util e sai da disputa horizontal com input e filtro;
+- `result-title`, `result-subtitle` e `result-badge` aceitam quebra controlada para evitar corte lateral em telas compactas.
 
 ## Integracao com modelos
 
@@ -50,4 +57,7 @@ Em evolucoes da busca global, revisar em conjunto:
 - `app/Models/ServicoModel.php`
 - `app/Models/PecaModel.php`
 - `app/Views/layouts/navbar.php`
+- `app/Views/layouts/sidebar.php`
+- `app/Views/layouts/partials/global_search.php`
+- `public/assets/css/global-search.css`
 - `public/assets/js/global-search.js`

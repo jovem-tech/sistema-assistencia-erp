@@ -13,7 +13,7 @@
 
 <table class="grid">
     <tr><td class="label">Cliente</td><td><?= esc($os['cliente_nome']) ?></td><td class="label">Telefone</td><td><?= esc($os['cliente_telefone'] ?? '-') ?></td></tr>
-    <tr><td class="label">Equipamento</td><td><?= esc(trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))) ?></td><td class="label">Numero OS</td><td><?= esc($os['numero_os']) ?></td></tr>
+    <tr><td class="label">Equipamento</td><td><?= esc(equipamento_nome_exibicao($os)) ?></td><td class="label">Numero OS</td><td><?= esc($os['numero_os']) ?></td></tr>
 </table>
 
 <div class="section-title">Diagnostico tecnico</div>
@@ -52,6 +52,6 @@
     <tr><td class="label">Desconto</td><td><?= esc(formatMoney($os['desconto'] ?? 0)) ?></td><td class="label">Valor final</td><td><strong><?= esc(formatMoney($os['valor_final'] ?? 0)) ?></strong></td></tr>
 </table>
 
-  <div class="footer">Aprovação deste orçamento autoriza execução do serviço descrito.</div>
+  <div class="footer">AprovaÃ§Ã£o deste orÃ§amento autoriza execuÃ§Ã£o do serviÃ§o descrito.</div>
 </body>
 </html>

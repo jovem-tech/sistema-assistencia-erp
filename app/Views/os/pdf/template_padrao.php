@@ -20,6 +20,7 @@ $os = $os ?? [];
         <div class="doc-subtitle">Gerado em <?= esc($geradoEm ?? date('d/m/Y H:i:s')) ?></div>
     </div>
     <?= $conteudoHtml ?? '' ?>
+    <?= $fotosAnexadasHtml ?? '' ?>
 </div>
 </body>
 </html>

@@ -1,8 +1,18 @@
 # Deploy do ERP em Docker Swarm (Contabo + Traefik)
 
-Atualizado em 04/05/2026.
+Atualizado em 27/05/2026.
 
 Este guia instala o ERP da assistencia tecnica em container Docker no seu servidor Contabo, aproveitando o Traefik ja ativo no host e mantendo persistencia de banco, uploads e `writable/`.
+
+## Atalho para o ecossistema Setup Vem Fazer
+
+Se a sua VPS ja foi preparada pelo `setup-vemfazer.sh`, existe agora um fluxo dedicado para encaixar o ERP nesse ambiente sem remontar o Swarm do zero:
+
+- script: `scripts/docker/install-vemfazer-stack.sh`
+- stack dedicada: `docker/swarm/setup-vemfazer-stack.yml`
+- guia: `documentacao/10-deploy/integracao-setup-vemfazer.md`
+
+Esse caminho faz o `build` local da imagem do ERP e publica a stack aproveitando o Traefik/rede ja existentes no ambiente Vem Fazer.
 
 ## 1. O que foi adicionado ao repositorio
 

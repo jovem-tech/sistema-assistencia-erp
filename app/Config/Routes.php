@@ -9,6 +9,8 @@ use CodeIgniter\Router\RouteCollection;
 // =====================================================
 // ROTAS PUBLICAS (sem autenticacao)
 // =====================================================
+$routes->get('site', 'Home::index');
+$routes->get('apresentacao', 'Home::index');
 $routes->get('/', 'Auth::login');
 $routes->get('login', 'Auth::login');
 $routes->post('login', 'Auth::attemptLogin');
@@ -145,11 +147,12 @@ $routes->post('notificacoes/limpar-lidas', 'Notificacoes::clearRead');
     $routes->get('fornecedores',                  'Fornecedores::index',      ['filter' => 'permission:fornecedores:visualizar']);
     $routes->get('fornecedores/novo',             'Fornecedores::create',     ['filter' => 'permission:fornecedores:criar']);
     $routes->post('fornecedores/salvar',          'Fornecedores::store',      ['filter' => 'permission:fornecedores:criar']);
+    $routes->get('fornecedores/consultar-cnpj',   'Fornecedores::consultarCnpj', ['filter' => 'permission:fornecedores:visualizar']);
     $routes->get('fornecedores/editar/(:num)',    'Fornecedores::edit/$1',    ['filter' => 'permission:fornecedores:editar']);
     $routes->post('fornecedores/atualizar/(:num)','Fornecedores::update/$1',  ['filter' => 'permission:fornecedores:editar']);
     $routes->get('fornecedores/excluir/(:num)',   'Fornecedores::delete/$1',  ['filter' => 'permission:fornecedores:excluir']);
 
-    // -- Funcionários ------------------------------------------------------
+    // -- FuncionÃ¡rios ------------------------------------------------------
     $routes->get('funcionarios',                  'Funcionarios::index',      ['filter' => 'permission:funcionarios:visualizar']);
     $routes->get('funcionarios/novo',             'Funcionarios::create',     ['filter' => 'permission:funcionarios:criar']);
     $routes->post('funcionarios/salvar',          'Funcionarios::store',      ['filter' => 'permission:funcionarios:criar']);
@@ -165,14 +168,19 @@ $routes->post('notificacoes/limpar-lidas', 'Notificacoes::clearRead');
     $routes->post('equipamentos/atualizar/(:num)','Equipamentos::update/$1',  ['filter' => 'permission:equipamentos:editar']);
     $routes->post('equipamentos/deletar-foto/(:num)','Equipamentos::deleteFoto/$1',['filter' => 'permission:equipamentos:editar']);
     $routes->post('equipamentos/foto-principal/(:num)','Equipamentos::setFotoPrincipal/$1',['filter' => 'permission:equipamentos:editar']);
+    $routes->post('equipamentos/encerrar/(:num)', 'Equipamentos::encerrar/$1', ['filter' => 'permission:equipamentos:encerrar']);
+    $routes->post('equipamentos/reativar/(:num)', 'Equipamentos::reativar/$1', ['filter' => 'permission:equipamentos:encerrar']);
     $routes->get('equipamentos/excluir/(:num)',   'Equipamentos::delete/$1',  ['filter' => 'permission:equipamentos:excluir']);
     $routes->get('equipamentos/visualizar/(:num)',   'Equipamentos::show/$1',  ['filter' => 'permission:equipamentos:visualizar']);
     $routes->post('equipamentos/vincular-cliente',   'Equipamentos::vincularCliente', ['filter' => 'permission:equipamentos:editar']);
+    $routes->post('equipamentos/vincular-existente-ajax', 'Equipamentos::vincularExistenteAjax', ['filter' => 'permission:equipamentos:criar']);
     $routes->get('equipamentos/desvincular-cliente/(:num)/(:num)', 'Equipamentos::desvincularCliente/$1/$2', ['filter' => 'permission:equipamentos:editar']);
     $routes->get('equipamentos/por-cliente/(:num)','Equipamentos::byClient/$1',['filter' => 'permission:equipamentos:visualizar']);
     $routes->get('equipamentos/fotos/(:num)','Equipamentos::getFotos/$1',['filter' => 'permission:equipamentos:visualizar']);
     $routes->post('equipamentos/salvar-ajax','Equipamentos::storeAjax',['filter' => 'permission:equipamentos:criar']);
     $routes->post('equipamentos/atualizar-ajax/(:num)','Equipamentos::updateAjax/$1',['filter' => 'permission:equipamentos:editar']);
+    $routes->get('equipamentos/bench-collector/snapshot-local', 'Equipamentos::benchCollectorSnapshotLocal', ['filter' => 'permission:equipamentos:editar']);
+    $routes->get('equipamentos/bench-collector/coletar-local', 'Equipamentos::benchCollectorCollectLocal', ['filter' => 'permission:equipamentos:editar']);
 
     // -- Equipamentos Tipos ------------------------------------------------
     $routes->get('equipamentostipos',              'EquipamentosTipos::index',  ['filter' => 'permission:equipamentos:visualizar']);
@@ -223,94 +231,94 @@ $routes->post('notificacoes/limpar-lidas', 'Notificacoes::clearRead');
     $routes->get('defeitosrelatados/excluir/(:num)',    'DefeitosRelatados::delete/$1',        ['filter' => 'permission:defeitos:excluir']);
 
     // CRM + Central de Mensagens
-    $routes->get('crm/clientes',                 'Crm::clientes',               ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('crm/timeline',                 'Crm::timeline',               ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('crm/interacoes',               'Crm::interacoes',             ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('crm/interacoes/salvar',       'Crm::salvarInteracao',        ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('crm/followups',                'Crm::followups',              ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('crm/followups/salvar',        'Crm::salvarFollowup',         ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('crm/followups/(:num)/status', 'Crm::atualizarFollowupStatus/$1', ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('crm/pipeline',                 'Crm::pipeline',               ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('crm/campanhas',                'Crm::campanhas',              ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('crm/clientes-inativos',        'Crm::clientesInativos',       ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('crm/clientes-inativos/followup', 'Crm::criarFollowupInativo', ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('crm/metricas-marketing',       'Crm::metricasMarketing',      ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('crm/metricas-marketing/engajamento', 'Crm::salvarEngajamentoPeriodos', ['filter' => 'permission:clientes:editar']);
+    $routes->get('crm/clientes',                 'Crm::clientes',               ['filter' => 'permission:crm:visualizar']);
+    $routes->get('crm/timeline',                 'Crm::timeline',               ['filter' => 'permission:crm:visualizar']);
+    $routes->get('crm/interacoes',               'Crm::interacoes',             ['filter' => 'permission:crm:visualizar']);
+    $routes->post('crm/interacoes/salvar',       'Crm::salvarInteracao',        ['filter' => 'permission:crm:criar']);
+    $routes->get('crm/followups',                'Crm::followups',              ['filter' => 'permission:crm:visualizar']);
+    $routes->post('crm/followups/salvar',        'Crm::salvarFollowup',         ['filter' => 'permission:crm:criar']);
+    $routes->post('crm/followups/(:num)/status', 'Crm::atualizarFollowupStatus/$1', ['filter' => 'permission:crm:editar']);
+    $routes->get('crm/pipeline',                 'Crm::pipeline',               ['filter' => 'permission:crm:visualizar']);
+    $routes->get('crm/campanhas',                'Crm::campanhas',              ['filter' => 'permission:crm:visualizar']);
+    $routes->get('crm/clientes-inativos',        'Crm::clientesInativos',       ['filter' => 'permission:crm:visualizar']);
+    $routes->post('crm/clientes-inativos/followup', 'Crm::criarFollowupInativo', ['filter' => 'permission:crm:criar']);
+    $routes->get('crm/metricas-marketing',       'Crm::metricasMarketing',      ['filter' => 'permission:crm:visualizar']);
+    $routes->post('crm/metricas-marketing/engajamento', 'Crm::salvarEngajamentoPeriodos', ['filter' => 'permission:crm:editar']);
 
     // Central de Atendimento WhatsApp (rota canonica + alias legado)
-    $routes->get('atendimento-mobile',                      'AtendimentoMobile::index',                ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('atendimento-whatsapp',                    'CentralMensagens::index',                       ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('atendimento-whatsapp/conversas',          'CentralMensagens::conversas',                   ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('atendimento-whatsapp/conversas/stream',   'CentralMensagens::conversasStream',             ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('atendimento-whatsapp/conversa/(:num)',    'CentralMensagens::conversa/$1',                 ['filter' => 'permission:clientes:visualizar']);
-$routes->get('atendimento-whatsapp/conversa/(:num)/novas', 'CentralMensagens::conversaNovas/$1',         ['filter' => 'permission:clientes:visualizar']);
-$routes->get('atendimento-whatsapp/conversa/(:num)/stream', 'CentralMensagens::conversaStream/$1',       ['filter' => 'permission:clientes:visualizar']);
-$routes->post('atendimento-whatsapp/conversa/(:num)/cadastrar-contato', 'CentralMensagens::cadastrarContatoConversa/$1', ['filter' => 'permission:clientes:visualizar']);
-$routes->post('atendimento-whatsapp/conversa/(:num)/cadastrar-cliente', 'CentralMensagens::cadastrarContatoConversa/$1', ['filter' => 'permission:clientes:visualizar']);
-$routes->post('atendimento-whatsapp/enviar',            'CentralMensagens::enviar',                      ['filter' => 'permission:clientes:visualizar']);
-$routes->post('atendimento-whatsapp/vincular-os',       'CentralMensagens::vincularOs',                  ['filter' => 'permission:clientes:visualizar']);
-$routes->post('atendimento-whatsapp/atualizar-meta',    'CentralMensagens::atualizarMeta',               ['filter' => 'permission:clientes:visualizar']);
-$routes->post('atendimento-whatsapp/sync-inbound',      'CentralMensagens::syncInbound',                 ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('atendimento-whatsapp/chatbot',            'CentralMensagens::chatbot',                     ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('atendimento-whatsapp/chatbot/intencao/salvar', 'CentralMensagens::salvarIntencao',        ['filter' => 'permission:clientes:editar']);
-    $routes->post('atendimento-whatsapp/chatbot/intencao/toggle/(:num)', 'CentralMensagens::toggleIntencao/$1', ['filter' => 'permission:clientes:editar']);
-    $routes->post('atendimento-whatsapp/chatbot/intencao/deletar/(:num)', 'CentralMensagens::deletarIntencao/$1', ['filter' => 'permission:clientes:editar']);
-    $routes->post('atendimento-whatsapp/chatbot/regra/salvar', 'CentralMensagens::salvarRegraErp',          ['filter' => 'permission:clientes:editar']);
-    $routes->post('atendimento-whatsapp/chatbot/regra/toggle/(:num)', 'CentralMensagens::toggleRegraErp/$1', ['filter' => 'permission:clientes:editar']);
-    $routes->post('atendimento-whatsapp/chatbot/regra/deletar/(:num)', 'CentralMensagens::deletarRegraErp/$1', ['filter' => 'permission:clientes:editar']);
-    $routes->get('atendimento-whatsapp/faq',                'CentralMensagens::faq',                         ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('atendimento-whatsapp/faq/salvar',        'CentralMensagens::salvarFaq',                   ['filter' => 'permission:clientes:editar']);
-    $routes->post('atendimento-whatsapp/faq/toggle/(:num)', 'CentralMensagens::toggleFaq/$1',                ['filter' => 'permission:clientes:editar']);
-    $routes->get('atendimento-whatsapp/respostas-rapidas',  'CentralMensagens::respostasRapidas',            ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('atendimento-whatsapp/respostas-rapidas/salvar', 'CentralMensagens::salvarRespostaRapida', ['filter' => 'permission:clientes:editar']);
-    $routes->post('atendimento-whatsapp/respostas-rapidas/toggle/(:num)', 'CentralMensagens::toggleRespostaRapida/$1', ['filter' => 'permission:clientes:editar']);
-    $routes->get('atendimento-whatsapp/fluxos',             'CentralMensagens::fluxos',                      ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('atendimento-whatsapp/fluxos/salvar',     'CentralMensagens::salvarFluxo',                 ['filter' => 'permission:clientes:editar']);
-    $routes->post('atendimento-whatsapp/fluxos/toggle/(:num)', 'CentralMensagens::toggleFluxo/$1',           ['filter' => 'permission:clientes:editar']);
-    $routes->get('atendimento-whatsapp/filas',              'CentralMensagens::filas',                       ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('atendimento-whatsapp/filas/atualizar',   'CentralMensagens::atualizarFila',               ['filter' => 'permission:clientes:editar']);
-    $routes->get('atendimento-whatsapp/metricas',           'CentralMensagens::metricas',                    ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('atendimento-whatsapp/metricas/consolidar-diario', 'CentralMensagens::consolidarMetricasDiarias', ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('atendimento-whatsapp/configuracoes',      'CentralMensagens::configuracoes',               ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('atendimento-whatsapp/configuracoes/salvar', 'CentralMensagens::salvarConfiguracoes',      ['filter' => 'permission:clientes:editar']);
+    $routes->get('atendimento-mobile',                      'AtendimentoMobile::index',                ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->get('atendimento-whatsapp',                    'CentralMensagens::index',                       ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->get('atendimento-whatsapp/conversas',          'CentralMensagens::conversas',                   ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->get('atendimento-whatsapp/conversas/stream',   'CentralMensagens::conversasStream',             ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->get('atendimento-whatsapp/conversa/(:num)',    'CentralMensagens::conversa/$1',                 ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+$routes->get('atendimento-whatsapp/conversa/(:num)/novas', 'CentralMensagens::conversaNovas/$1',         ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+$routes->get('atendimento-whatsapp/conversa/(:num)/stream', 'CentralMensagens::conversaStream/$1',       ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+$routes->post('atendimento-whatsapp/conversa/(:num)/cadastrar-contato', 'CentralMensagens::cadastrarContatoConversa/$1', ['filter' => 'permission:atendimento_whatsapp:editar']);
+$routes->post('atendimento-whatsapp/conversa/(:num)/cadastrar-cliente', 'CentralMensagens::cadastrarContatoConversa/$1', ['filter' => 'permission:atendimento_whatsapp:editar']);
+$routes->post('atendimento-whatsapp/enviar',            'CentralMensagens::enviar',                      ['filter' => 'permission:atendimento_whatsapp:editar']);
+$routes->post('atendimento-whatsapp/vincular-os',       'CentralMensagens::vincularOs',                  ['filter' => 'permission:atendimento_whatsapp:editar']);
+$routes->post('atendimento-whatsapp/atualizar-meta',    'CentralMensagens::atualizarMeta',               ['filter' => 'permission:atendimento_whatsapp:editar']);
+$routes->post('atendimento-whatsapp/sync-inbound',      'CentralMensagens::syncInbound',                 ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('atendimento-whatsapp/chatbot',            'CentralMensagens::chatbot',                     ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('atendimento-whatsapp/chatbot/intencao/salvar', 'CentralMensagens::salvarIntencao',        ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('atendimento-whatsapp/chatbot/intencao/toggle/(:num)', 'CentralMensagens::toggleIntencao/$1', ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('atendimento-whatsapp/chatbot/intencao/deletar/(:num)', 'CentralMensagens::deletarIntencao/$1', ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('atendimento-whatsapp/chatbot/regra/salvar', 'CentralMensagens::salvarRegraErp',          ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('atendimento-whatsapp/chatbot/regra/toggle/(:num)', 'CentralMensagens::toggleRegraErp/$1', ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('atendimento-whatsapp/chatbot/regra/deletar/(:num)', 'CentralMensagens::deletarRegraErp/$1', ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('atendimento-whatsapp/faq',                'CentralMensagens::faq',                         ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('atendimento-whatsapp/faq/salvar',        'CentralMensagens::salvarFaq',                   ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('atendimento-whatsapp/faq/toggle/(:num)', 'CentralMensagens::toggleFaq/$1',                ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('atendimento-whatsapp/respostas-rapidas',  'CentralMensagens::respostasRapidas',            ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('atendimento-whatsapp/respostas-rapidas/salvar', 'CentralMensagens::salvarRespostaRapida', ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('atendimento-whatsapp/respostas-rapidas/toggle/(:num)', 'CentralMensagens::toggleRespostaRapida/$1', ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('atendimento-whatsapp/fluxos',             'CentralMensagens::fluxos',                      ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('atendimento-whatsapp/fluxos/salvar',     'CentralMensagens::salvarFluxo',                 ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('atendimento-whatsapp/fluxos/toggle/(:num)', 'CentralMensagens::toggleFluxo/$1',           ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('atendimento-whatsapp/filas',              'CentralMensagens::filas',                       ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('atendimento-whatsapp/filas/atualizar',   'CentralMensagens::atualizarFila',               ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('atendimento-whatsapp/metricas',           'CentralMensagens::metricas',                    ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('atendimento-whatsapp/metricas/consolidar-diario', 'CentralMensagens::consolidarMetricasDiarias', ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('atendimento-whatsapp/configuracoes',      'CentralMensagens::configuracoes',               ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('atendimento-whatsapp/configuracoes/salvar', 'CentralMensagens::salvarConfiguracoes',      ['filter' => 'permission:atendimento_whatsapp:editar']);
 
     // Alias legado para compatibilidade interna/links antigos
-    $routes->get('central-mensagens',                       'CentralMensagens::index',                       ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('central-mensagens/conversas',             'CentralMensagens::conversas',                   ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('central-mensagens/conversas/stream',      'CentralMensagens::conversasStream',             ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('central-mensagens/conversa/(:num)',       'CentralMensagens::conversa/$1',                 ['filter' => 'permission:clientes:visualizar']);
-$routes->get('central-mensagens/conversa/(:num)/novas', 'CentralMensagens::conversaNovas/$1',            ['filter' => 'permission:clientes:visualizar']);
-$routes->get('central-mensagens/conversa/(:num)/stream', 'CentralMensagens::conversaStream/$1',          ['filter' => 'permission:clientes:visualizar']);
-$routes->post('central-mensagens/conversa/(:num)/cadastrar-contato', 'CentralMensagens::cadastrarContatoConversa/$1', ['filter' => 'permission:clientes:visualizar']);
-$routes->post('central-mensagens/conversa/(:num)/cadastrar-cliente', 'CentralMensagens::cadastrarContatoConversa/$1', ['filter' => 'permission:clientes:visualizar']);
-$routes->post('central-mensagens/enviar',               'CentralMensagens::enviar',                      ['filter' => 'permission:clientes:visualizar']);
-$routes->post('central-mensagens/vincular-os',          'CentralMensagens::vincularOs',                  ['filter' => 'permission:clientes:visualizar']);
-$routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atualizarMeta',               ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('central-mensagens/sync-inbound',         'CentralMensagens::syncInbound',                 ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('central-mensagens/chatbot',               'CentralMensagens::chatbot',                     ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('central-mensagens/chatbot/intencao/salvar', 'CentralMensagens::salvarIntencao',           ['filter' => 'permission:clientes:editar']);
-    $routes->post('central-mensagens/chatbot/intencao/toggle/(:num)', 'CentralMensagens::toggleIntencao/$1', ['filter' => 'permission:clientes:editar']);
-    $routes->post('central-mensagens/chatbot/intencao/deletar/(:num)', 'CentralMensagens::deletarIntencao/$1', ['filter' => 'permission:clientes:editar']);
-    $routes->post('central-mensagens/chatbot/regra/salvar', 'CentralMensagens::salvarRegraErp',             ['filter' => 'permission:clientes:editar']);
-    $routes->post('central-mensagens/chatbot/regra/toggle/(:num)', 'CentralMensagens::toggleRegraErp/$1',   ['filter' => 'permission:clientes:editar']);
-    $routes->post('central-mensagens/chatbot/regra/deletar/(:num)', 'CentralMensagens::deletarRegraErp/$1', ['filter' => 'permission:clientes:editar']);
-    $routes->get('central-mensagens/faq',                   'CentralMensagens::faq',                         ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('central-mensagens/faq/salvar',           'CentralMensagens::salvarFaq',                   ['filter' => 'permission:clientes:editar']);
-    $routes->post('central-mensagens/faq/toggle/(:num)',    'CentralMensagens::toggleFaq/$1',                ['filter' => 'permission:clientes:editar']);
-    $routes->get('central-mensagens/respostas-rapidas',     'CentralMensagens::respostasRapidas',            ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('central-mensagens/respostas-rapidas/salvar', 'CentralMensagens::salvarRespostaRapida',    ['filter' => 'permission:clientes:editar']);
-    $routes->post('central-mensagens/respostas-rapidas/toggle/(:num)', 'CentralMensagens::toggleRespostaRapida/$1', ['filter' => 'permission:clientes:editar']);
-    $routes->get('central-mensagens/fluxos',                'CentralMensagens::fluxos',                      ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('central-mensagens/fluxos/salvar',        'CentralMensagens::salvarFluxo',                 ['filter' => 'permission:clientes:editar']);
-    $routes->post('central-mensagens/fluxos/toggle/(:num)', 'CentralMensagens::toggleFluxo/$1',              ['filter' => 'permission:clientes:editar']);
-    $routes->get('central-mensagens/filas',                 'CentralMensagens::filas',                       ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('central-mensagens/filas/atualizar',      'CentralMensagens::atualizarFila',               ['filter' => 'permission:clientes:editar']);
-    $routes->get('central-mensagens/metricas',              'CentralMensagens::metricas',                    ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('central-mensagens/metricas/consolidar-diario', 'CentralMensagens::consolidarMetricasDiarias', ['filter' => 'permission:clientes:visualizar']);
-    $routes->get('central-mensagens/configuracoes',         'CentralMensagens::configuracoes',               ['filter' => 'permission:clientes:visualizar']);
-    $routes->post('central-mensagens/configuracoes/salvar', 'CentralMensagens::salvarConfiguracoes',         ['filter' => 'permission:clientes:editar']);
+    $routes->get('central-mensagens',                       'CentralMensagens::index',                       ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->get('central-mensagens/conversas',             'CentralMensagens::conversas',                   ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->get('central-mensagens/conversas/stream',      'CentralMensagens::conversasStream',             ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->get('central-mensagens/conversa/(:num)',       'CentralMensagens::conversa/$1',                 ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+$routes->get('central-mensagens/conversa/(:num)/novas', 'CentralMensagens::conversaNovas/$1',            ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+$routes->get('central-mensagens/conversa/(:num)/stream', 'CentralMensagens::conversaStream/$1',          ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+$routes->post('central-mensagens/conversa/(:num)/cadastrar-contato', 'CentralMensagens::cadastrarContatoConversa/$1', ['filter' => 'permission:atendimento_whatsapp:editar']);
+$routes->post('central-mensagens/conversa/(:num)/cadastrar-cliente', 'CentralMensagens::cadastrarContatoConversa/$1', ['filter' => 'permission:atendimento_whatsapp:editar']);
+$routes->post('central-mensagens/enviar',               'CentralMensagens::enviar',                      ['filter' => 'permission:atendimento_whatsapp:editar']);
+$routes->post('central-mensagens/vincular-os',          'CentralMensagens::vincularOs',                  ['filter' => 'permission:atendimento_whatsapp:editar']);
+$routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atualizarMeta',               ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('central-mensagens/sync-inbound',         'CentralMensagens::syncInbound',                 ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('central-mensagens/chatbot',               'CentralMensagens::chatbot',                     ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('central-mensagens/chatbot/intencao/salvar', 'CentralMensagens::salvarIntencao',           ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('central-mensagens/chatbot/intencao/toggle/(:num)', 'CentralMensagens::toggleIntencao/$1', ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('central-mensagens/chatbot/intencao/deletar/(:num)', 'CentralMensagens::deletarIntencao/$1', ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('central-mensagens/chatbot/regra/salvar', 'CentralMensagens::salvarRegraErp',             ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('central-mensagens/chatbot/regra/toggle/(:num)', 'CentralMensagens::toggleRegraErp/$1',   ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('central-mensagens/chatbot/regra/deletar/(:num)', 'CentralMensagens::deletarRegraErp/$1', ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('central-mensagens/faq',                   'CentralMensagens::faq',                         ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('central-mensagens/faq/salvar',           'CentralMensagens::salvarFaq',                   ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('central-mensagens/faq/toggle/(:num)',    'CentralMensagens::toggleFaq/$1',                ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('central-mensagens/respostas-rapidas',     'CentralMensagens::respostasRapidas',            ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('central-mensagens/respostas-rapidas/salvar', 'CentralMensagens::salvarRespostaRapida',    ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('central-mensagens/respostas-rapidas/toggle/(:num)', 'CentralMensagens::toggleRespostaRapida/$1', ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('central-mensagens/fluxos',                'CentralMensagens::fluxos',                      ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('central-mensagens/fluxos/salvar',        'CentralMensagens::salvarFluxo',                 ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->post('central-mensagens/fluxos/toggle/(:num)', 'CentralMensagens::toggleFluxo/$1',              ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('central-mensagens/filas',                 'CentralMensagens::filas',                       ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('central-mensagens/filas/atualizar',      'CentralMensagens::atualizarFila',               ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('central-mensagens/metricas',              'CentralMensagens::metricas',                    ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('central-mensagens/metricas/consolidar-diario', 'CentralMensagens::consolidarMetricasDiarias', ['filter' => 'permission:atendimento_whatsapp:editar']);
+    $routes->get('central-mensagens/configuracoes',         'CentralMensagens::configuracoes',               ['filter' => 'permission:atendimento_whatsapp:visualizar']);
+    $routes->post('central-mensagens/configuracoes/salvar', 'CentralMensagens::salvarConfiguracoes',         ['filter' => 'permission:atendimento_whatsapp:editar']);
 
-    // -- Ordens de Serviço -------------------------------------------------
+    // -- Ordens de ServiÃ§o -------------------------------------------------
     $routes->get('os',                    'Os::index',              ['filter' => 'permission:os:visualizar']);
     $routes->post('os/datatable',         'Os::datatable',          ['filter' => 'permission:os:visualizar']);
     $routes->get('os/fotos/(:num)',      'Os::photos/$1',          ['filter' => 'permission:os:visualizar']);
@@ -322,12 +330,15 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->post('os/atualizar/(:num)',  'Os::update/$1',          ['filter' => 'permission:os:editar']);
     $routes->get('os/visualizar/(:num)', 'Os::show/$1',            ['filter' => 'permission:os:visualizar']);
     $routes->get('os/status-meta/(:num)', 'Os::statusMeta/$1',      ['filter' => 'permission:os:visualizar']);
+    $routes->get('os/encerramento-meta/(:num)', 'Os::encerramentoMeta/$1', ['filter' => 'permission:os:visualizar']);
     $routes->get('os/prazos-meta/(:num)', 'Os::datesMeta/$1',       ['filter' => 'permission:os:editar']);
     $routes->post('os/prazos-ajax/(:num)', 'Os::updateDatesAjax/$1',['filter' => 'permission:os:editar']);
     $routes->get('os/orcamento-meta/(:num)', 'Os::budgetMeta/$1',   ['filter' => 'permission:os:editar']);
+    $routes->get('os/whatsapp-meta/(:num)', 'Os::whatsappMeta/$1',  ['filter' => 'permission:os:editar']);
     $routes->get('os/orcamento-resumo/(:num)', 'Os::budgetSummary/$1', ['filter' => 'permission:os:editar']);
     $routes->post('os/orcamento-ajax/(:num)', 'Os::budgetAjax/$1',  ['filter' => 'permission:os:editar']);
     $routes->post('os/status-ajax/(:num)','Os::updateStatusAjax/$1',['filter' => 'permission:os:editar']);
+    $routes->post('os/encerrar-ajax/(:num)', 'Os::encerrarAjax/$1', ['filter' => 'permission:os:encerrar']);
     $routes->post('os/status/(:num)',    'Os::updateStatus/$1',    ['filter' => 'permission:os:editar']);
     $routes->get('os/imprimir/(:num)',   'Os::print/$1',           ['filter' => 'permission:os:visualizar']);
     $routes->post('os/whatsapp/(:num)',  'Os::sendWhatsApp/$1',    ['filter' => 'permission:os:editar']);
@@ -353,10 +364,11 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->post('conhecimento/templates-whatsapp/salvar',   'ConhecimentoTemplates::saveWhatsapp', ['filter' => 'permission:os:editar']);
     $routes->post('conhecimento/templates-whatsapp/toggle/(:num)', 'ConhecimentoTemplates::toggleWhatsapp/$1', ['filter' => 'permission:os:editar']);
 
-    // -- Serviços ----------------------------------------------------------
+    // -- ServiÃ§os ----------------------------------------------------------
     $routes->get('servicos',                  'Servicos::index',            ['filter' => 'permission:servicos:visualizar']);
     $routes->get('servicos/novo',             'Servicos::create',           ['filter' => 'permission:servicos:criar']);
     $routes->post('servicos/salvar',          'Servicos::store',            ['filter' => 'permission:servicos:criar']);
+    $routes->post('servicos/salvar_ajax',     'Servicos::salvar_ajax',      ['filter' => 'permission:servicos:criar']);
     $routes->get('servicos/editar/(:num)',    'Servicos::edit/$1',          ['filter' => 'permission:servicos:editar']);
     $routes->post('servicos/atualizar/(:num)','Servicos::update/$1',        ['filter' => 'permission:servicos:editar']);
     $routes->get('servicos/excluir/(:num)',   'Servicos::delete/$1',        ['filter' => 'permission:servicos:excluir']);
@@ -390,7 +402,7 @@ $routes->post('orcamentos/email/(:num)/enviar',    'Orcamentos::sendEmail/$1', [
 $routes->post('orcamentos/pacotes/gerar-enviar/(:num)', 'Orcamentos::sendPacoteLink/$1', ['filter' => 'permission:orcamentos:editar']);
 $routes->post('orcamentos/central-mensagens/gerar-enviar', 'Orcamentos::quickCreateAndSendFromConversa', ['filter' => 'permission:orcamentos:criar']);
     $routes->get('orcamentos/excluir/(:num)',          'Orcamentos::delete/$1',    ['filter' => 'permission:orcamentos:excluir']);
-    
+
     // -- Pacotes de Servicos -----------------------------------------------
     $routes->get('pacotes-servicos',                    'PacotesServicos::index',    ['filter' => 'permission:orcamentos:visualizar']);
     $routes->get('pacotes-servicos/novo',               'PacotesServicos::create',   ['filter' => 'permission:orcamentos:criar']);
@@ -399,16 +411,16 @@ $routes->post('orcamentos/central-mensagens/gerar-enviar', 'Orcamentos::quickCre
     $routes->get('pacotes-servicos/preview/(:num)',     'PacotesServicos::preview/$1', ['filter' => 'permission:orcamentos:visualizar']);
     $routes->post('pacotes-servicos/atualizar/(:num)',  'PacotesServicos::update/$1',['filter' => 'permission:orcamentos:editar']);
     $routes->get('pacotes-servicos/excluir/(:num)',     'PacotesServicos::delete/$1',['filter' => 'permission:orcamentos:excluir']);
-    $routes->get('precificacao',                        'Precificacao::index', ['filter' => 'permission:orcamentos:visualizar']);
-    $routes->get('precificacao/configuracao',           'Precificacao::configuracao', ['filter' => 'permission:orcamentos:visualizar']);
-    $routes->post('precificacao/configuracao/salvar',    'Precificacao::saveConfiguracao', ['filter' => 'permission:orcamentos:editar']);
-    $routes->get('precificacao/simulador',              'Precificacao::simulador', ['filter' => 'permission:orcamentos:visualizar']);
-    $routes->get('precificacao/categoria-encargos/(:num)', 'Precificacao::categoriaEncargos/$1', ['filter' => 'permission:orcamentos:visualizar']);
-    $routes->post('precificacao/categoria-encargos/(:num)', 'Precificacao::salvarCategoriaEncargos/$1', ['filter' => 'permission:orcamentos:editar']);
-    $routes->get('precificacao/categoria-override',       'Precificacao::categoriaOverride', ['filter' => 'permission:orcamentos:visualizar']);
-    $routes->post('precificacao/salvar',                'Precificacao::save', ['filter' => 'permission:orcamentos:editar']);
-    $routes->post('precificacao/simular-peca',          'Precificacao::simularPeca', ['filter' => 'permission:orcamentos:visualizar']);
-    $routes->post('precificacao/simular-servico',       'Precificacao::simularServico', ['filter' => 'permission:orcamentos:visualizar']);
+    $routes->get('precificacao',                        'Precificacao::index', ['filter' => 'permission:precificacao:visualizar']);
+    $routes->get('precificacao/configuracao',           'Precificacao::configuracao', ['filter' => 'permission:precificacao:visualizar']);
+    $routes->post('precificacao/configuracao/salvar',    'Precificacao::saveConfiguracao', ['filter' => 'permission:precificacao:editar']);
+    $routes->get('precificacao/simulador',              'Precificacao::simulador', ['filter' => 'permission:precificacao:visualizar']);
+    $routes->get('precificacao/categoria-encargos/(:num)', 'Precificacao::categoriaEncargos/$1', ['filter' => 'permission:precificacao:visualizar']);
+    $routes->post('precificacao/categoria-encargos/(:num)', 'Precificacao::salvarCategoriaEncargos/$1', ['filter' => 'permission:precificacao:editar']);
+    $routes->get('precificacao/categoria-override',       'Precificacao::categoriaOverride', ['filter' => 'permission:precificacao:visualizar']);
+    $routes->post('precificacao/salvar',                'Precificacao::save', ['filter' => 'permission:precificacao:editar']);
+    $routes->post('precificacao/simular-peca',          'Precificacao::simularPeca', ['filter' => 'permission:precificacao:visualizar']);
+    $routes->post('precificacao/simular-servico',       'Precificacao::simularServico', ['filter' => 'permission:precificacao:visualizar']);
 
     // -- Vendas ------------------------------------------------------------
     $routes->get('vendas',                    'Vendas::index',              ['filter' => 'permission:vendas:visualizar']);
@@ -417,6 +429,7 @@ $routes->post('orcamentos/central-mensagens/gerar-enviar', 'Orcamentos::quickCre
     $routes->get('estoque',                    'Estoque::index',      ['filter' => 'permission:estoque:visualizar']);
     $routes->get('estoque/novo',              'Estoque::create',     ['filter' => 'permission:estoque:criar']);
     $routes->post('estoque/salvar',            'Estoque::store',      ['filter' => 'permission:estoque:criar']);
+    $routes->post('estoque/salvar_ajax',       'Estoque::salvar_ajax', ['filter' => 'permission:estoque:criar']);
     $routes->get('estoque/editar/(:num)',      'Estoque::edit/$1',    ['filter' => 'permission:estoque:editar']);
     $routes->post('estoque/atualizar/(:num)',  'Estoque::update/$1',  ['filter' => 'permission:estoque:editar']);
     $routes->get('estoque/excluir/(:num)',     'Estoque::delete/$1',  ['filter' => 'permission:estoque:excluir']);
@@ -429,6 +442,22 @@ $routes->post('orcamentos/central-mensagens/gerar-enviar', 'Orcamentos::quickCre
 
     // -- Financeiro --------------------------------------------------------
     $routes->get('financeiro',                  'Financeiro::index',    ['filter' => 'permission:financeiro:visualizar']);
+    $routes->get('financeiro/configuracoes',    'FinanceiroConfiguracoes::index', ['filter' => 'permission:financeiro:visualizar']);
+    $routes->get('financeiro/cartoes',          'FinanceiroCartoes::index', ['filter' => 'permission:financeiro:visualizar']);
+    $routes->post('financeiro/cartoes/operadoras/salvar', 'FinanceiroCartoes::saveOperadora', ['filter' => 'permission:financeiro:editar']);
+    $routes->post('financeiro/cartoes/operadoras/desativar/(:num)', 'FinanceiroCartoes::disableOperadora/$1', ['filter' => 'permission:financeiro:excluir']);
+    $routes->post('financeiro/cartoes/bandeiras/salvar', 'FinanceiroCartoes::saveBandeira', ['filter' => 'permission:financeiro:editar']);
+    $routes->post('financeiro/cartoes/bandeiras/desativar/(:num)', 'FinanceiroCartoes::disableBandeira/$1', ['filter' => 'permission:financeiro:excluir']);
+    $routes->post('financeiro/cartoes/taxas/salvar', 'FinanceiroCartoes::saveTaxa', ['filter' => 'permission:financeiro:editar']);
+    $routes->post('financeiro/cartoes/taxas/desativar/(:num)', 'FinanceiroCartoes::disableTaxa/$1', ['filter' => 'permission:financeiro:excluir']);
+    $routes->post('financeiro/cartoes/simular', 'FinanceiroCartoes::simulate', ['filter' => 'permission:financeiro:visualizar']);
+    $routes->post('financeiro/configuracoes/categorias/salvar', 'FinanceiroConfiguracoes::saveCategoria', ['filter' => 'permission:financeiro:editar']);
+    $routes->post('financeiro/configuracoes/categorias/excluir/(:num)', 'FinanceiroConfiguracoes::deleteCategoria/$1', ['filter' => 'permission:financeiro:excluir']);
+    $routes->post('financeiro/configuracoes/dre/grupos/salvar', 'FinanceiroConfiguracoes::saveGrupo', ['filter' => 'permission:financeiro:editar']);
+    $routes->post('financeiro/configuracoes/dre/grupos/excluir/(:num)', 'FinanceiroConfiguracoes::deleteGrupo/$1', ['filter' => 'permission:financeiro:excluir']);
+    $routes->post('financeiro/configuracoes/dre/subgrupos/salvar', 'FinanceiroConfiguracoes::saveSubgrupo', ['filter' => 'permission:financeiro:editar']);
+    $routes->post('financeiro/configuracoes/dre/subgrupos/excluir/(:num)', 'FinanceiroConfiguracoes::deleteSubgrupo/$1', ['filter' => 'permission:financeiro:excluir']);
+    $routes->get('financeiro/detalhes/(:num)', 'Financeiro::details/$1', ['filter' => 'permission:financeiro:visualizar']);
     $routes->get('financeiro/novo',            'Financeiro::create',   ['filter' => 'permission:financeiro:criar']);
     $routes->post('financeiro/salvar',          'Financeiro::store',    ['filter' => 'permission:financeiro:criar']);
     $routes->get('financeiro/editar/(:num)',    'Financeiro::edit/$1',  ['filter' => 'permission:financeiro:editar']);
@@ -436,14 +465,16 @@ $routes->post('orcamentos/central-mensagens/gerar-enviar', 'Orcamentos::quickCre
     $routes->get('financeiro/excluir/(:num)',   'Financeiro::delete/$1',['filter' => 'permission:financeiro:excluir']);
     $routes->post('financeiro/baixar/(:num)',   'Financeiro::pay/$1',   ['filter' => 'permission:financeiro:editar']);
 
-    // -- Relatórios --------------------------------------------------------
+    // -- RelatÃ³rios --------------------------------------------------------
     $routes->get('relatorios',             'Relatorios::index',      ['filter' => 'permission:relatorios:visualizar']);
     $routes->get('relatorios/os',          'Relatorios::osByPeriod', ['filter' => 'permission:relatorios:visualizar']);
     $routes->get('relatorios/financeiro',  'Relatorios::financial',  ['filter' => 'permission:relatorios:visualizar']);
+    $routes->get('relatorios/dre',         'Relatorios::dre',        ['filter' => 'permission:relatorios:visualizar']);
+    $routes->get('relatorios/fluxo-caixa', 'Relatorios::cashFlow',   ['filter' => 'permission:relatorios:visualizar']);
     $routes->get('relatorios/estoque',     'Relatorios::stock',      ['filter' => 'permission:relatorios:visualizar']);
     $routes->get('relatorios/clientes',    'Relatorios::clients',    ['filter' => 'permission:relatorios:visualizar']);
 
-    // -- Configurações -----------------------------------------------------
+    // -- ConfiguraÃ§Ãµes -----------------------------------------------------
     $routes->get('configuracoes',          'Configuracoes::index',   ['filter' => 'permission:configuracoes:visualizar']);
     $routes->post('configuracoes/salvar',  'Configuracoes::save',    ['filter' => 'permission:configuracoes:editar']);
     $routes->post('configuracoes/email/enviar-teste', 'Configuracoes::sendEmailTest', ['filter' => 'permission:configuracoes:editar']);
@@ -456,7 +487,7 @@ $routes->post('orcamentos/central-mensagens/gerar-enviar', 'Orcamentos::quickCre
     $routes->post('configuracoes/whatsapp/local-start', 'Configuracoes::whatsappLocalStart', ['filter' => 'permission:configuracoes:editar']);
     $routes->post('configuracoes/whatsapp/self-check-inbound', 'Configuracoes::whatsappInboundSelfCheck', ['filter' => 'permission:configuracoes:editar']);
 
-    // -- Usuários ----------------------------------------------------------
+    // -- UsuÃ¡rios ----------------------------------------------------------
     $routes->get('usuarios',                  'Usuarios::index',    ['filter' => 'permission:usuarios:visualizar']);
     $routes->post('usuarios/datatable',       'Usuarios::datatable',['filter' => 'permission:usuarios:visualizar']);
     $routes->get('usuarios/novo',             'Usuarios::create',   ['filter' => 'permission:usuarios:criar']);
@@ -465,14 +496,14 @@ $routes->post('orcamentos/central-mensagens/gerar-enviar', 'Orcamentos::quickCre
     $routes->post('usuarios/atualizar/(:num)','Usuarios::update/$1',['filter' => 'permission:usuarios:editar']);
     $routes->get('usuarios/excluir/(:num)',   'Usuarios::delete/$1',['filter' => 'permission:usuarios:excluir']);
 
-    // -- Documentação (Central de Conhecimento / Wiki) ---------------------
+    // -- DocumentaÃ§Ã£o (Central de Conhecimento / Wiki) ---------------------
     $routes->get('design-system',         'DesignSystem::index', ['filter' => 'permission:configuracoes:visualizar']);
     $routes->get('documentacao',          'Documentacao::index');
     $routes->get('documentacao/arquivo',  'Documentacao::arquivo');
     $routes->get('documentacao/buscar',   'Documentacao::buscar');
     $routes->get('documentacao/arvore',   'Documentacao::arvore');
 
-    // -- Upload (apenas usuários autenticados) -----------------------------
+    // -- Upload (apenas usuÃ¡rios autenticados) -----------------------------
     $routes->post('upload/imagem',         'Upload::image');
     // -- Busca Global ------------------------------------------------------
     $routes->get('api/busca-global', 'GlobalSearch::index');

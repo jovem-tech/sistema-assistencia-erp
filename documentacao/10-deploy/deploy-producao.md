@@ -105,6 +105,27 @@ php spark migrate
 - `writable/`
 - `public/uploads/`
 
+### 2.1 Automacao obrigatoria da cobranca de OS pendente
+
+Para que a baixa com `pagamento pendente` gere os lembretes automaticos em `1`, `3` e `5` dias, a VPS deve executar periodicamente o comando:
+
+```bash
+cd /var/www/sistema-hml
+php spark os:cobrancas
+```
+
+Agendamento recomendado no `crontab`:
+
+```bash
+*/15 * * * * cd /var/www/sistema-hml && php spark os:cobrancas >> writable/logs/os-cobrancas.log 2>&1
+```
+
+Observacoes:
+
+- o comando e seguro para execucao recorrente;
+- ele apenas processa agendamentos vencidos em `os_cobranca_agendamentos`;
+- quando a OS ja estiver quitada ou nao estiver mais em `entregue_pagamento_pendente`, o proprio processamento cancela o agendamento residual.
+
 ## 3. Gateway WhatsApp (Node)
 
 Pasta recomendada:

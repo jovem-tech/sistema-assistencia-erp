@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Relatório de OS por Período</title>
+    <title>RelatÃ³rio de OS por PerÃ­odo</title>
     <style>
         body { font-family: Arial, sans-serif; font-size: 12px; margin: 20px; }
         h1 { text-align: center; font-size: 18px; }
@@ -15,16 +15,16 @@
     </style>
 </head>
 <body onload="window.print()">
-    <h1>Relatório de Ordens de Serviço</h1>
+    <h1>RelatÃ³rio de Ordens de ServiÃ§o</h1>
     <p>
-        <strong>Período:</strong> <?= date('d/m/Y', strtotime($data_inicial)) ?> até <?= date('d/m/Y', strtotime($data_final)) ?><br>
+        <strong>PerÃ­odo:</strong> <?= date('d/m/Y', strtotime($data_inicial)) ?> atÃ© <?= date('d/m/Y', strtotime($data_final)) ?><br>
         <strong>Status:</strong> <?= ucwords(str_replace('_', ' ', $status ?? 'Todos')) ?>
     </p>
 
     <table>
         <thead>
             <tr>
-                <th>Nº OS</th>
+                <th>NÂº OS</th>
                 <th>Cliente</th>
                 <th>Equipamento</th>
                 <th>Status</th>
@@ -39,7 +39,7 @@
                 <tr>
                     <td><?= $os['id'] ?></td>
                     <td><?= esc($os['cliente_nome']) ?></td>
-                    <td><?= esc($os['equip_marca'] . ' ' . $os['equip_modelo']) ?></td>
+                    <td><?= esc(equipamento_nome_exibicao($os)) ?></td>
                     <td><?= ucwords(str_replace('_', ' ', $os['status'])) ?></td>
                     <td><?= date('d/m/Y', strtotime($os['created_at'])) ?></td>
                     <td class="text-right">R$ <?= number_format($os['valor_total'] ?? 0, 2, ',', '.') ?></td>
@@ -48,7 +48,7 @@
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="6" style="text-align: center;">Nenhuma ordem de serviço encontrada</td>
+                    <td colspan="6" style="text-align: center;">Nenhuma ordem de serviÃ§o encontrada</td>
                 </tr>
             <?php endif; ?>
         </tbody>

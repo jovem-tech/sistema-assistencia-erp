@@ -36,7 +36,7 @@ class OrdersController extends BaseApiController
 
         $db = \Config\Database::connect();
         $builder = $db->table('os')
-            ->select('os.id, os.numero_os, os.numero_os_legado, os.status, os.estado_fluxo, os.prioridade, os.relato_cliente, os.observacoes_cliente, os.observacoes_internas, os.data_abertura, os.data_entrada, os.data_previsao, os.data_conclusao, os.data_entrega, os.valor_final, os.created_at, clientes.nome_razao AS cliente_nome, clientes.telefone1 AS cliente_telefone, clientes.email AS cliente_email, et.nome AS equip_tipo, em.nome AS equip_marca, emod.nome AS equip_modelo, equipamentos.id AS equipamento_id, equipamentos.numero_serie AS equip_serie, equipamentos.imei AS equip_imei, funcionarios.nome AS tecnico_nome, (SELECT ef.arquivo FROM equipamentos_fotos ef WHERE ef.equipamento_id = equipamentos.id ORDER BY ef.is_principal DESC, ef.id ASC LIMIT 1) AS equip_foto_arquivo')
+            ->select('os.id, os.numero_os, os.numero_os_legado, os.status, os.estado_fluxo, os.prioridade, os.relato_cliente, os.observacoes_cliente, os.observacoes_internas, os.data_abertura, os.data_entrada, os.data_previsao, os.data_conclusao, os.data_entrega, os.valor_final, os.created_at, clientes.nome_razao AS cliente_nome, clientes.telefone1 AS cliente_telefone, clientes.email AS cliente_email, et.nome AS equip_tipo, em.nome AS equip_marca, emod.nome AS equip_modelo, equipamentos.id AS equipamento_id, equipamentos.numero_serie AS equip_serie, equipamentos.imei AS equip_imei, equipamentos.resumo_tecnico AS equip_resumo_tecnico, equipamentos.desktop_modalidade AS equip_desktop_modalidade, funcionarios.nome AS tecnico_nome, (SELECT ef.arquivo FROM equipamentos_fotos ef WHERE ef.equipamento_id = equipamentos.id ORDER BY ef.is_principal DESC, ef.id ASC LIMIT 1) AS equip_foto_arquivo')
             ->join('clientes', 'clientes.id = os.cliente_id', 'left')
             ->join('equipamentos', 'equipamentos.id = os.equipamento_id', 'left')
             ->join('equipamentos_tipos et', 'et.id = equipamentos.tipo_id', 'left')
@@ -108,6 +108,8 @@ class OrdersController extends BaseApiController
         $items = $this->hydrateOrderEquipmentPhotos($items);
         $items = array_map(function (array $item): array {
             $item['equip_foto_url'] = $this->buildEquipmentPhotoUrl((string) ($item['equip_foto_arquivo'] ?? ''));
+            $item['equipamento_nome'] = equipamento_nome_exibicao($item);
+            $item['equipamento_label'] = equipamento_rotulo_exibicao($item);
             return $item;
         }, $items);
 
@@ -180,7 +182,11 @@ class OrdersController extends BaseApiController
 
         $equipamentos = [];
         if ($clienteId > 0) {
-            $equipmentRows = (new EquipamentoModel())->getByCliente($clienteId);
+            $equipmentRows = (new EquipamentoModel())->getByCliente(
+                $clienteId,
+                true,
+                $equipamentoId > 0 ? [$equipamentoId] : []
+            );
             $equipmentPhotoMap = $this->groupEquipmentPhotosByEquipmentIds(array_column($equipmentRows, 'id'));
             $equipamentos = array_map(
                 function (array $equipamento) use ($equipmentPhotoMap): array {
@@ -208,6 +214,12 @@ class OrdersController extends BaseApiController
                         'cor' => trim((string) ($equipamento['cor'] ?? '')),
                         'numero_serie' => (string) ($equipamento['numero_serie'] ?? ''),
                         'imei' => (string) ($equipamento['imei'] ?? ''),
+                        'status_operacional' => (string) ($equipamento['status_operacional'] ?? 'ativo'),
+                        'is_encerrado' => !empty($equipamento['is_encerrado']),
+                        'motivo_encerramento' => (string) ($equipamento['motivo_encerramento'] ?? ''),
+                        'motivo_encerramento_label' => (string) ($equipamento['motivo_encerramento_label'] ?? ''),
+                        'encerrado_em' => (string) ($equipamento['encerrado_em'] ?? ''),
+                        'encerrado_em_label' => (string) ($equipamento['encerrado_em_label'] ?? ''),
                         'foto_url' => $fotoPrincipalUrl,
                         'fotos' => $fotos,
                         'label' => !empty($labelParts) ? implode(' - ', $labelParts) : ('Equipamento #' . $equipamentoId),
@@ -411,6 +423,10 @@ class OrdersController extends BaseApiController
                 422,
                 'ORDER_CREATE_VALIDATION'
             );
+        }
+
+        if ($error = $this->validateOperationalEquipmentSelection($equipamentoId)) {
+            return $error;
         }
 
         $statusService = new OsStatusFlowService();
@@ -713,6 +729,15 @@ class OrdersController extends BaseApiController
                 422,
                 'ORDER_UPDATE_EMPTY'
             );
+        }
+
+        if (array_key_exists('equipamento_id', $payload)) {
+            $equipamentoSelecionado = (int) ($payload['equipamento_id'] ?? 0);
+            if ($equipamentoSelecionado > 0 && $equipamentoSelecionado !== (int) ($existing['equipamento_id'] ?? 0)) {
+                if ($error = $this->validateOperationalEquipmentSelection($equipamentoSelecionado)) {
+                    return $error;
+                }
+            }
         }
 
         $db = \Config\Database::connect();
@@ -1265,6 +1290,38 @@ class OrdersController extends BaseApiController
         }
     }
 
+    private function validateOperationalEquipmentSelection(int $equipamentoId): ?\CodeIgniter\HTTP\ResponseInterface
+    {
+        if ($equipamentoId <= 0) {
+            return null;
+        }
+
+        $equipamentoModel = new EquipamentoModel();
+        if (! $equipamentoModel->supportsOperationalLifecycle()) {
+            return null;
+        }
+
+        $equipamento = $equipamentoModel
+            ->select('id, status_operacional, encerrado_em, motivo_encerramento')
+            ->find($equipamentoId);
+
+        if (! $equipamento) {
+            return $this->respondError('Equipamento informado nao foi encontrado.', 404, 'ORDER_EQUIPMENT_NOT_FOUND');
+        }
+
+        if (! equipamento_esta_encerrado($equipamento)) {
+            return null;
+        }
+
+        $motivo = trim((string) equipamento_motivo_encerramento_label($equipamento['motivo_encerramento'] ?? ''));
+        $message = 'O equipamento informado ja foi encerrado e nao pode receber novas OS.';
+        if ($motivo !== '') {
+            $message .= ' Motivo: ' . $motivo . '.';
+        }
+
+        return $this->respondError($message, 422, 'ORDER_EQUIPMENT_CLOSED');
+    }
+
     /**
      * @return array<string,array<int,\CodeIgniter\HTTP\Files\UploadedFile>>
      */
@@ -1662,8 +1719,7 @@ class OrdersController extends BaseApiController
     {
         $parts = array_values(array_filter([
             trim((string) ($item['equip_tipo'] ?? '')),
-            trim((string) ($item['equip_marca'] ?? '')),
-            trim((string) ($item['equip_modelo'] ?? '')),
+            equipamento_nome_exibicao($item),
         ]));
 
         $summary = implode(' - ', $parts);

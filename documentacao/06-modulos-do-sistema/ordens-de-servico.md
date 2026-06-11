@@ -51,7 +51,7 @@ Estados esperados:
 - o frontend intercepta especificamente o warning de reinicializacao da `osTable`, registrando no console sem abrir alerta modal para o usuario;
 - o bootstrap jQuery/DataTables agora reutiliza defensivamente a instancia existente de `#osTable` mesmo quando outra rotina tocar a grade depois da carga inicial;
 - o modal de status passou a normalizar textos renderizados dinamicamente apos hidratar timeline, historico e painel de orcamento;
-- os textos fixos do modal `Alterar status da OS` e do embed de orcamento tambem foram normalizados em pt-BR, incluindo `Nº de serie`, abas, cards e mensagens de apoio;
+- os textos fixos do modal `Alterar status da OS` e do embed de orcamento tambem foram normalizados em pt-BR, incluindo `NÂº de serie`, abas, cards e mensagens de apoio;
 - `app/Views/os/index.php` teve os principais labels e placeholders da listagem normalizados novamente em pt-BR;
 - `public/assets/js/os-list-filters.js` passou a apontar para os IDs corretos de e-mail no contexto do modal, evitando hidratacao incompleta do resumo lateral;
 - o ajuste preserva o fluxo AJAX server-side existente e atua apenas como hardening de bootstrap da grade.
@@ -72,6 +72,85 @@ Na release `2.16.5`, o modulo passou por uma recuperacao estrutural apos uma sub
 - paginacao server-side;
 - leitura combinada de OS, cliente, equipamento, prazo e orcamento.
 
+### Grade tecnica previsivel
+
+Regra atual da listagem `/os`:
+
+- a ordem base da grade passou a ser `Foto / OS`, `Cliente`, `Equipamento`, `Datas`, `Status / Orcamento`, `Valor`, `Relato` e `Acoes`;
+- a coluna separada de `N OS` continua sendo carregada pela DataTable, mas fica oculta na leitura principal porque o numero operacional e renderizado abaixo da foto, sem o prefixo `#`;
+- a responsividade da tabela deixou de depender da antiga combinacao de perfis (`desktop/notebook/tablet/mobile`) com autoajuste agressivo por overflow;
+- fora do mobile, as colunas continuam visiveis por padrao e somente `Acoes` pode migrar para o detalhe expansivel `+`; `Relato` ficou preso ao detalhe expansivel de forma permanente para preservar a leitura da grade;
+- o layout desktop passou a usar larguras fixas e bordas verticais para reduzir variacao visual causada por viewport, zoom e conteudos longos;
+- `Cliente` recebeu largura dedicada, fonte menor, quebra backend em linhas de ate `3 palavras` e o telefone passou a ocupar a propria linha sem truncamento visual;
+- o telefone do cliente passou a usar tipografia menor que a do nome, mantendo icone, cor e acao de WhatsApp com peso visual secundario;
+- a busca global da listagem passou a localizar tambem qualquer sequencia numerica encontrada no telefone principal do cliente, mesmo quando o usuario digita apenas os digitos;
+- `Equipamento` passou a renderizar `Equip.` em linhas controladas de ate `3 palavras`, mantendo previsibilidade da largura sem esconder a descricao tecnica;
+- `Status / Orcamento` agora mostra um badge principal de status, uma linha menor para o orcamento e esconde o estado secundario quando ele apenas repete a leitura principal;
+- badges longos de orcamento na coluna `Status / Orcamento` usam quebra interna (`white-space: normal`, `overflow-wrap: anywhere` e `max-width: 100%`) para nao invadir `Valor` ou outras colunas;
+- `Valor` deixou de mostrar apenas um numero isolado e passou a renderizar um mini resumo financeiro com `Total OS` em destaque, seguido de `Recebido`, `Adiantamento` e `Saldo` em linhas menores;
+- em 09/06/2026, a tipografia da listagem foi centralizada em uma escala visual unica dentro de `public/assets/css/design-system/layouts/os-list-layout.css`, reduzindo mistura de tamanhos muito pequenos entre `Cliente`, `Equipamento`, `Datas`, `Status / Orcamento` e `Valor`;
+- `Conclusao` e `Entrega` deixaram de reutilizar o pill colorido do `Prazo` e passaram a usar texto neutro, separando o destaque de atraso da leitura historica das datas finais;
+- em 09/06/2026, o fechamento responsivo da tela foi centralizado novamente em `public/assets/css/design-system/layouts/os-list-layout.css`, reduzindo conflito entre regras antigas e novas da grade;
+- o script `public/assets/js/os-list-filters.js` passou a medir a largura util da tabela com menos desconto artificial e a ocultar mais colunas no perfil `tablet-compact`, preservando leitura entre `768px` e `991.98px`;
+- o wrapper da DataTable deixou de depender de `overflow-x: hidden`, voltando a aceitar apenas scroll controlado do container quando a largura da grade realmente exigir.
+
+### Contato rapido por WhatsApp na grade
+
+Fluxo tecnico atual do modal `Enviar WhatsApp da OS`:
+
+- payload de contexto: `GET /os/whatsapp-meta/{osId}`;
+- submissao AJAX: `POST /os/whatsapp/{osId}`;
+- view do modal: `app/Views/os/index.php`;
+- JavaScript principal: `public/assets/js/os-list-filters.js`;
+- layout responsivo: `public/assets/css/design-system/layouts/os-list-layout.css`;
+- controller de contexto/envio: `app/Controllers/Os.php::whatsappMeta()` e `app/Controllers/Os.php::sendWhatsApp()`.
+
+### Envio de PDF por WhatsApp na visualizacao da OS
+
+Correcao de 09/06/2026 (v2.23.20):
+
+- o modal `Enviar PDF por WhatsApp` em `/os/visualizar/{id}` usa o wrapper global `DSFeedback.fire` para abrir SweetAlert2 sem manter foco em elementos ocultados por `aria-hidden`;
+- falhas esperadas do provider WhatsApp, como rejeicao da Evolution API, retornam JSON com HTTP `200`, `ok:false`, `failure_type`, `provider` e `status_code`;
+- validacoes reais de formulario, como telefone vazio ou mensagem/template ausente, continuam podendo retornar `422`;
+- quando o provider direto for `evolution`, telefones sem DDI passam a ser normalizados para `55 + DDD + numero`, alinhando o comportamento ao gateway local.
+
+Regra consolidada nesta release:
+
+- a coluna `Cliente` continua abrindo a ficha embed ao clicar no nome;
+- o telefone principal permanece abaixo do nome e aciona o modal rapido de WhatsApp da OS sem truncamento visivel;
+- o modal aceita `template pronto`, `mensagem personalizada` e `documento salvo da OS`;
+- quando nenhum documento salvo for escolhido, o backend gera automaticamente o `PDF consolidado da impressao (A4)` antes do envio;
+- o envio reaproveita a mesma infraestrutura oficial de WhatsApp ja usada na aba `Documentos` da visualizacao da OS, sem criar fluxo paralelo.
+
+### Regra mobile da grade
+
+No modo card (`< 768px`):
+
+- ficam visiveis apenas `Foto / OS`, `Cliente`, `Tipo + Equip.` e o botao `+`;
+- `Datas`, `Status / Orcamento`, `Valor`, `Relato` e `Acoes` sao renderizados dentro da child row expansivel;
+- `Relato` nao aparece mais na grade principal e a child row usa sempre o texto completo salvo em `data-relato-full`, em vez de repetir o preview resumido da coluna;
+- a busca global deixa de ficar exposta na navbar mobile e passa a aparecer dentro do menu hamburger, reaproveitando o mesmo componente da busca desktop;
+- em 09/06/2026, o dropdown de resultados da busca global no menu mobile foi corrigido para ocupar a largura total do bloco de busca, sem disputar espaco horizontal com o input ou o seletor de filtro;
+- o CSS especifico da tela remove o espacamento extra que existia abaixo da navbar fixa, ja que o campo de busca nao ocupa mais o topo da listagem.
+- cada `td` da face principal do card passa a ser uma linha flexivel com rÃ³tulo separado do valor, evitando sobreposicao entre `Cliente` e `Equipamento`;
+- o bloco de `Cliente` passou a ocupar a largura completa do card no mobile, permitindo que nomes longos quebrem em linhas normais dentro do card em vez de ficarem presos em uma faixa curta com rolagem horizontal;
+- o telefone principal permanece em linha unica abaixo do nome, mantendo o atalho do WhatsApp, e o bloco de `Equipamento` segue compacto;
+- a barra superior mobile foi alinhada globalmente em `responsive-layout.css`, mantendo notificacoes e perfil na mesma linha visual do menu hamburger em todo o sistema;
+- o mapeamento de `data-label` da DataTable usa o indice real da coluna, entao a coluna oculta `NÂº OS` nao desloca os rÃ³tulos visiveis;
+- o card principal deixou de usar uma grade interna por areas e agora empilha os blocos com leitura linear, sem alterar o comportamento do desktop.
+- em 09/06/2026, os blocos `Cliente`, `Equipamento`, `Status`, `Valor` e `Acoes` foram reforcados para sempre quebrar linha dentro do card, removendo os ultimos pontos de `nowrap` e `overflow-x:auto` que ainda comprimiam o conteudo em telas `<= 430px`, `<= 390px`, `<= 360px` e `<= 320px`.
+
+### Resumo compacto do equipamento na grade
+
+Na release `2.22.9`, a coluna `Equipamento` da listagem `/os` passou a aplicar um resumo visual mais curto para `Desktop montado` quando o nome tecnico fica grande demais.
+
+Regra atual:
+
+- a grade continua usando o nome completo quando o texto cabe naturalmente;
+- se o resumo tecnico do desktop montado ficar extenso, a celula passa a mostrar apenas `gabinete | chipset | processador`;
+- a renderizacao da linha `Equip.` agrupa separadores `|` ao termo anterior e quebra a descricao em blocos de ate `3 palavras`, por exemplo `Mini Tower | H610 |`, `12th Gen Intel(R)` e `Core(TM) i7-12700K`;
+- o clique na celula continua abrindo a ficha completa do equipamento em modal embed, mantendo o restante das informacoes detalhadas no contexto de visualizacao.
+
 ### Ajuste rapido de prazos na listagem
 
 Fluxo tecnico atual do modal `Atualizar prazos da OS`:
@@ -88,6 +167,62 @@ Regra consolidada na release `2.16.34`:
 - quando `requires_admin_approval = true` vier no payload, o modal passa a mostrar `admin_usuario` e `admin_senha`;
 - o JavaScript envia `data_entrada`, `data_previsao`, `data_entrega`, `motivo_alteracao` e, quando necessario, as credenciais do administrador;
 - o backend passou a usar `data_entrada` e `data_entrega` atuais da OS como fallback, reduzindo fragilidade caso algum campo nao viaje no POST.
+
+### Baixa tecnica da OS na listagem
+
+Fluxo tecnico atual do modal `Baixa da OS`:
+
+- payload de contexto: `GET /os/encerramento-meta/{osId}`;
+- submissao AJAX: `POST /os/encerrar-ajax/{osId}`;
+- view do modal: `app/Views/os/index.php`;
+- JavaScript principal: `public/assets/js/os-closure-modal.js`;
+- controller de persistencia: `app/Controllers/Os.php::encerrarAjax()`;
+- service de negocio: `app/Services/OsSettlementService.php`;
+- simulacao de cartao: `app/Services/FinanceiroCartaoService.php`.
+
+Regra consolidada na release `2.23.0`:
+
+- a baixa tecnica agora acontece sem sair da fila `/os`;
+- o operador escolhe o destino final entre `entregue_reparado`, `devolvido_sem_reparo` e `descartado`;
+- o modal mostra resumo de `cliente`, `equipamento`, `valor da OS`, `custos estimados`, `taxas de cartao`, `valor liquido` e `lucro estimado`;
+- a baixa aceita `zero recebimento`, `recebimento parcial` ou `quitacao total` no mesmo fluxo;
+- a area financeira da baixa agora aceita tambem `adiantamento` e `sinal`, com classificacao explicita por lancamento;
+- somente lancamentos classificados como `Recebimento da baixa` executam a baixa operacional e podem alterar `status`, `estado_fluxo`, `data_entrega`, `baixa_tecnica_em` e cobrancas;
+- `Adiantamento` e `Sinal` registram antecipacao do pagamento no titulo financeiro, no `Fluxo de Caixa` e na `DRE`, mas preservam o status atual da OS;
+- quando a baixa operacional for parcial e ainda existir saldo financeiro, a OS passa para `entregue_pagamento_pendente`, mantendo a conclusao tecnica sem encerrar definitivamente a parte financeira;
+- quando a baixa operacional quitar o saldo, o status final escolhido pelo operador e aplicado imediatamente;
+- o status final desejado fica memorizado em `os.status_final_pendente_pagamento` para o encerramento automatico apos a quitacao;
+- o backend cria ou reaproveita o titulo `A receber` da OS e registra os movimentos financeiros da baixa;
+- quando `os.valor_final` estiver zerado, mas a ordem ja possuir `orcamento aprovado` ou `convertido`, o backend usa esse orcamento como fallback para `valor da OS`, `saldo em aberto`, `lucro estimado` e criacao do titulo `A receber`;
+- pagamentos em `cartao de credito` e `cartao de debito` passam a considerar `operadora`, `bandeira`, `parcelas`, `taxa` e `valor liquido`;
+- a taxa da operadora pode gerar despesa automatica em `financeiro` para preservar a leitura real do faturamento liquido;
+- quando a OS for entregue com saldo pendente, o sistema cria a regua de cobranca automatica em `1`, `3` e `5` dias;
+- a opcao `Agendar retorno` cria follow-up automatico no CRM para o pos-servico.
+- quando o operador autoriza o WhatsApp na baixa, o backend anexa o PDF consolidado da impressao A4 da OS, gerado temporariamente pelo `OsPrintService`;
+- a confirmacao do modal pergunta antes de salvar se a mensagem deve seguir com o PDF completo, evitando envios de texto puro quando a intencao e compartilhar a OS finalizada.
+
+Observacao operacional obrigatoria:
+
+- para a regua de cobranca sair do estado `agendada` e realmente disparar as mensagens, o ambiente precisa executar periodicamente o comando `php spark os:cobrancas`;
+- em producao Linux, a recomendacao e agendar esse comando via `cron`;
+- em ambiente Windows local ou homologacao, a recomendacao e usar o `Agendador de Tarefas` com o mesmo comando no diretÃ³rio do ERP.
+
+### Campo `Data de entrega` no formulario da OS
+
+- `app/Views/os/form.php` passa a renderizar `Data de entrega` logo abaixo do status quando `OsStatusFlowService::shouldSetEntregaDate()` retorna verdadeiro;
+- a regra cobre `entregue_reparado`, `devolvido_sem_reparo`, `descartado`, `entregue_pagamento_pendente` e o alias `entregue`;
+- o JavaScript da tela alterna a visibilidade do campo em tempo real, sem depender de reload da pagina;
+- `app/Views/os/show.php` continua exibindo o valor no card de datas, mantendo a mesma leitura tanto na edicao quanto na visualizacao.
+
+### Trava financeira pos-baixa
+
+Regra tecnica consolidada na mesma release:
+
+- uma OS com `baixa_tecnica_em` preenchida passa a ter trava de alteracoes financeiras no formulario `/os/editar/{id}`;
+- campos como `forma_pagamento`, `valor_mao_obra`, `valor_pecas` e `desconto` ficam protegidos contra alteracao operacional comum;
+- usuarios administradores podem editar diretamente;
+- usuarios sem perfil administrativo precisam informar `usuario` e `senha` de um administrador no proprio fluxo de salvamento;
+- a mesma protecao tambem vale para mutacoes financeiras pontuais em itens e servicos da OS, evitando reabertura silenciosa de valor apos a entrega.
 
 ### Escopo operacional da listagem
 
@@ -253,9 +388,24 @@ Ao salvar o modal de status:
 - `Tecnico Responsavel` permanece opcional na interface e no backend;
 - a validacao obrigatoria de salvamento fica restrita aos campos realmente mandatorios do fluxo, como cliente, equipamento, data de entrada e relato do cliente;
 - o backend de `Fotos de Entrada` na abertura e na edicao usa um persistidor centralizado em `Os::persistEntryPhotosFromRequest()` para aceitar `fotos_entrada` e `fotos_entrada[]`, criar `public/uploads/os_anormalidades` quando necessario e registrar warning sem perder o restante do salvamento se houver falha de caminho;
+- a abertura e a edicao da OS voltaram a chamar `Os::persistEstadoFisicoData()`, garantindo que os registros estruturados de `estado_fisico_data` sejam persistidos junto com acessorios, checklist e fotos de entrada;
 - na edicao, o select `Status` agora usa a arvore completa de status operacionais ativos cadastrados, permitindo ajuste administrativo fora da sequencia curta do fluxo;
 - `data_entrada` e `data_previsao` passam por normalizacao e validacao no backend antes do `update`, impedindo previsao anterior a entrada.
 - a normalizacao textual do formulario agora tambem cobre pp/Views/os/form.php, com revisao de labels, placeholders, mensagens de checklist, avisos de camera, resumo lateral e textos operacionais em pt-BR/UTF-8.
+
+### Checklist de entrada e estado do aparelho
+
+O checklist de entrada passou a alimentar duas leituras ao mesmo tempo:
+
+- o payload estruturado de `checklist_execucoes` e `checklist_respostas`;
+- a composicao do bloco `Estado fisico` usado pelo documento de abertura e pela impressao consolidada.
+
+Regras tecnicas atuais:
+
+- `app/Views/os/form.php` agora coleta tambem `observacoes_estado` como texto livre de recepcao;
+- `app/Services/ChecklistService.php` persiste esse texto em `checklist_execucoes.observacoes_estado`;
+- discrepancias do checklist continuam sendo tratadas como pendencias de entrada e passam a ser projetadas no PDF de abertura mesmo quando nao houver registro manual em `estado_fisico_equipamento`;
+- o formulario converte as discrepancias em `estado_fisico_data` legado apenas para manter compatibilidade com os blocos historicos e com a visualizacao existente.
 
 ### Areas centrais
 
@@ -276,6 +426,16 @@ O seletor de equipamento passou a operar com contexto expandido:
 - modelo;
 - cor;
 - numero de serie/IMEI.
+
+### Modal inline de equipamento
+
+No formulario `app/Views/os/form.php`, a edicao inline do equipamento dentro da OS agora tambem expÃµe o campo `observacoes`.
+
+Regra tecnica atual:
+
+- a aba `Info` do modal mostra `Observacoes do equipamento` para registrar peculiaridades operacionais do aparelho;
+- o frontend hidrata esse valor a partir do cache `window._osEquipamentosCache` ou dos `data-*` do `select`, preservando o contexto mesmo quando o equipamento ja estava selecionado;
+- depois do salvamento AJAX, o valor atualizado volta para a opcao do equipamento e permanece disponivel para novas edicoes sem reload completo da OS.
 
 ### Regra de anti-cache para fotos da OS
 
@@ -301,19 +461,25 @@ Na aba `Fotos` da edicao:
 O dimensionamento da grade operacional da listagem combina HTML simples em `app/Views/os/index.php` com duas camadas de comportamento:
 
 - CSS de larguras e breakpoints em `public/assets/css/design-system/layouts/os-list-layout.css`;
-- logica de visibilidade e autoajuste em `public/assets/js/os-list-filters.js`.
+- logica de visibilidade responsiva em `public/assets/js/os-list-filters.js`.
 
 Na configuracao atual:
 
-- `Foto` foi reduzida para acompanhar a thumbnail principal;
-- `N OS` usa largura fixa por caracteres (`ch`) para seguir o numero operacional;
-- `Cliente` usa preview backend com ate `3 linhas` de `3 palavras`, segue a maior linha efetivamente renderizada na pagina atual, recebeu reducao da folga direita por ajuste conjunto de `padding-right` e `paddingOffset` e agora centraliza o texto dentro da celula clicavel;
-- `Equipamento` deixou de usar largura fixa e agora combina `Tipo`, `Marca` e `Modelo` com medicao no frontend baseada na maior palavra operacional visivel da pagina;
+- `Foto` passou a concentrar a thumbnail principal e o link visual do numero da OS no mesmo bloco;
+- `N OS` permanece no payload da DataTable, mas fica oculta na grade principal porque a identificacao da ordem agora aparece sob a foto;
+- `Cliente` usa preview backend com ate `4 linhas` de `3 palavras`, preservando nomes longos sem quebra arbitraria do navegador;
+- `Equipamento` usa preview backend na linha `Equip.` com ate `4 linhas` de `3 palavras`, agrupando separadores `|` ao termo anterior para manter leituras tecnicas naturais;
+- a grade voltou a privilegiar larguras fixas previsiveis na camada `os-list-layout.css`: `Foto / OS`, `Cliente`, `Equipamento`, `Datas`, `Status / Orcamento` e `Valor` possuem faixas dedicadas para reduzir sobreposicao entre datas, badges e resumo financeiro;
 - `Datas` continua lendo `data_entrada`, `data_previsao` e `data_entrega`, mas agora tambem consulta `data_conclusao` e `status_atualizado_em` para congelar o atraso quando a manutencao ja estiver encerrada;
 - a mesma celula `Datas` passa a renderizar a linha `Conclusao` quando houver encerramento operacional, preservando `Entrega` como marco separado de retirada/devolucao;
 - o badge `Atrasado ha X dias` fica restrito a OS realmente em andamento; quando a manutencao ja terminou fora do prazo, o texto passa para `Atraso de X dias`, usando `data_conclusao` como referencia e `status_atualizado_em` apenas como fallback visual para legados sem conclusao persistida;
-- `Valor Total` continua autoajustada pela maior celula da pagina atual via medicao no frontend;
+- `Valor` usa faixa fixa dedicada para o mini resumo financeiro, evitando corte de `Recebido`, `Adiantamento`, `Saldo` e `Total OS`;
 - `Relato` deixou de renderizar o texto integral na grade e passou a exibir um preview de ate `9 palavras` distribuidas em `3 linhas` de `3 palavras`, com tooltip nativo no hover para leitura completa.
+
+Detalhe de responsividade desta rodada:
+
+- a coluna da foto permanece visivel tambem no perfil `tablet`, porque ela agora carrega a identificacao principal da OS;
+- o controle de detalhes responsivos ignora a coluna `N OS` oculta, evitando abrir expand/collapse apenas por causa desse merge visual.
 
 ### Dados operacionais na edicao
 
@@ -372,6 +538,9 @@ Quando o orcamento e salvo em modo embed:
 - a aba `Orcamento` centraliza o vinculo comercial da OS;
 - a aba `Fotos` consolida fotos de perfil, equipamento, entrada, acessorios e checklist;
 - a aba `Valores` detalha financeiro da OS e do orcamento vinculado.
+- nessa mesma aba `Valores`, os recebimentos anteriores a entrega final passam a ser exibidos como `adiantamento` ou `sinal`, com `historico de recebimentos`, `total recebido` e `saldo pendente`;
+- pagamentos classificados como `adiantamento` ou `sinal` reduzem o saldo financeiro, mas nao promovem status da OS; a promocao operacional fica restrita a `Recebimento da baixa`;
+- quando a OS ainda nao tiver gravado seus totais finais, a aba `Valores` reaproveita o mesmo fallback do `orcamento aprovado/convertido` para evitar divergencia visual com a listagem e com o modal de baixa;
 - a lateral `Historico e Progresso`, a timeline e os labels auxiliares da visualizacao foram alinhados em pt-BR/UTF-8 no frontend e nos helpers do controller.
 - a normalizacao complementar desta release tambem revisou os textos de contexto da visualizacao em pp/Views/os/show.php, incluindo resumo primario, blocos de status, cards do orcamento vinculado e labels das abas.
 
@@ -489,6 +658,7 @@ Responsabilidades de `OsPrintService`:
 - montar grupos de fotos por categoria operacional;
 - gerar PDF temporario em `writable/uploads/os_print/` quando o envio partir do modal de impressao.
 - converter foto principal e galerias em `data URI` no contexto da impressao, evitando dependencia de URL publica durante a renderizacao do `Dompdf`.
+- aceitar `photo_groups` / `grupos_fotos` para restringir o anexo a fotos de `perfil`, `entrada`, `acessorios`, `estado_fisico` e `checklist`.
 
 Comportamento documental:
 
@@ -529,10 +699,29 @@ Fluxo adicional coberto nesta release:
 - o modal de impressao pode enviar um PDF sem criar uma nova versao persistida em `os_documentos`;
 - quando necessario, `Os::sendWhatsApp($id)` gera um PDF temporario pelo `OsPrintService`, envia o anexo e faz limpeza do arquivo ao final;
 - o formulario geral de `WhatsApp` da OS tambem passou a usar esse mesmo fallback, garantindo que o PDF gerado sob demanda siga o mesmo layout consolidado da impressao `A4`;
+- no card `Documentos PDF`, quando o operador escolhe `Comprovante de abertura` e clica em `Gerar`, `app/Views/os/show.php` abre um SweetAlert2 proprio para escolher `fotos de perfil` e `fotos de entrada` antes da submissao;
+- essa selecao e enviada ao endpoint `POST /os/pdf/{id}/gerar` pelos campos `incluir_fotos_abertura` e `grupos_fotos_abertura`, restritos ao tipo `abertura`;
+- apos o `POST /os/pdf/{id}/gerar`, o retorno agora ancora novamente em `#tab-documentos`, e a propria `show.php` reativa a aba correspondente pelo hash da URL;
+- os envios HTML de `POST /os/whatsapp/{id}` e `POST /os/email/{id}/enviar` passaram a seguir a mesma regra, mantendo o operador na aba `Documentos` apos sucesso ou erro.
+- logo apos a criacao da OS, `Os::store()` injeta a flashdata `os_post_create_pdf_prompt` e `app/Views/os/show.php` abre um SweetAlert2 perguntando se o operador deseja preparar o envio do `PDF de abertura` imediatamente;
+- esse prompt pos-criacao agora oferece tres caminhos operacionais: `Enviar agora`, `Gerar sem abrir WhatsApp` e `Enviar depois`;
+- quando o operador escolhe `Gerar sem abrir WhatsApp`, a tela abre a pre-visualizacao consolidada `A4` ja configurada com os grupos de foto selecionados, sem desviar para o modal de envio;
+- quando o operador escolhe `Enviar agora`, o modal de WhatsApp continua sendo aberto com `template os_aberta`, formato `A4` e os grupos de foto ja preconfigurados;
 - os templates configurados em `Gestao de Conhecimento -> Templates WhatsApp` continuam sendo a base de mensagem, mas o operador pode editar o texto antes do envio;
 - dentro do fluxo de impressao, o formulario de WhatsApp agora abre em modal dedicado, sem competir por espaco com a area de preview;
 - as respostas AJAX desse modal retornam `csrfHash`, mensagem operacional e flag de duplicidade para manter a interface reativa sem refresh.
 - a view `app/Views/os/print.php` recebeu hardening visual para compatibilidade simultanea com navegador e `Dompdf`, reduzindo dependencia de recursos CSS que degradavam blocos graficos no PDF final.
+
+### PDF de abertura
+
+O documento `abertura` passou a consumir a mesma base operacional consolidada usada pela impressao:
+
+- `app/Services/OsPdfService.php` monta o payload oficial reutilizando `OsPrintService::buildDocumentContext()`;
+- `OsPdfService::gerar()` agora aceita opcoes de `include_photos` e `photo_groups` para o comprovante de abertura salvo em `os_documentos`;
+- `app/Services/OsPdfTemplateService.php` agora resolve corretamente `relato_cliente`, `diagnostico_tecnico`, `solucao_aplicada`, acessorios estruturados, pendencias do checklist e `observacoes_estado`;
+- a view legada `app/Views/os/pdf/abertura.php` recebeu a mesma leitura para manter compatibilidade quando o HTML vier do fallback de view, e nao do template salvo em banco;
+- quando houver fotos selecionadas na geracao manual pela aba `Documentos`, o comprovante passa a anexar blocos fotografico por grupo usando `app/Views/os/pdf/_photo_annex.php`;
+- o wrapper `app/Views/os/pdf/template_padrao.php` tambem recebeu suporte a esse anexo fotografico, garantindo que templates HTML dinamicos continuem exibindo as fotos selecionadas no comprovante oficial.
 
 ### E-mail
 
@@ -576,3 +765,9 @@ Esse lote corrigiu textos visiveis de modais, timeline, filtros, status, camera 
 - `app/Controllers/Notificacoes.php`
 - `public/assets/js/os-list-filters.js`
 - `public/assets/js/navbar-notifications.js`
+
+## Atualizacao complementar 2.23.23 - Resumo financeiro reativo na baixa
+
+- o modal Baixa da OS passou a expor no resumo lateral os campos Adiantamento ja recebido, Lancado nesta acao e Saldo projetado apos salvar;
+- a sincronizacao desses totais agora ocorre tambem no evento de digitacao do valor recebido, e nao apenas em change ou blur;
+- a rotina preserva a regra operacional em pt-BR: Adiantamento e Sinal continuam apenas financeiros, enquanto o resumo passa a refletir imediatamente o efeito desses valores na baixa.

@@ -692,9 +692,9 @@ class ChatbotService
             $vars['valor_final'] = 'R$ ' . number_format((float) ($os['valor_final'] ?? 0), 2, ',', '.');
             $vars['data_previsao'] = !empty($os['data_previsao']) ? date('d/m/Y', strtotime((string) $os['data_previsao'])) : 'nao definida';
             $vars['garantia_dias'] = (string) ($os['garantia_dias'] ?? '0');
-            $vars['equipamento'] = trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? '')) ?: 'equipamento';
+            $vars['equipamento'] = equipamento_nome_exibicao($os) ?: 'equipamento';
             $vars['marca'] = (string) ($os['equip_marca'] ?? '');
-            $vars['modelo'] = (string) ($os['equip_modelo'] ?? '');
+            $vars['modelo'] = equipamento_nome_exibicao($os) ?: (string) ($os['equip_modelo'] ?? '');
             $vars['defeito'] = trim((string) ($os['relato_cliente'] ?? ''));
         }
 

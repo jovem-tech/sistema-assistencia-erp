@@ -1,6 +1,6 @@
 # Stack Tecnologica
 
-Atualizado em 03/04/2026 (release 2.11.0).
+Atualizado em 10/06/2026 (release 2.23.29).
 
 ## Backend
 
@@ -35,7 +35,7 @@ Atualizado em 03/04/2026 (release 2.11.0).
 | Chart.js | 4.4.0 | Graficos |
 | Cropper.js | 1.6.1 | Edicao de imagem |
 
-## Frontend Mobile (novo modulo paralelo)
+## Frontend Mobile/PWA
 
 | Tecnologia | Versao | Uso |
 |------------|--------|-----|
@@ -43,7 +43,15 @@ Atualizado em 03/04/2026 (release 2.11.0).
 | Next.js | 14.x | App Router do PWA |
 | Service Worker | browser API | Push notifications e cache |
 
-## API Mobile (v2.11.0)
+Documentacao complementar do app mobile/PWA:
+
+- `documentacao/12-app-mobile-pwa/README.md`
+
+## API Mobile/PWA
+
+- entrada protegida no ERP web: `GET /atendimento-mobile`
+- compatibilidade documentada: `0.4.2`
+- ERP minimo compativel: `2.11.5`
 
 - base versionada: `/api/v1`
 - auth por bearer token hashado em `mobile_api_tokens`

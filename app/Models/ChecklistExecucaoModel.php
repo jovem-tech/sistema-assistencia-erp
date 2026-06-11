@@ -20,6 +20,7 @@ class ChecklistExecucaoModel extends Model
         'total_itens',
         'total_discrepancias',
         'resumo_texto',
+        'observacoes_estado',
         'concluido_em',
         'created_at',
         'updated_at',

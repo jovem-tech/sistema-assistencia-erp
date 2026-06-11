@@ -12,7 +12,7 @@
 </div>
 
 <table class="grid">
-    <tr><td class="label">Cliente</td><td><?= esc($os['cliente_nome']) ?></td><td class="label">Equipamento</td><td><?= esc(trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))) ?></td></tr>
+    <tr><td class="label">Cliente</td><td><?= esc($os['cliente_nome']) ?></td><td class="label">Equipamento</td><td><?= esc(equipamento_nome_exibicao($os)) ?></td></tr>
     <tr><td class="label">Status atual</td><td><?= esc($os['status']) ?></td><td class="label">Tecnico</td><td><?= esc($os['tecnico_nome'] ?? '-') ?></td></tr>
 </table>
 

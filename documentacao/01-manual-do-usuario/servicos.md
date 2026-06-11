@@ -1,4 +1,4 @@
-﻿# Manual do Usuario - Servicos
+# Manual do Usuario - Servicos
 
 ## Visao geral
 O modulo `Servicos` centraliza o catalogo de mao de obra usado em OS e orcamentos.
@@ -16,6 +16,26 @@ Campos principais:
 Regra operacional:
 - servicos encerrados/inativos nao aparecem no Select2 de itens da OS;
 - no lancamento de itens da OS, a busca retorna apenas servicos `status = ativo` e `encerrado_em IS NULL`.
+
+## Cadastro rapido pelo Orcamento
+
+Quando o operador estiver montando um orcamento e o `Servico` ainda nao existir no catalogo:
+
+- escolha `Servico` na linha do item;
+- clique em `Cadastrar`;
+- informe pelo menos `Nome` e `Valor`;
+- o sistema salva o servico por AJAX e ja aplica esse item na mesma linha do orcamento.
+
+Campos usados no modal rapido:
+- `Nome`
+- `Tipo de Equipamento`
+- `Valor`
+- `Tempo padrao`
+- `Custo direto`
+- `Descricao complementar`
+
+Regra operacional complementar:
+- o cadastro rapido cria o servico com `status = ativo`, mantendo disponibilidade imediata para o proprio Select2 do orcamento.
 
 ## Listagem
 A grade de `Servicos` passou a exibir a coluna:

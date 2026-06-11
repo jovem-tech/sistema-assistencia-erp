@@ -13,7 +13,7 @@
 
 <table class="grid">
     <tr><td class="label">Cliente</td><td><?= esc($os['cliente_nome']) ?></td><td class="label">Telefone</td><td><?= esc($os['cliente_telefone'] ?? '-') ?></td></tr>
-    <tr><td class="label">Equipamento</td><td><?= esc(trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))) ?></td><td class="label">Data entrega</td><td><?= esc(formatDate($os['data_entrega'] ?? date('Y-m-d H:i:s'), true)) ?></td></tr>
+    <tr><td class="label">Equipamento</td><td><?= esc(equipamento_nome_exibicao($os)) ?></td><td class="label">Data entrega</td><td><?= esc(formatDate($os['data_entrega'] ?? date('Y-m-d H:i:s'), true)) ?></td></tr>
     <tr><td class="label">Status final</td><td><?= esc($os['status']) ?></td><td class="label">Valor final</td><td><?= esc(formatMoney($os['valor_final'] ?? 0)) ?></td></tr>
 </table>
 

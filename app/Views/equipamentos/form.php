@@ -1,7 +1,26 @@
 <?= $this->extend('layouts/main') ?>
 <?= $this->section('content') ?>
 
-<?php $isEdit = isset($equipamento); ?>
+<?php
+$isEdit = isset($equipamento);
+$equipamentoRow = $equipamento ?? [];
+$desktopModeValue = old('desktop_modalidade', $equipamentoRow['desktop_modalidade'] ?? 'montado');
+$gabineteTipoValue = old('gabinete_tipo', $equipamentoRow['gabinete_tipo'] ?? '');
+$gabineteStatusValue = old('gabinete_identificacao_status', $equipamentoRow['gabinete_identificacao_status'] ?? 'a_confirmar');
+$gabineteObservacaoValue = old('gabinete_observacao', $equipamentoRow['gabinete_observacao'] ?? '');
+$placaMaeValue = old('placa_mae', $equipamentoRow['placa_mae'] ?? '');
+$chipsetValue = old('chipset', $equipamentoRow['chipset'] ?? '');
+$processadorValue = old('processador', $equipamentoRow['processador'] ?? '');
+$memoriaRamValue = old('memoria_ram', $equipamentoRow['memoria_ram'] ?? '');
+$armazenamentoValue = old('armazenamento', $equipamentoRow['armazenamento'] ?? '');
+$placaVideoValue = old('placa_video', $equipamentoRow['placa_video'] ?? '');
+$fonteValue = old('fonte_alimentacao', $equipamentoRow['fonte_alimentacao'] ?? '');
+$resumoTecnicoAtual = old('resumo_tecnico', $equipamentoRow['technical_summary'] ?? $equipamentoRow['resumo_tecnico'] ?? '');
+$configStatusLabel = $equipamentoRow['configuracao_status_label'] ?? equipamento_configuracao_status_label($equipamentoRow['configuracao_status'] ?? '');
+$configDetectedAt = old('configuracao_detectada_em', $equipamentoRow['configuracao_detectada_em'] ?? '');
+$formErrors = session('errors') ?? [];
+$duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
+?>
 
 <div class="equip-form-page ds-form-layout">
 <div class="page-header d-flex justify-content-between align-items-center">
@@ -14,7 +33,7 @@
 
 <div class="card glass-card">
     <div class="card-body">
-        <form action="<?= $isEdit ? base_url('equipamentos/atualizar/' . $equipamento['id']) : base_url('equipamentos/salvar') ?>" method="POST" enctype="multipart/form-data">
+        <form id="equipamentoForm" action="<?= $isEdit ? base_url('equipamentos/atualizar/' . $equipamento['id']) : base_url('equipamentos/salvar') ?>" method="POST" enctype="multipart/form-data">
             <?= csrf_field() ?>
     <style>
         .custom-color-accordion .accordion-button {
@@ -52,6 +71,28 @@
         .equip-form-page .equip-photo-actions .btn {
             min-width: 170px;
         }
+        .equip-form-page .desktop-profile-card {
+            border: 1px solid rgba(13, 110, 253, 0.12);
+            background: linear-gradient(135deg, rgba(248, 250, 252, 0.96), rgba(239, 246, 255, 0.96));
+        }
+        .equip-form-page .desktop-profile-alert {
+            border: 1px dashed rgba(13, 110, 253, 0.28);
+            background: rgba(255, 255, 255, 0.88);
+        }
+        .equip-form-page .desktop-profile-summary {
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            background: rgba(255, 255, 255, 0.76);
+            border-radius: 14px;
+            padding: 0.85rem 1rem;
+        }
+        .equip-form-page .desktop-profile-summary code {
+            white-space: normal;
+            word-break: break-word;
+        }
+        .equip-form-page .desktop-mode-note {
+            font-size: 0.82rem;
+            color: #64748b;
+        }
         .equip-form-page .equip-photo-grid > div {
             flex: 0 0 auto;
         }
@@ -61,6 +102,9 @@
             }
         }
         @media (max-width: 767.98px) {
+            .equip-form-page .desktop-profile-card .card-body {
+                padding: 1rem;
+            }
             .equip-form-page .equip-photo-actions {
                 flex-direction: column;
             }
@@ -86,11 +130,22 @@
     </style>
     <input type="hidden" name="modelo_nome_ext" id="modelo_nome_ext">
 
-            <!-- Navegação por Abas -->
+            <?php if (!empty($formErrors)): ?>
+            <div class="alert alert-danger border-0 shadow-sm mb-4">
+                <div class="fw-semibold mb-2"><i class="bi bi-exclamation-triangle me-2"></i>Revise os campos obrigatorios</div>
+                <ul class="mb-0 ps-3">
+                    <?php foreach ($formErrors as $error): ?>
+                    <li><?= esc($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <?php endif; ?>
+
+            <!-- NavegaÃ§Ã£o por Abas -->
             <ul class="nav nav-tabs nav-fill ds-tabs-scroll mb-4" id="equipamentoTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active fw-bold" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab" aria-controls="info-pane" aria-selected="true">
-                        <i class="bi bi-info-circle me-2"></i>Informações
+                        <i class="bi bi-info-circle me-2"></i>InformaÃ§Ãµes
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -106,8 +161,8 @@
             </ul>
 
             <div class="tab-content" id="equipamentoTabsContent">
-                
-                <!-- ABA 1: INFORMAÇÕES -->
+
+                <!-- ABA 1: INFORMAÃ‡Ã•ES -->
                 <div class="tab-pane fade show active" id="info-pane" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
@@ -121,7 +176,7 @@
                             <select name="cliente_id" id="clienteSelect" class="form-select select2-clientes" required>
                                 <option value="">Selecione ou busque um cliente...</option>
                                 <?php foreach ($clientes as $c): ?>
-                                <option value="<?= $c['id'] ?>" <?= ($isEdit && $equipamento['cliente_id'] == $c['id']) ? 'selected' : '' ?>>
+                                <option value="<?= $c['id'] ?>" <?= ((string) old('cliente_id', $equipamentoRow['cliente_id'] ?? '') === (string) $c['id']) ? 'selected' : '' ?>>
                                     <?= esc($c['nome_razao']) ?> <?= !empty($c['cpf_cnpj']) ? ' - ' . esc($c['cpf_cnpj']) : '' ?> <?= !empty($c['telefone1']) ? ' - ' . esc($c['telefone1']) : '' ?>
                                 </option>
                                 <?php endforeach; ?>
@@ -129,44 +184,144 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Tipo *</label>
-                            <select name="tipo_id" class="form-select" required>
+                            <select name="tipo_id" id="tipoSelect" class="form-select" required>
                                 <option value="">Selecione o Tipo...</option>
                                 <?php foreach ($tipos as $t): ?>
-                                <option value="<?= $t['id'] ?>" <?= ($isEdit && ($equipamento['tipo_id'] ?? '') == $t['id']) ? 'selected' : '' ?>><?= esc($t['nome']) ?></option>
+                                <option value="<?= $t['id'] ?>" <?= ((string) old('tipo_id', $equipamentoRow['tipo_id'] ?? '') === (string) $t['id']) ? 'selected' : '' ?>><?= esc($t['nome']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                     </div>
 
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
+                    <div class="card desktop-profile-card shadow-sm mb-4 d-none" id="desktopProfilePanel">
+                        <div class="card-body p-4">
+                            <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-3">
+                                <div>
+                                    <h5 class="mb-1 text-primary"><i class="bi bi-cpu me-2"></i>Perfil tecnico e coleta local</h5>
+                                    <p class="desktop-mode-note mb-0">Use o balcao para o que estiver visivel e complemente pela coleta local quando a maquina ligar. Em notebooks, marca, modelo e serie podem vir da BIOS.</p>
+                                    <div class="small text-muted mt-1">Busca local em <span class="font-monospace">C:\JovemTechBenchCollector</span></div>
+                                </div>
+                                <div class="d-flex flex-column align-items-lg-end gap-2">
+                                    <?php if ($isEdit && $configStatusLabel !== ''): ?>
+                                    <span class="badge rounded-pill text-bg-light border text-primary"><?= esc($configStatusLabel) ?></span>
+                                    <?php endif; ?>
+                                    <button type="button" class="btn btn-outline-primary btn-sm" id="btnDesktopImportarAgenteLocal">
+                                        <i class="bi bi-folder2-open me-1"></i>Buscar do agente (C:\)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3" id="desktopOnlyProfileRow">
+                                <div class="col-lg-4">
+                                    <label class="form-label">Modalidade do desktop</label>
+                                    <select name="desktop_modalidade" id="desktopModeSelect" class="form-select">
+                                        <option value="montado" <?= $desktopModeValue === 'montado' ? 'selected' : '' ?>>Desktop montado</option>
+                                        <option value="oem" <?= $desktopModeValue === 'oem' ? 'selected' : '' ?>>Desktop de marca/OEM</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-4">
+                                    <label class="form-label d-flex align-items-center justify-content-between gap-2">
+                                        <span>Tipo de gabinete</span>
+                                        <button type="button" class="btn btn-outline-info btn-sm py-0 px-2 btn-gabinete-guia">
+                                            <i class="bi bi-question-circle me-1"></i>Como identificar?
+                                        </button>
+                                    </label>
+                                    <select name="gabinete_tipo" id="gabineteTipoSelect" class="form-select">
+                                        <option value="">Selecione se souber...</option>
+                                        <?php foreach (['Slim / SFF', 'Mini Tower', 'Mid Tower', 'Full Tower', 'Compacto / Cube', 'Rack / Industrial', 'Nao identificado / A confirmar'] as $gabineteOption): ?>
+                                        <option value="<?= esc($gabineteOption) ?>" <?= $gabineteTipoValue === $gabineteOption ? 'selected' : '' ?>><?= esc($gabineteOption) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="col-lg-4">
+                                    <label class="form-label">Status da identificacao</label>
+                                    <select name="gabinete_identificacao_status" id="gabineteStatusSelect" class="form-select">
+                                        <option value="a_confirmar" <?= $gabineteStatusValue === 'a_confirmar' ? 'selected' : '' ?>>A confirmar</option>
+                                        <option value="manual" <?= $gabineteStatusValue === 'manual' ? 'selected' : '' ?>>Identificado manualmente</option>
+                                        <option value="detectado" <?= $gabineteStatusValue === 'detectado' ? 'selected' : '' ?>>Detectado por agente</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="desktop-profile-alert rounded-4 p-3 mb-3 d-none" id="desktopMountedNotice">
+                                <div class="fw-semibold text-primary mb-1"><i class="bi bi-info-circle me-2"></i>Modo montado ativo</div>
+                                <div class="small text-muted mb-0">Neste modo o sistema usa o resumo tecnico como identificacao principal e trata Marca/Modelo catalogados como auxiliares automaticos.</div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Placa-mae / modelo</label>
+                                    <input type="text" name="placa_mae" id="placaMaeInput" class="form-control" placeholder="Ex.: ASUS PRIME H510M-E" value="<?= esc($placaMaeValue) ?>">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Chipset</label>
+                                    <input type="text" name="chipset" id="chipsetInput" class="form-control" placeholder="Ex.: H510, B450, A520" value="<?= esc($chipsetValue) ?>">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Processador</label>
+                                    <input type="text" name="processador" id="processadorInput" class="form-control" placeholder="Ex.: Intel Core i5-10400" value="<?= esc($processadorValue) ?>">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Memoria RAM</label>
+                                    <input type="text" name="memoria_ram" id="memoriaRamInput" class="form-control" placeholder="Ex.: 16 GB DDR4" value="<?= esc($memoriaRamValue) ?>">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Armazenamento</label>
+                                    <input type="text" name="armazenamento" id="armazenamentoInput" class="form-control" placeholder="Ex.: SSD 480 GB + HD 1 TB" value="<?= esc($armazenamentoValue) ?>">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Placa de video</label>
+                                    <input type="text" name="placa_video" id="placaVideoInput" class="form-control" placeholder="Ex.: RTX 3060 12 GB" value="<?= esc($placaVideoValue) ?>">
+                                </div>
+                                <div class="col-md-6 desktop-only-technical">
+                                    <label class="form-label">Fonte</label>
+                                    <input type="text" name="fonte_alimentacao" id="fonteInput" class="form-control" placeholder="Ex.: 500 W 80 Plus Bronze" value="<?= esc($fonteValue) ?>">
+                                </div>
+                                <div class="col-md-6 desktop-only-technical">
+                                    <label class="form-label">Observacao do gabinete</label>
+                                    <input type="text" name="gabinete_observacao" id="gabineteObservacaoInput" class="form-control" placeholder="Ex.: lateral de vidro, slim corporativo" value="<?= esc($gabineteObservacaoValue) ?>">
+                                </div>
+                            </div>
+
+                            <div class="desktop-profile-summary mt-3">
+                                <div class="small text-uppercase text-muted fw-semibold mb-2">Resumo tecnico previsto</div>
+                                <code id="desktopResumoPreview"><?= esc($resumoTecnicoAtual !== '' ? $resumoTecnicoAtual : 'Desktop montado | Mid Tower | H510 | Intel Core i5 | 16 GB | SSD 480 GB') ?></code>
+                                <?php if ($configDetectedAt !== ''): ?>
+                                <div class="small text-muted mt-2">Ultima deteccao registrada em <?= esc(date('d/m/Y H:i', strtotime($configDetectedAt))) ?></div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4" id="equipCatalogRow">
+                        <div class="col-md-6" id="equipMarcaCol">
                             <label class="form-label d-flex align-items-center justify-content-between gap-2">
-                                <span>Marca *</span>
+                                <span id="marcaLabelText">Marca *</span>
                                 <button class="btn btn-success btn-sm ds-inline-add-btn" type="button" data-bs-toggle="modal" data-bs-target="#modalNovaMarca"
                                         title="Nova Marca">
                                     <i class="bi bi-plus-lg"></i><span>Adicionar</span>
                                 </button>
                             </label>
-                            <select name="marca_id" id="marcaSelect" class="form-select select2-basic" required>
+                            <select name="marca_id" id="marcaSelect" class="form-select select2-basic">
                                 <option value="">Selecione a Marca...</option>
                                 <?php foreach ($marcas as $m): ?>
-                                <option value="<?= $m['id'] ?>" <?= ($isEdit && ($equipamento['marca_id'] ?? '') == $m['id']) ? 'selected' : '' ?>><?= esc($m['nome']) ?></option>
+                                <option value="<?= $m['id'] ?>" <?= ((string) old('marca_id', $equipamentoRow['marca_id'] ?? '') === (string) $m['id']) ? 'selected' : '' ?>><?= esc($m['nome']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6" id="equipModeloCol">
                             <label class="form-label d-flex align-items-center justify-content-between gap-2">
-                                <span>Modelo *</span>
+                                <span id="modeloLabelText">Modelo *</span>
                                 <button class="btn btn-success btn-sm ds-inline-add-btn" type="button" data-bs-toggle="modal" data-bs-target="#modalNovoModelo"
                                         title="Novo Modelo">
                                     <i class="bi bi-plus-lg"></i><span>Adicionar</span>
                                 </button>
                             </label>
-                            <select name="modelo_id" id="modeloSelect" class="form-select select2-basic" required>
+                            <select name="modelo_id" id="modeloSelect" class="form-select select2-basic">
                                 <option value="">Selecione a Marca primeiro...</option>
                                 <?php if ($isEdit && !empty($modelos)): ?>
                                     <?php foreach ($modelos as $md): ?>
-                                    <option value="<?= $md['id'] ?>" <?= ($equipamento['modelo_id'] ?? '') == $md['id'] ? 'selected' : '' ?>><?= esc($md['nome']) ?></option>
+                                    <option value="<?= $md['id'] ?>" <?= ((string) old('modelo_id', $equipamentoRow['modelo_id'] ?? '') === (string) $md['id']) ? 'selected' : '' ?>><?= esc($md['nome']) ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
@@ -175,8 +330,8 @@
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">Nº Série ou IMEI</label>
-                            <input type="text" name="numero_serie" class="form-control" placeholder="IMEI ou Série (*#06#)" value="<?= $isEdit ? esc($equipamento['numero_serie'] ?? '') : '' ?>">
+                            <label class="form-label">NÂº SÃ©rie ou IMEI</label>
+                            <input type="text" name="numero_serie" id="numeroSerieInput" class="form-control" placeholder="IMEI ou SÃ©rie (*#06#)" value="<?= esc(old('numero_serie', $equipamentoRow['numero_serie'] ?? '')) ?>">
                         </div>
                         <div class="col-md-6">
                             <div class="ds-password-field" id="equipSenhaBox">
@@ -211,12 +366,12 @@
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">Estado Físico</label>
-                            <textarea name="estado_fisico" class="form-control" rows="3" placeholder="Arranhões, tela trincada..."><?= $isEdit ? esc($equipamento['estado_fisico'] ?? '') : '' ?></textarea>
+                            <label class="form-label">Estado FÃ­sico</label>
+                            <textarea name="estado_fisico" class="form-control" rows="3" placeholder="ArranhÃµes, tela trincada..."><?= $isEdit ? esc($equipamento['estado_fisico'] ?? '') : '' ?></textarea>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label d-flex justify-content-between">
-                                Acessórios
+                                AcessÃ³rios
                                 <small class="text-muted">Clique para adicionar</small>
                             </label>
                             <textarea name="acessorios" id="textareaAcessorios" class="form-control mb-2" rows="3" placeholder="O que o cliente enviou?"><?= $isEdit ? esc($equipamento['acessorios'] ?? '') : '' ?></textarea>
@@ -225,14 +380,14 @@
                                 <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Cabo USB</button>
                                 <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Capa</button>
                                 <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Chip</button>
-                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Cartão Memória</button>
+                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ CartÃ£o MemÃ³ria</button>
                             </div>
                         </div>
                     </div>
 
                     <div class="row g-3 mb-4">
                         <div class="col-12">
-                            <label class="form-label text-muted">Observações Internas (Opcional)</label>
+                            <label class="form-label text-muted">ObservaÃ§Ãµes Internas (Opcional)</label>
                             <textarea name="observacoes" class="form-control" rows="2"><?= $isEdit ? esc($equipamento['observacoes'] ?? '') : '' ?></textarea>
                         </div>
                     </div>
@@ -242,7 +397,7 @@
                 <div class="tab-pane fade" id="cor-pane" role="tabpanel" aria-labelledby="cor-tab" tabindex="0">
                     <div class="p-3 border rounded bg-light bg-opacity-10 mb-4">
                         <h6 class="mb-3 d-flex align-items-center"><i class="bi bi-brush me-2 text-primary"></i> Seletor Profissional de Cor</h6>
-                        
+
                         <!-- HIDDEN: campos reais enviados ao banco -->
                         <input type="hidden" name="cor_hex" id="corHexReal" value="<?= $isEdit ? esc($equipamento['cor_hex'] ?? '#1A1A1A') : '#1A1A1A' ?>">
                         <input type="hidden" name="cor_rgb" id="corRgbReal" value="<?= $isEdit ? esc($equipamento['cor_rgb'] ?? '26,26,26') : '26,26,26' ?>">
@@ -251,7 +406,7 @@
                         <div class="row g-3">
                             <!-- Coluna Esquerda: Preview + Picker -->
                             <div class="col-md-5">
-                                <!-- Detecção por foto (smart) -->
+                                <!-- DetecÃ§Ã£o por foto (smart) -->
                                 <div class="p-2 mb-3 rounded border border-warning border-opacity-50 bg-warning bg-opacity-10 d-none" id="smartColorContainer">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                         <span style="font-size: 0.72rem;" class="text-warning fw-semibold"><i class="bi bi-magic me-1"></i>Detectado na foto:</span>
@@ -286,15 +441,15 @@
                                 </div>
 
                                 <div id="coresProximasBox">
-                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Sugestões Semelhantes</label>
+                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">SugestÃµes Semelhantes</label>
                                     <div id="coresProximasGrid" class="d-flex flex-wrap gap-2"></div>
                                 </div>
                             </div>
 
-                            <!-- Coluna Direita: Catálogo -->
+                            <!-- Coluna Direita: CatÃ¡logo -->
                             <div class="col-md-7">
                                 <div class="bg-white bg-opacity-50 p-3 rounded shadow-sm h-100 border">
-                                    <label class="form-label small text-muted fw-bold text-uppercase mb-3" style="letter-spacing: 0.5px;"><i class="bi bi-grid-3x3-gap me-1"></i> Catálogo Profissional</label>
+                                    <label class="form-label small text-muted fw-bold text-uppercase mb-3" style="letter-spacing: 0.5px;"><i class="bi bi-grid-3x3-gap me-1"></i> CatÃ¡logo Profissional</label>
                                     <div id="colorCatalog" class="pe-2 custom-scrollbar" style="max-height: 480px; overflow-y: auto;"></div>
                                 </div>
                             </div>
@@ -324,10 +479,10 @@
                     <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4 mx-auto" style="max-width: 600px;">
                         <i class="bi bi-info-circle-fill fs-4 me-3"></i>
                         <div class="small">
-                            Envie até <strong>4 fotos</strong> (Máximo 2MB cada). A primeira foto será usada como imagem principal do perfil do equipamento.
+                            Envie atÃ© <strong>4 fotos</strong> (MÃ¡ximo 2MB cada). A primeira foto serÃ¡ usada como imagem principal do perfil do equipamento.
                         </div>
                     </div>
-                    
+
                     <div id="fotoPreviewContainer" class="d-flex flex-wrap justify-content-center gap-4 mt-4 equip-photo-grid">
                         <!-- Fotos Existentes -->
                         <?php if($isEdit && !empty($fotos)): ?>
@@ -347,14 +502,14 @@
                             <?php endforeach; ?>
                         <?php endif; ?>
 
-                        <!-- Container para Previews dinâmicos de Novas -->
+                        <!-- Container para Previews dinÃ¢micos de Novas -->
                         <div id="fotoPreviewNovas" class="d-flex flex-wrap gap-4"></div>
                     </div>
                 </div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
-                <a href="<?= base_url('equipamentos') ?>" class="btn btn-link text-secondary text-decoration-none"><i class="bi bi-x-lg me-1"></i> Descartar Alterações</a>
+                <a href="<?= base_url('equipamentos') ?>" class="btn btn-link text-secondary text-decoration-none"><i class="bi bi-x-lg me-1"></i> Descartar AlteraÃ§Ãµes</a>
                 <button type="submit" class="btn btn-glow btn-lg px-5 shadow"><i class="bi bi-save me-2 text-warning"></i><?= $isEdit ? 'Atualizar Equipamento' : 'Finalizar Cadastro' ?></button>
             </div>
         </form>
@@ -362,14 +517,14 @@
 </div>
 </div>
 
-<!-- ================= MODAIS DE CADASTRO RÁPIDO ================= -->
+<!-- ================= MODAIS DE CADASTRO RÃPIDO ================= -->
 
 <!-- Modal Novo Cliente -->
 <div class="modal fade" id="modalNovoCliente" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content glass-card">
             <div class="modal-header border-bottom border-light">
-                <h5 class="modal-title">Novo Cliente Rápido</h5>
+                <h5 class="modal-title">Novo Cliente RÃ¡pido</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -430,7 +585,7 @@
                 <div class="mb-3">
                     <label>Marca Vinculada</label>
                     <select id="modMarcaId" class="form-select" disabled>
-                        <option value="">Selecione a marca no formulário antes...</option>
+                        <option value="">Selecione a marca no formulÃ¡rio antes...</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -441,12 +596,12 @@
                             <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                         </div>
                     </div>
-                    <!-- Dropdown de sugestões -->
+                    <!-- Dropdown de sugestÃµes -->
                     <div id="sugestoesNovoModeloForm" class="list-group shadow-lg mt-1 d-none"
                          style="max-height: 220px; overflow-y: auto; border-radius: 8px; z-index: 9999; position: relative;"></div>
                     <div class="form-text mt-1">
                         <i class="bi bi-globe2 me-1 text-info"></i>
-                        Digite 3+ caracteres para ver sugestões da internet
+                        Digite 3+ caracteres para ver sugestÃµes da internet
                     </div>
                 </div>
             </div>
@@ -457,7 +612,7 @@
     </div>
 </div>
 
-<!-- ===== MODAL: CÂMERA (AUXILIAR) ===== -->
+<!-- ===== MODAL: CÃ‚MERA (AUXILIAR) ===== -->
 <div class="modal fade" id="modalCamera" tabindex="-1" style="z-index: 2000;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-card border-0 shadow-lg">
@@ -514,6 +669,434 @@ $(document).ready(function() {
     const equipSenhaController = typeof window.initPatternPasswordField === 'function'
         ? window.initPatternPasswordField({ root: '#equipSenhaBox', defaultMode: 'desenho' })
         : null;
+    const $tipoSelect = $('#tipoSelect');
+    const $desktopModeSelect = $('#desktopModeSelect');
+    const $desktopPanel = $('#desktopProfilePanel');
+    const $catalogRow = $('#equipCatalogRow');
+    const desktopAgentCollectUrl = `${BASE_URL}equipamentos/bench-collector/coletar-local`;
+    const desktopAgentSnapshotUrl = desktopAgentCollectUrl;
+    const equipamentoVincularExistenteAjaxUrl = `${BASE_URL}equipamentos/vincular-existente-ajax`;
+    const duplicateEquipmentPayload = <?= json_encode($duplicateEquipmentPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    const csrfTokenName = <?= json_encode(csrf_token()) ?>;
+    const csrfTokenHash = <?= json_encode(csrf_hash()) ?>;
+
+    function normalizeDesktopTipoLabel(label) {
+        return String(label || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toLowerCase();
+    }
+
+    function isDesktopTipoSelecionado() {
+        const tipoNome = normalizeDesktopTipoLabel($tipoSelect.find('option:selected').text());
+        return ['desktop', 'computador', 'pc'].includes(tipoNome);
+    }
+
+    function isNotebookTipoSelecionado() {
+        const tipoNome = normalizeDesktopTipoLabel($tipoSelect.find('option:selected').text());
+        return ['notebook', 'laptop'].includes(tipoNome);
+    }
+
+    function isCollectorTipoSelecionado() {
+        return isDesktopTipoSelecionado() || isNotebookTipoSelecionado();
+    }
+
+    function getDesktopResumoPreview() {
+        const isNotebook = isNotebookTipoSelecionado();
+        const values = (isNotebook
+            ? [
+                $('#processadorInput').val(),
+                $('#memoriaRamInput').val(),
+                $('#armazenamentoInput').val(),
+                $('#placaVideoInput').val(),
+                $('#chipsetInput').val() || $('#placaMaeInput').val()
+            ]
+            : [
+                $('#gabineteTipoSelect').val(),
+                $('#chipsetInput').val() || $('#placaMaeInput').val(),
+                $('#processadorInput').val(),
+                $('#memoriaRamInput').val(),
+                $('#armazenamentoInput').val(),
+                $('#placaVideoInput').val(),
+                $('#fonteInput').val()
+            ])
+            .map((value) => String(value || '').trim())
+            .filter(Boolean);
+
+        if (!values.length) {
+            return isNotebook
+                ? 'Notebook | Intel Core i5 | 8 GB | SSD 256 GB'
+                : 'Desktop montado | Mid Tower | H510 | Intel Core i5 | 16 GB | SSD 480 GB';
+        }
+
+        return isNotebook ? ['Notebook', ...values].join(' | ') : values.join(' | ');
+    }
+
+    function updateDesktopResumoPreview() {
+        const previewEl = document.getElementById('desktopResumoPreview');
+        if (previewEl) {
+            previewEl.textContent = getDesktopResumoPreview();
+        }
+    }
+
+    function syncGabineteStatusSelection() {
+        const statusSelect = document.getElementById('gabineteStatusSelect');
+        const gabinete = String($('#gabineteTipoSelect').val() || '').trim().toLowerCase();
+        if (!statusSelect || statusSelect.value === 'detectado') {
+            return;
+        }
+
+        statusSelect.value = (!gabinete || gabinete.includes('confirmar')) ? 'a_confirmar' : 'manual';
+    }
+
+    function syncDesktopCatalogState() {
+        const isDesktop = isDesktopTipoSelecionado();
+        const isCollectorType = isCollectorTipoSelecionado();
+        const isMounted = String($desktopModeSelect.val() || 'montado') === 'montado';
+
+        $desktopPanel.toggleClass('d-none', !isCollectorType);
+        $catalogRow.toggleClass('d-none', isDesktop && isMounted);
+        $('#desktopOnlyProfileRow').toggleClass('d-none', !isDesktop);
+        $('.desktop-only-technical').toggleClass('d-none', !isDesktop);
+        $('#desktopMountedNotice').toggleClass('d-none', !(isDesktop && isMounted));
+
+        const marcaLabel = document.getElementById('marcaLabelText');
+        const modeloLabel = document.getElementById('modeloLabelText');
+        if (marcaLabel) {
+            marcaLabel.textContent = isDesktop && isMounted ? 'Marca (automatico no montado)' : 'Marca *';
+        }
+        if (modeloLabel) {
+            modeloLabel.textContent = isDesktop && isMounted ? 'Modelo (automatico no montado)' : 'Modelo *';
+        }
+
+        if (isDesktop && !$desktopModeSelect.val()) {
+            $desktopModeSelect.val('montado');
+        }
+
+        if (isDesktop) {
+            syncGabineteStatusSelection();
+        }
+
+        if (isCollectorType) {
+            updateDesktopResumoPreview();
+        }
+    }
+
+    function normalizeCatalogLookup(value) {
+        return String(value || '').trim().toLowerCase();
+    }
+
+    function selectOrCreateCatalogOption(selector, label) {
+        const $select = $(selector);
+        const cleanLabel = String(label || '').trim();
+        if (!$select.length || cleanLabel === '') {
+            return;
+        }
+
+        let selectedValue = '';
+        $select.find('option').each(function() {
+            if (normalizeCatalogLookup($(this).text()) === normalizeCatalogLookup(cleanLabel)) {
+                selectedValue = $(this).val();
+                return false;
+            }
+
+            return true;
+        });
+
+        if (selectedValue === '') {
+            $select.append(new Option(cleanLabel, cleanLabel, true, true));
+            selectedValue = cleanLabel;
+        }
+
+        $select.val(selectedValue).trigger('change');
+    }
+
+    function getCollectorClienteResumo() {
+        const select = document.getElementById('clienteSelect');
+        const optionText = String(select?.selectedOptions?.[0]?.text || '').trim();
+        const primaryName = optionText.split(' - ')[0]?.trim() || '';
+
+        return {
+            id: String(select?.value || '').trim(),
+            nome: primaryName
+        };
+    }
+
+    function buildCollectorContextQuery() {
+        const params = new URLSearchParams();
+        const cliente = getCollectorClienteResumo();
+        const equipamentoRotulo = isCollectorTipoSelecionado()
+            ? String(document.getElementById('desktopResumoPreview')?.textContent || '').trim()
+            : [
+                String($tipoSelect.find('option:selected').text() || '').trim(),
+                String($('#marcaSelect').find('option:selected').text() || '').trim(),
+                String($('#modeloSelect').find('option:selected').text() || '').trim()
+            ].filter(Boolean).join(' | ');
+
+        if (cliente.id !== '') {
+            params.set('cliente_id', cliente.id);
+        }
+        if (cliente.nome !== '') {
+            params.set('cliente_nome', cliente.nome);
+        }
+        if (equipamentoRotulo !== '') {
+            params.set('equipamento_rotulo', equipamentoRotulo);
+        }
+
+        params.set('v', String(Date.now()));
+        return params.toString();
+    }
+
+    async function vincularClienteAoEquipamentoExistente(equipmentId, clientId) {
+        const formData = new FormData();
+        formData.append('equipamento_id', String(equipmentId || ''));
+        formData.append('cliente_id', String(clientId || ''));
+        formData.append(csrfTokenName, csrfTokenHash);
+
+        const response = await fetch(equipamentoVincularExistenteAjaxUrl, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || payload.status !== 'success') {
+            throw new Error(payload.message || 'Nao foi possivel vincular o cliente ao equipamento existente.');
+        }
+
+        return payload;
+    }
+
+    async function abrirAlertaDuplicidadeEquipamento(payload) {
+        if (!payload || !payload.equipment_id) {
+            return;
+        }
+
+        const canLink = Boolean(payload.can_link_client);
+        const editUrl = String(payload.edit_url || payload.show_url || '').trim();
+        const clienteId = String(document.getElementById('clienteSelect')?.value || '').trim();
+
+        if (window.Swal && typeof window.Swal.fire === 'function') {
+            const result = await Swal.fire({
+                icon: 'warning',
+                title: 'Equipamento ja cadastrado',
+                text: String(payload.message || 'Ja existe um equipamento com este identificador no sistema.'),
+                showCancelButton: true,
+                showDenyButton: canLink,
+                confirmButtonText: canLink ? 'Vincular cliente e abrir' : 'Abrir cadastro existente',
+                denyButtonText: 'Abrir sem vincular',
+                cancelButtonText: 'Continuar editando',
+                reverseButtons: true,
+                customClass: { popup: 'glass-card' }
+            });
+
+            if (result.isConfirmed) {
+                if (canLink && clienteId !== '') {
+                    await vincularClienteAoEquipamentoExistente(payload.equipment_id, clienteId);
+                }
+                if (editUrl !== '') {
+                    window.location.href = editUrl;
+                }
+                return;
+            }
+
+            if (result.isDenied && editUrl !== '') {
+                window.location.href = editUrl;
+            }
+
+            return;
+        }
+
+        const fallbackMessage = String(payload.message || 'Ja existe um equipamento com este identificador no sistema.');
+        if (confirm(fallbackMessage + '\n\nDeseja abrir o cadastro existente?') && editUrl !== '') {
+            if (canLink && clienteId !== '') {
+                try {
+                    await vincularClienteAoEquipamentoExistente(payload.equipment_id, clienteId);
+                } catch (_) {
+                    // segue para abrir o cadastro mesmo sem vinculo automatico
+                }
+            }
+            window.location.href = editUrl;
+        }
+    }
+
+    function showDesktopGabineteGuide() {
+        const html = `
+            <div class="text-start">
+                <p class="mb-2">Use estes sinais para identificar o gabinete com mais seguranca:</p>
+                <ul class="small ps-3 mb-3">
+                    <li><strong>Slim / SFF:</strong> fino, baixo, costuma ficar deitado ou em gabinete corporativo.</li>
+                    <li><strong>Mini Tower:</strong> torre pequena, com poucos slots traseiros.</li>
+                    <li><strong>Mid Tower:</strong> o tamanho mais comum em desktops montados.</li>
+                    <li><strong>Full Tower:</strong> torre alta e profunda, comum em setups gamer e workstations.</li>
+                    <li><strong>Compacto / Cube:</strong> formato curto ou quadrado, diferente da torre tradicional.</li>
+                </ul>
+                <div class="small text-muted">Se ainda estiver em duvida no balcao, use <strong>Nao identificado / A confirmar</strong> e finalize a classificacao depois.</div>
+            </div>
+        `;
+
+        if (window.Swal && typeof window.Swal.fire === 'function') {
+            Swal.fire({
+                title: 'Como identificar o gabinete',
+                html,
+                icon: 'info',
+                confirmButtonText: 'Entendi',
+                customClass: { popup: 'glass-card text-start' }
+            });
+            return;
+        }
+
+        alert('Use Slim/SFF para gabinetes finos, Mini Tower para torre pequena, Mid Tower para o tamanho medio, Full Tower para torres grandes e Compacto/Cube para formatos curtos ou quadrados.');
+    }
+
+    function setDesktopAgentButtonLoading(isLoading) {
+        const button = document.getElementById('btnDesktopImportarAgenteLocal');
+        if (!button) {
+            return;
+        }
+
+        if (!button.dataset.originalHtml) {
+            button.dataset.originalHtml = button.innerHTML;
+        }
+
+        button.disabled = isLoading;
+        button.innerHTML = isLoading
+            ? '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Buscando...'
+            : button.dataset.originalHtml;
+    }
+
+    function applyDesktopAgentSnapshot(mapped) {
+        if (!mapped || typeof mapped !== 'object') {
+            return;
+        }
+
+        const assignValue = (selector, value) => {
+            const input = document.querySelector(selector);
+            if (input && String(value || '').trim() !== '') {
+                input.value = String(value).trim();
+            }
+        };
+
+        assignValue('#numeroSerieInput', mapped.numero_serie || '');
+        assignValue('#placaMaeInput', mapped.placa_mae || '');
+        assignValue('#chipsetInput', mapped.chipset || '');
+        assignValue('#processadorInput', mapped.processador || '');
+        assignValue('#memoriaRamInput', mapped.memoria_ram || '');
+        assignValue('#armazenamentoInput', mapped.armazenamento || '');
+        assignValue('#placaVideoInput', mapped.placa_video || '');
+        selectOrCreateCatalogOption('#marcaSelect', mapped.manufacturer || '');
+        selectOrCreateCatalogOption('#modeloSelect', mapped.catalog_model || mapped.chipset || mapped.model || '');
+
+        const gabineteTipo = String(mapped.gabinete_tipo || '').trim();
+        const gabineteStatus = String(mapped.gabinete_identificacao_status || '').trim();
+        const gabineteTipoSelect = document.getElementById('gabineteTipoSelect');
+        const gabineteStatusSelect = document.getElementById('gabineteStatusSelect');
+
+        if (gabineteTipoSelect && gabineteTipo) {
+            gabineteTipoSelect.value = gabineteTipo;
+        }
+        if (gabineteStatusSelect && gabineteStatus) {
+            gabineteStatusSelect.value = gabineteStatus;
+        }
+
+        updateDesktopResumoPreview();
+    }
+
+    async function importDesktopSnapshotFromAgentLocal() {
+        if (!isDesktopTipoSelecionado()) {
+            window.DSFeedback.warning('Tipo incompatÃ­vel', 'Selecione um equipamento do tipo Desktop antes de buscar os dados do agente.');
+            return;
+        }
+
+        setDesktopAgentButtonLoading(true);
+
+        try {
+            const response = await fetch(`${desktopAgentSnapshotUrl}?v=${Date.now()}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Nao foi possivel ler o snapshot local do coletor.');
+            }
+
+            applyDesktopAgentSnapshot(data.mapped || {});
+
+            const sourcePath = String(data.source_path || '').trim();
+            const sourceText = sourcePath ? `Arquivo lido: ${sourcePath}` : 'Campos tÃ©cnicos preenchidos com sucesso.';
+            window.DSFeedback.fire({
+                icon: 'success',
+                title: 'Dados importados do agente',
+                text: sourceText,
+                confirmButtonText: 'OK'
+            });
+        } catch (error) {
+            window.DSFeedback.error(
+                'Falha ao buscar do agente',
+                error instanceof Error ? error.message : 'Nao foi possivel buscar o snapshot local do coletor.'
+            );
+        } finally {
+            setDesktopAgentButtonLoading(false);
+        }
+    }
+
+    async function importCollectorSnapshotFromAgentLocal() {
+        if (!isCollectorTipoSelecionado()) {
+            window.DSFeedback.warning('Tipo incompatÃƒÂ­vel', 'Selecione um equipamento do tipo Desktop ou Notebook antes de buscar os dados do agente.');
+            return;
+        }
+
+        setDesktopAgentButtonLoading(true);
+
+        try {
+            const response = await fetch(`${desktopAgentCollectUrl}?${buildCollectorContextQuery()}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Nao foi possivel executar a coleta local do agente.');
+            }
+
+            applyDesktopAgentSnapshot(data.mapped || {});
+
+            const details = [];
+            if (data.collector?.installed_now) {
+                details.push('Coletor copiado para C:\\JovemTechBenchCollector.');
+            }
+            if (String(data.collector?.warning || '').trim() !== '') {
+                details.push(String(data.collector.warning).trim());
+            }
+            if (Array.isArray(data.collector?.cleanup?.removed_paths) && data.collector.cleanup.removed_paths.length > 0) {
+                details.push('Arquivos temporarios do coletor removidos apos a leitura local.');
+            }
+            if (String(data.mapped?.numero_serie_origem || '').trim() === 'mac') {
+                details.push('Serie preenchida com o MAC por falta de serie valida na BIOS.');
+            }
+            if (String(data.source_path || '').trim() !== '') {
+                details.push(`Snapshot: ${String(data.source_path).trim()}`);
+            }
+
+            window.DSFeedback.fire({
+                icon: 'success',
+                title: 'Dados importados do agente',
+                text: details.join(' ') || 'Campos tecnicos preenchidos com sucesso.',
+                confirmButtonText: 'OK'
+            });
+        } catch (error) {
+            window.DSFeedback.error(
+                'Falha ao buscar do agente',
+                error instanceof Error ? error.message : 'Nao foi possivel executar a coleta local do agente.'
+            );
+        } finally {
+            setDesktopAgentButtonLoading(false);
+        }
+    }
 
     // Inicializar Select2
     $('.select2-clientes').select2({
@@ -533,12 +1116,12 @@ $(document).ready(function() {
         width: '100%',
         placeholder: "Selecione a Marca..."
     }).on('change', function() {
-        // Quando a marca muda, destruímos e recriamos o select2 de modelos
+        // Quando a marca muda, destruÃ­mos e recriamos o select2 de modelos
         // ou pelo menos limpamos o valor dele.
         $('#modeloSelect').val(null).trigger('change');
     });
 
-    // Select2 Híbrido: Modelos via API
+    // Select2 HÃ­brido: Modelos via API
     $('#modeloSelect').select2({
         theme: 'bootstrap-5',
         width: '100%',
@@ -580,18 +1163,18 @@ $(document).ready(function() {
                 return `Digite mais ${restante} caractere(s) para buscar...`;
             },
             searching:    function() { return '<i class="bi bi-globe2 me-1"></i> Buscando modelos na internet...'; },
-            noResults:    function() { return 'Nenhuma sugestão encontrada. Use o botão <strong>+ Novo</strong> para cadastrar manualmente.'; },
-            errorLoading: function() { return 'Erro ao consultar. Verifique sua conexão.'; }
+            noResults:    function() { return 'Nenhuma sugestÃ£o encontrada. Use o botÃ£o <strong>+ Novo</strong> para cadastrar manualmente.'; },
+            errorLoading: function() { return 'Erro ao consultar. Verifique sua conexÃ£o.'; }
         },
         templateResult: function (data) {
             if (data.loading) return data.text;
             if (data.children) return data.text;
-            
+
             if (data.newTag) {
                 return $(`
                 <div>
                     <strong class="d-block text-primary"><i class="bi bi-pencil-square me-1"></i> "${data.text}"</strong>
-                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (edição manual)</small>
+                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (ediÃ§Ã£o manual)</small>
                 </div>`);
             }
 
@@ -623,6 +1206,17 @@ $(document).ready(function() {
         }
     });
 
+    $tipoSelect.on('change', syncDesktopCatalogState);
+    $desktopModeSelect.on('change', syncDesktopCatalogState);
+    $('#gabineteTipoSelect').on('change', function() {
+        syncGabineteStatusSelection();
+        updateDesktopResumoPreview();
+    });
+    $('#placaMaeInput, #chipsetInput, #processadorInput, #memoriaRamInput, #armazenamentoInput, #placaVideoInput, #fonteInput').on('input', updateDesktopResumoPreview);
+    $('.btn-gabinete-guia').on('click', showDesktopGabineteGuide);
+    $('#btnDesktopImportarAgenteLocal').on('click', importCollectorSnapshotFromAgentLocal);
+    syncDesktopCatalogState();
+
 
     // ===========================================================
     // SELETOR DE COR PROFISSIONAL
@@ -636,12 +1230,12 @@ $(document).ready(function() {
             { hex: '#41464D', name: 'Graphite' },
             { hex: '#5C5B57', name: 'Titanium' },
             { hex: '#696969', name: 'Cinza Escuro' },
-            { hex: '#708090', name: 'Cinza Ardósia' },
+            { hex: '#708090', name: 'Cinza ArdÃ³sia' },
             { hex: '#BEBEBE', name: 'Cinza' },
             { hex: '#D3D3D3', name: 'Cinza Claro' },
             { hex: '#FFFFFF', name: 'Branco' },
             { hex: '#F8F8FF', name: 'Branco Gelo' },
-            { hex: '#F5F5F5', name: 'Branco Fumaça' },
+            { hex: '#F5F5F5', name: 'Branco FumaÃ§a' },
             { hex: '#FFFFF0', name: 'Marfim' },
         ]},
         { category: 'Azuis e Marinhos', colors: [
@@ -650,10 +1244,10 @@ $(document).ready(function() {
             { hex: '#00008B', name: 'Azul Escuro' },
             { hex: '#0000FF', name: 'Azul Puro' },
             { hex: '#4169E1', name: 'Azul Real' },
-            { hex: '#1E90FF', name: 'Azul Céu' },
+            { hex: '#1E90FF', name: 'Azul CÃ©u' },
             { hex: '#87CEEB', name: 'Azul Celeste' },
             { hex: '#ADD8E6', name: 'Azul Beb?' },
-            { hex: '#5F9EA0', name: 'Azul Petróleo' },
+            { hex: '#5F9EA0', name: 'Azul PetrÃ³leo' },
         ]},
         { category: 'Verdes e Mentas', colors: [
             { hex: '#006400', name: 'Verde Escuro' },
@@ -673,11 +1267,11 @@ $(document).ready(function() {
             { hex: '#FF6347', name: 'Tomate' },
             { hex: '#FFA500', name: 'Laranja' },
             { hex: '#FF7F50', name: 'Coral' },
-            { hex: '#FA8072', name: 'Salmão' },
+            { hex: '#FA8072', name: 'SalmÃ£o' },
         ]},
         { category: 'Amarelos e Dourados', colors: [
             { hex: '#B8860B', name: 'Dourado Escuro' },
-            { hex: '#DAA520', name: 'Dourado Médio' },
+            { hex: '#DAA520', name: 'Dourado MÃ©dio' },
             { hex: '#D4AF37', name: 'Dourado' },
             { hex: '#FFD700', name: 'Dourado Vivo' },
             { hex: '#FFFF00', name: 'Amarelo' },
@@ -692,12 +1286,12 @@ $(document).ready(function() {
             { hex: '#D2691E', name: 'Chocolate' },
             { hex: '#F4A460', name: 'Areia' },
         ]},
-        { category: 'Roxos, Pinks e Lilás', colors: [
-            { hex: '#4B0082', name: 'Índigo' },
+        { category: 'Roxos, Pinks e LilÃ¡s', colors: [
+            { hex: '#4B0082', name: 'Ãndigo' },
             { hex: '#2D1B69', name: 'Violeta Escuro' },
             { hex: '#800080', name: 'Roxo Puro' },
-            { hex: '#9370DB', name: 'Roxo Médio' },
-            { hex: '#DA70D6', name: 'Lilás' },
+            { hex: '#9370DB', name: 'Roxo MÃ©dio' },
+            { hex: '#DA70D6', name: 'LilÃ¡s' },
             { hex: '#FF00FF', name: 'Magenta' },
             { hex: '#FF1493', name: 'Rosa Pink' },
             { hex: '#FFC0CB', name: 'Rosa' },
@@ -825,9 +1419,9 @@ $(document).ready(function() {
                             ${cat.colors.map(c => {
                                 const isSelected = $('#corHexReal').val().toUpperCase() === c.hex.toUpperCase();
                                 return `
-                                    <button type="button" class="list-group-item list-group-item-action py-2 px-3 d-flex align-items-center gap-3 border-0 ${isSelected ? 'active bg-primary bg-opacity-10 text-primary fw-bold' : ''}" 
+                                    <button type="button" class="list-group-item list-group-item-action py-2 px-3 d-flex align-items-center gap-3 border-0 ${isSelected ? 'active bg-primary bg-opacity-10 text-primary fw-bold' : ''}"
                                             onclick="updateColorUI('${c.hex}', '${c.name}')" style="font-size: 0.85rem;">
-                                        <div class="rounded-circle shadow-sm border border-light" 
+                                        <div class="rounded-circle shadow-sm border border-light"
                                              style="width: 26px; height: 26px; background: ${c.hex}; flex-shrink: 0;"></div>
                                         <span class="flex-grow-1 text-start">${c.name}</span>
                                         <small class="text-muted font-monospace opacity-50" style="font-size: 0.75rem;">${c.hex}</small>
@@ -861,7 +1455,7 @@ $(document).ready(function() {
         }
     });
 
-    // Nome editável manual
+    // Nome editÃ¡vel manual
     $('#corNomeInput').on('input', function() {
         $('#corNomeReal').val(this.value);
     });
@@ -888,41 +1482,41 @@ $(document).ready(function() {
     function detectDominantColor(sourceCanvas) {
         try {
             const ctx = sourceCanvas.getContext('2d', { willReadFrequently: true });
-            
-            // Foca nos 40% centrais da imagem para evitar fundos brancos/pretos de estúdio
+
+            // Foca nos 40% centrais da imagem para evitar fundos brancos/pretos de estÃºdio
             const w = sourceCanvas.width;
             const h = sourceCanvas.height;
             const startX = Math.floor(w * 0.3);
             const startY = Math.floor(h * 0.3);
             const width = Math.floor(w * 0.4);
             const height = Math.floor(h * 0.4);
-            
+
             if(width <= 0 || height <= 0) return;
 
             const imageData = ctx.getImageData(startX, startY, width, height);
             const data = imageData.data;
             const colorCounts = {};
-            
+
             // Amostragem (step = 4px)
             for (let i = 0; i < data.length; i += 16) {
-                const r = Math.round(data[i] / 20) * 20; // Quantização grossa
+                const r = Math.round(data[i] / 20) * 20; // QuantizaÃ§Ã£o grossa
                 const g = Math.round(data[i+1] / 20) * 20;
                 const b = Math.round(data[i+2] / 20) * 20;
                 const a = data[i+3];
-                
+
                 if (a < 128) continue;
-                
-                // Reduz consideravelmente o peso de pixels puramente pretos/apagados (como a lente ou tela preta) 
+
+                // Reduz consideravelmente o peso de pixels puramente pretos/apagados (como a lente ou tela preta)
                 // e brancos puros (fundo de caixa).
                 let weight = 1;
                 if ((r < 25 && g < 25 && b < 25) || (r > 235 && g > 235 && b > 235)) {
-                    weight = 0.05; 
+                    weight = 0.05;
                 }
-                
+
                 const hex = rgbToHexStr(r, g, b);
                 colorCounts[hex] = (colorCounts[hex] || 0) + weight;
             }
-            
+
             let dominantHex = '#000000';
             let maxCount = 0;
             for (const hex in colorCounts) {
@@ -931,15 +1525,15 @@ $(document).ready(function() {
                     dominantHex = hex;
                 }
             }
-            
+
             let bestMatch = { hex: dominantHex, name: 'Personalizada' };
             const closest = findClosestColor(dominantHex);
             if (closest) {
                 bestMatch = closest;
             }
-            
+
             const closestColorName = bestMatch.name;
-            
+
             // Exibir no painel UI
             $('#smartColorSwatch').css('background-color', dominantHex);
             $('#smartColorName').text(closestColorName);
@@ -948,7 +1542,7 @@ $(document).ready(function() {
             $('#smartColorContainer').removeClass('d-none');
 
         } catch (e) {
-            console.warn('Erro na detecção de cor: ', e);
+            console.warn('Erro na detecÃ§Ã£o de cor: ', e);
         }
     }
 
@@ -959,26 +1553,26 @@ $(document).ready(function() {
         const marcaId = $(this).val();
         const marcaNome = $(this).find('option:selected').text();
 
-        // Atualiza a opção no modal de Novo Modelo
+        // Atualiza a opÃ§Ã£o no modal de Novo Modelo
         if(marcaId) {
             $('#modMarcaId').html(`<option value="${marcaId}">${marcaNome}</option>`);
             $('#modMarcaId').prop('disabled', false);
         } else {
-            $('#modMarcaId').html('<option value="">Selecione a marca no formulário antes...</option>');
+            $('#modMarcaId').html('<option value="">Selecione a marca no formulÃ¡rio antes...</option>');
             $('#modMarcaId').prop('disabled', true);
         }
     });
 
-    // --- LÓGICA DE ACESSÓRIOS (NOVAS ABAS) ---
+    // --- LÃ“GICA DE ACESSÃ“RIOS (NOVAS ABAS) ---
     $(document).on('click', '.btn-quick-acessorio', function() {
         const value = $(this).text().replace('+ ', '').trim();
         const textarea = $('#textareaAcessorios');
         const current = textarea.val().trim();
-        
+
         if (current.includes(value)) return;
-        
+
         textarea.val(current === '' ? value : current + ', ' + value).focus();
-        
+
         $(this).addClass('bg-primary text-white').delay(300).queue(function(next){
             $(this).removeClass('bg-primary text-white');
             next();
@@ -994,7 +1588,7 @@ $(document).ready(function() {
         }
     }
 
-    // Chamar no init e após mudar fotos
+    // Chamar no init e apÃ³s mudar fotos
     setTimeout(checkPhotosEmptyState, 500);
 
     // Reaproveitar o renderNewPreviews para checar vazio
@@ -1006,7 +1600,7 @@ $(document).ready(function() {
         };
     }
 
-    // --- LÓGICA DE CÂMERA, GALERIA E CROPPER (FOTOS) ---
+    // --- LÃ“GICA DE CÃ‚MERA, GALERIA E CROPPER (FOTOS) ---
     const modalCameraEl  = document.getElementById('modalCamera');
     const modalCropEl    = document.getElementById('modalCropEquip');
     const modalCamera    = modalCameraEl ? new bootstrap.Modal(modalCameraEl) : null;
@@ -1114,7 +1708,7 @@ $(document).ready(function() {
             modalCamera?.show();
         } catch (err) {
             console.error('[Equipamentos Fotos] falha ao acessar camera', err);
-        showPhotoDialog('error', 'Câmera indisponível', 'Não foi possível acessar a câmera deste dispositivo.');
+        showPhotoDialog('error', 'CÃ¢mera indisponÃ­vel', 'NÃ£o foi possÃ­vel acessar a cÃ¢mera deste dispositivo.');
         }
     });
 
@@ -1136,7 +1730,7 @@ $(document).ready(function() {
         }
 
         if (!imgToCrop) {
-            console.error('[Equipamentos Fotos] imagem do cropper não encontrada');
+            console.error('[Equipamentos Fotos] imagem do cropper nÃ£o encontrada');
             return;
         }
 
@@ -1155,7 +1749,7 @@ $(document).ready(function() {
 
                 if (!context) {
                     console.error('[Equipamentos Fotos] fallback canvas sem contexto 2D');
-            showPhotoDialog('error', 'Falha ao processar imagem', 'Não foi possível preparar a foto selecionada.');
+            showPhotoDialog('error', 'Falha ao processar imagem', 'NÃ£o foi possÃ­vel preparar a foto selecionada.');
                     processPendingCropQueue();
                     return;
                 }
@@ -1164,7 +1758,7 @@ $(document).ready(function() {
                 fallbackCanvas.toBlob((blob) => {
                     if (!blob) {
                         console.error('[Equipamentos Fotos] fallback canvas retornou blob vazio');
-            showPhotoDialog('error', 'Falha ao processar imagem', 'Não foi possível gerar a foto selecionada.');
+            showPhotoDialog('error', 'Falha ao processar imagem', 'NÃ£o foi possÃ­vel gerar a foto selecionada.');
                         processPendingCropQueue();
                         return;
                     }
@@ -1174,7 +1768,7 @@ $(document).ready(function() {
             };
             fallbackImage.onerror = (error) => {
                 console.error('[Equipamentos Fotos] erro ao carregar imagem no fallback', error);
-            showPhotoDialog('error', 'Falha ao carregar imagem', 'A imagem escolhida não pode ser carregada.');
+            showPhotoDialog('error', 'Falha ao carregar imagem', 'A imagem escolhida nÃ£o pode ser carregada.');
                 processPendingCropQueue();
             };
             fallbackImage.src = source;
@@ -1207,7 +1801,7 @@ $(document).ready(function() {
             console.error('[Equipamentos Fotos] falha ao inicializar cropper', error);
             cropperReady = false;
             hideModalSafe(modalCrop, '#modalCropEquip');
-            showPhotoDialog('error', 'Falha no editor', 'Não foi possível abrir o editor de corte da foto.');
+            showPhotoDialog('error', 'Falha no editor', 'NÃ£o foi possÃ­vel abrir o editor de corte da foto.');
             processPendingCropQueue();
         }
     });
@@ -1244,7 +1838,7 @@ $(document).ready(function() {
         const context = canvasCamera.getContext('2d');
         if (!context) {
             console.error('[Equipamentos Fotos] canvas da camera sem contexto 2D');
-            showPhotoDialog('error', 'Falha na câmera', 'Não foi possível capturar a imagem da câmera.');
+            showPhotoDialog('error', 'Falha na cÃ¢mera', 'NÃ£o foi possÃ­vel capturar a imagem da cÃ¢mera.');
             return;
         }
 
@@ -1260,20 +1854,20 @@ $(document).ready(function() {
     document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
         if (!cropperReady || !cropper) {
             console.error('[Equipamentos Fotos] confirmacao de crop sem cropper pronto');
-            showPhotoDialog('warning', 'Editor indisponível', 'A foto ainda não está pronta para corte.');
+            showPhotoDialog('warning', 'Editor indisponÃ­vel', 'A foto ainda nÃ£o estÃ¡ pronta para corte.');
             return;
         }
 
         try {
             const canvas = cropper.getCroppedCanvas({ width: 1024, height: 1024, imageSmoothingQuality: 'high' });
             if (!canvas) {
-                throw new Error('Canvas do cropper não retornado.');
+                throw new Error('Canvas do cropper nÃ£o retornado.');
             }
 
             canvas.toBlob((blob) => {
                 if (!blob) {
                     console.error('[Equipamentos Fotos] cropper retornou blob vazio');
-            showPhotoDialog('error', 'Falha ao salvar foto', 'Não foi possível gerar a foto cortada.');
+            showPhotoDialog('error', 'Falha ao salvar foto', 'NÃ£o foi possÃ­vel gerar a foto cortada.');
                     return;
                 }
 
@@ -1281,7 +1875,7 @@ $(document).ready(function() {
             }, 'image/jpeg', 0.9);
         } catch (error) {
             console.error('[Equipamentos Fotos] erro ao confirmar crop', error);
-            showPhotoDialog('error', 'Falha ao salvar foto', 'Não foi possível finalizar o corte da imagem.');
+            showPhotoDialog('error', 'Falha ao salvar foto', 'NÃ£o foi possÃ­vel finalizar o corte da imagem.');
         }
     });
 
@@ -1404,18 +1998,18 @@ $(document).ready(function() {
                 $('#foto-existente-' + id).remove();
                 checkPhotosEmptyState();
             } else {
-            showPhotoDialog('error', 'Erro ao excluir foto', data.message || 'Não foi possível excluir a foto.');
+            showPhotoDialog('error', 'Erro ao excluir foto', data.message || 'NÃ£o foi possÃ­vel excluir a foto.');
                 btn.prop('disabled', false).html('<i class="bi bi-x"></i>');
             }
         })
         .catch(err => {
             console.error('[Equipamentos Fotos] erro ao excluir foto existente', err);
-            showPhotoDialog('error', 'Erro de comunicação', 'Não foi possível concluir a exclusão da foto.');
+            showPhotoDialog('error', 'Erro de comunicaÃ§Ã£o', 'NÃ£o foi possÃ­vel concluir a exclusÃ£o da foto.');
             btn.prop('disabled', false).html('<i class="bi bi-x"></i>');
         });
     });
 
-    // ================= AJAX SALVAMENTO RÁPIDO ================= //
+    // ================= AJAX SALVAMENTO RÃPIDO ================= //
 
     // Salvar Cliente
     $('#btnSalvarCliente').click(function() {
@@ -1425,9 +2019,9 @@ $(document).ready(function() {
             window.DSFeedback.warning('Nome obrigatorio', 'Informe o nome do cliente para continuar.');
             return;
         }
-        
+
         btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
-        
+
         const fd = new FormData();
         fd.append('nome_razao', nome);
         fd.append('telefone1', $('#cTelefone').val());
@@ -1447,7 +2041,7 @@ $(document).ready(function() {
                 window.DSFeedback.error('Falha ao salvar cliente', data.message || 'Erro ao salvar cliente');
             }
         })
-                .catch(() => window.DSFeedback.error('Erro de comunicação', 'Não foi possível salvar o cliente.'))
+                .catch(() => window.DSFeedback.error('Erro de comunicaÃ§Ã£o', 'NÃ£o foi possÃ­vel salvar o cliente.'))
         .finally(() => btn.prop('disabled', false).html('Salvar Cliente'));
     });
 
@@ -1456,7 +2050,7 @@ $(document).ready(function() {
         const btn = $(this);
         const nome = $('#mNome').val();
         if(!nome) return;
-        
+
         btn.prop('disabled', true);
         const fd = new FormData();
         fd.append('nome', nome);
@@ -1484,7 +2078,7 @@ $(document).ready(function() {
             window.DSFeedback.warning('Dados incompletos', 'Preencha nome e marca para salvar o modelo.');
             return;
         }
-        
+
         btn.prop('disabled', true);
         const fd = new FormData();
         fd.append('nome', nome);
@@ -1527,7 +2121,7 @@ $(document).ready(function() {
                 header.className = 'list-group-item list-group-item-secondary py-1 px-3';
                 header.style.cssText = 'font-size:0.7rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; pointer-events:none; opacity:0.8;';
                 const isCadastrado = group.text.includes('Cadastrados');
-                header.textContent = (isCadastrado ? '✓ ' : '• ') + group.text.replace(/^[✓•]\s+/, '');
+                header.textContent = (isCadastrado ? 'âœ“ ' : 'â€¢ ') + group.text.replace(/^[âœ“â€¢]\s+/, '');
                 sugestoesBox.appendChild(header);
 
                 group.children.forEach(item => {
@@ -1561,7 +2155,7 @@ $(document).ready(function() {
             if (total > 0) {
                 sugestoesBox.classList.remove('d-none');
             } else {
-                sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugestão encontrada. Salve manualmente.</div>';
+                sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugestÃ£o encontrada. Salve manualmente.</div>';
                 sugestoesBox.classList.remove('d-none');
             }
         }
@@ -1618,6 +2212,43 @@ $(document).ready(function() {
             spinnerModelo.classList.add('d-none');
         });
     })();
+
+    if (duplicateEquipmentPayload && duplicateEquipmentPayload.equipment_id) {
+        abrirAlertaDuplicidadeEquipamento(duplicateEquipmentPayload).catch((error) => {
+            console.error('[Equipamentos] Falha ao abrir alerta de duplicidade.', error);
+        });
+    }
+
+    $('form[action*="equipamentos/"]').on('submit', function(event) {
+        const isDesktop = isDesktopTipoSelecionado();
+        const isMounted = String($desktopModeSelect.val() || 'montado') === 'montado';
+        if (isDesktop && isMounted) {
+            return;
+        }
+
+        const marcaId = String($('#marcaSelect').val() || '').trim();
+        const modeloId = String($('#modeloSelect').val() || '').trim();
+        if (marcaId && modeloId) {
+            return;
+        }
+
+        event.preventDefault();
+        const message = !marcaId
+            ? 'Selecione a marca do equipamento antes de salvar.'
+            : 'Selecione o modelo do equipamento antes de salvar.';
+
+        if (window.Swal && typeof window.Swal.fire === 'function') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Pendencia obrigatoria',
+                text: message,
+                confirmButtonText: 'OK',
+                customClass: { popup: 'glass-card' }
+            });
+        } else {
+            alert(message);
+        }
+    });
 });
 </script>
 <?= $this->endSection() ?>

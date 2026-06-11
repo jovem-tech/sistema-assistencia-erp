@@ -1,21 +1,23 @@
-# Sistema de Permissões e Controle de Acesso (RBAC)
+# Sistema de PermissÃƒÂµes e Controle de Acesso (RBAC)
 
-> **Versão:** 2.0 ? implementado em março/2026  
+> **VersÃƒÂ£o:** 2.0 ? implementado em marÃƒÂ§o/2026
 > **Arquitetura:** Role-Based Access Control (RBAC) ? CodeIgniter 4
+
+> **Atualizacao relevante em 05/06/2026:** `crm`, `atendimento_whatsapp` e `precificacao` passaram a ser modulos RBAC independentes.
 
 ---
 
-## 1. Visão Geral
+## 1. VisÃƒÂ£o Geral
 
 O sistema utiliza um modelo de **controle de acesso baseado em grupos (RBAC)**, onde:
 
-- **Usuários** pertencem a um **Grupo**
-- **Grupos** possuem **Permissões**
-- **Permissões** são compostas por **Módulo + Ação**
-- Toda proteção é aplicada em **duas camadas**: backend (filtro de rota) e frontend (views)
+- **UsuÃƒÂ¡rios** pertencem a um **Grupo**
+- **Grupos** possuem **PermissÃƒÂµes**
+- **PermissÃƒÂµes** sÃƒÂ£o compostas por **MÃƒÂ³dulo + AÃƒÂ§ÃƒÂ£o**
+- Toda proteÃƒÂ§ÃƒÂ£o ÃƒÂ© aplicada em **duas camadas**: backend (filtro de rota) e frontend (views)
 
 ```
-Usuário ? pertence ? Grupo ? possui ? Permissão (Módulo + Ação)
+UsuÃƒÂ¡rio ? pertence ? Grupo ? possui ? PermissÃƒÂ£o (MÃƒÂ³dulo + AÃƒÂ§ÃƒÂ£o)
 ```
 
 ---
@@ -24,53 +26,72 @@ Usuário ? pertence ? Grupo ? possui ? Permissão (Módulo + Ação)
 
 ### 2.1 Tabela `grupos`
 
-| Coluna | Tipo | Descrição |
+| Coluna | Tipo | DescriÃƒÂ§ÃƒÂ£o |
 |--------|------|-----------|
 | `id` | INT PK | Identificador |
 | `nome` | VARCHAR(80) | Nome do grupo (ex: Administrador) |
-| `descricao` | VARCHAR(200) | Descrição opcional |
-| `sistema` | TINYINT(1) | `1` = protegido, não pode ser excluído |
-| `created_at` | DATETIME | Data de criação |
+| `descricao` | VARCHAR(200) | DescriÃƒÂ§ÃƒÂ£o opcional |
+| `sistema` | TINYINT(1) | `1` = protegido, nÃƒÂ£o pode ser excluÃƒÂ­do |
+| `created_at` | DATETIME | Data de criaÃƒÂ§ÃƒÂ£o |
 
-**Grupos padrão do sistema:**
+**Grupos padrÃƒÂ£o do sistema:**
 
-| ID | Nome | Sistema | Descrição |
+| ID | Nome | Sistema | DescriÃƒÂ§ÃƒÂ£o |
 |----|------|---------|-----------|
 | 1 | Administrador | ? | Acesso total. Protegido |
-| 2 | Técnico | ? | OS, Equipamentos, Estoque. Sem Financeiro |
-| 3 | Atendente | ? | Clientes, OS, Equipamentos. Sem Administração |
+| 2 | TÃƒÂ©cnico | ? | OS, Equipamentos, Estoque. Sem Financeiro |
+| 3 | Atendente | ? | Clientes, OS, Equipamentos. Sem AdministraÃƒÂ§ÃƒÂ£o |
 
 ---
 
 ### 2.2 Tabela `modulos`
 
-| Coluna | Tipo | Descrição |
+| Coluna | Tipo | DescriÃƒÂ§ÃƒÂ£o |
 |--------|------|-----------|
 | `id` | INT PK | Identificador |
 | `nome` | VARCHAR(80) | Nome exibido |
-| `slug` | VARCHAR(80) UNIQUE | Chave usada no código |
+| `slug` | VARCHAR(80) UNIQUE | Chave usada no cÃƒÂ³digo |
 | `icone` | VARCHAR(60) | Classe Bootstrap Icons |
 | `ordem_menu` | INT | Ordem no sidebar |
 | `ativo` | TINYINT(1) | Habilita/desabilita |
 
-**Módulos cadastrados:**
+**MÃƒÂ³dulos cadastrados:**
 
 | Slug | Nome | Ordem |
 |------|------|-------|
 | `dashboard` | Dashboard | 1 |
 | `clientes` | Clientes | 10 |
 | `fornecedores` | Fornecedores | 11 |
-| `funcionarios` | Funcionários | 12 |
-| `usuarios` | Usuários | 13 |
+| `funcionarios` | FuncionÃƒÂ¡rios | 12 |
+| `usuarios` | UsuÃƒÂ¡rios | 13 |
 | `grupos` | Grupos de Acesso | 14 |
 | `equipamentos` | Equipamentos | 20 |
-| `os` | Ordens de Serviço | 30 |
+| `os` | Ordens de ServiÃƒÂ§o | 30 |
 | `estoque` | Estoque | 40 |
 | `financeiro` | Financeiro | 50 |
-| `relatorios` | Relatórios | 60 |
-| `configuracoes` | Configurações | 70 |
+| `relatorios` | RelatÃƒÂ³rios | 60 |
+| `configuracoes` | ConfiguraÃƒÂ§ÃƒÂµes | 70 |
 
-> **Nota:** Os submenus de Equipamentos (Tipos, Marcas, Modelos, Defeitos Comuns) **herdam** do módulo `equipamentos`. Não são módulos separados.
+> **Nota:** Os submenus de Equipamentos (Tipos, Marcas, Modelos, Defeitos Comuns) **herdam** do mÃƒÂ³dulo `equipamentos`. NÃƒÂ£o sÃƒÂ£o mÃƒÂ³dulos separados.
+
+### 2.2.1 Modulos evoluidos da linha atual
+
+AlÃƒÂ©m da base original, a linha atual do ERP trabalha com os seguintes slugs independentes no RBAC:
+
+- `servicos`
+- `defeitos`
+- `orcamentos`
+- `crm`
+- `atendimento_whatsapp`
+- `precificacao`
+- `vendas`
+
+Compatibilidade aplicada pela migration `2026-06-05-160000_SyncEvolvedRbacModules`:
+
+- `crm` herda permissoes equivalentes de `clientes` no primeiro sync;
+- `atendimento_whatsapp` herda permissoes equivalentes de `clientes` no primeiro sync;
+- `precificacao` herda permissoes equivalentes de `orcamentos` no primeiro sync;
+- o grupo `Administrador` recebe acesso completo a esses novos modulos automaticamente.
 
 ---
 
@@ -90,16 +111,16 @@ Usuário ? pertence ? Grupo ? possui ? Permissão (Módulo + Ação)
 
 ### 2.4 Tabela `grupo_permissoes`
 
-Tabela central que associa Grupo + Módulo + Permissão.
+Tabela central que associa Grupo + MÃƒÂ³dulo + PermissÃƒÂ£o.
 
-| Coluna | Tipo | Descrição |
+| Coluna | Tipo | DescriÃƒÂ§ÃƒÂ£o |
 |--------|------|-----------|
 | `id` | INT PK | Identificador |
-| `grupo_id` | INT FK | Referência a `grupos` |
-| `modulo_id` | INT FK | Referência a `modulos` |
-| `permissao_id` | INT FK | Referência a `permissoes` |
+| `grupo_id` | INT FK | ReferÃƒÂªncia a `grupos` |
+| `modulo_id` | INT FK | ReferÃƒÂªncia a `modulos` |
+| `permissao_id` | INT FK | ReferÃƒÂªncia a `permissoes` |
 
-**Chave única:** `(grupo_id, modulo_id, permissao_id)` ? sem permissões duplicadas.
+**Chave ÃƒÂºnica:** `(grupo_id, modulo_id, permissao_id)` ? sem permissÃƒÂµes duplicadas.
 
 ---
 
@@ -112,9 +133,9 @@ ALTER TABLE usuarios ADD FOREIGN KEY (grupo_id) REFERENCES grupos(id) ON DELETE 
 
 ---
 
-## 3. Matriz de Permissões por Grupo
+## 3. Matriz de PermissÃƒÂµes por Grupo
 
-| Módulo | Admin | Técnico | Atendente |
+| MÃƒÂ³dulo | Admin | TÃƒÂ©cnico | Atendente |
 |--------|:-----:|:-------:|:---------:|
 | dashboard ? visualizar | ? | ? | ? |
 | clientes ? visualizar | ? | ? | ? |
@@ -144,9 +165,9 @@ ALTER TABLE usuarios ADD FOREIGN KEY (grupo_id) REFERENCES grupos(id) ON DELETE 
 
 ---
 
-## 4. Arquitetura de Código
+## 4. Arquitetura de CÃƒÂ³digo
 
-### 4.1 Fluxo completo de uma requisição
+### 4.1 Fluxo completo de uma requisiÃƒÂ§ÃƒÂ£o
 
 ```
 Browser/Cliente
@@ -175,9 +196,9 @@ Browser/Cliente
 ?    ??? loadUserPermissions()            ?
 ?    ?   ??? Cache session? retorna       ?
 ?    ?   ??? Query grupo_permissoes       ?
-?    ??? Verifica mapa de permissões      ?
+?    ??? Verifica mapa de permissÃƒÂµes      ?
 ?                                         ?
-?  NÃO TEM PERMISSÃO?                     ?
+?  NÃƒÆ’O TEM PERMISSÃƒÆ’O?                     ?
 ?  ??? AJAX ? HTTP 403 JSON               ?
 ?  ??? Browser ? redirect /dashboard     ?
 ?               + flashdata 'error'       ?
@@ -187,29 +208,29 @@ Browser/Cliente
                ?
 ???????????????????????????????????????????
 ?  Controller::action()                    ?
-?  Executa a lógica de negócio             ?
+?  Executa a lÃƒÂ³gica de negÃƒÂ³cio             ?
 ???????????????????????????????????????????
                ?
                ?
 ???????????????????????????????????????????
-?  View ? botões protegidos               ?
+?  View ? botÃƒÂµes protegidos               ?
 ?  <?php if (can('financeiro','criar')): ?> ?
-?    <a href="...">Novo Lançamento</a>    ?
+?    <a href="...">Novo LanÃƒÂ§amento</a>    ?
 ?  <?php endif; ?>                        ?
 ???????????????????????????????????????????
 ```
 
 ---
 
-### 4.2 Funções RBAC ? `app/Helpers/sistema_helper.php`
+### 4.2 FunÃƒÂ§ÃƒÂµes RBAC ? `app/Helpers/sistema_helper.php`
 
 ```php
-// ??? Verifica se o usuário pode executar uma ação num módulo
+// ??? Verifica se o usuÃƒÂ¡rio pode executar uma aÃƒÂ§ÃƒÂ£o num mÃƒÂ³dulo
 can(string $modulo, string $acao): bool
 
 // Exemplos:
 can('financeiro', 'visualizar')  // true/false
-can('clientes',   'excluir')     // true/false
+can('crm',        'editar')      // true/false
 can('os',         'criar')       // true/false
 
 // ??? Atalho: verifica apenas 'visualizar' (sidebar)
@@ -217,10 +238,11 @@ canModule(string $modulo): bool
 
 // Exemplos:
 canModule('financeiro')  // equivale a can('financeiro', 'visualizar')
+canModule('atendimento_whatsapp')
 
-// ??? Força recarga do cache de permissões
+// ??? ForÃƒÂ§a recarga do cache de permissÃƒÂµes
 refreshPermissions(): void
-// Chamar após alterar permissões de um grupo enquanto o usuário está logado
+// Chamar apÃƒÂ³s alterar permissÃƒÂµes de um grupo enquanto o usuÃƒÂ¡rio estÃƒÂ¡ logado
 
 // ??? Aborta com redirect 403 (uso legado em controllers)
 requirePermission(string $modulo, string $acao = 'visualizar'): void
@@ -229,11 +251,11 @@ requirePermission(string $modulo, string $acao = 'visualizar'): void
 #### Como `loadUserPermissions()` funciona:
 
 ```php
-// 1. Verifica cache na sessão
+// 1. Verifica cache na sessÃƒÂ£o
 session()->get('user_permissions')
 // Estrutura: ['clientes' => ['visualizar', 'criar', 'editar'], 'financeiro' => ['visualizar'], ...]
 
-// 2. Se não há cache: consulta o banco
+// 2. Se nÃƒÂ£o hÃƒÂ¡ cache: consulta o banco
 SELECT m.slug as modulo, p.slug as permissao
 FROM grupo_permissoes gp
 JOIN modulos m    ON m.id = gp.modulo_id
@@ -264,36 +286,36 @@ $modulo = $parts[0];  // ex: "financeiro"
 $acao   = $parts[1];  // ex: "visualizar"
 ```
 
-**Comportamento por tipo de requisição:**
+**Comportamento por tipo de requisiÃƒÂ§ÃƒÂ£o:**
 
-| Tipo | Sem permissão | Com permissão |
+| Tipo | Sem permissÃƒÂ£o | Com permissÃƒÂ£o |
 |------|--------------|--------------|
 | Browser (GET) | Redirect `/dashboard` + flash error | Passa para o controller |
 | AJAX (XHR) | HTTP 403 + JSON `{"error": "..."}` | Passa para o controller |
 
 ---
 
-### 4.4 Proteção nas Views ? padrão `can()`
+### 4.4 ProteÃƒÂ§ÃƒÂ£o nas Views ? padrÃƒÂ£o `can()`
 
 ```php
-// Botão criar (cabeçalho)
+// BotÃƒÂ£o criar (cabeÃƒÂ§alho)
 <?php if (can('clientes', 'criar')): ?>
     <a href="<?= base_url('clientes/novo') ?>">Novo Cliente</a>
 <?php endif; ?>
 
-// Botão editar (por linha)
+// BotÃƒÂ£o editar (por linha)
 <?php if (can('clientes', 'editar')): ?>
     <a href="<?= base_url('clientes/editar/' . $c['id']) ?>">??</a>
 <?php endif; ?>
 
-// Botão excluir (por linha)
+// BotÃƒÂ£o excluir (por linha)
 <?php if (can('clientes', 'excluir')): ?>
     <a href="<?= base_url('clientes/excluir/' . $c['id']) ?>">??</a>
 <?php endif; ?>
 
-// Visibilidade de seção inteira
+// Visibilidade de seÃƒÂ§ÃƒÂ£o inteira
 <?php if (can('os', 'editar')): ?>
-    <form><!-- formulário de adicionar item --></form>
+    <form><!-- formulÃƒÂ¡rio de adicionar item --></form>
 <?php endif; ?>
 ```
 
@@ -340,6 +362,47 @@ POST clientes/importar            ? permission:clientes:importar
 GET  clientes/modelo-csv          ? permission:clientes:importar
 ```
 
+### CRM
+```
+GET  crm/clientes                         ? permission:crm:visualizar
+GET  crm/timeline                         ? permission:crm:visualizar
+GET  crm/interacoes                       ? permission:crm:visualizar
+POST crm/interacoes/salvar                ? permission:crm:criar
+GET  crm/followups                        ? permission:crm:visualizar
+POST crm/followups/salvar                 ? permission:crm:criar
+POST crm/followups/:id/status             ? permission:crm:editar
+GET  crm/campanhas                        ? permission:crm:visualizar
+GET  crm/metricas-marketing               ? permission:crm:visualizar
+POST crm/metricas-marketing/engajamento   ? permission:crm:editar
+POST crm/clientes-inativos/followup       ? permission:crm:criar
+```
+
+### Central de Mensagens / WhatsApp
+```
+GET  atendimento-whatsapp                           ? permission:atendimento_whatsapp:visualizar
+GET  atendimento-whatsapp/conversas                 ? permission:atendimento_whatsapp:visualizar
+GET  atendimento-whatsapp/conversa/:id              ? permission:atendimento_whatsapp:visualizar
+POST atendimento-whatsapp/enviar                    ? permission:atendimento_whatsapp:editar
+POST atendimento-whatsapp/vincular-os               ? permission:atendimento_whatsapp:editar
+POST atendimento-whatsapp/atualizar-meta            ? permission:atendimento_whatsapp:editar
+POST atendimento-whatsapp/sync-inbound              ? permission:atendimento_whatsapp:editar
+POST atendimento-whatsapp/conversa/:id/cadastrar-contato ? permission:atendimento_whatsapp:editar
+```
+
+Observacao importante:
+- o fluxo `cadastrar-contato` tambem valida `clientes:criar` ou `clientes:editar`, porque a conversa pode gerar ou atualizar cadastro de contato/cliente no dominio de pessoas.
+
+### Precificacao
+```
+GET  precificacao                         ? permission:precificacao:visualizar
+GET  precificacao/configuracao            ? permission:precificacao:visualizar
+POST precificacao/configuracao/salvar     ? permission:precificacao:editar
+GET  precificacao/simulador               ? permission:precificacao:visualizar
+POST precificacao/simular-peca            ? permission:precificacao:visualizar
+POST precificacao/simular-servico         ? permission:precificacao:visualizar
+POST precificacao/salvar                  ? permission:precificacao:editar
+```
+
 ### Fornecedores
 ```
 GET  fornecedores                 ? permission:fornecedores:visualizar
@@ -350,7 +413,7 @@ POST fornecedores/atualizar/:id   ? permission:fornecedores:editar
 GET  fornecedores/excluir/:id     ? permission:fornecedores:excluir
 ```
 
-### Funcionários
+### FuncionÃƒÂ¡rios
 ```
 GET  funcionarios                 ? permission:funcionarios:visualizar
 GET  funcionarios/novo            ? permission:funcionarios:criar
@@ -399,7 +462,7 @@ POST equipamentosdefeitos/importar      ? permission:equipamentos:importar
 GET  equipamentosdefeitos/modelo-csv    ? permission:equipamentos:visualizar
 ```
 
-### Ordens de Serviço
+### Ordens de ServiÃƒÂ§o
 ```
 GET  os                           ? permission:os:visualizar
 POST os/datatable                 ? permission:os:visualizar
@@ -438,7 +501,7 @@ GET  financeiro/excluir/:id       ? permission:financeiro:excluir
 POST financeiro/baixar/:id        ? permission:financeiro:editar
 ```
 
-### Relatórios
+### RelatÃƒÂ³rios
 ```
 GET  relatorios                   ? permission:relatorios:visualizar
 GET  relatorios/os                ? permission:relatorios:visualizar
@@ -447,13 +510,13 @@ GET  relatorios/estoque           ? permission:relatorios:visualizar
 GET  relatorios/clientes          ? permission:relatorios:visualizar
 ```
 
-### Configurações
+### ConfiguraÃƒÂ§ÃƒÂµes
 ```
 GET  configuracoes                ? permission:configuracoes:visualizar
 POST configuracoes/salvar         ? permission:configuracoes:editar
 ```
 
-### Usuários
+### UsuÃƒÂ¡rios
 ```
 GET  usuarios                     ? permission:usuarios:visualizar
 POST usuarios/datatable           ? permission:usuarios:visualizar
@@ -466,19 +529,19 @@ GET  usuarios/excluir/:id         ? permission:usuarios:excluir
 
 ---
 
-## 6. Gestão de Permissões pela Interface
+## 6. GestÃƒÂ£o de PermissÃƒÂµes pela Interface
 
 ### 6.1 Tela de Grupos (`/grupos`)
 - Lista grupos existentes
-- Botão "Configurar Permissões" leva para a matriz
+- BotÃƒÂ£o "Configurar PermissÃƒÂµes" leva para a matriz
 
-### 6.2 Tela de Permissões do Grupo (`/grupos/:id/permissoes`)
-- Exibe tabela **Módulo × Ação** com checkboxes
-- Admin marca/desmarca cada combinação
-- `POST /grupos/:id/permissoes/salvar` persiste as mudanças
-- Se o usuário logado pertence ao grupo editado ? `refreshPermissions()` é chamado automaticamente
+### 6.2 Tela de PermissÃƒÂµes do Grupo (`/grupos/:id/permissoes`)
+- Exibe tabela **MÃƒÂ³dulo Ãƒâ€” AÃƒÂ§ÃƒÂ£o** com checkboxes
+- Admin marca/desmarca cada combinaÃƒÂ§ÃƒÂ£o
+- `POST /grupos/:id/permissoes/salvar` persiste as mudanÃƒÂ§as
+- Se o usuÃƒÂ¡rio logado pertence ao grupo editado ? `refreshPermissions()` ÃƒÂ© chamado automaticamente
 
-### 6.3 Cache de Sessão
+### 6.3 Cache de SessÃƒÂ£o
 ```
 Login ? loadUserPermissions() cacheia em session['user_permissions']
      ? Validado em cada can() / canModule()
@@ -487,7 +550,7 @@ Login ? loadUserPermissions() cacheia em session['user_permissions']
 
 ---
 
-## 7. Como Adicionar um Novo Módulo
+## 7. Como Adicionar um Novo MÃƒÂ³dulo
 
 ### Passo 1 ? Banco de Dados
 ```sql
@@ -495,8 +558,8 @@ INSERT INTO modulos (nome, slug, icone, ordem_menu)
 VALUES ('Contratos', 'contratos', 'bi-file-earmark-text', 55);
 ```
 
-### Passo 2 ? Configurar Permissões dos Grupos
-Acesse `/grupos` ? clique em "Configurar Permissões" no grupo desejado e marque as ações permitidas.
+### Passo 2 ? Configurar PermissÃƒÂµes dos Grupos
+Acesse `/grupos` ? clique em "Configurar PermissÃƒÂµes" no grupo desejado e marque as aÃƒÂ§ÃƒÂµes permitidas.
 
 ### Passo 3 ? Proteger as rotas em `Routes.php`
 ```php
@@ -509,9 +572,9 @@ $routes->post('contratos/atualizar/(:num)','Contratos::update/$1',['filter' => '
 $routes->get('contratos/excluir/(:num)', 'Contratos::delete/$1',['filter' => 'permission:contratos:excluir']);
 ```
 
-### Passo 4 ? Proteger botões nas Views
+### Passo 4 ? Proteger botÃƒÂµes nas Views
 ```php
-// Cabeçalho
+// CabeÃƒÂ§alho
 <?php if (can('contratos', 'criar')): ?>
     <a href="<?= base_url('contratos/novo') ?>">Novo Contrato</a>
 <?php endif; ?>
@@ -542,7 +605,7 @@ $routes->get('contratos/excluir/(:num)', 'Contratos::delete/$1',['filter' => 'pe
 
 ## 8. Compatibilidade com Sistema Legado
 
-O sistema mantém retrocompatibilidade com o campo `perfil` (admin/tecnico/atendente):
+O sistema mantÃƒÂ©m retrocompatibilidade com o campo `perfil` (admin/tecnico/atendente):
 
 ```php
 // loadUserPermissions() em sistema_helper.php
@@ -557,8 +620,8 @@ if (isset($permissions['*'])) return true;
 
 ```php
 // UsuarioModel::getTecnicos()
-// Considera tanto grupo 'Técnico' quanto perfil legado 'tecnico'
-WHERE g.nome = 'Técnico' OR u.perfil = 'tecnico'
+// Considera tanto grupo 'TÃƒÂ©cnico' quanto perfil legado 'tecnico'
+WHERE g.nome = 'TÃƒÂ©cnico' OR u.perfil = 'tecnico'
 ```
 
 ---
@@ -567,37 +630,37 @@ WHERE g.nome = 'Técnico' OR u.perfil = 'tecnico'
 
 | Arquivo | Responsabilidade |
 |---------|-----------------|
-| `app/Helpers/sistema_helper.php` | Funções `can()`, `canModule()`, `loadUserPermissions()`, `refreshPermissions()`, `requirePermission()` |
-| `app/Filters/PermissionFilter.php` | Filtro CI4 que bloqueia rotas sem permissão |
-| `app/Filters/AuthFilter.php` | Filtro CI4 que bloqueia rotas sem autenticação |
+| `app/Helpers/sistema_helper.php` | FunÃƒÂ§ÃƒÂµes `can()`, `canModule()`, `loadUserPermissions()`, `refreshPermissions()`, `requirePermission()` |
+| `app/Filters/PermissionFilter.php` | Filtro CI4 que bloqueia rotas sem permissÃƒÂ£o |
+| `app/Filters/AuthFilter.php` | Filtro CI4 que bloqueia rotas sem autenticaÃƒÂ§ÃƒÂ£o |
 | `app/Config/Filters.php` | Registro dos alias dos filtros (`auth`, `permission`) |
-| `app/Config/Routes.php` | Proteção declarativa de todas as rotas |
-| `app/Controllers/Grupos.php` | CRUD de grupos + gestão da matriz de permissões |
-| `app/Models/GrupoModel.php` | Query da matriz `modulos × permissoes` |
+| `app/Config/Routes.php` | ProteÃƒÂ§ÃƒÂ£o declarativa de todas as rotas |
+| `app/Controllers/Grupos.php` | CRUD de grupos + gestÃƒÂ£o da matriz de permissÃƒÂµes |
+| `app/Models/GrupoModel.php` | Query da matriz `modulos Ãƒâ€” permissoes` |
 | `app/Views/grupos/permissoes.php` | Interface visual de checkboxes por grupo |
-| `app/Views/layouts/sidebar.php` | Sidebar dinâmico com `canModule()` |
-| `setup_rbac.php` | Script de inicialização (rodar uma vez após deploy) |
+| `app/Views/layouts/sidebar.php` | Sidebar dinÃƒÂ¢mico com `canModule()` |
+| `setup_rbac.php` | Script de inicializaÃƒÂ§ÃƒÂ£o (rodar uma vez apÃƒÂ³s deploy) |
 
 ---
 
-## 10. Segurança ? Camadas de Defesa
+## 10. SeguranÃƒÂ§a ? Camadas de Defesa
 
 ```
 ??????????????????????????????????????????????????????????????
 ?  CAMADA 1 ? AuthFilter                                     ?
-?  Verifica sessão + timeout 30min                           ?
+?  Verifica sessÃƒÂ£o + timeout 30min                           ?
 ?  ? Protege TODAS as rotas do grupo protegido               ?
 ??????????????????????????????????????????????????????????????
 ?  CAMADA 2 ? PermissionFilter                               ?
-?  Verifica módulo:ação específico por rota                  ?
+?  Verifica mÃƒÂ³dulo:aÃƒÂ§ÃƒÂ£o especÃƒÂ­fico por rota                  ?
 ?  ? Bloqueia acesso por URL direta (OWASP A01:2021)         ?
-?  ? Loga tentativas não autorizadas                         ?
+?  ? Loga tentativas nÃƒÂ£o autorizadas                         ?
 ??????????????????????????????????????????????????????????????
 ?  CAMADA 3 ? can() nas Views                                ?
-?  Oculta botões e seções sem permissão                      ?
-?  ? Melhora UX, reduz confusão                              ?
-?  ? NÃO substitui as camadas 1 e 2                          ?
+?  Oculta botÃƒÂµes e seÃƒÂ§ÃƒÂµes sem permissÃƒÂ£o                      ?
+?  ? Melhora UX, reduz confusÃƒÂ£o                              ?
+?  ? NÃƒÆ’O substitui as camadas 1 e 2                          ?
 ??????????????????????????????????????????????????????????????
 ```
 
-> **Princípio:** A segurança real está nas camadas 1 e 2 (backend). A camada 3 (frontend) é apenas UX. Um usuário mal-intencionado que desabilite JS ou manipule HTML ainda será bloqueado pelo backend.
+> **PrincÃƒÂ­pio:** A seguranÃƒÂ§a real estÃƒÂ¡ nas camadas 1 e 2 (backend). A camada 3 (frontend) ÃƒÂ© apenas UX. Um usuÃƒÂ¡rio mal-intencionado que desabilite JS ou manipule HTML ainda serÃƒÂ¡ bloqueado pelo backend.

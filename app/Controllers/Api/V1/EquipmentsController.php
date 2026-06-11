@@ -9,6 +9,8 @@ use App\Models\EquipamentoMarcaModel;
 use App\Models\EquipamentoModeloModel;
 use App\Models\EquipamentoModel;
 use App\Models\EquipamentoTipoModel;
+use App\Services\EquipamentoIdentidadeService;
+use App\Services\EquipamentoProfileService;
 use CodeIgniter\HTTP\Files\UploadedFile;
 use Throwable;
 
@@ -21,6 +23,14 @@ class EquipmentsController extends BaseApiController
         'image/png',
         'image/webp',
     ];
+    private EquipamentoProfileService $profileService;
+    private EquipamentoIdentidadeService $identidadeService;
+
+    public function __construct()
+    {
+        $this->profileService = new EquipamentoProfileService();
+        $this->identidadeService = new EquipamentoIdentidadeService(new EquipamentoModel(), new EquipamentoClienteModel(), new ClienteModel());
+    }
 
     public function catalog()
     {
@@ -108,6 +118,7 @@ class EquipmentsController extends BaseApiController
             'tipos' => $tipos,
             'marcas' => $marcas,
             'modelos' => $modelos,
+            'desktop_catalog_defaults' => $this->profileService->getDesktopMountedCatalogDefaultsMeta(),
         ]);
     }
 
@@ -244,20 +255,32 @@ class EquipmentsController extends BaseApiController
             return $this->respondError('Tipo de equipamento nao encontrado.', 404, 'EQUIPMENT_CREATE_TYPE_NOT_FOUND');
         }
 
-        $marcaId = $this->resolveBrandId($payload);
-        if ($marcaId <= 0) {
+        $preparedPayload = $this->profileService->prepareForPersist($payload);
+        $catalogErrors = $this->profileService->validateCatalogRules($preparedPayload);
+        if (!empty($catalogErrors['marca_id'])) {
             return $this->respondError('Selecione ou informe a marca do equipamento.', 422, 'EQUIPMENT_CREATE_BRAND_REQUIRED');
         }
-
-        $modeloId = $this->resolveModelId($payload, $marcaId);
-        if ($modeloId <= 0) {
+        if (!empty($catalogErrors['modelo_id'])) {
             return $this->respondError('Selecione ou informe o modelo do equipamento.', 422, 'EQUIPMENT_CREATE_MODEL_REQUIRED');
         }
+
+        $marcaId = $this->resolveBrandId($preparedPayload);
+        $modeloId = $this->resolveModelId($preparedPayload, $marcaId);
 
         $cor = $this->nullableString($payload['cor'] ?? null);
         $corHex = $this->normalizeHexColor((string) ($payload['cor_hex'] ?? ''));
         if ($cor === null || $corHex === null) {
             return $this->respondError('Informe a cor correta do equipamento.', 422, 'EQUIPMENT_CREATE_COLOR_REQUIRED');
+        }
+
+        $duplicateConflict = $this->identidadeService->detectConflict($payload);
+        if ($duplicateConflict !== null) {
+            return $this->respondError(
+                (string) ($duplicateConflict['message'] ?? 'Ja existe um equipamento cadastrado com este identificador.'),
+                409,
+                'EQUIPMENT_DUPLICATE_IDENTIFIER',
+                $this->buildDuplicateConflictMeta($duplicateConflict)
+            );
         }
 
         $uploadedFiles = $this->collectUploadedFotos();
@@ -292,7 +315,21 @@ class EquipmentsController extends BaseApiController
             'estado_fisico' => $this->nullableString($payload['estado_fisico'] ?? null),
             'acessorios' => $this->nullableString($payload['acessorios'] ?? null),
             'observacoes' => $this->nullableString($payload['observacoes'] ?? null),
+            'desktop_modalidade' => $this->nullableString($preparedPayload['desktop_modalidade'] ?? null),
+            'gabinete_tipo' => $this->nullableString($preparedPayload['gabinete_tipo'] ?? null),
+            'gabinete_identificacao_status' => $this->nullableString($preparedPayload['gabinete_identificacao_status'] ?? null),
+            'gabinete_observacao' => $this->nullableString($preparedPayload['gabinete_observacao'] ?? null),
+            'placa_mae' => $this->nullableString($preparedPayload['placa_mae'] ?? null),
+            'chipset' => $this->nullableString($preparedPayload['chipset'] ?? null),
+            'processador' => $this->nullableString($preparedPayload['processador'] ?? null),
+            'memoria_ram' => $this->nullableString($preparedPayload['memoria_ram'] ?? null),
+            'armazenamento' => $this->nullableString($preparedPayload['armazenamento'] ?? null),
+            'placa_video' => $this->nullableString($preparedPayload['placa_video'] ?? null),
+            'fonte_alimentacao' => $this->nullableString($preparedPayload['fonte_alimentacao'] ?? null),
+            'configuracao_status' => $this->nullableString($preparedPayload['configuracao_status'] ?? null),
+            'configuracao_origem' => $this->nullableString($preparedPayload['configuracao_origem'] ?? null),
         ];
+        $data = $this->profileService->prepareForPersist($data);
 
         $model = new EquipamentoModel();
 
@@ -372,16 +409,19 @@ class EquipmentsController extends BaseApiController
         }
 
         $needsBrandResolution = array_key_exists('marca_id', $payload) || array_key_exists('marca_nome', $payload);
-        if ($needsBrandResolution) {
+        $catalogErrors = $this->profileService->validateCatalogRules($payload, $existing);
+        if ($needsBrandResolution && empty($catalogErrors['marca_id'])) {
             $marcaId = $this->resolveBrandId($payload);
             if ($marcaId <= 0) {
                 return $this->respondError('Selecione ou informe a marca do equipamento.', 422, 'EQUIPMENT_UPDATE_BRAND_REQUIRED');
             }
             $allowed['marca_id'] = $marcaId;
+        } elseif (!empty($catalogErrors['marca_id'])) {
+            return $this->respondError('Selecione ou informe a marca do equipamento.', 422, 'EQUIPMENT_UPDATE_BRAND_REQUIRED');
         }
 
         $needsModelResolution = array_key_exists('modelo_id', $payload) || array_key_exists('modelo_nome', $payload);
-        if ($needsModelResolution) {
+        if ($needsModelResolution && empty($catalogErrors['modelo_id'])) {
             $marcaIdForModel = (int) ($allowed['marca_id'] ?? $existing['marca_id'] ?? 0);
             if ($marcaIdForModel <= 0) {
                 return $this->respondError('Informe a marca antes de definir o modelo.', 422, 'EQUIPMENT_UPDATE_MODEL_BRAND_REQUIRED');
@@ -392,9 +432,31 @@ class EquipmentsController extends BaseApiController
                 return $this->respondError('Selecione ou informe o modelo do equipamento.', 422, 'EQUIPMENT_UPDATE_MODEL_REQUIRED');
             }
             $allowed['modelo_id'] = $modeloId;
+        } elseif (!empty($catalogErrors['modelo_id'])) {
+            return $this->respondError('Selecione ou informe o modelo do equipamento.', 422, 'EQUIPMENT_UPDATE_MODEL_REQUIRED');
         }
 
         foreach (['numero_serie', 'imei', 'senha_acesso', 'estado_fisico', 'acessorios', 'observacoes'] as $field) {
+            if (array_key_exists($field, $payload)) {
+                $allowed[$field] = $this->nullableString($payload[$field] ?? null);
+            }
+        }
+
+        foreach ([
+            'desktop_modalidade',
+            'gabinete_tipo',
+            'gabinete_identificacao_status',
+            'gabinete_observacao',
+            'placa_mae',
+            'chipset',
+            'processador',
+            'memoria_ram',
+            'armazenamento',
+            'placa_video',
+            'fonte_alimentacao',
+            'configuracao_status',
+            'configuracao_origem',
+        ] as $field) {
             if (array_key_exists($field, $payload)) {
                 $allowed[$field] = $this->nullableString($payload[$field] ?? null);
             }
@@ -408,6 +470,16 @@ class EquipmentsController extends BaseApiController
             : $this->normalizeHexColor((string) ($existing['cor_hex'] ?? ''));
         if ($corValue === null || $corHexValue === null) {
             return $this->respondError('Informe a cor correta do equipamento.', 422, 'EQUIPMENT_UPDATE_COLOR_REQUIRED');
+        }
+
+        $duplicateConflict = $this->identidadeService->detectConflict(array_merge($existing, $payload), $equipamentoId);
+        if ($duplicateConflict !== null) {
+            return $this->respondError(
+                (string) ($duplicateConflict['message'] ?? 'Ja existe um equipamento cadastrado com este identificador.'),
+                409,
+                'EQUIPMENT_DUPLICATE_IDENTIFIER',
+                $this->buildDuplicateConflictMeta($duplicateConflict)
+            );
         }
 
         if (array_key_exists('cor', $payload)) {
@@ -439,6 +511,8 @@ class EquipmentsController extends BaseApiController
                 'EQUIPMENT_UPDATE_EMPTY'
             );
         }
+
+        $allowed = $this->profileService->prepareForPersist($allowed, $existing);
 
         try {
             if (!empty($allowed)) {
@@ -918,6 +992,24 @@ class EquipmentsController extends BaseApiController
         $response['foto_principal_url'] = $principal['url'] ?? null;
 
         return $response;
+    }
+
+    /**
+     * @param array<string,mixed> $conflict
+     * @return array<string,mixed>
+     */
+    private function buildDuplicateConflictMeta(array $conflict): array
+    {
+        return [
+            'equipment_id' => (int) ($conflict['equipment_id'] ?? 0),
+            'same_client' => !empty($conflict['same_client']),
+            'already_linked' => !empty($conflict['already_linked']),
+            'can_link_client' => !empty($conflict['can_link_client']),
+            'matched_input' => $conflict['matched_input'] ?? null,
+            'matched_record' => $conflict['matched_record'] ?? null,
+            'primary_client' => $conflict['primary_client'] ?? null,
+            'related_clients' => $conflict['related_clients'] ?? [],
+        ];
     }
 
     private function missingImageDataUri(): string

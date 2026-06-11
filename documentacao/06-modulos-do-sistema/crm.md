@@ -9,6 +9,19 @@ Consolidar relacionamento tecnico/comercial dentro do ERP, reaproveitando os dad
 - ordens de servico
 - mensageria WhatsApp
 
+## Controle de acesso
+
+O CRM passou a operar com modulo RBAC proprio:
+
+- `crm:visualizar` para timeline, interacoes, follow-ups, pipeline, campanhas, clientes inativos e metricas;
+- `crm:criar` para registros manuais de interacao e follow-up;
+- `crm:editar` para mudanca de status de follow-up e configuracao dos periodos de engajamento.
+
+Compatibilidade:
+
+- a migration `2026-06-05-160000_SyncEvolvedRbacModules` cria o modulo `crm` e replica permissoes equivalentes a partir de `clientes`, evitando ruptura imediata dos grupos existentes;
+- a ficha do cliente (`/clientes/visualizar/{id}`) so exibe os blocos de CRM quando o usuario possuir `crm:visualizar`.
+
 ## Estrutura funcional
 
 ### 1. Timeline
@@ -84,7 +97,7 @@ Endpoint de acao:
 ### 7. Timeline CRM na ficha do cliente
 Tela: `/clientes/visualizar/{id}`
 
-Bloco "CRM - Relacionamento" exibe:
+Bloco "Relacionamento e Atendimento" exibe, quando o usuario possui `crm:visualizar`:
 - resumo de eventos/interacoes/follow-ups pendentes
 - timeline unificada (eventos + interacoes + follow-ups)
 - conversas WhatsApp vinculadas ao cliente

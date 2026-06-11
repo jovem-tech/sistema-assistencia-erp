@@ -26,11 +26,11 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Nome Fantasia / Razão Social</th>
+                        <th>Nome Fantasia / RazÃ£o Social</th>
                         <th>CNPJ / CPF</th>
                         <th>Telefone</th>
                         <th>Status</th>
-                        <th class="text-end">Ações</th>
+                        <th class="text-end">AÃ§Ãµes</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,8 +65,10 @@
                                     </a>
                                     <?php endif; ?>
                                     <?php if (can('fornecedores', 'excluir')): ?>
-                                    <button type="button" class="btn btn-outline-danger btn-delete" 
-                                            data-url="<?= base_url('fornecedores/excluir/' . $forn['id']) ?>" title="Excluir">
+                                    <button type="button" class="btn btn-outline-danger btn-delete"
+                                            data-url="<?= base_url('fornecedores/excluir/' . $forn['id']) ?>"
+                                            data-nome="<?= esc($forn['nome_fantasia'] ?: ($forn['razao_social'] ?? 'Fornecedor')) ?>"
+                                            title="Excluir">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                     <?php endif; ?>

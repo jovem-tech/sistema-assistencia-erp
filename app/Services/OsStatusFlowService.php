@@ -52,7 +52,9 @@ class OsStatusFlowService
     private const ENTREGA_STATUS_CODES = [
         'entregue_reparado',
         'devolvido_sem_reparo',
+        'descartado',
         'entregue_pagamento_pendente',
+        'entregue',
     ];
 
     private const PRAZO_CONCLUSAO_FLOW_STATES = [
@@ -491,16 +493,16 @@ class OsStatusFlowService
     {
         return [
             'diagnostico' => [
-                ['codigo' => 'aguardando_analise', 'nome' => 'Aguardando Análise', 'grupo_macro' => 'diagnostico', 'cor' => 'secondary'],
+                ['codigo' => 'aguardando_analise', 'nome' => 'Aguardando AnÃ¡lise', 'grupo_macro' => 'diagnostico', 'cor' => 'secondary'],
             ],
             'orcamento' => [
-                ['codigo' => 'aguardando_orcamento', 'nome' => 'Aguardando Orçamento', 'grupo_macro' => 'orcamento', 'cor' => 'info'],
-                ['codigo' => 'aguardando_aprovacao', 'nome' => 'Aguardando Aprovação', 'grupo_macro' => 'orcamento', 'cor' => 'purple'],
+                ['codigo' => 'aguardando_orcamento', 'nome' => 'Aguardando OrÃ§amento', 'grupo_macro' => 'orcamento', 'cor' => 'info'],
+                ['codigo' => 'aguardando_aprovacao', 'nome' => 'Aguardando AprovaÃ§Ã£o', 'grupo_macro' => 'orcamento', 'cor' => 'purple'],
             ],
             'execucao' => [
                 ['codigo' => 'aprovado', 'nome' => 'Aprovado', 'grupo_macro' => 'execucao', 'cor' => 'primary'],
                 ['codigo' => 'em_reparo', 'nome' => 'Em Reparo', 'grupo_macro' => 'execucao', 'cor' => 'warning'],
-                ['codigo' => 'aguardando_peca', 'nome' => 'Aguardando Peça', 'grupo_macro' => 'interrupcao', 'cor' => 'orange'],
+                ['codigo' => 'aguardando_peca', 'nome' => 'Aguardando PeÃ§a', 'grupo_macro' => 'interrupcao', 'cor' => 'orange'],
             ],
             'concluido' => [
                 ['codigo' => 'pronto', 'nome' => 'Pronto', 'grupo_macro' => 'concluido', 'cor' => 'success'],

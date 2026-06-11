@@ -1,6 +1,16 @@
 # Estudo de Implementacao - DRE e Fluxo de Caixa
 
-Atualizado em 21/05/2026.
+Atualizado em 01/06/2026.
+
+Status atual:
+- baseline implementada na release `2.17.0`;
+- suporte a `despesa fixa mensal na DRE` implementado na release `2.17.2`;
+- catalogos configuraveis de `categorias financeiras`, `grupos DRE` e `subgrupos DRE` implementados na release `2.18.0`;
+- catalogos financeiros conectados ao `fluxo de caixa` e aos `relatorios operacionais` na release `2.18.1`;
+- `baixa parcial` e `multiplos movimentos por titulo` implementados na release `2.19.0`;
+- `fornecedor_id` implementado na release `2.19.1`, com exibicao condicional do campo `Fornecedor` apenas para contas `A pagar`;
+- a captura manual de `competencia` foi refinada na release `2.19.6` para trabalhar como `mes/ano`, persistindo `01/mm/aaaa` por compatibilidade tecnica;
+- este documento continua valendo como referencia para as proximas fases (`multiplas contas`, `conciliacao` e separacao futura entre `titulo` e `movimento`).
 
 ## Objetivo
 
@@ -31,7 +41,7 @@ Hoje o sistema ja possui uma base financeira operacional, mas ainda sem a separa
 - o resumo do financeiro atual mede `caixa realizado`, nao `DRE`
 - o dashboard chama de `faturamento` a soma de `os.valor_final` por `data_entrega`
 - nao existe separacao entre `titulo financeiro` e `movimento de caixa`
-- nao existe suporte robusto para `pagamento parcial`, `recebimento em mais de uma conta` ou `conciliacao`
+- ja existe suporte a `pagamento parcial` e `multiplos movimentos por titulo`, mas ainda sem `multiplas contas financeiras` nem `conciliacao`
 - nao existe classificacao gerencial consistente para `grupo DRE`, `subgrupo` e `conta financeira`
 
 ## Conceitos que precisam ficar explicitos no ERP
@@ -93,6 +103,7 @@ Novos campos recomendados:
 | `status_titulo` | VARCHAR(30) | `pendente`, `parcial`, `liquidado`, `cancelado` |
 | `impacta_dre` | TINYINT(1) | define se entra na DRE |
 | `impacta_fluxo_caixa` | TINYINT(1) | define se entra no fluxo de caixa |
+| `dre_fixo_mensal` | TINYINT(1) | repete a despesa automaticamente na DRE dos meses seguintes |
 | `grupo_dre` | VARCHAR(60) | grupo principal da demonstracao |
 | `subgrupo_dre` | VARCHAR(80) | detalhamento gerencial |
 | `centro_resultado` | VARCHAR(60) | ex.: assistencia, balcao, administrativo |
@@ -100,6 +111,7 @@ Novos campos recomendados:
 Observacao:
 
 - no curto prazo, `status` pode continuar existindo por compatibilidade, mas o objetivo e migrar a leitura de relatorios para `status_titulo`
+- no fluxo manual de cadastro, a UX deve priorizar `mes/ano de competencia`, salvando internamente o primeiro dia do mes; a `data cheia` deve ficar reservada para origens automaticas como `OS`
 
 ### 2. Tabela de movimentos realizados: `financeiro_movimentos`
 
@@ -407,7 +419,8 @@ Recomendacao para backfill:
 4. usar `valor` atual como `valor_bruto` e `valor_liquido` inicial
 5. definir `data_competencia` provisoria:
    - `os.data_entrega` quando a origem for OS entregue
-   - `data_vencimento` para lancamentos manuais sem origem melhor
+   - `data_vencimento` para lancamentos sem referencia melhor
+   - `data_pagamento` apenas como ultimo fallback
 6. normalizar `categoria` livre para `financeiro_categorias`
 
 ## Decisoes de negocio pendentes
@@ -419,6 +432,7 @@ Se a equipe nao decidir agora, a recomendacao inicial e usar os defaults abaixo.
 | Data de competencia da receita da OS | `data_entrega` |
 | Compra para reposicao de estoque | entra no caixa, nao entra na DRE ate consumo |
 | Compra emergencial para OS | pode entrar como custo direto da OS |
+| Origem do lancamento no Financeiro | calculada automaticamente pelo backend |
 | Taxa de cartao | despesa operacional/financeira na data do recebimento |
 | Aporte e retirada de socio | fora da DRE, apenas no fluxo de caixa |
 

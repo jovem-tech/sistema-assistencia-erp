@@ -30,6 +30,8 @@ A busca global e a forma mais rapida de localizar telas, clientes, equipamentos,
 
 - A barra respeita as permissoes do usuario logado.
 - Em mobile, o campo continua funcional com o mesmo filtro de contexto.
+- No menu hamburger do celular, a lista de resultados agora abre abaixo do campo e ocupa toda a largura util do bloco de busca, evitando painel lateral espremido ou sobreposto ao input.
+- Em telas `<= 430px`, `<= 390px`, `<= 360px` e `<= 320px`, titulos, subtitulos e badges dos resultados podem quebrar linha dentro do proprio card sem gerar corte horizontal.
 - Nos filtros `Servicos` e `Pecas`, a busca mostra apenas catalogo operacional ativo:
   - servicos com `status = ativo` e sem encerramento;
   - pecas com `ativo = 1`.

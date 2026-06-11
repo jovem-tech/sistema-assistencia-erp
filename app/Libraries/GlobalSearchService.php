@@ -26,11 +26,13 @@ class GlobalSearchService
         ['name' => 'Servicos', 'url' => 'servicos', 'icon' => 'bi-tools', 'category' => 'Modulo', 'permission' => 'servicos:visualizar'],
         ['name' => 'Estoque / Pecas', 'url' => 'estoque', 'icon' => 'bi-box-seam', 'category' => 'Modulo', 'permission' => 'estoque:visualizar'],
         ['name' => 'Equipamentos / Aparelhos', 'url' => 'equipamentos', 'icon' => 'bi-laptop', 'category' => 'Modulo', 'permission' => 'equipamentos:visualizar'],
-        ['name' => 'Central de Mensagens WhatsApp', 'url' => 'atendimento-whatsapp', 'icon' => 'bi-whatsapp', 'category' => 'Modulo', 'permission' => 'clientes:visualizar'],
-        ['name' => 'Inbox WhatsApp', 'url' => 'atendimento-whatsapp/conversas', 'icon' => 'bi-chat-left-text', 'category' => 'Modulo', 'permission' => 'clientes:visualizar'],
-        ['name' => 'Chatbot / Automacao', 'url' => 'atendimento-whatsapp/chatbot', 'icon' => 'bi-robot', 'category' => 'Modulo', 'permission' => 'clientes:editar'],
-        ['name' => 'FAQ / Base de Conhecimento', 'url' => 'atendimento-whatsapp/faq', 'icon' => 'bi-question-circle', 'category' => 'Modulo', 'permission' => 'clientes:visualizar'],
-        ['name' => 'CRM / Timeline', 'url' => 'crm/timeline', 'icon' => 'bi-graph-up', 'category' => 'Modulo', 'permission' => 'clientes:visualizar'],
+        ['name' => 'Central de Mensagens WhatsApp', 'url' => 'atendimento-whatsapp', 'icon' => 'bi-whatsapp', 'category' => 'Modulo', 'permission' => 'atendimento_whatsapp:visualizar'],
+        ['name' => 'Inbox WhatsApp', 'url' => 'atendimento-whatsapp/conversas', 'icon' => 'bi-chat-left-text', 'category' => 'Modulo', 'permission' => 'atendimento_whatsapp:visualizar'],
+        ['name' => 'Chatbot / Automacao', 'url' => 'atendimento-whatsapp/chatbot', 'icon' => 'bi-robot', 'category' => 'Modulo', 'permission' => 'atendimento_whatsapp:editar'],
+        ['name' => 'FAQ / Base de Conhecimento', 'url' => 'atendimento-whatsapp/faq', 'icon' => 'bi-question-circle', 'category' => 'Modulo', 'permission' => 'atendimento_whatsapp:visualizar'],
+        ['name' => 'CRM / Timeline', 'url' => 'crm/timeline', 'icon' => 'bi-graph-up', 'category' => 'Modulo', 'permission' => 'crm:visualizar'],
+        ['name' => 'Precificacao / Configuracao', 'url' => 'precificacao/configuracao', 'icon' => 'bi-calculator', 'category' => 'Modulo', 'permission' => 'precificacao:visualizar'],
+        ['name' => 'Precificacao / Simulador', 'url' => 'precificacao/simulador', 'icon' => 'bi-graph-up-arrow', 'category' => 'Modulo', 'permission' => 'precificacao:visualizar'],
         ['name' => 'Configuracoes do Sistema', 'url' => 'configuracoes', 'icon' => 'bi-gear', 'category' => 'Modulo', 'permission' => 'configuracoes:visualizar'],
         ['name' => 'Usuarios e Permissoes', 'url' => 'usuarios', 'icon' => 'bi-people-fill', 'category' => 'Modulo', 'permission' => 'usuarios:visualizar'],
         ['name' => 'Financeiro', 'url' => 'financeiro', 'icon' => 'bi-cash-stack', 'category' => 'Modulo', 'permission' => 'financeiro:visualizar'],
@@ -96,7 +98,7 @@ class GlobalSearchService
         }
 
         if (in_array('all', $activeFilters, true) || in_array('whatsapp', $activeFilters, true)) {
-            if (can('clientes', 'visualizar')) {
+            if (can('atendimento_whatsapp', 'visualizar')) {
                 $whatsapp = $this->searchWhatsapp($term);
                 if (!empty($whatsapp)) {
                     $results['Mensagens WhatsApp'] = $whatsapp;
@@ -167,7 +169,7 @@ class GlobalSearchService
         $model = new OsModel();
         $termClean = str_replace(['OS', 'os'], '', $term);
 
-        $rows = $model->select('os.*, clientes.nome_razao as cliente_nome, et.nome as equip_tipo, em.nome as equip_marca, emod.nome as equip_modelo')
+        $rows = $model->select('os.*, clientes.nome_razao as cliente_nome, et.nome as equip_tipo, em.nome as equip_marca, emod.nome as equip_modelo, equipamentos.resumo_tecnico as equip_resumo_tecnico, equipamentos.desktop_modalidade as equip_desktop_modalidade')
             ->join('clientes', 'clientes.id = os.cliente_id')
             ->join('equipamentos', 'equipamentos.id = os.equipamento_id')
             ->join('equipamentos_tipos et', 'et.id = equipamentos.tipo_id', 'left')
@@ -197,7 +199,7 @@ class GlobalSearchService
         $model = new OsModel();
         $termClean = str_replace(['OS', 'os'], '', $term);
 
-        $rows = $model->select('os.*, clientes.nome_razao as cliente_nome, et.nome as equip_tipo, em.nome as equip_marca, emod.nome as equip_modelo')
+        $rows = $model->select('os.*, clientes.nome_razao as cliente_nome, et.nome as equip_tipo, em.nome as equip_marca, emod.nome as equip_modelo, equipamentos.resumo_tecnico as equip_resumo_tecnico, equipamentos.desktop_modalidade as equip_desktop_modalidade')
             ->join('clientes', 'clientes.id = os.cliente_id')
             ->join('equipamentos', 'equipamentos.id = os.equipamento_id')
             ->join('equipamentos_tipos et', 'et.id = equipamentos.tipo_id', 'left')
@@ -231,7 +233,7 @@ class GlobalSearchService
         foreach ($rows as $row) {
             $subtitleParts = [
                 $row['cliente_nome'] ?? '',
-                ($row['equip_modelo'] ?? $row['equip_tipo'] ?? ''),
+                equipamento_nome_exibicao($row),
             ];
 
             if (!empty($row['numero_os_legado'])) {
@@ -306,7 +308,7 @@ class GlobalSearchService
         $found = [];
         foreach ($rows as $row) {
             $found[] = [
-                'title' => trim(($row['marca_nome'] ?? '') . ' ' . ($row['modelo_nome'] ?? '')),
+                'title' => (string) ($row['display_name'] ?? equipamento_nome_exibicao($row)),
                 'subtitle' => 'S/N: ' . ($row['numero_serie'] ?? 'N/I') . ' - Cli: ' . ($row['cliente_nome'] ?? ''),
                 'url' => base_url('equipamentos/visualizar/' . $row['id']),
                 'icon' => 'bi-laptop',

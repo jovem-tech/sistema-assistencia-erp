@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\ServicoModel;
 use App\Models\LogModel;
 use App\Models\EquipamentoTipoModel;
+use App\Services\ServicoPrecificacaoService;
 
 class Servicos extends BaseController
 {
@@ -19,7 +20,7 @@ class Servicos extends BaseController
     public function index()
     {
         $data = [
-            'title'    => 'Serviços',
+            'title'    => 'ServiÃ§os',
             'servicos' => $this->model->orderBy('nome', 'ASC')->findAll(),
         ];
         return view('servicos/index', $data);
@@ -28,7 +29,7 @@ class Servicos extends BaseController
     public function create()
     {
         $data = [
-            'title' => 'Novo Serviço',
+            'title' => 'Novo ServiÃ§o',
             'tiposEquipamento' => $this->loadTiposEquipamentoOptions(),
         ];
         return view('servicos/form', $data);
@@ -60,20 +61,77 @@ class Servicos extends BaseController
 
         $this->model->insert($dados);
 
-        LogModel::registrar('servico_criado', 'Serviço cadastrado: ' . ($dados['nome'] ?? '')); 
+        LogModel::registrar('servico_criado', 'ServiÃ§o cadastrado: ' . ($dados['nome'] ?? ''));
 
-        return redirect()->to('/servicos')->with('success', 'Serviço cadastrado com sucesso!');
+        return redirect()->to('/servicos')->with('success', 'ServiÃ§o cadastrado com sucesso!');
+    }
+
+    public function salvar_ajax()
+    {
+        $rules = [
+            'nome'  => 'required|min_length[3]',
+            'valor' => 'required',
+        ];
+
+        if (! $this->validate($rules)) {
+            return $this->response
+                ->setStatusCode(422)
+                ->setJSON([
+                    'success' => false,
+                    'message' => implode(' ', $this->validator->getErrors()),
+                    'errors' => $this->validator->getErrors(),
+                    'csrfHash' => csrf_hash(),
+                ]);
+        }
+
+        $dados = $this->request->getPost();
+        $payload = [
+            'nome' => trim((string) ($dados['nome'] ?? '')),
+            'descricao' => trim((string) ($dados['descricao'] ?? '')),
+            'tipo_equipamento' => trim((string) ($dados['tipo_equipamento'] ?? '')) ?: null,
+            'valor' => max(0.0, $this->normalizeDecimalInput($dados['valor'] ?? '0')),
+            'tempo_padrao_horas' => max(0.01, $this->normalizeDecimalInput($dados['tempo_padrao_horas'] ?? '1')),
+            'custo_direto_padrao' => max(0.0, $this->normalizeDecimalInput($dados['custo_direto_padrao'] ?? '0')),
+            'status' => 'ativo',
+        ];
+
+        try {
+            $servicoId = (int) $this->model->insert($payload, true);
+            if ($servicoId <= 0) {
+                throw new \RuntimeException('Insercao sem identificador retornado.');
+            }
+
+            $servico = $this->model->find($servicoId) ?: array_merge($payload, ['id' => $servicoId]);
+            LogModel::registrar('servico_criado', 'ServiÃƒÂ§o cadastrado via orÃƒÂ§amento: ' . ($servico['nome'] ?? ''));
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'ServiÃƒÂ§o cadastrado com sucesso!',
+                'csrfHash' => csrf_hash(),
+                'item' => $this->buildCatalogItemPayload($servico),
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', '[Servicos] Falha ao salvar serviÃƒÂ§o via AJAX: ' . $e->getMessage());
+
+            return $this->response
+                ->setStatusCode(500)
+                ->setJSON([
+                    'success' => false,
+                    'message' => 'NÃƒÂ£o foi possÃƒÂ­vel cadastrar o serviÃƒÂ§o agora.',
+                    'csrfHash' => csrf_hash(),
+                ]);
+        }
     }
 
     public function edit($id)
     {
         $servico = $this->model->find($id);
         if (! $servico) {
-            return redirect()->to('/servicos')->with('error', 'Serviço não encontrado.');
+            return redirect()->to('/servicos')->with('error', 'ServiÃ§o nÃ£o encontrado.');
         }
 
         $data = [
-            'title'   => 'Editar Serviço',
+            'title'   => 'Editar ServiÃ§o',
             'servico' => $servico,
             'tiposEquipamento' => $this->loadTiposEquipamentoOptions(),
         ];
@@ -105,9 +163,9 @@ class Servicos extends BaseController
 
         $this->model->update($id, $dados);
 
-        LogModel::registrar('servico_atualizado', 'Serviço atualizado ID: ' . $id);
+        LogModel::registrar('servico_atualizado', 'ServiÃ§o atualizado ID: ' . $id);
 
-        return redirect()->to('/servicos')->with('success', 'Serviço atualizado com sucesso!');
+        return redirect()->to('/servicos')->with('success', 'ServiÃ§o atualizado com sucesso!');
     }
 
     public function delete($id)
@@ -115,17 +173,17 @@ class Servicos extends BaseController
         $servico = $this->model->find($id);
         if ($servico) {
             $this->model->delete($id);
-            LogModel::registrar('servico_excluido', 'Serviço excluído: ' . ($servico['nome'] ?? ''));
+            LogModel::registrar('servico_excluido', 'ServiÃ§o excluÃ­do: ' . ($servico['nome'] ?? ''));
         }
 
-        return redirect()->to('/servicos')->with('success', 'Serviço excluído com sucesso!');
+        return redirect()->to('/servicos')->with('success', 'ServiÃ§o excluÃ­do com sucesso!');
     }
 
     public function encerrar($id)
     {
         $servico = $this->model->find($id);
         if (! $servico) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Serviço não encontrado.']);
+            return $this->response->setJSON(['status' => 'error', 'message' => 'ServiÃ§o nÃ£o encontrado.']);
         }
 
         $this->model->update($id, [
@@ -133,9 +191,9 @@ class Servicos extends BaseController
             'encerrado_em' => date('Y-m-d H:i:s'),
         ]);
 
-        LogModel::registrar('servico_encerrado', 'Serviço encerrado: ' . ($servico['nome'] ?? ''));
+        LogModel::registrar('servico_encerrado', 'ServiÃ§o encerrado: ' . ($servico['nome'] ?? ''));
 
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Serviço encerrado com sucesso!']);
+        return $this->response->setJSON(['status' => 'success', 'message' => 'ServiÃ§o encerrado com sucesso!']);
     }
 
     public function exportCsv()
@@ -151,7 +209,7 @@ class Servicos extends BaseController
         $f = fopen('php://output', 'w');
         fputs($f, "\xEF\xBB\xBF");
 
-        fputcsv($f, ['ID', 'Nome', 'Descrição', 'Tipo de Equipamento', 'Valor Padrão', 'Tempo Padrão (h)', 'Custo Direto Padrão', 'Status'], ';');
+        fputcsv($f, ['ID', 'Nome', 'DescriÃ§Ã£o', 'Tipo de Equipamento', 'Valor PadrÃ£o', 'Tempo PadrÃ£o (h)', 'Custo Direto PadrÃ£o', 'Status'], ';');
 
         foreach ($servicos as $s) {
             fputcsv($f, [
@@ -182,8 +240,8 @@ class Servicos extends BaseController
         fputs($f, "\xEF\xBB\xBF");
 
         fputcsv($f, ['nome', 'descricao', 'tipo_equipamento', 'valor', 'tempo_padrao_horas', 'custo_direto_padrao'], ';');
-        fputcsv($f, ['Troca de Tela', 'Substituição completa do display frontal', 'Smartphone', '450,00', '1,00', '20,00'], ';');
-        fputcsv($f, ['Limpeza Interna', 'Desmontagem e higienização de componentes', 'Notebook', '120,50', '0,80', '8,00'], ';');
+        fputcsv($f, ['Troca de Tela', 'SubstituiÃ§Ã£o completa do display frontal', 'Smartphone', '450,00', '1,00', '20,00'], ';');
+        fputcsv($f, ['Limpeza Interna', 'Desmontagem e higienizaÃ§Ã£o de componentes', 'Notebook', '120,50', '0,80', '8,00'], ';');
 
         fclose($f);
         exit;
@@ -195,7 +253,7 @@ class Servicos extends BaseController
 
         $file = $this->request->getFile('arquivo_csv');
         if (! $file || ! $file->isValid() || $file->getExtension() !== 'csv') {
-            return redirect()->to('/servicos')->with('error', 'Arquivo inválido. Envie um arquivo CSV.');
+            return redirect()->to('/servicos')->with('error', 'Arquivo invÃ¡lido. Envie um arquivo CSV.');
         }
 
         $filepath = $file->getTempName();
@@ -215,7 +273,7 @@ class Servicos extends BaseController
 
         $headers = fgetcsv($fileStream, 1000, $delimiter);
         if (! $headers) {
-            return redirect()->to('/servicos')->with('error', 'CSV vazio ou inválido.');
+            return redirect()->to('/servicos')->with('error', 'CSV vazio ou invÃ¡lido.');
         }
         $headers = array_map('trim', $headers);
 
@@ -263,9 +321,9 @@ class Servicos extends BaseController
 
         fclose($fileStream);
 
-        LogModel::registrar('servicos_importacao', "Importação CSV de serviços: $importedCount cadastrados, $errorCount falhas.");
+        LogModel::registrar('servicos_importacao', "ImportaÃ§Ã£o CSV de serviÃ§os: $importedCount cadastrados, $errorCount falhas.");
 
-        $msg = "Importação concluída: $importedCount serviço(s) cadastrado(s).";
+        $msg = "ImportaÃ§Ã£o concluÃ­da: $importedCount serviÃ§o(s) cadastrado(s).";
         if ($errorCount > 0) {
             $msg .= " $errorCount registros falharam por falta de nome ou erro de formato.";
         }
@@ -304,5 +362,51 @@ class Servicos extends BaseController
         }
 
         return (float) $raw;
+    }
+
+    /**
+     * @param array<string,mixed> $servico
+     * @return array<string,mixed>
+     */
+    private function buildCatalogItemPayload(array $servico): array
+    {
+        $precificacaoService = new ServicoPrecificacaoService();
+        $quote = $precificacaoService->buildQuote($servico);
+        $servicoId = (int) ($servico['id'] ?? 0);
+        $valorCatalogo = (float) ($servico['valor'] ?? 0);
+
+        if ($precificacaoService->shouldApplyCatalogPrice()) {
+            $valorCatalogo = (float) ($quote['valor_recomendado'] ?? $valorCatalogo);
+        }
+
+        return [
+            'id' => 'servico:' . $servicoId,
+            'kind' => 'servico',
+            'text' => (string) ($servico['nome'] ?? ''),
+            'descricao' => (string) ($servico['nome'] ?? ''),
+            'valor_unitario' => $valorCatalogo,
+            'peca_id' => null,
+            'servico_id' => $servicoId,
+            'codigo' => '',
+            'meta' => (string) ($servico['descricao'] ?? ''),
+            'categoria' => '',
+            'tipo_equipamento' => trim((string) ($servico['tipo_equipamento'] ?? '')),
+            'estoque' => null,
+            'total_usos' => 0,
+            'pendencia' => false,
+            'precificacao' => [
+                'tempo_padrao_horas' => (float) ($quote['tempo_padrao_horas'] ?? 0),
+                'custo_mao_obra' => (float) ($quote['custo_mao_obra'] ?? 0),
+                'custo_direto_total' => (float) ($quote['custo_direto_total'] ?? 0),
+                'risco_percentual' => (float) ($quote['risco_percentual'] ?? 0),
+                'valor_risco' => (float) ($quote['valor_risco'] ?? 0),
+                'margem_percentual' => (float) ($quote['margem_percentual'] ?? 0),
+                'taxa_recebimento_percentual' => (float) ($quote['taxa_recebimento_percentual'] ?? 0),
+                'imposto_percentual' => (float) ($quote['imposto_percentual'] ?? 0),
+                'preco_minimo' => (float) ($quote['preco_minimo'] ?? 0),
+                'valor_recomendado' => (float) ($quote['valor_recomendado'] ?? $valorCatalogo),
+                'modo_precificacao' => (string) ($quote['modo_precificacao'] ?? 'servico_cadastro'),
+            ],
+        ];
     }
 }

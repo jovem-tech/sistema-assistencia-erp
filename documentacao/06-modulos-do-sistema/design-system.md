@@ -66,6 +66,18 @@ Objetivo:
 - `detail-layout.css`
 - `responsive-layout.css`
 
+Padrao recente da listagem de OS em `layouts/os-list-layout.css`:
+- celula `Cliente` com pilha de acoes (`nome do cliente` + `telefone clicavel`);
+- nomes de cliente longos ocupando a largura inteira do card no mobile, com quebra normal de linha para preservar leitura sem faixa estreita de rolagem;
+- descricao `Equip.` da celula `Equipamento` permanecendo em uma unica linha no mobile, com rolagem horizontal interna apenas quando necessario;
+- barra superior mobile alinhada globalmente em `responsive-layout.css`, mantendo menu hamburger, notificacoes e perfil na mesma linha visual em todas as telas;
+- celula `Status / Orcamento` com badge principal, linha menor de orcamento e estado secundario oculto quando redundante;
+- celula `Valor` com mini resumo financeiro centrado em `Total OS`, seguido de `Recebido`, `Adiantamento` e `Saldo`;
+- larguras fixas proporcionais para `Foto / OS`, `Cliente`, `Equipamento`, `Datas`, `Status / Orcamento` e `Valor`, preservando leitura do financeiro sem invadir badges ou datas;
+- no modo card mobile, cada `td` vira uma linha flexivel com `data-label` aplicado pelo indice real da coluna, evitando sobreposicao quando `NÂº OS` fica oculto;
+- o card mobile nao usa mais a grade interna por areas para o bloco principal da OS, preferindo fluxo linear com rÃ³tulo e valor separados;
+- modais operacionais rapidos da fila (`Datas`, `Orcamento`, `WhatsApp`, `Status` e `Baixa`) compartilhando a mesma estrutura de altura, scroll e rodape fixo.
+
 5. `patterns/`
 - `forms.css`
 - `lists.css`
@@ -143,6 +155,7 @@ A camada `layouts/responsive-layout.css` consolida:
 
 - `page-content` com largura util em telas grandes (sem espaco morto excessivo)
 - ajuste de sidebar e navbar para notebook, tablet e mobile
+- busca global no mobile dentro do menu hamburger, mantendo a navbar compacta e alinhada
 - `main-content` com largura calculada a partir da sidebar fixa ou recolhida, evitando shell mais largo que a viewport
 - padrao de colunas `ds-split-layout`, `ds-split-sidebar`, `ds-split-main`
 - abas com rolagem horizontal via `ds-tabs-scroll`

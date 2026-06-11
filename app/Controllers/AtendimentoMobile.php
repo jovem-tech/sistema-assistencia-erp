@@ -6,7 +6,7 @@ class AtendimentoMobile extends BaseController
 {
     public function __construct()
     {
-        requirePermission('clientes', 'visualizar');
+        requirePermission('atendimento_whatsapp', 'visualizar');
     }
 
     public function index()

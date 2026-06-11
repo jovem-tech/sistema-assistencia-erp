@@ -37,11 +37,14 @@ WHERE status = 'entregue_reparado'
 
 ## Graficos
 
-### 1) OS abertas por mes (principal)
+### 1) OS abertas x entregues reparadas por mes (principal)
 
 - Grafico em destaque.
 - Exibe janeiro a dezembro do ano selecionado.
-- Mostra quantidade de OS abertas por mes.
+- Mostra duas linhas no mesmo periodo:
+  - `OS abertas` por mes
+  - `OS entregues reparadas` por mes
+- A linha de `OS entregues reparadas` usa cor verde para facilitar a comparacao com a abertura mensal.
 - Mes sem movimento aparece com valor `0`.
 - O topo do card possui seletor de `Ano` com todos os anos que possuem OS registradas.
 - O ano corrente continua como padrao quando existir base no periodo.
@@ -58,9 +61,10 @@ WHERE status = 'entregue_reparado'
 - Grafico horizontal comparando:
   - receitas
   - despesas
-  - lucro
+  - resultado de caixa
   - pendentes
 - Abaixo do grafico existe um mini resumo numerico com os mesmos valores.
+- Importante: esse bloco continua representando `caixa realizado`, nao `DRE`.
 
 ## Ultimas Ordens de Servico
 

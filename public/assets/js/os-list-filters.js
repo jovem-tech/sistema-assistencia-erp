@@ -33,64 +33,64 @@
     ];
 
     const OS_TABLE_DATA_COLUMNS = [
-        { dtIndex: 1, dataIndex: 0, key: 'foto', label: 'Foto' },
-        { dtIndex: 2, dataIndex: 1, key: 'numero_os', label: 'N OS' },
+        { dtIndex: 1, dataIndex: 0, key: 'foto', label: 'Foto / OS' },
+        { dtIndex: 2, dataIndex: 1, key: 'numero_os', label: 'N\u00ba OS', responsive: false },
         { dtIndex: 3, dataIndex: 2, key: 'cliente', label: 'Cliente' },
         { dtIndex: 4, dataIndex: 3, key: 'equipamento', label: 'Equipamento' },
-        { dtIndex: 5, dataIndex: 4, key: 'relato', label: 'Relato' },
-        { dtIndex: 6, dataIndex: 5, key: 'datas', label: 'Datas' },
-        { dtIndex: 7, dataIndex: 6, key: 'status', label: 'Status' },
-        { dtIndex: 8, dataIndex: 7, key: 'valor_total', label: 'Valor Total' },
-        { dtIndex: 9, dataIndex: 8, key: 'acoes', label: 'Ações' },
+        { dtIndex: 5, dataIndex: 4, key: 'datas', label: 'Datas' },
+        { dtIndex: 6, dataIndex: 5, key: 'status', label: 'Status / Or\u00e7amento' },
+        { dtIndex: 7, dataIndex: 6, key: 'valor_total', label: 'Valor' },
+        { dtIndex: 8, dataIndex: 7, key: 'relato', label: 'Relato' },
+        { dtIndex: 9, dataIndex: 8, key: 'acoes', label: 'A\u00e7\u00f5es' },
     ];
-    const OS_AUTO_FIT_COLUMNS = [
-        { dtIndex: 3, nthChild: 4, contentSelector: '.os-cliente-cell', minWidth: 88, paddingOffset: 14, measureMode: 'intrinsic' },
-        { dtIndex: 4, nthChild: 5, contentSelector: '.os-equipamento-cell', minWidth: 92, paddingOffset: 18, measureMode: 'equipment-longest-word', textSelector: '.os-equipamento-measure', labelSelector: '.os-equipamento-label', inlineGap: 10 },
-        { dtIndex: 8, nthChild: 9, contentSelector: '.os-valor-cell', minWidth: 72, paddingOffset: 18, measureMode: 'intrinsic' },
-    ];
-    const OS_OVERFLOW_HIDE_PRIORITY = [9, 5, 7, 6, 4];
+    const OS_AUTO_FIT_COLUMNS = [];
+    const OS_OVERFLOW_HIDE_PRIORITY = [9];
 
     let syncInProgress = false;
+
+    function isResponsiveManagedColumn(column) {
+        return Boolean(column) && column.responsive !== false;
+    }
 
     function normalizeString(value) {
         return String(value ?? '').trim();
     }
 
     const PTBR_MOJIBAKE_REPLACEMENTS = [
-        ['ÃƒÆ’Ã‚Â§', 'ç'],
-        ['ÃƒÆ’Ã‚Â£', 'ã'],
-        ['ÃƒÆ’Ã‚Âµ', 'õ'],
-        ['ÃƒÆ’Ã‚Â³', 'ó'],
-        ['ÃƒÆ’Ã‚Â¡', 'á'],
-        ['ÃƒÆ’Ã‚Â©', 'é'],
-        ['ÃƒÆ’Ã‚Âª', 'ê'],
-        ['ÃƒÆ’Ã‚Â­', 'í'],
-        ['ÃƒÆ’Ã‚Âº', 'ú'],
-        ['ÃƒÆ’Ã‚Â', 'Á'],
-        ['Ãƒâ€šÂº', 'º'],
-        ['Ã‚Âº', 'º'],
-        ['ÃƒÂ§', 'ç'],
-        ['ÃƒÂ£', 'ã'],
-        ['ÃƒÂµ', 'õ'],
-        ['ÃƒÂ³', 'ó'],
-        ['ÃƒÂ¡', 'á'],
-        ['ÃƒÂ©', 'é'],
-        ['ÃƒÂª', 'ê'],
-        ['ÃƒÂ­', 'í'],
-        ['ÃƒÂº', 'ú'],
-        ['ÃƒÂ', 'Á'],
-        ['Ã§', 'ç'],
-        ['Ã£', 'ã'],
-        ['Ãµ', 'õ'],
-        ['Ã³', 'ó'],
-        ['Ã¡', 'á'],
-        ['Ã©', 'é'],
-        ['Ãª', 'ê'],
-        ['Ã­', 'í'],
-        ['Ãº', 'ú'],
-        ['Ã', 'Á'],
-        ['ï¿½', ''],
-        ['�', ''],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§', 'ÃƒÂ§'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£', 'ÃƒÂ£'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âµ', 'ÃƒÂµ'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³', 'ÃƒÂ³'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡', 'ÃƒÂ¡'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©', 'ÃƒÂ©'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âª', 'ÃƒÂª'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­', 'ÃƒÂ­'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âº', 'ÃƒÂº'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â', 'ÃƒÂ'],
+        ['ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Âº', 'Ã‚Âº'],
+        ['ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âº', 'Ã‚Âº'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§', 'ÃƒÂ§'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£', 'ÃƒÂ£'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âµ', 'ÃƒÂµ'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³', 'ÃƒÂ³'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡', 'ÃƒÂ¡'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©', 'ÃƒÂ©'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âª', 'ÃƒÂª'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­', 'ÃƒÂ­'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âº', 'ÃƒÂº'],
+        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â', 'ÃƒÂ'],
+        ['ÃƒÆ’Ã‚Â§', 'ÃƒÂ§'],
+        ['ÃƒÆ’Ã‚Â£', 'ÃƒÂ£'],
+        ['ÃƒÆ’Ã‚Âµ', 'ÃƒÂµ'],
+        ['ÃƒÆ’Ã‚Â³', 'ÃƒÂ³'],
+        ['ÃƒÆ’Ã‚Â¡', 'ÃƒÂ¡'],
+        ['ÃƒÆ’Ã‚Â©', 'ÃƒÂ©'],
+        ['ÃƒÆ’Ã‚Âª', 'ÃƒÂª'],
+        ['ÃƒÆ’Ã‚Â­', 'ÃƒÂ­'],
+        ['ÃƒÆ’Ã‚Âº', 'ÃƒÂº'],
+        ['ÃƒÆ’Ã‚Â', 'ÃƒÂ'],
+        ['ÃƒÂ¯Ã‚Â¿Ã‚Â½', ''],
+        ['Ã¯Â¿Â½', ''],
     ];
 
     function normalizePtBrText(value) {
@@ -414,7 +414,7 @@
             chips.push({
                 key: 'data_fim',
                 value: '',
-                text: `Abertura até: ${state.data_fim}`,
+                text: `Abertura atÃƒÂ©: ${state.data_fim}`,
             });
         }
 
@@ -422,7 +422,7 @@
             chips.push({
                 key: 'tecnico_id',
                 value: '',
-                text: `Técnico: ${getLabel('tecnicos', state.tecnico_id)}`,
+                text: `TÃƒÂ©cnico: ${getLabel('tecnicos', state.tecnico_id)}`,
             });
         }
 
@@ -430,7 +430,7 @@
             chips.push({
                 key: 'tipo_servico',
                 value: '',
-                text: `Serviço: ${state.tipo_servico}`,
+                text: `ServiÃƒÂ§o: ${state.tipo_servico}`,
             });
         }
 
@@ -438,7 +438,7 @@
             chips.push({
                 key: 'valor_min',
                 value: '',
-                text: `Valor mín.: ${state.valor_min}`,
+                text: `Valor mÃƒÂ­n.: ${state.valor_min}`,
             });
         }
 
@@ -446,7 +446,7 @@
             chips.push({
                 key: 'valor_max',
                 value: '',
-                text: `Valor máx.: ${state.valor_max}`,
+                text: `Valor mÃƒÂ¡x.: ${state.valor_max}`,
             });
         }
 
@@ -454,7 +454,7 @@
             chips.push({
                 key: 'situacao',
                 value: '',
-                text: `Situação: ${getLabel('situacao', state.situacao)}`,
+                text: `SituaÃƒÂ§ÃƒÂ£o: ${getLabel('situacao', state.situacao)}`,
             });
         }
 
@@ -534,7 +534,7 @@
         const fallbackWidth = Math.floor(window.innerWidth || 1280);
 
         if (measuredWidth > 0) {
-            return Math.max(320, measuredWidth - 24);
+            return Math.max(320, measuredWidth - 8);
         }
 
         return Math.max(
@@ -551,32 +551,24 @@
     }
 
     function getResponsiveProfile(viewport) {
-        if (viewport >= 1400) {
-            return 'desktop-xl';
+        if (viewport < 768) {
+            return 'mobile';
         }
-        if (viewport >= 1200) {
-            return 'desktop-lg';
+        if (viewport < 992) {
+            return 'tablet-compact';
         }
-        if (viewport >= 992) {
-            return 'notebook';
-        }
-        if (viewport >= 768) {
-            return 'tablet';
-        }
-        if (viewport >= 576) {
-            return 'mobile-lg';
+        if (viewport < 1200) {
+            return 'desktop-compact';
         }
 
-        return 'mobile-sm';
+        return 'desktop';
     }
 
     function getResponsiveColumnVisibility(viewport) {
-        const profile = getResponsiveProfile(viewport);
-
-        if (profile === 'mobile-lg' || profile === 'mobile-sm') {
+        if (viewport < 768) {
             return {
                 1: true,
-                2: true,
+                2: false,
                 3: true,
                 4: true,
                 5: false,
@@ -587,56 +579,31 @@
             };
         }
 
-        const visibility = {
+        if (viewport < 992) {
+            return {
+                1: true,
+                2: false,
+                3: true,
+                4: true,
+                5: true,
+                6: true,
+                7: false,
+                8: false,
+                9: false,
+            };
+        }
+
+        return {
             1: true,
-            2: true,
+            2: false,
             3: true,
             4: true,
             5: true,
             6: true,
             7: true,
-            8: true,
+            8: false,
             9: true,
         };
-
-        switch (profile) {
-            case 'desktop-lg':
-                visibility[8] = false;
-                if (viewport < 1360) {
-                    visibility[5] = false;
-                }
-                if (viewport < 1280) {
-                    visibility[9] = false;
-                }
-                break;
-
-            case 'notebook':
-                visibility[8] = false;
-                visibility[5] = false;
-                visibility[9] = false;
-                if (viewport < 1120) {
-                    visibility[4] = false;
-                }
-                if (viewport < 1000) {
-                    visibility[6] = false;
-                }
-                break;
-
-            case 'tablet':
-                visibility[8] = false;
-                visibility[5] = false;
-                visibility[4] = false;
-                visibility[1] = false;
-                if (viewport < 860) {
-                    visibility[6] = false;
-                }
-                break;
-
-            default:
-                break;
-        }
-
-        return visibility;
     }
 
     function escapeHtml(value) {
@@ -711,7 +678,17 @@
     }
 
     function getHiddenResponsiveColumns(dataTable) {
-        return OS_TABLE_DATA_COLUMNS.filter((column) => !dataTable.column(column.dtIndex).visible());
+        return OS_TABLE_DATA_COLUMNS.filter((column) => (
+            isResponsiveManagedColumn(column)
+            && !dataTable.column(column.dtIndex).visible()
+        ));
+    }
+
+    function hasResponsiveHiddenColumns(visibility) {
+        return OS_TABLE_DATA_COLUMNS.some((column) => (
+            isResponsiveManagedColumn(column)
+            && visibility[column.dtIndex] === false
+        ));
     }
 
     function updateResponsiveToggleButton(button, isExpanded) {
@@ -731,47 +708,53 @@
         }
 
         const hiddenColumns = getHiddenResponsiveColumns(dataTable);
-        const tableNode = dataTable?.table?.().node?.() || null;
-        const isMobileCardLayout = Boolean(tableNode?.classList.contains('os-mobile-cards'));
-        const detailEntries = [];
-
-        if (isMobileCardLayout) {
-            const equipamentoHtml = rowData[3] == null
-                ? ''
-                : String(rowData[3]).trim();
-
-            if (equipamentoHtml !== '') {
-                detailEntries.push({
-                    key: 'equipamento_detalhes',
-                    label: 'Equipamento',
-                    content: equipamentoHtml,
-                });
-            }
-        }
-
-        if (hiddenColumns.length === 0 && detailEntries.length === 0) {
+        if (hiddenColumns.length === 0) {
             return '';
         }
 
-        hiddenColumns.forEach((column) => {
+        const extractRelatoDetailContent = (rawValue) => {
+            if (!rawValue) {
+                return '<span class="text-muted">-</span>';
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = rawValue;
+
+            const relatoCell = wrapper.querySelector('.os-relato-cell');
+            const fullText = String(
+                relatoCell?.getAttribute('data-relato-full')
+                || relatoCell?.getAttribute('title')
+                || wrapper.textContent
+                || ''
+            ).trim();
+
+            return fullText !== ''
+                ? `<div class="os-relato-detail-full">${escapeHtml(fullText)}</div>`
+                : '<span class="text-muted">-</span>';
+        };
+
+        const detailEntries = hiddenColumns.map((column) => {
             const rawValue = rowData[column.dataIndex] == null
                 ? ''
                 : String(rowData[column.dataIndex]).trim();
-            detailEntries.push({
+
+            return {
                 key: column.key,
                 label: column.label,
-                content: rawValue !== '' ? rawValue : '<span class="text-muted">-</span>',
-            });
+                content: column.key === 'relato'
+                    ? extractRelatoDetailContent(rawValue)
+                    : (rawValue !== '' ? rawValue : '<span class="text-muted">-</span>'),
+            };
         });
 
         const detailsHtml = detailEntries.map((entry) => [
-            `<div class="os-responsive-detail-row${entry.key === 'acoes' ? ' is-actions' : ''}">`,
-            `<div class="os-responsive-detail-label">${entry.label}</div>`,
-            `<div class="os-responsive-detail-value">${entry.content}</div>`,
+            '<div class=\"os-responsive-detail-row' + (entry.key === 'acoes' ? ' is-actions' : '') + '\">',
+            '<div class=\"os-responsive-detail-label\">' + entry.label + '</div>',
+            '<div class=\"os-responsive-detail-value\">' + entry.content + '</div>',
             '</div>',
         ].join('')).join('');
 
-        return `<div class="os-responsive-details">${detailsHtml}</div>`;
+        return '<div class=\"os-responsive-details\">' + detailsHtml + '</div>';
     }
 
     function fitRelatoCells(scope) {
@@ -1067,7 +1050,7 @@
             collapseOverflowSensitiveColumns(dataTable, tableElement, visibility);
         }
 
-        const hasHiddenColumns = Object.values(visibility).some((isVisible) => !isVisible);
+        const hasHiddenColumns = hasResponsiveHiddenColumns(visibility);
         const showResponsiveControl = hasHiddenColumns;
         if (dataTable.column(0).visible() !== showResponsiveControl) {
             dataTable.column(0).visible(showResponsiveControl, false);
@@ -1081,16 +1064,25 @@
         const bodyRows = tableElement.querySelectorAll('tbody tr');
         bodyRows.forEach((row) => {
             const cells = row.querySelectorAll('td');
-            cells.forEach((cell, idx) => {
+            cells.forEach((cell) => {
                 const isControlCell = cell.classList.contains('os-details-control');
-                const columnMeta = OS_TABLE_DATA_COLUMNS.find((column) => column.dtIndex === idx) || null;
-                const isVisibleColumn = columnMeta ? dataTable.column(columnMeta.dtIndex).visible() : false;
-                const label = columnMeta?.label || '';
-                const isActionsCell = !isControlCell && label === 'Ações' && isVisibleColumn;
-
                 if (isControlCell) {
                     cell.removeAttribute('data-label');
-                } else if (!isVisibleColumn || !columnMeta) {
+                    cell.classList.remove('col-acoes');
+                    return;
+                }
+
+                const cellIndex = typeof dataTable.cell === 'function'
+                    ? dataTable.cell(cell).index()
+                    : null;
+                const columnMeta = cellIndex
+                    ? OS_TABLE_DATA_COLUMNS.find((column) => column.dtIndex === cellIndex.column) || null
+                    : null;
+                const isVisibleColumn = columnMeta ? dataTable.column(columnMeta.dtIndex).visible() : false;
+                const label = columnMeta?.label || '';
+                const isActionsCell = columnMeta?.key === 'acoes' && isVisibleColumn;
+
+                if (!isVisibleColumn || !columnMeta) {
                     cell.removeAttribute('data-label');
                 } else {
                     cell.setAttribute('data-label', label);
@@ -1162,6 +1154,7 @@
             'osPhotosModal',
             'osDatesModal',
             'osBudgetModal',
+            'osWhatsAppModal',
             'osStatusModal',
         ].forEach((modalId) => {
             const modalElement = document.getElementById(modalId);
@@ -1221,7 +1214,7 @@
                     && /Cannot reinitialise DataTable/i.test(normalizedMessage);
 
                 if (isOsReinitWarning) {
-                    console.warn('[OS list] Reutilizando instância existente do DataTable.', {
+                    console.warn('[OS list] Reutilizando instÃƒÂ¢ncia existente do DataTable.', {
                         techNote: techNote,
                         message: normalizedMessage,
                     });
@@ -1355,6 +1348,26 @@
         const budgetModal = budgetModalElement && window.bootstrap
             ? window.bootstrap.Modal.getOrCreateInstance(budgetModalElement)
             : null;
+        const whatsappModalElement = document.getElementById('osWhatsAppModal');
+        const whatsappModalForm = document.getElementById('osWhatsAppModalForm');
+        const whatsappModalNumero = document.getElementById('osWhatsAppModalNumero');
+        const whatsappModalBadges = document.getElementById('osWhatsAppModalBadges');
+        const whatsappModalClientName = document.getElementById('osWhatsAppModalClientName');
+        const whatsappModalClientPhone = document.getElementById('osWhatsAppModalClientPhone');
+        const whatsappModalClientEmail = document.getElementById('osWhatsAppModalClientEmail');
+        const whatsappModalEquipmentName = document.getElementById('osWhatsAppModalEquipmentName');
+        const whatsappModalEquipmentMeta = document.getElementById('osWhatsAppModalEquipmentMeta');
+        const whatsappModalTemplate = document.getElementById('osWhatsAppModalTemplate');
+        const whatsappModalMessage = document.getElementById('osWhatsAppModalMessage');
+        const whatsappModalPhone = document.getElementById('osWhatsAppModalPhone');
+        const whatsappModalDocument = document.getElementById('osWhatsAppModalDocument');
+        const whatsappModalDocumentHint = document.getElementById('osWhatsAppModalDocumentHint');
+        const whatsappModalSummary = document.getElementById('osWhatsAppModalSummary');
+        const whatsappModalPrintFormat = document.getElementById('osWhatsAppModalPrintFormat');
+        const whatsappModalSubmit = document.getElementById('osWhatsAppModalSubmit');
+        const whatsappModal = whatsappModalElement && window.bootstrap
+            ? window.bootstrap.Modal.getOrCreateInstance(whatsappModalElement)
+            : null;
         const photoModalElements = {
             element: document.getElementById('osPhotosModal'),
             title: document.getElementById('osPhotosModalTitle'),
@@ -1449,7 +1462,7 @@
 
             if (isAllQueueActive(activeState)) {
                 return {
-                    title: 'Todas as ordens de serviço',
+                    title: 'Todas as ordens de serviÃƒÂ§o',
                     subtitle: 'Exibindo OS abertas e fechadas sem o recorte padrao da fila.',
                     counterLabel: 'OS encontradas',
                 };
@@ -1557,6 +1570,7 @@
         let activeStatusSelectionSource = 'manual';
         let activeDatesOsId = null;
         let activeBudgetOsId = null;
+        let activeWhatsAppOsId = null;
 
         const updateCsrfFromPayload = (payload) => {
             if (!payload || !payload.csrfHash || !config.csrfTokenKey) {
@@ -1661,7 +1675,7 @@
             }
 
             if (!Array.isArray(documents) || documents.length === 0) {
-                budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Nenhum orçamento PDF registrado para esta OS.</p>';
+                budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Nenhum orÃƒÂ§amento PDF registrado para esta OS.</p>';
                 return;
             }
 
@@ -1673,7 +1687,7 @@
                 return [
                     '<div class="os-budget-doc-item">',
                     '<div>',
-                    `<strong>Orçamento v${version}</strong>`,
+                    `<strong>OrÃƒÂ§amento v${version}</strong>`,
                     `<span>${escapeHtml(createdAt)}</span>`,
                     '</div>',
                     downloadUrl
@@ -1682,6 +1696,214 @@
                     '</div>',
                 ].join('');
             }).join('');
+        };
+
+        const setWhatsAppModalLoading = (isLoading) => {
+            if (whatsappModalSubmit) {
+                whatsappModalSubmit.disabled = Boolean(isLoading);
+                whatsappModalSubmit.innerHTML = isLoading
+                    ? '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Enviando...'
+                    : '<i class="bi bi-whatsapp me-1"></i>Enviar mensagem';
+            }
+
+            [whatsappModalTemplate, whatsappModalMessage, whatsappModalPhone, whatsappModalDocument, whatsappModalPrintFormat]
+                .forEach((field) => {
+                    if (field) {
+                        field.disabled = Boolean(isLoading);
+                    }
+                });
+        };
+
+        const renderWhatsAppTemplates = (templates) => {
+            if (!whatsappModalTemplate) {
+                return;
+            }
+
+            const templateRows = Array.isArray(templates) ? templates : [];
+            const options = [
+                '<option value="">Selecione um template ou escreva manualmente</option>',
+            ];
+
+            templateRows.forEach((template) => {
+                const code = String(template?.codigo || '').trim();
+                if (!code) {
+                    return;
+                }
+
+                const name = String(template?.nome || code).trim();
+                const content = String(template?.conteudo || '');
+                options.push(
+                    `<option value="${escapeHtml(code)}" data-template-content="${escapeHtml(content)}">${escapeHtml(name)}</option>`
+                );
+            });
+
+            whatsappModalTemplate.innerHTML = options.join('');
+        };
+
+        const renderWhatsAppDocuments = (meta = {}) => {
+            if (!whatsappModalDocument) {
+                return;
+            }
+
+            const printDefaults = meta?.print_defaults || {};
+            const defaultLabel = String(printDefaults?.label || 'Gerar PDF consolidado da impressÃƒÂ£o (A4)').trim();
+            const defaultTemplate = String(printDefaults?.template_default || 'os_aberta').trim() || 'os_aberta';
+            const defaultPrintFormat = String(printDefaults?.print_formato || 'a4').trim() || 'a4';
+            const documents = Array.isArray(meta?.documents) ? meta.documents : [];
+
+            const options = [
+                `<option value="" data-template-default="${escapeHtml(defaultTemplate)}" data-print-formato="${escapeHtml(defaultPrintFormat)}">${escapeHtml(defaultLabel)}</option>`,
+            ];
+
+            documents.forEach((document) => {
+                const id = Number.parseInt(document?.id, 10) || 0;
+                if (id <= 0) {
+                    return;
+                }
+
+                const label = String(document?.label || 'Documento PDF').trim();
+                const createdAt = String(document?.created_at_label || '').trim();
+                const optionLabel = createdAt ? `${label} - ${createdAt}` : label;
+                const templateDefault = String(document?.template_default || 'os_aberta').trim() || 'os_aberta';
+
+                options.push(
+                    `<option value="${id}" data-template-default="${escapeHtml(templateDefault)}" data-document-type="${escapeHtml(String(document?.tipo || ''))}">${escapeHtml(optionLabel)}</option>`
+                );
+            });
+
+            whatsappModalDocument.innerHTML = options.join('');
+        };
+
+        const syncWhatsAppModalDocumentHint = () => {
+            if (!whatsappModalDocumentHint || !whatsappModalDocument) {
+                return;
+            }
+
+            const selectedOption = whatsappModalDocument.options[whatsappModalDocument.selectedIndex] || null;
+            const selectedLabel = String(selectedOption?.textContent || '').trim();
+            const isGeneratedPrint = String(selectedOption?.value || '').trim() === '';
+
+            whatsappModalDocumentHint.textContent = isGeneratedPrint
+                ? 'Nenhum documento salvo foi selecionado. O ERP vai gerar automaticamente o PDF consolidado da OS em A4 para anexar ao WhatsApp.'
+                : `Documento selecionado: ${selectedLabel || 'Documento da OS'}.`;
+        };
+
+        const syncWhatsAppTemplateByDocument = (force = false) => {
+            if (!whatsappModalDocument || !whatsappModalTemplate) {
+                return;
+            }
+
+            const selectedOption = whatsappModalDocument.options[whatsappModalDocument.selectedIndex] || null;
+            const templateDefault = String(selectedOption?.dataset?.templateDefault || '').trim();
+
+            if (!templateDefault) {
+                return;
+            }
+
+            if (force || !String(whatsappModalTemplate.value || '').trim()) {
+                whatsappModalTemplate.value = templateDefault;
+            }
+        };
+
+        const updateWhatsAppModalSummary = () => {
+            if (!whatsappModalSummary) {
+                return;
+            }
+
+            const templateOption = whatsappModalTemplate?.options?.[whatsappModalTemplate.selectedIndex] || null;
+            const templateLabel = String(templateOption?.textContent || '').trim();
+            const phoneValue = String(whatsappModalPhone?.value || '').trim() || 'telefone a confirmar';
+            const documentOption = whatsappModalDocument?.options?.[whatsappModalDocument.selectedIndex] || null;
+            const documentLabel = String(documentOption?.textContent || '').trim() || 'sem documento extra';
+
+            whatsappModalSummary.textContent = `Destino: ${phoneValue}. Template: ${templateLabel || 'mensagem personalizada'}. Documento: ${documentLabel}.`;
+        };
+
+        const hydrateWhatsAppModal = (payload) => {
+            const osMeta = payload?.os || {};
+            const whatsappMeta = payload?.whatsapp || {};
+            const tipo = String(osMeta?.equip_tipo_label || osMeta?.equip_tipo || '').trim() || '-';
+            const marca = String(osMeta?.equip_marca || '').trim() || '-';
+            const modelo = String(osMeta?.equip_modelo || '').trim() || '-';
+            const phone = String(whatsappMeta?.telefone || osMeta?.cliente_telefone || '').trim();
+
+            whatsappModalNumero && (whatsappModalNumero.textContent = osMeta?.numero_os ? `#${osMeta.numero_os}` : '-');
+            whatsappModalBadges && (whatsappModalBadges.innerHTML = [
+                String(osMeta?.statusBadgeHtml || '').trim(),
+                String(osMeta?.flowBadgeHtml || '').trim(),
+                String(osMeta?.priorityBadgeHtml || '').trim(),
+            ].filter(Boolean).join(''));
+            whatsappModalClientName && (whatsappModalClientName.textContent = String(osMeta?.cliente_nome || '').trim() || '-');
+            whatsappModalClientPhone && (whatsappModalClientPhone.textContent = `Telefone: ${phone || '-'}`);
+            whatsappModalClientEmail && (whatsappModalClientEmail.textContent = `E-mail: ${String(osMeta?.cliente_email || '').trim() || '-'}`);
+            whatsappModalEquipmentName && (whatsappModalEquipmentName.textContent = String(osMeta?.equipamento_nome || '').trim() || '-');
+            whatsappModalEquipmentMeta && (whatsappModalEquipmentMeta.textContent = `Tipo: ${tipo} | Marca: ${marca} | Modelo: ${modelo}`);
+            whatsappModalPhone && (whatsappModalPhone.value = phone);
+            whatsappModalMessage && (whatsappModalMessage.value = '');
+
+            renderWhatsAppTemplates(whatsappMeta?.templates || []);
+            renderWhatsAppDocuments(whatsappMeta || {});
+
+            whatsappModalTemplate && (whatsappModalTemplate.value = '');
+            whatsappModalDocument && (whatsappModalDocument.value = '');
+            whatsappModalPrintFormat && (whatsappModalPrintFormat.value = String(whatsappMeta?.print_defaults?.print_formato || 'a4'));
+
+            syncWhatsAppTemplateByDocument(true);
+            syncWhatsAppModalDocumentHint();
+            updateWhatsAppModalSummary();
+            normalizeRenderedText(whatsappModalElement);
+        };
+
+        const openWhatsAppModal = async (osId) => {
+            if (!whatsappModal || !config.whatsappMetaUrlBase) {
+                return;
+            }
+
+            activeWhatsAppOsId = osId;
+            whatsappModalNumero && (whatsappModalNumero.textContent = '-');
+            whatsappModalBadges && (whatsappModalBadges.innerHTML = '');
+            whatsappModalClientName && (whatsappModalClientName.textContent = '-');
+            whatsappModalClientPhone && (whatsappModalClientPhone.textContent = 'Telefone: -');
+            whatsappModalClientEmail && (whatsappModalClientEmail.textContent = 'E-mail: -');
+            whatsappModalEquipmentName && (whatsappModalEquipmentName.textContent = '-');
+            whatsappModalEquipmentMeta && (whatsappModalEquipmentMeta.textContent = 'Tipo: -');
+            whatsappModalTemplate && (whatsappModalTemplate.innerHTML = '<option value="">Carregando templates...</option>');
+            whatsappModalDocument && (whatsappModalDocument.innerHTML = '<option value="">Carregando documentos...</option>');
+            whatsappModalMessage && (whatsappModalMessage.value = '');
+            whatsappModalPhone && (whatsappModalPhone.value = '');
+            whatsappModalSummary && (whatsappModalSummary.textContent = 'Carregando contexto do envio...');
+            whatsappModalDocumentHint && (whatsappModalDocumentHint.textContent = 'Carregando opÃƒÂ§ÃƒÂµes de documento...');
+            whatsappModalForm?.reset();
+            setWhatsAppModalLoading(true);
+            whatsappModal.show();
+
+            try {
+                const response = await window.fetch(`${config.whatsappMetaUrlBase}/${osId}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin',
+                });
+                const payload = await response.json();
+                updateCsrfFromPayload(payload);
+
+                if (!response.ok || !payload.ok) {
+                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o envio por WhatsApp da OS.');
+                }
+
+                hydrateWhatsAppModal(payload);
+            } catch (error) {
+                whatsappModal.hide();
+                if (window.Swal) {
+                    window.Swal.fire({
+                        icon: 'error',
+                        title: 'Falha ao carregar WhatsApp',
+                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o envio por WhatsApp da OS.',
+                    });
+                } else {
+                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o envio por WhatsApp da OS.');
+                }
+            } finally {
+                setWhatsAppModalLoading(false);
+            }
         };
 
         const hydrateDatesModal = (payload) => {
@@ -1759,7 +1981,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'Não foi possível carregar os prazos da OS.');
+                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar os prazos da OS.');
                 }
 
                 hydrateDatesModal(payload);
@@ -1769,10 +1991,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao carregar prazos',
-                        text: error.message || 'Não foi possível carregar os prazos da OS.',
+                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar os prazos da OS.',
                     });
                 } else {
-                    alert(error.message || 'Não foi possível carregar os prazos da OS.');
+                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar os prazos da OS.');
                 }
             } finally {
                 setDatesModalLoading(false);
@@ -1815,10 +2037,10 @@
 
             if (budgetModalNotifyHelp) {
                 if (!canSend) {
-                    budgetModalNotifyHelp.textContent = 'Seu perfil atual não possui permissão para envio do orçamento ao cliente.';
+                    budgetModalNotifyHelp.textContent = 'Seu perfil atual nÃƒÂ£o possui permissÃƒÂ£o para envio do orÃƒÂ§amento ao cliente.';
                     budgetModalNotifyHelp.classList.add('text-danger');
                 } else if (!hasPhone) {
-                    budgetModalNotifyHelp.textContent = 'Cliente sem telefone cadastrado. Informe um número abaixo se quiser enviar o orçamento agora.';
+                    budgetModalNotifyHelp.textContent = 'Cliente sem telefone cadastrado. Informe um nÃƒÂºmero abaixo se quiser enviar o orÃƒÂ§amento agora.';
                     budgetModalNotifyHelp.classList.remove('text-danger');
                 } else {
                     budgetModalNotifyHelp.textContent = `Telefone atual para envio: ${phone}`;
@@ -1850,7 +2072,7 @@
             budgetModalValorFinal && (budgetModalValorFinal.textContent = 'R$ 0,00');
             budgetModalPhone && (budgetModalPhone.value = '');
             budgetModalMessage && (budgetModalMessage.value = '');
-            budgetModalDocsList && (budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Carregando orçamentos...</p>');
+            budgetModalDocsList && (budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Carregando orÃƒÂ§amentos...</p>');
             budgetModalForm?.reset();
             if (budgetModalNotify) {
                 budgetModalNotify.dataset.available = '0';
@@ -1868,7 +2090,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'Não foi possível carregar o orçamento da OS.');
+                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o orÃƒÂ§amento da OS.');
                 }
 
                 hydrateBudgetModal(payload);
@@ -1877,11 +2099,11 @@
                 if (window.Swal) {
                     window.Swal.fire({
                         icon: 'error',
-                        title: 'Falha ao carregar orçamento',
-                        text: error.message || 'Não foi possível carregar o orçamento da OS.',
+                        title: 'Falha ao carregar orÃƒÂ§amento',
+                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o orÃƒÂ§amento da OS.',
                     });
                 } else {
-                    alert(error.message || 'Não foi possível carregar o orçamento da OS.');
+                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o orÃƒÂ§amento da OS.');
                 }
             } finally {
                 setBudgetModalLoading(false);
@@ -1892,7 +2114,7 @@
             const key = String(state || 'upcoming').trim();
             if (key === 'completed') {
                 return {
-                    label: 'Concluída',
+                    label: 'ConcluÃƒÂ­da',
                     className: 'bg-success-subtle text-success-emphasis border border-success-subtle',
                 };
             }
@@ -1904,7 +2126,7 @@
             }
             if (key === 'probable') {
                 return {
-                    label: 'Provável',
+                    label: 'ProvÃƒÂ¡vel',
                     className: 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
                 };
             }
@@ -1988,11 +2210,11 @@
 
         const getStatusBudgetLoadingMarkup = (message) => `
             <div class="card os-tab-card os-status-modal-budget-card">
-                <div class="card-body p-4 text-muted small">${escapeHtml(message || 'Carregando gerenciamento do orçamento...')}</div>
+                <div class="card-body p-4 text-muted small">${escapeHtml(message || 'Carregando gerenciamento do orÃƒÂ§amento...')}</div>
             </div>
         `;
 
-        const setStatusBudgetPanelHtml = (html, emptyMessage = 'Nenhuma informação de orçamento disponível para esta OS.') => {
+        const setStatusBudgetPanelHtml = (html, emptyMessage = 'Nenhuma informaÃƒÂ§ÃƒÂ£o de orÃƒÂ§amento disponÃƒÂ­vel para esta OS.') => {
             if (!statusModalBudgetPanel) {
                 return;
             }
@@ -2049,7 +2271,7 @@
 
         const getStatusModalTechnicianLabel = () => {
             const label = String(activeStatusModalMeta?.os?.tecnico_nome || '').trim();
-            return label || 'Não atribuído';
+            return label || 'NÃƒÂ£o atribuÃƒÂ­do';
         };
 
         const renderStatusModalProceduresList = (items) => {
@@ -2103,7 +2325,7 @@
 
             const tecnicoNome = getStatusModalTechnicianLabel();
             const stamp = formatStatusProcedureTimestamp(new Date());
-            const line = `[${procedimentoBase} - ${stamp} - técnico: ${tecnicoNome}]`;
+            const line = `[${procedimentoBase} - ${stamp} - tÃƒÂ©cnico: ${tecnicoNome}]`;
             const items = parseStatusModalProcedures(statusModalProcedimentosInput.value);
             items.push(line);
             syncStatusModalProcedures(items);
@@ -2180,7 +2402,7 @@
             updateCsrfFromPayload(payload);
 
             if (!response.ok || !payload.ok) {
-                throw new Error(payload.message || 'Não foi possível carregar o fluxo de status.');
+                throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o fluxo de status.');
             }
 
             hydrateStatusModal(payload);
@@ -2197,7 +2419,7 @@
             }
 
             if (!Array.isArray(timeline) || timeline.length === 0) {
-                statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponível para esta OS.</p>';
+                statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponÃƒÂ­vel para esta OS.</p>';
                 return;
             }
 
@@ -2211,13 +2433,13 @@
                 const lastEventAt = formatStatusDateTime(stage?.last_event_at || '');
                 const lastUserName = String(stage?.last_user_name || '').trim();
 
-                let description = 'Etapa futura do fluxo da ordem de serviço.';
+                let description = 'Etapa futura do fluxo da ordem de serviÃƒÂ§o.';
                 if (stageState === 'current' && currentStatusName) {
                     description = `Etapa atual: ${escapeHtml(currentStatusName)}.`;
                 } else if (stageState === 'completed' && lastStatusName) {
                     description = `Passou por ${escapeHtml(lastStatusName)}.`;
                 } else if (stageState === 'probable' && nextStatusNames.length > 0) {
-                    description = `Próximos movimentos prováveis: ${escapeHtml(nextStatusNames.join(', '))}.`;
+                    description = `PrÃƒÂ³ximos movimentos provÃƒÂ¡veis: ${escapeHtml(nextStatusNames.join(', '))}.`;
                 }
 
                 const metaParts = [];
@@ -2254,7 +2476,7 @@
 
             if (!Array.isArray(history) || history.length === 0) {
                 statusModalHistoryWrap.classList.add('is-empty');
-                statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem histórico recente para esta OS.</p>';
+                statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem histÃƒÂ³rico recente para esta OS.</p>';
                 return;
             }
 
@@ -2322,7 +2544,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'Não foi possível carregar as fotos da OS.');
+                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar as fotos da OS.');
                 }
 
                 const numeroOs = payload.os?.numero_os ? `#${payload.os.numero_os}` : '-';
@@ -2347,7 +2569,7 @@
                 renderPhotoGallery(
                     photoViewerMap.entry,
                     entryPhotos,
-                    'Nenhuma foto foi registrada na abertura desta ordem de serviço.'
+                    'Nenhuma foto foi registrada na abertura desta ordem de serviÃƒÂ§o.'
                 );
 
                 if (window.bootstrap && photoModalTabs.equipmentButton && photoModalTabs.entryButton) {
@@ -2362,10 +2584,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao carregar fotos',
-                        text: error.message || 'Não foi possível carregar as fotos da OS.',
+                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar as fotos da OS.',
                     });
                 } else {
-                    alert(error.message || 'Não foi possível carregar as fotos da OS.');
+                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar as fotos da OS.');
                 }
             } finally {
                 setPhotoModalLoading(false);
@@ -2455,7 +2677,7 @@
                 statusModalEquipmentMeta.textContent = `Tipo: ${tipo} | Marca: ${marca} | Modelo: ${modelo}`;
             }
             if (statusModalEquipmentSerial) {
-                statusModalEquipmentSerial.textContent = `Nº de série: ${String(osMeta?.equip_serie || '').trim() || '-'}`;
+                statusModalEquipmentSerial.textContent = `NÃ‚Âº de sÃƒÂ©rie: ${String(osMeta?.equip_serie || '').trim() || '-'}`;
             }
 
             if (statusModalCurrentBadges) {
@@ -2474,7 +2696,7 @@
             if (statusModalPrimaryHint) {
                 statusModalPrimaryHint.innerHTML = primaryNextStatus?.nome
                     ? `Fluxo normal sugerido: <strong>${escapeHtml(primaryNextStatus.nome)}</strong>.`
-                    : 'Fluxo normal sugerido: <strong>indisponível no momento</strong>.';
+                    : 'Fluxo normal sugerido: <strong>indisponÃƒÂ­vel no momento</strong>.';
             }
 
             syncStatusModalProcedures(parseStatusModalProcedures(osMeta?.procedimentos_executados || ''));
@@ -2512,8 +2734,8 @@
 
             if (statusModalNotifyHelp) {
                 statusModalNotifyHelp.textContent = hasClientPhone
-                    ? `Telefone atual para comunicação: ${phoneLabel || 'não informado'}.`
-                    : 'Cliente sem telefone cadastrado para comunicação automática.';
+                    ? `Telefone atual para comunicaÃƒÂ§ÃƒÂ£o: ${phoneLabel || 'nÃƒÂ£o informado'}.`
+                    : 'Cliente sem telefone cadastrado para comunicaÃƒÂ§ÃƒÂ£o automÃƒÂ¡tica.';
                 statusModalNotifyHelp.classList.toggle('text-danger', !hasClientPhone);
             }
 
@@ -2553,19 +2775,19 @@
             statusModalClientEmail && (statusModalClientEmail.textContent = 'E-mail: -');
             statusModalEquipmentName && (statusModalEquipmentName.textContent = '-');
             statusModalEquipmentMeta && (statusModalEquipmentMeta.textContent = 'Tipo: -');
-            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'Nº de série: -');
+            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'NÃ‚Âº de sÃƒÂ©rie: -');
             statusModalCurrentBadges && (statusModalCurrentBadges.innerHTML = '');
             statusModalCurrentStatusHint && (statusModalCurrentStatusHint.textContent = 'Status atual da OS: aguardando contexto.');
             statusModalPrimaryHint && (statusModalPrimaryHint.textContent = 'Fluxo normal sugerido: aguardando contexto.');
             statusModalTargetHint && (statusModalTargetHint.textContent = 'Selecione um fluxo para continuar.');
             statusModalTimeline && (statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Carregando fluxo visual...</p>');
-            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Carregando histórico recente...</p>');
+            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Carregando histÃƒÂ³rico recente...</p>');
             statusModalHistoryWrap?.classList.remove('is-empty');
             syncStatusModalProcedures([]);
             statusModalProcedimentoTextoInput && (statusModalProcedimentoTextoInput.value = '');
             statusModalSolucaoInput && (statusModalSolucaoInput.value = '');
             statusModalDiagnosticoInput && (statusModalDiagnosticoInput.value = '');
-            setStatusBudgetPanelHtml('', 'Carregando gerenciamento do orçamento...');
+            setStatusBudgetPanelHtml('', 'Carregando gerenciamento do orÃƒÂ§amento...');
             activateStatusModalTab('#osStatusTabQuick');
             if (statusModalNotify) {
                 statusModalNotify.checked = false;
@@ -2573,7 +2795,7 @@
                 statusModalNotify.dataset.available = '0';
             }
             if (statusModalNotifyHelp) {
-                statusModalNotifyHelp.textContent = 'Verificando disponibilidade de comunicação com o cliente...';
+                statusModalNotifyHelp.textContent = 'Verificando disponibilidade de comunicaÃƒÂ§ÃƒÂ£o com o cliente...';
                 statusModalNotifyHelp.classList.remove('text-danger');
             }
             setStatusQuickButtonState(statusModalQuickNext, false, '', '', '');
@@ -2588,10 +2810,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao carregar status',
-                        text: error.message || 'Não foi possível carregar o fluxo de status.',
+                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o fluxo de status.',
                     });
                 } else {
-                    alert(error.message || 'Não foi possível carregar o fluxo de status.');
+                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o fluxo de status.');
                 }
             } finally {
                 setStatusModalLoading(false);
@@ -2687,7 +2909,7 @@
             retrieve: true,
             pageLength: 10,
             lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
-            order: [[6, 'desc']],
+            order: [[5, 'desc']],
             dom: '<"row align-items-center mb-3"<"col-12 col-md-6"l><"col-12 col-md-6 text-md-end"p>>rt<"row align-items-center mt-3"<"col-12 col-md-6"i><"col-12 col-md-6 text-md-end"p>>',
             ajax: {
                 url: config.datatableUrl,
@@ -2698,8 +2920,8 @@
                 error: function (xhr) {
                     toggleLoadingOverlay(false);
                     const message = xhr?.status === 0
-                        ? 'Falha de conexão ao carregar OS.'
-                        : 'Não foi possível aplicar os filtros no momento.';
+                        ? 'Falha de conexÃƒÂ£o ao carregar OS.'
+                        : 'NÃƒÂ£o foi possÃƒÂ­vel aplicar os filtros no momento.';
                     if (window.Swal) {
                         window.Swal.fire({
                             icon: 'error',
@@ -2760,6 +2982,20 @@
                 return;
             }
 
+            const whatsappTrigger = event.target.closest('[data-os-whatsapp-action]');
+            if (whatsappTrigger) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const osId = Number(whatsappTrigger.getAttribute('data-os-id') || '0');
+                if (!Number.isFinite(osId) || osId <= 0) {
+                    return;
+                }
+
+                openWhatsAppModal(osId);
+                return;
+            }
+
             const datesTrigger = event.target.closest('[data-os-dates-action]');
             if (datesTrigger) {
                 event.preventDefault();
@@ -2813,6 +3049,31 @@
 
         budgetModalNotify?.addEventListener('change', function () {
             setBudgetModalSubmitLabel();
+        });
+
+        whatsappModalTemplate?.addEventListener('change', function () {
+            updateWhatsAppModalSummary();
+        });
+
+        whatsappModalDocument?.addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex] || null;
+            const printFormat = String(selectedOption?.dataset?.printFormato || 'a4').trim() || 'a4';
+
+            if (whatsappModalPrintFormat) {
+                whatsappModalPrintFormat.value = printFormat;
+            }
+
+            syncWhatsAppTemplateByDocument(false);
+            syncWhatsAppModalDocumentHint();
+            updateWhatsAppModalSummary();
+        });
+
+        whatsappModalPhone?.addEventListener('input', function () {
+            updateWhatsAppModalSummary();
+        });
+
+        whatsappModalMessage?.addEventListener('input', function () {
+            updateWhatsAppModalSummary();
         });
 
         statusModalInserirProcedimento?.addEventListener('click', insertStatusModalProcedure);
@@ -2931,7 +3192,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'Não foi possível atualizar os prazos.');
+                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel atualizar os prazos.');
                 }
 
                 datesModal.hide();
@@ -2949,10 +3210,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao atualizar prazos',
-                        text: error.message || 'Não foi possível atualizar os prazos da OS.',
+                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel atualizar os prazos da OS.',
                     });
                 } else {
-                    alert(error.message || 'Não foi possível atualizar os prazos da OS.');
+                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel atualizar os prazos da OS.');
                 }
             } finally {
                 setDatesModalLoading(false);
@@ -2993,17 +3254,17 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'Não foi possível gerar o orçamento da OS.');
+                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel gerar o orÃƒÂ§amento da OS.');
                 }
 
                 budgetModal.hide();
                 if (window.Swal) {
                     await window.Swal.fire({
                         icon: payload.warning ? 'warning' : 'success',
-                        title: payload.warning ? 'Orçamento gerado com ressalvas' : 'Orçamento pronto',
+                        title: payload.warning ? 'OrÃƒÂ§amento gerado com ressalvas' : 'OrÃƒÂ§amento pronto',
                         text: payload.warning
                             ? `${payload.message || 'O PDF foi gerado.'} ${payload.warning}`
-                            : (payload.message || 'O PDF do orçamento foi gerado com sucesso.'),
+                            : (payload.message || 'O PDF do orÃƒÂ§amento foi gerado com sucesso.'),
                     });
                 }
 
@@ -3012,14 +3273,90 @@
                 if (window.Swal) {
                     window.Swal.fire({
                         icon: 'error',
-                        title: 'Falha ao gerar orçamento',
-                        text: error.message || 'Não foi possível gerar o orçamento da OS.',
+                        title: 'Falha ao gerar orÃƒÂ§amento',
+                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel gerar o orÃƒÂ§amento da OS.',
                     });
                 } else {
-                    alert(error.message || 'Não foi possível gerar o orçamento da OS.');
+                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel gerar o orÃƒÂ§amento da OS.');
                 }
             } finally {
                 setBudgetModalLoading(false);
+            }
+        });
+
+        whatsappModalForm?.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            if (!activeWhatsAppOsId) {
+                return;
+            }
+
+            const formData = new window.FormData();
+            const selectedDocument = whatsappModalDocument?.options?.[whatsappModalDocument.selectedIndex] || null;
+            let templateCode = String(whatsappModalTemplate?.value || '').trim();
+            const manualMessage = String(whatsappModalMessage?.value || '').trim();
+            const defaultTemplate = String(selectedDocument?.dataset?.templateDefault || '').trim() || 'os_aberta';
+
+            if (!templateCode && !manualMessage) {
+                templateCode = defaultTemplate;
+                if (whatsappModalTemplate) {
+                    whatsappModalTemplate.value = templateCode;
+                }
+            }
+
+            formData.append('telefone', whatsappModalPhone?.value || '');
+            formData.append('mensagem_manual', manualMessage);
+            formData.append('template_codigo', templateCode);
+            formData.append('print_formato', whatsappModalPrintFormat?.value || 'a4');
+
+            if (whatsappModalDocument && String(whatsappModalDocument.value || '').trim() !== '') {
+                formData.append('documento_id', whatsappModalDocument.value);
+            }
+
+            if (config.csrfTokenKey && config.csrfTokenValue) {
+                formData.append(config.csrfTokenKey, config.csrfTokenValue);
+            }
+
+            setWhatsAppModalLoading(true);
+
+            try {
+                const response = await window.fetch(`${config.whatsappActionUrlBase}/${activeWhatsAppOsId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    credentials: 'same-origin',
+                    body: formData,
+                });
+
+                const payload = await response.json();
+                updateCsrfFromPayload(payload);
+
+                if (!response.ok || !payload.ok) {
+                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel enviar o WhatsApp da OS.');
+                }
+
+                whatsappModal.hide();
+                if (window.Swal) {
+                    await window.Swal.fire({
+                        icon: payload.warning ? 'warning' : 'success',
+                        title: payload.warning ? 'Envio concluÃƒÂ­do com ressalvas' : 'WhatsApp enviado',
+                        text: payload.message || 'Mensagem enviada com sucesso.',
+                    });
+                }
+            } catch (error) {
+                if (window.Swal) {
+                    window.Swal.fire({
+                        icon: 'error',
+                        title: 'Falha no envio',
+                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel enviar o WhatsApp da OS.',
+                    });
+                } else {
+                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel enviar o WhatsApp da OS.');
+                }
+            } finally {
+                setWhatsAppModalLoading(false);
             }
         });
 
@@ -3035,10 +3372,10 @@
                     window.Swal.fire({
                         icon: 'warning',
                         title: 'Selecione um status',
-                        text: 'Escolha o próximo status permitido para continuar.',
+                        text: 'Escolha o prÃƒÂ³ximo status permitido para continuar.',
                     });
                 } else {
-                    alert('Escolha o próximo status permitido para continuar.');
+                    alert('Escolha o prÃƒÂ³ximo status permitido para continuar.');
                 }
                 return;
             }
@@ -3073,7 +3410,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'Não foi possível atualizar o status.');
+                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel atualizar o status.');
                 }
 
                 statusModal.hide();
@@ -3093,10 +3430,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao atualizar status',
-                        text: error.message || 'Não foi possível atualizar o status.',
+                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel atualizar o status.',
                     });
                 } else {
-                    alert(error.message || 'Não foi possível atualizar o status.');
+                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel atualizar o status.');
                 }
             } finally {
                 setStatusModalLoading(false);
@@ -3118,19 +3455,19 @@
             statusModalClientEmail && (statusModalClientEmail.textContent = 'E-mail: -');
             statusModalEquipmentName && (statusModalEquipmentName.textContent = '-');
             statusModalEquipmentMeta && (statusModalEquipmentMeta.textContent = 'Tipo: -');
-            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'Nº de série: -');
+            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'NÃ‚Âº de sÃƒÂ©rie: -');
             statusModalCurrentBadges && (statusModalCurrentBadges.innerHTML = '');
             statusModalCurrentStatusHint && (statusModalCurrentStatusHint.textContent = 'Status atual da OS: aguardando contexto.');
             statusModalPrimaryHint && (statusModalPrimaryHint.textContent = 'Fluxo normal sugerido: aguardando contexto.');
             statusModalTargetHint && (statusModalTargetHint.textContent = 'Selecione um fluxo para continuar.');
-            statusModalTimeline && (statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponível para esta OS.</p>');
-            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem histórico recente para esta OS.</p>');
+            statusModalTimeline && (statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponÃƒÂ­vel para esta OS.</p>');
+            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem histÃƒÂ³rico recente para esta OS.</p>');
             statusModalHistoryWrap?.classList.remove('is-empty');
             syncStatusModalProcedures([]);
             statusModalProcedimentoTextoInput && (statusModalProcedimentoTextoInput.value = '');
             statusModalSolucaoInput && (statusModalSolucaoInput.value = '');
             statusModalDiagnosticoInput && (statusModalDiagnosticoInput.value = '');
-            setStatusBudgetPanelHtml('', 'Gerenciamento do orçamento será exibido aqui.');
+            setStatusBudgetPanelHtml('', 'Gerenciamento do orÃƒÂ§amento serÃƒÂ¡ exibido aqui.');
             activateStatusModalTab('#osStatusTabQuick');
             setStatusQuickButtonState(statusModalQuickNext, false, '', '', '');
             setStatusQuickButtonState(statusModalQuickCancel, false, '', '', '');
@@ -3140,7 +3477,7 @@
                 statusModalNotify.dataset.available = '0';
             }
             if (statusModalNotifyHelp) {
-                statusModalNotifyHelp.textContent = 'O cliente será comunicado apenas se você mantiver esta opção ativa.';
+                statusModalNotifyHelp.textContent = 'O cliente serÃƒÂ¡ comunicado apenas se vocÃƒÂª mantiver esta opÃƒÂ§ÃƒÂ£o ativa.';
                 statusModalNotifyHelp.classList.remove('text-danger');
             }
             setStatusModalSubmitLabel('Salvar status');
@@ -3178,7 +3515,7 @@
             budgetModalPecas && (budgetModalPecas.textContent = 'R$ 0,00');
             budgetModalSubtotal && (budgetModalSubtotal.textContent = 'R$ 0,00');
             budgetModalValorFinal && (budgetModalValorFinal.textContent = 'R$ 0,00');
-            budgetModalDocsList && (budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Nenhum orçamento PDF registrado para esta OS.</p>');
+            budgetModalDocsList && (budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Nenhum orÃƒÂ§amento PDF registrado para esta OS.</p>');
             if (budgetModalNotify) {
                 budgetModalNotify.checked = false;
                 budgetModalNotify.disabled = true;
@@ -3189,6 +3526,26 @@
                 budgetModalNotifyHelp.classList.remove('text-danger');
             }
             setBudgetModalLoading(false);
+        });
+
+        whatsappModalElement?.addEventListener('hidden.bs.modal', function () {
+            activeWhatsAppOsId = null;
+            whatsappModalForm?.reset();
+            whatsappModalNumero && (whatsappModalNumero.textContent = '-');
+            whatsappModalBadges && (whatsappModalBadges.innerHTML = '');
+            whatsappModalClientName && (whatsappModalClientName.textContent = '-');
+            whatsappModalClientPhone && (whatsappModalClientPhone.textContent = 'Telefone: -');
+            whatsappModalClientEmail && (whatsappModalClientEmail.textContent = 'E-mail: -');
+            whatsappModalEquipmentName && (whatsappModalEquipmentName.textContent = '-');
+            whatsappModalEquipmentMeta && (whatsappModalEquipmentMeta.textContent = 'Tipo: -');
+            whatsappModalTemplate && (whatsappModalTemplate.innerHTML = '<option value="">Selecione um template ou escreva manualmente</option>');
+            whatsappModalDocument && (whatsappModalDocument.innerHTML = '<option value="">Gerar PDF consolidado da impressÃƒÂ£o (A4)</option>');
+            whatsappModalMessage && (whatsappModalMessage.value = '');
+            whatsappModalPhone && (whatsappModalPhone.value = '');
+            whatsappModalSummary && (whatsappModalSummary.textContent = 'Escolha um template pronto, escreva uma mensagem personalizada ou combine ambos com um documento salvo da OS.');
+            whatsappModalDocumentHint && (whatsappModalDocumentHint.textContent = 'Se nenhum documento salvo for escolhido, o sistema gera automaticamente o PDF consolidado da OS em A4.');
+            whatsappModalPrintFormat && (whatsappModalPrintFormat.value = 'a4');
+            setWhatsAppModalLoading(false);
         });
 
         photoModalElements.element?.addEventListener('hidden.bs.modal', function () {
@@ -3230,21 +3587,21 @@
                     if (window.Swal && payload.message) {
                         window.Swal.fire({
                             icon: 'success',
-                            title: 'Orçamento atualizado',
-                            text: String(payload.message || 'O resumo do orçamento foi sincronizado na OS.'),
+                            title: 'OrÃƒÂ§amento atualizado',
+                            text: String(payload.message || 'O resumo do orÃƒÂ§amento foi sincronizado na OS.'),
                             timer: 1800,
                             showConfirmButton: false,
                         });
                     }
                 })
                 .catch((error) => {
-                    console.error('[OS status modal] Falha ao sincronizar o orçamento após edição.', error);
+                    console.error('[OS status modal] Falha ao sincronizar o orÃƒÂ§amento apÃƒÂ³s ediÃƒÂ§ÃƒÂ£o.', error);
                     detailsModal?.hide();
                     if (window.Swal) {
                         window.Swal.fire({
                             icon: 'warning',
-                            title: 'Orçamento salvo com ressalvas',
-                            text: error?.message || 'O orçamento foi salvo, mas o resumo da OS não foi atualizado automaticamente.',
+                            title: 'OrÃƒÂ§amento salvo com ressalvas',
+                            text: error?.message || 'O orÃƒÂ§amento foi salvo, mas o resumo da OS nÃƒÂ£o foi atualizado automaticamente.',
                         });
                     }
                 });
@@ -3271,7 +3628,7 @@
 
             if (activeStatusOsId && Number(activeStatusOsId) === osId) {
                 refreshStatusModalContext({ preserveDraft: true }).catch(function (error) {
-                    console.error('[OS status modal] Falha ao reidratar contexto após notificação pública de orçamento.', error);
+                    console.error('[OS status modal] Falha ao reidratar contexto apÃƒÂ³s notificaÃƒÂ§ÃƒÂ£o pÃƒÂºblica de orÃƒÂ§amento.', error);
                 });
             }
         }, 300);

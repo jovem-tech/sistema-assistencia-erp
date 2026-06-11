@@ -89,6 +89,52 @@ O bloco `Dados do Cliente` foi mantido dentro do padrao reativo do sistema:
 - limpar a selecao remove o resumo adicional sem refresh;
 - carregar uma edicao existente reaplica o mesmo estado inicial no primeiro render.
 
+## Lookup de OS abertas no formulario
+
+O bloco `Dados do Equipamento` do formulario usa um lookup dedicado para vincular rapidamente uma OS aberta do mesmo cliente.
+
+Fluxo tecnico:
+
+- o frontend em `app/Views/orcamentos/form.php` chama `GET /orcamentos/os-abertas/cliente`;
+- o controller `App\Controllers\Orcamentos::lookupOsAbertasCliente()` monta a lista a partir de `loadOsAbertasCliente()`;
+- cada item e serializado por `formatOsAbertaLookupResult()`, com numero da OS, status e resumo do equipamento;
+- o formatter agora tolera `equip_marca` e `equip_modelo` vazios sem gerar erro PHP ou resposta `500`.
+
+Hotfix aplicado em `06/06/2026`:
+
+- corrigida a referencia a variaveis nao inicializadas no formatter das OS abertas;
+- o endpoint volta a responder com `200` mesmo quando o equipamento da OS esta com cadastro parcial;
+- o card `Vinculo OS` permanece reativo e sem dependencia de refresh manual.
+
+## Cadastro rapido de itens no formulario
+
+Na release `2.20.5`, o formulario `app/Views/orcamentos/form.php` ganhou um fluxo inline para cadastrar `Peca` e `Servico` sem sair da aba `Orcamento e financeiro`.
+
+Arquitetura do fluxo:
+
+- o frontend mostra o botao `Cadastrar` apenas quando `item_tipo[]` estiver em `peca` ou `servico`;
+- o modal `#modalCatalogoRapidoOrc` envia o cadastro por `fetch` com `X-Requested-With: XMLHttpRequest`;
+- para pecas, o request usa `POST /estoque/salvar_ajax` e o controller `App\Controllers\Estoque::salvar_ajax()`;
+- para servicos, o request usa `POST /servicos/salvar_ajax` e o controller `App\Controllers\Servicos::salvar_ajax()`;
+- os dois endpoints retornam o item no mesmo payload do `GET /orcamentos/item/catalogo`, o que permite reaproveitar a mesma funcao de hidratacao da linha (`applyCatalogDataToRow()`).
+
+Efeito tecnico:
+
+- o Select2 da linha atual recebe a nova opcao sem reload da pagina;
+- `descricao`, `referencia_id` e `valor_unitario` sao aplicados imediatamente na mesma linha;
+- no caso de `peca`, o payload tambem carrega a estrutura `precificacao`, permitindo manter o piso minimo de `peca instalada` no proprio frontend.
+
+## Visualizacao em abas
+
+Na tela `app/Views/orcamentos/show.php`, a leitura do orcamento segue separada por abas de contexto.
+
+Organizacao atual relevante para envio/comercial:
+
+- `Envio do orcamento` concentra PDF, WhatsApp, e-mail e o bloco `Link publico e referencia comercial`;
+- `Financeiro do orcamento` fica dedicado ao resumo monetario (`subtotal`, `desconto`, `acrescimo` e `total final`);
+- os botoes `Copiar link publico` e `Abrir link publico` continuam usando os mesmos IDs (`btnCopyPublicLink` e `orcamentoPublicLinkInput`), preservando o JavaScript existente.
+- o resumo `Status do envio` e calculado na propria view a partir de `envios` carregados por `OrcamentoEnvioModel::byOrcamento()`, considerando apenas canais comerciais (`whatsapp` e `email`) para exibir ultimo resultado geral e ultimo status por canal.
+
 ## Resposta publica e notificacao web em tempo real
 
 Na release `2.15.17`, o controller complementar `app/Controllers/Orcamento.php` passou a disparar notificacoes internas quando o cliente responde o orcamento pelo link publico.

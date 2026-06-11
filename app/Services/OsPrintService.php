@@ -24,6 +24,7 @@ class OsPrintService
 {
     public const FORMAT_A4 = 'a4';
     public const FORMAT_THERMAL = '80mm';
+    private const PHOTO_GROUP_KEYS = ['entrada', 'acessorios', 'perfil', 'estado_fisico', 'checklist'];
 
     private OsModel $osModel;
     private ClienteModel $clienteModel;
@@ -101,7 +102,7 @@ class OsPrintService
         $notasLegadas = $this->loadNotasLegadas($osId);
         $resumoFinanceiro = $this->buildFinancialSummary($os, $itensOs);
         $photoGroups = $normalizedOptions['include_photos']
-            ? $this->buildPhotoGroups($fotosPerfil, $fotosEntrada, $acessorios, $estadoFisico, $checklistEntrada)
+            ? $this->buildPhotoGroups($fotosPerfil, $fotosEntrada, $acessorios, $estadoFisico, $checklistEntrada, $normalizedOptions)
             : [];
 
         return [
@@ -200,9 +201,16 @@ class OsPrintService
             $format = self::FORMAT_A4;
         }
 
+        $photoGroups = $this->normalizePhotoGroups($options['photo_groups'] ?? $options['grupos_fotos'] ?? []);
+        $includePhotos = $this->toBool($options['include_photos'] ?? $options['incluir_fotos'] ?? false);
+        if ($photoGroups !== []) {
+            $includePhotos = true;
+        }
+
         return [
             'format' => $format,
-            'include_photos' => $this->toBool($options['include_photos'] ?? $options['incluir_fotos'] ?? false),
+            'include_photos' => $includePhotos,
+            'photo_groups' => $photoGroups,
         ];
     }
 
@@ -380,11 +388,12 @@ class OsPrintService
         array $fotosEntrada,
         array $acessorios,
         array $estadoFisico,
-        ?array $checklistEntrada
+        ?array $checklistEntrada,
+        array $printOptions = []
     ): array {
         $groups = [];
 
-        if (!empty($fotosEntrada)) {
+        if ($this->shouldIncludePhotoGroup($printOptions, 'entrada') && !empty($fotosEntrada)) {
             $groups[] = [
                 'key' => 'entrada',
                 'label' => 'Fotos de entrada',
@@ -408,7 +417,7 @@ class OsPrintService
                 ];
             }
         }
-        if (!empty($fotosAcessorios)) {
+        if ($this->shouldIncludePhotoGroup($printOptions, 'acessorios') && !empty($fotosAcessorios)) {
             $groups[] = [
                 'key' => 'acessorios',
                 'label' => 'Fotos de acessorios',
@@ -416,7 +425,7 @@ class OsPrintService
             ];
         }
 
-        if (!empty($fotosPerfil)) {
+        if ($this->shouldIncludePhotoGroup($printOptions, 'perfil') && !empty($fotosPerfil)) {
             $groups[] = [
                 'key' => 'perfil',
                 'label' => 'Fotos de perfil do equipamento',
@@ -447,7 +456,7 @@ class OsPrintService
                 ];
             }
         }
-        if (!empty($fotosEstadoFisico)) {
+        if ($this->shouldIncludePhotoGroup($printOptions, 'estado_fisico') && !empty($fotosEstadoFisico)) {
             $groups[] = [
                 'key' => 'estado_fisico',
                 'label' => 'Fotos de estado fisico',
@@ -464,7 +473,7 @@ class OsPrintService
                 ];
             }
         }
-        if (!empty($fotosChecklist)) {
+        if ($this->shouldIncludePhotoGroup($printOptions, 'checklist') && !empty($fotosChecklist)) {
             $groups[] = [
                 'key' => 'checklist',
                 'label' => 'Fotos do checklist',
@@ -473,6 +482,47 @@ class OsPrintService
         }
 
         return $groups;
+    }
+
+    /**
+     * @param mixed $rawGroups
+     * @return array<int, string>
+     */
+    private function normalizePhotoGroups($rawGroups): array
+    {
+        if (is_string($rawGroups)) {
+            $rawGroups = preg_split('/[\s,;|]+/', $rawGroups) ?: [];
+        }
+
+        if (!is_array($rawGroups)) {
+            return [];
+        }
+
+        $normalized = [];
+        foreach ($rawGroups as $group) {
+            $key = strtolower(trim((string) $group));
+            if ($key === '' || !in_array($key, self::PHOTO_GROUP_KEYS, true)) {
+                continue;
+            }
+
+            $normalized[$key] = $key;
+        }
+
+        return array_values($normalized);
+    }
+
+    private function shouldIncludePhotoGroup(array $printOptions, string $groupKey): bool
+    {
+        if (empty($printOptions['include_photos'])) {
+            return false;
+        }
+
+        $photoGroups = array_values((array) ($printOptions['photo_groups'] ?? []));
+        if ($photoGroups === []) {
+            return true;
+        }
+
+        return in_array($groupKey, $photoGroups, true);
     }
 
     private function loadAcessorios(int $osId, string $numeroOs): array

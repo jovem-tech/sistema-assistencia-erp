@@ -31,7 +31,7 @@ class CentralMensagens extends BaseController
 {
     public function __construct()
     {
-        requirePermission('clientes', 'visualizar');
+        requirePermission('atendimento_whatsapp', 'visualizar');
     }
 
     public function index()
@@ -261,7 +261,7 @@ class CentralMensagens extends BaseController
             'recebidas' => [
                 'titulo'   => 'Mensagens Recebidas',
                 'valor'    => (int) ($raw['mensagens_recebidas'] ?? 0),
-                'subtexto' => 'Demanda total inbound no período',
+                'subtexto' => 'Demanda total inbound no perÃ­odo',
                 'status'   => 'info',
                 'icone'    => 'bi-chat-left-text',
                 'tooltip'  => 'Quantidade total de mensagens enviadas pelos clientes para a central.'
@@ -275,12 +275,12 @@ class CentralMensagens extends BaseController
                 'tooltip'  => 'Total de mensagens saindo da central (Bot + Atendentes).'
             ],
             'automaticas' => [
-                'titulo'   => 'Respostas Automáticas',
+                'titulo'   => 'Respostas AutomÃ¡ticas',
                 'valor'    => (int) ($raw['mensagens_automaticas'] ?? 0),
-                'subtexto' => 'Interações resolvidas pelo Chatbot',
+                'subtexto' => 'InteraÃ§Ãµes resolvidas pelo Chatbot',
                 'status'   => 'primary',
                 'icone'    => 'bi-robot',
-                'tooltip'  => 'Mensagens disparadas automaticamente pelo sistema de automação.'
+                'tooltip'  => 'Mensagens disparadas automaticamente pelo sistema de automaÃ§Ã£o.'
             ],
             'aguardando' => [
                 'titulo'   => 'Aguardando Atendimento',
@@ -288,15 +288,15 @@ class CentralMensagens extends BaseController
                 'subtexto' => 'Clientes na fila de espera',
                 'status'   => ($raw['conversas_aguardando_humano'] ?? 0) > 5 ? 'danger' : 'warning',
                 'icone'    => 'bi-people',
-                'tooltip'  => 'Conversas que solicitaram transbordo humano e ainda não foram atendidas.'
+                'tooltip'  => 'Conversas que solicitaram transbordo humano e ainda nÃ£o foram atendidas.'
             ],
             'taxa_automacao' => [
-                'titulo'   => 'Taxa de Automação',
+                'titulo'   => 'Taxa de AutomaÃ§Ã£o',
                 'valor'    => number_format((float) ($raw['taxa_automacao'] ?? 0), 1, ',', '.') . '%',
-                'subtexto' => 'Eficiência do Chatbot',
+                'subtexto' => 'EficiÃªncia do Chatbot',
                 'status'   => ($raw['taxa_automacao'] ?? 0) > 70 ? 'success' : 'info',
                 'icone'    => 'bi-cpu',
-                'tooltip'  => 'Percentual de mensagens tratadas automaticamente em relação ao volume total.'
+                'tooltip'  => 'Percentual de mensagens tratadas automaticamente em relaÃ§Ã£o ao volume total.'
             ],
             'sla' => [
                 'titulo'   => 'SLA Estourado',
@@ -304,12 +304,12 @@ class CentralMensagens extends BaseController
                 'subtexto' => 'Contatos fora do tempo limite',
                 'status'   => ($raw['sla_estourado'] ?? 0) > 0 ? 'danger' : 'success',
                 'icone'    => 'bi-clock-history',
-                'tooltip'  => 'Número de conversas ativas que ultrapassaram o tempo limite de resposta definida.'
+                'tooltip'  => 'NÃºmero de conversas ativas que ultrapassaram o tempo limite de resposta definida.'
             ]
         ];
 
         return view('central_mensagens/metricas', [
-            'title' => 'Central de Mensagens - Métricas',
+            'title' => 'Central de Mensagens - MÃ©tricas',
             'cmActive' => 'metricas',
             'inicio' => $inicio,
             'fim' => $fim,
@@ -622,7 +622,7 @@ class CentralMensagens extends BaseController
         $post = $this->request->getPost();
 
         foreach ($defaults as $key => $default) {
-            // Se a chave não existe no POST e é um checkbox conhecido, valor é '0'
+            // Se a chave nÃ£o existe no POST e Ã© um checkbox conhecido, valor Ã© '0'
             if (!isset($post[$key]) && $key === 'central_mensagens_auto_bot_enabled') {
                 $value = '0';
             } else {

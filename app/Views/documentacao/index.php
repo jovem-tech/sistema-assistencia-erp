@@ -1,5 +1,5 @@
 <?php
-// Função PHP para renderizar a árvore HTML no servidor
+// FunÃ§Ã£o PHP para renderizar a Ã¡rvore HTML no servidor
 function renderTree(array $items): void {
     foreach ($items as $item) {
         if ($item['type'] === 'folder') {
@@ -31,7 +31,7 @@ function renderTree(array $items): void {
 <?= $this->section('content') ?>
 
 <style>
-/* ── Wiki Layout ────────────────────────────────────── */
+/* â”€â”€ Wiki Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .wiki-layout {
     display: flex;
     height: calc(100vh - 120px);
@@ -40,7 +40,7 @@ function renderTree(array $items): void {
     overflow: hidden;
 }
 
-/* ── Painel Esquerdo (Árvore) ───────────────────────── */
+/* â”€â”€ Painel Esquerdo (Ãrvore) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .wiki-sidebar {
     width: 300px;
     min-width: 260px;
@@ -113,7 +113,7 @@ function renderTree(array $items): void {
 .wiki-tree::-webkit-scrollbar { width: 4px; }
 .wiki-tree::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
 
-/* Itens da árvore */
+/* Itens da Ã¡rvore */
 .tree-folder {
     user-select: none;
 }
@@ -177,7 +177,7 @@ function renderTree(array $items): void {
     text-overflow: ellipsis;
 }
 
-/* ── Painel Direito (Conteúdo) ──────────────────────── */
+/* â”€â”€ Painel Direito (ConteÃºdo) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .wiki-content {
     flex: 1;
     display: flex;
@@ -400,19 +400,19 @@ function renderTree(array $items): void {
 
 <div class="wiki-layout glass-card">
 
-    <!-- ── PAINEL ESQUERDO: Árvore de Navegação ───────────────────────── -->
+    <!-- â”€â”€ PAINEL ESQUERDO: Ãrvore de NavegaÃ§Ã£o â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="wiki-sidebar" id="wikiSidebar">
         <div class="wiki-sidebar-header">
             <div class="wiki-sidebar-title">
-                <span><i class="bi bi-folder2-open me-1"></i>Navegação</span>
+                <span><i class="bi bi-folder2-open me-1"></i>NavegaÃ§Ã£o</span>
                 <button class="wiki-collapse-btn" id="btnCollapseSidebar" title="Recolher">
                     <i class="bi bi-layout-sidebar-reverse"></i>
                 </button>
             </div>
             <div class="wiki-search position-relative">
                 <input type="text" id="wikiSearchInput" class="form-control form-control-sm"
-                       placeholder="🔎 Buscar na documentação..." autocomplete="off">
-                <span class="search-kbd">⌘K</span>
+                       placeholder="ðŸ”Ž Buscar na documentaÃ§Ã£o..." autocomplete="off">
+                <span class="search-kbd">âŒ˜K</span>
                 <div class="search-results-overlay" id="searchResultsOverlay"></div>
             </div>
         </div>
@@ -421,7 +421,7 @@ function renderTree(array $items): void {
         </div>
     </div>
 
-    <!-- ── PAINEL DIREITO: Conteúdo ──────────────────────────────────── -->
+    <!-- â”€â”€ PAINEL DIREITO: ConteÃºdo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="wiki-content">
         <div class="wiki-content-header" id="docHeader" style="display:none;">
             <div class="flex-1">
@@ -434,14 +434,14 @@ function renderTree(array $items): void {
             <div id="docLoading" class="wiki-loading" style="display:none;">
                 <div class="spinner-border spinner-border-sm text-primary me-2"></div>Carregando...
             </div>
-            
+
             <div class="wiki-empty" id="wikiEmpty">
                 <div class="wiki-empty-icon"><i class="bi bi-journal-richtext"></i></div>
-                <h4>Central de Documentação</h4>
-                <p>Selecione um documento na árvore à esquerda<br>ou use a busca para encontrar o que precisa.</p>
+                <h4>Central de DocumentaÃ§Ã£o</h4>
+                <p>Selecione um documento na Ã¡rvore Ã  esquerda<br>ou use a busca para encontrar o que precisa.</p>
                 <div class="mt-4 d-flex flex-wrap gap-2 justify-content-center" id="quickLinks">
                     <button class="btn btn-sm btn-outline-secondary" onclick="loadDoc('README.md')">
-                        <i class="bi bi-house me-1"></i>Início
+                        <i class="bi bi-house me-1"></i>InÃ­cio
                     </button>
                     <button class="btn btn-sm btn-outline-secondary" onclick="loadDoc('01-manual-do-usuario/ordens-de-servico.md')">
                         <i class="bi bi-clipboard-check me-1"></i>Manual de OS
@@ -450,11 +450,11 @@ function renderTree(array $items): void {
                         <i class="bi bi-map me-1"></i>Roadmap
                     </button>
                     <button class="btn btn-sm btn-outline-secondary" onclick="loadDoc('11-padroes/boas-praticas.md')">
-                        <i class="bi bi-patch-check me-1"></i>Boas Práticas
+                        <i class="bi bi-patch-check me-1"></i>Boas PrÃ¡ticas
                     </button>
                 </div>
             </div>
-            
+
             <div id="docRender" class="doc-render" style="display:none;"></div>
             <div id="docError" class="wiki-empty" style="display:none;"></div>
         </div>
@@ -478,17 +478,17 @@ function renderTree(array $items): void {
                             $fluxo = [
                                 ['icon'=>'bi-person-badge','label'=>'Cliente','color'=>'#8b5cf6','url'=>'clientes'],
                                 ['icon'=>'bi-laptop','label'=>'Equipamento','color'=>'#3b82f6','url'=>'equipamentos'],
-                                ['icon'=>'bi-clipboard-check-fill','label'=>'Ordem de Serviço','color'=>'#f59e0b','url'=>'os'],
-                                ['icon'=>'bi-search','label'=>'Diagnóstico','color'=>'#f59e0b','url'=>null],
-                                ['icon'=>'bi-gear-wide-connected','label'=>'Serviços','color'=>'#10b981','url'=>'servicos'],
-                                ['icon'=>'bi-box-seam-fill','label'=>'Peças / Estoque','color'=>'#06b6d4','url'=>'estoque'],
+                                ['icon'=>'bi-clipboard-check-fill','label'=>'Ordem de ServiÃ§o','color'=>'#f59e0b','url'=>'os'],
+                                ['icon'=>'bi-search','label'=>'DiagnÃ³stico','color'=>'#f59e0b','url'=>null],
+                                ['icon'=>'bi-gear-wide-connected','label'=>'ServiÃ§os','color'=>'#10b981','url'=>'servicos'],
+                                ['icon'=>'bi-box-seam-fill','label'=>'PeÃ§as / Estoque','color'=>'#06b6d4','url'=>'estoque'],
                                 ['icon'=>'bi-cash-stack','label'=>'Financeiro','color'=>'#22c55e','url'=>'financeiro'],
                                 ['icon'=>'bi-check2-all','label'=>'Encerramento','color'=>'#a855f7','url'=>null],
                             ];
                             foreach ($fluxo as $i => $item): ?>
                             <div class="d-flex align-items-center gap-2">
                                 <?php if ($i > 0): ?>
-                                <div style="width:24px; text-align:center; color:rgba(255,255,255,0.2); font-size:1rem; margin-left:4px;">↓</div>
+                                <div style="width:24px; text-align:center; color:rgba(255,255,255,0.2); font-size:1rem; margin-left:4px;">â†“</div>
                                 <?php else: ?>
                                 <div style="width:24px;"></div>
                                 <?php endif; ?>
@@ -511,26 +511,26 @@ function renderTree(array $items): void {
                         </div>
                     </div>
                     <div class="col-md-7">
-                        <h6 class="text-muted text-uppercase mb-3" style="font-size:0.7rem; letter-spacing:0.1em;">Estrutura de Módulos</h6>
+                        <h6 class="text-muted text-uppercase mb-3" style="font-size:0.7rem; letter-spacing:0.1em;">Estrutura de MÃ³dulos</h6>
                         <div class="doc-render" style="font-size:0.8rem;">
                             <pre style="background:rgba(0,0,0,0.3); border-radius:10px; padding:1rem; font-size:0.75rem; line-height:1.8;">Clientes
-   └── Equipamentos
-         └── Ordens de Serviço
-               ├── Serviços (catálogo)
-               ├── Peças (estoque)
-               └── Financeiro (receitas)
+   â””â”€â”€ Equipamentos
+         â””â”€â”€ Ordens de ServiÃ§o
+               â”œâ”€â”€ ServiÃ§os (catÃ¡logo)
+               â”œâ”€â”€ PeÃ§as (estoque)
+               â””â”€â”€ Financeiro (receitas)
 
-Configurações
-   ├── Dados da Empresa
-   ├── Usuários
-   └── Níveis de Acesso (RBAC)
-         └── Permissões por módulo
+ConfiguraÃ§Ãµes
+   â”œâ”€â”€ Dados da Empresa
+   â”œâ”€â”€ UsuÃ¡rios
+   â””â”€â”€ NÃ­veis de Acesso (RBAC)
+         â””â”€â”€ PermissÃµes por mÃ³dulo
 
-Relatórios
-   ├── OS por Período
-   ├── Financeiro
-   ├── Estoque
-   └── Clientes</pre>
+RelatÃ³rios
+   â”œâ”€â”€ OS por PerÃ­odo
+   â”œâ”€â”€ Financeiro
+   â”œâ”€â”€ Estoque
+   â””â”€â”€ Clientes</pre>
                         </div>
                     </div>
                 </div>
@@ -542,27 +542,88 @@ Relatórios
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<!-- Marked.js — Markdown Renderer -->
+<!-- Marked.js â€” Markdown Renderer -->
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
-<!-- DOMPurify — Sanitiza HTML do markdown -->
+<!-- DOMPurify â€” Sanitiza HTML do markdown -->
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
-<!-- Highlight.js — Syntax highlighting de código -->
+<!-- Highlight.js â€” Syntax highlighting de cÃ³digo -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
 <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
 
 <script>
 const BASE_URL = document.querySelector('meta[name="base-url"]').content;
+const DOC_ALIASES = {
+    'dashboard': '01-manual-do-usuario/dashboard.md',
+    'financeiro': '01-manual-do-usuario/financeiro.md',
+    'relatorios': '01-manual-do-usuario/relatorios.md',
+    'ordens-de-servico': '01-manual-do-usuario/ordens-de-servico.md',
+    'clientes': '01-manual-do-usuario/clientes.md',
+    'equipamentos': '01-manual-do-usuario/equipamentos.md',
+    'estoque': '01-manual-do-usuario/estoque.md',
+    'servicos': '01-manual-do-usuario/servicos.md',
+    'fornecedores': '01-manual-do-usuario/fornecedores.md',
+    'funcionarios': '01-manual-do-usuario/funcionarios.md',
+    'contatos': '01-manual-do-usuario/contatos.md',
+    'perfil': '01-manual-do-usuario/perfil.md',
+    'busca-global': '01-manual-do-usuario/busca-global.md',
+    'orcamentos': '01-manual-do-usuario/orcamentos.md',
+    'usuarios': '02-manual-administrador/usuarios-e-permissoes.md',
+    'grupos': '02-manual-administrador/usuarios-e-permissoes.md',
+    'configuracoes': '02-manual-administrador/configuracao-do-sistema.md',
+    'os-workflow': '02-manual-administrador/fluxo-de-trabalho-os.md',
+    'vendas': '06-modulos-do-sistema/vendas.md',
+    'equipamentos-tipos': '06-modulos-do-sistema/equipamentos-tipos.md',
+    'equipamentos-modelos': '06-modulos-do-sistema/equipamentos-modelos.md',
+    'equipamentos-marcas': '06-modulos-do-sistema/equipamentos-marcas.md',
+    'equipamentos-defeitos': '06-modulos-do-sistema/defeitos-comuns.md',
+    'defeitos-relatados': '06-modulos-do-sistema/defeitos-relatados.md',
+    'design-system': '06-modulos-do-sistema/design-system.md',
+    'crm': '06-modulos-do-sistema/crm.md',
+    'pacotes-servicos': '06-modulos-do-sistema/pacotes-servicos.md',
+    'precificacao': '06-modulos-do-sistema/precificacao.md',
+    'checklists': '06-modulos-do-sistema/checklists.md',
+    'templates-whatsapp-os': '06-modulos-do-sistema/ordens-de-servico.md#templates-de-whatsapp-para-documentos',
+    'modelos-pdf-os': '06-modulos-do-sistema/ordens-de-servico.md#modelos-pdf-da-os',
+    'app-mobile-design-system': '12-app-mobile-pwa/README.md',
+    'atendimento-whatsapp': '06-modulos-do-sistema/whatsapp.md',
+    'atendimento-whatsapp-config': '06-modulos-do-sistema/whatsapp.md',
+    'atendimento-whatsapp-filas': '06-modulos-do-sistema/whatsapp.md',
+    'atendimento-whatsapp-fluxos': '06-modulos-do-sistema/whatsapp.md',
+    'atendimento-whatsapp-metricas': '06-modulos-do-sistema/whatsapp.md',
+    'atendimento-whatsapp-faq': '06-modulos-do-sistema/whatsapp.md',
+    'atendimento-whatsapp-respostas': '06-modulos-do-sistema/whatsapp.md',
+    'atendimento-whatsapp-chatbot': '06-modulos-do-sistema/whatsapp.md',
+    'atendimento-mobile': '12-app-mobile-pwa/README.md',
+    'atendimento-mobile-app': '12-app-mobile-pwa/README.md'
+};
 let currentPath  = null;
 let searchTimer  = null;
 
-// ── Configurar Marked.js ────────────────────────────────────────────────────
+function resolveDocPath(path) {
+    const cleanPath = String(path || '').trim();
+    if (!cleanPath) {
+        return 'README.md';
+    }
+
+    if (DOC_ALIASES[cleanPath]) {
+        return DOC_ALIASES[cleanPath];
+    }
+
+    if (cleanPath.includes('/') || cleanPath.endsWith('.md')) {
+        return cleanPath;
+    }
+
+    return 'README.md';
+}
+
+// â”€â”€ Configurar Marked.js â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function setupMarked() {
     if (typeof marked === 'undefined') {
-        console.error('Erro: Biblioteca marked não carregada.');
+        console.error('Erro: Biblioteca marked nÃ£o carregada.');
         return false;
     }
-    
-    // Configurações globais (nas versões novas algumas são depreciadas via setOptions)
+
+    // ConfiguraÃ§Ãµes globais (nas versÃµes novas algumas sÃ£o depreciadas via setOptions)
     try {
         marked.setOptions({
             breaks: true,
@@ -577,7 +638,7 @@ function setupMarked() {
 const renderer = new marked.Renderer();
 
 renderer.link = function(href, title, text) {
-    // Link interno: converte para navegação no wiki
+    // Link interno: converte para navegaÃ§Ã£o no wiki
     if (href && !href.startsWith('http') && !href.startsWith('#')) {
         return `<a href="#" class="doc-internal-link" data-path="${href}" title="${title || ''}">${text}</a>`;
     }
@@ -595,7 +656,7 @@ renderer.code = function(code, lang) {
             return `<pre><code>${hljs.highlightAuto(code).value}</code></pre>`;
         } catch(e) {}
     }
-    // Fallback se hljs falhar ou não existir
+    // Fallback se hljs falhar ou nÃ£o existir
     return `<pre><code>${escapeHtml(code)}</code></pre>`;
 };
 
@@ -605,11 +666,11 @@ if (typeof marked !== 'undefined' && typeof renderer !== 'undefined') {
     } catch(e) { console.error('Erro ao usar renderer customizado:', e); }
 }
 
-// ── Carregar Documento ──────────────────────────────────────────────────────
+// â”€â”€ Carregar Documento â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 window.loadDoc = function(path) {
     currentPath = path;
 
-    // Marca item ativo na árvore
+    // Marca item ativo na Ã¡rvore
     document.querySelectorAll('.tree-file').forEach(el => el.classList.remove('active'));
     const link = document.querySelector(`.tree-file[data-path="${path}"]`);
     if (link) {
@@ -647,18 +708,18 @@ window.loadDoc = function(path) {
                 return;
             }
 
-            // Título e breadcrumb
+            // TÃ­tulo e breadcrumb
             const parts = data.path.split('/');
-            const breadcrumb = parts.slice(0, -1).map(p => formatFolderName(p)).join(' › ');
+            const breadcrumb = parts.slice(0, -1).map(p => formatFolderName(p)).join(' â€º ');
             const docName    = data.filename.replace(/\.(md|markdown|html|txt)$/i, '');
 
-            if (document.getElementById('docBreadcrumb')) document.getElementById('docBreadcrumb').innerHTML = `<i class="bi bi-journal-text me-1"></i>${breadcrumb || 'Documentação'}`;
+            if (document.getElementById('docBreadcrumb')) document.getElementById('docBreadcrumb').innerHTML = `<i class="bi bi-journal-text me-1"></i>${breadcrumb || 'DocumentaÃ§Ã£o'}`;
             if (document.getElementById('docTitle'))      document.getElementById('docTitle').textContent = formatFolderName(docName);
             if (document.getElementById('docMeta'))       document.getElementById('docMeta').innerHTML = `<i class="bi bi-clock me-1"></i>Atualizado: ${data.modified}`;
 
             if (document.getElementById('docHeader')) document.getElementById('docHeader').style.display = '';
 
-            // Renderiza conteúdo
+            // Renderiza conteÃºdo
             let html = '';
             try {
                 if (data.type === 'markdown') {
@@ -674,7 +735,7 @@ window.loadDoc = function(path) {
                     html = `<pre style="white-space:pre-wrap;">${escapeHtml(data.content)}</pre>`;
                 }
             } catch (err) {
-                console.error('Erro de renderização:', err);
+                console.error('Erro de renderizaÃ§Ã£o:', err);
                 html = `<div class="alert alert-danger">Erro ao renderizar o documento: ${err.message}</div><pre>${escapeHtml(data.content)}</pre>`;
             }
 
@@ -707,14 +768,14 @@ window.loadDoc = function(path) {
             const docError = document.getElementById('docError');
             if (docError) {
                 docError.innerHTML = `<div class="wiki-empty-icon"><i class="bi bi-wifi-off"></i></div>
-                                     <h4>Erro de carregamento</h4><p>Não foi possível carregar o documento ou as bibliotecas de visualização.<br><small>${err.message}</small></p>
-                                     <button class="btn btn-sm btn-outline-primary mt-2" onclick="location.reload()">Recarregar Página</button>`;
+                                     <h4>Erro de carregamento</h4><p>NÃ£o foi possÃ­vel carregar o documento ou as bibliotecas de visualizaÃ§Ã£o.<br><small>${err.message}</small></p>
+                                     <button class="btn btn-sm btn-outline-primary mt-2" onclick="location.reload()">Recarregar PÃ¡gina</button>`;
                 docError.style.display = 'flex';
             }
         });
 };
 
-// ── Árvore — Toggle pasta ───────────────────────────────────────────────────
+// â”€â”€ Ãrvore â€” Toggle pasta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 document.getElementById('wikiTree').addEventListener('click', function(e) {
     const folder = e.target.closest('.tree-folder-header');
     const file   = e.target.closest('.tree-file');
@@ -737,7 +798,7 @@ document.querySelectorAll('.tree-folder').forEach((el, i) => {
     if (i === 0) el.classList.add('open');
 });
 
-// ── Busca ────────────────────────────────────────────────────────────────────
+// â”€â”€ Busca â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const searchInput   = document.getElementById('wikiSearchInput');
 const searchOverlay = document.getElementById('searchResultsOverlay');
 
@@ -765,7 +826,7 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Atalho ⌘K / Ctrl+K
+// Atalho âŒ˜K / Ctrl+K
 document.addEventListener('keydown', function(e) {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
@@ -812,7 +873,7 @@ function performSearch(query) {
         });
 }
 
-// ── Collapse da sidebar ──────────────────────────────────────────────────────
+// â”€â”€ Collapse da sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 document.getElementById('btnCollapseSidebar').addEventListener('click', function() {
     const sidebar = document.getElementById('wikiSidebar');
     sidebar.classList.toggle('collapsed');
@@ -829,13 +890,13 @@ document.getElementById('btnMobileSidebar')?.addEventListener('click', function(
     document.getElementById('wikiSidebar').classList.toggle('mobile-open');
 });
 
-// ── Mapa do Sistema ──────────────────────────────────────────────────────────
+// â”€â”€ Mapa do Sistema â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 document.getElementById('btnMapa').addEventListener('click', function() {
     const modal = new bootstrap.Modal(document.getElementById('modalMapa'));
     modal.show();
 });
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function escapeHtml(text) {
     if (!text) return '';
     return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -849,15 +910,15 @@ function formatFolderName(name) {
         .replace(/\.md$/i, '');
 }
 
-// ── Carregar README por padrão ───────────────────────────────────────────────
+// â”€â”€ Carregar README por padrÃ£o â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 window.addEventListener('DOMContentLoaded', function() {
     // Verifica hash na URL para deep link
     const hash = window.location.hash.replace('#', '');
     if (hash) {
-        loadDoc(decodeURIComponent(hash));
+        loadDoc(resolveDocPath(decodeURIComponent(hash)));
     }
 
-    // Exibe origem da ajuda quando disponível
+    // Exibe origem da ajuda quando disponÃ­vel
     const params = new URLSearchParams(window.location.search);
     const from = params.get('from');
     if (from) {
@@ -869,40 +930,44 @@ window.addEventListener('DOMContentLoaded', function() {
                     const path = url.pathname.startsWith('/') ? url.pathname.slice(1) : url.pathname;
                     const parts = path.split('/').filter(Boolean);
                     const moduleMap = {
-                        os: 'Ordens de Serviço',
+                        os: 'Ordens de ServiÃ§o',
                         clientes: 'Clientes',
                         equipamentos: 'Equipamentos',
-                        servicos: 'Serviços',
+                        servicos: 'ServiÃ§os',
                         estoque: 'Estoque',
                         financeiro: 'Financeiro',
-                        relatorios: 'Relatórios',
+                        relatorios: 'RelatÃ³rios',
                         fornecedores: 'Fornecedores',
-                        funcionarios: 'Funcionários',
-                        usuarios: 'Usuários',
+                        funcionarios: 'FuncionÃ¡rios',
+                        usuarios: 'UsuÃ¡rios',
                         grupos: 'Grupos',
-                        configuracoes: 'Configurações',
+                        configuracoes: 'ConfiguraÃ§Ãµes',
                         vendas: 'Vendas',
                         perfil: 'Perfil',
                         'atendimento-mobile': 'App Mobile/PWA',
-                        'atendimento-mobile-app': 'App Mobile/PWA'
+                        'atendimento-mobile-app': 'App Mobile/PWA',
+                        'checklists': 'Checklists',
+                        'pacotes-servicos': 'Pacotes de Servicos',
+                        'precificacao': 'Precificacao'
                     };
                     const moduleKey = parts[0] || 'dashboard';
                     const moduleName = moduleMap[moduleKey] || moduleKey;
                     const tail = parts.slice(1).join(' / ');
-                    label.textContent = tail ? `Ajuda referente a: ${moduleName} → ${tail}` : `Ajuda referente a: ${moduleName}`;
+                    label.textContent = tail ? `Ajuda referente a: ${moduleName} â†’ ${tail}` : `Ajuda referente a: ${moduleName}`;
                     label.style.display = 'block';
                 }
             }
         } catch (e) {
-            // ignora se from inválido
+            // ignora se from invÃ¡lido
         }
     }
 });
 
-// ── Ajuda contextual: botões ❓ em outras páginas ──────────────────────────
+// â”€â”€ Ajuda contextual: botÃµes â“ em outras pÃ¡ginas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 window.openDocPage = function(path) {
+    const resolvedPath = resolveDocPath(path);
     const from = encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
-    window.location.href = `${BASE_URL}documentacao?from=${from}#${encodeURIComponent(path)}`;
+    window.location.href = `${BASE_URL}documentacao?from=${from}#${encodeURIComponent(resolvedPath)}`;
 };
 
 setupMarked();

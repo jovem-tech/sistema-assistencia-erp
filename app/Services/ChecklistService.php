@@ -109,6 +109,7 @@ class ChecklistService
             'numero_os' => $numeroOs,
             'possui_modelo' => true,
             'execucao' => $execucao,
+            'observacoes_estado' => trim((string) ($execucao['observacoes_estado'] ?? '')),
             'itens' => $itens,
             'resumo' => $this->buildSummary($execucao),
         ];
@@ -142,6 +143,7 @@ class ChecklistService
 
         $db = Database::connect();
         $db->transBegin();
+        $observacoesEstado = trim((string) ($payload['observacoes_estado'] ?? ''));
 
         try {
             $execucao = $this->execucaoModel->findByOsAndTipo($osId, (int) $tipo['id']);
@@ -154,6 +156,7 @@ class ChecklistService
                 'total_itens' => count($itensModelo),
                 'total_discrepancias' => 0,
                 'resumo_texto' => null,
+                'observacoes_estado' => $observacoesEstado !== '' ? $observacoesEstado : null,
                 'concluido_em' => date('Y-m-d H:i:s'),
             ];
 
@@ -231,6 +234,7 @@ class ChecklistService
             $this->execucaoModel->update($execucaoId, [
                 'total_discrepancias' => $totalDiscrepancias,
                 'resumo_texto' => $resumoTexto,
+                'observacoes_estado' => $observacoesEstado !== '' ? $observacoesEstado : null,
             ]);
 
             $db->transCommit();

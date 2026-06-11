@@ -1,13 +1,57 @@
 <?= $this->extend($layout ?? 'layouts/main') ?>
 <?= $this->section('content') ?>
 
+<?php
+$isEncerrado = !empty($equipamento['is_encerrado']);
+$motivoEncerramentoLabel = trim((string) ($equipamento['motivo_encerramento_label'] ?? ''));
+$observacaoEncerramento = trim((string) ($equipamento['observacao_encerramento'] ?? ''));
+$osAbertasCount = (int) ($equipamento['os_abertas_count'] ?? 0);
+$temOsAbertas = !$isEncerrado && $osAbertasCount > 0;
+$historicoLifecycle = $historicoLifecycle ?? [];
+$historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLifecycle));
+?>
+
 <div class="page-header d-flex justify-content-between align-items-center">
     <h2><i class="bi bi-display me-2"></i><?= esc($title) ?></h2>
     <?php if (!($isEmbedded ?? false)): ?>
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 flex-wrap">
         <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('equipamentos')" title="Ajuda sobre Equipamentos">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
+        <?php if (can('equipamentos', 'encerrar')): ?>
+        <?php if (!$temOsAbertas): ?>
+        <span data-equipment-active-only data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>" class="<?= $isEncerrado ? 'd-none' : '' ?>">
+        <button
+            type="button"
+            class="btn btn-outline-warning<?= $isEncerrado ? ' d-none' : '' ?>"
+            data-equipment-encerrar-btn
+            data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>"
+            data-equipment-open-os-count="<?= $osAbertasCount ?>"
+            onclick="confirmarEncerramento('equipamentos', <?= (int) ($equipamento['id'] ?? 0) ?>, '<?= esc(csrf_token()) ?>', '<?= esc(csrf_hash()) ?>')"
+        ><i class="bi bi-archive me-1"></i>Encerrar</button>
+        </span>
+        <span data-equipment-closed-only data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>" class="<?= $isEncerrado ? '' : 'd-none' ?>">
+        <button
+            type="button"
+            class="btn btn-outline-success"
+            data-equipment-reativar-btn
+            data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>"
+            onclick="confirmarReativacao('equipamentos', <?= (int) ($equipamento['id'] ?? 0) ?>, '<?= esc(csrf_token()) ?>', '<?= esc(csrf_hash()) ?>')"
+        ><i class="bi bi-arrow-clockwise me-1"></i>Voltar a operacao</button>
+        </span>
+        <?php else: ?>
+        <button
+            type="button"
+            class="btn btn-outline-warning disabled"
+            disabled
+            aria-disabled="true"
+            title="Bloqueado: hÃ¡ <?= $osAbertasCount ?> OS em andamento"
+            data-equipment-encerrar-btn
+            data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>"
+            data-equipment-open-os-count="<?= $osAbertasCount ?>"
+        ><i class="bi bi-archive me-1"></i>Encerrar</button>
+        <?php endif; ?>
+        <?php endif; ?>
         <a href="<?= base_url('equipamentos/editar/' . $equipamento['id']) ?>" class="btn btn-glow"><i class="bi bi-pencil me-1"></i>Editar</a>
         <a href="<?= base_url('equipamentos') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('equipamentos') ?>"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
     </div>
@@ -15,7 +59,7 @@
 </div>
 
 <div class="row g-4">
-    <!-- Seção 1: Foto e Card Principal -->
+    <!-- SeÃ§Ã£o 1: Foto e Card Principal -->
     <div class="col-md-4">
         <div class="card glass-card h-100">
             <div class="card-body text-center">
@@ -25,7 +69,7 @@
                     $fotoPrincipal = !empty($principalArr) ? array_values($principalArr)[0] : (!empty($fotos) ? $fotos[0] : null);
                     $urlPrincipal = $fotoPrincipal['url'] ?? null;
                     ?>
-                    
+
                     <?php if ($urlPrincipal): ?>
                         <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= $urlPrincipal ?>" class="rounded bg-body-tertiary d-flex align-items-center justify-content-center overflow-hidden mx-auto border text-decoration-none" style="width: 200px; height: 200px; display: block; cursor: zoom-in;">
                             <img src="<?= $urlPrincipal ?>" alt="Foto Principal" style="max-width: 100%; max-height: 100%; object-fit: cover;">
@@ -40,9 +84,28 @@
                     <?php endif; ?>
                 </div>
 
-                <h4 class="mb-1 text-body"><?= esc($equipamento['marca_nome'] ?? 'Sem Marca') ?> <?= esc($equipamento['modelo_nome'] ?? 'Sem Modelo') ?></h4>
+                <h4 class="mb-1 text-body"><?= esc($equipamento['display_name'] ?? (($equipamento['marca_nome'] ?? 'Sem Marca') . ' ' . ($equipamento['modelo_nome'] ?? 'Sem Modelo'))) ?></h4>
                 <div class="text-body-secondary mb-3"><?= esc($equipamento['tipo_nome'] ?? '') ?></div>
-                
+                <div class="mb-3" data-equipment-lifecycle-badge data-equipment-lifecycle-context="detail" data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>" data-equipment-open-os-count="<?= $osAbertasCount ?>">
+                    <?php if ($isEncerrado): ?>
+                    <span class="badge text-bg-dark">Encerrado</span>
+                    <?php if ($motivoEncerramentoLabel !== ''): ?>
+                    <span class="text-muted ms-2"><?= esc($motivoEncerramentoLabel) ?></span>
+                    <?php endif; ?>
+                    <?php else: ?>
+                    <span class="badge text-bg-success">Ativo</span>
+                    <?php if ($temOsAbertas): ?>
+                    <span class="badge text-bg-warning text-dark ms-2">OS em andamento</span>
+                    <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+                <?php if ($temOsAbertas): ?>
+                <div class="alert alert-warning text-start py-2 px-3 mb-3">
+                    <strong>Encerramento bloqueado:</strong>
+                    este equipamento possui <?= $osAbertasCount ?> OS em andamento. Finalize ou cancele essas ordens antes de encerrar sua vida util.
+                </div>
+                <?php endif; ?>
+
                 <?php if (!empty($equipamento['cor'])): ?>
                 <div class="d-inline-flex align-items-center bg-body-tertiary px-3 py-1 rounded-pill border text-body">
                     <span class="d-inline-block rounded-circle me-2 border shadow-sm" style="width: 16px; height: 16px; background-color: <?= esc($equipamento['cor_hex'] ?? '#ccc') ?>;"></span>
@@ -54,7 +117,7 @@
                 <div class="mt-4 pt-3 border-top">
                     <h6 class="text-start mb-3 text-body">Galeria (<span id="galleryCount"><?= count($fotos) ?></span>)</h6>
                     <div class="d-flex flex-wrap gap-2 justify-content-center">
-                        <?php foreach($fotos as $foto): 
+                        <?php foreach($fotos as $foto):
                             $urlThumb = $foto['url'] ?? null;
                         ?>
                             <?php if ($urlThumb): ?>
@@ -72,20 +135,32 @@
 
     <div class="col-md-8">
         <div class="row g-4 h-100">
-            <!-- Seção 2: Informações do Equipamento e Seção 3: Proprietário -->
+            <!-- SeÃ§Ã£o 2: InformaÃ§Ãµes do Equipamento e SeÃ§Ã£o 3: ProprietÃ¡rio -->
             <div class="col-12">
                 <div class="card glass-card">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 border-end-md mb-4 mb-md-0">
                                 <h5 class="text-primary mb-3"><i class="bi bi-info-circle me-2"></i>Detalhes do Equipamento</h5>
-                                
+
                                 <table class="table table-sm table-borderless mb-0" style="--bs-table-bg: transparent;">
                                     <tbody>
                                         <tr>
-                                            <th class="ps-0 w-40 text-body-secondary fw-normal">Nº Série:</th>
+                                            <th class="ps-0 w-40 text-body-secondary fw-normal">NÂº SÃ©rie:</th>
                                             <td class="fw-medium text-body"><?= !empty($equipamento['numero_serie']) ? esc($equipamento['numero_serie']) : '<span class="text-body-secondary opacity-50">N/I</span>' ?></td>
                                         </tr>
+                                        <?php if (!empty($equipamento['desktop_modalidade_label'])): ?>
+                                        <tr>
+                                            <th class="ps-0 text-body-secondary fw-normal">Perfil:</th>
+                                            <td class="fw-medium text-body"><?= esc($equipamento['desktop_modalidade_label']) ?></td>
+                                        </tr>
+                                        <?php endif; ?>
+                                        <?php if (!empty($equipamento['technical_summary'])): ?>
+                                        <tr>
+                                            <th class="ps-0 text-body-secondary fw-normal">Resumo tÃƒÂ©cnico:</th>
+                                            <td class="fw-medium text-body"><?= esc($equipamento['technical_summary']) ?></td>
+                                        </tr>
+                                        <?php endif; ?>
                                         <tr>
                                             <th class="ps-0 text-body-secondary fw-normal">IMEI:</th>
                                             <td class="fw-medium text-body"><?= !empty($equipamento['imei']) ? esc($equipamento['imei']) : '<span class="text-body-secondary opacity-50">N/I</span>' ?></td>
@@ -100,32 +175,74 @@
                                         </tr>
                                     </tbody>
                                 </table>
+
+                                <div
+                                    class="alert alert-dark mt-3 mb-0<?= $isEncerrado ? '' : ' d-none' ?>"
+                                    data-equipment-closed-only
+                                    data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>"
+                                >
+                                    <div class="fw-semibold mb-1">Equipamento encerrado</div>
+                                    <div class="small mb-1">
+                                        Motivo:
+                                        <span data-equipment-field="motivo_label" data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>">
+                                            <?= esc($motivoEncerramentoLabel !== '' ? $motivoEncerramentoLabel : 'Nao informado') ?>
+                                        </span>
+                                    </div>
+                                    <div class="small mb-1">
+                                        Encerrado em
+                                        <span data-equipment-field="encerrado_em_label" data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>">
+                                            <?= esc((string) ($equipamento['encerrado_em_label'] ?? '')) ?>
+                                        </span>
+                                    </div>
+                                    <div
+                                        class="small<?= $observacaoEncerramento !== '' ? '' : ' d-none' ?>"
+                                        data-equipment-field-wrap="observacao"
+                                        data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>"
+                                    >
+                                        Observacao:
+                                        <span data-equipment-field="observacao" data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>">
+                                            <?= esc($observacaoEncerramento) ?>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            
+
                             <div class="col-md-6 ps-md-4">
-                                <h5 class="text-primary mb-3"><i class="bi bi-person-badge me-2"></i>Proprietário e Vínculos</h5>
+                                <h5 class="text-primary mb-3"><i class="bi bi-person-badge me-2"></i>ProprietÃ¡rio e VÃ­nculos</h5>
                                 <div class="d-flex align-items-center mb-3">
-                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" title="Proprietário Principal" style="width:40px; height:40px;">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" title="ProprietÃ¡rio Principal" style="width:40px; height:40px;">
                                         <i class="bi bi-star-fill fs-5"></i>
                                     </div>
                                     <div class="flex-grow-1">
                                         <h6 class="mb-0 fw-bold"><a href="<?= base_url('clientes/visualizar/' . $equipamento['cliente_id']) ?>" class="text-decoration-none text-body"><?= esc($equipamento['cliente_nome']) ?></a></h6>
-                                        <small class="text-muted">Proprietário Principal</small>
+                                        <small class="text-muted">ProprietÃ¡rio Principal</small>
                                     </div>
                                 </div>
                                 <hr class="border-secondary opacity-25">
-                                
+
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <h6 class="text-body fw-bold mb-0">Clientes Vinculados</h6>
-                                    <?php if(can('equipamentos', 'editar')): ?>
-                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#vincularClienteModal">
+                                    <?php if(can('equipamentos', 'editar') && !$isEncerrado): ?>
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-primary"
+                                            data-equipment-active-only
+                                            data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#vincularClienteModal"
+                                        >
                                             <i class="bi bi-link-45deg"></i> Vincular
                                         </button>
                                     <?php endif; ?>
+                                    <span
+                                        class="badge text-bg-dark<?= $isEncerrado ? '' : ' d-none' ?>"
+                                        data-equipment-closed-only
+                                        data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>"
+                                    >Historico encerrado</span>
                                 </div>
 
                                 <?php if(empty($vinculados)): ?>
-                                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i>Nenhum outro cliente está vinculado a utilizar este equipamento.</p>
+                                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i>Nenhum outro cliente estÃ¡ vinculado a utilizar este equipamento.</p>
                                 <?php else: ?>
                                     <ul class="list-group list-group-flush bg-transparent">
                                         <?php foreach($vinculados as $vinc): ?>
@@ -134,59 +251,287 @@
                                                     <i class="bi bi-person me-2 text-body-secondary"></i>
                                                     <a href="<?= base_url('clientes/visualizar/' . $vinc['id']) ?>" class="text-decoration-none text-body"><?= esc($vinc['nome_razao']) ?></a>
                                                 </div>
-                                                <?php if(can('equipamentos', 'editar')): ?>
+                                                <?php if(can('equipamentos', 'editar') && !$isEncerrado): ?>
                                                     <a href="<?= base_url('equipamentos/desvincular-cliente/' . $equipamento['id'] . '/' . $vinc['id']) ?>" class="btn btn-sm btn-link text-danger p-0 js-desvincular-cliente" title="Desvincular Cliente"><i class="bi bi-x-circle"></i></a>
                                                 <?php endif; ?>
                                             </li>
                                         <?php endforeach; ?>
                                     </ul>
                                 <?php endif; ?>
-                                
+
                             </div>
                         </div>
+
+                        <?php
+                        $hasTechnicalSection = !empty($equipamento['gabinete_tipo'])
+                            || !empty($equipamento['placa_mae'])
+                            || !empty($equipamento['chipset'])
+                            || !empty($equipamento['processador'])
+                            || !empty($equipamento['memoria_ram'])
+                            || !empty($equipamento['armazenamento'])
+                            || !empty($equipamento['placa_video'])
+                            || !empty($equipamento['fonte_alimentacao'])
+                            || !empty($equipamento['gabinete_observacao'])
+                            || !empty($equipamento['configuracao_status_label'])
+                            || !empty($equipamento['configuracao_detectada_em']);
+                        ?>
+
+                        <?php if($hasTechnicalSection): ?>
+                        <div class="mt-4 pt-4 border-top">
+                            <h6 class="text-primary mb-3"><i class="bi bi-motherboard me-2"></i>Configuracao tecnica</h6>
+                            <div class="row g-3 small">
+                                <?php if(!empty($equipamento['gabinete_tipo'])): ?>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Gabinete</div>
+                                    <div class="fw-semibold"><?= esc($equipamento['gabinete_tipo']) ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if(!empty($equipamento['placa_mae'])): ?>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Placa-mae</div>
+                                    <div class="fw-semibold"><?= esc($equipamento['placa_mae']) ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if(!empty($equipamento['chipset'])): ?>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Chipset</div>
+                                    <div class="fw-semibold"><?= esc($equipamento['chipset']) ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if(!empty($equipamento['processador'])): ?>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Processador</div>
+                                    <div class="fw-semibold"><?= esc($equipamento['processador']) ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if(!empty($equipamento['memoria_ram'])): ?>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Memoria RAM</div>
+                                    <div class="fw-semibold"><?= esc($equipamento['memoria_ram']) ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if(!empty($equipamento['armazenamento'])): ?>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Armazenamento</div>
+                                    <div class="fw-semibold"><?= esc($equipamento['armazenamento']) ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if(!empty($equipamento['placa_video'])): ?>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Placa de video</div>
+                                    <div class="fw-semibold"><?= esc($equipamento['placa_video']) ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if(!empty($equipamento['fonte_alimentacao'])): ?>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Fonte</div>
+                                    <div class="fw-semibold"><?= esc($equipamento['fonte_alimentacao']) ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if(!empty($equipamento['gabinete_observacao'])): ?>
+                                <div class="col-12">
+                                    <div class="text-muted mb-1">Observacao do gabinete</div>
+                                    <div class="fw-semibold"><?= esc($equipamento['gabinete_observacao']) ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if(!empty($equipamento['configuracao_status_label'])): ?>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Status da configuracao</div>
+                                    <div class="fw-semibold"><?= esc($equipamento['configuracao_status_label']) ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if(!empty($equipamento['configuracao_detectada_em'])): ?>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Ultima deteccao</div>
+                                    <div class="fw-semibold"><?= esc(date('d/m/Y H:i', strtotime($equipamento['configuracao_detectada_em']))) ?></div>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
+                        <?php if(!empty($agentMonitor)): ?>
+                        <div class="mt-4 pt-4 border-top">
+                            <h6 class="text-primary mb-3"><i class="bi bi-activity me-2"></i>Agente de deteccao</h6>
+                            <div class="row g-3 small">
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Ultimo check-in</div>
+                                    <div class="fw-semibold"><?= !empty($agentMonitor['ultimo_checkin_em']) ? esc(date('d/m/Y H:i', strtotime($agentMonitor['ultimo_checkin_em']))) : 'Nao informado' ?></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Instalacao</div>
+                                    <div class="fw-semibold"><?= esc($agentMonitor['installation_id'] ?? '-') ?></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Device type</div>
+                                    <div class="fw-semibold"><?= esc($agentMonitor['device_type'] ?? '-') ?></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Chassis</div>
+                                    <div class="fw-semibold"><?= esc($agentMonitor['chassis_type'] ?? '-') ?></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">CPU</div>
+                                    <div class="fw-semibold"><?= esc($agentMonitor['cpu'] ?? '-') ?></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">RAM</div>
+                                    <div class="fw-semibold"><?= esc($agentMonitor['ram_gb'] ?? '-') ?><?= !empty($agentMonitor['ram_gb']) ? ' GB' : '' ?></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">GPU</div>
+                                    <div class="fw-semibold"><?= esc($agentMonitor['gpu'] ?? '-') ?></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-muted mb-1">Armazenamento</div>
+                                    <div class="fw-semibold"><?= esc($agentMonitor['storage_summary'] ?? '-') ?></div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php elseif (equipamento_is_desktop_tipo($equipamento['tipo_nome'] ?? '') || equipamento_is_notebook_tipo($equipamento['tipo_nome'] ?? '')): ?>
+                        <div class="mt-4 pt-4 border-top">
+                            <h6 class="text-primary mb-3"><i class="bi bi-terminal me-2"></i>Instalar agente de deteccao</h6>
+                            <?php $osProvisionamento = trim((string) ($ordens[0]['numero_os'] ?? '')); ?>
+                            <?php
+                                $collectorZipRelative = 'assets/agents/JovemTechBenchCollector-win-x64.zip';
+                                $collectorZipUrl = base_url($collectorZipRelative);
+                                $collectorZipPath = FCPATH . str_replace('/', DIRECTORY_SEPARATOR, $collectorZipRelative);
+                                $collectorZipAvailable = is_file($collectorZipPath);
+                                $collectorCommand = '"JovemTechBenchCollector.exe" --erp-base-url \'' . base_url('/') . '\' --installation-id \'EQ-' . ($equipamento['id'] ?? '') . '\' --warranty-os-number \'' . $osProvisionamento . '\' --erp-login-email \'usuario@empresa.com\'';
+                                $powershellFallbackCommand = 'powershell -ExecutionPolicy Bypass -Command "iwr \'' . base_url('assets/agents/jovemtec-monitor-agent.ps1') . '\' -OutFile $env:TEMP\\jovemtec-monitor-agent.ps1; & $env:TEMP\\jovemtec-monitor-agent.ps1 -ErpBaseUrl \'' . base_url('/') . '\' -InstallationId \'EQ-' . ($equipamento['id'] ?? '') . '\' -WarrantyOsNumber \'' . $osProvisionamento . '\' -ErpLoginEmail \'usuario@empresa.com\'"';
+                            ?>
+                            <?php if ($osProvisionamento !== ''): ?>
+                            <p class="small text-muted mb-3">Quando o equipamento ligar na bancada, use o coletor portatil para complementar automaticamente memoria, chipset, processador, placa-mae, GPU e armazenamento. Ele roda sem instalacao e envia uma coleta unica por padrao.</p>
+
+                            <div class="card border-0 bg-body-tertiary mb-3">
+                                <div class="card-body p-3">
+                                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                                        <div>
+                                            <div class="fw-semibold text-body mb-1">Coletor de Bancada</div>
+                                            <div class="small text-muted d-flex flex-column gap-1">
+                                                <span>OS sugerida: <span class="fw-semibold text-body"><?= esc($osProvisionamento) ?></span></span>
+                                                <span>InstallationId sugerido: <span class="fw-semibold text-body">EQ-<?= esc($equipamento['id']) ?></span></span>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <?php if ($collectorZipAvailable): ?>
+                                            <a href="<?= esc($collectorZipUrl) ?>" class="btn btn-sm btn-success">
+                                                <i class="bi bi-download me-1"></i>Baixar coletor (.zip)
+                                            </a>
+                                            <?php endif; ?>
+                                            <a href="<?= esc(base_url('assets/agents/jovemtec-monitor-agent.ps1')) ?>" class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-file-earmark-code me-1"></i>PowerShell fallback
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="small text-muted mt-3 mb-2">Fluxo recomendado: baixe o pacote, extraia, abra `JovemTechBenchCollector.exe`, confirme ERP/e-mail/OS e deixe o envio concluir. Se quiser automacao por linha de comando, use o exemplo abaixo.</div>
+                                    <div class="bg-dark-subtle border rounded p-3 small overflow-auto">
+                                        <code><?= esc($collectorCommand) ?></code>
+                                    </div>
+                                    <div class="small text-muted mt-3 mb-2">Fallback tecnico em PowerShell:</div>
+                                    <div class="bg-body border rounded p-3 small overflow-auto">
+                                        <code><?= esc($powershellFallbackCommand) ?></code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <?php if (!$collectorZipAvailable): ?>
+                            <div class="alert alert-warning border-0 small mb-0">
+                                O pacote `.zip` do coletor ainda nao foi publicado neste ambiente. Enquanto isso, o script PowerShell continua disponivel como fallback.
+                            </div>
+                            <?php endif; ?>
+                            <?php else: ?>
+                            <div class="alert alert-info border-0 mb-0">
+                                Vincule primeiro este equipamento a uma OS para provisionar o agente com seguranca na bancada.
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php endif; ?>
 
                         <?php if(!empty($equipamento['estado_fisico']) || !empty($equipamento['acessorios']) || !empty($equipamento['observacoes'])): ?>
                         <div class="mt-4 pt-4 border-top">
                             <?php if(!empty($equipamento['estado_fisico'])): ?>
                             <div class="mb-3">
-                                <h6 class="text-warning mb-1">Estado Físico</h6>
+                                <h6 class="text-warning mb-1">Estado FÃ­sico</h6>
                                 <p class="text-body-secondary small mb-0"><?= nl2br(esc($equipamento['estado_fisico'])) ?></p>
                             </div>
                             <?php endif; ?>
-                            
+
                             <?php if(!empty($equipamento['acessorios'])): ?>
                             <div class="mb-3">
-                                <h6 class="text-warning mb-1">Acessórios Informados</h6>
+                                <h6 class="text-warning mb-1">AcessÃ³rios Informados</h6>
                                 <p class="text-body-secondary small mb-0"><?= nl2br(esc($equipamento['acessorios'])) ?></p>
                             </div>
                             <?php endif; ?>
 
                             <?php if(!empty($equipamento['observacoes'])): ?>
                             <div class="mb-0">
-                                <h6 class="text-warning mb-1">Observações Adicionais</h6>
+                                <h6 class="text-warning mb-1">ObservaÃ§Ãµes Adicionais</h6>
                                 <p class="text-body-secondary small mb-0"><?= nl2br(esc($equipamento['observacoes'])) ?></p>
                             </div>
                             <?php endif; ?>
                         </div>
                         <?php endif; ?>
-                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 pt-3">
+        <div class="card glass-card">
+            <div class="card-header border-bottom pb-3">
+                <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                    <h5 class="mb-0 text-primary"><i class="bi bi-clock-history me-2"></i>Historico do ciclo de vida</h5>
+                    <span
+                        class="badge text-bg-dark"
+                        data-equipment-lifecycle-history-count
+                        data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>"
+                    ><?= (int) $historicoLifecycleCount ?></span>
                 </div>
             </div>
-            
-            <!-- Seção 4: Ordens de Serviço -->
+            <div
+                class="card-body"
+                data-equipment-lifecycle-history-container
+                data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>"
+            >
+                <?= view('equipamentos/partials/lifecycle_history', [
+                    'historicoLifecycle' => $historicoLifecycle,
+                    'historicoLifecycleCount' => $historicoLifecycleCount,
+                ]) ?>
+            </div>
+        </div>
+    </div>
+
+            <!-- SeÃ§Ã£o 4: Ordens de ServiÃ§o -->
             <div class="col-12 pt-3">
                 <div class="card glass-card">
                     <div class="card-header border-bottom pb-3">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0 text-primary"><i class="bi bi-clipboard-data me-2"></i>Ordens de Serviço Vinculadas</h5>
-                            <a href="<?= base_url('os/nova?equipamento=' . $equipamento['id']) ?>" class="btn btn-sm btn-glow"><i class="bi bi-plus me-1"></i>Nova OS</a>
+                            <h5 class="mb-0 text-primary"><i class="bi bi-clipboard-data me-2"></i>Ordens de ServiÃ§o Vinculadas</h5>
+                            <?php if (!$isEncerrado): ?>
+                            <a
+                                href="<?= base_url('os/nova?equipamento=' . $equipamento['id']) ?>"
+                                class="btn btn-sm btn-glow"
+                                data-equipment-active-only
+                                data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>"
+                            ><i class="bi bi-plus me-1"></i>Nova OS</a>
+                            <?php endif; ?>
+                            <span
+                                class="badge text-bg-dark<?= $isEncerrado ? '' : ' d-none' ?>"
+                                data-equipment-closed-only
+                                data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>"
+                            >Novas OS bloqueadas</span>
                         </div>
                     </div>
                     <div class="card-body p-0">
+                        <div class="px-3 pt-3">
+                            <p class="small text-body-secondary mb-0">
+                                O historico completo de OS vinculadas permanece visivel mesmo quando o equipamento estiver encerrado.
+                            </p>
+                        </div>
                         <?php if(empty($ordens)): ?>
                             <div class="text-center p-5 text-body-secondary">
                                 <i class="bi bi-inbox fs-1 mb-2"></i>
-                                <p class="mb-0">Nenhuma Ordem de Serviço cadastrada para este equipamento.</p>
+                                <p class="mb-0">Nenhuma Ordem de ServiÃ§o cadastrada para este equipamento.</p>
                             </div>
                         <?php else: ?>
                             <div class="table-responsive">
@@ -196,8 +541,8 @@
                                             <th>OS</th>
                                             <th>Status</th>
                                             <th>Abertura</th>
-                                            <th>Síntese do Problema</th>
-                                            <th class="text-end">Ação</th>
+                                            <th>SÃ­ntese do Problema</th>
+                                            <th class="text-end">AÃ§Ã£o</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -255,7 +600,7 @@
                 <?= csrf_field() ?>
                 <input type="hidden" name="equipamento_id" value="<?= $equipamento['id'] ?>">
                 <div class="modal-body">
-                    <p class="text-muted small mb-3">Selecione um cliente para autorizar o uso deste equipamento. Ele passará a aparecer na lista de equipamentos do cliente ao abrir novas Ordens de Serviço.</p>
+                    <p class="text-muted small mb-3">Selecione um cliente para autorizar o uso deste equipamento. Ele passarÃ¡ a aparecer na lista de equipamentos do cliente ao abrir novas Ordens de ServiÃ§o.</p>
                     <div class="mb-3">
                         <label for="cliente_id" class="form-label text-body">Selecione o Cliente</label>
                         <select class="form-select" id="cliente_id" name="cliente_id" required>
@@ -295,7 +640,7 @@
                 modalImg.src = ''; // Clear image out of memory
             });
         }
-        
+
         // Ativar select2 caso esteja dispon vel globalmente
         if(typeof jQuery !== 'undefined' && $.fn.select2) {
             $('#cliente_id').select2({

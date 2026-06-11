@@ -22,6 +22,13 @@ O modulo de `Orcamentos` centraliza o ciclo comercial da assistencia tecnica:
 - services: `OrcamentoService`, `OrcamentoPdfService`, `OrcamentoMailService`, `OrcamentoLifecycleService`, `OrcamentoConversaoService`
 - views principais: `app/Views/orcamentos/index.php`, `form.php`, `show.php`, `publico.php` e `oferta_publica.php`
 
+## Controle de acesso relacionado
+
+- `orcamentos` continua sendo o modulo RBAC do ciclo comercial de propostas, pacotes e envios;
+- `precificacao` passou a ser um modulo RBAC independente para configuracao e simulador de precificacao;
+- com isso, acessar `/orcamentos` nao implica mais acesso automatico a `/precificacao`, e vice-versa;
+- a migration `2026-06-05-160000_SyncEvolvedRbacModules` replica permissao inicial de `orcamentos` para `precificacao` apenas como compatibilidade de transicao.
+
 ## Reaprovacao no proprio orcamento
 
 ### Regra operacional atual
@@ -33,7 +40,7 @@ O comportamento oficial agora e:
 - a edicao continua no mesmo `orcamentos.id`;
 - o historico das mudancas fica no proprio orcamento em `orcamento_status_historico`;
 - ao alterar um orcamento aprovado e preparar uma nova rodada de autorizacao, o status passa para `reenviar_orcamento`;
-- quando o cliente aprova novamente, a label do status passa a refletir a rodada atual, como `2ª aprovacao`, `3ª aprovacao` e assim por diante;
+- quando o cliente aprova novamente, a label do status passa a refletir a rodada atual, como `2Âª aprovacao`, `3Âª aprovacao` e assim por diante;
 - a versao interna (`orcamentos.versao`) sobe apenas quando o registro sai de um estado aprovado para uma nova rodada de aprovacao.
 
 ### Status envolvidos
@@ -157,11 +164,13 @@ Impacto tecnico:
 
 - o topo da tela ganhou um card de visao geral com status, total e metricas rapidas;
 - o bloco financeiro deixou de disputar espaco com os dados operacionais e passou para aba propria;
-- os fluxos de PDF, WhatsApp e e-mail passaram a ter aba propria em `Envio do orcamento`, enquanto `Orcamento` preserva itens, historico de status e rastreabilidade;
+- os fluxos de PDF, WhatsApp e e-mail passaram a ter aba propria em `Envio do orcamento`, que agora tambem concentra `Link publico e referencia comercial`;
+- a aba `Envio do orcamento` passou a exibir um resumo persistente do ultimo envio comercial gravado em `orcamento_envios`, separando tambem o ultimo status por `WhatsApp` e por `E-mail`;
+- `Financeiro do orcamento` ficou reservado ao resumo de subtotal, desconto, acrescimo e total final;
 - `App\Controllers\Orcamentos::show()` passou a enviar `equipamentoView` consolidado para a view, reunindo tipo, marca, modelo, cor e foto principal do equipamento;
 - a navegacao entre abas voltou a seguir o padrao `nav-tabs ds-tabs-scroll` do design system, mantendo linha unica e compatibilidade com `<= 430px`, `<= 390px`, `<= 360px` e `<= 320px`;
 - na view `Visualizar Orcamento`, a barra de rolagem horizontal do componente foi ocultada localmente, preservando a interacao sem expor trilho visual fora do padrao da tela;
-- os rotulos das abas passaram a usar variantes reduzidas por breakpoint, permitindo que todas permaneçam visiveis dentro da largura disponivel sem quebrar linha.
+- os rotulos das abas passaram a usar variantes reduzidas por breakpoint, permitindo que todas permaneÃ§am visiveis dentro da largura disponivel sem quebrar linha.
 
 ### Organizacao do formulario em abas nas releases 2.16.31 e 2.16.32
 
@@ -182,6 +191,20 @@ Impacto tecnico:
 - o fluxo de rascunho automatico, selecao de cliente, vinculo com OS, deteccao de pacote e recalculo de itens segue intacto;
 - o card `orcSecaoFinanceiro` passou a compartilhar o mesmo `tab-pane` de `orcSecaoItens`, reduzindo troca de contexto durante a montagem do orcamento;
 - a navegacao entre abas tambem usa `nav-pills` com scroll horizontal responsivo para telas compactas.
+
+### Cadastro rapido de peca e servico na release 2.20.5
+
+O formulario `app/Views/orcamentos/form.php` ganhou um fluxo reativo de cadastro rapido dentro da propria linha do item.
+
+Comportamento tecnico:
+
+- quando `item_tipo[]` estiver em `peca` ou `servico`, a area da descricao exibe um botao `Cadastrar`;
+- o botao abre o modal `#modalCatalogoRapidoOrc`, sem redirecionar o operador para `Estoque` ou `Servicos`;
+- o modal envia `POST /estoque/salvar_ajax` ou `POST /servicos/salvar_ajax`, conforme o tipo da linha;
+- os endpoints retornam o item no mesmo formato do `GET /orcamentos/item/catalogo`;
+- apos sucesso, o frontend injeta a opcao no Select2 da linha atual e aplica descricao, referencia, valor e metadados de precificacao sem reload;
+- em `peca`, o retorno ja carrega o bloco `precificacao`, preservando o piso minimo de `peca instalada`;
+- em `servico`, o retorno reaproveita a mesma estrutura de quote usada pelo catalogo assÃ­ncrono.
 
 ## Dados do Cliente no formulario
 
@@ -215,6 +238,17 @@ Regra tecnica atual:
 - valor preenchido continua exigindo celular WhatsApp com DDD;
 - o backend valida somente quando houver numero informado;
 - o frontend mantem mascara e mensagem de erro apenas para numero parcial ou invalido.
+
+## Vinculo de OS aberta no formulario
+
+O formulario tambem possui um lookup operacional para OS abertas do cliente no bloco `Dados do equipamento`.
+
+Comportamento atual:
+
+- a consulta usa a rota `GET /orcamentos/os-abertas/cliente`;
+- a busca retorna apenas OS ainda ativas para o cliente selecionado;
+- o resumo exibido combina numero, status e descricao do equipamento;
+- quando marca ou modelo nao estiverem preenchidos no equipamento da OS, o sistema usa os demais dados disponiveis e evita erro de execucao.
 
 ## Estado inicial de edicao
 

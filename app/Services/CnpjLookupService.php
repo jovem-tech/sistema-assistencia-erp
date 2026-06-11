@@ -47,6 +47,11 @@ class CnpjLookupService
             $result = $this->queryProvider($provider, $cnpjDigits);
 
             if (($result['success'] ?? false) === true) {
+                $result = $this->enrichWithAdditionalProviderData(
+                    $result,
+                    (string) ($provider['name'] ?? '')
+                );
+
                 if ($cache) {
                     $cache->save($cacheKey, $result, self::CACHE_TTL_SECONDS);
                 }
@@ -208,6 +213,7 @@ class CnpjLookupService
             'bairro' => trim((string) ($payload['bairro'] ?? '')),
             'cidade' => trim((string) ($payload['municipio'] ?? '')),
             'uf' => strtoupper(trim((string) ($payload['uf'] ?? ''))),
+            'ie_rg' => trim((string) ($payload['inscricao_estadual'] ?? '')),
             'situacao_cadastral' => trim((string) ($payload['descricao_situacao_cadastral'] ?? '')),
         ];
     }
@@ -247,8 +253,73 @@ class CnpjLookupService
             'bairro' => trim((string) ($estabelecimento['bairro'] ?? '')),
             'cidade' => trim((string) (($estabelecimento['cidade']['nome'] ?? '') ?: '')),
             'uf' => strtoupper(trim((string) (($estabelecimento['estado']['sigla'] ?? '') ?: ''))),
+            'ie_rg' => $this->resolveStateRegistration(
+                is_array($estabelecimento['inscricoes_estaduais'] ?? null) ? $estabelecimento['inscricoes_estaduais'] : [],
+                strtoupper(trim((string) (($estabelecimento['estado']['sigla'] ?? '') ?: '')))
+            ),
             'situacao_cadastral' => trim((string) ($estabelecimento['situacao_cadastral'] ?? '')),
         ];
+    }
+
+    private function enrichWithAdditionalProviderData(array $result, string $primaryProviderName): array
+    {
+        $cnpjDigits = (string) ($result['data']['cnpj'] ?? '');
+        $baseData = isset($result['data']) && is_array($result['data'])
+            ? $result['data']
+            : [];
+
+        if ($cnpjDigits === '' || $this->hasCompleteCoreData($baseData)) {
+            return $result;
+        }
+
+        foreach ($this->providers as $provider) {
+            $providerName = (string) ($provider['name'] ?? '');
+            if ($providerName === '' || $providerName === $primaryProviderName) {
+                continue;
+            }
+
+            $fallback = $this->queryProvider($provider, $cnpjDigits);
+            if (($fallback['success'] ?? false) !== true || !isset($fallback['data']) || !is_array($fallback['data'])) {
+                continue;
+            }
+
+            $baseData = $this->mergeLookupData($baseData, $fallback['data']);
+
+            if ($this->hasCompleteCoreData($baseData)) {
+                break;
+            }
+        }
+
+        $result['data'] = $baseData;
+
+        return $result;
+    }
+
+    private function mergeLookupData(array $baseData, array $fallbackData): array
+    {
+        foreach ($fallbackData as $key => $value) {
+            if ($this->isLookupValueEmpty($baseData[$key] ?? null) && !$this->isLookupValueEmpty($value)) {
+                $baseData[$key] = $value;
+            }
+        }
+
+        return $baseData;
+    }
+
+    private function hasCompleteCoreData(array $data): bool
+    {
+        foreach (['razao_social', 'nome_fantasia', 'email', 'telefone1', 'cep', 'endereco', 'numero', 'bairro', 'cidade', 'uf', 'ie_rg'] as $field) {
+            if ($this->isLookupValueEmpty($data[$field] ?? null)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function isLookupValueEmpty(mixed $value): bool
+    {
+        return trim((string) $value) === '';
     }
 
     private function normalizeDigits(string $value): string
@@ -274,5 +345,47 @@ class CnpjLookupService
     private function joinPhone(string $ddd, string $number): string
     {
         return $this->normalizeDigits($ddd . $number);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $inscricoesEstaduais
+     */
+    private function resolveStateRegistration(array $inscricoesEstaduais, string $preferredUf = ''): string
+    {
+        $fallback = '';
+
+        foreach ($inscricoesEstaduais as $inscricao) {
+            if (!is_array($inscricao)) {
+                continue;
+            }
+
+            $ie = trim((string) ($inscricao['inscricao_estadual'] ?? ''));
+            if ($ie === '') {
+                continue;
+            }
+
+            $sigla = strtoupper(trim((string) (($inscricao['estado']['sigla'] ?? '') ?: '')));
+            $isActive = filter_var($inscricao['ativo'] ?? false, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+            if ($preferredUf !== '' && $sigla === $preferredUf && $isActive === true) {
+                return $ie;
+            }
+
+            if ($fallback === '' && $preferredUf !== '' && $sigla === $preferredUf) {
+                $fallback = $ie;
+                continue;
+            }
+
+            if ($fallback === '' && $isActive === true) {
+                $fallback = $ie;
+                continue;
+            }
+
+            if ($fallback === '') {
+                $fallback = $ie;
+            }
+        }
+
+        return $fallback;
     }
 }

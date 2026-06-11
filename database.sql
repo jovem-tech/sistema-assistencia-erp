@@ -1,16 +1,16 @@
 -- =====================================================
--- SISTEMA DE ASSISTÊNCIA TÉCNICA - Database Schema
+-- SISTEMA DE ASSISTÃŠNCIA TÃ‰CNICA - Database Schema
 -- Banco: assistencia_tecnica
 -- Collation: utf8mb4_unicode_ci
 -- =====================================================
 
-CREATE DATABASE IF NOT EXISTS assistencia_tecnica 
-    CHARACTER SET utf8mb4 
+CREATE DATABASE IF NOT EXISTS assistencia_tecnica
+    CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
 USE assistencia_tecnica;
 
--- 1. TABELA DE USUÁRIOS
+-- 1. TABELA DE USUÃRIOS
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(100) NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS equipamentos (
     FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 4. TABELA DE PEÇAS (antes da OS para FK)
+-- 4. TABELA DE PEÃ‡AS (antes da OS para FK)
 CREATE TABLE IF NOT EXISTS pecas (
     id INT PRIMARY KEY AUTO_INCREMENT,
     codigo VARCHAR(50) UNIQUE,
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS pecas (
     INDEX idx_categoria (categoria)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 5. TABELA DE ORDENS DE SERVIÇO (OS)
+-- 5. TABELA DE ORDENS DE SERVIÃ‡O (OS)
 CREATE TABLE IF NOT EXISTS os (
     id INT PRIMARY KEY AUTO_INCREMENT,
     numero_os VARCHAR(20) UNIQUE NOT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS os (
     equipamento_id INT NOT NULL,
     tecnico_id INT NULL,
     status ENUM(
-        'aguardando_analise', 
+        'aguardando_analise',
         'aguardando_orcamento',
         'aguardando_aprovacao',
         'aprovado',
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS os_itens (
     FOREIGN KEY (peca_id) REFERENCES pecas(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 7. MOVIMENTAÇÃO DE ESTOQUE
+-- 7. MOVIMENTAÃ‡ÃƒO DE ESTOQUE
 CREATE TABLE IF NOT EXISTS movimentacoes (
     id INT PRIMARY KEY AUTO_INCREMENT,
     peca_id INT NOT NULL,
@@ -183,21 +183,47 @@ CREATE TABLE IF NOT EXISTS movimentacoes (
 CREATE TABLE IF NOT EXISTS financeiro (
     id INT PRIMARY KEY AUTO_INCREMENT,
     os_id INT NULL,
+    fornecedor_id INT NULL,
     tipo ENUM('receber', 'pagar') NOT NULL,
     categoria VARCHAR(50) NOT NULL,
     descricao VARCHAR(255) NOT NULL,
     valor DECIMAL(10,2) NOT NULL,
     forma_pagamento ENUM('dinheiro', 'cartao_credito', 'cartao_debito', 'pix', 'boleto', 'transferencia') NULL,
-    status ENUM('pendente', 'pago', 'cancelado') DEFAULT 'pendente',
+    status ENUM('pendente', 'parcial', 'pago', 'cancelado') DEFAULT 'pendente',
     data_vencimento DATE NOT NULL,
     data_pagamento DATE,
+    data_competencia DATE NULL,
+    origem_tipo VARCHAR(40) NULL,
+    origem_id INT NULL,
+    grupo_dre VARCHAR(60) NULL,
+    subgrupo_dre VARCHAR(80) NULL,
+    impacta_dre TINYINT(1) NOT NULL DEFAULT 1,
+    impacta_fluxo_caixa TINYINT(1) NOT NULL DEFAULT 1,
+    dre_fixo_mensal TINYINT(1) NOT NULL DEFAULT 0,
     observacoes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_tipo (tipo),
     INDEX idx_status (status),
     INDEX idx_vencimento (data_vencimento),
+    INDEX idx_financeiro_fornecedor_id (fornecedor_id),
     FOREIGN KEY (os_id) REFERENCES os(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS financeiro_movimentos (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    financeiro_id INT NOT NULL,
+    tipo_movimento ENUM('entrada', 'saida', 'estorno', 'transferencia') NOT NULL DEFAULT 'entrada',
+    data_movimento DATE NOT NULL,
+    valor_movimento DECIMAL(12,2) NOT NULL DEFAULT 0,
+    forma_pagamento VARCHAR(40) NULL,
+    documento_ref VARCHAR(100) NULL,
+    observacoes TEXT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL,
+    INDEX idx_financeiro_id (financeiro_id),
+    INDEX idx_data_movimento (data_movimento),
+    FOREIGN KEY (financeiro_id) REFERENCES financeiro(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 9. FOTOS DOS EQUIPAMENTOS
@@ -225,7 +251,7 @@ CREATE TABLE IF NOT EXISTS logs (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 11. CONFIGURAÇÕES DO SISTEMA
+-- 11. CONFIGURAÃ‡Ã•ES DO SISTEMA
 CREATE TABLE IF NOT EXISTS configuracoes (
     id INT PRIMARY KEY AUTO_INCREMENT,
     chave VARCHAR(100) UNIQUE NOT NULL,
@@ -239,13 +265,13 @@ CREATE TABLE IF NOT EXISTS configuracoes (
 -- DADOS INICIAIS
 -- =====================================================
 
--- Usuário admin padrão (senha: admin123)
+-- UsuÃ¡rio admin padrÃ£o (senha: admin123)
 INSERT INTO usuarios (nome, email, senha, perfil, ativo) VALUES
 ('Administrador', 'admin@sistema.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 1);
 
--- Configurações padrão
+-- ConfiguraÃ§Ãµes padrÃ£o
 INSERT INTO configuracoes (chave, valor, tipo) VALUES
-('empresa_nome', 'Minha Assistência Técnica', 'texto'),
+('empresa_nome', 'Minha AssistÃªncia TÃ©cnica', 'texto'),
 ('empresa_cnpj', '', 'texto'),
 ('empresa_telefone', '', 'texto'),
 ('empresa_email', '', 'texto'),

@@ -4,7 +4,7 @@
 <div class="page-header">
     <div class="d-flex align-items-center gap-2">
         <h2><i class="bi bi-ui-checks-grid me-2"></i>Checklist de Entrada</h2>
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('checklists')">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
     </div>
@@ -42,7 +42,7 @@
                         <input type="text" name="nome" class="form-control" required maxlength="160" value="<?= esc((string) ($selectedModelo['nome'] ?? 'Checklist de Entrada')) ?>">
                     </div>
                     <div class="col-12">
-                        <label class="form-label">Descrição</label>
+                        <label class="form-label">DescriÃ§Ã£o</label>
                         <textarea name="descricao" rows="2" class="form-control" placeholder="Ex: Conferencia visual inicial para equipamentos na recepcao."><?= esc((string) ($selectedModelo['descricao'] ?? '')) ?></textarea>
                     </div>
                     <div class="col-sm-4">
@@ -79,7 +79,7 @@
                                     <th>Tipo de equipamento</th>
                                     <th>Nome</th>
                                     <th class="text-center">Ativo</th>
-                                    <th class="text-end">Ações</th>
+                                    <th class="text-end">AÃ§Ãµes</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -95,7 +95,7 @@
                                         </td>
                                         <td class="text-center">
                                             <span class="badge <?= ((int) ($modelo['ativo'] ?? 0) === 1) ? 'bg-success' : 'bg-secondary' ?>">
-                                                <?= ((int) ($modelo['ativo'] ?? 0) === 1) ? 'Sim' : 'Não' ?>
+                                                <?= ((int) ($modelo['ativo'] ?? 0) === 1) ? 'Sim' : 'NÃ£o' ?>
                                             </span>
                                         </td>
                                         <td class="text-end">
@@ -130,7 +130,7 @@
                         <?= csrf_field() ?>
                         <input type="hidden" name="checklist_modelo_id" value="<?= esc((string) $selectedModeloId) ?>">
                         <div class="col-12 col-md-7">
-                            <label class="form-label">Descrição do item *</label>
+                            <label class="form-label">DescriÃ§Ã£o do item *</label>
                             <input type="text" name="descricao" class="form-control" maxlength="255" required placeholder="Ex: Tela sem trinca ou fissura">
                         </div>
                         <div class="col-6 col-md-2">
@@ -156,9 +156,9 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 80px;">Ordem</th>
-                                        <th>Descrição</th>
+                                        <th>DescriÃ§Ã£o</th>
                                         <th class="text-center" style="width: 110px;">Ativo</th>
-                                        <th class="text-end" style="width: 120px;">Ações</th>
+                                        <th class="text-end" style="width: 120px;">AÃ§Ãµes</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -168,7 +168,7 @@
                                             <td><?= esc((string) ($item['descricao'] ?? '-')) ?></td>
                                             <td class="text-center">
                                                 <span class="badge <?= ((int) ($item['ativo'] ?? 0) === 1) ? 'bg-success' : 'bg-secondary' ?>">
-                                                    <?= ((int) ($item['ativo'] ?? 0) === 1) ? 'Sim' : 'Não' ?>
+                                                    <?= ((int) ($item['ativo'] ?? 0) === 1) ? 'Sim' : 'NÃ£o' ?>
                                                 </span>
                                             </td>
                                             <td class="text-end">
@@ -203,7 +203,7 @@ document.querySelectorAll('.js-remove-checklist-item').forEach((form) => {
         const result = await Swal.fire({
             icon: 'warning',
             title: 'Remover item?',
-            text: 'Esta ação remove o item do checklist de entrada.',
+            text: 'Esta aÃ§Ã£o remove o item do checklist de entrada.',
             showCancelButton: true,
             confirmButtonText: 'Remover',
             cancelButtonText: 'Cancelar',

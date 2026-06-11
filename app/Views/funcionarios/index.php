@@ -4,14 +4,14 @@
 <div class="row mb-4">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
-            <h1 class="h3 mb-0">Funcionários</h1>
+            <h1 class="h3 mb-0">FuncionÃ¡rios</h1>
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('funcionarios')" title="Ajuda sobre Funcionários">
+                <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('funcionarios')" title="Ajuda sobre FuncionÃ¡rios">
                     <i class="bi bi-question-circle me-1"></i>Ajuda
                 </button>
             <?php if (can('funcionarios', 'criar')): ?>
             <a href="<?= base_url('funcionarios/novo') ?>" class="btn btn-primary btn-glow">
-                <i class="bi bi-person-plus-fill me-2"></i>Novo Funcionário
+                <i class="bi bi-person-plus-fill me-2"></i>Novo FuncionÃ¡rio
             </a>
             <?php endif; ?>
             </div>
@@ -31,7 +31,7 @@
                         <th>Cargo</th>
                         <th>Telefone / Email</th>
                         <th>Status</th>
-                        <th class="text-end">Ações</th>
+                        <th class="text-end">AÃ§Ãµes</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,8 +69,10 @@
                                     </a>
                                     <?php endif; ?>
                                     <?php if (can('funcionarios', 'excluir')): ?>
-                                    <button type="button" class="btn btn-outline-danger btn-delete" 
-                                            data-url="<?= base_url('funcionarios/excluir/' . $func['id']) ?>" title="Excluir">
+                                    <button type="button" class="btn btn-outline-danger btn-delete"
+                                            data-url="<?= base_url('funcionarios/excluir/' . $func['id']) ?>"
+                                            data-nome="<?= esc($func['nome'] ?? 'Funcionario') ?>"
+                                            title="Excluir">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                     <?php endif; ?>

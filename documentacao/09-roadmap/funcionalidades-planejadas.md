@@ -1,6 +1,6 @@
 # Roadmap - Funcionalidades Planejadas
 
-Atualizado em 21/05/2026.
+Atualizado em 06/06/2026.
 
 ## Concluido (fundacao pre-CRM + CRM operacional inicial)
 - fluxo de OS por macrofases com transicoes validas
@@ -10,6 +10,28 @@ Atualizado em 21/05/2026.
 - geracao/versionamento de PDFs da OS
 - log operacional de mensageria
 - gateway local WhatsApp hardenizado para producao
+- financeiro gerencial baseline:
+  - `DRE` por competencia
+  - `fluxo de caixa realizado`
+  - `fluxo de caixa projetado`
+  - classificacao automatica no `financeiro`
+  - `despesa fixa mensal na DRE`
+  - catalogos configuraveis de `categorias financeiras`, `grupos DRE` e `subgrupos DRE`
+  - leitura consistente por categoria no `fluxo de caixa` e nos `relatorios operacionais`
+  - `baixa parcial`
+  - `multiplos movimentos por titulo`
+  - vinculo de `fornecedor` nas contas `A pagar`
+- baixa tecnica profissional da OS:
+  - modal `Baixa da OS` na listagem
+  - conclusao com `pagamento pendente`
+  - encerramento automatico apos quitacao total
+  - follow-up opcional de retorno pos-servico
+  - regua automatica de cobranca em `1`, `3` e `5` dias
+- recebimento em cartao com leitura liquida:
+  - submenu `Cartoes e taxas`
+  - cadastro de `operadoras`, `bandeiras`, `taxas` e `parcelas`
+  - simulador de venda liquida por maquininha
+  - despesa automatica da `taxa de cartao`
 - camada desacoplada de mensageria (`MensageriaService` + providers)
 - base CRM integrada ao ERP:
   - timeline
@@ -28,18 +50,13 @@ Atualizado em 21/05/2026.
   - inbound com midia (imagem/PDF) persistido na thread
   - badges de operacao (SLA, prioridade, bot, aguardando humano)
   - motor de regras ERP dinamico para automacoes de mensagem/follow-up/evento
-  - busca global inteligente (navbar): OS, Clientes, Equipamentos, WhatsApp, Módulos, Serviços e Peças
+  - busca global inteligente (navbar): OS, Clientes, Equipamentos, WhatsApp, MÃ³dulos, ServiÃ§os e PeÃ§as
 
 ## Em andamento
 - unificacao de consulta entre `mensagens_whatsapp` e analiticos de atendimento
 - refinamento de templates por tipo de cliente/etapa
 - evolucao do painel de contexto da conversa para multi-OS
 - automacao por horario/SLA em camadas (regra + fila)
-- estudo e especificacao oficial do modulo financeiro gerencial:
-  - `DRE` por competencia
-  - `fluxo de caixa realizado` por movimento
-  - `fluxo de caixa projetado` por vencimento
-  - documento base: `09-roadmap/estudo-dre-fluxo-de-caixa.md`
 - extensao mobile/PWA paralela do ERP:
   - API interna v1 em CodeIgniter 4
   - auth mobile por token
@@ -55,6 +72,9 @@ Atualizado em 21/05/2026.
 - dashboard mobile para tecnicos e atendentes
 - modulo mobile de CRM (clientes e follow-ups)
 - modulo mobile de financeiro e agenda
+- evolucao do financeiro gerencial:
+  - contas financeiras/bancos
+  - conciliacao bancaria
 
 ## Backlog tecnico
 - provider oficial Meta para massa/campanhas

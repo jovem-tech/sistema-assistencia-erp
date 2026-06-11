@@ -8,6 +8,7 @@ use App\Models\MonitorAgentSnapshotModel;
 use App\Models\OsModel;
 use App\Models\UsuarioModel;
 use App\Services\AgentMonitor\AgentMonitorSchemaService;
+use App\Services\EquipamentoProfileService;
 use App\Services\Mobile\ApiTokenService;
 use Throwable;
 
@@ -16,12 +17,14 @@ class AgentsController extends BaseApiController
     private MonitorAgentModel $agentModel;
     private MonitorAgentSnapshotModel $snapshotModel;
     private MobileApiTokenModel $tokenModel;
+    private EquipamentoProfileService $equipamentoProfileService;
 
     public function __construct()
     {
         $this->agentModel = new MonitorAgentModel();
         $this->snapshotModel = new MonitorAgentSnapshotModel();
         $this->tokenModel = new MobileApiTokenModel();
+        $this->equipamentoProfileService = new EquipamentoProfileService();
     }
 
     public function bootstrapFromWarranty()
@@ -124,9 +127,14 @@ class AgentsController extends BaseApiController
                 'serial_number' => $this->limitText((string) $this->payloadValue($payload, ['serialNumber']), 120),
                 'manufacturer' => $this->limitText((string) $this->payloadValue($payload, ['manufacturer']), 160),
                 'model' => $this->limitText((string) $this->payloadValue($payload, ['model']), 160),
+                'device_type' => $this->limitText((string) $this->payloadValue($payload, ['deviceType']), 40),
+                'chassis_type' => $this->limitText((string) $this->payloadValue($payload, ['chassisType']), 80),
                 'motherboard' => $this->limitText((string) $this->payloadValue($payload, ['motherboard']), 180),
+                'chipset' => $this->limitText((string) $this->payloadValue($payload, ['chipset']), 120),
                 'bios_version' => $this->limitText((string) $this->payloadValue($payload, ['biosVersion']), 120),
                 'cpu' => $this->limitText((string) $this->payloadValue($payload, ['cpu']), 255),
+                'gpu' => $this->limitText((string) $this->payloadValue($payload, ['gpu']), 255),
+                'storage_summary' => $this->limitText((string) $this->payloadValue($payload, ['storageSummary']), 255),
                 'ram_gb' => $this->normalizeDecimal($this->payloadValue($payload, ['ramGb'])),
                 'windows_caption' => $this->limitText((string) $this->payloadValue($payload, ['windowsCaption']), 255),
                 'windows_version' => $this->limitText((string) $this->payloadValue($payload, ['windowsVersion']), 80),
@@ -219,9 +227,14 @@ class AgentsController extends BaseApiController
                 'serial_number' => $this->limitText((string) $this->payloadValue($payload, ['serialNumber']), 120),
                 'manufacturer' => $this->limitText((string) $this->payloadValue($payload, ['manufacturer']), 160),
                 'model' => $this->limitText((string) $this->payloadValue($payload, ['model']), 160),
+                'device_type' => $this->limitText((string) $this->payloadValue($payload, ['deviceType']), 40),
+                'chassis_type' => $this->limitText((string) $this->payloadValue($payload, ['chassisType']), 80),
                 'motherboard' => $this->limitText((string) $this->payloadValue($payload, ['motherboard']), 180),
+                'chipset' => $this->limitText((string) $this->payloadValue($payload, ['chipset']), 120),
                 'bios_version' => $this->limitText((string) $this->payloadValue($payload, ['biosVersion']), 120),
                 'cpu' => $this->limitText((string) $this->payloadValue($payload, ['cpu']), 255),
+                'gpu' => $this->limitText((string) $this->payloadValue($payload, ['gpu']), 255),
+                'storage_summary' => $this->limitText((string) $this->payloadValue($payload, ['storageSummary']), 255),
                 'ram_gb' => $this->normalizeDecimal($this->payloadValue($payload, ['ramGb'])),
                 'windows_caption' => $this->limitText((string) $this->payloadValue($payload, ['windowsCaption']), 255),
                 'windows_version' => $this->limitText((string) $this->payloadValue($payload, ['windowsVersion']), 80),
@@ -229,6 +242,12 @@ class AgentsController extends BaseApiController
                 'ultimo_checkin_em' => $receivedAt,
                 'ultimo_snapshot_em' => $collectedAt ?? $receivedAt,
             ]);
+
+            $this->equipamentoProfileService->syncEquipmentFromAgent(
+                (int) ($agent['equipamento_id'] ?? 0),
+                $payload,
+                $collectedAt ?? $receivedAt
+            );
 
             $snapshotPayload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             if ($snapshotPayload === false) {
@@ -374,13 +393,7 @@ class AgentsController extends BaseApiController
 
     private function buildEquipmentSummary(array $order): string
     {
-        $parts = array_values(array_filter([
-            trim((string) ($order['equip_tipo'] ?? '')),
-            trim((string) ($order['equip_marca'] ?? '')),
-            trim((string) ($order['equip_modelo'] ?? '')),
-        ]));
-
-        return implode(' - ', $parts);
+        return equipamento_rotulo_exibicao($order);
     }
 
     private function buildTokenName(string $installationId, string $numeroOs): string

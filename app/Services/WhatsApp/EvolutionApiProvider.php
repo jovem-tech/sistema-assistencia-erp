@@ -204,7 +204,11 @@ class EvolutionApiProvider implements WhatsAppProviderInterface
     private function normalizePhone(string $phone): string
     {
         $digits = preg_replace('/\D+/', '', $phone) ?? '';
-        return $digits;
+        if ($digits === '') {
+            return $phone;
+        }
+
+        return str_starts_with($digits, '55') ? $digits : ('55' . $digits);
     }
 
     private function normalizeContactIdentifier(string $phone): string
@@ -305,15 +309,76 @@ class EvolutionApiProvider implements WhatsAppProviderInterface
      */
     private function extractErrorMessage(array $response, int $statusCode): string
     {
-        $message = trim((string) (
-            $response['message'] ?? $response['error'] ?? $response['response']['message'] ?? ''
-        ));
+        $genericMessage = '';
+        $candidates = [
+            $response['message'] ?? null,
+            $response['response']['message'] ?? null,
+            $response['response']['error'] ?? null,
+            $response['error'] ?? null,
+        ];
 
-        if ($message !== '') {
+        foreach ($candidates as $candidate) {
+            $message = $this->extractErrorText($candidate);
+            if ($message === '') {
+                continue;
+            }
+
+            if ($this->isGenericBadRequestMessage($message)) {
+                $genericMessage = $message;
+                continue;
+            }
+
             return $message;
         }
 
+        if ($genericMessage !== '') {
+            return 'Evolution API rejeitou a mensagem (HTTP ' . $statusCode . '). Verifique se o telefone possui DDI, se a instancia esta conectada e se o arquivo e aceito.';
+        }
+
         return 'Falha na Evolution API (HTTP ' . $statusCode . ').';
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function extractErrorText($value): string
+    {
+        if (is_string($value) || is_numeric($value)) {
+            return trim((string) $value);
+        }
+
+        if (!is_array($value)) {
+            return '';
+        }
+
+        foreach (['message', 'error', 'detail', 'details', 'reason'] as $key) {
+            if (!array_key_exists($key, $value)) {
+                continue;
+            }
+
+            $message = $this->extractErrorText($value[$key]);
+            if ($message !== '') {
+                return $message;
+            }
+        }
+
+        foreach ($value as $item) {
+            $message = $this->extractErrorText($item);
+            if ($message !== '') {
+                return $message;
+            }
+        }
+
+        return '';
+    }
+
+    private function isGenericBadRequestMessage(string $message): bool
+    {
+        $normalizedMessage = function_exists('mb_strtolower')
+            ? mb_strtolower(trim($message), 'UTF-8')
+            : strtolower(trim($message));
+
+        return in_array($normalizedMessage, ['bad request', 'badrequest'], true);
     }
 
     private function validationFailure(string $message): array

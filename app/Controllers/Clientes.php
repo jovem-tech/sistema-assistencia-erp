@@ -190,8 +190,9 @@ class Clientes extends BaseController
             'title'        => 'Detalhes do Cliente',
             'cliente'      => $cliente,
             'equipamentos' => $equipamentoModel->getByCliente($id),
-            'ordens'       => $osModel->select('os.*, equipamentos_marcas.nome as equip_marca, equipamentos_modelos.nome as equip_modelo')
+            'ordens'       => $osModel->select('os.*, equipamentos_tipos.nome as equip_tipo, equipamentos_marcas.nome as equip_marca, equipamentos_modelos.nome as equip_modelo, equipamentos.numero_serie as equip_serie, equipamentos.resumo_tecnico as equip_resumo_tecnico, equipamentos.desktop_modalidade as equip_desktop_modalidade')
                                      ->join('equipamentos', 'equipamentos.id = os.equipamento_id', 'left')
+                                     ->join('equipamentos_tipos', 'equipamentos_tipos.id = equipamentos.tipo_id', 'left')
                                      ->join('equipamentos_marcas', 'equipamentos_marcas.id = equipamentos.marca_id', 'left')
                                      ->join('equipamentos_modelos', 'equipamentos_modelos.id = equipamentos.modelo_id', 'left')
                                      ->where('os.cliente_id', $id)
@@ -261,7 +262,7 @@ class Clientes extends BaseController
 
         $dados = $this->normalizeClientePayload((array) $this->request->getPost());
         $id = $forcedId ?: (int) ($this->request->getPost('id') ?? 0);
-        
+
         try {
             if (!empty($id)) {
                 $this->model->update($id, $dados);
@@ -301,28 +302,28 @@ class Clientes extends BaseController
         // Define headres
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $filename . '";');
-        
+
         // Write to output stream
         $f = fopen('php://output', 'w');
         // utf-8 BOM to Excel correctly render accents
         fputs($f, "\xEF\xBB\xBF");
-        
+
         $fields = [
-            'tipo_pessoa', 'nome_razao', 'cpf_cnpj', 'rg_ie', 'email', 
-            'telefone1', 'telefone2', 'cep', 'endereco', 'numero', 
+            'tipo_pessoa', 'nome_razao', 'cpf_cnpj', 'rg_ie', 'email',
+            'telefone1', 'telefone2', 'cep', 'endereco', 'numero',
             'complemento', 'bairro', 'cidade', 'uf', 'observacoes'
         ];
         fputcsv($f, $fields, ';');
-        
+
         $sampleData = [
             ['fisica', 'Joao da Silva', '111.222.333-44', '12345678', 'joao@email.com', '(11) 99999-8888', '', '01001-000', 'Praca da Se', '1', '', 'Se', 'Sao Paulo', 'SP', 'Cliente de demonstracao importado'],
             ['juridica', 'Empresa Modelo Ltda', '11.222.333/0001-44', '123456789012', 'contato@empresa.com', '(11) 3333-4444', '', '01310-100', 'Avenida Paulista', '1000', 'Andar 1', 'Bela Vista', 'Sao Paulo', 'SP', 'Empresa de demonstracao importada']
         ];
-        
+
         foreach ($sampleData as $row) {
             fputcsv($f, $row, ';');
         }
-        
+
         fclose($f);
         exit;
     }
@@ -358,13 +359,13 @@ class Clientes extends BaseController
         if (!$headers) {
             return redirect()->to('/clientes')->with('error', 'O arquivo CSV esta vazio ou em formato incorreto.');
         }
-        
+
         $expectedHeaders = [
-            'tipo_pessoa', 'nome_razao', 'cpf_cnpj', 'rg_ie', 'email', 
-            'telefone1', 'telefone2', 'cep', 'endereco', 'numero', 
+            'tipo_pessoa', 'nome_razao', 'cpf_cnpj', 'rg_ie', 'email',
+            'telefone1', 'telefone2', 'cep', 'endereco', 'numero',
             'complemento', 'bairro', 'cidade', 'uf', 'observacoes'
         ];
-        
+
         // Remove quaisquer espacos extras dos cabecalhos importados
         $headers = array_map('trim', $headers);
 

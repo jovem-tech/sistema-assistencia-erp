@@ -1,6 +1,6 @@
 # Manual do Administrador - Configuracao do Sistema
 
-Atualizado em 31/03/2026 para a release `2.9.6`.
+Atualizado em 10/06/2026 para a release `2.23.29`.
 
 ## 1. Dados da empresa
 Caminho: `Configuracoes`
@@ -47,6 +47,7 @@ Regras:
 - `whatsapp_test_phone`
 - `whatsapp_webhook_token`
 - `sistema_versao` (opcional, sobrescreve a versao padrao exibida no rodape e na tela de login)
+- `mobile_pwa_url` (destino do redirecionamento protegido do app mobile/PWA)
 
 ### Menuia
 - `whatsapp_menuia_url`
@@ -79,6 +80,16 @@ Regras operacionais:
 - `whatsapp_webhook_method`
 - `whatsapp_webhook_headers`
 - `whatsapp_webhook_payload`
+
+### App Mobile/PWA
+
+O acesso protegido ao app mobile usa a rota `GET /atendimento-mobile`.
+
+Regras:
+- o operador precisa ter permissao `atendimento_whatsapp:visualizar`;
+- em navegacao normal, a rota exige um dispositivo com perfil mobile;
+- para validacao em desktop, use `?preview=1`;
+- se `mobile_pwa_url` estiver vazio, o sistema usa `/atendimento-mobile-app/login` como fallback.
 
 ## 3.1 Migracao legada via banco SQL
 
@@ -130,6 +141,8 @@ Referencia operacional:
 
 Os avisos e erros devem usar `Swal.fire`.
 
+Falhas esperadas de diagnostico do WhatsApp, como gateway inacessivel ou provider indisponivel, continuam aparecendo como SweetAlert2 para o operador, mas retornam JSON com HTTP `200` e `ok:false` para evitar ruido de console (`Failed to load resource 422`). HTTP `422` fica reservado para validacoes de formulario.
+
 ## 5. Modal "Gerenciar Gateway"
 
 Status esperados:
@@ -144,6 +157,7 @@ Controles:
 - polling de status
 - leitura de QR dinamic
 - reinicio de inicializacao (`/restart`)
+- abertura de SweetAlert2 sem manter foco em botoes internos do modal, evitando conflito de acessibilidade com `aria-hidden`
 
 Metadados:
 - status atual

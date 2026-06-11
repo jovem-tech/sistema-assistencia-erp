@@ -1,7 +1,110 @@
 # Tabelas Principais do Banco de Dados
 
-Base: `assistencia_tecnica`  
-Atualizado em 26/04/2026 (catalogo estrutural de equipamentos, pacotes de servicos, oferta dinamica de pacote em orcamentos e notificacao web em tempo real)
+Base: `assistencia_tecnica`
+Atualizado em 08/06/2026 (desktop montado com resumo tecnico, complemento por agente de bancada para desktop/notebook, deduplicacao por numero de serie/MAC/IMEI com vinculo multi-cliente no mesmo equipamento, encerramento da vida util de equipamentos com preservacao de historico, financeiro gerencial com catalogos configuraveis, DRE, fluxo de caixa, despesa fixa mensal na DRE, baixa parcial com multiplos movimentos, vinculo de fornecedor em despesas e observacoes livres do estado na execucao do checklist)
+
+## Atualizacoes de schema (08/06/2026) - Encerramento da vida util de equipamentos
+Migration: `2026-06-08-101500_AddLifecycleFieldsToEquipamentos`
+
+Novas colunas em `equipamentos`:
+- `status_operacional` (`VARCHAR(20)`, default `ativo`)
+- `motivo_encerramento` (`VARCHAR(60)`, nullable)
+- `observacao_encerramento` (`TEXT`, nullable)
+- `encerrado_em` (`DATETIME`, nullable)
+
+Novos indices:
+- `idx_equipamentos_status_operacional`
+- `idx_equipamentos_status_encerrado_em`
+
+Uso funcional:
+- o equipamento pode ser encerrado sem ser excluido do historico do cliente;
+- o motivo e a observacao ficam persistidos na propria ficha do equipamento;
+- fluxos operacionais de `OS` e `Orcamentos` passam a listar apenas equipamentos ativos por padrao;
+- um equipamento encerrado pode continuar aparecendo apenas quando uma `OS` historica ja estiver vinculada a ele, para preservar rastreabilidade de edicoes antigas;
+- o backend bloqueia o encerramento enquanto houver `OS` abertas/em andamento para o mesmo equipamento;
+- quando uma `OS` e finalizada como `descartado`, o equipamento vinculado e encerrado automaticamente e fica indisponivel para novas OS ate ser reativado;
+- a reativacao devolve o cadastro para `ativo` quando o bem for recuperado, recondicionado ou reparado;
+- o historico de encerramento e volta a operacao fica registrado em uma timeline propria do equipamento, separada dos logs tecnicos gerais;
+- o quadro de OS vinculadas continua armazenado na propria tabela `os`, sem qualquer exclusao ou filtragem causada pelo status operacional do equipamento;
+
+## Atualizacoes de schema (08/06/2026) - Historico do ciclo de vida do equipamento
+Migration: `2026-06-08-120000_CreateEquipamentoLifecycleHistoricoTable`
+
+Nova tabela:
+- `equipamentos_lifecycle_historico`
+  - `equipamento_id`
+  - `os_id` (nullable, usado quando a baixa da OS encerra o equipamento automaticamente)
+  - `evento`
+  - `motivo`
+  - `observacao`
+  - `status_anterior`
+  - `status_novo`
+  - `usuario_id` (nullable)
+  - `created_at`
+
+Indices e FKs:
+- indice composto em `equipamento_id` + `created_at`
+- indice em `evento`
+- FK `equipamento_id -> equipamentos.id`
+- FK `os_id -> os.id`
+- FK `usuario_id -> usuarios.id`
+
+Uso funcional:
+- cada encerramento manual gera um registro proprio na timeline do equipamento;
+- cada volta a operacao tambem gera um evento, preservando a sequencia historica completa;
+- o encerramento automatico por OS `descartado` registra a referencia da OS que disparou a mudanca;
+- a ficha detalhada do equipamento passa a exibir essa timeline sem depender apenas da tabela `logs`.
+- a migration de backfill reaproveita os eventos antigos ja existentes em `logs` para popular a timeline inicial dos equipamentos antigos;
+- registros de equipamentos removidos do cadastro sao ignorados no backfill para manter a integridade das chaves estrangeiras.
+
+## Atualizacoes de schema (06/06/2026) - Baixa da OS, cartoes e cobranca automatica
+Migration: `2026-06-06-120000_CreateOsEncerramentoFinanceiroCartoes`
+
+Novas colunas em `os`:
+- `status_final_pendente_pagamento` (`VARCHAR(60)`, nullable)
+- `baixa_tecnica_em` (`DATETIME`, nullable)
+- `baixa_tecnica_por` (`INT`, nullable)
+
+Novas tabelas:
+- `financeiro_cartao_operadoras`
+  - operadoras/configuracoes das maquininhas
+  - inclui `prazo_padrao_dias`, `ativo` e ordenacao operacional
+- `financeiro_cartao_bandeiras`
+  - bandeiras aceitas no simulador e na baixa
+- `financeiro_cartao_taxas`
+  - combinacao de `operadora`, `bandeira`, `modalidade`, `parcelas`, `taxa_percentual`, `taxa_fixa` e `prazo_recebimento_dias`
+- `financeiro_movimentos_cartao`
+  - detalhamento do recebimento em cartao por movimento financeiro
+  - guarda `valor_bruto`, `valor_taxa`, `valor_liquido`, `parcelas`, `modalidade` e `data_prevista_recebimento`
+- `os_cobranca_agendamentos`
+  - fila de cobranca automatica para OS concluidas com pagamento pendente
+  - guarda `prazo_dias`, `enviar_em`, `status`, `mensagem_enviada` e `retorno_payload`
+
+Seeds operacionais da migration:
+- operadoras padrao: `Mercado Pago`, `Stone`, `PagBank`, `Cielo`
+- bandeiras padrao: `Visa`, `Mastercard`, `Elo`, `Hipercard`, `American Express`
+- categoria financeira padrao: `Taxa de cartao`
+
+Uso funcional:
+- a baixa tecnica da OS pode terminar em `entregue_pagamento_pendente` sem perder o encerramento operacional;
+- o status final definitivo fica guardado em `os.status_final_pendente_pagamento` ate a quitacao total;
+- pagamentos em cartao passam a compor o faturamento liquido real da assistencia;
+- o `Fluxo de Caixa`, na aba `Movimentos`, consome `financeiro_movimentos_cartao.valor_taxa` para exibir a taxa da operadora junto da referencia do recebimento em cartao;
+- a cobranca automatica passa a agendar tentativas em `1`, `3` e `5` dias quando a OS fechar com saldo pendente.
+
+## Atualizacoes de schema (05/06/2026) - Identidade unica de equipamentos
+Migration: `2026-06-05-120000_AddEquipamentoIdentityIndexes`
+
+Novos indices:
+- `idx_equipamentos_numero_serie`
+- `idx_equipamentos_imei`
+- `ux_equipamento_clientes_relacao`
+
+Uso funcional:
+- o ERP passou a comparar `numero_serie`, `IMEI` e `MAC` salvo no campo de serie antes de criar ou atualizar equipamentos;
+- se o identificador ja pertencer ao mesmo cliente, o novo cadastro e bloqueado para reaproveitar o equipamento existente;
+- se o identificador ja pertencer a outro cliente, o sistema passa a usar `equipamento_clientes` para vincular o novo cliente ao mesmo bem fisico;
+- a migration remove pares repetidos antigos em `equipamento_clientes` antes de aplicar a unicidade operacional.
 
 ## Nucleo operacional
 - `clientes`
@@ -12,6 +115,8 @@ Atualizado em 26/04/2026 (catalogo estrutural de equipamentos, pacotes de servic
 - `equipamentos_marcas`
 - `equipamentos_modelos`
 - `equipamentos_catalogo_relacoes`
+- `monitor_agents`
+- `monitor_agent_snapshots`
 - `os`
 - `os_itens`
 - `os_fotos`
@@ -33,6 +138,146 @@ Atualizado em 26/04/2026 (catalogo estrutural de equipamentos, pacotes de servic
 Observacao sobre transicao de fluxo:
 - os dados legados de `estado_fisico_*` seguem preservados por compatibilidade historica;
 - o fluxo atual de OS usa `Checklist de Entrada` estruturado (execucoes/respostas/fotos) conforme tipo de equipamento.
+
+## Atualizacoes de schema (04/06/2026) - Desktop montado e inventario por agente
+Migration: `2026-06-04-090000_AddDesktopProfilesAndAgentInventoryToEquipamentos`
+
+Novas colunas em `equipamentos`:
+- `desktop_modalidade` (`VARCHAR(30)`, nullable)
+- `gabinete_tipo` (`VARCHAR(80)`, nullable)
+- `gabinete_identificacao_status` (`VARCHAR(40)`, nullable)
+- `gabinete_observacao` (`VARCHAR(255)`, nullable)
+- `placa_mae` (`VARCHAR(180)`, nullable)
+- `chipset` (`VARCHAR(120)`, nullable)
+- `processador` (`VARCHAR(180)`, nullable)
+- `memoria_ram` (`VARCHAR(120)`, nullable)
+- `armazenamento` (`VARCHAR(255)`, nullable)
+- `placa_video` (`VARCHAR(180)`, nullable)
+- `fonte_alimentacao` (`VARCHAR(180)`, nullable)
+- `resumo_tecnico` (`VARCHAR(255)`, nullable)
+- `configuracao_status` (`VARCHAR(40)`, nullable)
+- `configuracao_origem` (`VARCHAR(20)`, nullable)
+- `configuracao_detectada_em` (`DATETIME`, nullable)
+
+Novas colunas em `monitor_agents`:
+- `device_type` (`VARCHAR(40)`, nullable)
+- `chassis_type` (`VARCHAR(80)`, nullable)
+- `chipset` (`VARCHAR(120)`, nullable)
+- `gpu` (`VARCHAR(255)`, nullable)
+- `storage_summary` (`VARCHAR(255)`, nullable)
+
+Uso funcional:
+- `Desktop` passa a aceitar os modos `OEM` e `Montado`;
+- `Desktop montado` usa `resumo_tecnico` como identificacao principal nas telas, OS, PDF e comunicacoes;
+- `Notebook` e `Desktop` podem receber complemento tecnico automatico por agente;
+- o agente sincroniza principalmente `placa_mae`, `chipset`, `processador`, `memoria_ram`, `armazenamento` e `placa_video`;
+- `modelo` pode ser preenchido com o `chipset` durante a importacao local do agente, mantendo o `model` bruto apenas no snapshot tecnico;
+- `monitor_agent_snapshots` continua sendo o historico bruto de inventario recebido no check-in.
+
+## Atualizacoes de schema (01/06/2026) - Observacoes livres no checklist de entrada
+Migration: `2026-06-01-190000_AddObservacoesEstadoToChecklistExecucoes`
+
+Nova coluna em `checklist_execucoes`:
+- `observacoes_estado` (`TEXT`, nullable)
+
+Uso funcional:
+- guarda o texto livre de recepcao que complementa as pendencias do checklist na entrada;
+- passa a abastecer o bloco `Estado do aparelho` no PDF de abertura e no consolidado `A4`;
+- trabalha em conjunto com `checklist_respostas` para separar o que e pendencia estruturada do que e observacao manual da equipe.
+
+## Atualizacoes de schema (31/05/2026) - Financeiro gerencial
+Migration: `2026-05-31-120000_AddGerencialFieldsToFinanceiro`
+
+Novas colunas em `financeiro`:
+- `data_competencia` (`DATE`, nullable)
+- `origem_tipo` (`VARCHAR(40)`, nullable)
+- `origem_id` (`INT`, nullable)
+- `grupo_dre` (`VARCHAR(60)`, nullable)
+- `subgrupo_dre` (`VARCHAR(80)`, nullable)
+- `impacta_dre` (`TINYINT(1)`, default `1`)
+- `impacta_fluxo_caixa` (`TINYINT(1)`, default `1`)
+
+Backfill aplicado na migration:
+- receitas vinculadas a `OS` passam a nascer como `Receita Operacional`
+- compras emergenciais de pecas passam a ser classificadas como `Custo Direto (OS)`
+- receitas manuais passam a ir para `Outras Receitas`
+- despesas manuais passam a ir para `Despesas Operacionais`
+- `data_competencia` e preenchida preferindo `data_entrega` da OS, depois `data_vencimento` e por fim `data_pagamento`
+- `origem_tipo` passa a ser calculada automaticamente pelo backend conforme `tipo`, `os_id` e `categoria`
+- no formulario manual, a equipe informa `mes/ano`; o backend persiste `data_competencia` como `01/mm/aaaa`
+- apenas lancamentos automaticos com origem `os` preservam a `data cheia` original na competencia
+
+Uso funcional:
+- `data_competencia` alimenta a `DRE`
+- `data_pagamento` alimenta o `fluxo de caixa realizado`
+- `data_vencimento` segue alimentando o `fluxo de caixa projetado`
+- `origem_tipo` funciona como trilha operacional automatica do titulo
+
+## Atualizacoes de schema (01/06/2026) - Despesa fixa mensal na DRE
+Migration: `2026-06-01-090000_AddDreFixoMensalToFinanceiro`
+
+Nova coluna em `financeiro`:
+- `dre_fixo_mensal` (`TINYINT(1)`, default `0`)
+
+Uso funcional:
+- quando marcada em um lancamento `A pagar`, a despesa passa a entrar automaticamente na `DRE` de todos os meses seguintes a partir da `data_competencia`
+- a automacao vale para leitura gerencial da `DRE`, sem exigir novo cadastro manual do mesmo titulo a cada mes
+
+## Atualizacoes de schema (01/06/2026) - Catalogos financeiros configuraveis
+Migration: `2026-06-01-120000_CreateFinanceiroCatalogos`
+
+Novas tabelas:
+- `financeiro_dre_grupos`
+  - cadastro dos grupos principais da DRE
+  - exemplos: `Receita Operacional`, `Despesas Operacionais`, `Custo Direto (OS)`
+- `financeiro_dre_subgrupos`
+  - cadastro dos subgrupos ligados a cada grupo DRE
+  - exemplos: `Aluguel`, `Energia`, `Internet`, `Compra emergencial de pecas`
+- `financeiro_categorias`
+  - cadastro das categorias operacionais exibidas no dropdown do lancamento
+  - aceita defaults de `grupo DRE`, `subgrupo DRE`, impacto em `DRE`, impacto em `Caixa` e sugestao de `despesa fixa mensal`
+
+Uso funcional:
+- o formulario de lancamento financeiro passa a usar dropdowns em vez de campo livre para `Categoria`, `Grupo DRE` e `Subgrupo DRE`
+- as categorias podem sugerir automaticamente a classificacao gerencial do lancamento
+
+## Atualizacoes de schema (01/06/2026) - Baixa parcial e multiplos movimentos
+Migration: `2026-06-01-150000_CreateFinanceiroMovimentosTable`
+
+Mudancas em `financeiro`:
+- `status` passa a aceitar `parcial`
+
+Nova tabela:
+- `financeiro_movimentos`
+  - `id` (`INT`, PK)
+  - `financeiro_id` (`INT`, FK para `financeiro.id`)
+  - `tipo_movimento` (`ENUM`: `entrada`, `saida`, `estorno`, `transferencia`)
+  - `data_movimento` (`DATE`)
+  - `valor_movimento` (`DECIMAL(12,2)`)
+  - `forma_pagamento` (`VARCHAR(40)`, nullable)
+  - `documento_ref` (`VARCHAR(100)`, nullable)
+  - `observacoes` (`TEXT`, nullable)
+  - `created_at`, `updated_at`
+
+Backfill aplicado na migration:
+- titulos antigos com `status = pago` e sem movimento passam a receber um movimento inicial para manter compatibilidade do `fluxo de caixa realizado`
+
+Uso funcional:
+- cada baixa vira um registro em `financeiro_movimentos`
+- o titulo em `financeiro` continua sendo a visao mestre do compromisso financeiro
+- o `fluxo de caixa realizado` passa a ler `financeiro_movimentos`
+- o `fluxo projetado` passa a ler o `saldo em aberto` dos titulos `pendentes` e `parciais`
+
+## Atualizacoes de schema (01/06/2026) - Fornecedor nas contas a pagar
+Migration: `2026-06-01-163000_AddFornecedorToFinanceiro`
+
+Nova coluna em `financeiro`:
+- `fornecedor_id` (`INT`, nullable, FK para `fornecedores.id`)
+
+Uso funcional:
+- o formulario de `Novo lancamento` e `Editar lancamento` passa a exibir o dropdown `Fornecedor` apenas quando `Tipo = A pagar`
+- o vinculo usa o cadastro oficial do modulo `Fornecedores`
+- em `A receber`, o campo fica oculto e o sistema nao persiste fornecedor no titulo
 
 ## Atualizacoes de schema (08/04/2026)
 Migration: `2026-04-08-153500_AddOsItensPendingWorkflowAndCatalogFilters`
@@ -103,7 +348,7 @@ Regra de backfill:
 
 Uso operacional:
 - formularios de OS e Orcamento usam essa relacao para montar o filtro encadeado `Tipo -> Marca -> Modelo`;
-- quando a relacao ainda nao existir para um par novo, o sistema mantém fallback por marca (legado) e sincroniza a relacao ao salvar.
+- quando a relacao ainda nao existir para um par novo, o sistema mantÃ©m fallback por marca (legado) e sincroniza a relacao ao salvar.
 
 ## Atualizacoes de schema (09/04/2026) - Pacotes de Servicos
 Migration: `2026-04-09-101500_CreatePacotesServicosModule`
@@ -236,7 +481,7 @@ Objetivo dos compostos:
 - sustentar ordenacao por `data_abertura` com paginacao server-side
 - reduzir custo de filtros por `status`, `estado_fluxo`, `tecnico_id`, `cliente_id` e `equipamento_id` quando combinados com ordenacao cronologica
 - acelerar filtro por `tipo_servico` sem depender de scan amplo em `os_itens`
-- sustentar a busca global `q` por catálogos relacionados sem forcar joins amplos na query principal da listagem
+- sustentar a busca global `q` por catÃ¡logos relacionados sem forcar joins amplos na query principal da listagem
 - acelerar o fallback textual de `relato_cliente` sem depender de `LIKE '%...%'` como caminho principal
 
 ## Fluxo de OS (pre-CRM)
@@ -378,7 +623,11 @@ Observacoes:
 - `whatsapp_templates`
 - `whatsapp_inbound`
 
-## Extensao Mobile/PWA (v2.11.0)
+## Extensao Mobile/PWA (estado atual)
+
+Documentacao complementar:
+
+- `documentacao/12-app-mobile-pwa/README.md`
 
 Tabelas complementares (sem duplicar `clientes`, `os`, `conversas_whatsapp` e `mensagens_whatsapp`):
 
@@ -394,7 +643,7 @@ Tabelas complementares (sem duplicar `clientes`, `os`, `conversas_whatsapp` e `m
   - relaciona notificacao a alvos de dominio (`order`, `conversation`, `client`, `budget`);
   - no fluxo de orcamento publico, a mesma notificacao pode apontar simultaneamente para `budget` e `order`.
 - `mobile_event_outbox`
-  - fila de eventos para despacho assíncrono (`event_type`, `aggregate_type`, `status`, `tentativas`, `processado_em`).
+  - fila de eventos para despacho assÃ­ncrono (`event_type`, `aggregate_type`, `status`, `tentativas`, `processado_em`).
 
 Indices operacionais novos:
 

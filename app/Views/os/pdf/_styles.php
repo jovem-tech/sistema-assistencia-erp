@@ -14,4 +14,11 @@
     .right { text-align: right; }
     .footer { margin-top: 22px; font-size: 10px; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 8px; }
     .badge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 10px; background: #eef2ff; color: #4338ca; }
+    .photo-annex-group { margin-bottom: 14px; }
+    .photo-annex-group-title { font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 6px; }
+    .photo-annex-table { width: 100%; border-collapse: collapse; }
+    .photo-annex-table td { padding: 6px; vertical-align: top; }
+    .photo-annex-card { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; background: #ffffff; }
+    .photo-annex-card img { display: block; width: 100%; height: 180px; object-fit: cover; }
+    .photo-annex-label { padding: 8px; font-size: 10px; color: #4b5563; background: #f8fafc; border-top: 1px solid #e5e7eb; }
 </style>

@@ -26,18 +26,7 @@ class Admin extends BaseController
         $db = \Config\Database::connect();
 
         $stats = $osModel->getDashboardStats();
-        $statusEquipamentoEntregue = 'entregue_reparado';
-        if ($db->tableExists('os_status')) {
-            $statusEntregueRow = $db->table('os_status')
-                ->select('codigo')
-                ->where('nome', 'Equipamento Entregue')
-                ->where('ativo', 1)
-                ->get()
-                ->getRowArray();
-            if (!empty($statusEntregueRow['codigo'])) {
-                $statusEquipamentoEntregue = (string) $statusEntregueRow['codigo'];
-            }
-        }
+        $statusEquipamentoEntregue = $this->resolveStatusEquipamentoEntregue($db);
         $stats['equipamento_entregue'] = (int) $db->table('os')
             ->where('status', $statusEquipamentoEntregue)
             ->countAllResults();
@@ -68,6 +57,7 @@ class Admin extends BaseController
     {
         $osModel = new OsModel();
         $db = \Config\Database::connect();
+        $statusEquipamentoEntregue = $this->resolveStatusEquipamentoEntregue($db);
 
         $hasEstadoFluxo = $db->fieldExists('estado_fluxo', 'os');
         $hasStatusTable = $db->tableExists('os_status');
@@ -194,11 +184,32 @@ class Admin extends BaseController
             )->getResultArray();
         }
 
+        $rowsOsEntreguesReparadas = [];
+        if ($db->fieldExists('data_entrega', 'os')) {
+            $rowsOsEntreguesReparadas = $db->query(
+                "SELECT MONTH(data_entrega) AS mes, COUNT(*) AS total
+                 FROM os
+                 WHERE data_entrega >= ?
+                   AND data_entrega < ?
+                   AND status = ?
+                 GROUP BY MONTH(data_entrega)",
+                [$inicioAno, $inicioProximoAno, $statusEquipamentoEntregue]
+            )->getResultArray();
+        }
+
         $mapaOsAbertas = array_fill(1, 12, 0);
         foreach ($rowsOsAbertas as $row) {
             $mes = (int) ($row['mes'] ?? 0);
             if ($mes >= 1 && $mes <= 12) {
                 $mapaOsAbertas[$mes] = (int) ($row['total'] ?? 0);
+            }
+        }
+
+        $mapaOsEntreguesReparadas = array_fill(1, 12, 0);
+        foreach ($rowsOsEntreguesReparadas as $row) {
+            $mes = (int) ($row['mes'] ?? 0);
+            if ($mes >= 1 && $mes <= 12) {
+                $mapaOsEntreguesReparadas[$mes] = (int) ($row['total'] ?? 0);
             }
         }
 
@@ -209,6 +220,7 @@ class Admin extends BaseController
                 'mes' => $mes,
                 'label' => $labelsMes[$mes - 1],
                 'total' => $mapaOsAbertas[$mes],
+                'entregues_reparadas' => $mapaOsEntreguesReparadas[$mes],
             ];
         }
 
@@ -229,5 +241,26 @@ class Admin extends BaseController
                 'pendentes' => (float) ($resumoFinanceiro['pendentes'] ?? 0),
             ],
         ]);
+    }
+
+    private function resolveStatusEquipamentoEntregue($db): string
+    {
+        $statusEquipamentoEntregue = 'entregue_reparado';
+        if (! $db->tableExists('os_status')) {
+            return $statusEquipamentoEntregue;
+        }
+
+        $statusEntregueRow = $db->table('os_status')
+            ->select('codigo')
+            ->where('nome', 'Equipamento Entregue')
+            ->where('ativo', 1)
+            ->get()
+            ->getRowArray();
+
+        if (! empty($statusEntregueRow['codigo'])) {
+            $statusEquipamentoEntregue = (string) $statusEntregueRow['codigo'];
+        }
+
+        return $statusEquipamentoEntregue;
     }
 }

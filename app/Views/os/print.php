@@ -24,7 +24,13 @@ $fotoPerfilPrincipal = is_array($fotoPerfilPrincipal ?? null) ? $fotoPerfilPrinc
 $orcamento = is_array($orcamento ?? null) ? $orcamento : null;
 $checklistEntrada = is_array($checklistEntrada ?? null) ? $checklistEntrada : null;
 $checklistItems = array_values((array) ($checklistEntrada['itens'] ?? []));
-$showEquipmentPhotoSlot = !$isThermal && $includePhotos;
+$selectedPhotoGroupKeys = array_values(array_filter(array_map(
+    static fn ($item): string => strtolower(trim((string) $item)),
+    (array) ($printOptions['photo_groups'] ?? [])
+), static fn (string $item): bool => $item !== ''));
+$showAllPhotoGroups = $selectedPhotoGroupKeys === [];
+$includeProfilePhotos = $includePhotos && ($showAllPhotoGroups || in_array('perfil', $selectedPhotoGroupKeys, true));
+$showEquipmentPhotoSlot = !$isThermal && $includeProfilePhotos;
 $orcamentoItems = array_values((array) ($orcamentoResumo['items'] ?? []));
 $renderMode = trim((string) ($renderMode ?? 'preview'));
 $autoPrint = !empty($autoPrint);
@@ -123,7 +129,7 @@ $diagnosticoTecnico = trim((string) ($os['diagnostico_tecnico'] ?? ''));
 $solucaoAplicada = trim((string) ($os['solucao_aplicada'] ?? ''));
 $procedimentosTexto = $procedimentosExecutados !== [] ? implode("\n", $procedimentosExecutados) : 'Nenhum procedimento registrado.';
 
-$equipamentoResumo = trim((string) (($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? '')));
+$equipamentoResumo = equipamento_nome_exibicao($os);
 $equipamentoTipo = trim((string) ($os['equip_tipo'] ?? $equipamento['tipo_nome'] ?? ''));
 $equipamentoCor = trim((string) ($equipamento['cor'] ?? ''));
 $equipamentoImei = trim((string) ($equipamento['imei'] ?? ''));
@@ -151,6 +157,26 @@ $checklistStatusMeta = static function (string $status): array {
         default => ['label' => $status !== '' ? $status : 'Pendente', 'class' => 'warn', 'marker' => '!'],
     };
 };
+$checklistPendencias = array_values(array_filter(array_map(
+    static function (array $item): ?array {
+        $status = strtolower(trim((string) ($item['status'] ?? '')));
+        if ($status !== 'discrepancia') {
+            return null;
+        }
+
+        $descricao = trim((string) ($item['descricao'] ?? ''));
+        if ($descricao === '') {
+            return null;
+        }
+
+        return [
+            'descricao' => $descricao,
+            'observacao' => trim((string) ($item['observacao'] ?? '')),
+        ];
+    },
+    $checklistItems
+)));
+$observacoesEstadoChecklist = trim((string) ($checklistEntrada['observacoes_estado'] ?? ''));
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -1439,9 +1465,29 @@ $checklistStatusMeta = static function (string $status): array {
                                 </td>
                                 <td style="width:51%;">
                                     <div class="sub-title" style="margin-top:0;">Estado fisico do equipamento</div>
-                                    <?php if ($estadoFisico === []): ?>
+                                    <?php if ($estadoFisico === [] && $checklistPendencias === [] && $observacoesEstadoChecklist === ''): ?>
                                         <div class="text-content">Nenhum registro de estado fisico anexado.</div>
-                                    <?php else: ?>
+                                    <?php endif; ?>
+                                    <?php if ($checklistPendencias !== []): ?>
+                                        <div class="soft-card">
+                                            <strong>Pendencias do checklist de entrada</strong>
+                                            <?php foreach ($checklistPendencias as $pendenciaChecklist): ?>
+                                                <p style="margin-top:6px;">
+                                                    <?= esc((string) ($pendenciaChecklist['descricao'] ?? 'Pendencia')) ?>
+                                                    <?php if (!empty($pendenciaChecklist['observacao'])): ?>
+                                                        <br><span style="color:#64748b;">Obs.: <?= esc((string) $pendenciaChecklist['observacao']) ?></span>
+                                                    <?php endif; ?>
+                                                </p>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if ($observacoesEstadoChecklist !== ''): ?>
+                                        <div class="soft-card">
+                                            <strong>Observacoes do estado na entrada</strong>
+                                            <p><?= esc($observacoesEstadoChecklist) ?></p>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if ($estadoFisico !== []): ?>
                                         <?php foreach ($estadoFisico as $itemEstado): ?>
                                             <div class="soft-card">
                                                 <strong><?= esc((string) ($itemEstado['descricao_dano'] ?? 'Registro')) ?></strong>
@@ -1555,7 +1601,7 @@ $checklistStatusMeta = static function (string $status): array {
 
                     <div class="divider"></div>
 
-                    
+
                 </div>
             </section>
 

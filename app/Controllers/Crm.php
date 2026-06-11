@@ -18,12 +18,17 @@ use App\Services\CrmService;
 
 class Crm extends BaseController
 {
-    // Seção CRM e Central de Mensagens
+    public function __construct()
+    {
+        requirePermission('crm', 'visualizar');
+    }
+
+    // SeÃ§Ã£o CRM e Central de Mensagens
 
     public function clientes()
     {
         $this->syncInbound();
-        
+
         $db = \Config\Database::connect();
         if (!$db->tableExists('clientes')) {
              return redirect()->to('/dashboard')->with('error', 'Modulo CRM ainda nao foi migrado.');
@@ -31,7 +36,7 @@ class Crm extends BaseController
         $q = trim((string) $this->request->getGet('q'));
         $status = trim((string) $this->request->getGet('status'));
 
-        // Query para buscar clientes e a última interação
+        // Query para buscar clientes e a Ãºltima interaÃ§Ã£o
         $builder = $db->table('clientes c');
         $builder->select('c.id, c.nome_razao, c.telefone1, c.email, c.cpf_cnpj');
         $builder->select('(SELECT data_interacao FROM crm_interacoes WHERE cliente_id = c.id ORDER BY data_interacao DESC LIMIT 1) as ultima_interacao');
@@ -47,7 +52,7 @@ class Crm extends BaseController
 
         $clientesRaw = $builder->orderBy('c.nome_razao', 'ASC')->get()->getResultArray();
 
-        // Filtragem por Status (Calculado via PHP para ser mais flexível)
+        // Filtragem por Status (Calculado via PHP para ser mais flexÃ­vel)
         $clientes = [];
         $agora = time();
         foreach ($clientesRaw as $c) {
@@ -66,7 +71,7 @@ class Crm extends BaseController
         }
 
         $data = [
-            'title' => 'CRM - Gestão de Clientes',
+            'title' => 'CRM - GestÃ£o de Clientes',
             'clientes' => $clientes,
             'filtro_q' => $q,
             'filtro_status' => $status,
@@ -151,6 +156,8 @@ class Crm extends BaseController
 
     public function salvarInteracao()
     {
+        requirePermission('crm', 'criar');
+
         $clienteId = (int) ($this->request->getPost('cliente_id') ?? 0);
         $osId = (int) ($this->request->getPost('os_id') ?? 0);
         $tipo = trim((string) $this->request->getPost('tipo'));
@@ -206,6 +213,8 @@ class Crm extends BaseController
 
     public function salvarFollowup()
     {
+        requirePermission('crm', 'criar');
+
         $clienteId = (int) ($this->request->getPost('cliente_id') ?? 0);
         $titulo = trim((string) $this->request->getPost('titulo'));
         $dataPrevista = trim((string) $this->request->getPost('data_prevista'));
@@ -229,6 +238,8 @@ class Crm extends BaseController
 
     public function atualizarFollowupStatus(int $id)
     {
+        requirePermission('crm', 'editar');
+
         $status = trim((string) $this->request->getPost('status'));
         if (!in_array($status, ['pendente', 'concluido', 'cancelado'], true)) {
             return redirect()->back()->with('error', 'Status de follow-up invalido.');
@@ -924,7 +935,7 @@ class Crm extends BaseController
 
     public function salvarEngajamentoPeriodos()
     {
-        requirePermission('clientes', 'editar');
+        requirePermission('crm', 'editar');
 
         $ativoDiasInput = (int) ($this->request->getPost('engajamento_ativo_dias') ?? 0);
         $riscoDiasInput = (int) ($this->request->getPost('engajamento_risco_dias') ?? 0);
@@ -1024,6 +1035,8 @@ class Crm extends BaseController
 
     public function criarFollowupInativo()
     {
+        requirePermission('crm', 'criar');
+
         $clienteId = (int) ($this->request->getPost('cliente_id') ?? 0);
         $dias = (int) ($this->request->getPost('dias') ?? 180);
         if ($clienteId <= 0) {

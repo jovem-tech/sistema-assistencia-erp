@@ -153,7 +153,7 @@ class Orcamentos extends BaseController
             }
         }
         return view('orcamentos/index', [
-            'title' => 'Orçamentos',
+            'title' => 'OrÃ§amentos',
             'orcamentos' => $orcamentos,
             'statusLabels' => $this->orcamentoModel->statusLabels(),
             'tipoLabels' => $this->orcamentoModel->tipoLabels(),
@@ -170,7 +170,7 @@ class Orcamentos extends BaseController
         $prefill = $this->prefillFromRequest();
         $prefill['status'] = OrcamentoModel::STATUS_RASCUNHO;
         return view('orcamentos/form', $this->buildFormData([
-            'title' => 'Novo Orçamento',
+            'title' => 'Novo OrÃ§amento',
             'orcamento' => $prefill,
             'itens' => [],
             'isEdit' => false,
@@ -290,7 +290,7 @@ class Orcamentos extends BaseController
         $termNormalized = function_exists('mb_strtolower')
             ? mb_strtolower($term, 'UTF-8')
             : strtolower($term);
-        $rows = (new EquipamentoModel())->getByCliente($clienteId);
+        $rows = (new EquipamentoModel())->getByCliente($clienteId, true);
         $results = [];
         foreach ($rows as $row) {
             $item = $this->formatEquipamentoLookupResult($row);
@@ -595,7 +595,7 @@ class Orcamentos extends BaseController
         if (!$this->isPacoteOfertaModuleReady()) {
             return $this->response->setJSON([
                 'ok' => false,
-                'message' => 'Módulo de ofertas de pacote não inicializado.',
+                'message' => 'MÃ³dulo de ofertas de pacote nÃ£o inicializado.',
                 'oferta' => null,
             ]);
         }
@@ -633,7 +633,7 @@ class Orcamentos extends BaseController
         if (!$this->isPacoteOfertaModuleReady()) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'Módulo de ofertas de pacote não inicializado. Execute as migrações.',
+                'message' => 'MÃ³dulo de ofertas de pacote nÃ£o inicializado. Execute as migraÃ§Ãµes.',
             ]);
         }
         $pacoteId = (int) ($this->request->getPost('pacote_servico_id') ?? 0);
@@ -650,7 +650,7 @@ class Orcamentos extends BaseController
         if (!$pacote) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
-                'message' => 'Pacote de serviços não encontrado ou inativo.',
+                'message' => 'Pacote de serviÃ§os nÃ£o encontrado ou inativo.',
             ]);
         }
         $niveis = (new PacoteServicoNivelModel())
@@ -661,7 +661,7 @@ class Orcamentos extends BaseController
         if (empty($niveis)) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'Este pacote não possui níveis ativos para envio.',
+                'message' => 'Este pacote nÃ£o possui nÃ­veis ativos para envio.',
             ]);
         }
         $clienteId = (int) ($this->request->getPost('cliente_id') ?? 0);
@@ -732,7 +732,7 @@ class Orcamentos extends BaseController
             $this->orcamentoModel->db->transRollback();
             return $this->response->setStatusCode(500)->setJSON([
                 'ok' => false,
-                'message' => 'Não foi possível criar a oferta de pacote.',
+                'message' => 'NÃ£o foi possÃ­vel criar a oferta de pacote.',
             ]);
         }
         $dispatch = ['ok' => true];
@@ -799,7 +799,7 @@ class Orcamentos extends BaseController
         }
         $pacoteOferta = $pacoteOfertaResolution['oferta'] ?? null;
         if (empty($itens) && $pacoteOferta === null && !$isPacoteBased) {
-        return redirect()->back()->withInput()->with('error', 'Adicione pelo menos um item no orçamento.');
+        return redirect()->back()->withInput()->with('error', 'Adicione pelo menos um item no orÃ§amento.');
         }
         if ($isPacoteBased && $pacoteOferta === null) {
             $autoIntentError = $this->validatePacoteOfertaAutosendIntent($pacoteOfertaIntent, $payload);
@@ -831,7 +831,7 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $this->orcamentoModel->getInsertID();
         if ($orcamentoId <= 0) {
             $this->orcamentoModel->db->transRollback();
-            return redirect()->back()->withInput()->with('error', 'Não foi possível salvar o orçamento.');
+            return redirect()->back()->withInput()->with('error', 'NÃ£o foi possÃ­vel salvar o orÃ§amento.');
         }
         $numero = $this->orcamentoService->ensureNumero($this->orcamentoModel, $orcamentoId);
         if (!empty($itens)) {
@@ -866,7 +866,7 @@ class Orcamentos extends BaseController
             null,
             (string) $payload['status'],
             $usuarioId > 0 ? $usuarioId : null,
-            'Criação do orçamento',
+            'CriaÃ§Ã£o do orÃ§amento',
             'interno'
         );
         $this->orcamentoModel->db->transComplete();
@@ -877,8 +877,8 @@ class Orcamentos extends BaseController
             (int) ($payload['os_id'] ?? 0),
             (string) ($payload['status'] ?? OrcamentoModel::STATUS_RASCUNHO)
         );
-        LogModel::registrar('orcamento_criado', 'Orçamento ' . $numero . ' criado.');
-        $successMessage = 'Orçamento criado com sucesso.';
+        LogModel::registrar('orcamento_criado', 'OrÃ§amento ' . $numero . ' criado.');
+        $successMessage = 'OrÃ§amento criado com sucesso.';
         if (!empty($autoOfertaResult['warning'])) {
             $successMessage .= ' ' . (string) $autoOfertaResult['warning'];
         }
@@ -983,7 +983,7 @@ class Orcamentos extends BaseController
         $isEmbedded = $this->isEmbedRequest();
         $orcamento = $this->findOrcamento((int) $id);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento não encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'OrÃ§amento nÃ£o encontrado.');
         }
         $orcamento = $this->ensurePublicToken($orcamento);
         $itens = $this->itemModel->byOrcamento((int) $id);
@@ -1012,12 +1012,12 @@ class Orcamentos extends BaseController
         $statusAtual = (string) ($orcamento['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
         $statusOptions = $this->buildShowStatusOptions($statusAtual);
         return view('orcamentos/show', [
-            'title' => 'Visualizar Orçamento',
+            'title' => 'Visualizar OrÃ§amento',
             'orcamento' => $orcamento,
             'itens' => $itens,
             'historico' => $historico,
-            'histÃ³rico' => $historico,
             'histÃƒÂ³rico' => $historico,
+            'histÃƒÆ’Ã‚Â³rico' => $historico,
             'envios' => $envios,
             'aprovacoes' => $aprovacoes,
             'statusLabels' => $this->orcamentoModel->statusLabels(),
@@ -1039,7 +1039,7 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $id;
         $orcamento = $this->findOrcamento($orcamentoId);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento não encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'OrÃ§amento nÃ£o encontrado.');
         }
         $usuarioId = (int) (session()->get('user_id') ?? 0);
         $forceNew = (string) $this->request->getPost('force_new') === '1';
@@ -1050,11 +1050,11 @@ class Orcamentos extends BaseController
             $forceNew
         );
         if (empty($pdfResult['ok'])) {
-        $error = (string) ($pdfResult['message'] ?? 'Falha ao gerar PDF do orçamento.');
+        $error = (string) ($pdfResult['message'] ?? 'Falha ao gerar PDF do orÃ§amento.');
             return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', $error);
         }
         LogModel::registrar('orcamento_pdf_gerado', 'PDF gerado para o orcamento ID ' . $orcamentoId . '.');
-        return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('success', 'PDF do orçamento gerado com sucesso.');
+        return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('success', 'PDF do orÃ§amento gerado com sucesso.');
     }
     public function downloadPdf($id)
     {
@@ -1062,7 +1062,7 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $id;
         $orcamento = $this->findOrcamento($orcamentoId);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento não encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'OrÃ§amento nÃ£o encontrado.');
         }
         $usuarioId = (int) (session()->get('user_id') ?? 0);
         $pdfResult = $this->resolvePdfDocument(
@@ -1072,17 +1072,17 @@ class Orcamentos extends BaseController
             false
         );
         if (empty($pdfResult['ok'])) {
-        $error = (string) ($pdfResult['message'] ?? 'Falha ao preparar o PDF do orçamento.');
+        $error = (string) ($pdfResult['message'] ?? 'Falha ao preparar o PDF do orÃ§amento.');
             return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', $error);
         }
         $filePath = (string) ($pdfResult['path'] ?? '');
         $fileName = (string) ($pdfResult['nome_arquivo'] ?? ('orcamento_' . $orcamentoId . '.pdf'));
         if ($filePath === '' || !is_file($filePath)) {
-            return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', 'Arquivo PDF do orçamento não encontrado no servidor.');
+            return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', 'Arquivo PDF do orÃ§amento nÃ£o encontrado no servidor.');
         }
         $content = file_get_contents($filePath);
         if ($content === false) {
-            return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', 'Não foi possível carregar o arquivo PDF do orçamento.');
+            return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', 'NÃ£o foi possÃ­vel carregar o arquivo PDF do orÃ§amento.');
         }
         return $this->response
             ->setContentType('application/pdf')
@@ -1095,12 +1095,12 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $id;
         $orcamento = $this->findOrcamento($orcamentoId);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento não encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'OrÃ§amento nÃ£o encontrado.');
         }
         $statusAtual = (string) ($orcamento['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
         if (!$this->canDispatchByStatus($statusAtual)) {
             return redirect()->to($this->orcamentoShowUrl($orcamentoId))
-                ->with('error', 'Este orçamento esta bloqueado para envio no status atual.');
+                ->with('error', 'Este orÃ§amento esta bloqueado para envio no status atual.');
         }
         $orcamento = $this->ensurePublicToken($orcamento);
         $usuarioId = (int) (session()->get('user_id') ?? 0);
@@ -1114,7 +1114,7 @@ class Orcamentos extends BaseController
                 'whatsapp',
                 $telefone,
                 null,
-            'Telefone inválido para envio do orçamento.',
+            'Telefone invÃ¡lido para envio do orÃ§amento.',
                 $usuarioId
             );
             return redirect()->to($this->orcamentoShowUrl($orcamentoId))
@@ -1133,13 +1133,13 @@ class Orcamentos extends BaseController
             $usuarioId
         );
         if (!empty($dispatch['ok'])) {
-            LogModel::registrar('orcamento_whatsapp', 'Orçamento ID ' . $orcamentoId . ' enviado por WhatsApp.');
+            LogModel::registrar('orcamento_whatsapp', 'OrÃ§amento ID ' . $orcamentoId . ' enviado por WhatsApp.');
             $success = !empty($dispatch['duplicate'])
                 ? 'Envio duplicado evitado: mensagem ja registrada recentemente no WhatsApp.'
-                : 'Orçamento enviado por WhatsApp com sucesso.';
+                : 'OrÃ§amento enviado por WhatsApp com sucesso.';
             return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('success', $success);
         }
-        $error = (string) ($dispatch['message'] ?? 'Falha ao enviar orçamento por WhatsApp.');
+        $error = (string) ($dispatch['message'] ?? 'Falha ao enviar orÃ§amento por WhatsApp.');
         LogModel::registrar('orcamento_whatsapp_erro', 'Falha no envio WhatsApp do orcamento ID ' . $orcamentoId . '.');
         return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('error', $error);
     }
@@ -1149,12 +1149,12 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $id;
         $orcamento = $this->findOrcamento($orcamentoId);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento não encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'OrÃ§amento nÃ£o encontrado.');
         }
         $statusAtual = (string) ($orcamento['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
         if (!$this->canDispatchByStatus($statusAtual)) {
             return redirect()->to($this->orcamentoShowUrl($orcamentoId))
-                ->with('error', 'Este orçamento esta bloqueado para envio no status atual.');
+                ->with('error', 'Este orÃ§amento esta bloqueado para envio no status atual.');
         }
         $orcamento = $this->ensurePublicToken($orcamento);
         $usuarioId = (int) (session()->get('user_id') ?? 0);
@@ -1168,11 +1168,11 @@ class Orcamentos extends BaseController
                 'email',
                 $emailDestino,
                 null,
-            'E-mail de destino inválido para envio do orçamento.',
+            'E-mail de destino invÃ¡lido para envio do orÃ§amento.',
                 $usuarioId
             );
             return redirect()->to($this->orcamentoShowUrl($orcamentoId))
-            ->with('error', 'E-mail de destino inválido para envio do orçamento.');
+            ->with('error', 'E-mail de destino invÃ¡lido para envio do orÃ§amento.');
         }
         $assunto = trim((string) $this->request->getPost('assunto_email'));
         if ($assunto === '') {
@@ -1220,12 +1220,12 @@ class Orcamentos extends BaseController
         );
         if ($ok) {
             $this->markAsDispatched($orcamento, 'email', $usuarioId > 0 ? $usuarioId : null);
-            LogModel::registrar('orcamento_email', 'Orçamento ID ' . $orcamentoId . ' enviado por email.');
-        return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('success', 'Orçamento enviado por e-mail com sucesso.');
+            LogModel::registrar('orcamento_email', 'OrÃ§amento ID ' . $orcamentoId . ' enviado por email.');
+        return redirect()->to($this->orcamentoShowUrl($orcamentoId))->with('success', 'OrÃ§amento enviado por e-mail com sucesso.');
         }
         LogModel::registrar('orcamento_email_erro', 'Falha no envio de email do orcamento ID ' . $orcamentoId . '.');
         return redirect()->to($this->orcamentoShowUrl($orcamentoId))
-            ->with('error', (string) ($mailResult['message'] ?? 'Falha ao enviar orçamento por e-mail.'));
+            ->with('error', (string) ($mailResult['message'] ?? 'Falha ao enviar orÃ§amento por e-mail.'));
     }
     public function sendPacoteLink($id)
     {
@@ -1291,7 +1291,7 @@ class Orcamentos extends BaseController
         $isEmbedded = $this->isEmbedRequest();
         $orcamento = $this->findOrcamento((int) $id);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento nao encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'OrÃ§amento nao encontrado.');
         }
         $statusAtual = (string) ($orcamento['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
         $allowEmbeddedLockedEdit = $this->canEditLockedOrcamentoFromOsEmbed($orcamento);
@@ -1301,7 +1301,7 @@ class Orcamentos extends BaseController
         }
         $itens = $this->itemModel->byOrcamento((int) $id);
         return view('orcamentos/form', $this->buildFormData([
-            'title' => 'Editar Orçamento',
+            'title' => 'Editar OrÃ§amento',
             'orcamento' => $orcamento,
             'itens' => $itens,
             'isEdit' => true,
@@ -1318,7 +1318,7 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $id;
         $current = $this->orcamentoModel->find($orcamentoId);
         if (!$current) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento nao encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'OrÃ§amento nao encontrado.');
         }
         $statusAnterior = (string) ($current['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
         $allowEmbeddedLockedEdit = $this->canEditLockedOrcamentoFromOsEmbed($current);
@@ -1469,8 +1469,8 @@ class Orcamentos extends BaseController
         if (!$this->orcamentoModel->db->transStatus()) {
             return redirect()->back()->withInput()->with('error', 'Falha ao atualizar o orcamento.');
         }
-        LogModel::registrar('orcamento_atualizado', 'Orçamento ID ' . $orcamentoId . ' atualizado.');
-        $successMessage = 'Orçamento atualizado com sucesso.';
+        LogModel::registrar('orcamento_atualizado', 'OrÃ§amento ID ' . $orcamentoId . ' atualizado.');
+        $successMessage = 'OrÃ§amento atualizado com sucesso.';
         if (!empty($autoOfertaResult['warning'])) {
             $successMessage .= ' ' . (string) $autoOfertaResult['warning'];
         }
@@ -1503,7 +1503,7 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $id;
         $orcamento = $this->orcamentoModel->find($orcamentoId);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento nao encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'OrÃ§amento nao encontrado.');
         }
         $statusNovo = trim((string) $this->request->getPost('status'));
         if (!array_key_exists($statusNovo, $this->orcamentoModel->statusLabels())) {
@@ -1551,7 +1551,7 @@ class Orcamentos extends BaseController
         if ($this->isConsolidatedStatus($statusNovo)) {
             $this->promoteContatoToCliente($orcamentoId, array_merge($orcamento, $update, ['id' => $orcamentoId]), $usuarioId > 0 ? $usuarioId : null);
         }
-        LogModel::registrar('orcamento_status', 'Orçamento ID ' . $orcamentoId . ' alterado para ' . $statusNovo . '.');
+        LogModel::registrar('orcamento_status', 'OrÃ§amento ID ' . $orcamentoId . ' alterado para ' . $statusNovo . '.');
         $this->syncLinkedOsByOrcamentoStatus(
             (int) ($orcamento['os_id'] ?? 0),
             $statusNovo
@@ -1589,7 +1589,7 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $id;
         $orcamento = $this->findOrcamento($orcamentoId);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento nao encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'OrÃ§amento nao encontrado.');
         }
         $statusAtual = (string) ($orcamento['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
         if (!in_array($statusAtual, [OrcamentoModel::STATUS_APROVADO, OrcamentoModel::STATUS_PENDENTE_OS, OrcamentoModel::STATUS_PACOTE_APROVADO], true)) {
@@ -1627,11 +1627,11 @@ class Orcamentos extends BaseController
                 $statusAtual,
                 OrcamentoModel::STATUS_CONVERTIDO,
                 $usuarioId > 0 ? $usuarioId : null,
-                'Orçamento convertido para OS #' . ($osId > 0 ? $osId : '-'),
+                'OrÃ§amento convertido para OS #' . ($osId > 0 ? $osId : '-'),
                 'interno'
             );
-            LogModel::registrar('orcamento_convertido_os', 'Orçamento ID ' . $orcamentoId . ' convertido para OS.');
-            $mensagem = trim((string) ($conversion['message'] ?? 'Orçamento convertido para OS com sucesso.'));
+            LogModel::registrar('orcamento_convertido_os', 'OrÃ§amento ID ' . $orcamentoId . ' convertido para OS.');
+            $mensagem = trim((string) ($conversion['message'] ?? 'OrÃ§amento convertido para OS com sucesso.'));
             $this->syncLinkedOsByOrcamentoStatus(
                 $osId > 0 ? $osId : (int) ($orcamento['os_id'] ?? 0),
                 OrcamentoModel::STATUS_CONVERTIDO
@@ -1652,16 +1652,16 @@ class Orcamentos extends BaseController
             $statusAtual,
             OrcamentoModel::STATUS_CONVERTIDO,
             $usuarioId > 0 ? $usuarioId : null,
-            'Orçamento convertido para venda manual.',
+            'OrÃ§amento convertido para venda manual.',
             'interno'
         );
-        LogModel::registrar('orcamento_convertido_venda', 'Orçamento ID ' . $orcamentoId . ' convertido para venda manual.');
+        LogModel::registrar('orcamento_convertido_venda', 'OrÃ§amento ID ' . $orcamentoId . ' convertido para venda manual.');
         $this->syncLinkedOsByOrcamentoStatus(
             (int) ($orcamento['os_id'] ?? 0),
             OrcamentoModel::STATUS_CONVERTIDO
         );
         return redirect()->to($this->orcamentoShowUrl($orcamentoId))
-            ->with('success', 'Orçamento convertido para venda manual com sucesso.');
+            ->with('success', 'OrÃ§amento convertido para venda manual com sucesso.');
     }
     public function quickCreateAndSendFromConversa()
     {
@@ -1677,7 +1677,7 @@ class Orcamentos extends BaseController
         if ($conversaId <= 0) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'Conversa inválida para gerar orçamento rápido.',
+                'message' => 'Conversa invÃ¡lida para gerar orÃ§amento rÃ¡pido.',
             ]);
         }
         $conversa = (new ConversaWhatsappModel())->find($conversaId);
@@ -1691,7 +1691,7 @@ class Orcamentos extends BaseController
         if ($itemDescricao === '') {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'Descrição do item obrigatória para orçamento rápido.',
+                'message' => 'DescriÃ§Ã£o do item obrigatÃ³ria para orÃ§amento rÃ¡pido.',
             ]);
         }
         $itemValor = max(0, $this->orcamentoService->normalizeMoney($this->request->getPost('item_valor')));
@@ -1708,7 +1708,7 @@ class Orcamentos extends BaseController
         if (!$this->isPhoneValid($telefone)) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'Telefone da conversa inválido para envio automático.',
+                'message' => 'Telefone da conversa invÃ¡lido para envio automÃ¡tico.',
             ]);
         }
         $usuarioId = (int) (session()->get('user_id') ?? 0);
@@ -1749,8 +1749,8 @@ class Orcamentos extends BaseController
         $titulo = trim((string) $this->request->getPost('titulo'));
         if ($titulo === '') {
             $titulo = $osId > 0
-                ? 'Orçamento rápido para OS #' . $osId
-                : 'Orçamento rápido via conversa #' . $conversaId;
+                ? 'OrÃ§amento rÃ¡pido para OS #' . $osId
+                : 'OrÃ§amento rÃ¡pido via conversa #' . $conversaId;
         }
         $validadeDias = (int) ($this->request->getPost('validade_dias') ?? 10);
         if ($validadeDias < 1) {
@@ -1803,7 +1803,7 @@ class Orcamentos extends BaseController
             $this->orcamentoModel->db->transRollback();
             return $this->response->setStatusCode(500)->setJSON([
                 'ok' => false,
-                'message' => 'Não foi possível salvar o orçamento rápido.',
+                'message' => 'NÃ£o foi possÃ­vel salvar o orÃ§amento rÃ¡pido.',
             ]);
         }
         $numero = $this->orcamentoService->ensureNumero($this->orcamentoModel, $orcamentoId);
@@ -1814,14 +1814,14 @@ class Orcamentos extends BaseController
             null,
             OrcamentoModel::STATUS_RASCUNHO,
             $usuarioId > 0 ? $usuarioId : null,
-            'Criação rápida pela Central de Mensagens',
+            'CriaÃ§Ã£o rÃ¡pida pela Central de Mensagens',
             'interno'
         );
         $this->orcamentoModel->db->transComplete();
         if (!$this->orcamentoModel->db->transStatus()) {
             return $this->response->setStatusCode(500)->setJSON([
                 'ok' => false,
-                'message' => 'Falha ao concluir gravação do orçamento rápido.',
+                'message' => 'Falha ao concluir gravaÃ§Ã£o do orÃ§amento rÃ¡pido.',
             ]);
         }
         $this->syncLinkedOsByOrcamentoStatus($osId, OrcamentoModel::STATUS_RASCUNHO);
@@ -1829,7 +1829,7 @@ class Orcamentos extends BaseController
         if (!$orcamento) {
             return $this->response->setStatusCode(500)->setJSON([
                 'ok' => false,
-                'message' => 'Orçamento criado, mas não foi possível carregar o registro.',
+                'message' => 'OrÃ§amento criado, mas nÃ£o foi possÃ­vel carregar o registro.',
                 'orcamento_id' => $orcamentoId,
             ]);
         }
@@ -1849,18 +1849,18 @@ class Orcamentos extends BaseController
         if (empty($dispatch['ok'])) {
             return $this->response->setStatusCode(502)->setJSON([
                 'ok' => false,
-                'message' => (string) ($dispatch['message'] ?? 'Orçamento criado, mas houve falha no envio por WhatsApp.'),
+                'message' => (string) ($dispatch['message'] ?? 'OrÃ§amento criado, mas houve falha no envio por WhatsApp.'),
                 'orcamento_id' => $orcamentoId,
                 'numero' => $numero,
                 'view_url' => base_url('orcamentos/visualizar/' . $orcamentoId),
             ]);
         }
-        LogModel::registrar('orcamento_conversa_rapida', 'Orçamento rápido ' . $numero . ' criado e enviado pela conversa #' . $conversaId . '.');
+        LogModel::registrar('orcamento_conversa_rapida', 'OrÃ§amento rÃ¡pido ' . $numero . ' criado e enviado pela conversa #' . $conversaId . '.');
         return $this->response->setJSON([
             'ok' => true,
             'message' => !empty($dispatch['duplicate'])
-                ? 'Orçamento ' . $numero . ' gerado. Envio duplicado foi evitado automaticamente.'
-                : 'Orçamento ' . $numero . ' gerado e enviado com sucesso.',
+                ? 'OrÃ§amento ' . $numero . ' gerado. Envio duplicado foi evitado automaticamente.'
+                : 'OrÃ§amento ' . $numero . ' gerado e enviado com sucesso.',
             'orcamento_id' => $orcamentoId,
             'numero' => $numero,
             'view_url' => base_url('orcamentos/visualizar/' . $orcamentoId),
@@ -1873,7 +1873,7 @@ class Orcamentos extends BaseController
         $orcamentoId = (int) $id;
         $orcamento = $this->orcamentoModel->find($orcamentoId);
         if (!$orcamento) {
-            return redirect()->to('/orcamentos')->with('error', 'Orçamento nao encontrado.');
+            return redirect()->to('/orcamentos')->with('error', 'OrÃ§amento nao encontrado.');
         }
         $status = (string) ($orcamento['status'] ?? OrcamentoModel::STATUS_RASCUNHO);
         if (!in_array($status, [OrcamentoModel::STATUS_RASCUNHO, OrcamentoModel::STATUS_CANCELADO, OrcamentoModel::STATUS_REJEITADO], true)) {
@@ -1881,8 +1881,8 @@ class Orcamentos extends BaseController
                 ->with('error', 'Somente orcamentos em rascunho, cancelado ou rejeitado podem ser excluidos.');
         }
         $this->orcamentoModel->delete($orcamentoId);
-        LogModel::registrar('orcamento_excluido', 'Orçamento ID ' . $orcamentoId . ' excluido.');
-        return redirect()->to('/orcamentos')->with('success', 'Orçamento excluido com sucesso.');
+        LogModel::registrar('orcamento_excluido', 'OrÃ§amento ID ' . $orcamentoId . ' excluido.');
+        return redirect()->to('/orcamentos')->with('success', 'OrÃ§amento excluido com sucesso.');
     }
     private function canDispatchByStatus(string $status): bool
     {
@@ -1907,7 +1907,7 @@ class Orcamentos extends BaseController
         if ($orcamentoId <= 0) {
             return [
                 'ok' => false,
-                'message' => 'Orçamento invalido para envio no WhatsApp.',
+                'message' => 'OrÃ§amento invalido para envio no WhatsApp.',
             ];
         }
         $pdfPath = null;
@@ -2428,7 +2428,7 @@ class Orcamentos extends BaseController
     {
         $numero = trim((string) ($orcamento['numero'] ?? '#'));
         $empresa = trim((string) get_config('empresa_nome', 'Assistencia Tecnica'));
-        return 'Orçamento ' . $numero . ' - ' . $empresa;
+        return 'OrÃ§amento ' . $numero . ' - ' . $empresa;
     }
     private function buildDefaultEmailBody(array $orcamento, string $mensagemLivre = ''): string
     {
@@ -2457,7 +2457,7 @@ class Orcamentos extends BaseController
         }
         return
             '<div style="font-family:Arial,sans-serif;color:#1f2937;font-size:14px;line-height:1.5;">' .
-                '<h2 style="margin:0 0 12px;color:#0f172a;">Orçamento ' . $numero . '</h2>' .
+                '<h2 style="margin:0 0 12px;color:#0f172a;">OrÃ§amento ' . $numero . '</h2>' .
                 '<p style="margin:0 0 12px;">Ola <strong>' . $cliente . '</strong>, segue seu orcamento em anexo.</p>' .
                 '<p style="margin:0 0 12px;">' . htmlspecialchars($tipoResumo, ENT_QUOTES, 'UTF-8') . '</p>' .
                 $mensagemHtml .
@@ -3333,7 +3333,7 @@ class Orcamentos extends BaseController
         ];
 
         $rows = (new OsModel())
-            ->select("os.id, os.numero_os, os.status, os.estado_fluxo, os.equipamento_id, os.data_abertura, os.data_previsao, tipos.nome as equip_tipo, marcas.nome as equip_marca, modelos.nome as equip_modelo, equipamentos.cor, (SELECT ef.arquivo FROM equipamentos_fotos ef WHERE ef.equipamento_id = os.equipamento_id ORDER BY ef.is_principal DESC, ef.id ASC LIMIT 1) AS foto_principal_arquivo")
+            ->select("os.id, os.numero_os, os.status, os.estado_fluxo, os.equipamento_id, os.data_abertura, os.data_previsao, tipos.nome as equip_tipo, marcas.nome as equip_marca, modelos.nome as equip_modelo, equipamentos.cor, equipamentos.resumo_tecnico as equip_resumo_tecnico, equipamentos.desktop_modalidade as equip_desktop_modalidade, (SELECT ef.arquivo FROM equipamentos_fotos ef WHERE ef.equipamento_id = os.equipamento_id ORDER BY ef.is_principal DESC, ef.id ASC LIMIT 1) AS foto_principal_arquivo")
             ->join('equipamentos', 'equipamentos.id = os.equipamento_id', 'left')
             ->join('equipamentos_tipos tipos', 'tipos.id = equipamentos.tipo_id', 'left')
             ->join('equipamentos_marcas marcas', 'marcas.id = equipamentos.marca_id', 'left')
@@ -3375,8 +3375,8 @@ class Orcamentos extends BaseController
         $marca = trim((string) ($os['equip_marca'] ?? ''));
         $modelo = trim((string) ($os['equip_modelo'] ?? ''));
         $cor = trim((string) ($os['cor'] ?? ''));
-        $marcaModelo = trim($marca . ' ' . $modelo);
-        $equipamentoLabel = trim(implode(' | ', array_filter([$tipo, $marcaModelo])));
+        $equipamentoNome = trim(equipamento_nome_exibicao($os));
+        $equipamentoLabel = trim(implode(' | ', array_filter([$tipo, $equipamentoNome])));
         if ($equipamentoLabel === '') {
             $equipamentoLabel = 'Equipamento sem identificacao detalhada';
         }
@@ -4161,6 +4161,8 @@ class Orcamentos extends BaseController
         $vinculosContext = $this->resolveVinculosContext($orcamento);
         $equipamentoCatalog = $this->buildEquipamentoCatalog();
         $equipamentoManual = $this->resolveEquipamentoManualContext($orcamento);
+        $itemQuickCreateTiposEquipamento = $this->loadItemQuickCreateTiposEquipamento();
+        $itemQuickCreateCategoriasPeca = $this->loadItemQuickCreateCategoriasPeca();
         $defaults = [
             'clientes' => [],
             'statusLabels' => $this->orcamentoModel->statusLabels(),
@@ -4171,12 +4173,90 @@ class Orcamentos extends BaseController
             'vinculosContext' => $vinculosContext,
             'equipamentoCatalog' => $equipamentoCatalog,
             'equipamentoManual' => $equipamentoManual,
+            'itemQuickCreateTiposEquipamento' => $itemQuickCreateTiposEquipamento,
+            'itemQuickCreateCategoriasPeca' => $itemQuickCreateCategoriasPeca,
             'pacoteOfertaModuleReady' => $this->isPacoteOfertaModuleReady(),
             'pacotesAtivosOferta' => $this->loadPacotesAtivosForOferta(),
             'orcamentoLockedEmbeddedEdit' => false,
         ];
         return array_merge($defaults, $overrides);
     }
+
+    /**
+     * @return array<int,string>
+     */
+    private function loadItemQuickCreateTiposEquipamento(): array
+    {
+        $options = [];
+        $push = static function (array &$bucket, string $value): void {
+            $normalized = trim($value);
+            if ($normalized === '') {
+                return;
+            }
+
+            $key = function_exists('mb_strtolower')
+                ? mb_strtolower($normalized)
+                : strtolower($normalized);
+
+            if (! array_key_exists($key, $bucket)) {
+                $bucket[$key] = $normalized;
+            }
+        };
+
+        try {
+            foreach ((new EquipamentoTipoModel())->where('ativo', 1)->orderBy('nome', 'ASC')->findAll() as $row) {
+                $push($options, (string) ($row['nome'] ?? ''));
+            }
+        } catch (\Throwable $e) {
+            log_message('warning', '[Orcamentos] Falha ao carregar tipos de equipamento para cadastro rapido: ' . $e->getMessage());
+        }
+
+        foreach ((new PecaModel())->getTiposEquipamentoAtivos() as $tipo) {
+            $push($options, (string) $tipo);
+        }
+        foreach ((new ServicoModel())->getTiposEquipamentoAtivos() as $tipo) {
+            $push($options, (string) $tipo);
+        }
+
+        $push($options, 'diverso');
+
+        $values = array_values($options);
+        usort($values, static fn(string $a, string $b): int => strcasecmp($a, $b));
+
+        return $values;
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    private function loadItemQuickCreateCategoriasPeca(): array
+    {
+        $options = [];
+        $push = static function (array &$bucket, string $value): void {
+            $normalized = trim($value);
+            if ($normalized === '') {
+                return;
+            }
+
+            $key = function_exists('mb_strtolower')
+                ? mb_strtolower($normalized)
+                : strtolower($normalized);
+
+            if (! array_key_exists($key, $bucket)) {
+                $bucket[$key] = $normalized;
+            }
+        };
+
+        foreach ((new PecaModel())->getCategoriasAtivas() as $categoria) {
+            $push($options, (string) $categoria);
+        }
+
+        $values = array_values($options);
+        usort($values, static fn(string $a, string $b): int => strcasecmp($a, $b));
+
+        return $values;
+    }
+
     /**
      * @return array<string,mixed>
      */

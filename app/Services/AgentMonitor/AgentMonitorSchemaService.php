@@ -110,9 +110,24 @@ class AgentMonitorSchemaService
                 'constraint' => 160,
                 'null' => true,
             ],
+            'device_type' => [
+                'type' => 'VARCHAR',
+                'constraint' => 40,
+                'null' => true,
+            ],
+            'chassis_type' => [
+                'type' => 'VARCHAR',
+                'constraint' => 80,
+                'null' => true,
+            ],
             'motherboard' => [
                 'type' => 'VARCHAR',
                 'constraint' => 180,
+                'null' => true,
+            ],
+            'chipset' => [
+                'type' => 'VARCHAR',
+                'constraint' => 120,
                 'null' => true,
             ],
             'bios_version' => [
@@ -121,6 +136,16 @@ class AgentMonitorSchemaService
                 'null' => true,
             ],
             'cpu' => [
+                'type' => 'VARCHAR',
+                'constraint' => 255,
+                'null' => true,
+            ],
+            'gpu' => [
+                'type' => 'VARCHAR',
+                'constraint' => 255,
+                'null' => true,
+            ],
+            'storage_summary' => [
                 'type' => 'VARCHAR',
                 'constraint' => 255,
                 'null' => true,

@@ -40,8 +40,8 @@ $historicoLista = is_array($historico ?? null) ? $historico : [];
 $enviosLista = is_array($envios ?? null) ? $envios : [];
 $aprovacoesLista = is_array($aprovacoes ?? null) ? $aprovacoes : [];
 ${"hist\xC3\x83\xC2\xB3rico"} = $historicoLista;
-$histÃƒÂ³rico = $historicoLista;
 $histÃƒÆ’Ã‚Â³rico = $historicoLista;
+$histÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³rico = $historicoLista;
 
 $tokenPublicoOrcamento = trim((string) ($orcamento['token_publico'] ?? ''));
 $linkPublicoOrcamento = $tokenPublicoOrcamento !== '' ? base_url('orcamento/' . $tokenPublicoOrcamento) : '';
@@ -62,6 +62,118 @@ $pacoteOfertaStatusLabels = [
     'expirado' => 'Expirado',
     'cancelado' => 'Cancelado',
     'erro_envio' => 'Erro no envio',
+];
+
+$envioStatusLabels = [
+    'sem_registro' => 'Sem tentativa',
+    'pendente' => 'Pendente',
+    'gerado' => 'PDF gerado',
+    'enviado' => 'Enviado',
+    'duplicado' => 'Duplicado evitado',
+    'erro' => 'Erro no envio',
+];
+$envioStatusClasses = [
+    'sem_registro' => 'bg-secondary-subtle text-secondary-emphasis',
+    'pendente' => 'bg-secondary',
+    'gerado' => 'bg-info text-dark',
+    'enviado' => 'bg-success',
+    'duplicado' => 'bg-warning text-dark',
+    'erro' => 'bg-danger',
+];
+$envioStatusIcons = [
+    'sem_registro' => 'bi-clock-history',
+    'pendente' => 'bi-hourglass-split',
+    'gerado' => 'bi-file-earmark-pdf',
+    'enviado' => 'bi-check-circle-fill',
+    'duplicado' => 'bi-shield-check',
+    'erro' => 'bi-exclamation-triangle-fill',
+];
+$envioCanalLabels = [
+    'whatsapp' => 'WhatsApp',
+    'email' => 'E-mail',
+    'pdf' => 'PDF',
+];
+$enviosComerciaisLista = [];
+foreach ($enviosLista as $envioRegistro) {
+    if (!is_array($envioRegistro)) {
+        continue;
+    }
+
+    $canalRegistro = strtolower(trim((string) ($envioRegistro['canal'] ?? '')));
+    if (in_array($canalRegistro, ['whatsapp', 'email'], true)) {
+        $enviosComerciaisLista[] = $envioRegistro;
+    }
+}
+$resolveEnvioTimestamp = static function (array $envioRegistro): int {
+    $dataTexto = trim((string) ($envioRegistro['enviado_em'] ?? $envioRegistro['created_at'] ?? ''));
+    if ($dataTexto === '') {
+        return 0;
+    }
+
+    $timestamp = strtotime($dataTexto);
+    return $timestamp === false ? 0 : $timestamp;
+};
+usort($enviosComerciaisLista, static function (array $envioAtual, array $envioAnterior) use ($resolveEnvioTimestamp): int {
+    $timestampAtual = $resolveEnvioTimestamp($envioAtual);
+    $timestampAnterior = $resolveEnvioTimestamp($envioAnterior);
+    if ($timestampAtual === $timestampAnterior) {
+        return (int) ($envioAnterior['id'] ?? 0) <=> (int) ($envioAtual['id'] ?? 0);
+    }
+
+    return $timestampAnterior <=> $timestampAtual;
+});
+$ultimoEnvioComercial = $enviosComerciaisLista[0] ?? null;
+$ultimosEnviosPorCanal = [
+    'whatsapp' => null,
+    'email' => null,
+];
+foreach ($enviosComerciaisLista as $envioRegistro) {
+    $canalRegistro = strtolower(trim((string) ($envioRegistro['canal'] ?? '')));
+    if (array_key_exists($canalRegistro, $ultimosEnviosPorCanal) && $ultimosEnviosPorCanal[$canalRegistro] === null) {
+        $ultimosEnviosPorCanal[$canalRegistro] = $envioRegistro;
+    }
+}
+$resolveEnvioMeta = static function (?array $envioRegistro) use ($envioStatusLabels, $envioStatusClasses, $envioStatusIcons, $envioCanalLabels): array {
+    if ($envioRegistro === null) {
+        return [
+            'status' => 'sem_registro',
+            'label' => $envioStatusLabels['sem_registro'],
+            'class' => $envioStatusClasses['sem_registro'],
+            'icon' => $envioStatusIcons['sem_registro'],
+            'canal' => '-',
+            'destino' => '-',
+            'data' => '-',
+            'provedor' => '',
+            'erro' => '',
+            'mensagem' => 'Nenhuma tentativa de envio foi registrada para este canal.',
+        ];
+    }
+
+    $statusEnvio = strtolower(trim((string) ($envioRegistro['status'] ?? 'pendente')));
+    $statusEnvio = $statusEnvio !== '' ? $statusEnvio : 'pendente';
+    $canalEnvio = strtolower(trim((string) ($envioRegistro['canal'] ?? '')));
+    $dataEnvio = trim((string) formatDate(($envioRegistro['enviado_em'] ?? $envioRegistro['created_at'] ?? null), true));
+    $erroDetalhe = trim((string) ($envioRegistro['erro_detalhe'] ?? ''));
+    $provedor = trim((string) ($envioRegistro['provedor'] ?? ''));
+    $destino = trim((string) ($envioRegistro['destino'] ?? ''));
+
+    return [
+        'status' => $statusEnvio,
+        'label' => $envioStatusLabels[$statusEnvio] ?? ucfirst(str_replace('_', ' ', $statusEnvio)),
+        'class' => $envioStatusClasses[$statusEnvio] ?? 'bg-secondary',
+        'icon' => $envioStatusIcons[$statusEnvio] ?? 'bi-info-circle',
+        'canal' => $envioCanalLabels[$canalEnvio] ?? strtoupper($canalEnvio !== '' ? $canalEnvio : '-'),
+        'destino' => $destino !== '' ? $destino : '-',
+        'data' => $dataEnvio !== '' ? $dataEnvio : '-',
+        'provedor' => $provedor,
+        'erro' => $erroDetalhe,
+        'mensagem' => $erroDetalhe !== '' ? $erroDetalhe : 'Ultima tentativa registrada sem erro tecnico.',
+    ];
+};
+$ultimoEnvioMeta = $resolveEnvioMeta($ultimoEnvioComercial);
+$enviosResumoPorCanal = [
+    'whatsapp' => $resolveEnvioMeta($ultimosEnviosPorCanal['whatsapp']),
+    'email' => $resolveEnvioMeta($ultimosEnviosPorCanal['email']),
 ];
 
 $dispatchBlocked = in_array($status, ['aprovado', 'pendente_abertura_os', 'pacote_aprovado', 'cancelado', 'convertido'], true);
@@ -861,6 +973,101 @@ $clienteTemContatoComplementar = $contatoNome !== ''
                             </div>
                         </div>
                     <?php endif; ?>
+
+                    <div class="border rounded-4 bg-white p-3 p-lg-4 orc-show-panel">
+                        <div class="small text-uppercase text-muted fw-semibold mb-3">Link publico e referencia comercial</div>
+
+                        <?php if ($resumoPublicLink !== ''): ?>
+                            <div class="small text-muted mb-1"><?= esc($resumoPublicLinkLabel) ?></div>
+                            <div class="input-group input-group-sm mb-3">
+                                <input type="text" class="form-control" readonly id="orcamentoPublicLinkInput" value="<?= esc($resumoPublicLink) ?>" data-copy-success-text="<?= esc($resumoPublicLinkCopyText) ?>">
+                                <button class="btn btn-outline-secondary" type="button" id="btnCopyPublicLink" title="Copiar link publico">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                                <a class="btn btn-outline-secondary" href="<?= esc($resumoPublicLink) ?>" target="_blank" rel="noopener">
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
+                            </div>
+                        <?php else: ?>
+                            <div class="alert alert-light border small">
+                                O link publico sera exibido aqui assim que o token de compartilhamento estiver disponivel.
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="orc-dispatch-status mb-3" aria-live="polite">
+                            <div class="orc-dispatch-status__header d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                                <div class="min-w-0">
+                                    <span class="orc-field-label">Status do envio</span>
+                                    <div class="orc-dispatch-status__headline">
+                                        <i class="bi <?= esc($ultimoEnvioMeta['icon']) ?> me-1"></i>
+                                        <?= esc($ultimoEnvioMeta['canal']) ?> - <?= esc($ultimoEnvioMeta['data']) ?>
+                                    </div>
+                                    <div class="small text-muted">
+                                        Destino: <?= esc($ultimoEnvioMeta['destino']) ?>
+                                        <?php if ($ultimoEnvioMeta['provedor'] !== ''): ?>
+                                            <span class="d-inline-block ms-1">Provedor: <?= esc($ultimoEnvioMeta['provedor']) ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <span class="badge <?= esc($ultimoEnvioMeta['class']) ?> orc-dispatch-status__badge">
+                                    <?= esc($ultimoEnvioMeta['label']) ?>
+                                </span>
+                            </div>
+
+                            <?php if ($ultimoEnvioMeta['status'] === 'erro' && $ultimoEnvioMeta['erro'] !== ''): ?>
+                                <div class="alert alert-danger py-2 px-3 small mt-3 mb-0">
+                                    <i class="bi bi-exclamation-triangle me-1"></i><?= esc($ultimoEnvioMeta['erro']) ?>
+                                </div>
+                            <?php elseif (in_array($ultimoEnvioMeta['status'], ['enviado', 'duplicado'], true)): ?>
+                                <div class="alert alert-success py-2 px-3 small mt-3 mb-0">
+                                    <i class="bi bi-check-circle me-1"></i>Ultimo envio comercial registrado com sucesso.
+                                </div>
+                            <?php elseif ($ultimoEnvioMeta['status'] === 'sem_registro'): ?>
+                                <div class="alert alert-light border py-2 px-3 small mt-3 mb-0">
+                                    <i class="bi bi-info-circle me-1"></i>Nenhum envio por WhatsApp ou e-mail foi registrado ainda.
+                                </div>
+                            <?php endif; ?>
+
+                            <div class="row g-2 mt-3">
+                                <?php foreach ($enviosResumoPorCanal as $canalResumo => $envioResumo): ?>
+                                    <div class="col-12 col-md-6">
+                                        <div class="orc-dispatch-channel">
+                                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                                <div class="fw-semibold">
+                                                    <i class="bi <?= $canalResumo === 'whatsapp' ? 'bi-whatsapp' : 'bi-envelope' ?> me-1"></i><?= esc($envioResumo['canal']) ?>
+                                                </div>
+                                                <span class="badge <?= esc($envioResumo['class']) ?>"><?= esc($envioResumo['label']) ?></span>
+                                            </div>
+                                            <div class="small text-muted mt-1">Atualizado: <?= esc($envioResumo['data']) ?></div>
+                                            <div class="small text-muted">Destino: <?= esc($envioResumo['destino']) ?></div>
+                                            <?php if ($envioResumo['status'] === 'erro' && $envioResumo['erro'] !== ''): ?>
+                                                <div class="small text-danger mt-1"><?= esc($envioResumo['erro']) ?></div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6 col-xl-3">
+                                <span class="orc-field-label">Status comercial</span>
+                                <div class="orc-field-value"><?= esc($statusDisplayLabel) ?></div>
+                            </div>
+                            <div class="col-12 col-md-6 col-xl-3">
+                                <span class="orc-field-label">Validade</span>
+                                <div class="orc-field-value"><?= esc($validadeFormatada) ?></div>
+                            </div>
+                            <div class="col-12 col-md-6 col-xl-3">
+                                <span class="orc-field-label">Tipo de registro</span>
+                                <div class="orc-field-value"><?= esc($tipoOrcamentoLabel) ?></div>
+                            </div>
+                            <div class="col-12 col-md-6 col-xl-3">
+                                <span class="orc-field-label">Versao atual</span>
+                                <div class="orc-field-value"><?= esc($versaoAtual) ?></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -967,7 +1174,7 @@ $clienteTemContatoComplementar = $contatoNome !== ''
                                         <?php else: ?>
                                             <ul class="list-group list-group-flush">
                                                 <?php foreach ($aprovacoesLista as $ap): ?>
-                                                    <?php $aprovacaoAcao = (string) ($ap['acao'] ?? ($ap['aÃ§Ã£o'] ?? '-')); ?>
+                                                    <?php $aprovacaoAcao = (string) ($ap['acao'] ?? ($ap['aÃƒÂ§ÃƒÂ£o'] ?? '-')); ?>
                                                     <li class="list-group-item px-0 bg-transparent small">
                                                         <strong><?= esc(ucfirst($aprovacaoAcao)) ?></strong> -
                                                         <?= esc(formatDate($ap['created_at'] ?? null, true)) ?>
@@ -988,8 +1195,8 @@ $clienteTemContatoComplementar = $contatoNome !== ''
 
             <div class="tab-pane fade" id="orc-tab-financeiro" role="tabpanel" aria-labelledby="orc-tab-financeiro-tab" tabindex="0">
                 <div class="orc-show-tab-pane">
-                    <div class="row g-3">
-                        <div class="col-12 col-xl-5">
+                    <div class="row g-3 justify-content-center">
+                        <div class="col-12 col-lg-8 col-xl-6">
                             <div class="border rounded-4 bg-white p-3 p-lg-4 h-100 orc-show-panel">
                                 <div class="small text-uppercase text-muted fw-semibold mb-3">Resumo financeiro</div>
                                 <div class="d-flex justify-content-between mb-2">
@@ -1008,48 +1215,6 @@ $clienteTemContatoComplementar = $contatoNome !== ''
                                 <div class="d-flex justify-content-between">
                                     <span class="fw-semibold">Total final</span>
                                     <strong class="fs-5"><?= esc(formatMoney($orcamento['total'] ?? 0)) ?></strong>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-xl-7">
-                            <div class="border rounded-4 bg-white p-3 p-lg-4 h-100 orc-show-panel">
-                                <div class="small text-uppercase text-muted fw-semibold mb-3">Link publico e referencia comercial</div>
-
-                                <?php if ($resumoPublicLink !== ''): ?>
-                                    <div class="small text-muted mb-1"><?= esc($resumoPublicLinkLabel) ?></div>
-                                    <div class="input-group input-group-sm mb-3">
-                                        <input type="text" class="form-control" readonly id="orcamentoPublicLinkInput" value="<?= esc($resumoPublicLink) ?>" data-copy-success-text="<?= esc($resumoPublicLinkCopyText) ?>">
-                                        <button class="btn btn-outline-secondary" type="button" id="btnCopyPublicLink" title="Copiar link publico">
-                                            <i class="bi bi-clipboard"></i>
-                                        </button>
-                                        <a class="btn btn-outline-secondary" href="<?= esc($resumoPublicLink) ?>" target="_blank" rel="noopener">
-                                            <i class="bi bi-box-arrow-up-right"></i>
-                                        </a>
-                                    </div>
-                                <?php else: ?>
-                                    <div class="alert alert-light border small">
-                                        O link publico sera exibido aqui assim que o token de compartilhamento estiver disponivel.
-                                    </div>
-                                <?php endif; ?>
-
-                                <div class="row g-3">
-                                    <div class="col-12 col-md-6">
-                                        <span class="orc-field-label">Status comercial</span>
-                                        <div class="orc-field-value"><?= esc($statusDisplayLabel) ?></div>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <span class="orc-field-label">Validade</span>
-                                        <div class="orc-field-value"><?= esc($validadeFormatada) ?></div>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <span class="orc-field-label">Tipo de registro</span>
-                                        <div class="orc-field-value"><?= esc($tipoOrcamentoLabel) ?></div>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <span class="orc-field-label">Versao atual</span>
-                                        <div class="orc-field-value"><?= esc($versaoAtual) ?></div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1456,6 +1621,77 @@ $clienteTemContatoComplementar = $contatoNome !== ''
     color: #1f2937;
     font-weight: 500;
     line-height: 1.45;
+}
+.orc-dispatch-status {
+    padding: 1rem;
+    border: 1px solid rgba(13, 110, 253, .14);
+    border-radius: 1rem;
+    background: linear-gradient(135deg, rgba(13, 110, 253, .06), rgba(25, 135, 84, .06));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+}
+.orc-dispatch-status__headline {
+    color: #1f2937;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+.orc-dispatch-status__badge,
+.orc-dispatch-channel .badge {
+    white-space: normal;
+    text-align: center;
+    line-height: 1.25;
+}
+.orc-dispatch-channel {
+    height: 100%;
+    min-width: 0;
+    padding: .85rem;
+    border: 1px solid rgba(0, 0, 0, .08);
+    border-radius: .85rem;
+    background: rgba(255,255,255,.84);
+    overflow-wrap: anywhere;
+}
+@media (max-width: 430px) {
+    .orc-dispatch-status {
+        padding: .85rem;
+        border-radius: .85rem;
+    }
+    .orc-dispatch-status__header {
+        align-items: stretch !important;
+    }
+    .orc-dispatch-status__badge {
+        width: 100%;
+    }
+    .orc-dispatch-channel {
+        padding: .75rem;
+    }
+}
+@media (max-width: 390px) {
+    .orc-dispatch-status {
+        padding: .78rem;
+    }
+    .orc-dispatch-status__headline {
+        font-size: .95rem;
+    }
+}
+@media (max-width: 360px) {
+    .orc-dispatch-status {
+        padding: .72rem;
+    }
+    .orc-dispatch-channel {
+        padding: .68rem;
+    }
+}
+@media (max-width: 320px) {
+    .orc-dispatch-status {
+        padding: .65rem;
+    }
+    .orc-dispatch-status__headline {
+        font-size: .9rem;
+    }
+    .orc-dispatch-channel {
+        padding: .62rem;
+    }
 }
 .orc-text-block {
     line-height: 1.6;

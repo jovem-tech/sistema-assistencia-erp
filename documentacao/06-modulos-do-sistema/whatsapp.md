@@ -1,6 +1,6 @@
 # Modulo: Atendimento WhatsApp (Unificado)
 
-Atualizado em 07/05/2026 (v2.16.41).
+Atualizado em 09/06/2026 (v2.23.20).
 
 ## Objetivo
 Concentrar todo o atendimento WhatsApp dentro do ERP, sem iframe e sem modulo externo dedicado.
@@ -23,6 +23,14 @@ Provider de massa (futuro):
 - Inbox principal: `/atendimento-whatsapp` (alias de `/central-mensagens`)
 - Sem embed externo, sem iframe e sem rota `/whaticket`
 - Operacao e contexto CRM/OS no mesmo modulo interno
+
+## Controle de acesso
+
+O atendimento web passou a responder por modulo RBAC proprio:
+
+- `atendimento_whatsapp:visualizar` para navegar e consultar a Central;
+- `atendimento_whatsapp:editar` para enviar mensagens, alterar fila/status e manter chatbot/FAQ/fluxos/configuracoes;
+- `clientes:criar|editar` continua necessario apenas nos fluxos que convertem a conversa em cadastro oficial de contato/cliente.
 
 ## Arquitetura omnichannel recomendada
 
@@ -50,6 +58,15 @@ Regras operacionais consolidadas:
 - chatbot/automacao (fluxos, FAQ, regras ERP)
 - metricas operacionais diarias
 - fila e atribuicao de responsavel
+
+## Evolution API em envios de OS (09/06/2026 - v2.23.20)
+
+Padroes atuais para reduzir falhas opacas em envios de PDF por WhatsApp:
+
+- `EvolutionApiProvider` normaliza telefones brasileiros sem DDI, adicionando `55` quando o numero possui apenas DDD + telefone;
+- retornos da Evolution priorizam detalhes internos como `response.message`; quando a API devolver apenas `Bad Request`, a mensagem operacional orienta conferir DDI, instancia e arquivo aceito;
+- o endpoint AJAX `POST /os/whatsapp/{id}` retorna HTTP `200` com `ok:false` para falhas esperadas do provider, mantendo `422` reservado para validacao de formulario;
+- o alerta de erro continua sendo exibido via SweetAlert2, mas sem gerar `Failed to load resource 422` para rejeicao operacional da API.
 
 ## Hotfix de estabilidade de envio + conflito Bootstrap (02/04/2026 - v2.10.14)
 
@@ -93,7 +110,7 @@ Para evitar timeout repetido no polling incremental da thread:
 
 - o fluxo rapido de leitura (`conversas` e `conversa/{id}/novas`) passou a processar apenas fila local inbound;
 - a sincronizacao de historico do gateway permaneceu no fluxo dedicado de sync, com lotes menores por ciclo para reduzir latencia;
-- endpoints críticos da Central liberam lock de sessao antes de rodar sync pesado, reduzindo bloqueio concorrente entre requests AJAX.
+- endpoints crÃ­ticos da Central liberam lock de sessao antes de rodar sync pesado, reduzindo bloqueio concorrente entre requests AJAX.
 
 ## Configuracao
 Caminho:
@@ -187,6 +204,18 @@ Mantemos o gateway Node como servico de transporte, com integracao ao ERP:
 - `POST /logout`
 - `POST /create-message`
 - `POST /self-check-inbound`
+
+## Diagnostico em Configuracoes
+
+Na tela `Configuracoes -> Integracoes WhatsApp`, os testes operacionais do provider usam retorno JSON mesmo quando o gateway esta inacessivel.
+
+Regras atuais:
+- `POST /configuracoes/whatsapp/testar-conexao` retorna HTTP `200` com `ok:false` quando a falha for operacional (`gateway_unreachable`, timeout, provider indisponivel ou rejeicao do provider);
+- `POST /configuracoes/whatsapp/enviar-teste` tambem retorna HTTP `200` com `ok:false` para falhas do provider, mantendo HTTP `422` apenas para validacoes de formulario, como telefone vazio;
+- `POST /configuracoes/whatsapp/self-check-inbound` retorna JSON detalhado com `ok:false` quando encontrar pendencias de host, token, origem ou webhook;
+- a interface continua exibindo SweetAlert2 de erro, mas o navegador deixa de registrar `Failed to load resource 422` para falhas esperadas de diagnostico.
+
+O modal `Gerenciar Gateway` tambem remove o foco do botao ativo antes de abrir SweetAlert2, evitando o aviso de acessibilidade sobre `aria-hidden` quando o alerta aparece sobre um modal Bootstrap.
 
 ## Regra obrigatoria para VPS Linux
 

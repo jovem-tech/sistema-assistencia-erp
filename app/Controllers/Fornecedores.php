@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\FornecedorModel;
 use App\Models\LogModel;
+use App\Services\CnpjLookupService;
 
 class Fornecedores extends BaseController
 {
@@ -43,7 +44,7 @@ class Fornecedores extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $dados = $this->request->getPost();
+        $dados = $this->buildFornecedorPayload();
         $this->model->insert($dados);
 
         LogModel::registrar('fornecedor_criado', 'Fornecedor cadastrado: ' . $dados['nome_fantasia']);
@@ -55,7 +56,7 @@ class Fornecedores extends BaseController
     {
         $fornecedor = $this->model->find($id);
         if (!$fornecedor) {
-            return redirect()->to('/fornecedores')->with('error', 'Fornecedor não encontrado.');
+            return redirect()->to('/fornecedores')->with('error', 'Fornecedor nÃ£o encontrado.');
         }
 
         $data = [
@@ -76,7 +77,7 @@ class Fornecedores extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $dados = $this->request->getPost();
+        $dados = $this->buildFornecedorPayload();
         $this->model->update($id, $dados);
 
         LogModel::registrar('fornecedor_atualizado', 'Fornecedor atualizado ID: ' . $id);
@@ -89,9 +90,29 @@ class Fornecedores extends BaseController
         $fornecedor = $this->model->find($id);
         if ($fornecedor) {
             $this->model->delete($id);
-            LogModel::registrar('fornecedor_excluido', 'Fornecedor excluído: ' . $fornecedor['nome_fantasia']);
+            LogModel::registrar('fornecedor_excluido', 'Fornecedor excluÃ­do: ' . $fornecedor['nome_fantasia']);
         }
 
-        return redirect()->to('/fornecedores')->with('success', 'Fornecedor excluído com sucesso!');
+        return redirect()->to('/fornecedores')->with('success', 'Fornecedor excluÃ­do com sucesso!');
+    }
+    public function consultarCnpj()
+    {
+        $cnpj = (string) $this->request->getGet('cnpj');
+        $service = new CnpjLookupService();
+        $result = $service->lookup($cnpj);
+
+        $statusCode = (($result['status'] ?? '') === 'validation_error') ? 422 : 200;
+
+        return $this->response
+            ->setStatusCode($statusCode)
+            ->setJSON($result);
+    }
+
+    private function buildFornecedorPayload(): array
+    {
+        $dados = $this->request->getPost();
+        $dados['ativo'] = $this->request->getPost('ativo') ? 1 : 0;
+
+        return $dados;
     }
 }

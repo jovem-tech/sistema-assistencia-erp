@@ -12,10 +12,10 @@ class OsModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $allowedFields = [
-        'numero_os', 'cliente_id', 'equipamento_id', 'tecnico_id', 'status', 'estado_fluxo', 'status_atualizado_em',
+        'numero_os', 'cliente_id', 'equipamento_id', 'tecnico_id', 'status', 'status_final_pendente_pagamento', 'estado_fluxo', 'status_atualizado_em',
         'legacy_origem', 'legacy_id', 'numero_os_legado',
         'prioridade', 'relato_cliente', 'diagnostico_tecnico', 'solucao_aplicada', 'procedimentos_executados',
-        'data_abertura', 'data_entrada', 'data_previsao', 'data_conclusao', 'data_entrega',
+        'data_abertura', 'data_entrada', 'data_previsao', 'data_conclusao', 'data_entrega', 'baixa_tecnica_em', 'baixa_tecnica_por',
         'valor_mao_obra', 'valor_pecas', 'valor_total', 'desconto', 'valor_final',
         'orcamento_aprovado', 'data_aprovacao', 'orcamento_pdf',
         'acessorios', 'forma_pagamento',
@@ -50,7 +50,8 @@ class OsModel extends Model
                 'os.*,
                 clientes.nome_razao as cliente_nome, clientes.telefone1 as cliente_telefone, clientes.email as cliente_email,
                 et.nome as equip_tipo, em.nome as equip_marca, emod.nome as equip_modelo,
-                equipamentos.numero_serie as equip_serie,
+                equipamentos.numero_serie as equip_serie, equipamentos.resumo_tecnico as equip_resumo_tecnico,
+                equipamentos.desktop_modalidade as equip_desktop_modalidade,
                 funcionarios.nome as tecnico_nome'
             )
             ->join('clientes', 'clientes.id = os.cliente_id')
@@ -79,6 +80,8 @@ class OsModel extends Model
                 clientes.nome_razao as cliente_nome, clientes.telefone1 as cliente_telefone, clientes.email as cliente_email,
                 et.nome as equip_tipo, em.nome as equip_marca, emod.nome as equip_modelo,
                 equipamentos.numero_serie as equip_serie, equipamentos.imei as equip_imei,
+                equipamentos.resumo_tecnico as equip_resumo_tecnico,
+                equipamentos.desktop_modalidade as equip_desktop_modalidade,
                 funcionarios.nome as tecnico_nome'
             )
             ->join('clientes', 'clientes.id = os.cliente_id')
@@ -98,11 +101,14 @@ class OsModel extends Model
     {
         return $this->select(
                 'os.*, clientes.nome_razao as cliente_nome,
-                em.nome as equip_marca, emod.nome as equip_modelo,
+                et.nome as equip_tipo, em.nome as equip_marca, emod.nome as equip_modelo,
+                equipamentos.numero_serie as equip_serie, equipamentos.resumo_tecnico as equip_resumo_tecnico,
+                equipamentos.desktop_modalidade as equip_desktop_modalidade,
                 funcionarios.nome as tecnico_nome'
             )
             ->join('clientes', 'clientes.id = os.cliente_id')
             ->join('equipamentos', 'equipamentos.id = os.equipamento_id')
+            ->join('equipamentos_tipos et', 'et.id = equipamentos.tipo_id', 'left')
             ->join('equipamentos_marcas em', 'em.id = equipamentos.marca_id', 'left')
             ->join('equipamentos_modelos emod', 'emod.id = equipamentos.modelo_id', 'left')
             ->join('funcionarios', 'funcionarios.id = os.tecnico_id', 'left')
@@ -115,21 +121,21 @@ class OsModel extends Model
     {
         $db = \Config\Database::connect();
         $config = $db->table('configuracoes');
-        
+
         $prefixo = $config->where('chave', 'os_prefixo')->get()->getRow()->valor ?? 'OS';
-        
+
         $anoAtualShort = date('y'); // Ex: 26
         $mesAtual = date('m');      // Ex: 03
-        
+
         $configAno = $config->where('chave', 'os_ano')->get()->getRow()->valor ?? '';
         $configMes = $config->where('chave', 'os_mes')->get()->getRow()->valor ?? '';
-        
+
         // Reset sequence if month or year changed
         if ($anoAtualShort !== $configAno || $mesAtual !== $configMes) {
             $novo = 1;
             $db->table('configuracoes')->where('chave', 'os_ultimo_numero')->update(['valor' => $novo]);
             $db->table('configuracoes')->where('chave', 'os_ano')->update(['valor' => $anoAtualShort]);
-            
+
             $checkMes = $db->table('configuracoes')->where('chave', 'os_mes')->get()->getRow();
             if ($checkMes) {
                 $db->table('configuracoes')->where('chave', 'os_mes')->update(['valor' => $mesAtual]);
@@ -142,7 +148,7 @@ class OsModel extends Model
             $novo = $ultimo + 1;
             $db->table('configuracoes')->where('chave', 'os_ultimo_numero')->update(['valor' => $novo]);
         }
-        
+
         return $prefixo . $anoAtualShort . $mesAtual . str_pad($novo, 4, '0', STR_PAD_LEFT);
     }
 
@@ -260,10 +266,13 @@ class OsModel extends Model
     {
         return $this->select(
                 'os.*, clientes.nome_razao as cliente_nome,
-                em.nome as equip_marca, emod.nome as equip_modelo'
+                et.nome as equip_tipo, em.nome as equip_marca, emod.nome as equip_modelo,
+                equipamentos.numero_serie as equip_serie, equipamentos.resumo_tecnico as equip_resumo_tecnico,
+                equipamentos.desktop_modalidade as equip_desktop_modalidade'
             )
             ->join('clientes', 'clientes.id = os.cliente_id')
             ->join('equipamentos', 'equipamentos.id = os.equipamento_id')
+            ->join('equipamentos_tipos et', 'et.id = equipamentos.tipo_id', 'left')
             ->join('equipamentos_marcas em', 'em.id = equipamentos.marca_id', 'left')
             ->join('equipamentos_modelos emod', 'emod.id = equipamentos.modelo_id', 'left')
             ->orderBy('os.created_at', 'DESC')

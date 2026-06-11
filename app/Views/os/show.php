@@ -11,6 +11,12 @@ $legacyFinancialOrigins = is_array($legacyFinancialOrigins ?? null) ? $legacyFin
 $observacoesInternas = trim((string) ($os['observacoes_internas'] ?? ''));
 $observacoesCliente = trim((string) ($os['observacoes_cliente'] ?? ''));
 $formaPagamento = trim((string) ($os['forma_pagamento'] ?? ''));
+$financeiroOsResumo = is_array($financeiroOsResumo ?? null) ? $financeiroOsResumo : [];
+$osFinancialBase = is_array($osFinancialBase ?? null) ? $osFinancialBase : [];
+$formasRecebimentoOs = trim((string) ($financeiroOsResumo['formas_pagamento_label'] ?? ''));
+if ($formasRecebimentoOs === '' || $formasRecebimentoOs === '-') {
+    $formasRecebimentoOs = $formaPagamento !== '' ? ucfirst(str_replace('_', ' ', $formaPagamento)) : '-';
+}
 $procedimentosExecutados = array_values(array_filter(array_map(
     static fn (string $item): string => trim($item),
     preg_split('/\r\n|\r|\n/', (string) ($os['procedimentos_executados'] ?? '')) ?: []
@@ -33,40 +39,40 @@ $orcamentoQuickEmbedUrl = base_url('orcamentos/novo?' . http_build_query([
     'embed' => 1,
 ]));
 $orcamentoVinculado = is_array($orcamentoVinculado ?? null) ? $orcamentoVinculado : null;
-$hasOrçamentoVinculado = !empty($orcamentoVinculado['id']);
+$hasOrÃ§amentoVinculado = !empty($orcamentoVinculado['id']);
 $orcamentoItensResumo = is_array($orcamentoItensResumo ?? null) ? $orcamentoItensResumo : ['items' => [], 'groups' => [], 'total_items' => 0, 'total_quantity' => 0.0];
 $orcamentoStatusLabels = is_array($orcamentoStatusLabels ?? null) ? $orcamentoStatusLabels : [];
 $orcamentoTipoLabels = is_array($orcamentoTipoLabels ?? null) ? $orcamentoTipoLabels : [];
-$orcamentoEditUrl = $hasOrçamentoVinculado
+$orcamentoEditUrl = $hasOrÃ§amentoVinculado
     ? base_url('orcamentos/editar/' . (int) ($orcamentoVinculado['id'] ?? 0)) . $embedQuery
     : '';
-$orcamentoViewUrl = $hasOrçamentoVinculado
+$orcamentoViewUrl = $hasOrÃ§amentoVinculado
     ? base_url('orcamentos/visualizar/' . (int) ($orcamentoVinculado['id'] ?? 0)) . $embedQuery
     : '';
-$canCreateOrçamento = can('orcamentos', 'criar');
-$canEditOrçamento = can('orcamentos', 'editar');
-$canViewOrçamento = can('orcamentos', 'visualizar');
+$canCreateOrÃ§amento = can('orcamentos', 'criar');
+$canEditOrÃ§amento = can('orcamentos', 'editar');
+$canViewOrÃ§amento = can('orcamentos', 'visualizar');
 $orcamentoActionUrl = '';
 $orcamentoActionLabel = '';
 $orcamentoActionClass = '';
 $orcamentoActionTitle = '';
-if ($hasOrçamentoVinculado) {
-    if ($canEditOrçamento) {
+if ($hasOrÃ§amentoVinculado) {
+    if ($canEditOrÃ§amento) {
         $orcamentoActionUrl = $orcamentoEditUrl;
-        $orcamentoActionLabel = 'Editar orçamento';
+        $orcamentoActionLabel = 'Editar orÃ§amento';
         $orcamentoActionClass = 'btn btn-primary';
-        $orcamentoActionTitle = 'Editar orçamento vinculado a esta OS';
-    } elseif ($canViewOrçamento) {
+        $orcamentoActionTitle = 'Editar orÃ§amento vinculado a esta OS';
+    } elseif ($canViewOrÃ§amento) {
         $orcamentoActionUrl = $orcamentoViewUrl;
-        $orcamentoActionLabel = 'Visualizar orçamento';
+        $orcamentoActionLabel = 'Visualizar orÃ§amento';
         $orcamentoActionClass = 'btn btn-primary';
-        $orcamentoActionTitle = 'Visualizar orçamento vinculado a esta OS';
+        $orcamentoActionTitle = 'Visualizar orÃ§amento vinculado a esta OS';
     }
-} elseif ($canCreateOrçamento) {
+} elseif ($canCreateOrÃ§amento) {
     $orcamentoActionUrl = $orcamentoQuickUrl;
-    $orcamentoActionLabel = 'Gerar orçamento';
+    $orcamentoActionLabel = 'Gerar orÃ§amento';
     $orcamentoActionClass = 'btn btn-outline-warning';
-    $orcamentoActionTitle = 'Gerar orçamento para esta OS';
+    $orcamentoActionTitle = 'Gerar orÃ§amento para esta OS';
 }
 $checklistFotos = [];
 foreach ((array) ($checklist_entrada['itens'] ?? []) as $itemChecklist) {
@@ -94,8 +100,9 @@ $emailDefaultMessage = trim((string) ($emailDefaultMessage ?? ''));
 $orcamentoWhatsappDefaultMessage = trim((string) ($orcamentoWhatsappDefaultMessage ?? ''));
 $orcamentoEmailDefaultSubject = trim((string) ($orcamentoEmailDefaultSubject ?? ''));
 $orcamentoDispatchBlocked = (bool) ($orcamentoDispatchBlocked ?? false);
-$orcamentoWhatsappSendUrl = $hasOrçamentoVinculado ? base_url('orcamentos/whatsapp/' . (int) ($orcamentoVinculado['id'] ?? 0) . '/enviar') . $embedQuery : '';
-$orcamentoEmailSendUrl = $hasOrçamentoVinculado ? base_url('orcamentos/email/' . (int) ($orcamentoVinculado['id'] ?? 0) . '/enviar') . $embedQuery : '';
+$postCreatePdfPrompt = is_array($postCreatePdfPrompt ?? null) ? $postCreatePdfPrompt : [];
+$orcamentoWhatsappSendUrl = $hasOrÃ§amentoVinculado ? base_url('orcamentos/whatsapp/' . (int) ($orcamentoVinculado['id'] ?? 0) . '/enviar') . $embedQuery : '';
+$orcamentoEmailSendUrl = $hasOrÃ§amentoVinculado ? base_url('orcamentos/email/' . (int) ($orcamentoVinculado['id'] ?? 0) . '/enviar') . $embedQuery : '';
 $templateByDocumento = [
     'abertura' => 'os_aberta',
     'orcamento' => 'orcamento_enviado',
@@ -107,6 +114,7 @@ $documentLabelByCode = $pdfTipos;
 $printPreviewBaseUrl = base_url('os/imprimir/' . (int) ($os['id'] ?? 0));
 $printWhatsAppUrl = base_url('os/whatsapp/' . (int) ($os['id'] ?? 0)) . $embedQuery;
 $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
+$osEquipamentoNome = equipamento_nome_exibicao($os);
 ?>
 <?= $this->extend($layout ?? 'layouts/main') ?>
 
@@ -238,7 +246,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
             <?php if (!empty($os['numero_os_legado']) || !empty($os['legacy_origem'])): ?>
                 <div class="small text-muted mt-2">
                     <?php if (!empty($os['numero_os_legado'])): ?>
-                        <span class="me-3"><strong>Número legado:</strong> <?= esc($os['numero_os_legado']) ?></span>
+                        <span class="me-3"><strong>NÃºmero legado:</strong> <?= esc($os['numero_os_legado']) ?></span>
                     <?php endif; ?>
                     <?php if (!empty($os['legacy_origem'])): ?>
                         <span><strong>Origem:</strong> <?= esc($os['legacy_origem']) ?></span>
@@ -247,7 +255,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
             <?php endif; ?>
         </div>
         <div class="os-top-actions">
-            <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')" title="Ajuda sobre Ordens de Serviço">
+            <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')" title="Ajuda sobre Ordens de ServiÃ§o">
                 <i class="bi bi-question-circle me-1"></i>Ajuda
             </button>
             <?php if (can('os', 'editar')): ?>
@@ -309,7 +317,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                             <?php else: ?>
                                 <div class="rounded bg-body-tertiary d-flex align-items-center justify-content-center mx-auto border text-body-secondary os-show-photo-preview">
                                     <div class="text-center opacity-50">
-                                        <i class="bi bi-câmera fs-1"></i>
+                                        <i class="bi bi-cÃ¢mera fs-1"></i>
                                         <div class="small mt-1">Sem foto</div>
                                     </div>
                                 </div>
@@ -327,7 +335,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                         <?php endif; ?>
 
                         <div class="mt-3 p-2 rounded text-start os-show-photo-meta">
-                            <div class="text-white-50"><i class="bi bi-laptop me-1"></i><?= esc(trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))) ?></div>
+                            <div class="text-white-50"><i class="bi bi-laptop me-1"></i><?= esc($osEquipamentoNome) ?></div>
                             <div class="text-muted mt-1"><i class="bi bi-upc me-1"></i>SN: <?= esc($os['equip_serie'] ?? '-') ?></div>
                         </div>
                     </div>
@@ -335,12 +343,12 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
 
                 <div class="card glass-card os-workflow-card">
                     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <h6 class="mb-0"><i class="bi bi-bezier2 me-1"></i>Histórico e Progresso</h6>
-                        <span class="small text-muted">Etapas percorridas, etapa atual e prováveis próximos movimentos.</span>
+                        <h6 class="mb-0"><i class="bi bi-bezier2 me-1"></i>HistÃ³rico e Progresso</h6>
+                        <span class="small text-muted">Etapas percorridas, etapa atual e provÃ¡veis prÃ³ximos movimentos.</span>
                     </div>
                     <div class="card-body">
                         <?php if (empty($workflowTimeline ?? [])): ?>
-                            <p class="text-muted mb-0 small">Fluxo visual indisponível para esta OS.</p>
+                            <p class="text-muted mb-0 small">Fluxo visual indisponÃ­vel para esta OS.</p>
                         <?php else: ?>
                             <div class="os-workflow-timeline">
                                 <?php foreach (($workflowTimeline ?? []) as $stage): ?>
@@ -351,13 +359,13 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
 
                                     if ($stageState === 'completed') {
                                         $stageBadgeClass = 'bg-success-subtle text-success-emphasis border border-success-subtle';
-                                        $stageBadgeLabel = 'Concluída';
+                                        $stageBadgeLabel = 'ConcluÃ­da';
                                     } elseif ($stageState === 'current') {
                                         $stageBadgeClass = 'bg-primary-subtle text-primary-emphasis border border-primary-subtle';
                                         $stageBadgeLabel = 'Atual';
                                     } elseif ($stageState === 'probable') {
                                         $stageBadgeClass = 'bg-warning-subtle text-warning-emphasis border border-warning-subtle';
-                                        $stageBadgeLabel = 'Provável';
+                                        $stageBadgeLabel = 'ProvÃ¡vel';
                                     }
                                     ?>
                                     <div class="os-workflow-step is-<?= esc($stageState) ?>">
@@ -381,7 +389,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                     </div>
                                                 <?php endif; ?>
                                             <?php elseif ($stageState === 'probable' && !empty($stage['next_status_names'])): ?>
-                                                <div class="os-workflow-step-text">Próximas opções: <?= esc(implode(', ', (array) $stage['next_status_names'])) ?>.</div>
+                                                <div class="os-workflow-step-text">PrÃ³ximas opÃ§Ãµes: <?= esc(implode(', ', (array) $stage['next_status_names'])) ?>.</div>
                                             <?php else: ?>
                                                 <div class="os-workflow-step-text">Etapa futura do atendimento.</div>
                                             <?php endif; ?>
@@ -393,7 +401,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                             <?php if (!empty($workflowRecentHistory ?? [])): ?>
                                 <div class="os-section-divider"></div>
                                 <div class="os-workflow-history">
-                                    <div class="os-section-caption">Últimas movimentações</div>
+                                    <div class="os-section-caption">Ãšltimas movimentaÃ§Ãµes</div>
                                     <div class="os-workflow-history-list">
                                         <?php foreach (($workflowRecentHistory ?? []) as $item): ?>
                                             <div class="os-workflow-history-item">
@@ -426,20 +434,20 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                 </div>
                                 <div class="os-primary-summary-item">
                                     <span class="os-primary-summary-label">Equipamento</span>
-                                    <strong><?= esc(trim(($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))) ?></strong>
+                                    <strong><?= esc($osEquipamentoNome) ?></strong>
                                     <small><?= esc(getEquipTipo($os['equip_tipo'] ?? '')) ?><?php if (!empty($os['equip_serie'])): ?> | SN: <?= esc($os['equip_serie']) ?><?php endif; ?></small>
                                 </div>
                                 <div class="os-primary-summary-item">
-                                    <span class="os-primary-summary-label">Técnico</span>
-                                <strong><?= esc($os['tecnico_nome'] ?? 'Não atribuído') ?></strong>
+                                    <span class="os-primary-summary-label">TÃ©cnico</span>
+                                <strong><?= esc($os['tecnico_nome'] ?? 'NÃ£o atribuÃ­do') ?></strong>
                                     <small>OS aberta em <?= esc(formatDate($os['data_abertura'] ?? '', true)) ?></small>
                                 </div>
                             </div>
 
                             <ul class="nav nav-tabs ds-tabs-scroll os-show-tabs" role="tablist">
-                                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-info">Informações</a></li>
-                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-itens">Orçamento</a></li>
-                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-técnico">Diagnóstico</a></li>
+                                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-info">InformaÃ§Ãµes</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-itens">OrÃ§amento</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-tÃ©cnico">DiagnÃ³stico</a></li>
                                 <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-fotos">Fotos</a></li>
                                 <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-documentos">Documentos</a></li>
                                 <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-valores">Valores</a></li>
@@ -457,22 +465,22 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                         <span class="badge bg-light text-dark border"><?= esc((string) ($estadoFluxoLabel ?? $os['estado_fluxo'])) ?></span>
                                                     <?php endif; ?>
                                                     <?= getPriorityBadge($os['prioridade'] ?? 'normal') ?>
-                                                    <?php if ($hasOrçamentoVinculado): ?>
-                                                        <span class="badge bg-light text-dark border">Orçamento <?= esc((string) ($orcamentoVinculado['numero'] ?? '#')) ?></span>
+                                                    <?php if ($hasOrÃ§amentoVinculado): ?>
+                                                        <span class="badge bg-light text-dark border">OrÃ§amento <?= esc((string) ($orcamentoVinculado['numero'] ?? '#')) ?></span>
                                                     <?php endif; ?>
                                                 </div>
-                                                <?php if ($hasOrçamentoVinculado): ?>
-                                                    <div class="small text-muted mb-2">Status do orçamento vinculado</div>
+                                                <?php if ($hasOrÃ§amentoVinculado): ?>
+                                                    <div class="small text-muted mb-2">Status do orÃ§amento vinculado</div>
                                                     <div class="d-flex flex-wrap gap-2 mb-3">
-                                                        <span class="badge bg-primary-subtle text-primary-emphasis"><?= esc((string) ($orcamentoVinculado['status_label'] ?? ($orcamentoStatusLabels[$orcamentoVinculado['status'] ?? ''] ?? 'Orçamento vinculado'))) ?></span>
+                                                        <span class="badge bg-primary-subtle text-primary-emphasis"><?= esc((string) ($orcamentoVinculado['status_label'] ?? ($orcamentoStatusLabels[$orcamentoVinculado['status'] ?? ''] ?? 'OrÃ§amento vinculado'))) ?></span>
                                                         <?php if (!empty($orcamentoVinculado['tipo_label'])): ?>
                                                             <span class="badge bg-light text-dark border"><?= esc((string) $orcamentoVinculado['tipo_label']) ?></span>
                                                         <?php endif; ?>
                                                     </div>
                                                 <?php endif; ?>
-                                                <div class="small text-muted mb-2">Próximas etapas prováveis</div>
+                                                <div class="small text-muted mb-2">PrÃ³ximas etapas provÃ¡veis</div>
                                                 <?php if (empty($nextStatusOptions)): ?>
-                                                    <p class="mb-0 text-muted">Não há transições sugeridas além do status atual.</p>
+                                                    <p class="mb-0 text-muted">NÃ£o hÃ¡ transiÃ§Ãµes sugeridas alÃ©m do status atual.</p>
                                                 <?php else: ?>
                                                     <div class="d-flex flex-wrap gap-2">
                                                         <?php foreach ($nextStatusOptions as $statusHint): ?>
@@ -497,7 +505,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                 <?php else: ?>
                                                     <div class="mb-2">
                                                         <span class="badge <?= ($checklistResumo['variant'] ?? '') === 'success' ? 'bg-success' : ((($checklistResumo['variant'] ?? '') === 'warning') ? 'bg-warning text-dark' : 'bg-secondary') ?>">
-                                                            <?= esc((string) ($checklistResumo['label'] ?? 'Checklist não preenchido')) ?>
+                                                            <?= esc((string) ($checklistResumo['label'] ?? 'Checklist nÃ£o preenchido')) ?>
                                                         </span>
                                                     </div>
                                                     <?php
@@ -507,7 +515,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                         }));
                                                     ?>
                                                     <?php if (empty($checklistItens)): ?>
-                                                        <p class="mb-0 text-muted">Nenhuma discrepância registrada no checklist.</p>
+                                                        <p class="mb-0 text-muted">Nenhuma discrepÃ¢ncia registrada no checklist.</p>
                                                     <?php else: ?>
                                                         <div class="d-flex flex-column gap-2">
                                                             <?php foreach ($checklistItens as $item): ?>
@@ -536,14 +544,14 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                 </div>
 
                                 <div class="tab-pane fade" id="tab-itens">
-                                    <?php if ($hasOrçamentoVinculado): ?>
+                                    <?php if ($hasOrÃ§amentoVinculado): ?>
                                     <div class="row g-4">
                                         <div class="col-12">
                                             <div class="info-card">
                                                 <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
                                                     <div>
-                                                        <div class="info-card-title mb-1"><i class="bi bi-receipt"></i>Resumo do Orçamento</div>
-                                                        <p class="text-muted mb-0">Este orçamento está vinculado a esta OS e concentra peças, serviços, pacotes e acessórios cadastrados.</p>
+                                                        <div class="info-card-title mb-1"><i class="bi bi-receipt"></i>Resumo do OrÃ§amento</div>
+                                                        <p class="text-muted mb-0">Este orÃ§amento estÃ¡ vinculado a esta OS e concentra peÃ§as, serviÃ§os, pacotes e acessÃ³rios cadastrados.</p>
                                                     </div>
                                                     <?php if ($orcamentoActionUrl !== '' && $orcamentoActionLabel !== ''): ?>
                                                         <a href="<?= esc($orcamentoActionUrl) ?>" class="<?= esc(trim($orcamentoActionClass . ' btn-sm')) ?>">
@@ -554,7 +562,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
 
                                                 <div class="row g-3 mt-1">
                                                     <div class="col-12 col-md-4 col-xl-2">
-                                                        <div class="small text-muted">Número</div>
+                                                        <div class="small text-muted">NÃºmero</div>
                                                         <div class="fw-semibold"><?= esc((string) ($orcamentoVinculado['numero'] ?? '-')) ?></div>
                                                     </div>
                                                     <div class="col-12 col-md-4 col-xl-3">
@@ -576,11 +584,11 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                 </div>
 
                                                 <?php if (!empty($orcamentoVinculado['prazo_execucao'])): ?>
-                                                    <div class="small text-muted mt-3">Prazo de execução: <strong class="text-body"><?= esc((string) $orcamentoVinculado['prazo_execucao']) ?></strong></div>
+                                                    <div class="small text-muted mt-3">Prazo de execuÃ§Ã£o: <strong class="text-body"><?= esc((string) $orcamentoVinculado['prazo_execucao']) ?></strong></div>
                                                 <?php endif; ?>
 
                                                 <?php if (!empty($orcamentoVinculado['is_locked'])): ?>
-                                                    <div class="alert alert-light border small mt-3 mb-0">Este orçamento está bloqueado para edição direta pelo status atual. Se precisar reenviar uma nova proposta, utilize o fluxo de revisão no módulo de orçamentos.</div>
+                                                    <div class="alert alert-light border small mt-3 mb-0">Este orÃ§amento estÃ¡ bloqueado para ediÃ§Ã£o direta pelo status atual. Se precisar reenviar uma nova proposta, utilize o fluxo de revisÃ£o no mÃ³dulo de orÃ§amentos.</div>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -590,8 +598,8 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                 <?php if (empty($orcamentoItensResumo['groups'])): ?>
                                                     <div class="col-12">
                                                         <div class="info-card">
-                                                            <div class="info-card-title"><i class="bi bi-box-seam"></i>Composição do Orçamento</div>
-                                                            <p class="mb-0 text-muted">Nenhum item foi inserido neste orçamento ainda.</p>
+                                                            <div class="info-card-title"><i class="bi bi-box-seam"></i>ComposiÃ§Ã£o do OrÃ§amento</div>
+                                                            <p class="mb-0 text-muted">Nenhum item foi inserido neste orÃ§amento ainda.</p>
                                                         </div>
                                                     </div>
                                                 <?php else: ?>
@@ -617,7 +625,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                         <div class="col-12">
                                             <div class="card glass-card">
                                                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                                    <h5 class="card-title mb-0">Itens do Orçamento</h5>
+                                                    <h5 class="card-title mb-0">Itens do OrÃ§amento</h5>
                                                     <span class="small text-muted"><?= esc((string) ($orcamentoItensResumo['total_items'] ?? 0)) ?> item(ns) vinculado(s)</span>
                                                 </div>
                                                 <div class="card-body p-0">
@@ -626,36 +634,36 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                             <thead>
                                                                 <tr>
                                                                     <th>Tipo</th>
-                                                                    <th>Descrição</th>
+                                                                    <th>DescriÃ§Ã£o</th>
                                                                     <th>Qtd</th>
                                                                     <th>Valor Unit.</th>
                                                                     <th>Desconto</th>
-                                                                    <th>Acréscimo</th>
+                                                                    <th>AcrÃ©scimo</th>
                                                                     <th>Total</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 <?php if (empty($orcamentoItensResumo['items'])): ?>
-                                                            <tr><td colspan="7" class="text-center py-3 text-muted">Nenhum item cadastrado neste orçamento.</td></tr>
+                                                            <tr><td colspan="7" class="text-center py-3 text-muted">Nenhum item cadastrado neste orÃ§amento.</td></tr>
                                                                 <?php else: ?>
-                                                                    <?php foreach ($orcamentoItensResumo['items'] as $itemOrçamento): ?>
+                                                                    <?php foreach ($orcamentoItensResumo['items'] as $itemOrÃ§amento): ?>
                                                                         <tr>
                                                                             <td>
-                                                                                <span class="badge <?= esc((string) ($itemOrçamento['tipo_item_badge_class'] ?? 'bg-light text-dark border')) ?>">
-                                                                                    <?= esc((string) ($itemOrçamento['tipo_item_label'] ?? ucwords((string) ($itemOrçamento['tipo_item'] ?? 'item')))) ?>
+                                                                                <span class="badge <?= esc((string) ($itemOrÃ§amento['tipo_item_badge_class'] ?? 'bg-light text-dark border')) ?>">
+                                                                                    <?= esc((string) ($itemOrÃ§amento['tipo_item_label'] ?? ucwords((string) ($itemOrÃ§amento['tipo_item'] ?? 'item')))) ?>
                                                                                 </span>
                                                                             </td>
                                                                             <td>
-                                                                                <div><?= esc((string) ($itemOrçamento['descricao'] ?? '-')) ?></div>
-                                                                                <?php if (!empty($itemOrçamento['observacoes'])): ?>
-                                                                                    <small class="text-muted d-block mt-1"><?= esc((string) $itemOrçamento['observacoes']) ?></small>
+                                                                                <div><?= esc((string) ($itemOrÃ§amento['descricao'] ?? '-')) ?></div>
+                                                                                <?php if (!empty($itemOrÃ§amento['observacoes'])): ?>
+                                                                                    <small class="text-muted d-block mt-1"><?= esc((string) $itemOrÃ§amento['observacoes']) ?></small>
                                                                                 <?php endif; ?>
                                                                             </td>
-                                                                            <td><?= esc((string) ($itemOrçamento['quantidade'] ?? 0)) ?></td>
-                                                                            <td><?= esc(formatMoney($itemOrçamento['valor_unitario'] ?? 0)) ?></td>
-                                                                            <td><?= esc(formatMoney($itemOrçamento['desconto'] ?? 0)) ?></td>
-                                                                            <td><?= esc(formatMoney($itemOrçamento['acrescimo'] ?? 0)) ?></td>
-                                                                            <td><strong><?= esc(formatMoney($itemOrçamento['total'] ?? 0)) ?></strong></td>
+                                                                            <td><?= esc((string) ($itemOrÃ§amento['quantidade'] ?? 0)) ?></td>
+                                                                            <td><?= esc(formatMoney($itemOrÃ§amento['valor_unitario'] ?? 0)) ?></td>
+                                                                            <td><?= esc(formatMoney($itemOrÃ§amento['desconto'] ?? 0)) ?></td>
+                                                                            <td><?= esc(formatMoney($itemOrÃ§amento['acrescimo'] ?? 0)) ?></td>
+                                                                            <td><strong><?= esc(formatMoney($itemOrÃ§amento['total'] ?? 0)) ?></strong></td>
                                                                         </tr>
                                                                     <?php endforeach; ?>
                                                                 <?php endif; ?>
@@ -668,8 +676,8 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                     </div>
                                     <?php else: ?>
                                     <div class="info-card">
-                                            <div class="info-card-title"><i class="bi bi-receipt"></i>Orçamento</div>
-                                            <p class="text-muted mb-3">Esta OS ainda não possui um orçamento vinculado.</p>
+                                            <div class="info-card-title"><i class="bi bi-receipt"></i>OrÃ§amento</div>
+                                            <p class="text-muted mb-3">Esta OS ainda nÃ£o possui um orÃ§amento vinculado.</p>
                                         <?php if ($orcamentoActionUrl !== '' && $orcamentoActionLabel !== ''): ?>
                                             <a href="<?= esc($orcamentoActionUrl) ?>" class="<?= esc($orcamentoActionClass) ?>">
                                                 <i class="bi bi-receipt-cutoff me-1"></i><?= esc($orcamentoActionLabel) ?>
@@ -678,7 +686,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                     </div>
                                     <?php endif; ?>
                                 </div>
-                                <div class="tab-pane fade" id="tab-técnico">
+                                <div class="tab-pane fade" id="tab-tÃ©cnico">
                                     <div class="row g-4">
                                         <div class="col-12">
                                             <div class="info-card">
@@ -698,20 +706,20 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                         </div>
                                         <div class="col-md-6">
                                             <div class="info-card">
-                                                <div class="info-card-title"><i class="bi bi-search"></i>Diagnóstico Técnico</div>
-                                                <p><?= nl2br(esc($os['diagnostico_tecnico'] ?? 'Nenhum diagnóstico registrado.')) ?></p>
+                                                <div class="info-card-title"><i class="bi bi-search"></i>DiagnÃ³stico TÃ©cnico</div>
+                                                <p><?= nl2br(esc($os['diagnostico_tecnico'] ?? 'Nenhum diagnÃ³stico registrado.')) ?></p>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="info-card">
-                                                <div class="info-card-title"><i class="bi bi-wrench"></i>Solução Aplicada</div>
-                                                <p><?= nl2br(esc($os['solucao_aplicada'] ?? 'Nenhuma solução registrada.')) ?></p>
+                                                <div class="info-card-title"><i class="bi bi-wrench"></i>SoluÃ§Ã£o Aplicada</div>
+                                                <p><?= nl2br(esc($os['solucao_aplicada'] ?? 'Nenhuma soluÃ§Ã£o registrada.')) ?></p>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="info-card">
-                                                <div class="info-card-title"><i class="bi bi-person-badge"></i>Técnico</div>
-                                                <p><?= esc($os['tecnico_nome'] ?? 'Não atribuído') ?></p>
+                                                <div class="info-card-title"><i class="bi bi-person-badge"></i>TÃ©cnico</div>
+                                                <p><?= esc($os['tecnico_nome'] ?? 'NÃ£o atribuÃ­do') ?></p>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -720,7 +728,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                 <p>
                                                     <?= esc((string) ($os['garantia_dias'] ?? '0')) ?> dias
                                                     <?php if (!empty($os['garantia_validade'])): ?>
-                                                        - Válida até <?= esc(formatDate($os['garantia_validade'])) ?>
+                                                        - VÃ¡lida atÃ© <?= esc(formatDate($os['garantia_validade'])) ?>
                                                     <?php endif; ?>
                                                 </p>
                                             </div>
@@ -729,7 +737,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                         <?php if ($observacoesInternas !== ''): ?>
                                         <div class="col-md-6">
                                             <div class="info-card">
-                                                <div class="info-card-title"><i class="bi bi-journal-text"></i>Observações Internas</div>
+                                                <div class="info-card-title"><i class="bi bi-journal-text"></i>ObservaÃ§Ãµes Internas</div>
                                                 <p class="mb-0"><?= nl2br(esc($observacoesInternas)) ?></p>
                                             </div>
                                         </div>
@@ -738,7 +746,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                         <?php if ($observacoesCliente !== ''): ?>
                                         <div class="col-md-6">
                                             <div class="info-card">
-                                                <div class="info-card-title"><i class="bi bi-chat-square-quote"></i>Observações do Cliente</div>
+                                                <div class="info-card-title"><i class="bi bi-chat-square-quote"></i>ObservaÃ§Ãµes do Cliente</div>
                                                 <p class="mb-0"><?= nl2br(esc($observacoesCliente)) ?></p>
                                             </div>
                                         </div>
@@ -855,7 +863,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                         <div class="col-12">
                                             <div class="card glass-card">
                                                 <div class="card-header d-flex justify-content-between align-items-center">
-                                                    <h5 class="card-title mb-0"><i class="bi bi-câmera me-2"></i>Fotos de Entrada</h5>
+                                                    <h5 class="card-title mb-0"><i class="bi bi-cÃ¢mera me-2"></i>Fotos de Entrada</h5>
                                                     <span class="badge bg-light text-dark border"><?= esc((string) count($fotos_entrada ?? [])) ?></span>
                                                 </div>
                                                 <div class="card-body">
@@ -879,22 +887,22 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                         <div class="col-12">
                                             <div class="card glass-card">
                                                 <div class="card-header d-flex justify-content-between align-items-center">
-                                                    <h5 class="card-title mb-0"><i class="bi bi-patch-check me-2"></i>Fotos dos Acessórios</h5>
+                                                    <h5 class="card-title mb-0"><i class="bi bi-patch-check me-2"></i>Fotos dos AcessÃ³rios</h5>
                                                     <span class="badge bg-light text-dark border"><?= esc((string) count($acessoriosComFotos)) ?></span>
                                                 </div>
                                                 <div class="card-body">
                                                     <?php if (empty($acessoriosComFotos)): ?>
-                                                        <p class="text-muted mb-0">Nenhuma foto de acessório registrada.</p>
+                                                        <p class="text-muted mb-0">Nenhuma foto de acessÃ³rio registrada.</p>
                                                     <?php else: ?>
                                                         <div class="row g-3">
                                                             <?php foreach ($acessoriosComFotos as $acessorio): ?>
                                                                 <div class="col-12 col-md-6 col-xl-4">
                                                                     <div class="border rounded-3 p-3 h-100 os-show-subitem-card">
-                                                                        <div class="fw-semibold mb-3"><?= esc((string) ($acessorio['descricao'] ?? 'Acessório')) ?></div>
+                                                                        <div class="fw-semibold mb-3"><?= esc((string) ($acessorio['descricao'] ?? 'AcessÃ³rio')) ?></div>
                                                                         <div class="d-flex flex-wrap gap-2">
                                                                             <?php foreach ((array) ($acessorio['fotos'] ?? []) as $foto): ?>
                                                                                 <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= esc($foto['url']) ?>" class="border rounded overflow-hidden shadow-sm os-show-inline-photo">
-                                                                                    <img src="<?= esc($foto['url']) ?>" class="w-100 h-100 object-fit-cover" alt="Foto do acessório">
+                                                                                    <img src="<?= esc($foto['url']) ?>" class="w-100 h-100 object-fit-cover" alt="Foto do acessÃ³rio">
                                                                                 </a>
                                                                             <?php endforeach; ?>
                                                                         </div>
@@ -944,8 +952,8 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                     <span class="badge bg-light text-dark border"><?= esc((string) count($documentosDaOs)) ?></span>
                                                 </div>
                                                 <div class="card-body">
-                                                    <p class="text-muted small mb-3">Gere novas versões dos documentos da OS e centralize os arquivos prontos para envio.</p>
-                                                    <form action="<?= base_url('os/pdf/' . $os['id'] . '/gerar') ?><?= $embedQuery ?>" method="POST" class="os-doc-form mb-3" id="osPdfGenerateForm" data-budget-create-url="<?= esc($orcamentoQuickEmbedUrl) ?>" data-has-budget="<?= $hasOrçamentoVinculado ? '1' : '0' ?>">
+                                                    <p class="text-muted small mb-3">Gere novas versÃµes dos documentos da OS e centralize os arquivos prontos para envio.</p>
+                                                    <form action="<?= base_url('os/pdf/' . $os['id'] . '/gerar') ?><?= $embedQuery ?>" method="POST" class="os-doc-form mb-3" id="osPdfGenerateForm" data-budget-create-url="<?= esc($orcamentoQuickEmbedUrl) ?>" data-has-budget="<?= $hasOrÃ§amentoVinculado ? '1' : '0' ?>">
                                                         <?= csrf_field() ?>
                                                         <select name="tipo_documento" class="form-select form-select-sm" id="osPdfTipoSelect" required>
                                                             <option value="">Selecionar tipo...</option>
@@ -953,6 +961,8 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                                 <option value="<?= esc($codigo) ?>"><?= esc($nome) ?></option>
                                                             <?php endforeach; ?>
                                                         </select>
+                                                        <input type="hidden" name="incluir_fotos_abertura" id="osPdfIncludePhotosInput" value="0">
+                                                        <input type="hidden" name="grupos_fotos_abertura" id="osPdfPhotoGroupsInput" value="">
                                                         <button type="submit" class="btn btn-sm btn-glow">Gerar</button>
                                                     </form>
 
@@ -964,7 +974,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                                 <?php
                                                                 $docType = (string) ($doc['tipo_documento'] ?? 'documento');
                                                                 $docLabel = $documentLabelByCode[$docType] ?? ucwords(str_replace('_', ' ', $docType));
-                                                                $isBudgetDoc = $docType === 'orcamento' && $hasOrçamentoVinculado;
+                                                                $isBudgetDoc = $docType === 'orcamento' && $hasOrÃ§amentoVinculado;
                                                                 ?>
                                                                 <div class="border rounded p-2 small d-flex justify-content-between align-items-center gap-2 flex-wrap">
                                                                     <div>
@@ -1037,7 +1047,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                             <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-send me-1"></i>Enviar</button>
                                                         </form>
                                                     <?php else: ?>
-                                                        <p class="text-muted small">Sem permissão para envio manual.</p>
+                                                        <p class="text-muted small">Sem permissÃ£o para envio manual.</p>
                                                     <?php endif; ?>
 
                                                     <?php if (empty($whatsappLogs ?? [])): ?>
@@ -1089,7 +1099,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                             </select>
                                                             <input type="text" name="assunto_email" id="osE-mailSubjectInput" class="form-control form-control-sm" value="<?= esc($emailDefaultSubject) ?>" placeholder="Assunto do e-mail">
                                                             <textarea name="mensagem_email" id="osE-mailMessageInput" class="form-control form-control-sm" rows="5" placeholder="Mensagem do e-mail"><?= esc($emailDefaultMessage) ?></textarea>
-                                                            <div class="small text-muted" id="osE-mailDispatchHint">O PDF selecionado será anexado ao e-mail usando a configuração SMTP do ERP.</div>
+                                                            <div class="small text-muted" id="osE-mailDispatchHint">O PDF selecionado serÃ¡ anexado ao e-mail usando a configuraÃ§Ã£o SMTP do ERP.</div>
                                                             <button type="submit" class="btn btn-sm btn-primary" <?= empty($documentosDaOs) ? 'disabled' : '' ?>>
                                                                 <i class="bi bi-envelope-paper me-1"></i>Enviar E-mail
                                                             </button>
@@ -1098,7 +1108,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                             <p class="text-muted mb-0 small mt-3">Gere ao menos um PDF da OS para habilitar o envio por e-mail.</p>
                                                         <?php endif; ?>
                                                     <?php else: ?>
-                                                        <p class="text-muted small mb-0">Sem permissão para envio manual por e-mail.</p>
+                                                        <p class="text-muted small mb-0">Sem permissÃ£o para envio manual por e-mail.</p>
                                                     <?php endif; ?>
                                                 </div>
                                             </div>
@@ -1111,37 +1121,104 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                             <div class="info-card h-100">
                                                 <div class="info-card-title"><i class="bi bi-currency-dollar"></i>Resumo Financeiro da OS</div>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">Mão de Obra</span>
-                                                    <span class="finance-value"><?= esc(formatMoney($os['valor_mao_obra'] ?? 0)) ?></span>
+                                                    <span class="finance-label">MÃ£o de Obra</span>
+                                                    <span class="finance-value"><?= esc(formatMoney($osFinancialBase['valor_mao_obra'] ?? $os['valor_mao_obra'] ?? 0)) ?></span>
                                                 </div>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">Peças</span>
-                                                    <span class="finance-value"><?= esc(formatMoney($os['valor_pecas'] ?? 0)) ?></span>
+                                                    <span class="finance-label">PeÃ§as</span>
+                                                    <span class="finance-value"><?= esc(formatMoney($osFinancialBase['valor_pecas'] ?? $os['valor_pecas'] ?? 0)) ?></span>
                                                 </div>
                                                 <div class="finance-item">
                                                     <span class="finance-label">Subtotal da OS</span>
-                                                    <span class="finance-value"><?= esc(formatMoney($os['valor_total'] ?? 0)) ?></span>
+                                                    <span class="finance-value"><?= esc(formatMoney($osFinancialBase['valor_total'] ?? $os['valor_total'] ?? 0)) ?></span>
                                                 </div>
                                                 <div class="finance-item text-danger">
                                                     <span class="finance-label">Desconto</span>
-                                                    <span class="finance-value">- <?= esc(formatMoney($os['desconto'] ?? 0)) ?></span>
+                                                    <span class="finance-value">- <?= esc(formatMoney($osFinancialBase['desconto'] ?? $os['desconto'] ?? 0)) ?></span>
                                                 </div>
                                                 <hr>
                                                 <div class="finance-item">
                                                     <span class="finance-label"><strong>Total final da OS</strong></span>
-                                                    <span class="finance-value text-success"><strong><?= esc(formatMoney($os['valor_final'] ?? 0)) ?></strong></span>
+                                                    <span class="finance-value text-success"><strong><?= esc(formatMoney($osFinancialBase['valor_final'] ?? $os['valor_final'] ?? 0)) ?></strong></span>
                                                 </div>
+                                                <hr>
+                                                <div class="finance-item">
+                                                    <span class="finance-label">Adiantamento recebido</span>
+                                                    <span class="finance-value text-primary"><strong><?= esc(formatMoney($financeiroOsResumo['valor_adiantamento'] ?? 0)) ?></strong></span>
+                                                </div>
+                                                <div class="finance-item">
+                                                    <span class="finance-label">Total recebido</span>
+                                                    <span class="finance-value"><?= esc(formatMoney($financeiroOsResumo['valor_recebido_total'] ?? 0)) ?></span>
+                                                </div>
+                                                <div class="finance-item">
+                                                    <span class="finance-label">Saldo pendente da OS</span>
+                                                    <span class="finance-value <?= ((float) ($financeiroOsResumo['valor_em_aberto'] ?? 0) > 0) ? 'text-danger' : 'text-success' ?>">
+                                                        <strong><?= esc(formatMoney($financeiroOsResumo['valor_em_aberto'] ?? 0)) ?></strong>
+                                                    </span>
+                                                </div>
+                                                <div class="finance-item">
+                                                    <span class="finance-label">Status financeiro</span>
+                                                    <span class="finance-value"><?= esc((string) ($financeiroOsResumo['status_titulo_label'] ?? 'Pendente')) ?></span>
+                                                </div>
+                                                <div class="finance-item">
+                                                    <span class="finance-label">Ãšltimo recebimento</span>
+                                                    <span class="finance-value"><?= esc((string) ($financeiroOsResumo['ultimo_recebimento_em_label'] ?? '-')) ?></span>
+                                                </div>
+                                                <?php if (!empty($financeiroOsResumo['movimentos'])): ?>
+                                                    <div class="alert alert-info border-0 small mt-3 mb-0">
+                                                        Os recebimentos registrados antes da entrega ficam marcados como <strong>adiantamento</strong> ou <strong>sinal</strong> nesta OS.
+                                                    </div>
+                                                    <div class="mt-3">
+                                                        <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
+                                                            <div class="small text-uppercase text-muted fw-semibold">HistÃ³rico de recebimentos</div>
+                                                            <span class="badge text-bg-light"><?= (int) ($financeiroOsResumo['quantidade_movimentos'] ?? 0) ?> lanÃ§amento(s)</span>
+                                                        </div>
+                                                        <div class="d-flex flex-column gap-2">
+                                                            <?php foreach ((array) ($financeiroOsResumo['movimentos'] ?? []) as $movimentoFinanceiro): ?>
+                                                                <div class="border rounded-3 p-2 os-show-subitem-card">
+                                                                    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-1">
+                                                                        <div class="fw-semibold">
+                                                                            <?= esc((string) ($movimentoFinanceiro['data_movimento_label'] ?? '-')) ?>
+                                                                            <?php if (!empty($movimentoFinanceiro['is_adiantamento'])): ?>
+                                                                                <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis ms-2"><?= esc((string) ($movimentoFinanceiro['receipt_kind_label'] ?? 'Adiantamento')) ?></span>
+                                                                            <?php endif; ?>
+                                                                        </div>
+                                                                        <div class="fw-semibold <?= !empty($movimentoFinanceiro['is_adiantamento']) ? 'text-primary' : 'text-success' ?>">
+                                                                            <?= esc(formatMoney($movimentoFinanceiro['valor'] ?? 0)) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="small text-muted">
+                                                                        <?= esc((string) ($movimentoFinanceiro['forma_pagamento_label'] ?? '-')) ?>
+                                                                        <?php if (!empty($movimentoFinanceiro['documento_ref'])): ?>
+                                                                            | Ref.: <?= esc((string) $movimentoFinanceiro['documento_ref']) ?>
+                                                                        <?php endif; ?>
+                                                                        <?php if (!empty($movimentoFinanceiro['created_at']) && ($movimentoFinanceiro['created_at_label'] ?? '-') !== '-'): ?>
+                                                                            | LanÃ§ado em <?= esc((string) ($movimentoFinanceiro['created_at_label'] ?? '-')) ?>
+                                                                        <?php endif; ?>
+                                                                    </div>
+                                                                    <?php if (!empty($movimentoFinanceiro['observacoes'])): ?>
+                                                                        <div class="small mt-1"><?= esc((string) $movimentoFinanceiro['observacoes']) ?></div>
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                            <?php endforeach; ?>
+                                                        </div>
+                                                    </div>
+                                                <?php elseif (!empty($financeiroOsResumo['existe_titulo'])): ?>
+                                                    <div class="small text-muted mt-3">
+                                                        Este tÃ­tulo financeiro ainda nÃ£o possui recebimentos lanÃ§ados.
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
 
                                         <div class="col-12 col-xl-6">
                                             <div class="info-card h-100">
-                                                <div class="info-card-title"><i class="bi bi-receipt"></i>Resumo Financeiro do Orçamento</div>
-                                                <?php if (!$hasOrçamentoVinculado): ?>
-                                                    <p class="mb-0 text-muted">Nenhum orçamento vinculado para detalhar nesta OS.</p>
+                                                <div class="info-card-title"><i class="bi bi-receipt"></i>Resumo Financeiro do OrÃ§amento</div>
+                                                <?php if (!$hasOrÃ§amentoVinculado): ?>
+                                                    <p class="mb-0 text-muted">Nenhum orÃ§amento vinculado para detalhar nesta OS.</p>
                                                 <?php else: ?>
                                                     <div class="finance-item">
-                                                        <span class="finance-label">Número</span>
+                                                        <span class="finance-label">NÃºmero</span>
                                                         <span class="finance-value"><?= esc((string) ($orcamentoVinculado['numero'] ?? '-')) ?></span>
                                                     </div>
                                                     <div class="finance-item">
@@ -1157,12 +1234,12 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                         <span class="finance-value">- <?= esc(formatMoney($orcamentoVinculado['desconto'] ?? 0)) ?></span>
                                                     </div>
                                                     <div class="finance-item text-success">
-                                                        <span class="finance-label">Acréscimo</span>
+                                                        <span class="finance-label">AcrÃ©scimo</span>
                                                         <span class="finance-value">+ <?= esc(formatMoney($orcamentoVinculado['acrescimo'] ?? 0)) ?></span>
                                                     </div>
                                                     <hr>
                                                     <div class="finance-item">
-                                                        <span class="finance-label"><strong>Total do orçamento</strong></span>
+                                                        <span class="finance-label"><strong>Total do orÃ§amento</strong></span>
                                                         <span class="finance-value text-success"><strong><?= esc(formatMoney($orcamentoVinculado['total'] ?? 0)) ?></strong></span>
                                                     </div>
                                                 <?php endif; ?>
@@ -1171,7 +1248,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
 
                                         <div class="col-12 col-xl-6">
                                             <div class="info-card h-100">
-                                                <div class="info-card-title"><i class="bi bi-calendar-check"></i>Datas e Aprovações</div>
+                                                <div class="info-card-title"><i class="bi bi-calendar-check"></i>Datas e AprovaÃ§Ãµes</div>
                                                 <div class="finance-item">
                                                     <span class="finance-label">Abertura</span>
                                                     <span class="finance-value"><?= esc(formatDate($os['data_abertura'] ?? '', true)) ?></span>
@@ -1181,11 +1258,11 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                     <span class="finance-value"><?= esc(formatDate($os['data_entrada'] ?? '', true)) ?></span>
                                                 </div>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">Previsão</span>
+                                                    <span class="finance-label">PrevisÃ£o</span>
                                                     <span class="finance-value"><?= esc(formatDate($os['data_previsao'] ?? '')) ?></span>
                                                 </div>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">Conclusão</span>
+                                                    <span class="finance-label">ConclusÃ£o</span>
                                                     <span class="finance-value"><?= esc(formatDate($os['data_conclusao'] ?? '')) ?></span>
                                                 </div>
                                                 <div class="finance-item">
@@ -1194,30 +1271,30 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                 </div>
                                                 <?php if (!empty($os['data_aprovacao'])): ?>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">Aprovação da OS</span>
+                                                    <span class="finance-label">AprovaÃ§Ã£o da OS</span>
                                                     <span class="finance-value"><?= esc(formatDate($os['data_aprovacao'], true)) ?></span>
                                                 </div>
                                                 <?php endif; ?>
-                                                <?php if ($hasOrçamentoVinculado): ?>
+                                                <?php if ($hasOrÃ§amentoVinculado): ?>
                                                     <hr>
                                                     <div class="finance-item">
-                                                        <span class="finance-label">Orçamento criado</span>
+                                                        <span class="finance-label">OrÃ§amento criado</span>
                                                         <span class="finance-value"><?= esc(formatDate($orcamentoVinculado['created_at'] ?? '', true)) ?></span>
                                                     </div>
                                                     <div class="finance-item">
-                                                        <span class="finance-label">Orçamento enviado</span>
+                                                        <span class="finance-label">OrÃ§amento enviado</span>
                                                         <span class="finance-value"><?= esc(formatDate($orcamentoVinculado['enviado_em'] ?? '', true)) ?></span>
                                                     </div>
                                                     <div class="finance-item">
-                                                        <span class="finance-label">Orçamento aprovado</span>
+                                                        <span class="finance-label">OrÃ§amento aprovado</span>
                                                         <span class="finance-value"><?= esc(formatDate($orcamentoVinculado['aprovado_em'] ?? '', true)) ?></span>
                                                     </div>
                                                     <div class="finance-item">
-                                                        <span class="finance-label">Orçamento rejeitado</span>
+                                                        <span class="finance-label">OrÃ§amento rejeitado</span>
                                                         <span class="finance-value"><?= esc(formatDate($orcamentoVinculado['rejeitado_em'] ?? '', true)) ?></span>
                                                     </div>
                                                     <div class="finance-item">
-                                                        <span class="finance-label">Orçamento cancelado</span>
+                                                        <span class="finance-label">OrÃ§amento cancelado</span>
                                                         <span class="finance-value"><?= esc(formatDate($orcamentoVinculado['cancelado_em'] ?? '', true)) ?></span>
                                                     </div>
                                                 <?php endif; ?>
@@ -1228,12 +1305,12 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                             <div class="info-card h-100">
                                                 <div class="info-card-title"><i class="bi bi-wallet2"></i>Complementos Financeiros</div>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">Orçamento aprovado</span>
-                                                    <span class="finance-value"><?= !empty($os['orcamento_aprovado']) ? 'Sim' : 'Não' ?></span>
+                                                    <span class="finance-label">OrÃ§amento aprovado</span>
+                                                    <span class="finance-value"><?= !empty($os['orcamento_aprovado']) ? 'Sim' : 'NÃ£o' ?></span>
                                                 </div>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">Forma de pagamento</span>
-                                                    <span class="finance-value"><?= esc($formaPagamento !== '' ? $formaPagamento : '-') ?></span>
+                                                    <span class="finance-label">Formas de recebimento</span>
+                                                    <span class="finance-value"><?= esc($formasRecebimentoOs) ?></span>
                                                 </div>
                                                 <div class="finance-item">
                                                     <span class="finance-label">Garantia</span>
@@ -1241,7 +1318,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                                 </div>
                                                 <?php if (!empty($orcamentoVinculado['validade_data'])): ?>
                                                 <div class="finance-item">
-                                                        <span class="finance-label">Validade do orçamento</span>
+                                                        <span class="finance-label">Validade do orÃ§amento</span>
                                                     <span class="finance-value"><?= esc(formatDate($orcamentoVinculado['validade_data'] ?? '')) ?></span>
                                                 </div>
                                                 <?php endif; ?>
@@ -1279,7 +1356,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                 <div class="modal-body text-center p-0 position-relative">
                     <div class="d-inline-block position-relative">
                         <button type="button" class="btn-close position-absolute os-show-modal-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    <img src="" id="modalImagePreview" class="img-fluid rounded shadow-lg os-show-modal-image" alt="Visualização ampliada">
+    <img src="" id="modalImagePreview" class="img-fluid rounded shadow-lg os-show-modal-image" alt="VisualizaÃ§Ã£o ampliada">
                     </div>
                 </div>
             </div>
@@ -1294,7 +1371,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body p-0 bg-body-tertiary">
-                    <iframe id="pdfPreviewFrame" title="Pré-visualização do PDF" style="width:100%;height:min(80vh,900px);border:0;"></iframe>
+                    <iframe id="pdfPreviewFrame" title="PrÃ©-visualizaÃ§Ã£o do PDF" style="width:100%;height:min(80vh,900px);border:0;"></iframe>
                 </div>
             </div>
         </div>
@@ -1393,6 +1470,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                                 <?= csrf_field() ?>
                                 <input type="hidden" name="print_formato" id="osPrintWhatsappFormatInput" value="a4">
                                 <input type="hidden" name="print_incluir_fotos" id="osPrintWhatsappIncludePhotosInput" value="0">
+                                <input type="hidden" name="print_grupos_fotos" id="osPrintWhatsappPhotoGroupsInput" value="">
                                 <div>
                                     <label for="osPrintWhatsappTemplateSelect" class="form-label small fw-semibold mb-1">Template base</label>
                                     <select name="template_codigo" id="osPrintWhatsappTemplateSelect" class="form-select form-select-sm">
@@ -1431,15 +1509,15 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
         <div class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-lg-down">
             <div class="modal-content border-0 shadow-lg">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="orcamentoFrameModalTitle">Orçamento</h5>
+                    <h5 class="modal-title" id="orcamentoFrameModalTitle">OrÃ§amento</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body p-0 position-relative">
                     <div id="orcamentoFrameModalLoading" class="position-absolute top-50 start-50 translate-middle z-3 text-center">
                         <div class="spinner-border text-primary" role="status"></div>
-                        <div class="small text-muted mt-2">Abrindo orçamento...</div>
+                        <div class="small text-muted mt-2">Abrindo orÃ§amento...</div>
                     </div>
-                    <iframe id="orcamentoFrameModalFrame" title="Fluxo de orçamento" style="width:100%;height:min(84vh,980px);border:0;"></iframe>
+                    <iframe id="orcamentoFrameModalFrame" title="Fluxo de orÃ§amento" style="width:100%;height:min(84vh,980px);border:0;"></iframe>
                 </div>
             </div>
         </div>
@@ -1462,6 +1540,8 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
         const budgetFrameTitle = document.getElementById('orcamentoFrameModalTitle');
         const generateForm = document.getElementById('osPdfGenerateForm');
         const generateTypeSelect = document.getElementById('osPdfTipoSelect');
+        const generateIncludePhotosInput = document.getElementById('osPdfIncludePhotosInput');
+        const generatePhotoGroupsInput = document.getElementById('osPdfPhotoGroupsInput');
         const whatsappForm = document.getElementById('osWhatsappForm');
         const whatsappTemplateGroup = document.getElementById('osWhatsappTemplateGroup');
         const whatsappTemplateSelect = document.getElementById('osWhatsappTemplateSelect');
@@ -1494,18 +1574,33 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
         const printWhatsappSubmitButton = document.getElementById('osPrintWhatsappSubmitButton');
         const printWhatsappFormatInput = document.getElementById('osPrintWhatsappFormatInput');
         const printWhatsappIncludePhotosInput = document.getElementById('osPrintWhatsappIncludePhotosInput');
+        const printWhatsappPhotoGroupsInput = document.getElementById('osPrintWhatsappPhotoGroupsInput');
+        const osTabLinks = Array.from(document.querySelectorAll('.os-show-tabs [data-bs-toggle="tab"]'));
         const csrfTokenName = <?= json_encode(csrf_token()) ?>;
         let csrfTokenValue = <?= json_encode(csrf_hash()) ?>;
         const printTemplatePreviewVars = <?= json_encode([
             'numero_os' => (string) ($os['numero_os'] ?? ''),
             'data_abertura' => !empty($os['data_abertura']) ? formatDate($os['data_abertura'], true) : '',
-            'equipamento' => trim((string) (($os['equip_marca'] ?? '') . ' ' . ($os['equip_modelo'] ?? ''))),
+            'equipamento' => $osEquipamentoNome,
             'cliente' => (string) ($os['cliente_nome'] ?? ''),
-            'valor_final' => formatMoney($os['valor_final'] ?? 0),
+            'valor_final' => formatMoney($osFinancialBase['valor_final'] ?? $os['valor_final'] ?? 0),
             'status' => (string) ($os['status'] ?? ''),
             'pdf_url' => 'PDF em anexo nesta mensagem.',
         ], JSON_UNESCAPED_UNICODE) ?>;
         const printFormatLabels = <?= json_encode($printFormats ?? [], JSON_UNESCAPED_UNICODE) ?>;
+        const postCreatePdfPrompt = <?= json_encode([
+            'enabled' => !empty($postCreatePdfPrompt['enabled']),
+            'numero_os' => (string) ($postCreatePdfPrompt['numero_os'] ?? ($os['numero_os'] ?? '')),
+            'hasProfilePhotos' => !empty($fotosPerfilEquipamento),
+            'hasEntryPhotos' => !empty($fotos_entrada),
+            'canSend' => can('os', 'editar'),
+            'phone' => trim((string) ($os['cliente_telefone'] ?? '')),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+        const openingDocumentPhotoPrompt = <?= json_encode([
+            'numero_os' => (string) ($os['numero_os'] ?? ''),
+            'hasProfilePhotos' => !empty($fotosPerfilEquipamento),
+            'hasEntryPhotos' => !empty($fotos_entrada),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 
         if (imageModal) {
             imageModal.addEventListener('show.bs.modal', function(event) {
@@ -1553,7 +1648,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
             }
 
             setBudgetFrameLoading(true);
-            budgetFrameTitle && (budgetFrameTitle.textContent = title || 'Orçamento');
+            budgetFrameTitle && (budgetFrameTitle.textContent = title || 'OrÃ§amento');
             budgetFrame.src = 'about:blank';
             budgetFrameModal.show();
             budgetFrame.src = url;
@@ -1589,7 +1684,7 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                 event.preventDefault();
                 openBudgetFrameModal(
                     budgetTrigger.getAttribute('data-open-budget-modal-url') || '',
-                    budgetTrigger.getAttribute('data-open-budget-modal-title') || 'Orçamento'
+                    budgetTrigger.getAttribute('data-open-budget-modal-title') || 'OrÃ§amento'
                 );
             }
         });
@@ -1599,6 +1694,41 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                 pdfPreviewFrame.src = 'about:blank';
             }
         });
+
+        const syncOsTabHash = (hashValue) => {
+            const normalizedHash = String(hashValue || '').trim();
+            if (!normalizedHash || !normalizedHash.startsWith('#tab-') || !window.bootstrap?.Tab) {
+                return false;
+            }
+
+            const targetLink = osTabLinks.find((link) => (link.getAttribute('href') || '').trim() === normalizedHash);
+            if (!targetLink) {
+                return false;
+            }
+
+            window.bootstrap.Tab.getOrCreateInstance(targetLink).show();
+            return true;
+        };
+
+        osTabLinks.forEach((link) => {
+            link.addEventListener('shown.bs.tab', function() {
+                const targetHash = String(this.getAttribute('href') || '').trim();
+                if (!targetHash || !targetHash.startsWith('#tab-')) {
+                    return;
+                }
+
+                if (window.location.hash !== targetHash) {
+                    window.history.replaceState(null, '', targetHash);
+                }
+            });
+        });
+
+        if (!syncOsTabHash(window.location.hash)) {
+            const tabHashFromQuery = new URLSearchParams(window.location.search).get('tab');
+            if (tabHashFromQuery) {
+                syncOsTabHash('#' + String(tabHashFromQuery).replace(/^#/, ''));
+            }
+        }
 
         const ensureHiddenInput = (form, name, value) => {
             if (!form) {
@@ -1634,8 +1764,21 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
         };
 
         const showAlert = async (options) => {
+            if (window.DSFeedback && typeof window.DSFeedback.fire === 'function') {
+                return window.DSFeedback.fire(options);
+            }
+
             if (window.Swal && typeof window.Swal.fire === 'function') {
-                return window.Swal.fire(options);
+                const normalized = options && typeof options === 'object' ? { ...options } : {};
+                const previousElement = document.activeElement;
+                if (previousElement && previousElement !== document.body && typeof previousElement.blur === 'function') {
+                    previousElement.blur();
+                }
+                if (!Object.prototype.hasOwnProperty.call(normalized, 'returnFocus')) {
+                    normalized.returnFocus = false;
+                }
+
+                return window.Swal.fire(normalized);
             }
 
             const fallbackMessage = typeof options === 'string'
@@ -1665,9 +1808,142 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
             return String(option?.dataset?.documentType || '').trim();
         };
 
+        const setOpeningDocumentPhotoInputs = (photoGroups = []) => {
+            const normalizedGroups = normalizePhotoGroupSelection(photoGroups);
+            if (generateIncludePhotosInput) {
+                generateIncludePhotosInput.value = normalizedGroups.length > 0 ? '1' : '0';
+            }
+            if (generatePhotoGroupsInput) {
+                generatePhotoGroupsInput.value = normalizedGroups.join(',');
+            }
+        };
+
         const printPreviewState = {
             format: 'a4',
             includePhotos: false,
+            photoGroups: [],
+        };
+
+        const normalizePhotoGroupSelection = (value) => {
+            const source = Array.isArray(value)
+                ? value
+                : String(value || '').split(/[\s,;|]+/);
+            const allowed = ['entrada', 'perfil', 'acessorios', 'estado_fisico', 'checklist'];
+            const normalized = [];
+
+            source.forEach((item) => {
+                const key = String(item || '').trim().toLowerCase();
+                if (!key || !allowed.includes(key) || normalized.includes(key)) {
+                    return;
+                }
+                normalized.push(key);
+            });
+
+            return normalized;
+        };
+
+        const setPrintWhatsappPhotoGroups = (groups) => {
+            if (!printWhatsappPhotoGroupsInput) {
+                return;
+            }
+
+            printWhatsappPhotoGroupsInput.value = normalizePhotoGroupSelection(groups).join(',');
+        };
+
+        const formatPhotoGroupLabel = (group) => {
+            switch (String(group || '').trim().toLowerCase()) {
+                case 'perfil':
+                    return 'perfil';
+                case 'entrada':
+                    return 'entrada';
+                case 'acessorios':
+                    return 'acessorios';
+                case 'estado_fisico':
+                    return 'estado fisico';
+                case 'checklist':
+                    return 'checklist';
+                default:
+                    return String(group || '').trim().toLowerCase();
+            }
+        };
+
+        const describeSelectedPhotoGroups = (groups) => {
+            const normalized = normalizePhotoGroupSelection(groups);
+            if (normalized.length === 0) {
+                return 'todas as fotos habilitadas';
+            }
+
+            return normalized.map((group) => formatPhotoGroupLabel(group)).join(' e ');
+        };
+
+        const openOpeningDocumentPhotoPrompt = async () => {
+            const fireModal = window.DSFeedback?.fire || showAlert;
+            const hasProfilePhotos = !!openingDocumentPhotoPrompt?.hasProfilePhotos;
+            const hasEntryPhotos = !!openingDocumentPhotoPrompt?.hasEntryPhotos;
+            const hasAnyPhotos = hasProfilePhotos || hasEntryPhotos;
+            const collectSelection = () => ({
+                includeProfile: Boolean(document.getElementById('openingDocumentIncludeProfilePhotos')?.checked),
+                includeEntry: Boolean(document.getElementById('openingDocumentIncludeEntryPhotos')?.checked),
+            });
+
+            const result = await fireModal({
+                icon: 'info',
+                title: 'Comprovante de abertura',
+                html: `
+                    <div class="text-start">
+                        <p class="mb-3">Escolha se o comprovante de abertura da OS <strong>${String(openingDocumentPhotoPrompt?.numero_os || '').trim() || '#'}</strong> deve levar fotos anexadas.</p>
+                        <div class="small text-muted mb-3">
+                            Esta selecao vale para a nova versao do PDF que sera salva na aba Documentos.
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="openingDocumentIncludeProfilePhotos" ${hasProfilePhotos ? 'checked' : 'disabled'}>
+                            <label class="form-check-label" for="openingDocumentIncludeProfilePhotos">Adicionar fotos de perfil do equipamento</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="openingDocumentIncludeEntryPhotos" ${hasEntryPhotos ? 'checked' : 'disabled'}>
+                            <label class="form-check-label" for="openingDocumentIncludeEntryPhotos">Adicionar fotos de entrada da recepcao</label>
+                        </div>
+                        ${hasAnyPhotos ? '' : '<div class="alert alert-light border small mt-3 mb-0">Nenhuma foto de perfil ou de entrada esta disponivel nesta OS no momento. O comprovante sera gerado sem anexos fotograficos.</div>'}
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Gerar comprovante',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                focusConfirm: false,
+                preConfirm: () => collectSelection(),
+            });
+
+            if (!result?.isConfirmed) {
+                return null;
+            }
+
+            const selectedPhotoGroups = [];
+            if (result.value?.includeProfile) {
+                selectedPhotoGroups.push('perfil');
+            }
+            if (result.value?.includeEntry) {
+                selectedPhotoGroups.push('entrada');
+            }
+
+            return selectedPhotoGroups;
+        };
+
+        const setDefaultOpeningTemplateOnWhatsapp = () => {
+            if (!printWhatsappTemplateSelect) {
+                return;
+            }
+
+            const targetOption = Array.from(printWhatsappTemplateSelect.options || []).find((option) => {
+                return String(option?.value || '').trim() === 'os_aberta';
+            });
+
+            if (!targetOption) {
+                return;
+            }
+
+            printWhatsappTemplateSelect.value = 'os_aberta';
+            printWhatsappTemplateSelect.dispatchEvent(new Event('change', { bubbles: true }));
         };
 
         const setPrintPreviewLoading = (isLoading) => {
@@ -1703,7 +1979,10 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
 
         const buildPrintPreviewUrl = () => buildPrintDocumentUrl(
             printPreviewState.format || 'a4',
-            !!printPreviewState.includePhotos
+            !!printPreviewState.includePhotos,
+            printPreviewState.includePhotos && Array.isArray(printPreviewState.photoGroups) && printPreviewState.photoGroups.length > 0
+                ? { grupos_fotos: normalizePhotoGroupSelection(printPreviewState.photoGroups).join(',') }
+                : {}
         );
 
         const syncPrintPreviewControls = () => {
@@ -1727,15 +2006,19 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
             if (printWhatsappIncludePhotosInput) {
                 printWhatsappIncludePhotosInput.value = printPreviewState.includePhotos ? '1' : '0';
             }
+            setPrintWhatsappPhotoGroups(printPreviewState.includePhotos ? printPreviewState.photoGroups : []);
             if (printPreviewPhotoHint) {
+                const selectedGroupsDescription = describeSelectedPhotoGroups(printPreviewState.photoGroups);
                 printPreviewPhotoHint.textContent = activeFormat === '80mm'
                     ? 'Na bobina 80mm as fotos entram na galeria final quando habilitadas, priorizando legibilidade e rolagem continua.'
-                    : 'No modelo A4, a foto principal de perfil aparece ao lado esquerdo do bloco de equipamento quando habilitada. As demais fotos entram ao fim do documento por tipo.';
+                    : (printPreviewState.includePhotos
+                        ? `No modelo A4, o documento esta configurado para usar ${selectedGroupsDescription}.`
+                        : 'No modelo A4, a foto principal de perfil aparece ao lado esquerdo do bloco de equipamento quando habilitada. As demais fotos entram ao fim do documento por tipo.');
             }
             if (printWhatsappHint) {
                 const baseHint = 'O PDF sera gerado no formato exibido na pre-visualizacao e enviado como anexo.';
                 printWhatsappHint.textContent = printPreviewState.includePhotos
-                    ? `${baseHint} As fotos selecionadas tambem acompanham o PDF.`
+                    ? `${baseHint} O documento levara ${describeSelectedPhotoGroups(printPreviewState.photoGroups)}.`
                     : baseHint;
             }
         };
@@ -1754,9 +2037,15 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
             printPreviewFrame.src = previewUrl;
         };
 
-        const openPrintPreviewModal = (formatCode) => {
+        const openPrintPreviewModal = (formatCode, options = {}) => {
             if (formatCode) {
                 printPreviewState.format = String(formatCode);
+            }
+            if (Object.prototype.hasOwnProperty.call(options, 'includePhotos')) {
+                printPreviewState.includePhotos = !!options.includePhotos;
+            }
+            if (Object.prototype.hasOwnProperty.call(options, 'photoGroups')) {
+                printPreviewState.photoGroups = normalizePhotoGroupSelection(options.photoGroups);
             }
 
             printPreviewTransitionToWhatsapp = false;
@@ -1785,6 +2074,9 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
 
         printPreviewIncludePhotos?.addEventListener('change', function() {
             printPreviewState.includePhotos = !!this.checked;
+            if (!printPreviewState.includePhotos) {
+                printPreviewState.photoGroups = [];
+            }
             refreshPrintPreview();
         });
 
@@ -1796,7 +2088,10 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                     return;
                 }
 
-                openPrintPreviewModal(formatCode);
+                openPrintPreviewModal(formatCode, {
+                    includePhotos: !!printPreviewState.includePhotos,
+                    photoGroups: [],
+                });
             });
         });
 
@@ -1981,8 +2276,8 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                 ensureHiddenInput(whatsappForm, 'mensagem_whatsapp', whatsappMessageInput?.value || '');
                 if (whatsappHint) {
                     whatsappHint.textContent = budgetBlocked
-                        ? 'Este orçamento está bloqueado para novo envio no status atual.'
-                        : 'Para orçamento, o envio segue o mesmo fluxo oficial do módulo de orçamentos, incluindo o link público de aprovação.';
+                        ? 'Este orÃ§amento estÃ¡ bloqueado para novo envio no status atual.'
+                        : 'Para orÃ§amento, o envio segue o mesmo fluxo oficial do mÃ³dulo de orÃ§amentos, incluindo o link pÃºblico de aprovaÃ§Ã£o.';
                 }
                 if (whatsappMessageInput && whatsappMessageInput.value.trim() === '' && whatsappForm.dataset.budgetDefaultMessage) {
                     whatsappMessageInput.placeholder = whatsappForm.dataset.budgetDefaultMessage;
@@ -2025,14 +2320,14 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
 
                 if (emailHint) {
                     emailHint.textContent = budgetBlocked
-                        ? 'Este orçamento está bloqueado para novo envio no status atual.'
-                        : 'Ao selecionar orçamento, o envio usa o mesmo fluxo oficial do módulo de orçamentos e anexa o PDF oficial.';
+                        ? 'Este orÃ§amento estÃ¡ bloqueado para novo envio no status atual.'
+                        : 'Ao selecionar orÃ§amento, o envio usa o mesmo fluxo oficial do mÃ³dulo de orÃ§amentos e anexa o PDF oficial.';
                 }
                 if (submitButton) {
                     submitButton.disabled = budgetBlocked;
                 }
             } else if (emailHint) {
-                emailHint.textContent = 'O PDF selecionado será anexado ao e-mail usando a configuração SMTP do ERP.';
+                emailHint.textContent = 'O PDF selecionado serÃ¡ anexado ao e-mail usando a configuraÃ§Ã£o SMTP do ERP.';
                 if (emailSubjectInput) {
                     const budgetDefaultSubject = emailForm.dataset.budgetDefaultSubject || '';
                     if (emailSubjectInput.value === budgetDefaultSubject) {
@@ -2062,35 +2357,158 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
                 ensureHiddenInput(emailForm, 'email_contato', emailDestinationInput.value || '');
             }
         });
+        generateTypeSelect?.addEventListener('change', function() {
+            if (String(this.value || '').trim() !== 'abertura') {
+                setOpeningDocumentPhotoInputs([]);
+            }
+        });
+
+        const openPostCreatePdfPrompt = async () => {
+            if (!postCreatePdfPrompt?.enabled) {
+                return;
+            }
+
+            const fireModal = window.DSFeedback?.fire || showAlert;
+            const hasProfilePhotos = !!postCreatePdfPrompt.hasProfilePhotos;
+            const hasEntryPhotos = !!postCreatePdfPrompt.hasEntryPhotos;
+            const canSendNow = !!postCreatePdfPrompt.canSend;
+            const collectPostCreateSelection = () => ({
+                includeProfile: Boolean(document.getElementById('postCreateIncludeProfilePhotos')?.checked),
+                includeEntry: Boolean(document.getElementById('postCreateIncludeEntryPhotos')?.checked),
+            });
+            const result = await fireModal({
+                icon: 'success',
+                title: 'OS aberta com sucesso',
+                html: `
+                    <div class="text-start">
+                        <p class="mb-3">A OS <strong>${String(postCreatePdfPrompt.numero_os || '').trim() || '#'}</strong> foi criada. Escolha como deseja seguir com o PDF de abertura.</p>
+                        <div class="small text-muted mb-3">
+                            ${canSendNow
+                                ? 'Voce pode abrir o envio por WhatsApp agora, gerar o PDF sem abrir o WhatsApp ou deixar para depois.'
+                                : 'Voce pode gerar o PDF agora ou deixar o envio para depois.'}
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="postCreateIncludeProfilePhotos" ${hasProfilePhotos ? 'checked' : 'disabled'}>
+                            <label class="form-check-label" for="postCreateIncludeProfilePhotos">Anexar fotos de perfil do equipamento ao documento</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="postCreateIncludeEntryPhotos" ${hasEntryPhotos ? 'checked' : 'disabled'}>
+                            <label class="form-check-label" for="postCreateIncludeEntryPhotos">Anexar fotos de entrada ao documento</label>
+                        </div>
+                    </div>
+                `,
+                showDenyButton: canSendNow,
+                showCancelButton: true,
+                confirmButtonText: canSendNow ? 'Enviar agora' : 'Gerar PDF agora',
+                denyButtonText: 'Gerar sem abrir WhatsApp',
+                cancelButtonText: 'Enviar depois',
+                reverseButtons: true,
+                focusConfirm: false,
+                preConfirm: () => collectPostCreateSelection(),
+                preDeny: () => collectPostCreateSelection(),
+            });
+
+            if (!result?.isConfirmed && !result?.isDenied) {
+                return;
+            }
+
+            const selection = result.value || {};
+            const selectedPhotoGroups = [];
+            if (selection.includeProfile) {
+                selectedPhotoGroups.push('perfil');
+            }
+            if (selection.includeEntry) {
+                selectedPhotoGroups.push('entrada');
+            }
+
+            setDefaultOpeningTemplateOnWhatsapp();
+            if (printWhatsappFormatInput) {
+                printWhatsappFormatInput.value = 'a4';
+            }
+            if (printWhatsappIncludePhotosInput) {
+                printWhatsappIncludePhotosInput.value = selectedPhotoGroups.length > 0 ? '1' : '0';
+            }
+            setPrintWhatsappPhotoGroups(selectedPhotoGroups);
+            if (printWhatsappHint) {
+                if (selectedPhotoGroups.length > 0) {
+                    printWhatsappHint.textContent = `O PDF sera gerado em A4 com as fotos selecionadas (${describeSelectedPhotoGroups(selectedPhotoGroups)}) antes do envio final.`;
+                } else {
+                    printWhatsappHint.textContent = 'O PDF sera gerado em A4 sem anexar fotos adicionais antes do envio final.';
+                }
+            }
+
+            if (result.isDenied || !canSendNow) {
+                openPrintPreviewModal('a4', {
+                    includePhotos: selectedPhotoGroups.length > 0,
+                    photoGroups: selectedPhotoGroups,
+                });
+                return;
+            }
+
+            if (printWhatsappModal) {
+                printWhatsappModal.show();
+                return;
+            }
+
+            await showAlert({
+                icon: 'info',
+                title: 'Envio indisponivel na tela atual',
+                text: 'Nao foi possivel abrir o modal de envio do PDF nesta visualizacao.',
+            });
+        };
 
         syncPrintPreviewControls();
         syncWhatsappFormMode();
         syncEmailFormMode();
+        openPostCreatePdfPrompt();
 
         generateForm?.addEventListener('submit', async function(event) {
             const selectedType = String(generateTypeSelect?.value || '').trim();
+            const skipOpeningPrompt = String(generateForm.dataset.skipOpeningPhotoPrompt || '0') === '1';
             const hasBudget = String(generateForm.dataset.hasBudget || '0') === '1';
+
+            if (selectedType === 'abertura' && !skipOpeningPrompt) {
+                event.preventDefault();
+                const selectedPhotoGroups = await openOpeningDocumentPhotoPrompt();
+                if (selectedPhotoGroups === null) {
+                    return;
+                }
+
+                setOpeningDocumentPhotoInputs(selectedPhotoGroups);
+                generateForm.dataset.skipOpeningPhotoPrompt = '1';
+                generateForm.requestSubmit();
+                return;
+            }
+
+            if (selectedType !== 'abertura') {
+                setOpeningDocumentPhotoInputs([]);
+            }
+
+            if (skipOpeningPrompt) {
+                delete generateForm.dataset.skipOpeningPhotoPrompt;
+            }
+
             if (selectedType !== 'orcamento' || hasBudget) {
                 return;
             }
 
             event.preventDefault();
             if (!window.Swal || typeof window.Swal.fire !== 'function') {
-                openBudgetFrameModal(generateForm.dataset.budgetCreateUrl || '', 'Criar orçamento');
+                openBudgetFrameModal(generateForm.dataset.budgetCreateUrl || '', 'Criar orÃ§amento');
                 return;
             }
 
-            const result = await window.Swal.fire({
+            const result = await showAlert({
                 icon: 'warning',
-                title: 'Crie primeiro o orçamento',
-                text: 'Esta ordem de serviço ainda não possui orçamento vinculado. Deseja elaborar o orçamento agora?',
+                title: 'Crie primeiro o orÃ§amento',
+                text: 'Esta ordem de serviÃ§o ainda nÃ£o possui orÃ§amento vinculado. Deseja elaborar o orÃ§amento agora?',
                 showCancelButton: true,
-                confirmButtonText: 'Sim, criar orçamento',
-                cancelButtonText: 'Agora não',
+                confirmButtonText: 'Sim, criar orÃ§amento',
+                cancelButtonText: 'Agora nÃ£o',
             });
 
             if (result.isConfirmed) {
-                openBudgetFrameModal(generateForm.dataset.budgetCreateUrl || '', 'Criar orçamento');
+                openBudgetFrameModal(generateForm.dataset.budgetCreateUrl || '', 'Criar orÃ§amento');
             }
         });
 
@@ -2107,10 +2525,10 @@ $knowledgeWhatsappTemplatesUrl = base_url('conhecimento/templates-whatsapp');
             budgetFrameModal?.hide();
 
             if (window.Swal && payload.message) {
-                window.Swal.fire({
+                showAlert({
                     icon: 'success',
-                    title: 'Orçamento atualizado',
-                    text: String(payload.message || 'O orçamento foi salvo com sucesso.'),
+                    title: 'OrÃ§amento atualizado',
+                    text: String(payload.message || 'O orÃ§amento foi salvo com sucesso.'),
                     timer: 1800,
                     showConfirmButton: false,
                 }).then(function() {

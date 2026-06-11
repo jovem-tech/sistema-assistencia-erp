@@ -80,6 +80,15 @@ Depois de preencher o cliente, o fluxo segue para:
 - vinculo com equipamento ja cadastrado;
 - cadastro manual do equipamento para o orcamento atual, quando necessario.
 
+### Vinculo com OS aberta
+
+Quando o orcamento nasce a partir de uma OS ou quando o cliente possui ordens em aberto:
+
+- o card `Vinculo OS` consulta automaticamente as OS abertas do cliente;
+- a lista usa numero da OS, status atual e resumo do equipamento vinculado;
+- a busca continua funcionando mesmo quando marca ou modelo do equipamento estiverem vazios;
+- nesses casos, o sistema reaproveita os demais dados disponiveis sem quebrar a tela.
+
 ## Itens e valores
 
 O orcamento permite adicionar:
@@ -90,6 +99,24 @@ O orcamento permite adicionar:
 - desconto e acrescimo no fechamento.
 
 Os totais sao recalculados na propria tela conforme o usuario preenche a proposta.
+
+### Cadastro rapido sem sair do orcamento
+
+Na aba `Orcamento e financeiro`, cada linha do item agora pode exibir o botao `Cadastrar` quando o tipo estiver como `Peca` ou `Servico`.
+
+Fluxo:
+
+- selecione o tipo `Peca` ou `Servico`;
+- clique em `Cadastrar` ao lado da busca de catalogo;
+- preencha o modal rapido;
+- salve e o novo item sera aplicado automaticamente na mesma linha do orcamento.
+
+Comportamento pratico:
+
+- nao e mais necessario sair do orcamento para abrir o modulo de `Estoque` ou `Servicos`;
+- a linha atual recebe descricao, referencia e valor automaticamente;
+- em `Peca`, o sistema aplica o valor recomendado de `peca instalada` usando a mesma regra do catalogo;
+- em `Servico`, o sistema aplica o valor configurado no cadastro salvo.
 
 ## Resposta do cliente pelo link publico
 
@@ -146,14 +173,16 @@ As abas atuais sao:
 - `Dados do equipamento`: foto principal, tipo, marca, modelo, cor e identificacao consolidada;
 - `Dados operacionais`: contexto do tipo de orcamento, status, origem, versao, conversao, prazo, observacoes, condicoes e controle manual de status;
 - `Pacotes de servico`: oferta dinamica principal, link publico da oferta e historico tecnico das ofertas anteriores;
-- `Envio do orcamento`: PDF, envio por WhatsApp e envio por e-mail;
+- `Envio do orcamento`: PDF, envio por WhatsApp, envio por e-mail, link publico do documento e referencia comercial;
 - `Orcamento`: itens lancados, historico de status e rastreabilidade;
-- `Financeiro do orcamento`: subtotal, desconto, acrescimo, total final e link publico do documento.
+- `Financeiro do orcamento`: subtotal, desconto, acrescimo e total final.
 
 Na pratica:
 
 - o operador encontra cada bloco sem precisar alternar entre cards espalhados na pagina;
-- o financeiro deixa de dividir espaco com o resumo operacional no topo;
+- o link publico e a referencia comercial ficam junto dos canais de envio, facilitando copiar, abrir e conferir o status antes do disparo;
+- o bloco `Status do envio` mostra no proprio modal o ultimo resultado comercial registrado (`Enviado`, `Erro no envio`, `Duplicado evitado` ou `Sem tentativa`), com data, canal, destino e detalhe do erro quando houver;
+- o financeiro deixa de dividir espaco com informacoes de compartilhamento e fica focado apenas no resumo monetario;
 - as abas seguem o padrao do design system em linha unica e ajustam o tamanho dos rotulos conforme a largura da tela, mantendo todas visiveis sem exibir barra de rolagem nessa view.
 
 ## Formulario em abas

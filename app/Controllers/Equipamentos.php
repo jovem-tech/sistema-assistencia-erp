@@ -104,7 +104,7 @@ class Equipamentos extends BaseController
         if (false && ($imagefile = $this->request->getFiles())) {
             $fotoModel = new EquipamentoFotoModel();
 
-            // Buscar dados para nomeaÃƒÂ§ÃƒÂ£o
+            // Buscar dados para nomeação
             $marcaModel = new EquipamentoMarcaModel();
             $modeloModel = new EquipamentoModeloModel();
 
@@ -157,7 +157,7 @@ class Equipamentos extends BaseController
         $equipamento = $this->model->find($id);
         if (!$equipamento) {
             return redirect()->to('/equipamentos')
-                ->with('error', 'Equipamento nÃƒÂ£o encontrado.');
+                ->with('error', 'Equipamento não encontrado.');
         }
 
         $clienteModel = new ClienteModel();
@@ -218,7 +218,7 @@ class Equipamentos extends BaseController
         if (false && ($imagefile = $this->request->getFiles())) {
             $fotoModel = new EquipamentoFotoModel();
 
-            // Buscar dados para nomeaÃƒÂ§ÃƒÂ£o
+            // Buscar dados para nomeação
             $equip = $this->model->find($id);
             $marcaModel  = new EquipamentoMarcaModel();
             $modeloModel = new EquipamentoModeloModel();
@@ -226,7 +226,7 @@ class Equipamentos extends BaseController
             $modelo = $modeloModel->find($equip['modelo_id'])['nome'] ?? 'modelo';
             $slug   = strtolower(url_title($marca . '_' . $modelo, '_', true));
 
-            // Verifica se jÃƒÂ¡ existe uma foto principal para este equipamento
+            // Verifica se já existe uma foto principal para este equipamento
             $hasPrincipal = $fotoModel->where('equipamento_id', $id)->where('is_principal', 1)->first() ? 0 : 1;
             $is_principal = $hasPrincipal;
 
@@ -650,7 +650,7 @@ class Equipamentos extends BaseController
         if (!$equipAtual) {
             return $this->response->setJSON([
                 'status'  => 'error',
-                'message' => 'Equipamento nÃƒÂ£o encontrado.'
+                'message' => 'Equipamento não encontrado.'
             ]);
         }
 
@@ -702,7 +702,7 @@ class Equipamentos extends BaseController
 
         $equip = $this->findEquipamentoForJson((int) $id);
 
-        // Se nÃƒÂ£o subiu nova foto, retorna a principal atual para refletir no painel lateral.
+        // Se não subiu nova foto, retorna a principal atual para refletir no painel lateral.
         if (!$fotoUrl) {
             $fotoModel = new EquipamentoFotoModel();
             $fotoPrincipal = $fotoModel->where('equipamento_id', $id)
@@ -1542,14 +1542,14 @@ class Equipamentos extends BaseController
      */
     private function processarMarcaModelo(array $dados)
     {
-        // Tratar Marca DinÃƒÂ¢mica
+        // Tratar Marca Dinâmica
         if (isset($dados['marca_id']) && !is_numeric($dados['marca_id'])) {
             $marcaModel = new \App\Models\EquipamentoMarcaModel();
             $marcaModel->insert(['nome' => $dados['marca_id']]);
             $dados['marca_id'] = $marcaModel->getInsertID();
         }
 
-        // Tratar Modelo DinÃƒÂ¢mico
+        // Tratar Modelo Dinâmico
         if (isset($dados['modelo_id']) && !is_numeric($dados['modelo_id'])) {
             $modeloModel = new \App\Models\EquipamentoModeloModel();
 

@@ -67,7 +67,7 @@ class AddEquipamentoIdentityIndexes extends Migration
                 );
             }
         } catch (\Throwable $e) {
-            // Ambiente sem dados compatÃ­veis ou estrutura ainda incompleta.
+            // Ambiente sem dados compatíveis ou estrutura ainda incompleta.
         }
     }
 
@@ -76,7 +76,7 @@ class AddEquipamentoIdentityIndexes extends Migration
         try {
             $this->db->query($sql);
         } catch (\Throwable $e) {
-            // Indice jÃ¡ existente ou estrutura ainda nao compativel neste ambiente.
+            // Indice já existente ou estrutura ainda nao compativel neste ambiente.
         }
     }
 

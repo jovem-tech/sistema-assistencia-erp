@@ -124,7 +124,7 @@ class Os extends BaseController
         ];
 
         $data = [
-            'title'  => 'Ordens de ServiÃƒÂ§o',
+            'title'  => 'Ordens de Serviço',
             'filtro_status' => $filters['status'][0] ?? '',
             'filtro_status_list' => $filters['status'],
             'filtro_macrofase' => $filters['macrofase'],
@@ -203,7 +203,7 @@ class Os extends BaseController
                 ->setStatusCode(404)
                 ->setJSON([
                     'ok' => false,
-                    'message' => 'OS nÃƒÂ£o encontrada.',
+                    'message' => 'OS não encontrada.',
                 ]);
         }
 
@@ -254,7 +254,7 @@ class Os extends BaseController
                 ->setStatusCode(404)
                 ->setJSON([
                     'success' => false,
-                'message' => 'Foto de entrada nÃƒÂ£o encontrada.',
+                'message' => 'Foto de entrada não encontrada.',
                     'csrfHash' => csrf_hash(),
                 ]);
         }
@@ -667,11 +667,11 @@ class Os extends BaseController
             }
         }
 
-        if ($searchPlan['tÃƒÂ©cnico'] !== null) {
+        if ($searchPlan['técnico'] !== null) {
             if ($hasStructuredMatch) {
-                $builder->orWhere("os.tecnico_id IN ({$searchPlan['tÃƒÂ©cnico']})", null, false);
+                $builder->orWhere("os.tecnico_id IN ({$searchPlan['técnico']})", null, false);
             } else {
-                $builder->where("os.tecnico_id IN ({$searchPlan['tÃƒÂ©cnico']})", null, false);
+                $builder->where("os.tecnico_id IN ({$searchPlan['técnico']})", null, false);
                 $hasStructuredMatch = true;
             }
         }
@@ -713,11 +713,11 @@ class Os extends BaseController
             'cliente' => $this->resolveSearchSubquery('clientes', 'c', 'id', 'nome_razao', $query, $db, $allowContains),
             'cliente_telefone' => $this->resolveClienteTelefoneSearchSubquery($query, $db),
             'equipamento' => $this->resolveEquipmentSearchSubquery($query, $db, $allowContains),
-            'tÃƒÂ©cnico' => $this->resolveSearchSubquery('funcionarios', 'f', 'id', 'nome', $query, $db, $allowContains),
+            'técnico' => $this->resolveSearchSubquery('funcionarios', 'f', 'id', 'nome', $query, $db, $allowContains),
             'relato_mode' => null,
         ];
 
-        if ($plan['cliente'] === null && $plan['cliente_telefone'] === null && $plan['equipamento'] === null && $plan['tÃƒÂ©cnico'] === null && mb_strlen($query) >= 4) {
+        if ($plan['cliente'] === null && $plan['cliente_telefone'] === null && $plan['equipamento'] === null && $plan['técnico'] === null && mb_strlen($query) >= 4) {
             $plan['relato_mode'] = $this->canUseRelatoFulltext($query, $db) ? 'fulltext' : 'like';
         }
 
@@ -1523,12 +1523,12 @@ class Os extends BaseController
         return match ($normalized) {
             'servico', 'servicos' => [
                 'key' => 'servico',
-                'label' => 'ServiÃƒÂ§os',
+                'label' => 'Serviços',
                 'badge_class' => 'bg-info text-dark',
             ],
             'peca', 'pecas' => [
                 'key' => 'peca',
-                'label' => 'PeÃƒÂ§as',
+                'label' => 'Peças',
                 'badge_class' => 'bg-warning text-dark',
             ],
             'pacote', 'pacotes', 'pacote_servico', 'pacote_servicos' => [
@@ -1538,7 +1538,7 @@ class Os extends BaseController
             ],
             'acessorio', 'acessorios' => [
                 'key' => 'acessorio',
-                'label' => 'AcessÃƒÂ³rios',
+                'label' => 'Acessórios',
                 'badge_class' => 'bg-secondary',
             ],
             default => [
@@ -1597,7 +1597,7 @@ class Os extends BaseController
 
         return [
             $this->formatOsPhotoCell($row, $photoContext),
-            '<a href="' . base_url('os/visualizar/' . $row['id']) . '" class="os-numero-link" title="Abrir visualizaÃƒÂ§ÃƒÂ£o da OS">' . $numeroOsHtml . '</a>',
+            '<a href="' . base_url('os/visualizar/' . $row['id']) . '" class="os-numero-link" title="Abrir visualização da OS">' . $numeroOsHtml . '</a>',
             $this->formatOsClientCellCompact($row),
             $this->formatOsEquipmentCellCompact($row),
             $this->formatOsDatesCell($row),
@@ -1803,7 +1803,7 @@ class Os extends BaseController
             return $content;
         }
 
-        return '<button type="button" class="btn btn-link p-0 text-start os-cell-link os-cell-link-client" data-os-frame-modal-url="' . esc(base_url('clientes/visualizar/' . $clienteId . '?embed=1')) . '" data-os-frame-modal-title="' . esc('Cliente: ' . $clientName) . '" title="Abrir ficha completa e histÃƒÂ³rico do cliente">' . $content . '</button>';
+        return '<button type="button" class="btn btn-link p-0 text-start os-cell-link os-cell-link-client" data-os-frame-modal-url="' . esc(base_url('clientes/visualizar/' . $clienteId . '?embed=1')) . '" data-os-frame-modal-title="' . esc('Cliente: ' . $clientName) . '" title="Abrir ficha completa e histórico do cliente">' . $content . '</button>';
     }
 
     private function formatOsPhotoCell(array $row, array $photoContext = []): string
@@ -2279,7 +2279,7 @@ class Os extends BaseController
 
         $overdueDays = $this->calculateElapsedDays($previsaoRaw, date('Y-m-d'));
         if ($overdueDays !== null && $overdueDays > 0) {
-            return 'Atrasado hÃƒÂ¡ ' . $overdueDays . ' dia' . ($overdueDays === 1 ? '' : 's') . ' - ' . $previsaoLabel;
+            return 'Atrasado há ' . $overdueDays . ' dia' . ($overdueDays === 1 ? '' : 's') . ' - ' . $previsaoLabel;
         }
 
         return $prazoBaseLabel . ' - ' . $previsaoLabel;
@@ -2296,7 +2296,7 @@ class Os extends BaseController
         if (!$os) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
-                'message' => 'OS nÃƒÂ£o encontrada.',
+                'message' => 'OS não encontrada.',
             ]);
         }
 
@@ -2375,7 +2375,7 @@ class Os extends BaseController
         if (! $os) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
-                'message' => 'OS nÃƒÂ£o encontrada.',
+                'message' => 'OS não encontrada.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -2442,7 +2442,7 @@ class Os extends BaseController
         if (! $os) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
-                'message' => 'OS nÃƒÂ£o encontrada.',
+                'message' => 'OS não encontrada.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -2452,7 +2452,7 @@ class Os extends BaseController
         if (! in_array($encerrarComo, $allowed, true)) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'Selecione como a OS deve ser concluÃƒÂ­da.',
+                'message' => 'Selecione como a OS deve ser concluída.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -2552,7 +2552,7 @@ class Os extends BaseController
                 if (! $cartaoService->isReady()) {
                     return $this->response->setStatusCode(422)->setJSON([
                         'ok' => false,
-                        'message' => 'Configure primeiro as taxas de cartÃƒÂ£o no submenu FinanÃƒÂ§as > CartÃƒÂµes e taxas.',
+                        'message' => 'Configure primeiro as taxas de cartão no submenu Finanças > Cartões e taxas.',
                         'csrfHash' => csrf_hash(),
                     ]);
                 }
@@ -2569,7 +2569,7 @@ class Os extends BaseController
                 } catch (\Throwable $e) {
                     return $this->response->setStatusCode(422)->setJSON([
                         'ok' => false,
-                        'message' => 'LanÃƒÂ§amento #' . ($index + 1) . ': ' . $e->getMessage(),
+                        'message' => 'Lançamento #' . ($index + 1) . ': ' . $e->getMessage(),
                         'csrfHash' => csrf_hash(),
                     ]);
                 }
@@ -2587,7 +2587,7 @@ class Os extends BaseController
         if ($totalRecebidoAgora > $saldoAntes + 0.001) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'O total recebido nesta baixa nÃƒÂ£o pode ultrapassar o saldo financeiro em aberto da OS.',
+                'message' => 'O total recebido nesta baixa não pode ultrapassar o saldo financeiro em aberto da OS.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -2595,7 +2595,7 @@ class Os extends BaseController
         if ($totalRecebidoAgora > 0 && ! $titulo) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'Esta OS nÃƒÂ£o possui valor financeiro em aberto para receber.',
+                'message' => 'Esta OS não possui valor financeiro em aberto para receber.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -2644,7 +2644,7 @@ class Os extends BaseController
             );
 
             if (empty($notifyResult['ok'])) {
-                $warningMessages[] = $notifyResult['message'] ?? 'A baixa foi registrada, mas o cliente nÃƒÂ£o pÃƒÂ´de ser comunicado.';
+                $warningMessages[] = $notifyResult['message'] ?? 'A baixa foi registrada, mas o cliente não pôde ser comunicado.';
             }
         }
 
@@ -2697,7 +2697,7 @@ class Os extends BaseController
                 );
 
                 if (trim((string) ($os['cliente_telefone'] ?? '')) === '') {
-                    $warningMessages[] = 'A OS ficou com saldo pendente, mas o cliente nÃƒÂ£o possui telefone vÃƒÂ¡lido para a cobranÃƒÂ§a automÃƒÂ¡tica por WhatsApp.';
+                    $warningMessages[] = 'A OS ficou com saldo pendente, mas o cliente não possui telefone válido para a cobrança automática por WhatsApp.';
                 }
             } elseif ($deveProcessarBaixaOperacional) {
                 $settlementService->cancelPendingCollections($osId);
@@ -2729,11 +2729,11 @@ class Os extends BaseController
         );
 
         if (! $deveProcessarBaixaOperacional) {
-            $message = 'Pagamento antecipado registrado com sucesso. O status da OS nÃƒÂ£o foi alterado.';
+            $message = 'Pagamento antecipado registrado com sucesso. O status da OS não foi alterado.';
         } else {
             $message = $statusProcessado === 'entregue_pagamento_pendente'
-                ? 'Baixa concluÃƒÂ­da. A OS ficou em aberto por saldo pendente e jÃƒÂ¡ entrou na rÃƒÂ©gua automÃƒÂ¡tica de cobranÃƒÂ§a.'
-                : 'Baixa concluÃƒÂ­da com sucesso.';
+                ? 'Baixa concluída. A OS ficou em aberto por saldo pendente e já entrou na régua automática de cobrança.'
+                : 'Baixa concluída com sucesso.';
         }
 
         $response = [
@@ -2760,7 +2760,7 @@ class Os extends BaseController
         if (!$os) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
-                'message' => 'OS nÃƒÂ£o encontrada.',
+                'message' => 'OS não encontrada.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -2795,18 +2795,18 @@ class Os extends BaseController
         if (empty($result['ok'])) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => $result['message'] ?? 'NÃƒÂ£o foi possÃƒÂ­vel atualizar o status.',
+                'message' => $result['message'] ?? 'Não foi possível atualizar o status.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
 
         $warningMessages = [];
         if ($detailUpdates !== [] && !$this->model->update((int) $id, $detailUpdates)) {
-            log_message('error', '[OS status modal] Falha ao salvar bloco tÃƒÂ©cnico da OS {os_id}: {errors}', [
+            log_message('error', '[OS status modal] Falha ao salvar bloco técnico da OS {os_id}: {errors}', [
                 'os_id' => (int) $id,
                 'errors' => json_encode($this->model->errors(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
             ]);
-            $warningMessages[] = 'O status foi atualizado, mas nÃƒÂ£o foi possÃƒÂ­vel salvar soluÃƒÂ§ÃƒÂ£o, diagnÃƒÂ³stico e procedimentos.';
+            $warningMessages[] = 'O status foi atualizado, mas não foi possível salvar solução, diagnóstico e procedimentos.';
         }
 
         $this->finalizeStatusSideEffects((int) $id, $os, $status, !$controlaComunicacaoCliente);
@@ -2821,7 +2821,7 @@ class Os extends BaseController
             );
 
             if (empty($notifyResult['ok'])) {
-                $warningMessage = $notifyResult['message'] ?? 'O status foi atualizado, mas nÃƒÂ£o foi possÃƒÂ­vel comunicar o cliente.';
+                $warningMessage = $notifyResult['message'] ?? 'O status foi atualizado, mas não foi possível comunicar o cliente.';
             }
         }
 
@@ -2851,7 +2851,7 @@ class Os extends BaseController
         if (!$os) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
-                'message' => 'OS nÃƒÂ£o encontrada.',
+                'message' => 'OS não encontrada.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -2885,7 +2885,7 @@ class Os extends BaseController
         if (!$os) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
-                'message' => 'OS nÃƒÂ£o encontrada.',
+                'message' => 'OS não encontrada.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -2960,7 +2960,7 @@ class Os extends BaseController
         if ($entradaComparacao !== null && $previsao !== null && strtotime($previsao) < strtotime($entradaComparacao)) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'A previsÃƒÂ£o nÃƒÂ£o pode ser anterior ÃƒÂ  data de entrada.',
+                'message' => 'A previsão não pode ser anterior à data de entrada.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -2968,7 +2968,7 @@ class Os extends BaseController
         if ($entradaComparacao !== null && $entrega !== null && strtotime($entrega) < strtotime($entradaComparacao)) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'A data de entrega nÃƒÂ£o pode ser anterior ÃƒÂ  data de entrada.',
+                'message' => 'A data de entrega não pode ser anterior à data de entrada.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -2992,7 +2992,7 @@ class Os extends BaseController
             'Datas da OS ' . ($os['numero_os'] ?? ('#' . $osId))
                 . ' atualizadas via listagem. Entrada: '
                 . $this->formatDateDisplay($entradaAnterior, true) . ' -> ' . $this->formatDateDisplay($entrada, true)
-                . ' | PrevisÃƒÂ£o: ' . $this->formatDateDisplay($previsaoAnterior) . ' -> ' . $this->formatDateDisplay($previsao)
+                . ' | Previsão: ' . $this->formatDateDisplay($previsaoAnterior) . ' -> ' . $this->formatDateDisplay($previsao)
                 . ' | Entrega: ' . $this->formatDateDisplay($entregaAnterior) . ' -> ' . $this->formatDateDisplay($entrega)
                 . ' | Motivo: ' . $motivo
                 . ' | ' . $aprovacaoContexto . '.'
@@ -3091,8 +3091,8 @@ class Os extends BaseController
     {
         $changes = [];
         $numericFields = [
-            'valor_mao_obra' => 'mÃƒÂ£o de obra',
-            'valor_pecas' => 'peÃƒÂ§as',
+            'valor_mao_obra' => 'mão de obra',
+            'valor_pecas' => 'peças',
             'desconto' => 'desconto',
         ];
 
@@ -3122,22 +3122,22 @@ class Os extends BaseController
     private function resolveAdministrativeApprovalForLockedOsChange(): array
     {
         if ($this->isCurrentUserAdministrator()) {
-            return [true, 'AlteraÃƒÂ§ÃƒÂµes financeiras autorizadas pelo administrador logado.'];
+            return [true, 'Alterações financeiras autorizadas pelo administrador logado.'];
         }
 
         $adminUsuario = trim((string) $this->request->getPost('admin_usuario'));
         $adminSenha = (string) $this->request->getPost('admin_senha');
 
         if ($adminUsuario === '' || $adminSenha === '') {
-            return [false, 'Informe usuÃƒÂ¡rio e senha de um administrador para alterar valores apÃƒÂ³s a baixa da OS.'];
+            return [false, 'Informe usuário e senha de um administrador para alterar valores após a baixa da OS.'];
         }
 
         $adminAprovador = $this->resolveAdministratorByIdentifier($adminUsuario);
         if (! $adminAprovador || ! password_verify($adminSenha, (string) ($adminAprovador['senha'] ?? ''))) {
-            return [false, 'Credenciais de administrador invÃƒÂ¡lidas.'];
+            return [false, 'Credenciais de administrador inválidas.'];
         }
 
-        return [true, 'AlteraÃƒÂ§ÃƒÂµes financeiras autorizadas por administrador.'];
+        return [true, 'Alterações financeiras autorizadas por administrador.'];
     }
 
     private function ensureOsFinancialMutationAllowedForCurrentUser(int $osId): ?string
@@ -3151,7 +3151,7 @@ class Os extends BaseController
             return null;
         }
 
-        return 'Esta OS jÃƒÂ¡ passou pela baixa. Apenas administradores podem alterar itens ou valores depois desse estÃƒÂ¡gio.';
+        return 'Esta OS já passou pela baixa. Apenas administradores podem alterar itens ou valores depois desse estágio.';
     }
 
     private function normalizeEncerramentoReceipts(string $rawJson): array
@@ -3163,7 +3163,7 @@ class Os extends BaseController
 
         $decoded = json_decode($rawJson, true);
         if (! is_array($decoded)) {
-            throw new \InvalidArgumentException('Os recebimentos informados na baixa estÃƒÂ£o invÃƒÂ¡lidos.');
+            throw new \InvalidArgumentException('Os recebimentos informados na baixa estão inválidos.');
         }
 
         $allowedMethods = ['dinheiro', 'pix', 'cartao_credito', 'cartao_debito', 'transferencia', 'boleto'];
@@ -3182,7 +3182,7 @@ class Os extends BaseController
             }
 
             if (! in_array($formaPagamento, $allowedMethods, true)) {
-                throw new \InvalidArgumentException('Existe um recebimento com forma de pagamento invÃƒÂ¡lida.');
+                throw new \InvalidArgumentException('Existe um recebimento com forma de pagamento inválida.');
             }
 
             if ($valor <= 0) {
@@ -3308,7 +3308,7 @@ class Os extends BaseController
         if (!$os) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
-                'message' => 'OS nÃƒÂ£o encontrada.',
+                'message' => 'OS não encontrada.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -3429,7 +3429,7 @@ class Os extends BaseController
         if (!$os) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
-                'message' => 'OS nÃƒÂ£o encontrada.',
+                'message' => 'OS não encontrada.',
             ]);
         }
 
@@ -3451,7 +3451,7 @@ class Os extends BaseController
         if (!$os) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
-                'message' => 'OS nÃƒÂ£o encontrada.',
+                'message' => 'OS não encontrada.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -3461,7 +3461,7 @@ class Os extends BaseController
         if (empty($pdfResult['ok'])) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => $pdfResult['message'] ?? 'NÃƒÂ£o foi possÃƒÂ­vel gerar o PDF do orÃƒÂ§amento.',
+                'message' => $pdfResult['message'] ?? 'Não foi possível gerar o PDF do orçamento.',
                 'csrfHash' => csrf_hash(),
             ]);
         }
@@ -3472,14 +3472,14 @@ class Os extends BaseController
             if (!can('os', 'editar')) {
                 return $this->response->setStatusCode(403)->setJSON([
                     'ok' => false,
-                    'message' => 'Sem permissÃƒÂ£o para enviar o orÃƒÂ§amento ao cliente.',
+                    'message' => 'Sem permissão para enviar o orçamento ao cliente.',
                     'csrfHash' => csrf_hash(),
                 ]);
             }
 
             $telefone = trim((string) ($this->request->getPost('telefone') ?: ($os['cliente_telefone'] ?? '')));
             if ($telefone === '') {
-                $warningMessage = 'O PDF foi gerado, mas o cliente nÃƒÂ£o possui telefone cadastrado para envio.';
+                $warningMessage = 'O PDF foi gerado, mas o cliente não possui telefone cadastrado para envio.';
             } else {
                 $mensagem = trim((string) $this->request->getPost('mensagem_manual'));
                 $os['cliente_telefone'] = $telefone;
@@ -3520,14 +3520,14 @@ class Os extends BaseController
 
         LogModel::registrar(
             'os_orcamento_pdf',
-            'OrÃƒÂ§amento PDF da OS ' . ($os['numero_os'] ?? ('#' . $osId)) . ' gerado via listagem.'
+            'Orçamento PDF da OS ' . ($os['numero_os'] ?? ('#' . $osId)) . ' gerado via listagem.'
         );
 
         return $this->response->setJSON([
             'ok' => true,
             'message' => $sendRequested
-                ? ($warningMessage === null ? 'OrÃƒÂ§amento gerado e enviado com sucesso.' : 'OrÃƒÂ§amento gerado com ressalvas.')
-                : 'OrÃƒÂ§amento PDF gerado com sucesso.',
+                ? ($warningMessage === null ? 'Orçamento gerado e enviado com sucesso.' : 'Orçamento gerado com ressalvas.')
+                : 'Orçamento PDF gerado com sucesso.',
             'warning' => $warningMessage,
             'documentUrl' => (string) ($pdfResult['url'] ?? ''),
             'csrfHash' => csrf_hash(),
@@ -3957,7 +3957,7 @@ class Os extends BaseController
         }
 
         $data = [
-            'title'    => 'Nova Ordem de ServiÃƒÂ§o',
+            'title'    => 'Nova Ordem de Serviço',
             'clientes' => $clienteModel->orderBy('nome_razao', 'ASC')->findAll(),
             'tecnicos' => $funcionarioModel->getTecnicos(),
             'tipos'    => $tipoModel->orderBy('nome', 'ASC')->findAll(),
@@ -4031,7 +4031,7 @@ class Os extends BaseController
                 $osId,
                 'os_aberta',
                 'OS aberta',
-                'Ordem de serviÃƒÂ§o aberta no ERP',
+                'Ordem de serviço aberta no ERP',
                 session()->get('user_id') ?: null,
                 ['status' => $novoStatus]
             );
@@ -4073,7 +4073,7 @@ class Os extends BaseController
         }
 
         return redirect()->to($this->osViewUrl((int) $osId))
-            ->with('success', 'Ordem de ServiÃƒÂ§o ' . $dados['numero_os'] . ' criada com sucesso!')
+            ->with('success', 'Ordem de Serviço ' . $dados['numero_os'] . ' criada com sucesso!')
             ->with('os_post_create_pdf_prompt', [
                 'enabled' => true,
                 'numero_os' => (string) ($dados['numero_os'] ?? ''),
@@ -4088,7 +4088,7 @@ class Os extends BaseController
         $os = $this->model->getComplete($id);
         if (!$os) {
             return redirect()->to('/os')
-                ->with('error', 'OS nÃƒÂ£o encontrada.');
+                ->with('error', 'OS não encontrada.');
         }
 
         $itemModel = new OsItemModel();
@@ -4638,7 +4638,7 @@ class Os extends BaseController
         $os = $this->model->getComplete($id);
         if (!$os) {
             return redirect()->to('/os')
-                ->with('error', 'OS nÃƒÂ£o encontrada.');
+                ->with('error', 'OS não encontrada.');
         }
 
         $clienteModel = new ClienteModel();
@@ -4697,7 +4697,7 @@ class Os extends BaseController
         $osAnterior = $this->model->find($id);
 
         if (! $osAnterior) {
-            return redirect()->to('/os')->with('error', 'OS nÃƒÂ£o encontrada.');
+            return redirect()->to('/os')->with('error', 'OS não encontrada.');
         }
 
         try {
@@ -4724,7 +4724,7 @@ class Os extends BaseController
         if ($entradaComparacao !== null && $previsaoComparacao !== '' && strtotime($previsaoComparacao) < strtotime($entradaComparacao)) {
             return redirect()->to($this->osEditUrl((int) $id))
                 ->withInput()
-            ->with('error', 'A previsÃƒÂ£o nÃƒÂ£o pode ser anterior ÃƒÂ  data de entrada.');
+            ->with('error', 'A previsão não pode ser anterior à data de entrada.');
         }
 
         $statusNovo = strtolower(trim((string) ($dados['status'] ?? '')));
@@ -4737,7 +4737,7 @@ class Os extends BaseController
         if ($statusNovo !== '' && !in_array($statusNovo, $statusDisponiveis, true)) {
             return redirect()->to($this->osEditUrl((int) $id))
                 ->withInput()
-                ->with('error', 'Status informado para a OS ?? invÃƒÂ¡lido.');
+                ->with('error', 'Status informado para a OS ?? inválido.');
         }
         if ($statusAlterado) {
             $dados['status'] = $statusNovo;
@@ -4769,7 +4769,7 @@ class Os extends BaseController
             if (! $approved) {
                 return redirect()->to($this->osEditUrl((int) $id))
                     ->withInput()
-                    ->with('error', $adminApprovalMessage ?: 'Esta OS jÃƒÂ¡ passou pela baixa e exige autorizaÃƒÂ§ÃƒÂ£o administrativa para alterar valores.');
+                    ->with('error', $adminApprovalMessage ?: 'Esta OS já passou pela baixa e exige autorização administrativa para alterar valores.');
             }
         }
 
@@ -4793,7 +4793,7 @@ class Os extends BaseController
                     'status_novo' => $statusNovo,
                     'estado_fluxo' => (string) ($dados['estado_fluxo'] ?? $statusService->resolveEstadoFluxo($statusNovo)),
                     'usuario_id' => session()->get('user_id') ?: null,
-                    'observacao' => 'Alterado na ediÃƒÂ§ÃƒÂ£o da OS',
+                    'observacao' => 'Alterado na edição da OS',
                     'created_at' => date('Y-m-d H:i:s'),
                 ]);
             }
@@ -4827,7 +4827,7 @@ class Os extends BaseController
             LogModel::registrar(
                 'os_valor_pos_baixa_atualizado',
                 'Valores da OS ' . ($osAnterior['numero_os'] ?? ('#' . (int) $id))
-                    . ' alterados apÃƒÂ³s a baixa. Campos: ' . implode(', ', $financialChanges) . '.'
+                    . ' alterados após a baixa. Campos: ' . implode(', ', $financialChanges) . '.'
             );
         }
 
@@ -4836,7 +4836,7 @@ class Os extends BaseController
         }
 
         $successMessage = $adminApprovalMessage !== null
-            ? 'OS atualizada com autorizaÃƒÂ§ÃƒÂ£o de administrador.'
+            ? 'OS atualizada com autorização de administrador.'
             : 'OS atualizada com sucesso!';
 
         return redirect()->to($this->osViewUrl((int) $id))
@@ -4888,7 +4888,7 @@ class Os extends BaseController
         $os = $this->model->find($id);
 
         if (!$os) {
-            return redirect()->to('/os')->with('error', 'OS nÃƒÂ£o encontrada.');
+            return redirect()->to('/os')->with('error', 'OS não encontrada.');
         }
 
         $statusService = new OsStatusFlowService();
@@ -4901,7 +4901,7 @@ class Os extends BaseController
 
         if (empty($result['ok'])) {
             return redirect()->to($this->osViewUrl((int) $id))
-                ->with('error', $result['message'] ?? 'NÃƒÂ£o foi possÃƒÂ­vel atualizar o status.');
+                ->with('error', $result['message'] ?? 'Não foi possível atualizar o status.');
         }
 
         $this->finalizeStatusSideEffects((int) $id, $os, $status, !$controlaComunicacaoCliente);
@@ -4916,7 +4916,7 @@ class Os extends BaseController
             );
 
             if (empty($notifyResult['ok'])) {
-                $warningMessage = $notifyResult['message'] ?? 'O status foi atualizado, mas nÃƒÂ£o foi possÃƒÂ­vel comunicar o cliente.';
+                $warningMessage = $notifyResult['message'] ?? 'O status foi atualizado, mas não foi possível comunicar o cliente.';
             }
         }
 
@@ -4951,7 +4951,7 @@ class Os extends BaseController
                     $finModel->insert([
                         'os_id'           => $id,
                         'tipo'            => 'receber',
-                        'categoria'       => 'ServiÃƒÂ§o',
+                        'categoria'       => 'Serviço',
                         'descricao'       => 'OS ' . (($osAtualizada['numero_os'] ?? '') ?: ($os['numero_os'] ?? '')),
                         'valor'           => $valorFinalEfetivo,
                         'status'          => 'pendente',
@@ -5068,7 +5068,7 @@ class Os extends BaseController
         if (!$os) {
             return [
                 'ok' => false,
-                'message' => 'A OS nÃƒÂ£o foi encontrada para envio da notificaÃƒÂ§ÃƒÂ£o.',
+                'message' => 'A OS não foi encontrada para envio da notificação.',
             ];
         }
 
@@ -5076,17 +5076,17 @@ class Os extends BaseController
         if ($telefone === '') {
             return [
                 'ok' => false,
-                'message' => 'O status foi atualizado, mas o cliente nÃƒÂ£o possui telefone cadastrado para notificaÃƒÂ§ÃƒÂ£o.',
+                'message' => 'O status foi atualizado, mas o cliente não possui telefone cadastrado para notificação.',
             ];
         }
 
         $statusNome = $this->humanizeOsStatus($statusCode);
         $mensagem = $statusCode === 'cancelado'
-            ? 'AtualizaÃƒÂ§ÃƒÂ£o da sua OS ' . ($os['numero_os'] ?? '') . ': o atendimento foi cancelado conforme solicitado.'
-            : 'AtualizaÃƒÂ§ÃƒÂ£o da sua OS ' . ($os['numero_os'] ?? '') . ': novo status "' . $statusNome . '".';
+            ? 'Atualização da sua OS ' . ($os['numero_os'] ?? '') . ': o atendimento foi cancelado conforme solicitado.'
+            : 'Atualização da sua OS ' . ($os['numero_os'] ?? '') . ': novo status "' . $statusNome . '".';
 
         if ($observacao !== null && trim($observacao) !== '') {
-            $mensagem .= "\nObservaÃƒÂ§ÃƒÂµes: " . trim($observacao);
+            $mensagem .= "\nObservações: " . trim($observacao);
         }
 
         $whatsAppService = new WhatsAppService();
@@ -5156,13 +5156,13 @@ class Os extends BaseController
         $macro = strtolower(trim($macro));
 
         $map = [
-            'recepcao' => 'RecepÃƒÂ§ÃƒÂ£o',
-            'diagnostico' => 'DiagnÃƒÂ³stico',
-            'orcamento' => 'OrÃƒÂ§amento',
-            'execucao' => 'ExecuÃƒÂ§ÃƒÂ£o',
+            'recepcao' => 'Recepção',
+            'diagnostico' => 'Diagnóstico',
+            'orcamento' => 'Orçamento',
+            'execucao' => 'Execução',
             'qualidade' => 'Qualidade',
-            'interrupcao' => 'InterrupÃƒÂ§ÃƒÂ£o',
-            'concluido' => 'ConcluÃƒÂ­do',
+            'interrupcao' => 'Interrupção',
+            'concluido' => 'Concluído',
             'finalizado_sem_reparo' => 'Finalizado sem Reparo',
             'encerrado' => 'Encerrado',
             'cancelado' => 'Cancelado',
@@ -5178,7 +5178,7 @@ class Os extends BaseController
 
         $map = [
             'em_atendimento' => 'Em atendimento',
-            'em_execucao' => 'Em execuÃƒÂ§ÃƒÂ£o',
+            'em_execucao' => 'Em execução',
             'pausado' => 'Pausado',
             'pronto' => 'Pronto',
             'encerrado' => 'Encerrado',
@@ -5238,10 +5238,10 @@ class Os extends BaseController
 
         $map = [
             'abertura' => 'Abertura',
-            'orcamento' => 'OrÃƒÂ§amento',
+            'orcamento' => 'Orçamento',
             'laudo' => 'Laudo',
             'entrega' => 'Entrega',
-            'devolucao_sem_reparo' => 'DevoluÃƒÂ§ÃƒÂ£o sem Reparo',
+            'devolucao_sem_reparo' => 'Devolução sem Reparo',
         ];
 
         if (isset($map[$tipoDocumento])) {
@@ -5265,7 +5265,7 @@ class Os extends BaseController
     private function buildDefaultOsEmailSubject(array $os): string
     {
         $numeroOs = trim((string) ($os['numero_os'] ?? '#'));
-        $empresa = trim((string) get_config('empresa_nome', 'Assist?ncia T?cnica'));
+        $empresa = trim((string) get_config('empresa_nome', 'Assistência Técnica'));
 
         return 'Documentos da OS ' . $numeroOs . ' - ' . $empresa;
     }
@@ -5273,16 +5273,16 @@ class Os extends BaseController
     private function buildDefaultOsEmailMessage(array $os): string
     {
         $cliente = trim((string) ($os['cliente_nome'] ?? 'cliente'));
-        $numeroOs = trim((string) ($os['nÃƒÂºmero_os'] ?? '#'));
+        $numeroOs = trim((string) ($os['número_os'] ?? '#'));
         $equipamento = equipamento_nome_exibicao($os);
 
-        $mensagem = 'OlÃƒÂ¡ ' . $cliente . ',' . "\n\n";
-        $mensagem .= 'Segue em anexo o PDF da sua ordem de serviÃƒÂ§o ' . $numeroOs . '.';
+        $mensagem = 'Olá ' . $cliente . ',' . "\n\n";
+        $mensagem .= 'Segue em anexo o PDF da sua ordem de serviço ' . $numeroOs . '.';
         if ($equipamento !== '') {
             $mensagem .= "\nEquipamento: " . $equipamento . '.';
         }
         $mensagem .= "\n\n";
-        $mensagem .= 'Permanecemos ÃƒÂ  disposiÃƒÂ§ÃƒÂ£o para qualquer dÃƒÂºvida.';
+        $mensagem .= 'Permanecemos à disposição para qualquer dúvida.';
 
         return $mensagem;
     }
@@ -5360,19 +5360,19 @@ class Os extends BaseController
             (int) ($orcamento['os_id'] ?? 0) ?: null
         );
 
-        $mensagem = 'Ol? ' . $cliente . ', segue o orÃƒÂ§amento ' . $numero . ' no valor total de ' . $total . '.';
+        $mensagem = 'Olá ' . $cliente . ', segue o orçamento ' . $numero . ' no valor total de ' . $total . '.';
         if ($tipoOrcamento === OrcamentoModel::TIPO_PREVIO) {
-            $mensagem .= "\nEste documento representa uma estimativa inicial, sujeita ÃƒÂ  confirmaÃƒÂ§ÃƒÂ£o apÃƒÂ³s a anÃƒÂ¡lise presencial do equipamento.";
+            $mensagem .= "\nEste documento representa uma estimativa inicial, sujeita à confirmação após a análise presencial do equipamento.";
         } else {
-            $mensagem .= "\nEste documento considera o equipamento jÃƒÂ¡ recebido em assist?ncia e a anÃƒÂ¡lise t?cnica realizada.";
+            $mensagem .= "\nEste documento considera o equipamento já recebido em assistência e a análise técnica realizada.";
         }
         if ($validade !== '-') {
             $mensagem .= "\nValidade: " . $validade . '.';
         }
         if (!empty($orcamento['token_publico'])) {
-            $mensagem .= "\nAprovaÃƒÂ§ÃƒÂ£o online: " . base_url('orcamento/' . $orcamento['token_publico']);
+            $mensagem .= "\nAprovação online: " . base_url('orcamento/' . $orcamento['token_publico']);
         }
-        $mensagem .= "\nFico ÃƒÂ  disposiÃƒÂ§ÃƒÂ£o para qualquer dÃƒÂºvida.";
+        $mensagem .= "\nFico à disposição para qualquer dúvida.";
 
         return $mensagem;
     }
@@ -5380,9 +5380,9 @@ class Os extends BaseController
     private function buildDefaultOrcamentoEmailSubject(array $orcamento): string
     {
         $numero = trim((string) ($orcamento['numero'] ?? '#'));
-        $empresa = trim((string) get_config('empresa_nome', 'Assist?ncia T?cnica'));
+        $empresa = trim((string) get_config('empresa_nome', 'Assistência Técnica'));
 
-        return 'OrÃƒÂ§amento ' . $numero . ' - ' . $empresa;
+        return 'Orçamento ' . $numero . ' - ' . $empresa;
     }
 
     private function requestExpectsJson(): bool
@@ -5493,7 +5493,7 @@ class Os extends BaseController
                 ->setJSON($jsonNotFoundPayload);
         }
         if (!$os) {
-            return redirect()->to('/os')->with('error', 'OS nÃƒÂ£o encontrada.');
+            return redirect()->to('/os')->with('error', 'OS não encontrada.');
         }
 
         $documentosTabUrl = $this->osViewUrl($osId) . '#tab-documentos';
@@ -5693,16 +5693,16 @@ class Os extends BaseController
     {
         $os = $this->model->getComplete((int) $id);
         if (!$os) {
-            return redirect()->to('/os')->with('error', 'OS nÃ¯Â¿Â½o encontrada.');
+            return redirect()->to('/os')->with('error', 'OS nï¿½o encontrada.');
         }
 
         $osId = (int) $id;
         $documentosTabUrl = $this->osViewUrl($osId) . '#tab-documentos';
         $emailDestino = trim((string) ($this->request->getPost('email_destino') ?: ($os['cliente_email'] ?? '')));
         if ($emailDestino === '' || !filter_var($emailDestino, FILTER_VALIDATE_EMAIL)) {
-        LogModel::registrar('os_email_erro', 'Falha no envio de e-mail da OS ID ' . $osId . ': e-mail de destino invÃƒÂ¡lido.');
+        LogModel::registrar('os_email_erro', 'Falha no envio de e-mail da OS ID ' . $osId . ': e-mail de destino inválido.');
             return redirect()->to($documentosTabUrl)
-            ->with('error', 'E-mail de destino invÃƒÂ¡lido para envio dos documentos da OS.');
+            ->with('error', 'E-mail de destino inválido para envio dos documentos da OS.');
         }
 
         $documentoId = (int) ($this->request->getPost('documento_id') ?? 0);
@@ -5715,7 +5715,7 @@ class Os extends BaseController
         if ($documento === null) {
             LogModel::registrar('os_email_erro', 'Falha no envio de email da OS ID ' . $osId . ': documento PDF ausente ou indisponivel.');
             return redirect()->to($documentosTabUrl)
-            ->with('error', 'O PDF selecionado nÃƒÂ£o foi encontrado. Gere novamente o documento antes de enviar.');
+            ->with('error', 'O PDF selecionado não foi encontrado. Gere novamente o documento antes de enviar.');
         }
 
         $assunto = trim((string) $this->request->getPost('assunto_email'));
@@ -5755,14 +5755,14 @@ class Os extends BaseController
     {
         $os = $this->model->find((int) $id);
         if (!$os) {
-            return redirect()->to('/os')->with('error', 'OS nÃƒÂ£o encontrada.');
+            return redirect()->to('/os')->with('error', 'OS não encontrada.');
         }
 
         $documentosTabUrl = $this->osViewUrl((int) $id) . '#tab-documentos';
 
         $tipo = trim((string) $this->request->getPost('tipo_documento'));
         if ($tipo === '') {
-            return redirect()->to($documentosTabUrl)->with('error', 'Tipo de documento nÃƒÆ’Ã‚Â£o informado.');
+            return redirect()->to($documentosTabUrl)->with('error', 'Tipo de documento não informado.');
         }
         $pdfOptions = [];
         if ($tipo === 'abertura') {
@@ -5783,7 +5783,7 @@ class Os extends BaseController
         if (empty($result['ok'])) {
             if (!empty($result['needs_budget'])) {
                 return redirect()->to($documentosTabUrl)
-                    ->with('warning', $result['message'] ?? 'Crie primeiro um orÃƒÆ’Ã‚Â§amento vinculado ÃƒÆ’Ã‚Â  OS para gerar este PDF.');
+                    ->with('warning', $result['message'] ?? 'Crie primeiro um orçamento vinculado à OS para gerar este PDF.');
             }
             return redirect()->to($documentosTabUrl)->with('error', $result['message'] ?? 'Falha ao gerar PDF.');
         }
@@ -6125,7 +6125,7 @@ class Os extends BaseController
                     'risco_percentual' => (float) ($quote['risco_percentual'] ?? 0),
                     'valor_risco' => (float) ($quote['valor_risco'] ?? 0),
                     'custo_total' => (float) ($quote['custo_total'] ?? 0),
-                    'preco_m?nimo' => (float) ($quote['preco_m?nimo'] ?? 0),
+                    'preco_minimo' => (float) ($quote['preco_minimo'] ?? 0),
                     'valor_recomendado' => (float) ($quote['valor_recomendado'] ?? 0),
                     'modo_precificacao' => (string) ($quote['modo_precificacao'] ?? 'servico_cadastro'),
                 ],
@@ -6261,7 +6261,7 @@ class Os extends BaseController
 
         if ($descricao === '') {
             $db->transRollback();
-            return redirect()->back()->with('error', 'Selecione uma peÃƒÂ§a ou serviÃƒÂ§o vÃƒÂ¡lido antes de adicionar.');
+            return redirect()->back()->with('error', 'Selecione uma peça ou serviço válido antes de adicionar.');
         }
 
         if ($valorUnitario < 0) {
@@ -6298,7 +6298,7 @@ class Os extends BaseController
         $insertResult = $itemModel->insert($itemPayload);
         if (! $insertResult) {
             $db->transRollback();
-            return redirect()->back()->with('error', 'NÃƒÂ£o foi possÃƒÂ­vel inserir o item na OS.');
+            return redirect()->back()->with('error', 'Não foi possível inserir o item na OS.');
         }
 
         $db->transComplete();
@@ -6310,7 +6310,7 @@ class Os extends BaseController
 
         $successMessage = 'Item adicionado com sucesso!';
         if ($tipo === 'peca' && $this->isPendingItemStatus($statusItem)) {
-            $successMessage = 'Item adicionado com pendÃƒÂªncia de estoque. Use "Resolver pendÃƒÂªncia" para finalizar a reserva.';
+            $successMessage = 'Item adicionado com pendência de estoque. Use "Resolver pendência" para finalizar a reserva.';
         }
 
         return redirect()->to($this->osViewUrl($osId))
@@ -6324,7 +6324,7 @@ class Os extends BaseController
         $item = $itemModel->find($itemId);
 
         if (! $item) {
-            return redirect()->back()->with('error', 'Item nÃƒÂ£o encontrado.');
+            return redirect()->back()->with('error', 'Item não encontrado.');
         }
 
         $osId = (int) ($item['os_id'] ?? 0);
@@ -6368,7 +6368,7 @@ class Os extends BaseController
 
         $db->transComplete();
         if (! $db->transStatus()) {
-            return redirect()->back()->with('error', 'NÃƒÂ£o foi possÃƒÂ­vel remover o item.');
+            return redirect()->back()->with('error', 'Não foi possível remover o item.');
         }
 
         if ($osId > 0) {
@@ -6386,13 +6386,13 @@ class Os extends BaseController
         $item = $itemModel->find($itemId);
 
         if (! $item) {
-            return redirect()->back()->with('error', 'Item nÃƒÂ£o encontrado para resolver pendÃƒÂªncia.');
+            return redirect()->back()->with('error', 'Item não encontrado para resolver pendência.');
         }
 
         $osId = (int) ($item['os_id'] ?? 0);
         if ((string) ($item['tipo'] ?? '') !== 'peca' || empty($item['peca_id'])) {
             return redirect()->to($this->osViewUrl($osId))
-                ->with('error', 'A resoluÃƒÂ§ÃƒÂ£o de pendÃƒÂªncia se aplica apenas a itens de peÃƒÂ§a.');
+                ->with('error', 'A resolução de pendência se aplica apenas a itens de peça.');
         }
 
         $pecaId = (int) $item['peca_id'];
@@ -6400,7 +6400,7 @@ class Os extends BaseController
         $peca = $pecaModel->find($pecaId);
         if (! $peca || (int) ($peca['ativo'] ?? 1) !== 1) {
             return redirect()->to($this->osViewUrl($osId))
-                ->with('error', 'PeÃƒÂ§a vinculada nÃƒÂ£o encontrada ou inativa.');
+                ->with('error', 'Peça vinculada não encontrada ou inativa.');
         }
 
         $db = Database::connect();
@@ -6461,7 +6461,7 @@ class Os extends BaseController
         $osNumero = trim((string) ((new OsModel())->find($osId)['numero_os'] ?? ('#' . $osId)));
         $destinoDespesa = trim((string) $this->request->getPost('destino_despesa'));
         if ($destinoDespesa === '') {
-            $destinoDespesa = 'Compra da peÃƒÂ§a ' . trim((string) ($peca['nome'] ?? '')) . ' para OS ' . $osNumero;
+            $destinoDespesa = 'Compra da peça ' . trim((string) ($peca['nome'] ?? '')) . ' para OS ' . $osNumero;
         }
 
         $quantidadeItem = max(1, (int) ($item['quantidade'] ?? 1));
@@ -6483,7 +6483,7 @@ class Os extends BaseController
                 'os_id'          => $osId > 0 ? $osId : null,
                 'tipo'           => 'entrada',
                 'quantidade'     => $quantidadeEntrada,
-                'motivo'         => 'Entrada para resolver pendÃƒÂªncia da OS ' . $osNumero,
+                'motivo'         => 'Entrada para resolver pendência da OS ' . $osNumero,
                 'responsavel_id' => $responsavelId > 0 ? $responsavelId : null,
             ]);
         }
@@ -6502,7 +6502,7 @@ class Os extends BaseController
                     'os_id'          => $osId > 0 ? $osId : null,
                     'tipo'           => 'saida',
                     'quantidade'     => $quantidadeItem,
-                    'motivo'         => 'Reserva apÃƒÂ³s resoluÃƒÂ§ÃƒÂ£o de pendÃƒÂªncia na OS ' . $osNumero,
+                    'motivo'         => 'Reserva após resolução de pendência na OS ' . $osNumero,
                     'responsavel_id' => $responsavelId > 0 ? $responsavelId : null,
                 ]);
 
@@ -6574,7 +6574,7 @@ class Os extends BaseController
                 'os_id'           => $osId > 0 ? $osId : null,
                 'tipo'            => 'pagar',
                 'categoria'       => 'Compra de pecas',
-                'descricao'       => 'Compra da peÃƒÂ§a ' . trim((string) ($peca['nome'] ?? '')) . ' - OS ' . $osNumero,
+                'descricao'       => 'Compra da peça ' . trim((string) ($peca['nome'] ?? '')) . ' - OS ' . $osNumero,
                 'valor'           => $valorCompra,
                 'status'          => $statusDespesa,
                 'data_vencimento' => $dataEntrada,
@@ -6586,7 +6586,7 @@ class Os extends BaseController
         $db->transComplete();
         if (! $db->transStatus()) {
             return redirect()->to($this->osViewUrl($osId))
-                ->with('error', 'Falha ao resolver pendÃƒÂªncia deste item.');
+                ->with('error', 'Falha ao resolver pendência deste item.');
         }
 
         $this->recalcularTotaisOs($osId);
@@ -6862,7 +6862,7 @@ class Os extends BaseController
         if (!$equipamento) {
             return $this->response->setStatusCode(404)->setJSON([
                 'ok' => false,
-                'message' => 'Equipamento nÃƒÂ£o encontrado.',
+                'message' => 'Equipamento não encontrado.',
             ]);
         }
 
@@ -6870,7 +6870,7 @@ class Os extends BaseController
         if ($tipoEquipamentoId <= 0) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'Tipo de equipamento nÃƒÂ£o identificado para o checklist.',
+                'message' => 'Tipo de equipamento não identificado para o checklist.',
             ]);
         }
 
@@ -6898,7 +6898,7 @@ class Os extends BaseController
             log_message('error', '[Checklist] falha no checklistMeta da OS: ' . $e->getMessage());
             return $this->response->setStatusCode(500)->setJSON([
                 'ok' => false,
-                'message' => 'NÃƒÂ£o foi possÃƒÂ­vel carregar o checklist agora.',
+                'message' => 'Não foi possível carregar o checklist agora.',
             ]);
         }
     }
@@ -7070,7 +7070,7 @@ class Os extends BaseController
             'resumo' => [
                 'preenchido' => false,
                 'total_discrepancias' => 0,
-                'label' => 'Checklist indisponÃƒÂ­vel',
+                'label' => 'Checklist indisponível',
                 'variant' => 'secondary',
             ],
             'tipo_equipamento_nome' => '',
@@ -7096,7 +7096,7 @@ class Os extends BaseController
 
             return true;
         } catch (\Throwable $e) {
-            log_message('error', '[Checklist] Falha ao validar infraestrutura no m?dulo OS: ' . $e->getMessage());
+            log_message('error', '[Checklist] Falha ao validar infraestrutura no módulo OS: ' . $e->getMessage());
             return false;
         }
     }
@@ -7185,7 +7185,7 @@ class Os extends BaseController
                 'target_dir' => $targetDir,
             ]);
 
-        return 'A OS foi salva, mas nÃƒÂ£o foi possÃƒÂ­vel preparar o diretÃƒÂ³rio das fotos de entrada.';
+        return 'A OS foi salva, mas não foi possível preparar o diretório das fotos de entrada.';
         }
 
         $slug = strtolower($this->normalizeOsSlug($numeroOs));
@@ -7234,7 +7234,7 @@ class Os extends BaseController
             return 'A OS foi salva, mas uma ou mais fotos de entrada nao puderam ser anexadas.';
         }
 
-        return 'A OS foi salva, mas nÃƒÂ£o foi possÃƒÂ­vel anexar as fotos de entrada.';
+        return 'A OS foi salva, mas não foi possível anexar as fotos de entrada.';
     }
 
     private function ensureAccessoryDirectory(string $slug): string
@@ -7307,7 +7307,7 @@ class Os extends BaseController
             ]);
             $sequence++;
         } catch (\Throwable $e) {
-            log_message('warning', 'Erro ao salvar foto de acess?rio: ' . $e->getMessage());
+            log_message('warning', 'Erro ao salvar foto de acessório: ' . $e->getMessage());
         }
     }
 
@@ -7802,7 +7802,7 @@ class Os extends BaseController
 
         $os = $this->model->getComplete($id);
         if (!$os) {
-            return redirect()->back()->with('error', 'OS nÃƒÂ£o encontrada.');
+            return redirect()->back()->with('error', 'OS não encontrada.');
         }
 
         $itemModel = new OsItemModel();

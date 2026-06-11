@@ -26,22 +26,22 @@ function getStatusBadge($status)
             'pendencia',
         ];
         $to = [
-            'ExecuÃ§Ã£o',
-            'execuÃ§Ã£o',
-            'ServiÃ§o',
-            'serviÃ§o',
-            'OrÃ§amento',
-            'orÃ§amento',
-            'AprovaÃ§Ã£o',
-            'aprovaÃ§Ã£o',
-            'AnÃ¡lise',
-            'anÃ¡lise',
-            'PeÃ§a',
-            'peÃ§a',
-            'TÃ©cnico',
-            'tÃ©cnico',
-            'PendÃªncia',
-            'pendÃªncia',
+            'Execução',
+            'execução',
+            'Serviço',
+            'serviço',
+            'Orçamento',
+            'orçamento',
+            'Aprovação',
+            'aprovação',
+            'Análise',
+            'análise',
+            'Peça',
+            'peça',
+            'Técnico',
+            'técnico',
+            'Pendência',
+            'pendência',
         ];
         return str_replace($from, $to, $label);
     };
@@ -89,13 +89,13 @@ function getStatusBadge($status)
     }
 
     $legacy = [
-        'aguardando_analise' => 'Aguard. AnÃ¡lise',
-        'aguardando_orcamento' => 'Aguard. OrÃ§amento',
-        'aguardando_aprovacao' => 'Aguard. AprovaÃ§Ã£o',
+        'aguardando_analise' => 'Aguard. Análise',
+        'aguardando_orcamento' => 'Aguard. Orçamento',
+        'aguardando_aprovacao' => 'Aguard. Aprovação',
         'aprovado' => 'Aprovado',
         'reprovado' => 'Reprovado',
         'em_reparo' => 'Em Reparo',
-        'aguardando_peca' => 'Aguard. PeÃ§a',
+        'aguardando_peca' => 'Aguard. Peça',
         'pronto' => 'Pronto',
         'entregue' => 'Entregue',
         'cancelado' => 'Cancelado',
@@ -142,11 +142,11 @@ function formatDateWithWeekdayPtBr($date, $withYear = false)
     $weekdays = [
         'domingo',
         'segunda-feira',
-        'terÃ§a-feira',
+        'terça-feira',
         'quarta-feira',
         'quinta-feira',
         'sexta-feira',
-        'sÃ¡bado',
+        'sábado',
     ];
 
     $base = date($withYear ? 'd/m/Y' : 'd/m', $timestamp);
@@ -445,7 +445,7 @@ if (!function_exists('equipamento_esta_encerrado')) {
 }
 
 /**
- * Obter valor de configuraÃ§Ã£o
+ * Obter valor de configuração
  */
 function get_config($chave, $default = null)
 {
@@ -463,7 +463,7 @@ function get_config($chave, $default = null)
 }
 
 /**
- * Retorna a versÃ£o de release do sistema com fallback seguro.
+ * Retorna a versão de release do sistema com fallback seguro.
  */
 function get_system_version(): string
 {
@@ -490,7 +490,7 @@ function get_theme()
 }
 
 /**
- * Retorna o tempo mÃ¡ximo de inatividade da sessÃ£o em minutos.
+ * Retorna o tempo máximo de inatividade da sessão em minutos.
  */
 function get_session_inactivity_minutes(int $default = 30): int
 {
@@ -504,7 +504,7 @@ function get_session_inactivity_minutes(int $default = 30): int
 }
 
 /**
- * Retorna o tempo mÃ¡ximo de inatividade da sessÃ£o em segundos.
+ * Retorna o tempo máximo de inatividade da sessão em segundos.
  */
 function get_session_inactivity_seconds(int $defaultMinutes = 30): int
 {
@@ -512,7 +512,7 @@ function get_session_inactivity_seconds(int $defaultMinutes = 30): int
 }
 
 /**
- * Carrega e cacheia no session o mapa de permissÃµes do usuÃ¡rio logado.
+ * Carrega e cacheia no session o mapa de permissões do usuário logado.
  * Estrutura: ['clientes' => ['visualizar', 'criar', 'editar'], ...]
  */
 function loadUserPermissions(): array
@@ -581,12 +581,12 @@ function refreshPermissions(): void
 }
 
 /**
- * Aborta a requisiÃ§Ã£o com erro 403 se o usuÃ¡rio nÃ£o tiver a permissÃ£o.
+ * Aborta a requisição com erro 403 se o usuário não tiver a permissão.
  */
 function requirePermission(string $modulo, string $acao = 'visualizar'): void
 {
     if (!can($modulo, $acao)) {
-        session()->setFlashdata('error', 'Acesso negado. VocÃª nÃ£o tem permissÃ£o para esta aÃ§Ã£o.');
+        session()->setFlashdata('error', 'Acesso negado. Você não tem permissão para esta ação.');
         header('Location: ' . base_url('dashboard'));
         exit;
     }

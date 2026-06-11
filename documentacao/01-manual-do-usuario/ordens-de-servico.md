@@ -1,32 +1,32 @@
-# Manual do UsuÃ¡rio - Ordens de ServiÃ§o
+# Manual do Usuário - Ordens de Serviço
 
-## VisÃ£o geral
+## Visão geral
 
-A Ordem de ServiÃ§o (OS) Ã© o registro central do atendimento tÃ©cnico, desde a entrada do equipamento atÃ© a entrega, cancelamento ou devoluÃ§Ã£o.
+A Ordem de Serviço (OS) é o registro central do atendimento técnico, desde a entrada do equipamento até a entrega, cancelamento ou devolução.
 
 O fluxo operacional atual cobre:
 
-- recepÃ§Ã£o;
-- diagnÃ³stico;
-- orÃ§amento;
-- execuÃ§Ã£o;
+- recepção;
+- diagnóstico;
+- orçamento;
+- execução;
 - qualidade;
 - encerramento.
 
 ## Onde acessar
 
-- listagem principal: `Ordens de ServiÃ§o`
-- nova abertura pela listagem: botÃ£o `+ Nova OS`
-- ediÃ§Ã£o: `/os/editar/{id}`
-- visualizaÃ§Ã£o: `/os/visualizar/{id}`
+- listagem principal: `Ordens de Serviço`
+- nova abertura pela listagem: botão `+ Nova OS`
+- edição: `/os/editar/{id}`
+- visualização: `/os/visualizar/{id}`
 
 ## Identificador da OS
 
-O nÃºmero segue o padrÃ£o `OSYYMMSSSS`:
+O número segue o padrão `OSYYMMSSSS`:
 
 - `YY`: ano;
-- `MM`: mÃªs;
-- `SSSS`: sequÃªncia do mÃªs.
+- `MM`: mês;
+- `SSSS`: sequência do mês.
 
 Exemplo: `OS26040010`.
 
@@ -46,7 +46,7 @@ Exemplo: `OS26040010`.
 - `numero da OS`, `nome do cliente`, `tipo do equipamento`, `datas principais`, `status principal` e `total da OS` passaram a ter mais destaque visual;
 - labels de apoio como `Tipo`, `Equip.`, `Entrada`, `Prazo`, `Recebido`, `Adiantamento` e `Saldo` ficaram mais discretas, sem competir com o conteudo operacional;
 - o telefone principal do cliente passou a usar fonte um pouco menor que o nome, preservando o atalho do WhatsApp com menos competicao visual dentro da coluna `Cliente`;
-- badges, datas tecnicas e resumo financeiro ganharam mais legibilidade em desktop, tablet e mobile, evitando leitura â€œmicroscopicaâ€ na fila.
+- badges, datas tecnicas e resumo financeiro ganharam mais legibilidade em desktop, tablet e mobile, evitando leitura “microscopica” na fila.
 
 ### Correcao de 27/04/2026
 
@@ -69,13 +69,13 @@ Na release `2.16.5`, a listagem, a edicao e a visualizacao da OS passaram por um
 ### O que a listagem mostra
 
 - foto do equipamento;
-- nÃºmero da OS, agora exibido logo abaixo da foto do equipamento;
+- número da OS, agora exibido logo abaixo da foto do equipamento;
 - cliente e telefone principal;
 - equipamento;
 - datas principais;
 - status operacional;
 - mini resumo financeiro;
-- aÃ§Ãµes de visualizar e editar.
+- ações de visualizar e editar.
 
 Na coluna `Equipamento`:
 
@@ -87,7 +87,7 @@ Na coluna `Equipamento`:
 
 Na barra de busca da listagem `/os`:
 
-- a pesquisa continua aceitando cliente, equipamento, nÃºmero da OS e OS legado;
+- a pesquisa continua aceitando cliente, equipamento, número da OS e OS legado;
 - qualquer sequencia numerica digitada que exista no telefone principal do cliente tambem passa a localizar a OS correspondente;
 - quando o usuario digita apenas os numeros do telefone, a busca encontra a OS mesmo se o numero estiver mascarado na exibicao.
 
@@ -128,25 +128,25 @@ A coluna de status agora concentra o contexto operacional completo da OS:
 
 - status atual da OS;
 - estado de fluxo da OS;
-- status do orÃ§amento vinculado, quando existir;
-- nÃºmero do orÃ§amento vinculado.
+- status do orçamento vinculado, quando existir;
+- número do orçamento vinculado.
 
-Regras prÃ¡ticas:
+Regras práticas:
 
 - o badge principal sempre mostra o status real salvo na OS;
 - o badge de fluxo continua mostrando a etapa operacional real da OS;
-- o status do orÃ§amento vinculado aparece apenas como contexto comercial secundÃ¡rio;
-- orÃ§amento criado/vinculado e ainda em andamento pode sugerir `Aguardando AutorizaÃ§Ã£o`, sem substituir o status principal da OS;
-- orÃ§amento `Aprovado` ou `Convertido` pode sugerir `Aguardando Reparo`, sem substituir o status principal da OS na listagem;
-- depois que a equipe avanÃ§a a OS para etapas como `Em ExecuÃ§Ã£o do ServiÃ§o`, `Aguardando PeÃ§a`, `Testes` ou fases posteriores, a listagem nÃ£o deve mais voltar o status automaticamente para `Aguardando Reparo` sÃ³ porque o orÃ§amento continua aprovado;
-- quando a OS nÃ£o tiver `valor_final` preenchido, a listagem pode usar o total do orÃ§amento vinculado como fallback visual.
-- quando o status comercial do orÃ§amento for grande, o badge quebra em mais de uma linha dentro da prÃ³pria coluna `Status / OrÃ§amento`, sem invadir a coluna `Valor`.
+- o status do orçamento vinculado aparece apenas como contexto comercial secundário;
+- orçamento criado/vinculado e ainda em andamento pode sugerir `Aguardando Autorização`, sem substituir o status principal da OS;
+- orçamento `Aprovado` ou `Convertido` pode sugerir `Aguardando Reparo`, sem substituir o status principal da OS na listagem;
+- depois que a equipe avança a OS para etapas como `Em Execução do Serviço`, `Aguardando Peça`, `Testes` ou fases posteriores, a listagem não deve mais voltar o status automaticamente para `Aguardando Reparo` só porque o orçamento continua aprovado;
+- quando a OS não tiver `valor_final` preenchido, a listagem pode usar o total do orçamento vinculado como fallback visual.
+- quando o status comercial do orçamento for grande, o badge quebra em mais de uma linha dentro da própria coluna `Status / Orçamento`, sem invadir a coluna `Valor`.
 
-Na prÃ¡tica:
+Na prática:
 
-- o orÃ§amento continua sugerindo o ponto de entrada do reparo;
-- a conduÃ§Ã£o manual do reparo passa a prevalecer depois que a OS sai da fase inicial de execuÃ§Ã£o;
-- a coluna `Status` nÃ£o deve mascarar o status real da OS com o status sugerido do orÃ§amento.
+- o orçamento continua sugerindo o ponto de entrada do reparo;
+- a condução manual do reparo passa a prevalecer depois que a OS sai da fase inicial de execução;
+- a coluna `Status` não deve mascarar o status real da OS com o status sugerido do orçamento.
 
 ### Leitura do prazo na coluna `Datas`
 
@@ -168,28 +168,28 @@ Na pratica:
 
 ### Modal `Atualizar prazos da OS`
 
-Ao clicar sobre a coluna de datas na listagem `/os`, o sistema abre um modal rÃ¡pido para ajuste da previsÃ£o.
+Ao clicar sobre a coluna de datas na listagem `/os`, o sistema abre um modal rápido para ajuste da previsão.
 
 Campos e regras atuais:
 
-- `Data de entrada`: exibida como referÃªncia operacional e enviada pelo sistema como base de comparaÃ§Ã£o;
-- `Atalho de prazo`: ajuda a recalcular rapidamente a `PrevisÃ£o`;
-- `PrevisÃ£o`: campo principal da alteraÃ§Ã£o;
+- `Data de entrada`: exibida como referência operacional e enviada pelo sistema como base de comparação;
+- `Atalho de prazo`: ajuda a recalcular rapidamente a `Previsão`;
+- `Previsão`: campo principal da alteração;
 - `Entrega`: somente leitura, preservada para o fluxo correto de encerramento;
-- `Motivo da alteraÃ§Ã£o`: obrigatÃ³rio e registrado no histÃ³rico da OS;
-- `AutorizaÃ§Ã£o administrativa`: aparece somente para perfis que nÃ£o sÃ£o administradores.
+- `Motivo da alteração`: obrigatório e registrado no histórico da OS;
+- `Autorização administrativa`: aparece somente para perfis que não são administradores.
 
-Na prÃ¡tica:
+Na prática:
 
-- nÃ£o Ã© mais necessÃ¡rio adivinhar por que o backend recusou a alteraÃ§Ã£o;
-- quando o usuÃ¡rio nÃ£o for administrador, o prÃ³prio modal passa a pedir `administrador` e `senha`;
-- o histÃ³rico tÃ©cnico da OS registra o motivo informado junto com a alteraÃ§Ã£o de prazo.
+- não é mais necessário adivinhar por que o backend recusou a alteração;
+- quando o usuário não for administrador, o próprio modal passa a pedir `administrador` e `senha`;
+- o histórico técnico da OS registra o motivo informado junto com a alteração de prazo.
 
 ### Modal `Baixa da OS`
 
-Ao clicar no botÃ£o `Baixa da OS` na listagem `/os`, o sistema agora abre um modal operacional prÃ³prio para concluir a ordem sem sair da fila.
+Ao clicar no botão `Baixa da OS` na listagem `/os`, o sistema agora abre um modal operacional próprio para concluir a ordem sem sair da fila.
 
-O que o modal reÃºne:
+O que o modal reúne:
 
 - contexto resumido da OS, com cliente, equipamento e badges atuais;
 - escolha de `como encerrar` a ordem:
@@ -197,26 +197,26 @@ O que o modal reÃºne:
   - `Equipamento devolvido sem reparo`
   - `Equipamento descartado`
 - `data da entrega`;
-- `observaÃ§Ãµes da baixa`;
-- opÃ§Ã£o para `enviar WhatsApp com o PDF consolidado da OS`;
-- opÃ§Ã£o para `agendar retorno pÃ³s-serviÃ§o`;
+- `observações da baixa`;
+- opção para `enviar WhatsApp com o PDF consolidado da OS`;
+- opção para `agendar retorno pós-serviço`;
 - bloco de `recebimentos e adiantamentos`;
-- resumo financeiro com `custos`, `taxas de cartÃ£o`, `recebimento lÃ­quido` e `lucro estimado`.
+- resumo financeiro com `custos`, `taxas de cartão`, `recebimento líquido` e `lucro estimado`.
 
-Comportamento prÃ¡tico:
+Comportamento prático:
 
 - o operador pode concluir a baixa sem registrar recebimento imediato;
-- o modal permite registrar um ou vÃ¡rios recebimentos na mesma baixa;
-- o botÃ£o `Adicionar adiantamento` abre uma escolha rÃ¡pida entre `Adiantamento total` e `Sinal`;
-- cada lanÃ§amento da baixa pode ser classificado como `Recebimento da baixa`, `Adiantamento` ou `Sinal`;
-- somente a classificaÃ§Ã£o `Recebimento da baixa` altera o status operacional da OS;
-- `Adiantamento` e `Sinal` reduzem o saldo financeiro e entram no `Fluxo de Caixa`/`DRE`, mas nÃ£o alteram status, data de entrega, baixa tÃ©cnica ou cobranÃ§a automÃ¡tica;
-- se a baixa operacional ficar parcial, a OS passa para `entregue_pagamento_pendente` e continua aberta para cobranÃ§a;
+- o modal permite registrar um ou vários recebimentos na mesma baixa;
+- o botão `Adicionar adiantamento` abre uma escolha rápida entre `Adiantamento total` e `Sinal`;
+- cada lançamento da baixa pode ser classificado como `Recebimento da baixa`, `Adiantamento` ou `Sinal`;
+- somente a classificação `Recebimento da baixa` altera o status operacional da OS;
+- `Adiantamento` e `Sinal` reduzem o saldo financeiro e entram no `Fluxo de Caixa`/`DRE`, mas não alteram status, data de entrega, baixa técnica ou cobrança automática;
+- se a baixa operacional ficar parcial, a OS passa para `entregue_pagamento_pendente` e continua aberta para cobrança;
 - se a baixa operacional quitar o saldo, a OS muda para o status final selecionado, como `entregue_reparado`, `devolvido_sem_reparo` ou `descartado`;
 - antes de confirmar a baixa, o sistema pergunta se o operador deseja enviar a mensagem no WhatsApp; quando a resposta for positiva, a mensagem segue com o PDF consolidado da impressao A4 da OS;
-- antes de confirmar, a tela mostra o `status projetado` ou `Sem alteraÃ§Ã£o de status`, o `saldo remanescente` e o `lucro estimado da OS`.
+- antes de confirmar, a tela mostra o `status projetado` ou `Sem alteração de status`, o `saldo remanescente` e o `lucro estimado da OS`.
 - se a OS estiver com campos financeiros zerados, mas ja houver `orcamento aprovado` ou `convertido`, o modal usa automaticamente esse total aprovado para preencher `valor da OS`, `saldo` e `lucro estimado`.
-- em telas menores ou janelas com pouca altura, o modal libera rolagem interna para manter `Recebimentos`, `Resumo financeiro` e `RodapÃ© de aÃ§Ã£o` acessÃ­veis sem cortar conteÃºdo.
+- em telas menores ou janelas com pouca altura, o modal libera rolagem interna para manter `Recebimentos`, `Resumo financeiro` e `Rodapé de ação` acessíveis sem cortar conteúdo.
 - quando a baixa for concluida como `Equipamento descartado`, o equipamento vinculado passa a ser encerrado automaticamente e sai de operacao para novas OS;
 - se esse equipamento voltar a funcionar depois, a equipe pode reativa-lo pela propria ficha do cadastro.
 - o encerramento automatico e a eventual volta a operacao tambem ficam registrados na timeline do proprio equipamento.
@@ -228,23 +228,23 @@ Comportamento prÃ¡tico:
 - na tela de visualizacao, a mesma data continua aparecendo no card de datas, junto de entrada, previsao e conclusao;
 - quando a OS voltar para um status em andamento, o campo deixa de ser exibido na edicao, mas o historico da OS continua preservado.
 
-### Pagamento pendente apÃ³s a baixa
+### Pagamento pendente após a baixa
 
 Regra operacional atual:
 
-- `baixa tÃ©cnica concluÃ­da` nÃ£o significa `encerramento financeiro definitivo`;
+- `baixa técnica concluída` não significa `encerramento financeiro definitivo`;
 - quando a OS for entregue com saldo pendente, ela fica em `entregue_pagamento_pendente`;
-- essa OS deve ser tratada como `concluÃ­da`, mas ainda `nÃ£o encerrada`;
-- a equipe pode continuar acompanhando a pendÃªncia financeira atÃ© a quitaÃ§Ã£o;
+- essa OS deve ser tratada como `concluída`, mas ainda `não encerrada`;
+- a equipe pode continuar acompanhando a pendência financeira até a quitação;
 - quando o saldo chega a zero, o sistema sincroniza automaticamente o status final da OS.
 
-### CobranÃ§a automÃ¡tica da OS pendente
+### Cobrança automática da OS pendente
 
 Quando a baixa termina com saldo financeiro em aberto:
 
-- o sistema agenda cobranÃ§as automÃ¡ticas em `1`, `3` e `5` dias;
-- a rÃ©gua usa o telefone do cliente cadastrado na OS;
-- se o cliente nÃ£o tiver telefone vÃ¡lido, a baixa Ã© concluÃ­da mesmo assim, mas o sistema avisa que a cobranÃ§a automÃ¡tica nÃ£o poderÃ¡ funcionar corretamente.
+- o sistema agenda cobranças automáticas em `1`, `3` e `5` dias;
+- a régua usa o telefone do cliente cadastrado na OS;
+- se o cliente não tiver telefone válido, a baixa é concluída mesmo assim, mas o sistema avisa que a cobrança automática não poderá funcionar corretamente.
 
 ### Atualizacao automatica do status do orcamento
 
@@ -281,7 +281,7 @@ Comportamento pratico:
 - a aba `Gerenciamento do Orcamento` concentra o resumo e as acoes de criar, editar ou visualizar o orcamento;
 - o modal continua respeitando o fluxo permitido para troca de status;
 - os procedimentos inseridos passam a registrar automaticamente data/hora e tecnico atual da OS;
-- os labels visiveis do modal foram padronizados em pt-BR, incluindo `AÃ§Ãµes rÃ¡pidas`, `SoluÃ§Ã£o e diagnÃ³stico`, `Gerenciamento do OrÃ§amento`, `HistÃ³rico e progresso` e `Ãšltimas movimentaÃ§Ãµes`;
+- os labels visiveis do modal foram padronizados em pt-BR, incluindo `Ações rápidas`, `Solução e diagnóstico`, `Gerenciamento do Orçamento`, `Histórico e progresso` e `Últimas movimentações`;
 - ao abrir `Editar orcamento` ou `Visualizar`, a janela do orcamento sobe na frente do modal de status para evitar sobreposicao invertida;
 - quando o orcamento e salvo em modo embed, o resumo dentro do modal de status e atualizado automaticamente;
 - quando o cliente responde o orcamento pelo link publico, o contexto comercial da ordem volta sincronizado assim que a notificacao em tempo real chega ao ERP.
@@ -315,7 +315,7 @@ No celular, a face principal do card mostra somente:
 - `Tipo` + `Equip.` do equipamento;
 - botao `+` para expandir os detalhes.
 
-Cada bloco do card agora reserva o proprio espaco no mobile, entao os rÃ³tulos nao ficam sobre o nome do cliente ou sobre a descricao do equipamento.
+Cada bloco do card agora reserva o proprio espaco no mobile, entao os rótulos nao ficam sobre o nome do cliente ou sobre a descricao do equipamento.
 
 O nome do cliente agora usa toda a largura util do card no celular e pode quebrar em linhas normais quando for grande, evitando ficar preso em uma faixa curta com rolagem horizontal.
 O telefone principal continua em linha unica abaixo do nome, mantendo o atalho do WhatsApp, e o equipamento segue compacto no card.
@@ -358,21 +358,21 @@ Comportamento do reset:
 
 ### Fechamento da nova OS pela listagem
 
-Ao clicar em `+ Nova OS`, a abertura Ã© feita em modal.
+Ao clicar em `+ Nova OS`, a abertura é feita em modal.
 
 Comportamento atual:
 
-- o modal nÃ£o fecha clicando fora;
-- o modal nÃ£o fecha pela tecla `ESC`;
-- o fechamento manual fica restrito ao botÃ£o `X`;
-- ao clicar no `X`, o sistema alerta que existe um registro de ordem de serviÃ§o em andamento e que o preenchimento nÃ£o salvo serÃ¡ perdido.
-- esse alerta de confirmaÃ§Ã£o agora sobe acima do modal iframe e do backdrop, evitando ficar escondido atrÃ¡s da janela `Nova OS`.
+- o modal não fecha clicando fora;
+- o modal não fecha pela tecla `ESC`;
+- o fechamento manual fica restrito ao botão `X`;
+- ao clicar no `X`, o sistema alerta que existe um registro de ordem de serviço em andamento e que o preenchimento não salvo será perdido.
+- esse alerta de confirmação agora sobe acima do modal iframe e do backdrop, evitando ficar escondido atrás da janela `Nova OS`.
 
 ## Abertura de nova OS
 
-### Estrutura do formulÃ¡rio
+### Estrutura do formulário
 
-O cadastro Ã© organizado por abas:
+O cadastro é organizado por abas:
 
 - `Cliente`
 - `Equipamento`
@@ -380,7 +380,7 @@ O cadastro Ã© organizado por abas:
 - `Dados Operacionais`
 - `Fotos`
 
-Na ediÃ§Ã£o, o fluxo inclui tambÃ©m a etapa `SoluÃ§Ã£o`.
+Na edição, o fluxo inclui também a etapa `Solução`.
 
 ### Campos centrais
 
@@ -398,18 +398,18 @@ Regras praticas:
 - nesse mesmo modal, a equipe pode escolher se o documento vai anexar `fotos de perfil do equipamento`, `fotos de entrada` ou ambos.
 - dentro da aba `Documentos`, as acoes `Gerar`, `Enviar por WhatsApp` e `Enviar por E-mail` preservam a propria aba aberta mesmo quando o fluxo recarrega a visualizacao da OS.
 
-| Campo | ObrigatÃ³rio | ObservaÃ§Ã£o |
+| Campo | Obrigatório | Observação |
 |---|---|---|
-| Cliente | Sim | pode ser selecionado e editado pelo fluxo rÃ¡pido |
-| Equipamento | Sim | seleÃ§Ã£o rica com foto e identificaÃ§Ã£o tÃ©cnica |
-| TÃ©cnico responsÃ¡vel | NÃ£o | pode ser definido na abertura ou depois |
+| Cliente | Sim | pode ser selecionado e editado pelo fluxo rápido |
+| Equipamento | Sim | seleção rica com foto e identificação técnica |
+| Técnico responsável | Não | pode ser definido na abertura ou depois |
 | Prioridade | Sim | baixa, normal, alta ou urgente |
-| Data de entrada | Sim | data/hora da recepÃ§Ã£o |
-| PrevisÃ£o | NÃ£o | usada para acompanhamento do prazo |
+| Data de entrada | Sim | data/hora da recepção |
+| Previsão | Não | usada para acompanhamento do prazo |
 | Status | Sim | estado inicial da OS |
-| Relato do cliente | Sim | problema informado na recepÃ§Ã£o |
+| Relato do cliente | Sim | problema informado na recepção |
 
-### SeleÃ§Ã£o de equipamento
+### Seleção de equipamento
 
 O seletor de equipamento foi enriquecido para reduzir erro de escolha quando o cliente possui aparelhos parecidos.
 
@@ -432,143 +432,143 @@ No modal rapido de equipamento:
 - se o identificador ja pertencer ao mesmo cliente, o modal passa a usar diretamente o equipamento existente, evitando duplicidade;
 - o `Numero de serie` prioriza o valor da `BIOS` e, se ele nao existir ou vier invalido, usa o `MAC` da placa de rede.
 
-Cada opÃ§Ã£o pode exibir:
+Cada opção pode exibir:
 
 - foto de perfil;
 - tipo e marca;
 - modelo e cor;
-- nÃºmero de sÃ©rie ou IMEI.
+- número de série ou IMEI.
 
-TambÃ©m existem aÃ§Ãµes inline:
+Também existem ações inline:
 
 - `Novo`
 - `Editar`
 
-### Sidebar de fotos na ediÃ§Ã£o
+### Sidebar de fotos na edição
 
-Na ediÃ§Ã£o da OS, a lateral `Foto do Equipamento` continua exibindo a imagem principal e as miniaturas de forma imediata.
+Na edição da OS, a lateral `Foto do Equipamento` continua exibindo a imagem principal e as miniaturas de forma imediata.
 
 Comportamento atual:
 
-- fotos reais do equipamento recebem atualizaÃ§Ã£o anti-cache automÃ¡tica quando hÃ¡ troca de principal, inclusÃ£o ou exclusÃ£o;
-- quando o equipamento nÃ£o possui arquivo fÃ­sico disponÃ­vel, o sistema usa fallback inline sem quebrar a visualizaÃ§Ã£o;
-- o preview principal e as miniaturas permanecem sincronizados sem exigir recarga manual da pÃ¡gina.
+- fotos reais do equipamento recebem atualização anti-cache automática quando há troca de principal, inclusão ou exclusão;
+- quando o equipamento não possui arquivo físico disponível, o sistema usa fallback inline sem quebrar a visualização;
+- o preview principal e as miniaturas permanecem sincronizados sem exigir recarga manual da página.
 
-### Aba `Dados Operacionais` na ediÃ§Ã£o
+### Aba `Dados Operacionais` na edição
 
-Na ediÃ§Ã£o, os campos `Status` e `PrevisÃ£o de Entrega` seguem o fluxo de salvamento direto da OS.
+Na edição, os campos `Status` e `Previsão de Entrega` seguem o fluxo de salvamento direto da OS.
 
-Regras prÃ¡ticas:
+Regras práticas:
 
 - o select `Status` da edicao exibe todos os status operacionais cadastrados, permitindo ajustes fora da trilha curta do fluxo quando a equipe precisar corrigir a etapa manualmente;
-- a `PrevisÃ£o de Entrega` nÃ£o pode ficar anterior Ã  `Data de Entrada`;
-- o dropdown `Prazo (dias)` passa a refletir novamente o prazo salvo ao reabrir a OS, calculando a diferenca entre `Data de Entrada` e `PrevisÃ£o de Entrega`;
+- a `Previsão de Entrega` não pode ficar anterior à `Data de Entrada`;
+- o dropdown `Prazo (dias)` passa a refletir novamente o prazo salvo ao reabrir a OS, calculando a diferenca entre `Data de Entrada` e `Previsão de Entrega`;
 - os labels, dicas, placeholders e mensagens auxiliares da tela /os/editar/{id} passaram por uma varredura complementar de pt-BR/UTF-8, cobrindo cliente, tecnico, acessorios, checklist, camera, diagnostico e resumo lateral;
-- pendÃªncias opcionais da recepÃ§Ã£o nÃ£o bloqueiam mais o salvamento da ediÃ§Ã£o.
+- pendências opcionais da recepção não bloqueiam mais o salvamento da edição.
 
 ### Aba `Fotos`
 
-As `Fotos de Entrada do Equipamento` agora trabalham com inclusÃ£o e remoÃ§Ã£o sem recarregar a tela.
+As `Fotos de Entrada do Equipamento` agora trabalham com inclusão e remoção sem recarregar a tela.
 
 Comportamento atual:
 
-- fotos novas continuam podendo ser capturadas pela cÃ¢mera ou escolhidas na galeria;
-- fotos jÃ¡ persistidas aparecem com botÃ£o de exclusÃ£o;
-- ao excluir uma foto persistida, ela sai da visualizaÃ§Ã£o imediatamente;
-- a mesma exclusÃ£o remove o arquivo fÃ­sico correspondente de `public/uploads/os_anormalidades`.
+- fotos novas continuam podendo ser capturadas pela câmera ou escolhidas na galeria;
+- fotos já persistidas aparecem com botão de exclusão;
+- ao excluir uma foto persistida, ela sai da visualização imediatamente;
+- a mesma exclusão remove o arquivo físico correspondente de `public/uploads/os_anormalidades`.
 
 ### Aba `Pecas e Orcamento`
 
-A aba `Pecas e Orcamento` passou a mostrar o conteÃºdo real do orÃ§amento vinculado Ã  OS.
+A aba `Pecas e Orcamento` passou a mostrar o conteúdo real do orçamento vinculado à OS.
 
 Comportamento atual:
 
-- lista todos os itens lanÃ§ados no orÃ§amento, incluindo peÃ§as, serviÃ§os, pacotes e outros tipos;
+- lista todos os itens lançados no orçamento, incluindo peças, serviços, pacotes e outros tipos;
 - mostra resumo por grupo e tabela completa de itens;
-- quando nÃ£o houver itens, a aba exibe o botÃ£o para criar ou lanÃ§ar itens no orÃ§amento;
-- quando jÃ¡ houver orÃ§amento vinculado, a aba pode mostrar `Visualizar orÃ§amento` e tambÃ©m `Editar orÃ§amento`;
-- a abertura dessas aÃ§Ãµes acontece em modal, no mesmo padrÃ£o visual da `Nova OS` da listagem;
-- depois do salvamento do orÃ§amento no modal, o bloco da aba Ã© atualizado automaticamente dentro da tela da OS.
+- quando não houver itens, a aba exibe o botão para criar ou lançar itens no orçamento;
+- quando já houver orçamento vinculado, a aba pode mostrar `Visualizar orçamento` e também `Editar orçamento`;
+- a abertura dessas ações acontece em modal, no mesmo padrão visual da `Nova OS` da listagem;
+- depois do salvamento do orçamento no modal, o bloco da aba é atualizado automaticamente dentro da tela da OS.
 
-## VisualizaÃ§Ã£o da OS (`/os/visualizar/{id}`)
+## Visualização da OS (`/os/visualizar/{id}`)
 
 ### Estrutura atual da tela
 
-A tela foi reorganizada em duas Ã¡reas:
+A tela foi reorganizada em duas áreas:
 
-- coluna lateral com `Fotos do Equipamento` e `HistÃ³rico e Progresso`;
+- coluna lateral com `Fotos do Equipamento` e `Histórico e Progresso`;
 - coluna principal com resumo superior e abas centrais.
 
 Resumo superior:
 
 - cliente;
 - equipamento;
-- tÃ©cnico.
+- técnico.
 
-### Abas da visualizaÃ§Ã£o
+### Abas da visualização
 
-As abas principais sÃ£o:
+As abas principais são:
 
-- `InformaÃ§Ãµes`
-- `OrÃ§amento`
-- `DiagnÃ³stico`
+- `Informações`
+- `Orçamento`
+- `Diagnóstico`
 - `Fotos`
 - `Documentos`
 - `Valores`
 
-### Aba `InformaÃ§Ãµes`
+### Aba `Informações`
 
-A aba `InformaÃ§Ãµes` agora Ã© somente de leitura para contexto operacional.
+A aba `Informações` agora é somente de leitura para contexto operacional.
 
 Ela mostra:
 
 - relato do cliente;
 - checklist de entrada;
 - status atual da OS;
-- status do orÃ§amento vinculado, quando existir.
+- status do orçamento vinculado, quando existir.
 
-Tambem foi aplicada revisao de labels em pt-BR/UTF-8 na lateral e na timeline, cobrindo `HistÃ³rico e Progresso`, `RecepÃ§Ã£o`, `DiagnÃ³stico`, `OrÃ§amento`, `ExecuÃ§Ã£o`, `InterrupÃ§Ã£o`, `ConcluÃ­do`, `Ãšltimas movimentaÃ§Ãµes`, `PrevisÃ£o` e `ConclusÃ£o`.
+Tambem foi aplicada revisao de labels em pt-BR/UTF-8 na lateral e na timeline, cobrindo `Histórico e Progresso`, `Recepção`, `Diagnóstico`, `Orçamento`, `Execução`, `Interrupção`, `Concluído`, `Últimas movimentações`, `Previsão` e `Conclusão`.
 
 Nesta mesma rodada, a navegacao por abas, o resumo de contexto, os blocos do orcamento vinculado e os textos auxiliares da visualizacao tambem receberam normalizacao complementar em pt-BR/UTF-8.
 
 Importante:
 
 - essa aba exibe o status atual;
-- ela nÃ£o Ã© usada para alterar o status da OS.
+- ela não é usada para alterar o status da OS.
 
-### Aba `OrÃ§amento`
+### Aba `Orçamento`
 
-Quando existir orÃ§amento vinculado, a aba apresenta o resumo comercial da OS:
+Quando existir orçamento vinculado, a aba apresenta o resumo comercial da OS:
 
-- nÃºmero do orÃ§amento;
-- status do orÃ§amento;
+- número do orçamento;
+- status do orçamento;
 - tipo/origem;
 - validade;
 - itens inseridos;
-- total do orÃ§amento.
+- total do orçamento.
 
-Se a OS ainda nÃ£o tiver orÃ§amento, a aba informa o estado vazio de forma explÃ­cita.
+Se a OS ainda não tiver orçamento, a aba informa o estado vazio de forma explícita.
 
-### Aba `DiagnÃ³stico`
+### Aba `Diagnóstico`
 
-Concentra o conteÃºdo tÃ©cnico da ordem:
+Concentra o conteúdo técnico da ordem:
 
 - procedimentos executados;
-- diagnÃ³stico tÃ©cnico;
-- soluÃ§Ã£o aplicada;
-- tÃ©cnico responsÃ¡vel;
+- diagnóstico técnico;
+- solução aplicada;
+- técnico responsável;
 - garantia.
 
 ### Aba `Fotos`
 
-O agrupamento de imagens foi consolidado em uma Ãºnica aba organizada por cards.
+O agrupamento de imagens foi consolidado em uma única aba organizada por cards.
 
 Ela pode reunir:
 
 - foto de perfil do equipamento;
 - demais fotos do equipamento;
 - fotos da entrada;
-- fotos de acessÃ³rios;
+- fotos de acessórios;
 - fotos de checklist, quando houver.
 
 ### Aba `Documentos`
@@ -696,60 +696,60 @@ Quando a equipe registra valores antes da entrega final do equipamento:
 - esses recebimentos podem ser classificados como `adiantamento` ou `sinal`;
 - o modal `Baixa da OS` mostra esse valor no card `Adiantamento ja recebido`;
 - a aba `Valores` da propria OS exibe o acumulado do adiantamento, o total recebido e o saldo ainda pendente;
-- o histÃ³rico de recebimentos passa a destacar cada movimento com o badge `Adiantamento` ou `Sinal`, conforme a classificaÃ§Ã£o escolhida na baixa;
-- esses lanÃ§amentos sÃ£o financeiros, entram no `Fluxo de Caixa` e na `DRE`, mas nÃ£o mudam o status da OS;
-- para entregar a ordem, use a classificaÃ§Ã£o `Recebimento da baixa`.
+- o histórico de recebimentos passa a destacar cada movimento com o badge `Adiantamento` ou `Sinal`, conforme a classificação escolhida na baixa;
+- esses lançamentos são financeiros, entram no `Fluxo de Caixa` e na `DRE`, mas não mudam o status da OS;
+- para entregar a ordem, use a classificação `Recebimento da baixa`.
 
-ReÃºne os detalhes financeiros e temporais da OS:
+Reúne os detalhes financeiros e temporais da OS:
 
-- mÃ£o de obra;
-- peÃ§as;
+- mão de obra;
+- peças;
 - subtotal;
 - desconto;
 - total;
 - datas principais;
-- situaÃ§Ã£o do orÃ§amento;
-- dados complementares de financeiro da OS e do orÃ§amento vinculado.
+- situação do orçamento;
+- dados complementares de financeiro da OS e do orçamento vinculado.
 
-## BotÃ£o de orÃ§amento no topo da OS
+## Botão de orçamento no topo da OS
 
 O comportamento foi endurecido para evitar duplicidade.
 
 ### Regras
 
-- se a OS nÃ£o possui orÃ§amento vinculado: o botÃ£o permanece `Gerar orÃ§amento`;
-- se a OS jÃ¡ possui orÃ§amento vinculado, em qualquer status:
-  - nÃ£o cria novo orÃ§amento;
-  - passa a abrir o orÃ§amento existente;
-  - o rÃ³tulo muda para `Editar orÃ§amento` ou visualizaÃ§Ã£o equivalente conforme o contexto e a permissÃ£o.
+- se a OS não possui orçamento vinculado: o botão permanece `Gerar orçamento`;
+- se a OS já possui orçamento vinculado, em qualquer status:
+  - não cria novo orçamento;
+  - passa a abrir o orçamento existente;
+  - o rótulo muda para `Editar orçamento` ou visualização equivalente conforme o contexto e a permissão.
 
-## RelaÃ§Ã£o entre OS e orÃ§amento
+## Relação entre OS e orçamento
 
-### Quando um orÃ§amento Ã© gerado para a OS
+### Quando um orçamento é gerado para a OS
 
-- a listagem da OS Ã© recarregada com o contexto do orÃ§amento;
-- a OS Ã© movida para `Aguardando AutorizaÃ§Ã£o` enquanto o orÃ§amento estiver em andamento.
+- a listagem da OS é recarregada com o contexto do orçamento;
+- a OS é movida para `Aguardando Autorização` enquanto o orçamento estiver em andamento.
 
-### Quando o orÃ§amento muda para `Aprovado` ou `Convertido`
+### Quando o orçamento muda para `Aprovado` ou `Convertido`
 
 - a OS vinculada passa para `Aguardando Reparo`.
 
-Essa regra vale tanto para a experiÃªncia visual da listagem quanto para a sincronizaÃ§Ã£o operacional da OS.
+Essa regra vale tanto para a experiência visual da listagem quanto para a sincronização operacional da OS.
 
-## Checklist, acessÃ³rios e fotos de entrada
+## Checklist, acessórios e fotos de entrada
 
 O fluxo de entrada continua permitindo:
 
 - checklist por tipo de equipamento;
-- registro de acessÃ³rios na entrada;
-- fotos por galeria ou cÃ¢mera;
-- preview e organizaÃ§Ã£o dos anexos.
+- registro de acessórios na entrada;
+- fotos por galeria ou câmera;
+- preview e organização dos anexos.
 
-## ObservaÃ§Ãµes finais
+## Observações finais
 
-- use a visualizaÃ§Ã£o da OS para leitura e acompanhamento;
-- use os fluxos operacionais especÃ­ficos para alterar status, gerar documentos e enviar orÃ§amento;
-- quando houver orÃ§amento vinculado, considere sempre o estado combinado `OS + orÃ§amento` antes de avanÃ§ar a execuÃ§Ã£o.
+- use a visualização da OS para leitura e acompanhamento;
+- use os fluxos operacionais específicos para alterar status, gerar documentos e enviar orçamento;
+- quando houver orçamento vinculado, considere sempre o estado combinado `OS + orçamento` antes de avançar a execução.
 
 ## Atualizacao complementar 2.23.23 - Resumo financeiro e lucro
 

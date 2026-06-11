@@ -26,8 +26,8 @@
                         <th>Tipo</th>
                         <th>Marca</th>
                         <th>Modelo</th>
-                        <th>NÂ° SÃ©rie</th>
-                        <th width="14%">AÃ§Ãµes</th>
+                        <th>N° Série</th>
+                        <th width="14%">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,8 +64,8 @@
                                 <?php endif; ?>
                             </div>
                         </td>
-                        <td data-label="NÃ‚Âº SÃƒÂ©rie" class="font-monospace small"><?= esc($eq['numero_serie'] ?? '-') ?></td>
-                        <td data-label="AÃƒÂ§ÃƒÂµes">
+                        <td data-label="Nº Série" class="font-monospace small"><?= esc($eq['numero_serie'] ?? '-') ?></td>
+                        <td data-label="Ações">
                             <div class="action-btns">
                                 <?php if (can('equipamentos', 'visualizar')): ?>
                                 <a href="<?= base_url('equipamentos/visualizar/' . $eq['id']) ?>" class="btn btn-sm btn-outline-info" title="Visualizar"><i class="bi bi-eye"></i></a>
@@ -78,7 +78,7 @@
                                 <button
                                     type="button"
                                     class="btn btn-sm btn-outline-warning<?= $temOsAbertas ? ' disabled' : '' ?>"
-                                    title="<?= $temOsAbertas ? 'Bloqueado: hÃ¡ ' . $osAbertasCount . ' OS em andamento' : 'Encerrar' ?>"
+                                    title="<?= $temOsAbertas ? 'Bloqueado: há ' . $osAbertasCount . ' OS em andamento' : 'Encerrar' ?>"
                                     <?= $temOsAbertas ? 'disabled aria-disabled="true"' : '' ?>
                                     data-equipment-encerrar-btn
                                     data-equipment-id="<?= (int) $eq['id'] ?>"

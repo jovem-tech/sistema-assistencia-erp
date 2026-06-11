@@ -372,7 +372,7 @@ O que mudou:
   - `Aguard. humano`;
 - sync inbound em background agora:
   - nao reabre a thread ativa automaticamente;
-  - nao forÃ§a refresh da fila quando `count = 0`, reduzindo flicker visual;
+  - nao força refresh da fila quando `count = 0`, reduzindo flicker visual;
 - backend passa conversa de `resolvida` para `aberta` automaticamente quando chega novo inbound.
 
 Arquivos tecnicos impactados:
@@ -788,7 +788,7 @@ Layout estrutural aplicado (index):
 - rolagem individual por coluna
 - remocao da barra superior de modulos (WhatsApp OS/Chatbot/Metricas/...) na tela principal para ampliar area util do atendimento
 - cabecalho da pagina (`.cm-page-header`) com fundo transparente e sem bordas para maxima integracao visual
-- barra de filtros horizontal e compacta no topo da listagem de conversas, com alinhamento flexÃ­vel e responsivo
+- barra de filtros horizontal e compacta no topo da listagem de conversas, com alinhamento flexível e responsivo
 
 #### Responsividade profissional (inspirada em WhatsApp Web/Business)
 
@@ -863,17 +863,17 @@ Comportamento implementado:
 - audio reproduzido no proprio chat com player embutido (play/pause, progresso e duracao)
 - refresh da thread sem recarregamento bruto (incremental por `after_id`)
 - carregamento inicial da thread com **janela mais recente** de mensagens (evita abrir conversas longas no inicio historico e garante visibilidade das mensagens externas mais novas)
-- Ã¡rea de chat com fundo personalizado estilo "WhatsApp Doodle" com suporte a temas claro e escuro para maior imersÃ£o
-- abertura de conversa executa sincronizacao forÃ§ada do historico no gateway local/linux antes do render, para reduzir defasagem de mensagens externas em casos de atraso de webhook
-- **Hub de ComposiÃ§Ã£o (BotÃ£o "+")**: CentralizaÃ§Ã£o de todas as aÃ§Ãµes de envio em um menu hub inspirado no WhatsApp Web:
-  - **Enviar arquivo**: SeleÃ§Ã£o de mÃ­dias e documentos locais (imagem, vÃ­deo, Ã¡udio, PDF, docs).
-  - **Enviar PDF do sistema**: Painel flutuante para seleÃ§Ã£o de PDFs gerados pelo ERP (Laudos, OrÃ§amentos).
-  - **Tipo da mensagem**: Painel flutuante para classificar a mensagem (Manual, OrÃ§amento, Laudo, Status OS).
-  - **Tirar foto agora**: Acionamento direto da cÃ¢mera do dispositivo (mobile/desktop).
-  - **Gravar Ã¡udio agora**: Gravador de voz integrado com preview e confirmaÃ§Ã£o (`MediaRecorder API`).
-  - **Gravar vÃ­deo agora**: Gravador de vÃ­deo integrado com preview de cÃ¢mera e confirmaÃ§Ã£o.
-- **Preview de Anexo Moderno**: ExibiÃ§Ã£o de anexos selecionados via "Chips" compactos com Ã­cone por tipo, nome do arquivo, tamanho e aÃ§Ã£o de remover.
-- **ResiliÃªncia de Captura**: Fallback para seleÃ§Ã£o de arquivo caso o dispositivo nÃ£o suporte capturas diretas de mÃ­dia.
+- área de chat com fundo personalizado estilo "WhatsApp Doodle" com suporte a temas claro e escuro para maior imersão
+- abertura de conversa executa sincronizacao forçada do historico no gateway local/linux antes do render, para reduzir defasagem de mensagens externas em casos de atraso de webhook
+- **Hub de Composição (Botão "+")**: Centralização de todas as ações de envio em um menu hub inspirado no WhatsApp Web:
+  - **Enviar arquivo**: Seleção de mídias e documentos locais (imagem, vídeo, áudio, PDF, docs).
+  - **Enviar PDF do sistema**: Painel flutuante para seleção de PDFs gerados pelo ERP (Laudos, Orçamentos).
+  - **Tipo da mensagem**: Painel flutuante para classificar a mensagem (Manual, Orçamento, Laudo, Status OS).
+  - **Tirar foto agora**: Acionamento direto da câmera do dispositivo (mobile/desktop).
+  - **Gravar áudio agora**: Gravador de voz integrado com preview e confirmação (`MediaRecorder API`).
+  - **Gravar vídeo agora**: Gravador de vídeo integrado com preview de câmera e confirmação.
+- **Preview de Anexo Moderno**: Exibição de anexos selecionados via "Chips" compactos com ícone por tipo, nome do arquivo, tamanho e ação de remover.
+- **Resiliência de Captura**: Fallback para seleção de arquivo caso o dispositivo não suporte capturas diretas de mídia.
 
 ## Midias e armazenamento (padrao oficial)
 
@@ -923,15 +923,15 @@ Exibe:
 - produtividade por atendente
 
 <a id="respostas-rapidas"></a>
-### 4) Respostas RÃ¡pidas
+### 4) Respostas Rápidas
 Rota: `/atendimento-whatsapp/respostas-rapidas`
 
 Interface refatorada para alta produtividade com:
-- **Layout Bilateral**: FormulÃ¡rio de cadastro dinÃ¢mico Ã  esquerda e catÃ¡logo de visualizaÃ§Ã£o Ã  direita.
-- **EdiÃ§Ã£o Profissional em Modal**: Abertura de formulÃ¡rio dedicado em modal glassmorphism para uma experiÃªncia de ediÃ§Ã£o focada, sem perder o contexto da listagem.
-- **VariÃ¡veis DinÃ¢micas (Tags)**: Suporte a placeholders inteligentes como `{{cliente_nome}}`, `{{numero_os}}`, `{{equipamento}}`, `{{status}}`, `{{valor_final}}`, `{{data_previsao}}`, `{{garantia_dias}}` e `{{defeito}}`.
-- **Seletor de VariÃ¡veis**: Interface visual para inserÃ§Ã£o rÃ¡pida de tags no texto com um clique, garantindo o uso correto da sintaxe.
-- **Preenchimento em Tempo Real**: No chat, ao selecionar uma resposta rÃ¡pida, o sistema substitui automaticamente as tags pelos dados reais do cliente e da OS vinculada antes de carregar no campo de envio.
+- **Layout Bilateral**: Formulário de cadastro dinâmico à esquerda e catálogo de visualização à direita.
+- **Edição Profissional em Modal**: Abertura de formulário dedicado em modal glassmorphism para uma experiência de edição focada, sem perder o contexto da listagem.
+- **Variáveis Dinâmicas (Tags)**: Suporte a placeholders inteligentes como `{{cliente_nome}}`, `{{numero_os}}`, `{{equipamento}}`, `{{status}}`, `{{valor_final}}`, `{{data_previsao}}`, `{{garantia_dias}}` e `{{defeito}}`.
+- **Seletor de Variáveis**: Interface visual para inserção rápida de tags no texto com um clique, garantindo o uso correto da sintaxe.
+- **Preenchimento em Tempo Real**: No chat, ao selecionar uma resposta rápida, o sistema substitui automaticamente as tags pelos dados reais do cliente e da OS vinculada antes de carregar no campo de envio.
 
 <a id="fluxos"></a>
 ### 5) Fluxos de Atendimento
@@ -943,11 +943,11 @@ Fluxos padronizados por tipo (operacional, orcamento, pos-atendimento).
 ### 6) FAQ / Base de Conhecimento
 Rota: `/atendimento-whatsapp/faq`
 
-IntegraÃ§Ã£o de inteligÃªncia e interface avanÃ§ada:
-- **EdiÃ§Ã£o via Modal**: GestÃ£o simplificada de perguntas e respostas em ambiente focado.
-- **Base de Conhecimento DinÃ¢mica**: FAQ agora suporta as mesmas tags dinÃ¢micas (`{{cliente_nome}}`, `{{numero_os}}`, etc.) das respostas rÃ¡pidas.
-- **DetecÃ§Ã£o por Gatilhos**: DefiniÃ§Ã£o de palavras-chave que disparam a resposta automÃ¡tica via motor de intenÃ§Ãµes.
-- **Preview de ConteÃºdo**: Listagem otimizada com truncamento inteligente para facilitar a navegaÃ§Ã£o em grandes bases.
+Integração de inteligência e interface avançada:
+- **Edição via Modal**: Gestão simplificada de perguntas e respostas em ambiente focado.
+- **Base de Conhecimento Dinâmica**: FAQ agora suporta as mesmas tags dinâmicas (`{{cliente_nome}}`, `{{numero_os}}`, etc.) das respostas rápidas.
+- **Detecção por Gatilhos**: Definição de palavras-chave que disparam a resposta automática via motor de intenções.
+- **Preview de Conteúdo**: Listagem otimizada com truncamento inteligente para facilitar a navegação em grandes bases.
 
 <a id="filas"></a>
 ### 7) Filas e Responsaveis
@@ -1085,7 +1085,7 @@ Para garantir visao completa da conversa, a Central agora registra tambem mensag
 
 ### 4) UX mobile/offcanvas
 - Gatilhos mobile de WhatsApp OS/Contexto (`cm-mobile-list-trigger` e `cm-mobile-context-trigger`) ganharam fallback JS para `bootstrap.Offcanvas.getOrCreateInstance(...).show()`.
-- Mantem funcionamento em viewport reduzida mesmo quando o `data-bs-toggle` nao dispara por re-render dinÃ¢mico.
+- Mantem funcionamento em viewport reduzida mesmo quando o `data-bs-toggle` nao dispara por re-render dinâmico.
 
 ### 5) Envio com timeout defensivo no frontend
 - `POST /atendimento-whatsapp/enviar` no cliente passou a usar timeout de 16s.

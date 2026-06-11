@@ -110,7 +110,7 @@ Para evitar timeout repetido no polling incremental da thread:
 
 - o fluxo rapido de leitura (`conversas` e `conversa/{id}/novas`) passou a processar apenas fila local inbound;
 - a sincronizacao de historico do gateway permaneceu no fluxo dedicado de sync, com lotes menores por ciclo para reduzir latencia;
-- endpoints crÃ­ticos da Central liberam lock de sessao antes de rodar sync pesado, reduzindo bloqueio concorrente entre requests AJAX.
+- endpoints críticos da Central liberam lock de sessao antes de rodar sync pesado, reduzindo bloqueio concorrente entre requests AJAX.
 
 ## Configuracao
 Caminho:

@@ -39,40 +39,40 @@ $orcamentoQuickEmbedUrl = base_url('orcamentos/novo?' . http_build_query([
     'embed' => 1,
 ]));
 $orcamentoVinculado = is_array($orcamentoVinculado ?? null) ? $orcamentoVinculado : null;
-$hasOrÃ§amentoVinculado = !empty($orcamentoVinculado['id']);
+$hasOrçamentoVinculado = !empty($orcamentoVinculado['id']);
 $orcamentoItensResumo = is_array($orcamentoItensResumo ?? null) ? $orcamentoItensResumo : ['items' => [], 'groups' => [], 'total_items' => 0, 'total_quantity' => 0.0];
 $orcamentoStatusLabels = is_array($orcamentoStatusLabels ?? null) ? $orcamentoStatusLabels : [];
 $orcamentoTipoLabels = is_array($orcamentoTipoLabels ?? null) ? $orcamentoTipoLabels : [];
-$orcamentoEditUrl = $hasOrÃ§amentoVinculado
+$orcamentoEditUrl = $hasOrçamentoVinculado
     ? base_url('orcamentos/editar/' . (int) ($orcamentoVinculado['id'] ?? 0)) . $embedQuery
     : '';
-$orcamentoViewUrl = $hasOrÃ§amentoVinculado
+$orcamentoViewUrl = $hasOrçamentoVinculado
     ? base_url('orcamentos/visualizar/' . (int) ($orcamentoVinculado['id'] ?? 0)) . $embedQuery
     : '';
-$canCreateOrÃ§amento = can('orcamentos', 'criar');
-$canEditOrÃ§amento = can('orcamentos', 'editar');
-$canViewOrÃ§amento = can('orcamentos', 'visualizar');
+$canCreateOrçamento = can('orcamentos', 'criar');
+$canEditOrçamento = can('orcamentos', 'editar');
+$canViewOrçamento = can('orcamentos', 'visualizar');
 $orcamentoActionUrl = '';
 $orcamentoActionLabel = '';
 $orcamentoActionClass = '';
 $orcamentoActionTitle = '';
-if ($hasOrÃ§amentoVinculado) {
-    if ($canEditOrÃ§amento) {
+if ($hasOrçamentoVinculado) {
+    if ($canEditOrçamento) {
         $orcamentoActionUrl = $orcamentoEditUrl;
-        $orcamentoActionLabel = 'Editar orÃ§amento';
+        $orcamentoActionLabel = 'Editar orçamento';
         $orcamentoActionClass = 'btn btn-primary';
-        $orcamentoActionTitle = 'Editar orÃ§amento vinculado a esta OS';
-    } elseif ($canViewOrÃ§amento) {
+        $orcamentoActionTitle = 'Editar orçamento vinculado a esta OS';
+    } elseif ($canViewOrçamento) {
         $orcamentoActionUrl = $orcamentoViewUrl;
-        $orcamentoActionLabel = 'Visualizar orÃ§amento';
+        $orcamentoActionLabel = 'Visualizar orçamento';
         $orcamentoActionClass = 'btn btn-primary';
-        $orcamentoActionTitle = 'Visualizar orÃ§amento vinculado a esta OS';
+        $orcamentoActionTitle = 'Visualizar orçamento vinculado a esta OS';
     }
-} elseif ($canCreateOrÃ§amento) {
+} elseif ($canCreateOrçamento) {
     $orcamentoActionUrl = $orcamentoQuickUrl;
-    $orcamentoActionLabel = 'Gerar orÃ§amento';
+    $orcamentoActionLabel = 'Gerar orçamento';
     $orcamentoActionClass = 'btn btn-outline-warning';
-    $orcamentoActionTitle = 'Gerar orÃ§amento para esta OS';
+    $orcamentoActionTitle = 'Gerar orçamento para esta OS';
 }
 $checklistFotos = [];
 foreach ((array) ($checklist_entrada['itens'] ?? []) as $itemChecklist) {
@@ -101,8 +101,8 @@ $orcamentoWhatsappDefaultMessage = trim((string) ($orcamentoWhatsappDefaultMessa
 $orcamentoEmailDefaultSubject = trim((string) ($orcamentoEmailDefaultSubject ?? ''));
 $orcamentoDispatchBlocked = (bool) ($orcamentoDispatchBlocked ?? false);
 $postCreatePdfPrompt = is_array($postCreatePdfPrompt ?? null) ? $postCreatePdfPrompt : [];
-$orcamentoWhatsappSendUrl = $hasOrÃ§amentoVinculado ? base_url('orcamentos/whatsapp/' . (int) ($orcamentoVinculado['id'] ?? 0) . '/enviar') . $embedQuery : '';
-$orcamentoEmailSendUrl = $hasOrÃ§amentoVinculado ? base_url('orcamentos/email/' . (int) ($orcamentoVinculado['id'] ?? 0) . '/enviar') . $embedQuery : '';
+$orcamentoWhatsappSendUrl = $hasOrçamentoVinculado ? base_url('orcamentos/whatsapp/' . (int) ($orcamentoVinculado['id'] ?? 0) . '/enviar') . $embedQuery : '';
+$orcamentoEmailSendUrl = $hasOrçamentoVinculado ? base_url('orcamentos/email/' . (int) ($orcamentoVinculado['id'] ?? 0) . '/enviar') . $embedQuery : '';
 $templateByDocumento = [
     'abertura' => 'os_aberta',
     'orcamento' => 'orcamento_enviado',
@@ -246,7 +246,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
             <?php if (!empty($os['numero_os_legado']) || !empty($os['legacy_origem'])): ?>
                 <div class="small text-muted mt-2">
                     <?php if (!empty($os['numero_os_legado'])): ?>
-                        <span class="me-3"><strong>NÃºmero legado:</strong> <?= esc($os['numero_os_legado']) ?></span>
+                        <span class="me-3"><strong>Número legado:</strong> <?= esc($os['numero_os_legado']) ?></span>
                     <?php endif; ?>
                     <?php if (!empty($os['legacy_origem'])): ?>
                         <span><strong>Origem:</strong> <?= esc($os['legacy_origem']) ?></span>
@@ -255,7 +255,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
             <?php endif; ?>
         </div>
         <div class="os-top-actions">
-            <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')" title="Ajuda sobre Ordens de ServiÃ§o">
+            <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')" title="Ajuda sobre Ordens de Serviço">
                 <i class="bi bi-question-circle me-1"></i>Ajuda
             </button>
             <?php if (can('os', 'editar')): ?>
@@ -317,7 +317,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                             <?php else: ?>
                                 <div class="rounded bg-body-tertiary d-flex align-items-center justify-content-center mx-auto border text-body-secondary os-show-photo-preview">
                                     <div class="text-center opacity-50">
-                                        <i class="bi bi-cÃ¢mera fs-1"></i>
+                                        <i class="bi bi-câmera fs-1"></i>
                                         <div class="small mt-1">Sem foto</div>
                                     </div>
                                 </div>
@@ -343,12 +343,12 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
 
                 <div class="card glass-card os-workflow-card">
                     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <h6 class="mb-0"><i class="bi bi-bezier2 me-1"></i>HistÃ³rico e Progresso</h6>
-                        <span class="small text-muted">Etapas percorridas, etapa atual e provÃ¡veis prÃ³ximos movimentos.</span>
+                        <h6 class="mb-0"><i class="bi bi-bezier2 me-1"></i>Histórico e Progresso</h6>
+                        <span class="small text-muted">Etapas percorridas, etapa atual e prováveis próximos movimentos.</span>
                     </div>
                     <div class="card-body">
                         <?php if (empty($workflowTimeline ?? [])): ?>
-                            <p class="text-muted mb-0 small">Fluxo visual indisponÃ­vel para esta OS.</p>
+                            <p class="text-muted mb-0 small">Fluxo visual indisponível para esta OS.</p>
                         <?php else: ?>
                             <div class="os-workflow-timeline">
                                 <?php foreach (($workflowTimeline ?? []) as $stage): ?>
@@ -359,13 +359,13 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
 
                                     if ($stageState === 'completed') {
                                         $stageBadgeClass = 'bg-success-subtle text-success-emphasis border border-success-subtle';
-                                        $stageBadgeLabel = 'ConcluÃ­da';
+                                        $stageBadgeLabel = 'Concluída';
                                     } elseif ($stageState === 'current') {
                                         $stageBadgeClass = 'bg-primary-subtle text-primary-emphasis border border-primary-subtle';
                                         $stageBadgeLabel = 'Atual';
                                     } elseif ($stageState === 'probable') {
                                         $stageBadgeClass = 'bg-warning-subtle text-warning-emphasis border border-warning-subtle';
-                                        $stageBadgeLabel = 'ProvÃ¡vel';
+                                        $stageBadgeLabel = 'Provável';
                                     }
                                     ?>
                                     <div class="os-workflow-step is-<?= esc($stageState) ?>">
@@ -389,7 +389,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                     </div>
                                                 <?php endif; ?>
                                             <?php elseif ($stageState === 'probable' && !empty($stage['next_status_names'])): ?>
-                                                <div class="os-workflow-step-text">PrÃ³ximas opÃ§Ãµes: <?= esc(implode(', ', (array) $stage['next_status_names'])) ?>.</div>
+                                                <div class="os-workflow-step-text">Próximas opções: <?= esc(implode(', ', (array) $stage['next_status_names'])) ?>.</div>
                                             <?php else: ?>
                                                 <div class="os-workflow-step-text">Etapa futura do atendimento.</div>
                                             <?php endif; ?>
@@ -401,7 +401,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                             <?php if (!empty($workflowRecentHistory ?? [])): ?>
                                 <div class="os-section-divider"></div>
                                 <div class="os-workflow-history">
-                                    <div class="os-section-caption">Ãšltimas movimentaÃ§Ãµes</div>
+                                    <div class="os-section-caption">Últimas movimentações</div>
                                     <div class="os-workflow-history-list">
                                         <?php foreach (($workflowRecentHistory ?? []) as $item): ?>
                                             <div class="os-workflow-history-item">
@@ -438,16 +438,16 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                     <small><?= esc(getEquipTipo($os['equip_tipo'] ?? '')) ?><?php if (!empty($os['equip_serie'])): ?> | SN: <?= esc($os['equip_serie']) ?><?php endif; ?></small>
                                 </div>
                                 <div class="os-primary-summary-item">
-                                    <span class="os-primary-summary-label">TÃ©cnico</span>
-                                <strong><?= esc($os['tecnico_nome'] ?? 'NÃ£o atribuÃ­do') ?></strong>
+                                    <span class="os-primary-summary-label">Técnico</span>
+                                <strong><?= esc($os['tecnico_nome'] ?? 'Não atribuído') ?></strong>
                                     <small>OS aberta em <?= esc(formatDate($os['data_abertura'] ?? '', true)) ?></small>
                                 </div>
                             </div>
 
                             <ul class="nav nav-tabs ds-tabs-scroll os-show-tabs" role="tablist">
-                                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-info">InformaÃ§Ãµes</a></li>
-                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-itens">OrÃ§amento</a></li>
-                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-tÃ©cnico">DiagnÃ³stico</a></li>
+                                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-info">Informações</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-itens">Orçamento</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-técnico">Diagnóstico</a></li>
                                 <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-fotos">Fotos</a></li>
                                 <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-documentos">Documentos</a></li>
                                 <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-valores">Valores</a></li>
@@ -465,22 +465,22 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                         <span class="badge bg-light text-dark border"><?= esc((string) ($estadoFluxoLabel ?? $os['estado_fluxo'])) ?></span>
                                                     <?php endif; ?>
                                                     <?= getPriorityBadge($os['prioridade'] ?? 'normal') ?>
-                                                    <?php if ($hasOrÃ§amentoVinculado): ?>
-                                                        <span class="badge bg-light text-dark border">OrÃ§amento <?= esc((string) ($orcamentoVinculado['numero'] ?? '#')) ?></span>
+                                                    <?php if ($hasOrçamentoVinculado): ?>
+                                                        <span class="badge bg-light text-dark border">Orçamento <?= esc((string) ($orcamentoVinculado['numero'] ?? '#')) ?></span>
                                                     <?php endif; ?>
                                                 </div>
-                                                <?php if ($hasOrÃ§amentoVinculado): ?>
-                                                    <div class="small text-muted mb-2">Status do orÃ§amento vinculado</div>
+                                                <?php if ($hasOrçamentoVinculado): ?>
+                                                    <div class="small text-muted mb-2">Status do orçamento vinculado</div>
                                                     <div class="d-flex flex-wrap gap-2 mb-3">
-                                                        <span class="badge bg-primary-subtle text-primary-emphasis"><?= esc((string) ($orcamentoVinculado['status_label'] ?? ($orcamentoStatusLabels[$orcamentoVinculado['status'] ?? ''] ?? 'OrÃ§amento vinculado'))) ?></span>
+                                                        <span class="badge bg-primary-subtle text-primary-emphasis"><?= esc((string) ($orcamentoVinculado['status_label'] ?? ($orcamentoStatusLabels[$orcamentoVinculado['status'] ?? ''] ?? 'Orçamento vinculado'))) ?></span>
                                                         <?php if (!empty($orcamentoVinculado['tipo_label'])): ?>
                                                             <span class="badge bg-light text-dark border"><?= esc((string) $orcamentoVinculado['tipo_label']) ?></span>
                                                         <?php endif; ?>
                                                     </div>
                                                 <?php endif; ?>
-                                                <div class="small text-muted mb-2">PrÃ³ximas etapas provÃ¡veis</div>
+                                                <div class="small text-muted mb-2">Próximas etapas prováveis</div>
                                                 <?php if (empty($nextStatusOptions)): ?>
-                                                    <p class="mb-0 text-muted">NÃ£o hÃ¡ transiÃ§Ãµes sugeridas alÃ©m do status atual.</p>
+                                                    <p class="mb-0 text-muted">Não há transições sugeridas além do status atual.</p>
                                                 <?php else: ?>
                                                     <div class="d-flex flex-wrap gap-2">
                                                         <?php foreach ($nextStatusOptions as $statusHint): ?>
@@ -505,7 +505,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                 <?php else: ?>
                                                     <div class="mb-2">
                                                         <span class="badge <?= ($checklistResumo['variant'] ?? '') === 'success' ? 'bg-success' : ((($checklistResumo['variant'] ?? '') === 'warning') ? 'bg-warning text-dark' : 'bg-secondary') ?>">
-                                                            <?= esc((string) ($checklistResumo['label'] ?? 'Checklist nÃ£o preenchido')) ?>
+                                                            <?= esc((string) ($checklistResumo['label'] ?? 'Checklist não preenchido')) ?>
                                                         </span>
                                                     </div>
                                                     <?php
@@ -515,7 +515,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                         }));
                                                     ?>
                                                     <?php if (empty($checklistItens)): ?>
-                                                        <p class="mb-0 text-muted">Nenhuma discrepÃ¢ncia registrada no checklist.</p>
+                                                        <p class="mb-0 text-muted">Nenhuma discrepância registrada no checklist.</p>
                                                     <?php else: ?>
                                                         <div class="d-flex flex-column gap-2">
                                                             <?php foreach ($checklistItens as $item): ?>
@@ -544,14 +544,14 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                 </div>
 
                                 <div class="tab-pane fade" id="tab-itens">
-                                    <?php if ($hasOrÃ§amentoVinculado): ?>
+                                    <?php if ($hasOrçamentoVinculado): ?>
                                     <div class="row g-4">
                                         <div class="col-12">
                                             <div class="info-card">
                                                 <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
                                                     <div>
-                                                        <div class="info-card-title mb-1"><i class="bi bi-receipt"></i>Resumo do OrÃ§amento</div>
-                                                        <p class="text-muted mb-0">Este orÃ§amento estÃ¡ vinculado a esta OS e concentra peÃ§as, serviÃ§os, pacotes e acessÃ³rios cadastrados.</p>
+                                                        <div class="info-card-title mb-1"><i class="bi bi-receipt"></i>Resumo do Orçamento</div>
+                                                        <p class="text-muted mb-0">Este orçamento está vinculado a esta OS e concentra peças, serviços, pacotes e acessórios cadastrados.</p>
                                                     </div>
                                                     <?php if ($orcamentoActionUrl !== '' && $orcamentoActionLabel !== ''): ?>
                                                         <a href="<?= esc($orcamentoActionUrl) ?>" class="<?= esc(trim($orcamentoActionClass . ' btn-sm')) ?>">
@@ -562,7 +562,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
 
                                                 <div class="row g-3 mt-1">
                                                     <div class="col-12 col-md-4 col-xl-2">
-                                                        <div class="small text-muted">NÃºmero</div>
+                                                        <div class="small text-muted">Número</div>
                                                         <div class="fw-semibold"><?= esc((string) ($orcamentoVinculado['numero'] ?? '-')) ?></div>
                                                     </div>
                                                     <div class="col-12 col-md-4 col-xl-3">
@@ -584,11 +584,11 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                 </div>
 
                                                 <?php if (!empty($orcamentoVinculado['prazo_execucao'])): ?>
-                                                    <div class="small text-muted mt-3">Prazo de execuÃ§Ã£o: <strong class="text-body"><?= esc((string) $orcamentoVinculado['prazo_execucao']) ?></strong></div>
+                                                    <div class="small text-muted mt-3">Prazo de execução: <strong class="text-body"><?= esc((string) $orcamentoVinculado['prazo_execucao']) ?></strong></div>
                                                 <?php endif; ?>
 
                                                 <?php if (!empty($orcamentoVinculado['is_locked'])): ?>
-                                                    <div class="alert alert-light border small mt-3 mb-0">Este orÃ§amento estÃ¡ bloqueado para ediÃ§Ã£o direta pelo status atual. Se precisar reenviar uma nova proposta, utilize o fluxo de revisÃ£o no mÃ³dulo de orÃ§amentos.</div>
+                                                    <div class="alert alert-light border small mt-3 mb-0">Este orçamento está bloqueado para edição direta pelo status atual. Se precisar reenviar uma nova proposta, utilize o fluxo de revisão no módulo de orçamentos.</div>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -598,8 +598,8 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                 <?php if (empty($orcamentoItensResumo['groups'])): ?>
                                                     <div class="col-12">
                                                         <div class="info-card">
-                                                            <div class="info-card-title"><i class="bi bi-box-seam"></i>ComposiÃ§Ã£o do OrÃ§amento</div>
-                                                            <p class="mb-0 text-muted">Nenhum item foi inserido neste orÃ§amento ainda.</p>
+                                                            <div class="info-card-title"><i class="bi bi-box-seam"></i>Composição do Orçamento</div>
+                                                            <p class="mb-0 text-muted">Nenhum item foi inserido neste orçamento ainda.</p>
                                                         </div>
                                                     </div>
                                                 <?php else: ?>
@@ -625,7 +625,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                         <div class="col-12">
                                             <div class="card glass-card">
                                                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                                    <h5 class="card-title mb-0">Itens do OrÃ§amento</h5>
+                                                    <h5 class="card-title mb-0">Itens do Orçamento</h5>
                                                     <span class="small text-muted"><?= esc((string) ($orcamentoItensResumo['total_items'] ?? 0)) ?> item(ns) vinculado(s)</span>
                                                 </div>
                                                 <div class="card-body p-0">
@@ -634,36 +634,36 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                             <thead>
                                                                 <tr>
                                                                     <th>Tipo</th>
-                                                                    <th>DescriÃ§Ã£o</th>
+                                                                    <th>Descrição</th>
                                                                     <th>Qtd</th>
                                                                     <th>Valor Unit.</th>
                                                                     <th>Desconto</th>
-                                                                    <th>AcrÃ©scimo</th>
+                                                                    <th>Acréscimo</th>
                                                                     <th>Total</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 <?php if (empty($orcamentoItensResumo['items'])): ?>
-                                                            <tr><td colspan="7" class="text-center py-3 text-muted">Nenhum item cadastrado neste orÃ§amento.</td></tr>
+                                                            <tr><td colspan="7" class="text-center py-3 text-muted">Nenhum item cadastrado neste orçamento.</td></tr>
                                                                 <?php else: ?>
-                                                                    <?php foreach ($orcamentoItensResumo['items'] as $itemOrÃ§amento): ?>
+                                                                    <?php foreach ($orcamentoItensResumo['items'] as $itemOrçamento): ?>
                                                                         <tr>
                                                                             <td>
-                                                                                <span class="badge <?= esc((string) ($itemOrÃ§amento['tipo_item_badge_class'] ?? 'bg-light text-dark border')) ?>">
-                                                                                    <?= esc((string) ($itemOrÃ§amento['tipo_item_label'] ?? ucwords((string) ($itemOrÃ§amento['tipo_item'] ?? 'item')))) ?>
+                                                                                <span class="badge <?= esc((string) ($itemOrçamento['tipo_item_badge_class'] ?? 'bg-light text-dark border')) ?>">
+                                                                                    <?= esc((string) ($itemOrçamento['tipo_item_label'] ?? ucwords((string) ($itemOrçamento['tipo_item'] ?? 'item')))) ?>
                                                                                 </span>
                                                                             </td>
                                                                             <td>
-                                                                                <div><?= esc((string) ($itemOrÃ§amento['descricao'] ?? '-')) ?></div>
-                                                                                <?php if (!empty($itemOrÃ§amento['observacoes'])): ?>
-                                                                                    <small class="text-muted d-block mt-1"><?= esc((string) $itemOrÃ§amento['observacoes']) ?></small>
+                                                                                <div><?= esc((string) ($itemOrçamento['descricao'] ?? '-')) ?></div>
+                                                                                <?php if (!empty($itemOrçamento['observacoes'])): ?>
+                                                                                    <small class="text-muted d-block mt-1"><?= esc((string) $itemOrçamento['observacoes']) ?></small>
                                                                                 <?php endif; ?>
                                                                             </td>
-                                                                            <td><?= esc((string) ($itemOrÃ§amento['quantidade'] ?? 0)) ?></td>
-                                                                            <td><?= esc(formatMoney($itemOrÃ§amento['valor_unitario'] ?? 0)) ?></td>
-                                                                            <td><?= esc(formatMoney($itemOrÃ§amento['desconto'] ?? 0)) ?></td>
-                                                                            <td><?= esc(formatMoney($itemOrÃ§amento['acrescimo'] ?? 0)) ?></td>
-                                                                            <td><strong><?= esc(formatMoney($itemOrÃ§amento['total'] ?? 0)) ?></strong></td>
+                                                                            <td><?= esc((string) ($itemOrçamento['quantidade'] ?? 0)) ?></td>
+                                                                            <td><?= esc(formatMoney($itemOrçamento['valor_unitario'] ?? 0)) ?></td>
+                                                                            <td><?= esc(formatMoney($itemOrçamento['desconto'] ?? 0)) ?></td>
+                                                                            <td><?= esc(formatMoney($itemOrçamento['acrescimo'] ?? 0)) ?></td>
+                                                                            <td><strong><?= esc(formatMoney($itemOrçamento['total'] ?? 0)) ?></strong></td>
                                                                         </tr>
                                                                     <?php endforeach; ?>
                                                                 <?php endif; ?>
@@ -676,8 +676,8 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                     </div>
                                     <?php else: ?>
                                     <div class="info-card">
-                                            <div class="info-card-title"><i class="bi bi-receipt"></i>OrÃ§amento</div>
-                                            <p class="text-muted mb-3">Esta OS ainda nÃ£o possui um orÃ§amento vinculado.</p>
+                                            <div class="info-card-title"><i class="bi bi-receipt"></i>Orçamento</div>
+                                            <p class="text-muted mb-3">Esta OS ainda não possui um orçamento vinculado.</p>
                                         <?php if ($orcamentoActionUrl !== '' && $orcamentoActionLabel !== ''): ?>
                                             <a href="<?= esc($orcamentoActionUrl) ?>" class="<?= esc($orcamentoActionClass) ?>">
                                                 <i class="bi bi-receipt-cutoff me-1"></i><?= esc($orcamentoActionLabel) ?>
@@ -686,7 +686,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                     </div>
                                     <?php endif; ?>
                                 </div>
-                                <div class="tab-pane fade" id="tab-tÃ©cnico">
+                                <div class="tab-pane fade" id="tab-técnico">
                                     <div class="row g-4">
                                         <div class="col-12">
                                             <div class="info-card">
@@ -706,20 +706,20 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                         </div>
                                         <div class="col-md-6">
                                             <div class="info-card">
-                                                <div class="info-card-title"><i class="bi bi-search"></i>DiagnÃ³stico TÃ©cnico</div>
-                                                <p><?= nl2br(esc($os['diagnostico_tecnico'] ?? 'Nenhum diagnÃ³stico registrado.')) ?></p>
+                                                <div class="info-card-title"><i class="bi bi-search"></i>Diagnóstico Técnico</div>
+                                                <p><?= nl2br(esc($os['diagnostico_tecnico'] ?? 'Nenhum diagnóstico registrado.')) ?></p>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="info-card">
-                                                <div class="info-card-title"><i class="bi bi-wrench"></i>SoluÃ§Ã£o Aplicada</div>
-                                                <p><?= nl2br(esc($os['solucao_aplicada'] ?? 'Nenhuma soluÃ§Ã£o registrada.')) ?></p>
+                                                <div class="info-card-title"><i class="bi bi-wrench"></i>Solução Aplicada</div>
+                                                <p><?= nl2br(esc($os['solucao_aplicada'] ?? 'Nenhuma solução registrada.')) ?></p>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="info-card">
-                                                <div class="info-card-title"><i class="bi bi-person-badge"></i>TÃ©cnico</div>
-                                                <p><?= esc($os['tecnico_nome'] ?? 'NÃ£o atribuÃ­do') ?></p>
+                                                <div class="info-card-title"><i class="bi bi-person-badge"></i>Técnico</div>
+                                                <p><?= esc($os['tecnico_nome'] ?? 'Não atribuído') ?></p>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -728,7 +728,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                 <p>
                                                     <?= esc((string) ($os['garantia_dias'] ?? '0')) ?> dias
                                                     <?php if (!empty($os['garantia_validade'])): ?>
-                                                        - VÃ¡lida atÃ© <?= esc(formatDate($os['garantia_validade'])) ?>
+                                                        - Válida até <?= esc(formatDate($os['garantia_validade'])) ?>
                                                     <?php endif; ?>
                                                 </p>
                                             </div>
@@ -737,7 +737,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                         <?php if ($observacoesInternas !== ''): ?>
                                         <div class="col-md-6">
                                             <div class="info-card">
-                                                <div class="info-card-title"><i class="bi bi-journal-text"></i>ObservaÃ§Ãµes Internas</div>
+                                                <div class="info-card-title"><i class="bi bi-journal-text"></i>Observações Internas</div>
                                                 <p class="mb-0"><?= nl2br(esc($observacoesInternas)) ?></p>
                                             </div>
                                         </div>
@@ -746,7 +746,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                         <?php if ($observacoesCliente !== ''): ?>
                                         <div class="col-md-6">
                                             <div class="info-card">
-                                                <div class="info-card-title"><i class="bi bi-chat-square-quote"></i>ObservaÃ§Ãµes do Cliente</div>
+                                                <div class="info-card-title"><i class="bi bi-chat-square-quote"></i>Observações do Cliente</div>
                                                 <p class="mb-0"><?= nl2br(esc($observacoesCliente)) ?></p>
                                             </div>
                                         </div>
@@ -863,7 +863,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                         <div class="col-12">
                                             <div class="card glass-card">
                                                 <div class="card-header d-flex justify-content-between align-items-center">
-                                                    <h5 class="card-title mb-0"><i class="bi bi-cÃ¢mera me-2"></i>Fotos de Entrada</h5>
+                                                    <h5 class="card-title mb-0"><i class="bi bi-câmera me-2"></i>Fotos de Entrada</h5>
                                                     <span class="badge bg-light text-dark border"><?= esc((string) count($fotos_entrada ?? [])) ?></span>
                                                 </div>
                                                 <div class="card-body">
@@ -887,22 +887,22 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                         <div class="col-12">
                                             <div class="card glass-card">
                                                 <div class="card-header d-flex justify-content-between align-items-center">
-                                                    <h5 class="card-title mb-0"><i class="bi bi-patch-check me-2"></i>Fotos dos AcessÃ³rios</h5>
+                                                    <h5 class="card-title mb-0"><i class="bi bi-patch-check me-2"></i>Fotos dos Acessórios</h5>
                                                     <span class="badge bg-light text-dark border"><?= esc((string) count($acessoriosComFotos)) ?></span>
                                                 </div>
                                                 <div class="card-body">
                                                     <?php if (empty($acessoriosComFotos)): ?>
-                                                        <p class="text-muted mb-0">Nenhuma foto de acessÃ³rio registrada.</p>
+                                                        <p class="text-muted mb-0">Nenhuma foto de acessório registrada.</p>
                                                     <?php else: ?>
                                                         <div class="row g-3">
                                                             <?php foreach ($acessoriosComFotos as $acessorio): ?>
                                                                 <div class="col-12 col-md-6 col-xl-4">
                                                                     <div class="border rounded-3 p-3 h-100 os-show-subitem-card">
-                                                                        <div class="fw-semibold mb-3"><?= esc((string) ($acessorio['descricao'] ?? 'AcessÃ³rio')) ?></div>
+                                                                        <div class="fw-semibold mb-3"><?= esc((string) ($acessorio['descricao'] ?? 'Acessório')) ?></div>
                                                                         <div class="d-flex flex-wrap gap-2">
                                                                             <?php foreach ((array) ($acessorio['fotos'] ?? []) as $foto): ?>
                                                                                 <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="<?= esc($foto['url']) ?>" class="border rounded overflow-hidden shadow-sm os-show-inline-photo">
-                                                                                    <img src="<?= esc($foto['url']) ?>" class="w-100 h-100 object-fit-cover" alt="Foto do acessÃ³rio">
+                                                                                    <img src="<?= esc($foto['url']) ?>" class="w-100 h-100 object-fit-cover" alt="Foto do acessório">
                                                                                 </a>
                                                                             <?php endforeach; ?>
                                                                         </div>
@@ -952,8 +952,8 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                     <span class="badge bg-light text-dark border"><?= esc((string) count($documentosDaOs)) ?></span>
                                                 </div>
                                                 <div class="card-body">
-                                                    <p class="text-muted small mb-3">Gere novas versÃµes dos documentos da OS e centralize os arquivos prontos para envio.</p>
-                                                    <form action="<?= base_url('os/pdf/' . $os['id'] . '/gerar') ?><?= $embedQuery ?>" method="POST" class="os-doc-form mb-3" id="osPdfGenerateForm" data-budget-create-url="<?= esc($orcamentoQuickEmbedUrl) ?>" data-has-budget="<?= $hasOrÃ§amentoVinculado ? '1' : '0' ?>">
+                                                    <p class="text-muted small mb-3">Gere novas versões dos documentos da OS e centralize os arquivos prontos para envio.</p>
+                                                    <form action="<?= base_url('os/pdf/' . $os['id'] . '/gerar') ?><?= $embedQuery ?>" method="POST" class="os-doc-form mb-3" id="osPdfGenerateForm" data-budget-create-url="<?= esc($orcamentoQuickEmbedUrl) ?>" data-has-budget="<?= $hasOrçamentoVinculado ? '1' : '0' ?>">
                                                         <?= csrf_field() ?>
                                                         <select name="tipo_documento" class="form-select form-select-sm" id="osPdfTipoSelect" required>
                                                             <option value="">Selecionar tipo...</option>
@@ -974,7 +974,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                                 <?php
                                                                 $docType = (string) ($doc['tipo_documento'] ?? 'documento');
                                                                 $docLabel = $documentLabelByCode[$docType] ?? ucwords(str_replace('_', ' ', $docType));
-                                                                $isBudgetDoc = $docType === 'orcamento' && $hasOrÃ§amentoVinculado;
+                                                                $isBudgetDoc = $docType === 'orcamento' && $hasOrçamentoVinculado;
                                                                 ?>
                                                                 <div class="border rounded p-2 small d-flex justify-content-between align-items-center gap-2 flex-wrap">
                                                                     <div>
@@ -1047,7 +1047,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                             <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-send me-1"></i>Enviar</button>
                                                         </form>
                                                     <?php else: ?>
-                                                        <p class="text-muted small">Sem permissÃ£o para envio manual.</p>
+                                                        <p class="text-muted small">Sem permissão para envio manual.</p>
                                                     <?php endif; ?>
 
                                                     <?php if (empty($whatsappLogs ?? [])): ?>
@@ -1099,7 +1099,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                             </select>
                                                             <input type="text" name="assunto_email" id="osE-mailSubjectInput" class="form-control form-control-sm" value="<?= esc($emailDefaultSubject) ?>" placeholder="Assunto do e-mail">
                                                             <textarea name="mensagem_email" id="osE-mailMessageInput" class="form-control form-control-sm" rows="5" placeholder="Mensagem do e-mail"><?= esc($emailDefaultMessage) ?></textarea>
-                                                            <div class="small text-muted" id="osE-mailDispatchHint">O PDF selecionado serÃ¡ anexado ao e-mail usando a configuraÃ§Ã£o SMTP do ERP.</div>
+                                                            <div class="small text-muted" id="osE-mailDispatchHint">O PDF selecionado será anexado ao e-mail usando a configuração SMTP do ERP.</div>
                                                             <button type="submit" class="btn btn-sm btn-primary" <?= empty($documentosDaOs) ? 'disabled' : '' ?>>
                                                                 <i class="bi bi-envelope-paper me-1"></i>Enviar E-mail
                                                             </button>
@@ -1108,7 +1108,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                             <p class="text-muted mb-0 small mt-3">Gere ao menos um PDF da OS para habilitar o envio por e-mail.</p>
                                                         <?php endif; ?>
                                                     <?php else: ?>
-                                                        <p class="text-muted small mb-0">Sem permissÃ£o para envio manual por e-mail.</p>
+                                                        <p class="text-muted small mb-0">Sem permissão para envio manual por e-mail.</p>
                                                     <?php endif; ?>
                                                 </div>
                                             </div>
@@ -1121,11 +1121,11 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                             <div class="info-card h-100">
                                                 <div class="info-card-title"><i class="bi bi-currency-dollar"></i>Resumo Financeiro da OS</div>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">MÃ£o de Obra</span>
+                                                    <span class="finance-label">Mão de Obra</span>
                                                     <span class="finance-value"><?= esc(formatMoney($osFinancialBase['valor_mao_obra'] ?? $os['valor_mao_obra'] ?? 0)) ?></span>
                                                 </div>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">PeÃ§as</span>
+                                                    <span class="finance-label">Peças</span>
                                                     <span class="finance-value"><?= esc(formatMoney($osFinancialBase['valor_pecas'] ?? $os['valor_pecas'] ?? 0)) ?></span>
                                                 </div>
                                                 <div class="finance-item">
@@ -1161,7 +1161,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                     <span class="finance-value"><?= esc((string) ($financeiroOsResumo['status_titulo_label'] ?? 'Pendente')) ?></span>
                                                 </div>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">Ãšltimo recebimento</span>
+                                                    <span class="finance-label">Último recebimento</span>
                                                     <span class="finance-value"><?= esc((string) ($financeiroOsResumo['ultimo_recebimento_em_label'] ?? '-')) ?></span>
                                                 </div>
                                                 <?php if (!empty($financeiroOsResumo['movimentos'])): ?>
@@ -1170,8 +1170,8 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                     </div>
                                                     <div class="mt-3">
                                                         <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
-                                                            <div class="small text-uppercase text-muted fw-semibold">HistÃ³rico de recebimentos</div>
-                                                            <span class="badge text-bg-light"><?= (int) ($financeiroOsResumo['quantidade_movimentos'] ?? 0) ?> lanÃ§amento(s)</span>
+                                                            <div class="small text-uppercase text-muted fw-semibold">Histórico de recebimentos</div>
+                                                            <span class="badge text-bg-light"><?= (int) ($financeiroOsResumo['quantidade_movimentos'] ?? 0) ?> lançamento(s)</span>
                                                         </div>
                                                         <div class="d-flex flex-column gap-2">
                                                             <?php foreach ((array) ($financeiroOsResumo['movimentos'] ?? []) as $movimentoFinanceiro): ?>
@@ -1193,7 +1193,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                                             | Ref.: <?= esc((string) $movimentoFinanceiro['documento_ref']) ?>
                                                                         <?php endif; ?>
                                                                         <?php if (!empty($movimentoFinanceiro['created_at']) && ($movimentoFinanceiro['created_at_label'] ?? '-') !== '-'): ?>
-                                                                            | LanÃ§ado em <?= esc((string) ($movimentoFinanceiro['created_at_label'] ?? '-')) ?>
+                                                                            | Lançado em <?= esc((string) ($movimentoFinanceiro['created_at_label'] ?? '-')) ?>
                                                                         <?php endif; ?>
                                                                     </div>
                                                                     <?php if (!empty($movimentoFinanceiro['observacoes'])): ?>
@@ -1205,7 +1205,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                     </div>
                                                 <?php elseif (!empty($financeiroOsResumo['existe_titulo'])): ?>
                                                     <div class="small text-muted mt-3">
-                                                        Este tÃ­tulo financeiro ainda nÃ£o possui recebimentos lanÃ§ados.
+                                                        Este título financeiro ainda não possui recebimentos lançados.
                                                     </div>
                                                 <?php endif; ?>
                                             </div>
@@ -1213,12 +1213,12 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
 
                                         <div class="col-12 col-xl-6">
                                             <div class="info-card h-100">
-                                                <div class="info-card-title"><i class="bi bi-receipt"></i>Resumo Financeiro do OrÃ§amento</div>
-                                                <?php if (!$hasOrÃ§amentoVinculado): ?>
-                                                    <p class="mb-0 text-muted">Nenhum orÃ§amento vinculado para detalhar nesta OS.</p>
+                                                <div class="info-card-title"><i class="bi bi-receipt"></i>Resumo Financeiro do Orçamento</div>
+                                                <?php if (!$hasOrçamentoVinculado): ?>
+                                                    <p class="mb-0 text-muted">Nenhum orçamento vinculado para detalhar nesta OS.</p>
                                                 <?php else: ?>
                                                     <div class="finance-item">
-                                                        <span class="finance-label">NÃºmero</span>
+                                                        <span class="finance-label">Número</span>
                                                         <span class="finance-value"><?= esc((string) ($orcamentoVinculado['numero'] ?? '-')) ?></span>
                                                     </div>
                                                     <div class="finance-item">
@@ -1234,12 +1234,12 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                         <span class="finance-value">- <?= esc(formatMoney($orcamentoVinculado['desconto'] ?? 0)) ?></span>
                                                     </div>
                                                     <div class="finance-item text-success">
-                                                        <span class="finance-label">AcrÃ©scimo</span>
+                                                        <span class="finance-label">Acréscimo</span>
                                                         <span class="finance-value">+ <?= esc(formatMoney($orcamentoVinculado['acrescimo'] ?? 0)) ?></span>
                                                     </div>
                                                     <hr>
                                                     <div class="finance-item">
-                                                        <span class="finance-label"><strong>Total do orÃ§amento</strong></span>
+                                                        <span class="finance-label"><strong>Total do orçamento</strong></span>
                                                         <span class="finance-value text-success"><strong><?= esc(formatMoney($orcamentoVinculado['total'] ?? 0)) ?></strong></span>
                                                     </div>
                                                 <?php endif; ?>
@@ -1248,7 +1248,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
 
                                         <div class="col-12 col-xl-6">
                                             <div class="info-card h-100">
-                                                <div class="info-card-title"><i class="bi bi-calendar-check"></i>Datas e AprovaÃ§Ãµes</div>
+                                                <div class="info-card-title"><i class="bi bi-calendar-check"></i>Datas e Aprovações</div>
                                                 <div class="finance-item">
                                                     <span class="finance-label">Abertura</span>
                                                     <span class="finance-value"><?= esc(formatDate($os['data_abertura'] ?? '', true)) ?></span>
@@ -1258,11 +1258,11 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                     <span class="finance-value"><?= esc(formatDate($os['data_entrada'] ?? '', true)) ?></span>
                                                 </div>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">PrevisÃ£o</span>
+                                                    <span class="finance-label">Previsão</span>
                                                     <span class="finance-value"><?= esc(formatDate($os['data_previsao'] ?? '')) ?></span>
                                                 </div>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">ConclusÃ£o</span>
+                                                    <span class="finance-label">Conclusão</span>
                                                     <span class="finance-value"><?= esc(formatDate($os['data_conclusao'] ?? '')) ?></span>
                                                 </div>
                                                 <div class="finance-item">
@@ -1271,30 +1271,30 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                 </div>
                                                 <?php if (!empty($os['data_aprovacao'])): ?>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">AprovaÃ§Ã£o da OS</span>
+                                                    <span class="finance-label">Aprovação da OS</span>
                                                     <span class="finance-value"><?= esc(formatDate($os['data_aprovacao'], true)) ?></span>
                                                 </div>
                                                 <?php endif; ?>
-                                                <?php if ($hasOrÃ§amentoVinculado): ?>
+                                                <?php if ($hasOrçamentoVinculado): ?>
                                                     <hr>
                                                     <div class="finance-item">
-                                                        <span class="finance-label">OrÃ§amento criado</span>
+                                                        <span class="finance-label">Orçamento criado</span>
                                                         <span class="finance-value"><?= esc(formatDate($orcamentoVinculado['created_at'] ?? '', true)) ?></span>
                                                     </div>
                                                     <div class="finance-item">
-                                                        <span class="finance-label">OrÃ§amento enviado</span>
+                                                        <span class="finance-label">Orçamento enviado</span>
                                                         <span class="finance-value"><?= esc(formatDate($orcamentoVinculado['enviado_em'] ?? '', true)) ?></span>
                                                     </div>
                                                     <div class="finance-item">
-                                                        <span class="finance-label">OrÃ§amento aprovado</span>
+                                                        <span class="finance-label">Orçamento aprovado</span>
                                                         <span class="finance-value"><?= esc(formatDate($orcamentoVinculado['aprovado_em'] ?? '', true)) ?></span>
                                                     </div>
                                                     <div class="finance-item">
-                                                        <span class="finance-label">OrÃ§amento rejeitado</span>
+                                                        <span class="finance-label">Orçamento rejeitado</span>
                                                         <span class="finance-value"><?= esc(formatDate($orcamentoVinculado['rejeitado_em'] ?? '', true)) ?></span>
                                                     </div>
                                                     <div class="finance-item">
-                                                        <span class="finance-label">OrÃ§amento cancelado</span>
+                                                        <span class="finance-label">Orçamento cancelado</span>
                                                         <span class="finance-value"><?= esc(formatDate($orcamentoVinculado['cancelado_em'] ?? '', true)) ?></span>
                                                     </div>
                                                 <?php endif; ?>
@@ -1305,8 +1305,8 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                             <div class="info-card h-100">
                                                 <div class="info-card-title"><i class="bi bi-wallet2"></i>Complementos Financeiros</div>
                                                 <div class="finance-item">
-                                                    <span class="finance-label">OrÃ§amento aprovado</span>
-                                                    <span class="finance-value"><?= !empty($os['orcamento_aprovado']) ? 'Sim' : 'NÃ£o' ?></span>
+                                                    <span class="finance-label">Orçamento aprovado</span>
+                                                    <span class="finance-value"><?= !empty($os['orcamento_aprovado']) ? 'Sim' : 'Não' ?></span>
                                                 </div>
                                                 <div class="finance-item">
                                                     <span class="finance-label">Formas de recebimento</span>
@@ -1318,7 +1318,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                                                 </div>
                                                 <?php if (!empty($orcamentoVinculado['validade_data'])): ?>
                                                 <div class="finance-item">
-                                                        <span class="finance-label">Validade do orÃ§amento</span>
+                                                        <span class="finance-label">Validade do orçamento</span>
                                                     <span class="finance-value"><?= esc(formatDate($orcamentoVinculado['validade_data'] ?? '')) ?></span>
                                                 </div>
                                                 <?php endif; ?>
@@ -1356,7 +1356,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                 <div class="modal-body text-center p-0 position-relative">
                     <div class="d-inline-block position-relative">
                         <button type="button" class="btn-close position-absolute os-show-modal-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    <img src="" id="modalImagePreview" class="img-fluid rounded shadow-lg os-show-modal-image" alt="VisualizaÃ§Ã£o ampliada">
+    <img src="" id="modalImagePreview" class="img-fluid rounded shadow-lg os-show-modal-image" alt="Visualização ampliada">
                     </div>
                 </div>
             </div>
@@ -1371,7 +1371,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body p-0 bg-body-tertiary">
-                    <iframe id="pdfPreviewFrame" title="PrÃ©-visualizaÃ§Ã£o do PDF" style="width:100%;height:min(80vh,900px);border:0;"></iframe>
+                    <iframe id="pdfPreviewFrame" title="Pré-visualização do PDF" style="width:100%;height:min(80vh,900px);border:0;"></iframe>
                 </div>
             </div>
         </div>
@@ -1509,15 +1509,15 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
         <div class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-lg-down">
             <div class="modal-content border-0 shadow-lg">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="orcamentoFrameModalTitle">OrÃ§amento</h5>
+                    <h5 class="modal-title" id="orcamentoFrameModalTitle">Orçamento</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body p-0 position-relative">
                     <div id="orcamentoFrameModalLoading" class="position-absolute top-50 start-50 translate-middle z-3 text-center">
                         <div class="spinner-border text-primary" role="status"></div>
-                        <div class="small text-muted mt-2">Abrindo orÃ§amento...</div>
+                        <div class="small text-muted mt-2">Abrindo orçamento...</div>
                     </div>
-                    <iframe id="orcamentoFrameModalFrame" title="Fluxo de orÃ§amento" style="width:100%;height:min(84vh,980px);border:0;"></iframe>
+                    <iframe id="orcamentoFrameModalFrame" title="Fluxo de orçamento" style="width:100%;height:min(84vh,980px);border:0;"></iframe>
                 </div>
             </div>
         </div>
@@ -1648,7 +1648,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
             }
 
             setBudgetFrameLoading(true);
-            budgetFrameTitle && (budgetFrameTitle.textContent = title || 'OrÃ§amento');
+            budgetFrameTitle && (budgetFrameTitle.textContent = title || 'Orçamento');
             budgetFrame.src = 'about:blank';
             budgetFrameModal.show();
             budgetFrame.src = url;
@@ -1684,7 +1684,7 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                 event.preventDefault();
                 openBudgetFrameModal(
                     budgetTrigger.getAttribute('data-open-budget-modal-url') || '',
-                    budgetTrigger.getAttribute('data-open-budget-modal-title') || 'OrÃ§amento'
+                    budgetTrigger.getAttribute('data-open-budget-modal-title') || 'Orçamento'
                 );
             }
         });
@@ -2276,8 +2276,8 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
                 ensureHiddenInput(whatsappForm, 'mensagem_whatsapp', whatsappMessageInput?.value || '');
                 if (whatsappHint) {
                     whatsappHint.textContent = budgetBlocked
-                        ? 'Este orÃ§amento estÃ¡ bloqueado para novo envio no status atual.'
-                        : 'Para orÃ§amento, o envio segue o mesmo fluxo oficial do mÃ³dulo de orÃ§amentos, incluindo o link pÃºblico de aprovaÃ§Ã£o.';
+                        ? 'Este orçamento está bloqueado para novo envio no status atual.'
+                        : 'Para orçamento, o envio segue o mesmo fluxo oficial do módulo de orçamentos, incluindo o link público de aprovação.';
                 }
                 if (whatsappMessageInput && whatsappMessageInput.value.trim() === '' && whatsappForm.dataset.budgetDefaultMessage) {
                     whatsappMessageInput.placeholder = whatsappForm.dataset.budgetDefaultMessage;
@@ -2320,14 +2320,14 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
 
                 if (emailHint) {
                     emailHint.textContent = budgetBlocked
-                        ? 'Este orÃ§amento estÃ¡ bloqueado para novo envio no status atual.'
-                        : 'Ao selecionar orÃ§amento, o envio usa o mesmo fluxo oficial do mÃ³dulo de orÃ§amentos e anexa o PDF oficial.';
+                        ? 'Este orçamento está bloqueado para novo envio no status atual.'
+                        : 'Ao selecionar orçamento, o envio usa o mesmo fluxo oficial do módulo de orçamentos e anexa o PDF oficial.';
                 }
                 if (submitButton) {
                     submitButton.disabled = budgetBlocked;
                 }
             } else if (emailHint) {
-                emailHint.textContent = 'O PDF selecionado serÃ¡ anexado ao e-mail usando a configuraÃ§Ã£o SMTP do ERP.';
+                emailHint.textContent = 'O PDF selecionado será anexado ao e-mail usando a configuração SMTP do ERP.';
                 if (emailSubjectInput) {
                     const budgetDefaultSubject = emailForm.dataset.budgetDefaultSubject || '';
                     if (emailSubjectInput.value === budgetDefaultSubject) {
@@ -2494,21 +2494,21 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
 
             event.preventDefault();
             if (!window.Swal || typeof window.Swal.fire !== 'function') {
-                openBudgetFrameModal(generateForm.dataset.budgetCreateUrl || '', 'Criar orÃ§amento');
+                openBudgetFrameModal(generateForm.dataset.budgetCreateUrl || '', 'Criar orçamento');
                 return;
             }
 
             const result = await showAlert({
                 icon: 'warning',
-                title: 'Crie primeiro o orÃ§amento',
-                text: 'Esta ordem de serviÃ§o ainda nÃ£o possui orÃ§amento vinculado. Deseja elaborar o orÃ§amento agora?',
+                title: 'Crie primeiro o orçamento',
+                text: 'Esta ordem de serviço ainda não possui orçamento vinculado. Deseja elaborar o orçamento agora?',
                 showCancelButton: true,
-                confirmButtonText: 'Sim, criar orÃ§amento',
-                cancelButtonText: 'Agora nÃ£o',
+                confirmButtonText: 'Sim, criar orçamento',
+                cancelButtonText: 'Agora não',
             });
 
             if (result.isConfirmed) {
-                openBudgetFrameModal(generateForm.dataset.budgetCreateUrl || '', 'Criar orÃ§amento');
+                openBudgetFrameModal(generateForm.dataset.budgetCreateUrl || '', 'Criar orçamento');
             }
         });
 
@@ -2527,8 +2527,8 @@ $osEquipamentoNome = equipamento_nome_exibicao($os);
             if (window.Swal && payload.message) {
                 showAlert({
                     icon: 'success',
-                    title: 'OrÃ§amento atualizado',
-                    text: String(payload.message || 'O orÃ§amento foi salvo com sucesso.'),
+                    title: 'Orçamento atualizado',
+                    text: String(payload.message || 'O orçamento foi salvo com sucesso.'),
                     timer: 1800,
                     showConfirmButton: false,
                 }).then(function() {

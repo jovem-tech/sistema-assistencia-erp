@@ -56,7 +56,7 @@ class Fornecedores extends BaseController
     {
         $fornecedor = $this->model->find($id);
         if (!$fornecedor) {
-            return redirect()->to('/fornecedores')->with('error', 'Fornecedor nÃ£o encontrado.');
+            return redirect()->to('/fornecedores')->with('error', 'Fornecedor não encontrado.');
         }
 
         $data = [
@@ -90,10 +90,10 @@ class Fornecedores extends BaseController
         $fornecedor = $this->model->find($id);
         if ($fornecedor) {
             $this->model->delete($id);
-            LogModel::registrar('fornecedor_excluido', 'Fornecedor excluÃ­do: ' . $fornecedor['nome_fantasia']);
+            LogModel::registrar('fornecedor_excluido', 'Fornecedor excluído: ' . $fornecedor['nome_fantasia']);
         }
 
-        return redirect()->to('/fornecedores')->with('success', 'Fornecedor excluÃ­do com sucesso!');
+        return redirect()->to('/fornecedores')->with('success', 'Fornecedor excluído com sucesso!');
     }
     public function consultarCnpj()
     {

@@ -141,11 +141,11 @@ $duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
             </div>
             <?php endif; ?>
 
-            <!-- NavegaÃ§Ã£o por Abas -->
+            <!-- Navegação por Abas -->
             <ul class="nav nav-tabs nav-fill ds-tabs-scroll mb-4" id="equipamentoTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active fw-bold" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab" aria-controls="info-pane" aria-selected="true">
-                        <i class="bi bi-info-circle me-2"></i>InformaÃ§Ãµes
+                        <i class="bi bi-info-circle me-2"></i>Informações
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -162,7 +162,7 @@ $duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
 
             <div class="tab-content" id="equipamentoTabsContent">
 
-                <!-- ABA 1: INFORMAÃ‡Ã•ES -->
+                <!-- ABA 1: INFORMAÇÕES -->
                 <div class="tab-pane fade show active" id="info-pane" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
@@ -330,8 +330,8 @@ $duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">NÂº SÃ©rie ou IMEI</label>
-                            <input type="text" name="numero_serie" id="numeroSerieInput" class="form-control" placeholder="IMEI ou SÃ©rie (*#06#)" value="<?= esc(old('numero_serie', $equipamentoRow['numero_serie'] ?? '')) ?>">
+                            <label class="form-label">Nº Série ou IMEI</label>
+                            <input type="text" name="numero_serie" id="numeroSerieInput" class="form-control" placeholder="IMEI ou Série (*#06#)" value="<?= esc(old('numero_serie', $equipamentoRow['numero_serie'] ?? '')) ?>">
                         </div>
                         <div class="col-md-6">
                             <div class="ds-password-field" id="equipSenhaBox">
@@ -366,12 +366,12 @@ $duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">Estado FÃ­sico</label>
-                            <textarea name="estado_fisico" class="form-control" rows="3" placeholder="ArranhÃµes, tela trincada..."><?= $isEdit ? esc($equipamento['estado_fisico'] ?? '') : '' ?></textarea>
+                            <label class="form-label">Estado Físico</label>
+                            <textarea name="estado_fisico" class="form-control" rows="3" placeholder="Arranhões, tela trincada..."><?= $isEdit ? esc($equipamento['estado_fisico'] ?? '') : '' ?></textarea>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label d-flex justify-content-between">
-                                AcessÃ³rios
+                                Acessórios
                                 <small class="text-muted">Clique para adicionar</small>
                             </label>
                             <textarea name="acessorios" id="textareaAcessorios" class="form-control mb-2" rows="3" placeholder="O que o cliente enviou?"><?= $isEdit ? esc($equipamento['acessorios'] ?? '') : '' ?></textarea>
@@ -380,14 +380,14 @@ $duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
                                 <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Cabo USB</button>
                                 <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Capa</button>
                                 <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Chip</button>
-                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ CartÃ£o MemÃ³ria</button>
+                                <button type="button" class="btn btn-sm btn-light border py-0 px-2 btn-quick-acessorio" style="font-size: 0.75rem;">+ Cartão Memória</button>
                             </div>
                         </div>
                     </div>
 
                     <div class="row g-3 mb-4">
                         <div class="col-12">
-                            <label class="form-label text-muted">ObservaÃ§Ãµes Internas (Opcional)</label>
+                            <label class="form-label text-muted">Observações Internas (Opcional)</label>
                             <textarea name="observacoes" class="form-control" rows="2"><?= $isEdit ? esc($equipamento['observacoes'] ?? '') : '' ?></textarea>
                         </div>
                     </div>
@@ -406,7 +406,7 @@ $duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
                         <div class="row g-3">
                             <!-- Coluna Esquerda: Preview + Picker -->
                             <div class="col-md-5">
-                                <!-- DetecÃ§Ã£o por foto (smart) -->
+                                <!-- Detecção por foto (smart) -->
                                 <div class="p-2 mb-3 rounded border border-warning border-opacity-50 bg-warning bg-opacity-10 d-none" id="smartColorContainer">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                         <span style="font-size: 0.72rem;" class="text-warning fw-semibold"><i class="bi bi-magic me-1"></i>Detectado na foto:</span>
@@ -441,15 +441,15 @@ $duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
                                 </div>
 
                                 <div id="coresProximasBox">
-                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">SugestÃµes Semelhantes</label>
+                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Sugestões Semelhantes</label>
                                     <div id="coresProximasGrid" class="d-flex flex-wrap gap-2"></div>
                                 </div>
                             </div>
 
-                            <!-- Coluna Direita: CatÃ¡logo -->
+                            <!-- Coluna Direita: Catálogo -->
                             <div class="col-md-7">
                                 <div class="bg-white bg-opacity-50 p-3 rounded shadow-sm h-100 border">
-                                    <label class="form-label small text-muted fw-bold text-uppercase mb-3" style="letter-spacing: 0.5px;"><i class="bi bi-grid-3x3-gap me-1"></i> CatÃ¡logo Profissional</label>
+                                    <label class="form-label small text-muted fw-bold text-uppercase mb-3" style="letter-spacing: 0.5px;"><i class="bi bi-grid-3x3-gap me-1"></i> Catálogo Profissional</label>
                                     <div id="colorCatalog" class="pe-2 custom-scrollbar" style="max-height: 480px; overflow-y: auto;"></div>
                                 </div>
                             </div>
@@ -479,7 +479,7 @@ $duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
                     <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4 mx-auto" style="max-width: 600px;">
                         <i class="bi bi-info-circle-fill fs-4 me-3"></i>
                         <div class="small">
-                            Envie atÃ© <strong>4 fotos</strong> (MÃ¡ximo 2MB cada). A primeira foto serÃ¡ usada como imagem principal do perfil do equipamento.
+                            Envie até <strong>4 fotos</strong> (Máximo 2MB cada). A primeira foto será usada como imagem principal do perfil do equipamento.
                         </div>
                     </div>
 
@@ -502,14 +502,14 @@ $duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
                             <?php endforeach; ?>
                         <?php endif; ?>
 
-                        <!-- Container para Previews dinÃ¢micos de Novas -->
+                        <!-- Container para Previews dinâmicos de Novas -->
                         <div id="fotoPreviewNovas" class="d-flex flex-wrap gap-4"></div>
                     </div>
                 </div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
-                <a href="<?= base_url('equipamentos') ?>" class="btn btn-link text-secondary text-decoration-none"><i class="bi bi-x-lg me-1"></i> Descartar AlteraÃ§Ãµes</a>
+                <a href="<?= base_url('equipamentos') ?>" class="btn btn-link text-secondary text-decoration-none"><i class="bi bi-x-lg me-1"></i> Descartar Alterações</a>
                 <button type="submit" class="btn btn-glow btn-lg px-5 shadow"><i class="bi bi-save me-2 text-warning"></i><?= $isEdit ? 'Atualizar Equipamento' : 'Finalizar Cadastro' ?></button>
             </div>
         </form>
@@ -517,14 +517,14 @@ $duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
 </div>
 </div>
 
-<!-- ================= MODAIS DE CADASTRO RÃPIDO ================= -->
+<!-- ================= MODAIS DE CADASTRO RÁPIDO ================= -->
 
 <!-- Modal Novo Cliente -->
 <div class="modal fade" id="modalNovoCliente" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content glass-card">
             <div class="modal-header border-bottom border-light">
-                <h5 class="modal-title">Novo Cliente RÃ¡pido</h5>
+                <h5 class="modal-title">Novo Cliente Rápido</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -585,7 +585,7 @@ $duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
                 <div class="mb-3">
                     <label>Marca Vinculada</label>
                     <select id="modMarcaId" class="form-select" disabled>
-                        <option value="">Selecione a marca no formulÃ¡rio antes...</option>
+                        <option value="">Selecione a marca no formulário antes...</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -596,12 +596,12 @@ $duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
                             <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                         </div>
                     </div>
-                    <!-- Dropdown de sugestÃµes -->
+                    <!-- Dropdown de sugestões -->
                     <div id="sugestoesNovoModeloForm" class="list-group shadow-lg mt-1 d-none"
                          style="max-height: 220px; overflow-y: auto; border-radius: 8px; z-index: 9999; position: relative;"></div>
                     <div class="form-text mt-1">
                         <i class="bi bi-globe2 me-1 text-info"></i>
-                        Digite 3+ caracteres para ver sugestÃµes da internet
+                        Digite 3+ caracteres para ver sugestões da internet
                     </div>
                 </div>
             </div>
@@ -612,7 +612,7 @@ $duplicateEquipmentPayload = session('duplicate_equipment') ?? null;
     </div>
 </div>
 
-<!-- ===== MODAL: CÃ‚MERA (AUXILIAR) ===== -->
+<!-- ===== MODAL: CÂMERA (AUXILIAR) ===== -->
 <div class="modal fade" id="modalCamera" tabindex="-1" style="z-index: 2000;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-card border-0 shadow-lg">
@@ -1005,7 +1005,7 @@ $(document).ready(function() {
 
     async function importDesktopSnapshotFromAgentLocal() {
         if (!isDesktopTipoSelecionado()) {
-            window.DSFeedback.warning('Tipo incompatÃ­vel', 'Selecione um equipamento do tipo Desktop antes de buscar os dados do agente.');
+            window.DSFeedback.warning('Tipo incompatível', 'Selecione um equipamento do tipo Desktop antes de buscar os dados do agente.');
             return;
         }
 
@@ -1026,7 +1026,7 @@ $(document).ready(function() {
             applyDesktopAgentSnapshot(data.mapped || {});
 
             const sourcePath = String(data.source_path || '').trim();
-            const sourceText = sourcePath ? `Arquivo lido: ${sourcePath}` : 'Campos tÃ©cnicos preenchidos com sucesso.';
+            const sourceText = sourcePath ? `Arquivo lido: ${sourcePath}` : 'Campos técnicos preenchidos com sucesso.';
             window.DSFeedback.fire({
                 icon: 'success',
                 title: 'Dados importados do agente',
@@ -1045,7 +1045,7 @@ $(document).ready(function() {
 
     async function importCollectorSnapshotFromAgentLocal() {
         if (!isCollectorTipoSelecionado()) {
-            window.DSFeedback.warning('Tipo incompatÃƒÂ­vel', 'Selecione um equipamento do tipo Desktop ou Notebook antes de buscar os dados do agente.');
+            window.DSFeedback.warning('Tipo incompatível', 'Selecione um equipamento do tipo Desktop ou Notebook antes de buscar os dados do agente.');
             return;
         }
 
@@ -1116,12 +1116,12 @@ $(document).ready(function() {
         width: '100%',
         placeholder: "Selecione a Marca..."
     }).on('change', function() {
-        // Quando a marca muda, destruÃ­mos e recriamos o select2 de modelos
+        // Quando a marca muda, destruímos e recriamos o select2 de modelos
         // ou pelo menos limpamos o valor dele.
         $('#modeloSelect').val(null).trigger('change');
     });
 
-    // Select2 HÃ­brido: Modelos via API
+    // Select2 Híbrido: Modelos via API
     $('#modeloSelect').select2({
         theme: 'bootstrap-5',
         width: '100%',
@@ -1163,8 +1163,8 @@ $(document).ready(function() {
                 return `Digite mais ${restante} caractere(s) para buscar...`;
             },
             searching:    function() { return '<i class="bi bi-globe2 me-1"></i> Buscando modelos na internet...'; },
-            noResults:    function() { return 'Nenhuma sugestÃ£o encontrada. Use o botÃ£o <strong>+ Novo</strong> para cadastrar manualmente.'; },
-            errorLoading: function() { return 'Erro ao consultar. Verifique sua conexÃ£o.'; }
+            noResults:    function() { return 'Nenhuma sugestão encontrada. Use o botão <strong>+ Novo</strong> para cadastrar manualmente.'; },
+            errorLoading: function() { return 'Erro ao consultar. Verifique sua conexão.'; }
         },
         templateResult: function (data) {
             if (data.loading) return data.text;
@@ -1174,7 +1174,7 @@ $(document).ready(function() {
                 return $(`
                 <div>
                     <strong class="d-block text-primary"><i class="bi bi-pencil-square me-1"></i> "${data.text}"</strong>
-                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (ediÃ§Ã£o manual)</small>
+                    <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (edição manual)</small>
                 </div>`);
             }
 
@@ -1230,12 +1230,12 @@ $(document).ready(function() {
             { hex: '#41464D', name: 'Graphite' },
             { hex: '#5C5B57', name: 'Titanium' },
             { hex: '#696969', name: 'Cinza Escuro' },
-            { hex: '#708090', name: 'Cinza ArdÃ³sia' },
+            { hex: '#708090', name: 'Cinza Ardósia' },
             { hex: '#BEBEBE', name: 'Cinza' },
             { hex: '#D3D3D3', name: 'Cinza Claro' },
             { hex: '#FFFFFF', name: 'Branco' },
             { hex: '#F8F8FF', name: 'Branco Gelo' },
-            { hex: '#F5F5F5', name: 'Branco FumaÃ§a' },
+            { hex: '#F5F5F5', name: 'Branco Fumaça' },
             { hex: '#FFFFF0', name: 'Marfim' },
         ]},
         { category: 'Azuis e Marinhos', colors: [
@@ -1244,10 +1244,10 @@ $(document).ready(function() {
             { hex: '#00008B', name: 'Azul Escuro' },
             { hex: '#0000FF', name: 'Azul Puro' },
             { hex: '#4169E1', name: 'Azul Real' },
-            { hex: '#1E90FF', name: 'Azul CÃ©u' },
+            { hex: '#1E90FF', name: 'Azul Céu' },
             { hex: '#87CEEB', name: 'Azul Celeste' },
             { hex: '#ADD8E6', name: 'Azul Beb?' },
-            { hex: '#5F9EA0', name: 'Azul PetrÃ³leo' },
+            { hex: '#5F9EA0', name: 'Azul Petróleo' },
         ]},
         { category: 'Verdes e Mentas', colors: [
             { hex: '#006400', name: 'Verde Escuro' },
@@ -1267,11 +1267,11 @@ $(document).ready(function() {
             { hex: '#FF6347', name: 'Tomate' },
             { hex: '#FFA500', name: 'Laranja' },
             { hex: '#FF7F50', name: 'Coral' },
-            { hex: '#FA8072', name: 'SalmÃ£o' },
+            { hex: '#FA8072', name: 'Salmão' },
         ]},
         { category: 'Amarelos e Dourados', colors: [
             { hex: '#B8860B', name: 'Dourado Escuro' },
-            { hex: '#DAA520', name: 'Dourado MÃ©dio' },
+            { hex: '#DAA520', name: 'Dourado Médio' },
             { hex: '#D4AF37', name: 'Dourado' },
             { hex: '#FFD700', name: 'Dourado Vivo' },
             { hex: '#FFFF00', name: 'Amarelo' },
@@ -1286,12 +1286,12 @@ $(document).ready(function() {
             { hex: '#D2691E', name: 'Chocolate' },
             { hex: '#F4A460', name: 'Areia' },
         ]},
-        { category: 'Roxos, Pinks e LilÃ¡s', colors: [
-            { hex: '#4B0082', name: 'Ãndigo' },
+        { category: 'Roxos, Pinks e Lilás', colors: [
+            { hex: '#4B0082', name: 'Índigo' },
             { hex: '#2D1B69', name: 'Violeta Escuro' },
             { hex: '#800080', name: 'Roxo Puro' },
-            { hex: '#9370DB', name: 'Roxo MÃ©dio' },
-            { hex: '#DA70D6', name: 'LilÃ¡s' },
+            { hex: '#9370DB', name: 'Roxo Médio' },
+            { hex: '#DA70D6', name: 'Lilás' },
             { hex: '#FF00FF', name: 'Magenta' },
             { hex: '#FF1493', name: 'Rosa Pink' },
             { hex: '#FFC0CB', name: 'Rosa' },
@@ -1455,7 +1455,7 @@ $(document).ready(function() {
         }
     });
 
-    // Nome editÃ¡vel manual
+    // Nome editável manual
     $('#corNomeInput').on('input', function() {
         $('#corNomeReal').val(this.value);
     });
@@ -1466,7 +1466,7 @@ $(document).ready(function() {
     const initClosest = findClosestColor(initHex);
     updateColorUI(initHex, initClosest ? initClosest.name : ($('#corNomeReal').val() || 'Preto'));
 
-    // --- L?GICA DE DETEC??O DE COR INTELIGENTE NA IMAGEM ---
+    // --- LÓGICA DE DETECÇÃO DE COR INTELIGENTE NA IMAGEM ---
 // (smartColorMap removido, usando PROFESSIONAL_COLORS)
 
     function rgbToHexStr(r, g, b) {
@@ -1483,7 +1483,7 @@ $(document).ready(function() {
         try {
             const ctx = sourceCanvas.getContext('2d', { willReadFrequently: true });
 
-            // Foca nos 40% centrais da imagem para evitar fundos brancos/pretos de estÃºdio
+            // Foca nos 40% centrais da imagem para evitar fundos brancos/pretos de estúdio
             const w = sourceCanvas.width;
             const h = sourceCanvas.height;
             const startX = Math.floor(w * 0.3);
@@ -1499,7 +1499,7 @@ $(document).ready(function() {
 
             // Amostragem (step = 4px)
             for (let i = 0; i < data.length; i += 16) {
-                const r = Math.round(data[i] / 20) * 20; // QuantizaÃ§Ã£o grossa
+                const r = Math.round(data[i] / 20) * 20; // Quantização grossa
                 const g = Math.round(data[i+1] / 20) * 20;
                 const b = Math.round(data[i+2] / 20) * 20;
                 const a = data[i+3];
@@ -1542,7 +1542,7 @@ $(document).ready(function() {
             $('#smartColorContainer').removeClass('d-none');
 
         } catch (e) {
-            console.warn('Erro na detecÃ§Ã£o de cor: ', e);
+            console.warn('Erro na detecção de cor: ', e);
         }
     }
 
@@ -1553,17 +1553,17 @@ $(document).ready(function() {
         const marcaId = $(this).val();
         const marcaNome = $(this).find('option:selected').text();
 
-        // Atualiza a opÃ§Ã£o no modal de Novo Modelo
+        // Atualiza a opção no modal de Novo Modelo
         if(marcaId) {
             $('#modMarcaId').html(`<option value="${marcaId}">${marcaNome}</option>`);
             $('#modMarcaId').prop('disabled', false);
         } else {
-            $('#modMarcaId').html('<option value="">Selecione a marca no formulÃ¡rio antes...</option>');
+            $('#modMarcaId').html('<option value="">Selecione a marca no formulário antes...</option>');
             $('#modMarcaId').prop('disabled', true);
         }
     });
 
-    // --- LÃ“GICA DE ACESSÃ“RIOS (NOVAS ABAS) ---
+    // --- LÓGICA DE ACESSÓRIOS (NOVAS ABAS) ---
     $(document).on('click', '.btn-quick-acessorio', function() {
         const value = $(this).text().replace('+ ', '').trim();
         const textarea = $('#textareaAcessorios');
@@ -1588,7 +1588,7 @@ $(document).ready(function() {
         }
     }
 
-    // Chamar no init e apÃ³s mudar fotos
+    // Chamar no init e após mudar fotos
     setTimeout(checkPhotosEmptyState, 500);
 
     // Reaproveitar o renderNewPreviews para checar vazio
@@ -1600,7 +1600,7 @@ $(document).ready(function() {
         };
     }
 
-    // --- LÃ“GICA DE CÃ‚MERA, GALERIA E CROPPER (FOTOS) ---
+    // --- LÓGICA DE CÂMERA, GALERIA E CROPPER (FOTOS) ---
     const modalCameraEl  = document.getElementById('modalCamera');
     const modalCropEl    = document.getElementById('modalCropEquip');
     const modalCamera    = modalCameraEl ? new bootstrap.Modal(modalCameraEl) : null;
@@ -1708,7 +1708,7 @@ $(document).ready(function() {
             modalCamera?.show();
         } catch (err) {
             console.error('[Equipamentos Fotos] falha ao acessar camera', err);
-        showPhotoDialog('error', 'CÃ¢mera indisponÃ­vel', 'NÃ£o foi possÃ­vel acessar a cÃ¢mera deste dispositivo.');
+        showPhotoDialog('error', 'Câmera indisponível', 'Não foi possível acessar a câmera deste dispositivo.');
         }
     });
 
@@ -1730,7 +1730,7 @@ $(document).ready(function() {
         }
 
         if (!imgToCrop) {
-            console.error('[Equipamentos Fotos] imagem do cropper nÃ£o encontrada');
+            console.error('[Equipamentos Fotos] imagem do cropper não encontrada');
             return;
         }
 
@@ -1749,7 +1749,7 @@ $(document).ready(function() {
 
                 if (!context) {
                     console.error('[Equipamentos Fotos] fallback canvas sem contexto 2D');
-            showPhotoDialog('error', 'Falha ao processar imagem', 'NÃ£o foi possÃ­vel preparar a foto selecionada.');
+            showPhotoDialog('error', 'Falha ao processar imagem', 'Não foi possível preparar a foto selecionada.');
                     processPendingCropQueue();
                     return;
                 }
@@ -1758,7 +1758,7 @@ $(document).ready(function() {
                 fallbackCanvas.toBlob((blob) => {
                     if (!blob) {
                         console.error('[Equipamentos Fotos] fallback canvas retornou blob vazio');
-            showPhotoDialog('error', 'Falha ao processar imagem', 'NÃ£o foi possÃ­vel gerar a foto selecionada.');
+            showPhotoDialog('error', 'Falha ao processar imagem', 'Não foi possível gerar a foto selecionada.');
                         processPendingCropQueue();
                         return;
                     }
@@ -1768,7 +1768,7 @@ $(document).ready(function() {
             };
             fallbackImage.onerror = (error) => {
                 console.error('[Equipamentos Fotos] erro ao carregar imagem no fallback', error);
-            showPhotoDialog('error', 'Falha ao carregar imagem', 'A imagem escolhida nÃ£o pode ser carregada.');
+            showPhotoDialog('error', 'Falha ao carregar imagem', 'A imagem escolhida não pode ser carregada.');
                 processPendingCropQueue();
             };
             fallbackImage.src = source;
@@ -1801,7 +1801,7 @@ $(document).ready(function() {
             console.error('[Equipamentos Fotos] falha ao inicializar cropper', error);
             cropperReady = false;
             hideModalSafe(modalCrop, '#modalCropEquip');
-            showPhotoDialog('error', 'Falha no editor', 'NÃ£o foi possÃ­vel abrir o editor de corte da foto.');
+            showPhotoDialog('error', 'Falha no editor', 'Não foi possível abrir o editor de corte da foto.');
             processPendingCropQueue();
         }
     });
@@ -1838,7 +1838,7 @@ $(document).ready(function() {
         const context = canvasCamera.getContext('2d');
         if (!context) {
             console.error('[Equipamentos Fotos] canvas da camera sem contexto 2D');
-            showPhotoDialog('error', 'Falha na cÃ¢mera', 'NÃ£o foi possÃ­vel capturar a imagem da cÃ¢mera.');
+            showPhotoDialog('error', 'Falha na câmera', 'Não foi possível capturar a imagem da câmera.');
             return;
         }
 
@@ -1854,20 +1854,20 @@ $(document).ready(function() {
     document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
         if (!cropperReady || !cropper) {
             console.error('[Equipamentos Fotos] confirmacao de crop sem cropper pronto');
-            showPhotoDialog('warning', 'Editor indisponÃ­vel', 'A foto ainda nÃ£o estÃ¡ pronta para corte.');
+            showPhotoDialog('warning', 'Editor indisponível', 'A foto ainda não está pronta para corte.');
             return;
         }
 
         try {
             const canvas = cropper.getCroppedCanvas({ width: 1024, height: 1024, imageSmoothingQuality: 'high' });
             if (!canvas) {
-                throw new Error('Canvas do cropper nÃ£o retornado.');
+                throw new Error('Canvas do cropper não retornado.');
             }
 
             canvas.toBlob((blob) => {
                 if (!blob) {
                     console.error('[Equipamentos Fotos] cropper retornou blob vazio');
-            showPhotoDialog('error', 'Falha ao salvar foto', 'NÃ£o foi possÃ­vel gerar a foto cortada.');
+            showPhotoDialog('error', 'Falha ao salvar foto', 'Não foi possível gerar a foto cortada.');
                     return;
                 }
 
@@ -1875,7 +1875,7 @@ $(document).ready(function() {
             }, 'image/jpeg', 0.9);
         } catch (error) {
             console.error('[Equipamentos Fotos] erro ao confirmar crop', error);
-            showPhotoDialog('error', 'Falha ao salvar foto', 'NÃ£o foi possÃ­vel finalizar o corte da imagem.');
+            showPhotoDialog('error', 'Falha ao salvar foto', 'Não foi possível finalizar o corte da imagem.');
         }
     });
 
@@ -1998,18 +1998,18 @@ $(document).ready(function() {
                 $('#foto-existente-' + id).remove();
                 checkPhotosEmptyState();
             } else {
-            showPhotoDialog('error', 'Erro ao excluir foto', data.message || 'NÃ£o foi possÃ­vel excluir a foto.');
+            showPhotoDialog('error', 'Erro ao excluir foto', data.message || 'Não foi possível excluir a foto.');
                 btn.prop('disabled', false).html('<i class="bi bi-x"></i>');
             }
         })
         .catch(err => {
             console.error('[Equipamentos Fotos] erro ao excluir foto existente', err);
-            showPhotoDialog('error', 'Erro de comunicaÃ§Ã£o', 'NÃ£o foi possÃ­vel concluir a exclusÃ£o da foto.');
+            showPhotoDialog('error', 'Erro de comunicação', 'Não foi possível concluir a exclusão da foto.');
             btn.prop('disabled', false).html('<i class="bi bi-x"></i>');
         });
     });
 
-    // ================= AJAX SALVAMENTO RÃPIDO ================= //
+    // ================= AJAX SALVAMENTO RÁPIDO ================= //
 
     // Salvar Cliente
     $('#btnSalvarCliente').click(function() {
@@ -2041,7 +2041,7 @@ $(document).ready(function() {
                 window.DSFeedback.error('Falha ao salvar cliente', data.message || 'Erro ao salvar cliente');
             }
         })
-                .catch(() => window.DSFeedback.error('Erro de comunicaÃ§Ã£o', 'NÃ£o foi possÃ­vel salvar o cliente.'))
+                .catch(() => window.DSFeedback.error('Erro de comunicação', 'Não foi possível salvar o cliente.'))
         .finally(() => btn.prop('disabled', false).html('Salvar Cliente'));
     });
 
@@ -2121,7 +2121,7 @@ $(document).ready(function() {
                 header.className = 'list-group-item list-group-item-secondary py-1 px-3';
                 header.style.cssText = 'font-size:0.7rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; pointer-events:none; opacity:0.8;';
                 const isCadastrado = group.text.includes('Cadastrados');
-                header.textContent = (isCadastrado ? 'âœ“ ' : 'â€¢ ') + group.text.replace(/^[âœ“â€¢]\s+/, '');
+                header.textContent = (isCadastrado ? '✓ ' : '• ') + group.text.replace(/^[✓•]\s+/, '');
                 sugestoesBox.appendChild(header);
 
                 group.children.forEach(item => {
@@ -2155,7 +2155,7 @@ $(document).ready(function() {
             if (total > 0) {
                 sugestoesBox.classList.remove('d-none');
             } else {
-                sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugestÃ£o encontrada. Salve manualmente.</div>';
+                sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugestão encontrada. Salve manualmente.</div>';
                 sugestoesBox.classList.remove('d-none');
             }
         }

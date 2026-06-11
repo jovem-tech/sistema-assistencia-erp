@@ -1,8 +1,8 @@
-# Padrıes de CÛdigo
+# Padr√µes de C√≥digo
 
 ## PHP / CodeIgniter 4
 
-### Controller ? Estrutura Padr„o
+### Controller ? Estrutura Padr√£o
 
 ```php
 <?php
@@ -18,7 +18,7 @@ class Clientes extends BaseController
     public function __construct()
     {
         $this->model = new ClienteModel();
-        requirePermission('clientes'); // Bloqueia acesso sem permiss„o
+        requirePermission('clientes'); // Bloqueia acesso sem permiss√£o
     }
 
     // LISTAGEM
@@ -31,7 +31,7 @@ class Clientes extends BaseController
         return view('clientes/index', $data);
     }
 
-    // FORMUL¡RIO DE CRIA«√O
+    // FORMUL√ÅRIO DE CRIA√á√ÉO
     public function create()
     {
         return view('clientes/form', ['title' => 'Novo Cliente']);
@@ -60,7 +60,7 @@ class Clientes extends BaseController
 
 ---
 
-### Model ? Estrutura Padr„o
+### Model ? Estrutura Padr√£o
 
 ```php
 <?php
@@ -82,7 +82,7 @@ class ClienteModel extends Model
 
     protected $useTimestamps = true;
 
-    // Regras de validaÁ„o
+    // Regras de valida√ß√£o
     protected $validationRules = [
         'nome_razao' => 'required|min_length[3]|max_length[100]',
         'telefone1'  => 'required|max_length[20]',
@@ -107,7 +107,7 @@ class ClienteModel extends Model
 
 ---
 
-### View ? Estrutura Padr„o
+### View ? Estrutura Padr√£o
 
 ```php
 <?= $this->extend('layouts/main') ?>
@@ -119,7 +119,7 @@ class ClienteModel extends Model
 
 <div class="card glass-card">
     <div class="card-body">
-        <!-- conte˙do -->
+        <!-- conte√∫do -->
     </div>
 </div>
 
@@ -127,22 +127,22 @@ class ClienteModel extends Model
 
 <?= $this->section('scripts') ?>
 <script>
-// Scripts especÌficos desta p·gina
+// Scripts espec√≠ficos desta p√°gina
 </script>
 <?= $this->endSection() ?>
 ```
 
 ---
 
-## Regras e ConvenÁıes
+## Regras e Conven√ß√µes
 
 ### Nomenclatura
-| Tipo | Padr„o | Exemplo |
+| Tipo | Padr√£o | Exemplo |
 |------|--------|---------|
 | Controller | PascalCase | `Clientes.php` |
 | Model | PascalCase + Model | `ClienteModel.php` |
 | View | snake_case | `ordens_servico/form.php` |
-| Vari·vel PHP | camelCase | `$clienteAtivo` |
+| Vari√°vel PHP | camelCase | `$clienteAtivo` |
 | Coluna DB | snake_case | `nome_razao` |
 | Rota URL | kebab-case | `/os/nova` |
 | Classe CSS | kebab-case | `.glass-card` |
@@ -150,30 +150,30 @@ class ClienteModel extends Model
 
 ---
 
-### SeguranÁa
+### Seguran√ßa
 
 1. **Sempre usar `esc()`** em dados do banco exibidos nas Views
-2. **Sempre usar `csrf_field()`** em formul·rios POST
+2. **Sempre usar `csrf_field()`** em formul√°rios POST
 3. **Nunca confiar em dados do POST** ? validar no Controller
-4. **Campos ˙nicos opcionais** devem ser convertidos para `null` quando vazios (ver `nullifyEmptyFields`)
-5. **Uploads** devem ter extens„o validada e ser armazenados fora da raiz p˙blica naveg·vel
+4. **Campos √∫nicos opcionais** devem ser convertidos para `null` quando vazios (ver `nullifyEmptyFields`)
+5. **Uploads** devem ter extens√£o validada e ser armazenados fora da raiz p√∫blica naveg√°vel
 
 ---
 
 ### AJAX / Retorno JSON
 
 ```php
-// Padr„o de resposta JSON para requests AJAX
+// Padr√£o de resposta JSON para requests AJAX
 return $this->response->setJSON([
     'success' => true,
-    'message' => 'OperaÁ„o realizada com sucesso',
+    'message' => 'Opera√ß√£o realizada com sucesso',
     'data'    => $resultado
 ]);
 
 // Em caso de erro
 return $this->response->setJSON([
     'success' => false,
-    'message' => 'Mensagem de erro para o usu·rio'
+    'message' => 'Mensagem de erro para o usu√°rio'
 ]);
 ```
 
@@ -181,8 +181,8 @@ return $this->response->setJSON([
 
 ### Logs de Auditoria
 
-Sempre registrar aÁıes importantes:
+Sempre registrar a√ß√µes importantes:
 
 ```php
-LogModel::registrar('acao_realizada', 'DescriÁ„o detalhada do que ocorreu');
+LogModel::registrar('acao_realizada', 'Descri√ß√£o detalhada do que ocorreu');
 ```

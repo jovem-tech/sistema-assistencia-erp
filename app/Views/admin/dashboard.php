@@ -61,7 +61,7 @@ $resumoFinanceiroInicial = [
             <div class="stat-card stat-card-success h-100">
                 <div class="stat-card-body">
                     <div class="stat-info">
-                        <span class="stat-label">Faturamento mes</span>
+                        <span class="stat-label">Faturamento mês</span>
                         <h2 class="stat-value">R$ <?= number_format($faturamentoMes, 2, ',', '.') ?></h2>
                     </div>
                     <div class="stat-icon">
@@ -116,7 +116,7 @@ $resumoFinanceiroInicial = [
                     </div>
                 </div>
                 <div class="stat-card-footer">
-                                <a href="<?= base_url('os') ?>"><i class="bi bi-arrow-right me-1"></i>Ver operaÃ§Ã£o</a>
+                                <a href="<?= base_url('os') ?>"><i class="bi bi-arrow-right me-1"></i>Ver operação</a>
                 </div>
             </div>
         </div>
@@ -127,7 +127,7 @@ $resumoFinanceiroInicial = [
             <div class="card glass-card ds-dashboard-main-chart-card">
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
-                        <h5 class="card-title mb-0"><i class="bi bi-graph-up-arrow me-2"></i>OS abertas x entregues reparadas por mes</h5>
+                        <h5 class="card-title mb-0"><i class="bi bi-graph-up-arrow me-2"></i>OS abertas x entregues reparadas por mês</h5>
                             <small class="text-muted">Comparativo mensal de janeiro a dezembro de <span id="dashboardAnoRef"><?= $anoDashboard ?></span></small>
                     </div>
                     <div class="ds-dashboard-year-filter">
@@ -208,13 +208,13 @@ $resumoFinanceiroInicial = [
         <div class="col-12">
             <div class="card glass-card h-100 ds-dashboard-table-card">
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <h5 class="card-title mb-0"><i class="bi bi-clock-history me-2"></i>Ãšltimas Ordens de ServiÃ§o</h5>
+                            <h5 class="card-title mb-0"><i class="bi bi-clock-history me-2"></i>Últimas Ordens de Serviço</h5>
                     <?php if (can('os', 'criar')): ?>
                         <button
                             type="button"
                             class="btn btn-glow btn-sm"
                             data-os-modal-url="<?= base_url('os/nova?embed=1') ?>"
-                                            data-os-modal-title="Nova Ordem de ServiÃ§o"
+                                            data-os-modal-title="Nova Ordem de Serviço"
                             data-os-open-full-url="<?= base_url('os/nova') ?>"
                         >
                             <i class="bi bi-plus-lg me-1"></i>Nova OS
@@ -231,7 +231,7 @@ $resumoFinanceiroInicial = [
                                     <th>Equipamento</th>
                                     <th>Status</th>
                                     <th>Data</th>
-                                    <th class="text-end">AÃ§Ã£o</th>
+                                    <th class="text-end">Ação</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -250,7 +250,7 @@ $resumoFinanceiroInicial = [
                                             <td data-label="Equipamento"><?= esc(equipamento_nome_exibicao($os)) ?></td>
                                             <td data-label="Status"><?= getStatusBadge($os['status']) ?></td>
                                             <td data-label="Data"><?= date('d/m/Y', strtotime($os['created_at'])) ?></td>
-                                        <td data-label="AÃ§Ã£o" class="text-end">
+                                        <td data-label="Ação" class="text-end">
                                                 <button
                                                     type="button"
                                                     class="btn btn-sm btn-outline-secondary"
@@ -290,7 +290,7 @@ $resumoFinanceiroInicial = [
                                         <th>Peca</th>
                                         <th>Qtd. atual</th>
                                         <th>Minimo</th>
-                                    <th class="text-end">AÃ§Ã£o</th>
+                                    <th class="text-end">Ação</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -322,7 +322,7 @@ $resumoFinanceiroInicial = [
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl modal-fullscreen-md-down">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="dashboardOsModalTitle">Ordem de ServiÃ§o</h5>
+                    <h5 class="modal-title" id="dashboardOsModalTitle">Ordem de Serviço</h5>
                     <div class="d-flex align-items-center gap-2 ms-auto">
                         <a href="#" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary d-none" id="dashboardOsModalOpenFull">
                             <i class="bi bi-box-arrow-up-right me-1"></i>Abrir pagina
@@ -366,11 +366,11 @@ document.addEventListener('DOMContentLoaded', function () {
     let statsRequestToken = 0;
 
     const macroLabels = {
-        recepcao: 'Recepcao',
-        diagnostico: 'Diagnostico',
-        orcamento: 'OrÃ§amento',
-        execucao: 'Execucao',
-        interrupcao: 'Interrupcao',
+        recepcao: 'Recepção',
+        diagnostico: 'Diagnóstico',
+        orcamento: 'Orçamento',
+        execucao: 'Execução',
+        interrupcao: 'Interrupção',
         qualidade: 'Qualidade',
         concluido: 'Concluido',
         finalizado_sem_reparo: 'Finalizado sem reparo',
@@ -631,7 +631,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const isUltraNarrow = isUltraNarrowViewport();
         const labels = isUltraNarrow
             ? ['Rec.', 'Desp.', 'Caixa', 'Pend.']
-            : ['Receitas', 'Despesas', 'Resultado caixa', 'Pendentes'];
+            : ['Receitas', 'Despesas', 'Resultado caixa', 'Pendêntes'];
 
         if (chartFinanceiro) {
             chartFinanceiro.destroy();
@@ -782,7 +782,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (requestToken !== statsRequestToken) {
                     return;
                 }
-            console.error('[Dashboard] erro ao carregar mÃ©tricas:', error);
+            console.error('[Dashboard] erro ao carregar métricas:', error);
                 lastPayload = {
                     os_abertas_ano: [],
                     macro_count: [],
@@ -857,7 +857,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         clearLoadTimeout();
         setModalLoading(true);
-        modalTitle.textContent = title || 'Ordem de ServiÃ§o';
+        modalTitle.textContent = title || 'Ordem de Serviço';
         modalFrame.src = 'about:blank';
 
         if (fullUrl) {

@@ -1,5 +1,5 @@
 -- =====================================================
--- SISTEMA DE ASSISTÃŠNCIA TÃ‰CNICA - Database Schema
+-- SISTEMA DE ASSISTÊNCIA TÉCNICA - Database Schema
 -- Banco: assistencia_tecnica
 -- Collation: utf8mb4_unicode_ci
 -- =====================================================
@@ -10,7 +10,7 @@ CREATE DATABASE IF NOT EXISTS assistencia_tecnica
 
 USE assistencia_tecnica;
 
--- 1. TABELA DE USUÃRIOS
+-- 1. TABELA DE USUÁRIOS
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(100) NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS equipamentos (
     FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 4. TABELA DE PEÃ‡AS (antes da OS para FK)
+-- 4. TABELA DE PEÇAS (antes da OS para FK)
 CREATE TABLE IF NOT EXISTS pecas (
     id INT PRIMARY KEY AUTO_INCREMENT,
     codigo VARCHAR(50) UNIQUE,
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS pecas (
     INDEX idx_categoria (categoria)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 5. TABELA DE ORDENS DE SERVIÃ‡O (OS)
+-- 5. TABELA DE ORDENS DE SERVIÇO (OS)
 CREATE TABLE IF NOT EXISTS os (
     id INT PRIMARY KEY AUTO_INCREMENT,
     numero_os VARCHAR(20) UNIQUE NOT NULL,
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS os_itens (
     FOREIGN KEY (peca_id) REFERENCES pecas(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 7. MOVIMENTAÃ‡ÃƒO DE ESTOQUE
+-- 7. MOVIMENTAÇÃO DE ESTOQUE
 CREATE TABLE IF NOT EXISTS movimentacoes (
     id INT PRIMARY KEY AUTO_INCREMENT,
     peca_id INT NOT NULL,
@@ -251,7 +251,7 @@ CREATE TABLE IF NOT EXISTS logs (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 11. CONFIGURAÃ‡Ã•ES DO SISTEMA
+-- 11. CONFIGURAÇÕES DO SISTEMA
 CREATE TABLE IF NOT EXISTS configuracoes (
     id INT PRIMARY KEY AUTO_INCREMENT,
     chave VARCHAR(100) UNIQUE NOT NULL,
@@ -265,13 +265,13 @@ CREATE TABLE IF NOT EXISTS configuracoes (
 -- DADOS INICIAIS
 -- =====================================================
 
--- UsuÃ¡rio admin padrÃ£o (senha: admin123)
+-- Usuário admin padrão (senha: admin123)
 INSERT INTO usuarios (nome, email, senha, perfil, ativo) VALUES
 ('Administrador', 'admin@sistema.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 1);
 
--- ConfiguraÃ§Ãµes padrÃ£o
+-- Configurações padrão
 INSERT INTO configuracoes (chave, valor, tipo) VALUES
-('empresa_nome', 'Minha AssistÃªncia TÃ©cnica', 'texto'),
+('empresa_nome', 'Minha Assistência Técnica', 'texto'),
 ('empresa_cnpj', '', 'texto'),
 ('empresa_telefone', '', 'texto'),
 ('empresa_email', '', 'texto'),

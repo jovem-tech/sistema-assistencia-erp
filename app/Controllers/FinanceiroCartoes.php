@@ -26,7 +26,7 @@ class FinanceiroCartoes extends BaseController
     public function index()
     {
         return view('financeiro/cartoes', [
-            'title' => 'CartÃµes e Taxas',
+            'title' => 'Cartões e Taxas',
             'operadoras' => $this->operadoraModel->orderBy('ativo', 'DESC')->orderBy('ordem_exibicao', 'ASC')->orderBy('nome', 'ASC')->findAll(),
             'bandeiras' => $this->bandeiraModel->orderBy('ativo', 'DESC')->orderBy('ordem_exibicao', 'ASC')->orderBy('nome', 'ASC')->findAll(),
             'taxas' => $this->buildTaxaRows(),
@@ -54,12 +54,12 @@ class FinanceiroCartoes extends BaseController
 
         if ($id > 0) {
             $this->operadoraModel->update($id, $payload);
-            LogModel::registrar('financeiro_cartao_operadora_atualizada', 'Operadora de cartÃ£o atualizada: ' . $nome);
+            LogModel::registrar('financeiro_cartao_operadora_atualizada', 'Operadora de cartão atualizada: ' . $nome);
             return redirect()->to('/financeiro/cartoes')->with('success', 'Operadora atualizada com sucesso.');
         }
 
         $this->operadoraModel->insert($payload);
-        LogModel::registrar('financeiro_cartao_operadora_criada', 'Operadora de cartÃ£o criada: ' . $nome);
+        LogModel::registrar('financeiro_cartao_operadora_criada', 'Operadora de cartão criada: ' . $nome);
         return redirect()->to('/financeiro/cartoes')->with('success', 'Operadora cadastrada com sucesso.');
     }
 
@@ -67,11 +67,11 @@ class FinanceiroCartoes extends BaseController
     {
         $row = $this->operadoraModel->find((int) $id);
         if (! $row) {
-            return redirect()->to('/financeiro/cartoes')->with('error', 'Operadora nÃ£o encontrada.');
+            return redirect()->to('/financeiro/cartoes')->with('error', 'Operadora não encontrada.');
         }
 
         $this->operadoraModel->update((int) $id, ['ativo' => 0]);
-        LogModel::registrar('financeiro_cartao_operadora_desativada', 'Operadora de cartÃ£o desativada: ' . ($row['nome'] ?? ''));
+        LogModel::registrar('financeiro_cartao_operadora_desativada', 'Operadora de cartão desativada: ' . ($row['nome'] ?? ''));
         return redirect()->to('/financeiro/cartoes')->with('success', 'Operadora desativada com sucesso.');
     }
 
@@ -92,12 +92,12 @@ class FinanceiroCartoes extends BaseController
 
         if ($id > 0) {
             $this->bandeiraModel->update($id, $payload);
-            LogModel::registrar('financeiro_cartao_bandeira_atualizada', 'Bandeira de cartÃ£o atualizada: ' . $nome);
+            LogModel::registrar('financeiro_cartao_bandeira_atualizada', 'Bandeira de cartão atualizada: ' . $nome);
             return redirect()->to('/financeiro/cartoes')->with('success', 'Bandeira atualizada com sucesso.');
         }
 
         $this->bandeiraModel->insert($payload);
-        LogModel::registrar('financeiro_cartao_bandeira_criada', 'Bandeira de cartÃ£o criada: ' . $nome);
+        LogModel::registrar('financeiro_cartao_bandeira_criada', 'Bandeira de cartão criada: ' . $nome);
         return redirect()->to('/financeiro/cartoes')->with('success', 'Bandeira cadastrada com sucesso.');
     }
 
@@ -105,11 +105,11 @@ class FinanceiroCartoes extends BaseController
     {
         $row = $this->bandeiraModel->find((int) $id);
         if (! $row) {
-            return redirect()->to('/financeiro/cartoes')->with('error', 'Bandeira nÃ£o encontrada.');
+            return redirect()->to('/financeiro/cartoes')->with('error', 'Bandeira não encontrada.');
         }
 
         $this->bandeiraModel->update((int) $id, ['ativo' => 0]);
-        LogModel::registrar('financeiro_cartao_bandeira_desativada', 'Bandeira de cartÃ£o desativada: ' . ($row['nome'] ?? ''));
+        LogModel::registrar('financeiro_cartao_bandeira_desativada', 'Bandeira de cartão desativada: ' . ($row['nome'] ?? ''));
         return redirect()->to('/financeiro/cartoes')->with('success', 'Bandeira desativada com sucesso.');
     }
 
@@ -126,7 +126,7 @@ class FinanceiroCartoes extends BaseController
         }
 
         if (! in_array($modalidade, ['credito', 'debito'], true)) {
-            return redirect()->to('/financeiro/cartoes')->with('error', 'Selecione uma modalidade vÃ¡lida para a taxa.');
+            return redirect()->to('/financeiro/cartoes')->with('error', 'Selecione uma modalidade válida para a taxa.');
         }
 
         $payload = [
@@ -146,12 +146,12 @@ class FinanceiroCartoes extends BaseController
 
         if ($id > 0) {
             $this->taxaModel->update($id, $payload);
-            LogModel::registrar('financeiro_cartao_taxa_atualizada', 'Taxa de cartÃ£o atualizada ID: ' . $id);
+            LogModel::registrar('financeiro_cartao_taxa_atualizada', 'Taxa de cartão atualizada ID: ' . $id);
             return redirect()->to('/financeiro/cartoes')->with('success', 'Taxa atualizada com sucesso.');
         }
 
         $this->taxaModel->insert($payload);
-        LogModel::registrar('financeiro_cartao_taxa_criada', 'Taxa de cartÃ£o criada para operadora ID: ' . $operadoraId);
+        LogModel::registrar('financeiro_cartao_taxa_criada', 'Taxa de cartão criada para operadora ID: ' . $operadoraId);
         return redirect()->to('/financeiro/cartoes')->with('success', 'Taxa cadastrada com sucesso.');
     }
 
@@ -159,11 +159,11 @@ class FinanceiroCartoes extends BaseController
     {
         $row = $this->taxaModel->find((int) $id);
         if (! $row) {
-            return redirect()->to('/financeiro/cartoes')->with('error', 'Taxa nÃ£o encontrada.');
+            return redirect()->to('/financeiro/cartoes')->with('error', 'Taxa não encontrada.');
         }
 
         $this->taxaModel->update((int) $id, ['ativo' => 0]);
-        LogModel::registrar('financeiro_cartao_taxa_desativada', 'Taxa de cartÃ£o desativada ID: ' . (int) ($row['id'] ?? 0));
+        LogModel::registrar('financeiro_cartao_taxa_desativada', 'Taxa de cartão desativada ID: ' . (int) ($row['id'] ?? 0));
         return redirect()->to('/financeiro/cartoes')->with('success', 'Taxa desativada com sucesso.');
     }
 
@@ -178,7 +178,7 @@ class FinanceiroCartoes extends BaseController
         } catch (\Throwable $e) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => $e->getMessage() !== '' ? $e->getMessage() : 'NÃ£o foi possÃ­vel simular a venda no cartÃ£o.',
+                'message' => $e->getMessage() !== '' ? $e->getMessage() : 'Não foi possível simular a venda no cartão.',
             ]);
         }
     }

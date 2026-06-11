@@ -40,7 +40,7 @@ O comportamento oficial agora e:
 - a edicao continua no mesmo `orcamentos.id`;
 - o historico das mudancas fica no proprio orcamento em `orcamento_status_historico`;
 - ao alterar um orcamento aprovado e preparar uma nova rodada de autorizacao, o status passa para `reenviar_orcamento`;
-- quando o cliente aprova novamente, a label do status passa a refletir a rodada atual, como `2Âª aprovacao`, `3Âª aprovacao` e assim por diante;
+- quando o cliente aprova novamente, a label do status passa a refletir a rodada atual, como `2ª aprovacao`, `3ª aprovacao` e assim por diante;
 - a versao interna (`orcamentos.versao`) sobe apenas quando o registro sai de um estado aprovado para uma nova rodada de aprovacao.
 
 ### Status envolvidos
@@ -170,7 +170,7 @@ Impacto tecnico:
 - `App\Controllers\Orcamentos::show()` passou a enviar `equipamentoView` consolidado para a view, reunindo tipo, marca, modelo, cor e foto principal do equipamento;
 - a navegacao entre abas voltou a seguir o padrao `nav-tabs ds-tabs-scroll` do design system, mantendo linha unica e compatibilidade com `<= 430px`, `<= 390px`, `<= 360px` e `<= 320px`;
 - na view `Visualizar Orcamento`, a barra de rolagem horizontal do componente foi ocultada localmente, preservando a interacao sem expor trilho visual fora do padrao da tela;
-- os rotulos das abas passaram a usar variantes reduzidas por breakpoint, permitindo que todas permaneÃ§am visiveis dentro da largura disponivel sem quebrar linha.
+- os rotulos das abas passaram a usar variantes reduzidas por breakpoint, permitindo que todas permaneçam visiveis dentro da largura disponivel sem quebrar linha.
 
 ### Organizacao do formulario em abas nas releases 2.16.31 e 2.16.32
 
@@ -204,7 +204,7 @@ Comportamento tecnico:
 - os endpoints retornam o item no mesmo formato do `GET /orcamentos/item/catalogo`;
 - apos sucesso, o frontend injeta a opcao no Select2 da linha atual e aplica descricao, referencia, valor e metadados de precificacao sem reload;
 - em `peca`, o retorno ja carrega o bloco `precificacao`, preservando o piso minimo de `peca instalada`;
-- em `servico`, o retorno reaproveita a mesma estrutura de quote usada pelo catalogo assÃ­ncrono.
+- em `servico`, o retorno reaproveita a mesma estrutura de quote usada pelo catalogo assíncrono.
 
 ## Dados do Cliente no formulario
 

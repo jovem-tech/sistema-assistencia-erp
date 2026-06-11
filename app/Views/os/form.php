@@ -434,7 +434,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
     }
 }
 
-/* SweetAlert2 deve sempre ficar acima dos modais tecnicos da OS (checklist/cÃ¢mera/crop). */
+/* SweetAlert2 deve sempre ficar acima dos modais tecnicos da OS (checklist/câmera/crop). */
 .swal2-container {
     z-index: 2600 !important;
 }
@@ -452,7 +452,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
     <?php endif; ?>
 </div>
 
-<!-- LAYOUT PRINCIPAL: SIDEBAR (foto) + CONTE?DO -->
+<!-- LAYOUT PRINCIPAL: SIDEBAR (foto) + CONTEÚDO -->
 <div class="os-form-page">
 <div class="row g-4 ds-split-layout align-items-start" style="align-items: flex-start;">
 
@@ -482,7 +482,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
 
                     <div id="equipColorInfo" class="d-flex align-items-center gap-2 small text-muted mb-2 d-none">
                         <span id="equipColorSwatch" class="os-color-swatch d-inline-block rounded-circle border"></span>
-                        <span id="equipColorName">Cor nÃ£o informada</span>
+                        <span id="equipColorName">Cor não informada</span>
                     </div>
 
                     <!-- Miniaturas -->
@@ -512,21 +512,21 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Cliente</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoCliente" class="os-summary-value">NÃ£o selecionado</span>
+                                <span id="resumoCliente" class="os-summary-value">Não selecionado</span>
                                 <span id="statusCliente" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Equipamento</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoEquipamento" class="os-summary-value">NÃ£o selecionado</span>
+                                <span id="resumoEquipamento" class="os-summary-value">Não selecionado</span>
                                 <span id="statusEquipamento" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">TÃ©cnico</span>
+                            <span class="text-muted">Técnico</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoTecnico" class="os-summary-value">NÃ£o atribuÃ­do</span>
+                                <span id="resumoTecnico" class="os-summary-value">Não atribuído</span>
                                 <span id="statusTecnico" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
@@ -552,7 +552,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">PrevisÃ£o</span>
+                            <span class="text-muted">Previsão</span>
                             <span class="d-flex align-items-center gap-2">
                                 <span id="resumoPrevisao" class="os-summary-value">-</span>
                                 <span id="statusPrevisao" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
@@ -566,16 +566,16 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">AcessÃ³rios</span>
+                            <span class="text-muted">Acessórios</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoAcessorios" class="os-summary-value">NÃ£o informado</span>
+                                <span id="resumoAcessorios" class="os-summary-value">Não informado</span>
                                 <span id="statusAcessorios" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Checklist de entrada</span>
                             <span class="d-flex align-items-center gap-2">
-                                <span id="resumoEstadoFisico" class="os-summary-value">NÃ£o preenchido</span>
+                                <span id="resumoEstadoFisico" class="os-summary-value">Não preenchido</span>
                                 <span id="statusEstadoFisico" class="text-danger" title="Pendente"><i class="bi bi-x-circle-fill" aria-hidden="true"></i><span class="visually-hidden">Pendente</span></span>
                             </span>
                         </div>
@@ -597,7 +597,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                         <?php endif; ?>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Rascunho</span>
-                            <span id="resumoRascunho" class="os-summary-value">NÃ£o salvo</span>
+                            <span id="resumoRascunho" class="os-summary-value">Não salvo</span>
                         </div>
                     </div>
                 </div>
@@ -605,7 +605,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
         </div>
     </div>
 
-    <!-- ?REA PRINCIPAL DO FORMUL?RIO -->
+    <!-- ÁREA PRINCIPAL DO FORMULÁRIO -->
     <div class="col-12 col-xl-8 col-xxl-9 ds-split-main align-self-start" id="formCol" style="align-self: flex-start;">
         <div class="card glass-card os-form-shell h-auto" style="height: auto;">
             <div class="card-body" style="height: auto;">
@@ -669,7 +669,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                         </li>
                         <?php if ($isEdit): ?>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold" id="tab-solucao-btn" data-bs-toggle="tab" data-bs-target="#tab-solucao" type="button" role="tab" aria-controls="tab-solucao" aria-selected="false">SoluÃ§Ã£o</button>
+                            <button class="nav-link fw-bold" id="tab-solucao-btn" data-bs-toggle="tab" data-bs-target="#tab-solucao" type="button" role="tab" aria-controls="tab-solucao" aria-selected="false">Solução</button>
                         </li>
                         <?php endif; ?>
                         <li class="nav-item" role="presentation">
@@ -677,7 +677,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                         </li>
                         <?php if ($isEdit): ?>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold" id="tab-financeiro-btn" data-bs-toggle="tab" data-bs-target="#tab-financeiro" type="button" role="tab" aria-controls="tab-financeiro" aria-selected="false">PeÃ§as e OrÃ§amento</button>
+                            <button class="nav-link fw-bold" id="tab-financeiro-btn" data-bs-toggle="tab" data-bs-target="#tab-financeiro" type="button" role="tab" aria-controls="tab-financeiro" aria-selected="false">Peças e Orçamento</button>
                         </li>
                         <?php endif; ?>
                     </ul>
@@ -725,24 +725,24 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                         </select>
                                         <?php if (!$isEdit && $isOrigemCentralWhatsapp && $clienteSelecionadoNoForm <= 0): ?>
                                         <div class="form-text text-warning">
-                                            Este contato ainda nÃ£o estÃ¡ vinculado ao cadastro de clientes. Selecione o cliente para abrir a OS.
+                                            Este contato ainda não está vinculado ao cadastro de clientes. Selecione o cliente para abrir a OS.
                                         </div>
                                         <?php endif; ?>
                                     </div>
                                     <div class="col-12 col-xl-4 os-cliente-tech-col os-cliente-tech-col--tecnico">
                                         <div class="os-inline-label">
                                             <label for="tecnicoResponsavelSelect" class="form-label mb-0">
-                                                <span>TÃ©cnico ResponsÃ¡vel</span>
+                                                <span>Técnico Responsável</span>
                                             </label>
                                         </div>
                                         <select name="tecnico_id" id="tecnicoResponsavelSelect" class="form-select">
-                                            <option value="">NÃ£o atribuÃ­do</option>
+                                            <option value="">Não atribuído</option>
                                             <?php foreach ($tecnicos as $t): ?>
                                             <option value="<?= $t['id'] ?>" <?= ($tecnicoSelecionadoNoForm !== '' && $tecnicoSelecionadoNoForm === (string) $t['id']) ? 'selected' : '' ?>><?= esc($t['nome']) ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                         <small class="text-muted d-block mt-2 os-cliente-tech-helper">
-                                            Defina o tÃ©cnico responsÃ¡vel pela OS.
+                                            Defina o técnico responsável pela OS.
                                         </small>
                                     </div>
                                 </div>
@@ -752,7 +752,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <i class="bi bi-card-text me-1"></i>Resumo do cliente selecionado
                                 </div>
                                 <div class="os-client-card" id="clienteInfoCard">
-                                    <div class="os-client-card__empty" id="clienteInfoEmpty">Selecione um cliente para visualizar nome, telefone e endereÃ§o de atendimento.</div>
+                                    <div class="os-client-card__empty" id="clienteInfoEmpty">Selecione um cliente para visualizar nome, telefone e endereço de atendimento.</div>
                                     <div class="os-client-card__content d-none" id="clienteInfoContent">
                                         <div class="os-client-card__name" id="clienteInfoNome">-</div>
                                         <div class="os-client-card__meta-list">
@@ -770,7 +770,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <i class="bi bi-laptop me-1"></i>Equipamento em atendimento
                                 </div>
                                 <div class="os-tab-helper">
-                                    Escolha o aparelho do cliente e registre as condiÃ§Ãµes tÃ©cnicas observadas na entrada.
+                                    Escolha o aparelho do cliente e registre as condições técnicas observadas na entrada.
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-12">
@@ -875,7 +875,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                 <div class="col-12 col-xxl-6">
                                     <div class="os-data-section os-equip-acessorios-section mb-4 h-100">
                                         <div class="os-data-section-title">
-                                            <i class="bi bi-box-seam me-1"></i>AcessÃ³rios e Componentes (na entrada)
+                                            <i class="bi bi-box-seam me-1"></i>Acessórios e Componentes (na entrada)
                                         </div>
                                         <div class="border rounded-3 p-3 bg-white bg-opacity-10 h-100 os-equip-panel-card">
                                             <div class="d-flex flex-wrap gap-2 mb-2">
@@ -886,11 +886,11 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="bolsa">+ Bolsa notebook</button>
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="cabo">+ Cabo</button>
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="carregador">+ Carregador</button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acessÃ³rio</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acessório</button>
                                             </div>
                                             <div class="form-check form-switch mb-3">
                                                 <input class="form-check-input" type="checkbox" id="acessoriosSemItens" name="acessorios_sem_itens" value="1" <?= old('acessorios_sem_itens') ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="acessoriosSemItens">Equipamento recebido sem acessÃ³rios</label>
+                                                <label class="form-check-label" for="acessoriosSemItens">Equipamento recebido sem acessórios</label>
                                             </div>
                                             <div id="acessoriosQuickForm" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
                                                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -899,13 +899,13 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                                 </div>
                                                 <div id="acessoriosQuickFields" class="row g-2"></div>
                                                 <div id="acessoriosQuickPhotosBlock" class="mt-3 border rounded p-2 bg-white">
-                                                    <div class="small fw-semibold text-uppercase text-muted mb-2">Fotos do acessÃ³rio</div>
+                                                    <div class="small fw-semibold text-uppercase text-muted mb-2">Fotos do acessório</div>
                                                     <div class="d-flex flex-wrap gap-2">
                                                         <button type="button" class="btn btn-sm btn-outline-info" id="acessoriosQuickAddFoto">
                                                             <i class="bi bi-images me-1"></i>Galeria
                                                         </button>
                                                         <button type="button" class="btn btn-sm btn-outline-primary" id="acessoriosQuickAddFotoCamera">
-                                                            <i class="bi bi-cÃ¢mera-fill me-1"></i>CÃ¢mera
+                                                            <i class="bi bi-câmera-fill me-1"></i>Câmera
                                                         </button>
                                                     </div>
                                                     <div id="acessoriosQuickPhotosHint" class="small text-muted mt-2">Adicione fotos antes de salvar o item.</div>
@@ -917,7 +917,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                                 </div>
                                             </div>
                                             <div id="acessoriosList" class="list-group"></div>
-                                            <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acessÃ³rios comuns.</small>
+                                            <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acessórios comuns.</small>
                                             <textarea name="acessorios" id="acessoriosInput" class="d-none"><?= $isEdit ? esc($os['acessorios'] ?? '') : old('acessorios') ?></textarea>
                                             <input type="hidden" name="acessorios_data" id="acessoriosDataInput">
                                             <input type="file" id="acessoriosPhotoInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
@@ -935,7 +935,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <i class="bi bi-chat-left-text me-1"></i>Relato do cliente
                                 </div>
                                 <div class="os-tab-helper">
-                                    Registre o que foi informado na entrada antes de detalhar o equipamento e as condiÃ§Ãµes tÃ©cnicas.
+                                    Registre o que foi informado na entrada antes de detalhar o equipamento e as condições técnicas.
                                 </div>
                                 <label for="relatoClienteInput" class="form-label">Relato do Cliente <span class="os-required-mark" aria-hidden="true">*</span></label>
                                 <?php if (!$isEdit): ?>
@@ -974,17 +974,17 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                             <?php endforeach; ?>
                                         <?php else: ?>
                                             <span class="text-muted small">
-                                                Nenhum relato rÃ¡pido ativo. Cadastre em
+                                                Nenhum relato rápido ativo. Cadastre em
                                                 <a href="<?= base_url('defeitosrelatados') ?>">Defeitos Relatados</a>.
                                             </span>
                                         <?php endif; ?>
                                     </div>
-                                    <small class="text-muted d-block mt-2">Escolha a categoria e clique em um item rÃ¡pido para inserir no relato.</small>
+                                    <small class="text-muted d-block mt-2">Escolha a categoria e clique em um item rápido para inserir no relato.</small>
                                 </div>
                                 <?php endif; ?>
                                 <textarea name="relato_cliente" id="relatoClienteInput" class="form-control" rows="6"><?= esc($relatoClienteValue) ?></textarea>
                                 <?php if (!$isEdit): ?>
-                                <small class="text-muted d-block mt-2">VocÃª pode complementar manualmente o relato a qualquer momento.</small>
+                                <small class="text-muted d-block mt-2">Você pode complementar manualmente o relato a qualquer momento.</small>
                                 <?php endif; ?>
                             </div>
 
@@ -996,7 +996,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                 <div class="border rounded-3 p-3 bg-white bg-opacity-10">
                                     <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
                                         <div class="small text-muted" id="defeitosHelperText">
-                                            Selecione os defeitos que se aplicam ao diagnÃ³stico atual.
+                                            Selecione os defeitos que se aplicam ao diagnóstico atual.
                                         </div>
                                         <button type="button" class="btn btn-outline-primary btn-sm" id="btnAdicionarDefeitosComuns" disabled>
                                             <i class="bi bi-plus-circle me-1"></i>Adicionar defeitos comuns
@@ -1039,7 +1039,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <i class="bi bi-calendar-check me-1"></i>Dados Operacionais
                                 </div>
                                 <div class="os-tab-helper">
-                                    Gerencie prioridade, datas, garantia e status operacional sem misturar esse fluxo com cadastro, relato e diagnÃ³stico.
+                                    Gerencie prioridade, datas, garantia e status operacional sem misturar esse fluxo com cadastro, relato e diagnóstico.
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-md-3">
@@ -1056,7 +1056,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                         <input type="datetime-local" name="data_entrada" class="form-control" value="<?= esc($dataEntradaInputValue) ?>" required>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label">PrevisÃ£o de Entrega</label>
+                                        <label class="form-label">Previsão de Entrega</label>
                                         <select id="prazoEntregaSelect" class="form-select mb-2">
                                             <option value="" <?= $prazoEntregaSelecionado === '' ? 'selected' : '' ?>>Prazo (dias)</option>
                                             <?php foreach ($prazoEntregaPresets as $prazoDias => $prazoLabel): ?>
@@ -1091,17 +1091,17 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                             <?php else: ?>
                                                 <?php $currStatus = $statusSelecionado; ?>
                                                 <option value="triagem" <?= $currStatus === 'triagem' ? 'selected' : '' ?>>Triagem</option>
-                                                <option value="diagnostico" <?= $currStatus === 'diagnostico' ? 'selected' : '' ?>>DiagnÃ³stico TÃ©cnico</option>
-                                                <option value="aguardando_orcamento" <?= $currStatus === 'aguardando_orcamento' ? 'selected' : '' ?>>Aguardando OrÃ§amento</option>
-                                                <option value="aguardando_autorizacao" <?= $currStatus === 'aguardando_autorizacao' ? 'selected' : '' ?>>Aguardando AutorizaÃ§Ã£o</option>
-                                                <option value="reparo_execucao" <?= $currStatus === 'reparo_execucao' ? 'selected' : '' ?>>Em ExecuÃ§Ã£o</option>
+                                                <option value="diagnostico" <?= $currStatus === 'diagnostico' ? 'selected' : '' ?>>Diagnóstico Técnico</option>
+                                                <option value="aguardando_orcamento" <?= $currStatus === 'aguardando_orcamento' ? 'selected' : '' ?>>Aguardando Orçamento</option>
+                                                <option value="aguardando_autorizacao" <?= $currStatus === 'aguardando_autorizacao' ? 'selected' : '' ?>>Aguardando Autorização</option>
+                                                <option value="reparo_execucao" <?= $currStatus === 'reparo_execucao' ? 'selected' : '' ?>>Em Execução</option>
                                                 <option value="reparado_disponivel_loja" <?= $currStatus === 'reparado_disponivel_loja' ? 'selected' : '' ?>>Pronto para retirada</option>
                                                 <option value="entregue_reparado" <?= $currStatus === 'entregue_reparado' ? 'selected' : '' ?>>Entregue</option>
                                                 <option value="cancelado" <?= $currStatus === 'cancelado' ? 'selected' : '' ?>>Cancelado</option>
                                             <?php endif; ?>
                                         </select>
                                         <?php if ($isEdit): ?>
-                                        <small class="text-muted d-block mt-2">A ediÃ§Ã£o permite ajustar qualquer status operacional cadastrado para esta OS.</small>
+                                        <small class="text-muted d-block mt-2">A edição permite ajustar qualquer status operacional cadastrado para esta OS.</small>
                                         <?php endif; ?>
                                         <div id="osDataEntregaFieldWrap" class="mt-3 <?= $statusEntregaRequerData ? '' : 'd-none' ?>">
                                             <label class="form-label" for="osDataEntregaInput">Data de Entrega</label>
@@ -1113,7 +1113,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                                 value="<?= esc($dataEntregaInputValue) ?>"
                                             >
                                             <div class="form-text">
-                                                Exibido quando a OS for concluÃ­da como entregue, devolvida sem reparo, descartada ou com pendÃªncia financeira.
+                                                Exibido quando a OS for concluída como entregue, devolvida sem reparo, descartada ou com pendência financeira.
                                             </div>
                                         </div>
                                     </div>
@@ -1130,10 +1130,10 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                         <div class="tab-pane fade" id="tab-solucao" role="tabpanel" aria-labelledby="tab-solucao-btn" tabindex="0">
                             <div class="os-data-section mb-4">
                                 <div class="os-data-section-title">
-                                    <i class="bi bi-activity me-1"></i>SoluÃ§Ã£o e DiagnÃ³stico
+                                    <i class="bi bi-activity me-1"></i>Solução e Diagnóstico
                                 </div>
                                 <div class="os-tab-helper">
-                                    Registre os procedimentos executados e consolide a soluÃ§Ã£o aplicada e o diagnÃ³stico tÃ©cnico da OS.
+                                    Registre os procedimentos executados e consolide a solução aplicada e o diagnóstico técnico da OS.
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-12">
@@ -1153,7 +1153,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                                 <textarea name="procedimentos_executados" id="procedimentosExecutadosInput" class="d-none"><?= esc($os['procedimentos_executados'] ?? '') ?></textarea>
                                                 <div id="procedimentosExecutadosLista" class="d-flex flex-column gap-2"></div>
                                                 <small class="text-muted d-block mt-2">
-                                                    Cada inserÃ¡o registra automaticamente data/hora e tÃ©cnico selecionado.
+                                                    Cada inseráo registra automaticamente data/hora e técnico selecionado.
                                                 </small>
                                             </div>
                                         </div>
@@ -1161,7 +1161,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <div class="col-12 col-xl-6">
                                         <div class="card os-operational-card h-100">
                                             <div class="card-body p-3">
-                                                <label class="form-label fw-semibold">SoluÃ§Ã£o aplicada</label>
+                                                <label class="form-label fw-semibold">Solução aplicada</label>
                                                 <textarea name="solucao_aplicada" id="solucaoAplicadaInput" class="form-control" rows="5"><?= esc($os['solucao_aplicada'] ?? '') ?></textarea>
                                             </div>
                                         </div>
@@ -1169,7 +1169,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <div class="col-12 col-xl-6">
                                         <div class="card os-operational-card h-100">
                                             <div class="card-body p-3">
-                                                <label class="form-label fw-semibold">DiagnÃ³stico</label>
+                                                <label class="form-label fw-semibold">Diagnóstico</label>
                                                 <textarea name="diagnostico_tecnico" id="diagnosticoTecnicoInput" class="form-control" rows="5"><?= esc($os['diagnostico_tecnico'] ?? '') ?></textarea>
                                             </div>
                                         </div>
@@ -1182,7 +1182,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                     <fieldset class="d-none" disabled aria-hidden="true">
                     <div class="os-data-section mb-4">
                         <div class="os-data-section-title">
-                            <i class="bi bi-people me-1"></i>Cliente, Equipamento e TÃ©cnico ResponsÃ¡vel
+                            <i class="bi bi-people me-1"></i>Cliente, Equipamento e Técnico Responsável
                         </div>
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
@@ -1212,7 +1212,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             </select>
                             <?php if (!$isEdit && $isOrigemCentralWhatsapp && $clienteSelecionadoNoForm <= 0): ?>
                             <div class="form-text text-warning">
-                                Este contato ainda nÃ£o estÃ¡ vinculado ao cadastro de clientes. Selecione o cliente para abrir a OS.
+                                Este contato ainda não está vinculado ao cadastro de clientes. Selecione o cliente para abrir a OS.
                             </div>
                             <?php endif; ?>
                         </div>
@@ -1267,9 +1267,9 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">TÃ©cnico ResponsÃ¡vel</label>
+                            <label class="form-label">Técnico Responsável</label>
                             <select name="tecnico_id" class="form-select">
-                                <option value="">NÃ£o atribuÃ­do</option>
+                                <option value="">Não atribuído</option>
                                 <?php foreach ($tecnicos as $t): ?>
                                 <option value="<?= $t['id'] ?>"
                                     <?= ($isEdit && ($os['tecnico_id'] ?? '') == $t['id']) ? 'selected' : '' ?>>
@@ -1287,7 +1287,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                     <fieldset class="d-none" disabled aria-hidden="true">
                     <div class="os-data-section mb-4">
                         <div class="os-data-section-title">
-                            <i class="bi bi-calendar-check me-1"></i>Prioridade, Entrada, PrevisÃ£o e Status
+                            <i class="bi bi-calendar-check me-1"></i>Prioridade, Entrada, Previsão e Status
                         </div>
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
@@ -1305,7 +1305,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                    value="<?= $isEdit ? ($os['data_entrada'] ?? date('Y-m-d\TH:i')) : date('Y-m-d\TH:i') ?>" required>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">PrevisÃ£o de Entrega</label>
+                            <label class="form-label">Previsão de Entrega</label>
                             <select id="prazoEntregaSelect" class="form-select mb-2">
                                 <option value="">Prazo (dias)</option>
                                 <option value="1">1 dia</option>
@@ -1335,10 +1335,10 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                 <?php else: ?>
                                     <?php $currStatus = (string) ($os['status'] ?? $statusDefault); ?>
                                     <option value="triagem" <?= $currStatus === 'triagem' ? 'selected' : '' ?>>Triagem</option>
-                                    <option value="diagnostico" <?= $currStatus === 'diagnostico' ? 'selected' : '' ?>>DiagnÃ³stico TÃ©cnico</option>
-                                    <option value="aguardando_orcamento" <?= $currStatus === 'aguardando_orcamento' ? 'selected' : '' ?>>Aguardando OrÃ§amento</option>
-                                    <option value="aguardando_autorizacao" <?= $currStatus === 'aguardando_autorizacao' ? 'selected' : '' ?>>Aguardando AutorizaÃ§Ã£o</option>
-                                    <option value="reparo_execucao" <?= $currStatus === 'reparo_execucao' ? 'selected' : '' ?>>Em ExecuÃ§Ã£o</option>
+                                    <option value="diagnostico" <?= $currStatus === 'diagnostico' ? 'selected' : '' ?>>Diagnóstico Técnico</option>
+                                    <option value="aguardando_orcamento" <?= $currStatus === 'aguardando_orcamento' ? 'selected' : '' ?>>Aguardando Orçamento</option>
+                                    <option value="aguardando_autorizacao" <?= $currStatus === 'aguardando_autorizacao' ? 'selected' : '' ?>>Aguardando Autorização</option>
+                                    <option value="reparo_execucao" <?= $currStatus === 'reparo_execucao' ? 'selected' : '' ?>>Em Execução</option>
                                     <option value="reparado_disponivel_loja" <?= $currStatus === 'reparado_disponivel_loja' ? 'selected' : '' ?>>Pronto para retirada</option>
                                     <option value="entregue_reparado" <?= $currStatus === 'entregue_reparado' ? 'selected' : '' ?>>Entregue</option>
                                     <option value="cancelado" <?= $currStatus === 'cancelado' ? 'selected' : '' ?>>Cancelado</option>
@@ -1349,7 +1349,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
 
                     </div>
 
-<!-- LINHA EXTRA (ediÃ§Ã£o): Garantia -->
+<!-- LINHA EXTRA (edição): Garantia -->
                     <?php if ($isEdit): ?>
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
@@ -1400,7 +1400,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
 
                     <div class="os-data-section mb-4">
                             <div class="os-data-section-title">
-                                <i class="bi bi-box-seam me-1"></i>AcessÃ³rios e Componentes (na entrada)
+                                <i class="bi bi-box-seam me-1"></i>Acessórios e Componentes (na entrada)
                             </div>
                             <div class="border rounded-3 p-3 bg-white bg-opacity-10">
                                 <div class="d-flex flex-wrap gap-2 mb-2">
@@ -1411,11 +1411,11 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="bolsa">+ Bolsa notebook</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="cabo">+ Cabo</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="carregador">+ Carregador</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acessÃ³rio</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-acessorio-key="outro">+ Outro acessório</button>
                                 </div>
                                 <div class="form-check form-switch mb-3">
                                     <input class="form-check-input" type="checkbox" id="acessoriosSemItensLegacy" name="acessorios_sem_itens_legacy" value="1" <?= old('acessorios_sem_itens_legacy') ? 'checked' : '' ?>>
-                                    <label class="form-check-label" for="acessoriosSemItens">Equipamento recebido sem acessÃ³rios</label>
+                                    <label class="form-check-label" for="acessoriosSemItens">Equipamento recebido sem acessórios</label>
                                 </div>
                                 <div id="acessoriosQuickFormLegacy" class="border rounded p-3 bg-body-tertiary mb-3 d-none">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -1429,7 +1429,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     </div>
                                 </div>
                                 <div id="acessoriosListLegacy" class="list-group"></div>
-                                <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acessÃ³rios comuns.</small>
+                                <small class="form-text text-muted mt-3">Padronize rapidamente o registro de acessórios comuns.</small>
                                 <textarea name="acessorios_legacy" id="acessoriosInputLegacy" class="d-none"><?= $isEdit ? esc($os['acessorios'] ?? '') : old('acessorios') ?></textarea>
                                 <input type="hidden" name="acessorios_data_legacy" id="acessoriosDataInputLegacy">
                                 <input type="file" id="acessoriosPhotoInputLegacy" class="d-none" accept="image/jpeg,image/png,image/webp" multiple>
@@ -1464,12 +1464,12 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <span class="text-muted small">
-                                            Nenhum relato rÃ¡pido ativo. Cadastre em
+                                            Nenhum relato rápido ativo. Cadastre em
                                             <a href="<?= base_url('defeitosrelatados') ?>">Defeitos Relatados</a>.
                                         </span>
                                     <?php endif; ?>
                                 </div>
-                                <small class="text-muted d-block mt-2">Clique em uma opÃ§Ã£o para inserir no relato.</small>
+                                <small class="text-muted d-block mt-2">Clique em uma opção para inserir no relato.</small>
                             </div>
                             <?php endif; ?>
                             <textarea name="relato_cliente" id="relatoClienteInput" class="form-control" rows="6"><?= $isEdit ? esc($os['relato_cliente']) : old('relato_cliente') ?></textarea>
@@ -1503,15 +1503,15 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                     <div class="card os-tab-card os-photo-card">
                         <div class="card-header os-tab-card-header py-3 d-flex flex-column flex-md-row justify-content-between gap-2">
                             <div>
-                                <strong><i class="bi bi-cÃ¢mera me-2 text-info"></i>Fotos de Entrada do Equipamento</strong>
-                                <small class="text-muted ms-2">(opcional: acessÃ³rios, estado fÃ­sico, placa interna, etc.)</small>
+                                <strong><i class="bi bi-câmera me-2 text-info"></i>Fotos de Entrada do Equipamento</strong>
+                                <small class="text-muted ms-2">(opcional: acessórios, estado físico, placa interna, etc.)</small>
                             </div>
                             <div class="os-photo-card-actions d-flex justify-content-center justify-content-md-end gap-2 flex-wrap">
                                 <button type="button" class="btn btn-outline-light btn-sm d-none" id="btnFotosEscolher">
                                     <i class="bi bi-folder2-open me-1"></i>Escolher Arquivos
                                 </button>
                                 <button type="button" class="btn btn-primary btn-sm" id="btnFotosEntradaCamera">
-                                    <i class="bi bi-cÃ¢mera-fill me-1"></i>Capturar Foto
+                                    <i class="bi bi-câmera-fill me-1"></i>Capturar Foto
                                 </button>
                                 <button type="button" class="btn btn-outline-secondary btn-sm" id="btnFotosEntradaGaleria">
                                     <i class="bi bi-images me-1"></i>Abrir Galeria
@@ -1538,7 +1538,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             <div id="osFotosDropzone" class="os-photo-dropzone border rounded-4 d-none align-items-center justify-content-center flex-column gap-2 text-center py-4 mb-3">
                                 <i class="bi bi-cloud-upload display-4 text-muted"></i>
                                 <p class="text-muted mb-0 fw-semibold">Clique para selecionar ou arraste arquivos aqui.</p>
-                                <small class="text-muted">AtÃ© 4 fotos, 2MB cada.</small>
+                                <small class="text-muted">Até 4 fotos, 2MB cada.</small>
                             </div>
                             <div id="osFotosPreview" class="d-flex flex-wrap justify-content-center gap-3"></div>
                             <div id="osFotosExisting" class="d-flex flex-wrap justify-content-center gap-3 mt-3"></div>
@@ -1563,10 +1563,10 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                         <div class="col-12">
                             <div class="card" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;">
                                 <div class="card-header py-2" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                    <strong><i class="bi bi-box-seam me-2 text-primary"></i>PeÃ§as e ServiÃ§os</strong>
+                                    <strong><i class="bi bi-box-seam me-2 text-primary"></i>Peças e Serviços</strong>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted small mb-2">Adicione peÃ§as e serviÃ§os na tela de visualizaÃ§Ã£o da OS.</p>
+                                    <p class="text-muted small mb-2">Adicione peças e serviços na tela de visualização da OS.</p>
                                     <a href="<?= base_url('os/visualizar/' . $os['id']) ?><?= $embedQuery ?>" class="btn btn-sm btn-outline-info">Abrir OS e lancar itens</a>
                                 </div>
                             </div>
@@ -1579,12 +1579,12 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             <select name="forma_pagamento" class="form-select">
                                 <?php
                                 $formas = [
-                                    '' => 'NÃ£o definido',
+                                    '' => 'Não definido',
                                     'dinheiro' => 'Dinheiro',
                                     'pix' => 'Pix',
-                                    'cartao_credito' => 'CartÃ£o de CrÃ©dito',
-                                    'cartao_debito' => 'CartÃ£o de DÃ©bito',
-                                    'transferencia' => 'Transfer?ncia',
+                                    'cartao_credito' => 'Cartão de Crédito',
+                                    'cartao_debito' => 'Cartão de Débito',
+                                    'transferencia' => 'Transferência',
                                     'boleto' => 'Boleto',
                                 ];
                                 foreach ($formas as $val => $label): ?>
@@ -1598,10 +1598,10 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                     <div class="alert <?= $currentUserIsAdmin ? 'alert-warning' : 'alert-info' ?> border-0 shadow-sm d-flex align-items-start gap-2 mb-4">
                         <i class="bi bi-shield-lock fs-5"></i>
                         <div class="small mb-0">
-                            <strong>Valores protegidos apÃ³s a baixa da OS.</strong>
+                            <strong>Valores protegidos após a baixa da OS.</strong>
                             <?= $currentUserIsAdmin
-                                ? 'Esta ordem jÃ¡ passou pela baixa tÃ©cnica. Como seu perfil Ã© administrativo, alteraÃ§Ãµes financeiras continuarÃ£o permitidas e serÃ£o auditadas.'
-                                : 'Esta ordem jÃ¡ passou pela baixa tÃ©cnica. AlteraÃ§Ãµes em forma de pagamento, mÃ£o de obra, peÃ§as e desconto exigem autorizaÃ§Ã£o de um administrador no momento de salvar.' ?>
+                                ? 'Esta ordem já passou pela baixa técnica. Como seu perfil é administrativo, alterações financeiras continuarão permitidas e serão auditadas.'
+                                : 'Esta ordem já passou pela baixa técnica. Alterações em forma de pagamento, mão de obra, peças e desconto exigem autorização de um administrador no momento de salvar.' ?>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -1610,11 +1610,11 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                     <h6 class="text-uppercase text-muted mb-3"><i class="bi bi-currency-dollar me-1"></i>Valores</h6>
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
-                            <label class="form-label">MÃ£o de Obra (R$)</label>
+                            <label class="form-label">Mão de Obra (R$)</label>
                             <input type="number" step="0.01" name="valor_mao_obra" class="form-control" value="<?= $os['valor_mao_obra'] ?? 0 ?>">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">PeÃ§as (R$)</label>
+                            <label class="form-label">Peças (R$)</label>
                             <input type="number" step="0.01" name="valor_pecas" class="form-control" readonly value="<?= $os['valor_pecas'] ?? 0 ?>">
                         </div>
                         <div class="col-md-3">
@@ -1627,14 +1627,14 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                         </div>
                     </div>
 
-                        <!-- ObservaÃ§Ãµes -->
+                        <!-- Observações -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                                <label class="form-label">ObservaÃ§Ãµes Internas</label>
+                                <label class="form-label">Observações Internas</label>
                             <textarea name="observacoes_internas" class="form-control" rows="2"><?= esc($os['observacoes_internas'] ?? '') ?></textarea>
                         </div>
                         <div class="col-md-6">
-                                <label class="form-label">ObservaÃ§Ãµes para o Cliente</label>
+                                <label class="form-label">Observações para o Cliente</label>
                             <textarea name="observacoes_cliente" class="form-control" rows="2"><?= esc($os['observacoes_cliente'] ?? '') ?></textarea>
                         </div>
                     </div>
@@ -1667,7 +1667,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="osBudgetEditorModalTitle">OrÃ§amento da OS</h5>
+                <h5 class="modal-title" id="osBudgetEditorModalTitle">Orçamento da OS</h5>
                 <button type="button" class="btn-close ms-auto" id="osBudgetEditorModalCloseBtn" aria-label="Fechar"></button>
             </div>
             <div class="modal-body p-0 position-relative">
@@ -1675,7 +1675,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                     <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
                     <span>Carregando orcamento...</span>
                 </div>
-                <iframe id="osBudgetEditorModalFrame" title="OrÃ§amento da OS" class="dashboard-os-modal-frame" src="about:blank"></iframe>
+                <iframe id="osBudgetEditorModalFrame" title="Orçamento da OS" class="dashboard-os-modal-frame" src="about:blank"></iframe>
             </div>
         </div>
     </div>
@@ -1688,7 +1688,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
         <div class="modal-content glass-card">
             <div class="modal-header border-bottom">
                 <h5 class="modal-title">
-                    <i class="bi bi-person-plus text-warning me-2"></i>Cadastro RÃ¡pido de Cliente
+                    <i class="bi bi-person-plus text-warning me-2"></i>Cadastro Rápido de Cliente
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
@@ -1698,7 +1698,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                     <input type="hidden" name="id" id="modalNovoClienteId">
                     <div class="row g-3">
                         <div class="col-md-8">
-                            <label class="form-label">Nome / RazÃ£o Social *</label>
+                            <label class="form-label">Nome / Razão Social *</label>
                             <input type="text" name="nome_razao" class="form-control" data-auto-title-case="person-name" required>
                         </div>
                         <div class="col-md-4">
@@ -1727,11 +1727,11 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             <input type="text" name="cep" class="form-control mask-cep">
                         </div>
                         <div class="col-md-7">
-                            <label class="form-label text-muted">EndereÃ§o</label>
+                            <label class="form-label text-muted">Endereço</label>
                             <input type="text" name="endereco" class="form-control js-logradouro">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label text-muted">NÂ°</label>
+                            <label class="form-label text-muted">N°</label>
                             <input type="text" name="numero" class="form-control js-numero">
                         </div>
                         <div class="col-md-5">
@@ -1774,7 +1774,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                 <form id="formNovoEquipAjax" enctype="multipart/form-data">
                     <?= csrf_field() ?>
 
-<!-- NavegaÃ§Ã£o por Abas no Modal -->
+<!-- Navegação por Abas no Modal -->
                     <ul class="nav nav-pills nav-fill mb-3 bg-light p-1 rounded-3" id="modalEquipTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active small py-1" id="m-info-tab" data-bs-toggle="tab" data-bs-target="#m-info-pane" type="button" role="tab"><i class="bi bi-info-circle me-1"></i>Info</button>
@@ -1783,7 +1783,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             <button class="nav-link small py-1" id="m-cor-tab" data-bs-toggle="tab" data-bs-target="#m-cor-pane" type="button" role="tab"><i class="bi bi-palette me-1"></i>Cor</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link small py-1" id="m-foto-tab" data-bs-toggle="tab" data-bs-target="#m-foto-pane" type="button" role="tab"><i class="bi bi-cÃ¢mera me-1"></i>Foto</button>
+                            <button class="nav-link small py-1" id="m-foto-tab" data-bs-toggle="tab" data-bs-target="#m-foto-pane" type="button" role="tab"><i class="bi bi-câmera me-1"></i>Foto</button>
                         </li>
                     </ul>
 
@@ -1827,8 +1827,8 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                                     <input type="hidden" name="modelo_nome_ext" id="novoEquipModeloNomeExt">
                                 </div>
                                 <div class="col-md-6 text-start mt-2">
-                                    <label class="form-label mb-1 small fw-bold">NÂ° de SÃ©rie</label>
-                                    <input type="text" name="numero_serie" id="novoEquipNumeroSerie" class="form-control form-control-sm" placeholder="IMEI ou SÃ©rie">
+                                    <label class="form-label mb-1 small fw-bold">N° de Série</label>
+                                    <input type="text" name="numero_serie" id="novoEquipNumeroSerie" class="form-control form-control-sm" placeholder="IMEI ou Série">
                                 </div>
                                 <div class="col-12 text-start mt-2 d-none" id="novoEquipDesktopPanel">
                                     <div class="rounded-4 border p-3 bg-light bg-opacity-25">
@@ -2004,7 +2004,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                         <div class="tab-pane fade text-center py-2" id="m-foto-pane" role="tabpanel">
                             <div class="d-flex justify-content-center gap-2 mb-3">
                                 <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" id="btnAbrirCamera">
-                                    <i class="bi bi-cÃ¢mera me-1"></i>Tirar Foto
+                                    <i class="bi bi-câmera me-1"></i>Tirar Foto
                                 </button>
                                 <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="btnAbrirGaleria">
                                     <i class="bi bi-images me-1"></i>Galeria
@@ -2014,7 +2014,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
 
                             <div id="novoEquipFotoPreview" class="mt-2" style="display:none;">
                                 <div id="novoEquipFotosNovasList" class="d-flex flex-wrap gap-2 justify-content-center"></div>
-                                <div class="mt-2 small text-muted">A foto de perfil ajuda na identificaÃ§Ã£o visual rÃ¡pida.</div>
+                                <div class="mt-2 small text-muted">A foto de perfil ajuda na identificação visual rápida.</div>
                             </div>
 
                             <div id="fotoVaziaOS" class="py-4 text-muted opacity-50">
@@ -2023,7 +2023,7 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             </div>
 
                             <div id="modalEquipFotosExistentesWrap" class="mt-3 d-none">
-                                <div class="small text-muted mb-2">Fotos jÃ¡ cadastradas neste equipamento</div>
+                                <div class="small text-muted mb-2">Fotos já cadastradas neste equipamento</div>
                                 <div id="modalEquipFotosExistentes" class="d-flex flex-wrap gap-2 justify-content-center"></div>
                             </div>
                     </div>
@@ -2082,12 +2082,12 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
                             <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                         </div>
                     </div>
-                    <!-- Dropdown de sugestÃ¡es -->
+                    <!-- Dropdown de sugestáes -->
                     <div id="sugestoesNovoModeloOS" class="list-group shadow-lg mt-1 d-none"
                          style="max-height: 220px; overflow-y: auto; border-radius: 8px; z-index: 9999; position: relative;"></div>
                     <div class="form-text mt-1">
                         <i class="bi bi-globe2 me-1 text-info"></i>
-                        Digite 3+ caracteres para ver sugestÃ¡es da internet
+                        Digite 3+ caracteres para ver sugestáes da internet
                     </div>
                 </div>
                 <div id="errorNovoModeloOS" class="text-danger small mt-2 d-none"></div>
@@ -2103,12 +2103,12 @@ $resolveEquipamentoFotoOptionUrl = static function ($rawPath): string {
 </div>
 
 
-<!-- ===== MODAL: C?MERA (AUXILIAR) ===== -->
+<!-- ===== MODAL: CÂMERA (AUXILIAR) ===== -->
 <div class="modal fade" id="modalCamera" tabindex="-1" style="z-index: 2250;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-card border-0 shadow-lg">
             <div class="modal-header border-bottom border-light">
-                <h5 class="modal-title"><i class="bi bi-cÃ¢mera me-2 text-warning"></i>Capturar Foto</h5>
+                <h5 class="modal-title"><i class="bi bi-câmera me-2 text-warning"></i>Capturar Foto</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center p-0 overflow-hidden bg-black" style="min-height: 300px;">
@@ -2325,7 +2325,7 @@ function cloneChecklistEntradaState(state) {
         resumo: {
             preenchido: Boolean(state.resumo?.preenchido),
             total_discrepancias: Number(state.resumo?.total_discrepancias || 0),
-            label: String(state.resumo?.label || 'Checklist nÃ£o preenchido'),
+            label: String(state.resumo?.label || 'Checklist não preenchido'),
             variant: String(state.resumo?.variant || 'secondary')
         },
         itens: Array.isArray(state.itens)
@@ -2379,7 +2379,7 @@ function normalizeChecklistEntradaPayload(payload, tipoEquipamentoNomeFallback =
         resumo: {
             preenchido: false,
             total_discrepancias: 0,
-            label: 'Checklist nÃ£o preenchido',
+            label: 'Checklist não preenchido',
             variant: 'secondary'
         },
         itens: []
@@ -2435,7 +2435,7 @@ function normalizeChecklistEntradaPayload(payload, tipoEquipamentoNomeFallback =
         normalized.resumo = {
             preenchido: Boolean(payload.resumo.preenchido),
             total_discrepancias: Number(payload.resumo.total_discrepancias || 0),
-            label: String(payload.resumo.label || 'Checklist nÃ£o preenchido'),
+            label: String(payload.resumo.label || 'Checklist não preenchido'),
             variant: String(payload.resumo.variant || 'secondary')
         };
     } else {
@@ -2480,7 +2480,7 @@ function computeChecklistResumo(state) {
     return {
         preenchido: true,
         total_discrepancias: totalDiscrepancias,
-        label: totalDiscrepancias === 1 ? '1 discrepÃ¢ncia' : `${totalDiscrepancias} discrepÃ¢ncias`,
+        label: totalDiscrepancias === 1 ? '1 discrepância' : `${totalDiscrepancias} discrepâncias`,
         variant: 'warning'
     };
 }
@@ -2514,20 +2514,20 @@ function updateChecklistInlineSummary() {
     } else if (!checklistEntradaCommitted?.possuiModelo) {
         statusVariantClass = 'os-checklist-status-unavailable';
         statusIcon = 'bi-slash-circle';
-        statusTitle = 'Checklist indisponÃ­vel para este tipo de equipamento';
-        statusInfo = 'NÃ£o hÃ¡ modelo configurado para este equipamento em GestÃ£o de Conhecimento.';
+        statusTitle = 'Checklist indisponível para este tipo de equipamento';
+        statusInfo = 'Não há modelo configurado para este equipamento em Gestão de Conhecimento.';
     } else if (checklistEntradaCommitted.resumo.preenchido && totalDiscrepancias <= 0) {
         statusVariantClass = 'os-checklist-status-success';
         statusIcon = 'bi-check-circle-fill';
-        statusTitle = 'Checklist concluÃ­do: tudo OK';
-        statusInfo = 'Todos os itens foram verificados sem discrepÃ¢ncias.';
+        statusTitle = 'Checklist concluído: tudo OK';
+        statusInfo = 'Todos os itens foram verificados sem discrepâncias.';
     } else if (checklistEntradaCommitted.resumo.preenchido && totalDiscrepancias > 0) {
         statusVariantClass = 'os-checklist-status-warning';
         statusIcon = 'bi-exclamation-triangle-fill';
-        statusTitle = 'Checklist concluÃ­do com discrepÃ¢ncias';
+        statusTitle = 'Checklist concluído com discrepâncias';
         statusInfo = totalDiscrepancias === 1
-            ? '1 item foi marcado com discrepÃ¢ncia. Reabra o checklist para revisar.'
-            : `${totalDiscrepancias} itens foram marcados com discrepÃ¢ncia. Reabra o checklist para revisar.`;
+            ? '1 item foi marcado com discrepância. Reabra o checklist para revisar.'
+            : `${totalDiscrepancias} itens foram marcados com discrepância. Reabra o checklist para revisar.`;
     }
 
     if (checklistEntradaBadge) {
@@ -2743,7 +2743,7 @@ function getChecklistResumoState() {
     const resumo = checklistEntradaCommitted?.resumo || computeChecklistResumo(checklistEntradaCommitted || {});
     return {
         ok: !checklistEntradaCommitted?.possuiModelo || Boolean(resumo.preenchido),
-        label: String(resumo.label || 'Checklist nÃ£o preenchido')
+        label: String(resumo.label || 'Checklist não preenchido')
     };
 }
 
@@ -2837,7 +2837,7 @@ function renderChecklistEntradaModal() {
     if (!checklistEntradaDraft?.possuiModelo) {
         checklistEntradaModalAlert.classList.remove('d-none');
         checklistEntradaModalAlert.classList.add('alert-warning');
-        checklistEntradaModalAlert.textContent = 'NÃ£o existe checklist cadastrado para este tipo de equipamento.';
+        checklistEntradaModalAlert.textContent = 'Não existe checklist cadastrado para este tipo de equipamento.';
         checklistEntradaModalMeta.textContent = '';
         if (checklistEntradaModalResumo) {
             checklistEntradaModalResumo.textContent = 'Sem modelo configurado';
@@ -2874,20 +2874,20 @@ function renderChecklistEntradaModal() {
                 </div>
                 <div class="checklist-status-actions">
                     <button type="button" class="btn btn-sm checklist-status-btn ${status === 'ok' ? 'btn-success' : 'btn-outline-success'}" data-checklist-status="ok">OK</button>
-                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'discrepancia' ? 'btn-warning' : 'btn-outline-warning'}" data-checklist-status="discrepancia">DiscrepÃ¢ncia</button>
-                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'nao_verificado' ? 'btn-secondary' : 'btn-outline-secondary'}" data-checklist-status="nao_verificado">NÃ£o verificado</button>
+                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'discrepancia' ? 'btn-warning' : 'btn-outline-warning'}" data-checklist-status="discrepancia">Discrepância</button>
+                    <button type="button" class="btn btn-sm checklist-status-btn ${status === 'nao_verificado' ? 'btn-secondary' : 'btn-outline-secondary'}" data-checklist-status="nao_verificado">Não verificado</button>
                 </div>
             </div>
             <div class="mt-2 ${precisaObs ? '' : 'd-none'}" data-checklist-observacao-wrap>
-                <label class="form-label form-label-sm mb-1">ObservaÃ§Ã£o da discrepÃ¢ncia</label>
-                <textarea class="form-control form-control-sm" rows="2" data-checklist-observacao placeholder="Descreva a divergÃªncia encontrada...">${escapeEquipamentoHtml(item.observacao || '')}</textarea>
+                <label class="form-label form-label-sm mb-1">Observação da discrepância</label>
+                <textarea class="form-control form-control-sm" rows="2" data-checklist-observacao placeholder="Descreva a divergência encontrada...">${escapeEquipamentoHtml(item.observacao || '')}</textarea>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2">
                 <button type="button" class="btn btn-outline-secondary btn-sm" data-checklist-action="galeria">
                     <i class="bi bi-image me-1"></i>Galeria
                 </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-checklist-action="cÃ¢mera">
-                    <i class="bi bi-cÃ¢mera me-1"></i>CÃ¢mera
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-checklist-action="câmera">
+                    <i class="bi bi-câmera me-1"></i>Câmera
                 </button>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-2" data-checklist-photos></div>
@@ -2907,7 +2907,7 @@ function renderChecklistEntradaModal() {
 function openChecklistEntradaModal() {
     const equipamentoSelecionado = document.getElementById('equipamentoSelect')?.value || '';
     if (!equipamentoSelecionado) {
-        showWarningDialog('Selecione o equipamento antes de preencher o checklist.', 'Checklist indisponÃ­vel');
+        showWarningDialog('Selecione o equipamento antes de preencher o checklist.', 'Checklist indisponível');
         return;
     }
 
@@ -2986,7 +2986,7 @@ async function loadChecklistEntradaMeta(equipamentoId, optionEl = null) {
         }
 
         if (!response.ok || !payload?.ok) {
-            throw new Error(payload?.message || 'NÃ£o foi possÃ­vel carregar o checklist.');
+            throw new Error(payload?.message || 'Não foi possível carregar o checklist.');
         }
 
         checklistEntradaCommitted = normalizeChecklistEntradaPayload(payload.data || null, getSelectedEquipamentoTipoNome(optionEl));
@@ -3089,7 +3089,7 @@ checklistEntradaModalList?.addEventListener('click', (event) => {
         return;
     }
 
-    if (action === 'cÃ¢mera') {
+    if (action === 'câmera') {
         checklistEntradaCropItemId = String(item.id);
         checklistEntradaCropQueue = [];
         openCameraCapture({ type: 'checklist_entrada', entryId: String(item.id) });
@@ -3175,12 +3175,12 @@ if (typeof $.fn.select2 !== 'undefined') {
         allowClear: true,
         width: '100%'
     }).on('select2:open', function() {
-        // Adiciona um listener para detectar quando o usuÃ­rio pressiona Enter na busca vazia
-        // ou quando nÃ£o hÃ¡ resultados. Mas vamos focar no botÃ£o fixo.
+        // Adiciona um listener para detectar quando o usuírio pressiona Enter na busca vazia
+        // ou quando não há resultados. Mas vamos focar no botão fixo.
     });
 
-    // Se quiser botÃ£o de Add dentro do dropdown Select2, Ã© complexo.
-    // O botÃ£o '+ Novo' jÃ¡ resolve bem.
+    // Se quiser botão de Add dentro do dropdown Select2, é complexo.
+    // O botão '+ Novo' já resolve bem.
 }
 
 function escapeEquipamentoHtml(value) {
@@ -3215,7 +3215,7 @@ function buildEquipamentoSecondary(meta) {
     const modelo = String(meta.modelo_nome || meta.modelo || '').trim();
     const cor = String(meta.cor || '').trim();
     const parts = [modelo, cor].filter(Boolean);
-    return parts.length ? parts.join(' - ') : 'Modelo ou cor nÃ£o informados';
+    return parts.length ? parts.join(' - ') : 'Modelo ou cor não informados';
 }
 
 function buildEquipamentoSecondaryRich(meta) {
@@ -3228,22 +3228,22 @@ function buildEquipamentoSecondaryRich(meta) {
     const tipo = String(meta.tipo_nome || meta.tipo || '').trim();
     const cor = String(meta.cor || '').trim();
     const parts = [tipo, cor].filter(Boolean);
-    return parts.length ? parts.join(' - ') : 'Tipo ou cor nÃƒÂ£o informados';
+    return parts.length ? parts.join(' - ') : 'Tipo ou cor não informados';
 }
 
 function buildEquipamentoIdentity(meta) {
     const serie = String(meta.numero_serie || meta.serie || '').trim();
     const imei = String(meta.imei || '').trim();
     if (serie && imei) {
-        return `NÂ° sÃ©rie: ${serie} | IMEI: ${imei}`;
+        return `N° série: ${serie} | IMEI: ${imei}`;
     }
     if (serie) {
-        return `NÂ° sÃ©rie: ${serie}`;
+        return `N° série: ${serie}`;
     }
     if (imei) {
         return `IMEI: ${imei}`;
     }
-    return 'Sem nÃºmero de sÃ©rie ou IMEI';
+    return 'Sem número de série ou IMEI';
 }
 
 function buildEquipamentoFallback(meta) {
@@ -3441,8 +3441,8 @@ function renderClienteInfoCard(clienteId) {
     emptyState.classList.add('d-none');
     content.classList.remove('d-none');
     nomeEl.textContent = meta.nome;
-    telefoneEl.textContent = meta.telefone || 'Telefone nÃ£o informado';
-    enderecoEl.textContent = meta.endereco || 'EndereÃ§o nÃ£o informado';
+    telefoneEl.textContent = meta.telefone || 'Telefone não informado';
+    enderecoEl.textContent = meta.endereco || 'Endereço não informado';
     telefoneWrap.classList.toggle('d-none', !meta.telefone);
     enderecoWrap.classList.toggle('d-none', !meta.endereco);
 }
@@ -3472,7 +3472,7 @@ function initClienteOsSelect2() {
     return true;
 }
 
-// Inicializa a inst?ncia do modal uma unica vez para evitar conflitos de backdrop
+// Inicializa a instância do modal uma única vez para evitar conflitos de backdrop
 let modalClienteInstance;
 let lastClienteModalTrigger = null;
 
@@ -3766,7 +3766,7 @@ if (btnNovoCliente) {
         e.stopPropagation();
         document.getElementById('formNovoClienteAjax').reset();
         document.getElementById('modalNovoClienteId').value = '';
-        document.querySelector('#modalNovoCliente .modal-title').innerHTML = '<i class="bi bi-person-plus text-warning me-2"></i>Cadastro RÃ¡pido de Cliente';
+        document.querySelector('#modalNovoCliente .modal-title').innerHTML = '<i class="bi bi-person-plus text-warning me-2"></i>Cadastro Rápido de Cliente';
         document.getElementById('btnSalvarNovoCliente').innerHTML = '<i class="bi bi-check-lg me-1"></i>Cadastrar Cliente';
         document.getElementById('modalClienteErrors')?.classList.add('d-none');
         showClienteModal(e.currentTarget);
@@ -3834,7 +3834,7 @@ document.getElementById('btnSalvarNovoCliente')?.addEventListener('click', funct
             const opt = new Option(res.nome, res.id, true, true);
             clienteOsSelect.append(opt).trigger('change');
 
-            // Dispara o mudou(cliente) para recarregar equipamentos do novo cliente (virÃ£o vazios mas reseta combobox)
+            // Dispara o mudou(cliente) para recarregar equipamentos do novo cliente (virão vazios mas reseta combobox)
             _onClienteChange(res.id);
             }
         }
@@ -3939,9 +3939,9 @@ function updateResumo() {
     const acessoriosInp = document.querySelector('textarea[name="acessorios"]');
     const checklistResumo = getChecklistResumoState();
 
-    const clienteText = _getSelectedText(clienteSel, 'NÃ£o selecionado');
-    const equipText   = _getSelectedText(equipSel, 'NÃ£o selecionado');
-    const tecnicoText = _getSelectedText(tecnicoSel, 'NÃ£o atribuÃ­do');
+    const clienteText = _getSelectedText(clienteSel, 'Não selecionado');
+    const equipText   = _getSelectedText(equipSel, 'Não selecionado');
+    const tecnicoText = _getSelectedText(tecnicoSel, 'Não atribuído');
     const prioridadeVal = prioridadeSel?.value || 'normal';
     const statusVal = statusSel?.value || 'triagem';
     const relatoVal = relatoInp?.value?.trim() || '';
@@ -3952,9 +3952,9 @@ function updateResumo() {
     document.getElementById('resumoTecnico').textContent = tecnicoText;
     document.getElementById('resumoEntrada').textContent = _formatDateTime(entradaInp?.value);
     document.getElementById('resumoPrevisao').textContent = _formatDate(previsaoInp?.value);
-    const semAcessorios = acessoriosVal.toLowerCase() === 'sem acessÃ³rios';
+    const semAcessorios = acessoriosVal.toLowerCase() === 'sem acessórios';
     document.getElementById('resumoRelato').textContent = relatoVal ? 'Preenchido' : 'Vazio';
-    document.getElementById('resumoAcessorios').textContent = semAcessorios ? 'Sem acessÃ³rios' : (acessoriosVal ? 'Informado' : 'NÃ£o informado');
+    document.getElementById('resumoAcessorios').textContent = semAcessorios ? 'Sem acessórios' : (acessoriosVal ? 'Informado' : 'Não informado');
     document.getElementById('resumoEstadoFisico').textContent = checklistResumo.label;
 
     const prioridadeBadgeClass = {
@@ -4088,12 +4088,12 @@ function formatProcedimentoTimestamp(date = new Date()) {
 function getTecnicoLabelForProcedimento() {
     const tecnicoSel = document.querySelector('select[name="tecnico_id"]');
     if (!tecnicoSel || !tecnicoSel.value) {
-        return 'NÃ£o atribuÃ­do';
+        return 'Não atribuído';
     }
 
     const selected = tecnicoSel.options[tecnicoSel.selectedIndex];
     const label = String(selected?.textContent || '').trim();
-    return label || 'NÃ£o atribuÃ­do';
+    return label || 'Não atribuído';
 }
 
 function renderProcedimentosExecutadosList(items) {
@@ -4140,7 +4140,7 @@ function inserirProcedimentoExecutado() {
 
     const tecnicoNome = getTecnicoLabelForProcedimento();
     const stamp = formatProcedimentoTimestamp(new Date());
-    const linha = `[${procedimentoBase} - ${stamp} - tÃ©cnico: ${tecnicoNome}]`;
+    const linha = `[${procedimentoBase} - ${stamp} - técnico: ${tecnicoNome}]`;
     const items = parseProcedimentosExecutados(procedimentosExecutadosInput.value);
     items.push(linha);
     syncProcedimentosExecutadosList(items);
@@ -4266,7 +4266,7 @@ function getClosestAccessoryColorName(hex) {
             best = color;
         }
     });
-    return bestÃ¡.name || normalizedHex;
+    return bestá.name || normalizedHex;
 }
 
 function formatAccessoryColorValue(hex) {
@@ -4284,7 +4284,7 @@ function composeAccessoryText(base, detail = '') {
 const acessoriosConfig = {
     chip: {
         title: 'Chip',
-        fields: [{ name: 'chip_digits', label: '?ltimos 6 d?gitos do chip', placeholder: '123456', max: 6 }],
+        fields: [{ name: 'chip_digits', label: 'Últimos 6 dígitos do chip', placeholder: '123456', max: 6 }],
         format: values => composeAccessoryText('Chip', values.chip_digits ? ('final ' + values.chip_digits) : '')
     },
     capinha: {
@@ -4321,7 +4321,7 @@ const acessoriosConfig = {
                 { value: 'Micro USB', label: 'Micro USB' },
                 { value: 'Lightning', label: 'Lightning' },
                 { value: 'HDMI', label: 'HDMI' },
-                { value: 'Cabo de forÃ§a', label: 'Cabo de forÃ§a' },
+                { value: 'Cabo de força', label: 'Cabo de força' },
                 { value: 'Outro', label: 'Outro' }
             ]
         }],
@@ -4344,9 +4344,9 @@ const acessoriosConfig = {
         format: values => composeAccessoryText('Carregador', values.tipo_equip)
     },
     outro: {
-        title: 'Outro acessÃ³rio',
-        fields: [{ name: 'descricao', label: 'DescriÃ§Ã£o', placeholder: 'Ex.: cabo adaptador' }],
-        format: values => `${values.descricao || 'Outro acessÃ³rio'}`
+        title: 'Outro acessório',
+        fields: [{ name: 'descricao', label: 'Descrição', placeholder: 'Ex.: cabo adaptador' }],
+        format: values => `${values.descricao || 'Outro acessório'}`
     }
 };
 
@@ -4376,7 +4376,7 @@ let acessoriosQuickEntryId = null;
 let acessoriosPhotoTarget = null;
 let acessorioCropQueue = [];
 let acessorioCropEntryId = null;
-const ACCESSORIOS_SEM_ITENS_TEXT = 'Sem acessÃ³rios';
+const ACCESSORIOS_SEM_ITENS_TEXT = 'Sem acessórios';
 
 const initialAcessoriosText = acessoriosInput?.value?.trim() || '';
 if (acessoriosSemItensCheckbox && initialAcessoriosText.toLowerCase() === ACCESSORIOS_SEM_ITENS_TEXT.toLowerCase()) {
@@ -4549,7 +4549,7 @@ function renderAcessoriosList() {
     if (isAcessoriosSemItensChecked()) {
         const item = document.createElement('div');
         item.className = 'list-group-item text-muted';
-        item.textContent = 'Marcado como sem acessÃ³rios.';
+        item.textContent = 'Marcado como sem acessórios.';
         acessoriosList.appendChild(item);
         return;
     }
@@ -4565,8 +4565,8 @@ function renderAcessoriosList() {
             <div class="d-flex justify-content-between align-items-center">
                 <span class="fw-semibold">${cleanText}</span>
                 <div class="d-flex gap-1">
-                    <button type="button" class="btn btn-outline-info btn-sm btn-add-foto" data-entry="${entry.id}"><i class="bi bi-cÃ¢mera"></i> Adicionar foto</button>
-                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-cÃ¢mera" data-entry="${entry.id}"><i class="bi bi-cÃ¢mera-video"></i> CÃ¢mera</button>
+                    <button type="button" class="btn btn-outline-info btn-sm btn-add-foto" data-entry="${entry.id}"><i class="bi bi-câmera"></i> Adicionar foto</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-câmera" data-entry="${entry.id}"><i class="bi bi-câmera-video"></i> Câmera</button>
                     <button type="button" class="btn btn-outline-secondary btn-sm btn-edit-acessorio" data-index="${index}"><i class="bi bi-pencil"></i></button>
                     <button type="button" class="btn btn-outline-danger btn-sm btn-remove-acessorio" data-index="${index}"><i class="bi bi-trash"></i></button>
                 </div>
@@ -4712,7 +4712,7 @@ function openAcessoriosForm(key, index = null) {
             const dropdownId = `acessorioColorQuick_${field.name}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
             quickColorsMobile.innerHTML = `
                 <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" id="${dropdownId}" data-bs-toggle="dropdown" aria-expanded="false">
-                    Cores rÃ¡pidas
+                    Cores rápidas
                 </button>
                 <ul class="dropdown-menu w-100" aria-labelledby="${dropdownId}"></ul>
             `;
@@ -4969,8 +4969,8 @@ acessoriosSemItensCheckbox?.addEventListener('change', () => {
     if (window.Swal && typeof window.Swal.fire === 'function') {
         Swal.fire({
             icon: 'warning',
-            title: 'Marcar como sem acessÃ³rios?',
-            text: 'Os acessÃ³rios jÃ¡ adicionados serÃ¡o removidos.',
+            title: 'Marcar como sem acessórios?',
+            text: 'Os acessórios já adicionados seráo removidos.',
             showCancelButton: true,
             confirmButtonText: 'Sim, marcar',
             cancelButtonText: 'Cancelar',
@@ -4987,7 +4987,7 @@ acessoriosSemItensCheckbox?.addEventListener('change', () => {
         return;
     }
 
-    const confirmed = confirm('Marcar como sem acessÃ³rios vai remover os acessÃ³rios jÃ¡ adicionados. Deseja continuar?');
+    const confirmed = confirm('Marcar como sem acessórios vai remover os acessórios já adicionados. Deseja continuar?');
     if (confirmed) {
         applySemItens();
         return;
@@ -5015,7 +5015,7 @@ document.addEventListener('click', event => {
     if (editBtn) handleEditAcessorio({ currentTarget: editBtn });
     const addPhotoBtn = event.target.closest('.btn-add-foto');
     if (addPhotoBtn) openAcessorioPhotoInput(addPhotoBtn.dataset.entry);
-    const addPhotoCameraBtn = event.target.closest('.btn-add-foto-cÃ¢mera');
+    const addPhotoCameraBtn = event.target.closest('.btn-add-foto-câmera');
     if (addPhotoCameraBtn) openAcessorioCameraCapture(addPhotoCameraBtn.dataset.entry);
     const removePhotoBtn = event.target.closest('.btn-remove-foto-accessorio');
     if (removePhotoBtn) handleRemovePhoto({ currentTarget: removePhotoBtn });
@@ -5025,7 +5025,7 @@ document.addEventListener('click', event => {
     if (editEstadoBtn) handleEditEstadoFisico({ currentTarget: editEstadoBtn });
     const addEstadoPhotoBtn = event.target.closest('.btn-add-foto-estado');
     if (addEstadoPhotoBtn) openEstadoFisicoPhotoInput(addEstadoPhotoBtn.dataset.entry);
-    const addEstadoPhotoCameraBtn = event.target.closest('.btn-add-foto-cÃ¢mera-estado');
+    const addEstadoPhotoCameraBtn = event.target.closest('.btn-add-foto-câmera-estado');
     if (addEstadoPhotoCameraBtn) openEstadoFisicoCameraCapture(addEstadoPhotoCameraBtn.dataset.entry);
     const removeEstadoPhotoBtn = event.target.closest('.btn-remove-foto-estado');
     if (removeEstadoPhotoBtn) handleRemoveEstadoFisicoPhoto({ currentTarget: removeEstadoPhotoBtn });
@@ -5060,12 +5060,12 @@ const estadoFisicoConfig = {
     },
     botao_quebrado: {
         title: 'Botao quebrado',
-        fields: [{ name: 'detalhe', label: 'Qual botÃ£o?', placeholder: 'Ex.: power' }],
+        fields: [{ name: 'detalhe', label: 'Qual botão?', placeholder: 'Ex.: power' }],
         format: values => composeAccessoryText('Botao quebrado', values.detalhe)
     },
     outro: {
         title: 'Outro dano',
-        fields: [{ name: 'descricao', label: 'DescriÃ§Ã£o', placeholder: 'Ex.: cÃ¢mera traseira quebrada' }],
+        fields: [{ name: 'descricao', label: 'Descrição', placeholder: 'Ex.: câmera traseira quebrada' }],
         format: values => values.descricao || 'Outro dano'
     }
 };
@@ -5249,8 +5249,8 @@ function renderEstadoFisicoList() {
             <div class="d-flex justify-content-between align-items-center">
                 <span class="fw-semibold">${entry.text}</span>
                 <div class="d-flex gap-1">
-                    <button type="button" class="btn btn-outline-info btn-sm btn-add-foto-estado" data-entry="${entry.id}"><i class="bi bi-cÃ¢mera"></i> Adicionar foto</button>
-                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-cÃ¢mera-estado" data-entry="${entry.id}"><i class="bi bi-cÃ¢mera-video"></i> CÃ¢mera</button>
+                    <button type="button" class="btn btn-outline-info btn-sm btn-add-foto-estado" data-entry="${entry.id}"><i class="bi bi-câmera"></i> Adicionar foto</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm btn-add-foto-câmera-estado" data-entry="${entry.id}"><i class="bi bi-câmera-video"></i> Câmera</button>
                     <button type="button" class="btn btn-outline-secondary btn-sm btn-edit-estado" data-index="${index}"><i class="bi bi-pencil"></i></button>
                     <button type="button" class="btn btn-outline-danger btn-sm btn-remove-estado" data-index="${index}"><i class="bi bi-trash"></i></button>
                 </div>
@@ -5571,7 +5571,7 @@ function saveDraftNow() {
     const data = _collectDraft();
     if (!_hasDraftData(data)) {
         localStorage.removeItem(DRAFT_KEY);
-        _setResumoRascunho('NÃ£o salvo');
+        _setResumoRascunho('Não salvo');
         return;
     }
     localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
@@ -5697,7 +5697,7 @@ function _applyPendingDefeitos() {
     }
 }
 
-// Rascunho autom?tico para nova OS
+// Rascunho automático para nova OS
 if (!isEdit) {
     const draftData = _loadDraft();
     const draftAlert = document.getElementById('osDraftAlert');
@@ -5714,15 +5714,15 @@ if (!isEdit) {
         document.getElementById('btnDescartarRascunho')?.addEventListener('click', () => {
             localStorage.removeItem(DRAFT_KEY);
             draftAlert.classList.add('d-none');
-            _setResumoRascunho('NÃ£o salvo');
+            _setResumoRascunho('Não salvo');
         });
     } else {
-        _setResumoRascunho('NÃ£o salvo');
+        _setResumoRascunho('Não salvo');
     }
 
     document.getElementById('btnLimparRascunho')?.addEventListener('click', () => {
         localStorage.removeItem(DRAFT_KEY);
-        _setResumoRascunho('NÃ£o salvo');
+        _setResumoRascunho('Não salvo');
     });
 }
 
@@ -5831,7 +5831,7 @@ if (formOs) {
         toggleOsSubmitLoading(true);
         formOs.dataset.bypassValidation = '1';
         localStorage.removeItem(DRAFT_KEY);
-        _setResumoRascunho('NÃ£o salvo');
+        _setResumoRascunho('Não salvo');
         window.setTimeout(() => formOs.submit(), 0);
     };
 
@@ -5846,8 +5846,8 @@ if (formOs) {
     const adminApprovalPassInput = document.getElementById('osAdminApprovalPass');
     const lockedFinancialFieldLabels = {
         forma_pagamento: 'forma de pagamento',
-        valor_mao_obra: 'mÃ£o de obra',
-        valor_pecas: 'peÃ§as',
+        valor_mao_obra: 'mão de obra',
+        valor_pecas: 'peças',
         desconto: 'desconto',
     };
 
@@ -5891,20 +5891,20 @@ if (formOs) {
         }
 
         if (!(window.Swal && typeof window.Swal.fire === 'function')) {
-            showWarningDialog('Esta OS jÃ¡ passou pela baixa tÃ©cnica. Use um navegador com SweetAlert2 disponÃ­vel para solicitar a autorizaÃ§Ã£o administrativa.');
+            showWarningDialog('Esta OS já passou pela baixa técnica. Use um navegador com SweetAlert2 disponível para solicitar a autorização administrativa.');
             return false;
         }
 
         const labels = changedFields.map((field) => lockedFinancialFieldLabels[field] || field);
         const result = await window.Swal.fire({
             icon: 'warning',
-            title: 'AutorizaÃ§Ã£o administrativa obrigatÃ³ria',
+            title: 'Autorização administrativa obrigatória',
             html: `
                 <div class="text-start">
-                    <p class="mb-3">Esta OS jÃ¡ passou pela baixa tÃ©cnica. Para alterar <strong>${escapeEquipamentoHtml(labels.join(', '))}</strong>, informe abaixo as credenciais de um administrador.</p>
+                    <p class="mb-3">Esta OS já passou pela baixa técnica. Para alterar <strong>${escapeEquipamentoHtml(labels.join(', '))}</strong>, informe abaixo as credenciais de um administrador.</p>
                     <div class="mb-3">
-                        <label class="form-label" for="swalOsAdminUser">UsuÃ¡rio ou e-mail do administrador</label>
-                        <input type="text" id="swalOsAdminUser" class="form-control" autocomplete="username" placeholder="Administrador responsÃ¡vel">
+                        <label class="form-label" for="swalOsAdminUser">Usuário ou e-mail do administrador</label>
+                        <input type="text" id="swalOsAdminUser" class="form-control" autocomplete="username" placeholder="Administrador responsável">
                     </div>
                     <div class="mb-0">
                         <label class="form-label" for="swalOsAdminPass">Senha do administrador</label>
@@ -5922,7 +5922,7 @@ if (formOs) {
                 const pass = document.getElementById('swalOsAdminPass')?.value || '';
 
                 if (!user || !pass) {
-                    window.Swal.showValidationMessage('Informe o usuÃ¡rio e a senha do administrador para continuar.');
+                    window.Swal.showValidationMessage('Informe o usuário e a senha do administrador para continuar.');
                     return false;
                 }
 
@@ -5968,10 +5968,10 @@ if (formOs) {
         ];
 
         const optionalChecks = [
-            { selector: 'input[name="data_previsao"]', label: 'PrevisÃ£o de Entrega', tabBtnId: 'tab-relato-btn', isMissing: (el) => !el?.value },
+            { selector: 'input[name="data_previsao"]', label: 'Previsão de Entrega', tabBtnId: 'tab-relato-btn', isMissing: (el) => !el?.value },
             {
                 selector: '#acessoriosSemItens',
-                label: 'AcessÃ³rios/Componentes',
+                label: 'Acessórios/Componentes',
                 tabBtnId: 'tab-equipamento-btn',
                 isMissing: () => !isAcessoriosSemItensChecked() && !((acessoriosInput?.value || '').trim())
             },
@@ -6196,7 +6196,7 @@ function carregarFotosEquipamentoLegacy(equipId, equipData) {
             ${equipData.tipo  ? `<div class="mt-1"><i class="bi bi-cpu me-1"></i>${equipData.tipo}</div>` : ''}
         `;
         const corHex = equipData.cor_hex || '#2a2a2a';
-        const corNome = equipData.cor || 'Cor nÃ£o informada';
+        const corNome = equipData.cor || 'Cor não informada';
         if (colorSwatch) colorSwatch.style.background = corHex;
         if (colorName) colorName.textContent = corNome;
         if (colorInfo) colorInfo.classList.remove('d-none');
@@ -6495,7 +6495,7 @@ if (typeof $.fn.select2 !== 'undefined') {
     });
 }
 
-// --- Handler de mudanÃ§a de equipamento ---
+// --- Handler de mudança de equipamento ---
 function _onEquipamentoChange(id, opt) {
     const tipoId = opt ? opt.getAttribute('data-tipo') : null;
     carregarDefeitos(tipoId);
@@ -6519,24 +6519,24 @@ function _onEquipamentoChange(id, opt) {
     scheduleDraftSave();
 }
 
-// --- Listener vanilla do equipamentoSelect (usado quando Select2 ainda nÃ£o foi inicializado) ---
+// --- Listener vanilla do equipamentoSelect (usado quando Select2 ainda não foi inicializado) ---
 const equipSelect = document.getElementById('equipamentoSelect');
 if (equipSelect) {
     equipSelect.addEventListener('change', function() {
-        // Apenas disparado quando Select2 nÃ£o estÃ¡ ativo
+        // Apenas disparado quando Select2 não está ativo
         if (!$(this).data('select2')) {
             _onEquipamentoChange(this.value, this.options[this.selectedIndex]);
         }
     });
 
-// Na ediÃ§Ã£o, carrega automaticamente
+// Na edição, carrega automaticamente
     if (isEdit && equipSelect.value) {
         const opt = equipSelect.options[equipSelect.selectedIndex];
         _onEquipamentoChange(equipSelect.value, opt);
     }
 }
 
-// Atualiza resumo e rascunho conforme alteraÃ§Ãµes no formul?rio
+// Atualiza resumo e rascunho conforme alterações no formulário
 ['input', 'change'].forEach(evt => {
     document.querySelector('textarea[name="acessorios"]')?.addEventListener(evt, () => {
         updateResumo();
@@ -6661,7 +6661,7 @@ function processNextFotoEntradaCrop() {
     }
     const nextFile = fotosEntradaCropQueue.shift();
     if (nextFile.size > (osFotoMaxSizeMb * 1024 * 1024)) {
-        showWarningDialog(`Cada foto deve ter no m?ximo ${osFotoMaxSizeMb}MB.`);
+        showWarningDialog(`Cada foto deve ter no máximo ${osFotoMaxSizeMb}MB.`);
         processNextFotoEntradaCrop();
         return;
     }
@@ -6739,7 +6739,7 @@ async function deleteExistingEntradaPhoto(fotoId) {
         syncCsrfHashFromPayload(payload);
 
         if (!response.ok || !payload || payload.success !== true) {
-            throw new Error(payload?.message || 'NÃ£o foi possÃ­vel excluir a foto de entrada.');
+            throw new Error(payload?.message || 'Não foi possível excluir a foto de entrada.');
         }
 
         const refreshedFotos = Array.isArray(payload.fotos)
@@ -6765,7 +6765,7 @@ async function deleteExistingEntradaPhoto(fotoId) {
         osFotosExistingData.splice(0, osFotosExistingData.length, ...previousFotos);
         renderExistingFotos();
         updatePhotoState();
-        showWarningDialog(error?.message || 'NÃ£o foi possÃ­vel excluir a foto.', 'Falha na exclusÃ£o');
+        showWarningDialog(error?.message || 'Não foi possível excluir a foto.', 'Falha na exclusão');
     }
 }
 
@@ -6890,7 +6890,7 @@ function openOsBudgetEditorModal(url, title) {
     clearOsBudgetEditorTimeout();
     setOsBudgetEditorLoading(true);
     if (osBudgetEditorModalTitle) {
-        osBudgetEditorModalTitle.textContent = title || 'OrÃ§amento da OS';
+        osBudgetEditorModalTitle.textContent = title || 'Orçamento da OS';
     }
     osBudgetEditorModalFrame.src = 'about:blank';
     osBudgetEditorModal.show();
@@ -6930,7 +6930,7 @@ async function refreshOsBudgetSummary(options = {}) {
         });
         const payload = await response.json();
         if (!response.ok || !payload || payload.ok !== true) {
-            throw new Error(payload?.message || 'NÃ£o foi possÃ­vel atualizar o resumo do orÃ§amento.');
+            throw new Error(payload?.message || 'Não foi possível atualizar o resumo do orçamento.');
         }
 
         osBudgetSummaryPanel.innerHTML = payload.html || '';
@@ -6938,7 +6938,7 @@ async function refreshOsBudgetSummary(options = {}) {
         if (options.successMessage && window.Swal && typeof window.Swal.fire === 'function') {
             Swal.fire({
                 icon: 'success',
-                title: 'OrÃ§amento atualizado',
+                title: 'Orçamento atualizado',
                 text: options.successMessage,
                 timer: 1800,
                 showConfirmButton: false,
@@ -6959,7 +6959,7 @@ document.addEventListener('click', function(event) {
     event.preventDefault();
     openOsBudgetEditorModal(
         modalTrigger.getAttribute('data-os-orcamento-modal-url') || '',
-        modalTrigger.getAttribute('data-os-orcamento-modal-title') || 'OrÃ§amento da OS'
+        modalTrigger.getAttribute('data-os-orcamento-modal-title') || 'Orçamento da OS'
     );
 });
 
@@ -7007,7 +7007,7 @@ window.addEventListener('message', async function(event) {
         });
         osBudgetEditorModal?.hide();
     } catch (error) {
-        showWarningDialog(error?.message || 'NÃ£o foi possÃ­vel atualizar o resumo do orÃ§amento.', 'Falha ao sincronizar');
+        showWarningDialog(error?.message || 'Não foi possível atualizar o resumo do orçamento.', 'Falha ao sincronizar');
     }
 });
 
@@ -7307,7 +7307,7 @@ function buildNovoEquipCollectorContextQuery() {
 
 async function importNovoEquipSnapshotFromAgentLocal() {
     if (!isNovoEquipDesktopTipoSelected()) {
-        showWarningDialog('Selecione um equipamento do tipo Desktop antes de buscar os dados do agente.', 'Tipo incompatÃ­vel');
+        showWarningDialog('Selecione um equipamento do tipo Desktop antes de buscar os dados do agente.', 'Tipo incompatível');
         return;
     }
 
@@ -7352,7 +7352,7 @@ async function importNovoEquipSnapshotFromAgentLocal() {
 
 async function collectNovoEquipSnapshotFromAgentLocal() {
     if (!isNovoEquipCollectorTipoSelected()) {
-        showWarningDialog('Selecione um equipamento do tipo Desktop ou Notebook antes de buscar os dados do agente.', 'Tipo incompatÃƒÂ­vel');
+        showWarningDialog('Selecione um equipamento do tipo Desktop ou Notebook antes de buscar os dados do agente.', 'Tipo incompatível');
         return;
     }
 
@@ -7459,7 +7459,7 @@ function getTopModalStackZIndex(defaultZ = 2600) {
     return Math.max(defaultZ, maxActive + 40);
 }
 
-function showWarningDialog(message, title = 'AtenÃ§Ã£o') {
+function showWarningDialog(message, title = 'Atenção') {
     if (window.Swal && typeof window.Swal.fire === 'function') {
         const dynamicZIndex = getTopModalStackZIndex(2600);
         Swal.fire({
@@ -7852,7 +7852,7 @@ async function reloadModalEquipFotosExistentes() {
             }, fotos);
         }
     } catch (_) {
-        showWarningDialog('NÃ£o foi possÃ­vel atualizar a lista de fotos do equipamento.', 'Falha ao atualizar');
+        showWarningDialog('Não foi possível atualizar a lista de fotos do equipamento.', 'Falha ao atualizar');
     }
 }
 
@@ -7863,7 +7863,7 @@ function setNovoEquipModalMode(mode) {
             labelModalNovoEquip.innerHTML = '<i class="bi bi-pencil-square text-primary me-2"></i>Editar Equipamento';
         }
         if (btnSalvarNovoEquip) {
-        btnSalvarNovoEquip.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Salvar AlteraÃ§Ãµes';
+        btnSalvarNovoEquip.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Salvar Alterações';
         }
         return;
     }
@@ -8234,7 +8234,7 @@ modalNovoEquipamentoEl?.addEventListener('hidden.bs.modal', () => {
     resetNovoEquipModalForm();
 });
 
-// --- Cadastro R?pido de Marcas e Modelos (Dentro da OS) ---
+// --- Cadastro Rápido de Marcas e Modelos (Dentro da OS) ---
 const modalNovaMarca = new bootstrap.Modal(document.getElementById('modalNovaMarcaOS'));
 const modalNovoModelo = new bootstrap.Modal(document.getElementById('modalNovoModeloOS'));
 
@@ -8243,7 +8243,7 @@ document.getElementById('btnNovoModeloOS')?.addEventListener('click', () => {
     const marcaId = $('#novoEquipMarca').val();
     if (!marcaId) { showWarningDialog('Selecione uma marca primeiro!'); return; }
 
-    // Mostra o nome da marca no modal para confer?ncia
+    // Mostra o nome da marca no modal para conferência
     const marcaNome = $('#novoEquipMarca option:selected').text();
     document.getElementById('displayMarcaOS').value = marcaNome;
 
@@ -8322,7 +8322,7 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
         groups.forEach(group => {
             if (!group.children || group.children.length === 0) return;
 
-            // CabeÃ§alho do grupo
+            // Cabeçalho do grupo
             const header = document.createElement('div');
             header.className = 'list-group-item list-group-item-secondary py-1 px-3';
             header.style.cssText = 'font-size:0.7rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; pointer-events:none;';
@@ -8369,7 +8369,7 @@ document.getElementById('btnSalvarModeloOS')?.addEventListener('click', function
         if (total > 0) {
             sugestoesBox.classList.remove('d-none');
         } else {
-            sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugestÃ£o. Digite e salve manualmente.</div>';
+            sugestoesBox.innerHTML = '<div class="list-group-item text-muted small py-2 px-3"><i class="bi bi-info-circle me-1"></i>Nenhuma sugestão. Digite e salve manualmente.</div>';
             sugestoesBox.classList.remove('d-none');
         }
     }
@@ -8445,8 +8445,8 @@ const PROFESSIONAL_COLORS_OS = [
     ]},
     { category: 'Azuis e Marinhos', colors: [
         { hex: '#191970', name: 'Azul Meia-Noite' }, { hex: '#000080', name: 'Azul Marinho' }, { hex: '#0000FF', name: 'Azul Puro' },
-        { hex: '#4169E1', name: 'Azul Real' }, { hex: '#1E90FF', name: 'Azul CÃ©u' }, { hex: '#87CEEB', name: 'Azul Celeste' },
-        { hex: '#5F9EA0', name: 'Azul Petr?leo' },
+        { hex: '#4169E1', name: 'Azul Real' }, { hex: '#1E90FF', name: 'Azul Céu' }, { hex: '#87CEEB', name: 'Azul Celeste' },
+        { hex: '#5F9EA0', name: 'Azul Petróleo' },
     ]},
     { category: 'Verdes e Mentas', colors: [
         { hex: '#006400', name: 'Verde Escuro' }, { hex: '#2E8B57', name: 'Verde Floresta' }, { hex: '#008000', name: 'Verde Puro' },
@@ -8460,9 +8460,9 @@ const PROFESSIONAL_COLORS_OS = [
         { hex: '#DAA520', name: 'Dourado' }, { hex: '#FFD700', name: 'Dourado Vivo' }, { hex: '#FFFF00', name: 'Amarelo' },
         { hex: '#F5F5DC', name: 'Bege' }, { hex: '#FFF8DC', name: 'Marfim' },
     ]},
-    { category: 'Roxos, Pinks e Lil?s', colors: [
+    { category: 'Roxos, Pinks e Lilás', colors: [
         { hex: '#4B0082', name: '?ndigo' }, { hex: '#2D1B69', name: 'Violeta' }, { hex: '#800080', name: 'Roxo Puro' },
-        { hex: '#DA70D6', name: 'Lil?s' }, { hex: '#FF1493', name: 'Pink' }, { hex: '#AA336A', name: 'Rose Gold' },
+        { hex: '#DA70D6', name: 'Lilás' }, { hex: '#FF1493', name: 'Pink' }, { hex: '#AA336A', name: 'Rose Gold' },
     ]},
 ];
 
@@ -8493,7 +8493,7 @@ window.updateColorUIOS = function(hex, name) {
     const normalizedHex = normalizeHexColorOS(hex);
     const isEmpty = normalizedHex === '';
     const safeHex = isEmpty ? '#E9ECEF' : normalizedHex;
-    const safeName = isEmpty ? 'Cor nÃ£o selecionada' : name;
+    const safeName = isEmpty ? 'Cor não selecionada' : name;
 
     const rgb = hexToRgbOS(safeHex);
     const rgbStr = rgb ? `${rgb.r},${rgb.g},${rgb.b}` : '';
@@ -8615,7 +8615,7 @@ $('#corNomeInputOS').on('input', function() {
 buildCatalogOS();
 updateColorUIOS('#1A1A1A', 'Preto');
 
-// --- LÃ“GICA DE DETECÃ‡ÃƒO DE COR INTELIGENTE NA IMAGEM (OS Modal) ---
+// --- LÓGICA DE DETECÇÃO DE COR INTELIGENTE NA IMAGEM (OS Modal) ---
 const smartColorMapOS = {
     '#1C1C1E': 'Midnight',
     '#F2F2F4': 'Starlight',
@@ -8703,7 +8703,7 @@ function detectDominantColorOS(sourceCanvas) {
         $('#smartColorContainerOS').removeClass('d-none');
 
     } catch (e) {
-        console.warn('Erro na detecÃ§Ã£o de cor: ', e);
+        console.warn('Erro na detecção de cor: ', e);
     }
 }
 
@@ -8736,7 +8736,7 @@ $('#btnAcceptColorOS').click(function() {
     }, 1500);
 });
 
-// --- L?gica de CÃ¢mera, Galeria e Cropper ---
+// --- L?gica de Câmera, Galeria e Cropper ---
 const modalCameraEl  = document.getElementById('modalCamera');
 const modalCropEl    = document.getElementById('modalCropEquip');
 const CHECKLIST_MODAL_Z_INDEX = 2150;
@@ -8774,7 +8774,7 @@ const imgToCrop      = document.getElementById('imgToCrop');
 let streamCamera     = null;
 let cropper          = null;
 let cropContext      = { type: 'equipamento' };
-let cÃ¢meraCaptureContext = { type: 'equipamento', entryId: null };
+let câmeraCaptureContext = { type: 'equipamento', entryId: null };
 let cropperUnavailableWarned = false;
 let cropModalFailureWarned = false;
 let activeCropToken = 0;
@@ -8859,11 +8859,11 @@ document.getElementById('btnAbrirGaleria')?.addEventListener('click', () => novo
 
 async function openCameraCapture(context = { type: 'equipamento', entryId: null }) {
     closeImageModalIfOpen();
-    cÃ¢meraCaptureContext = context;
+    câmeraCaptureContext = context;
     try {
         if (!navigator.mediaDevices?.getUserMedia) {
             console.error('[OS Nova] navigator.mediaDevices.getUserMedia indisponivel');
-            showWarningDialog('Este dispositivo ou navegador nÃ£o permite acesso Ã  cÃ¢mera.', 'CÃ¢mera indisponÃ­vel');
+            showWarningDialog('Este dispositivo ou navegador não permite acesso à câmera.', 'Câmera indisponível');
             return;
         }
 
@@ -8877,7 +8877,7 @@ async function openCameraCapture(context = { type: 'equipamento', entryId: null 
             videoCamera.srcObject = streamCamera;
             const playPromise = videoCamera.play?.();
             if (playPromise && typeof playPromise.catch === 'function') {
-                playPromise.catch(err => console.error('[OS Nova] falha ao iniciar preview da cÃ¢mera', err));
+                playPromise.catch(err => console.error('[OS Nova] falha ao iniciar preview da câmera', err));
             }
         }
 
@@ -8889,11 +8889,11 @@ async function openCameraCapture(context = { type: 'equipamento', entryId: null 
         try {
             bootstrap.Modal.getInstance(modalCameraEl)?.dispose();
         } catch (error) {
-            console.error('[OS Nova] falha ao descartar instancia anterior do modal da cÃ¢mera', error);
+            console.error('[OS Nova] falha ao descartar instancia anterior do modal da câmera', error);
         }
 
-        const cÃ¢meraModalInstance = modalCameraEl ? new bootstrap.Modal(modalCameraEl) : null;
-        cÃ¢meraModalInstance?.show();
+        const câmeraModalInstance = modalCameraEl ? new bootstrap.Modal(modalCameraEl) : null;
+        câmeraModalInstance?.show();
         window.setTimeout(() => elevateLatestBackdrop(CAMERA_MODAL_Z_INDEX - 10), 80);
 
         window.setTimeout(() => {
@@ -8901,17 +8901,17 @@ async function openCameraCapture(context = { type: 'equipamento', entryId: null 
             if (modalCameraEl.classList.contains('show') && window.getComputedStyle(modalCameraEl).display !== 'none') {
                 return;
             }
-            console.error('[OS Nova] modal da cÃ¢mera nao abriu corretamente', {
+            console.error('[OS Nova] modal da câmera nao abriu corretamente', {
                 context,
                 display: modalCameraEl.style.display,
                 computedDisplay: window.getComputedStyle(modalCameraEl).display,
                 classes: modalCameraEl.className
             });
-            showWarningDialog('NÃ£o foi possÃ­vel abrir a interface da cÃ¢mera. Tente pela galeria enquanto ajustamos este fluxo.', 'Falha ao abrir cÃ¢mera');
+            showWarningDialog('Não foi possível abrir a interface da câmera. Tente pela galeria enquanto ajustamos este fluxo.', 'Falha ao abrir câmera');
         }, 1000);
     } catch (err) {
-        console.error('[OS Nova] falha ao acessar cÃ¢mera', err);
-        showWarningDialog('NÃ£o foi possÃ­vel acessar a cÃ¢mera: ' + err.message, 'CÃ¢mera indisponÃ­vel');
+        console.error('[OS Nova] falha ao acessar câmera', err);
+        showWarningDialog('Não foi possível acessar a câmera: ' + err.message, 'Câmera indisponível');
     }
 }
 
@@ -8924,7 +8924,7 @@ modalCameraEl?.addEventListener('shown.bs.modal', () => {
         modalCameraEl.style.zIndex = String(CAMERA_MODAL_Z_INDEX);
     }
     elevateLatestBackdrop(CAMERA_MODAL_Z_INDEX - 10);
-    console.info('[OS Nova] modal da cÃ¢mera exibido com sucesso');
+    console.info('[OS Nova] modal da câmera exibido com sucesso');
 });
 
 modalCameraEl?.addEventListener('hidden.bs.modal', () => {
@@ -8935,22 +8935,22 @@ modalCameraEl?.addEventListener('hidden.bs.modal', () => {
     if (videoCamera) {
         videoCamera.srcObject = null;
     }
-    if (cÃ¢meraCaptureContext.type === 'acessorio' && cropContext.type !== 'acessorio') {
+    if (câmeraCaptureContext.type === 'acessorio' && cropContext.type !== 'acessorio') {
         acessorioCropEntryId = null;
         acessorioCropQueue = [];
     }
-    if (cÃ¢meraCaptureContext.type === 'estado_fisico' && cropContext.type !== 'estado_fisico') {
+    if (câmeraCaptureContext.type === 'estado_fisico' && cropContext.type !== 'estado_fisico') {
         estadoFisicoCropEntryId = null;
         estadoFisicoCropQueue = [];
     }
-    if (cÃ¢meraCaptureContext.type === 'checklist_entrada' && cropContext.type !== 'checklist_entrada') {
+    if (câmeraCaptureContext.type === 'checklist_entrada' && cropContext.type !== 'checklist_entrada') {
         checklistEntradaCropItemId = null;
         checklistEntradaCropQueue = [];
     }
-    if (cÃ¢meraCaptureContext.type === 'entrada' && cropContext.type !== 'entrada') {
+    if (câmeraCaptureContext.type === 'entrada' && cropContext.type !== 'entrada') {
         fotosEntradaCropQueue = [];
     }
-    cÃ¢meraCaptureContext = { type: 'equipamento', entryId: null };
+    câmeraCaptureContext = { type: 'equipamento', entryId: null };
     scheduleModalCleanup();
 });
 
@@ -8962,7 +8962,7 @@ function setCropContext(context = { type: 'equipamento' }) {
         } else if (cropContext.type === 'estado_fisico') {
             modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto do Estado Fisico';
         } else if (cropContext.type === 'checklist_entrada') {
-            modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto da Discrep?ncia';
+            modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto da Discrepância';
         } else if (cropContext.type === 'entrada') {
             modalCropTitle.innerHTML = '<i class="bi bi-crop text-warning me-2"></i>Ajustar Foto de Entrada da OS';
         } else {
@@ -9001,7 +9001,7 @@ function isCropModalVisible() {
 function appendBlobToCurrentPhotoContext(blob, canvas) {
     if (!blob) {
         console.error('[OS Nova] blob vazio ao anexar foto', cropContext);
-        showWarningDialog('NÃ£o foi possÃ­vel gerar a imagem selecionada.');
+        showWarningDialog('Não foi possível gerar a imagem selecionada.');
         return;
     }
 
@@ -9141,7 +9141,7 @@ function fallbackCropperFromSource(source, context, warnMessage = null) {
         const ctx = canvas.getContext('2d');
         if (!ctx) {
             console.error('[OS Nova] Canvas nao disponivel no fallback de imagem', context);
-            showWarningDialog('NÃ£o foi possÃ­vel processar a imagem selecionada.');
+            showWarningDialog('Não foi possível processar a imagem selecionada.');
             hideModalSafe(modalCrop, '#modalCropEquip');
             return;
         }
@@ -9151,7 +9151,7 @@ function fallbackCropperFromSource(source, context, warnMessage = null) {
     };
     img.onerror = () => {
         console.error('[OS Nova] erro ao carregar imagem no fallback visual', context);
-        showWarningDialog('NÃ£o foi possÃ­vel carregar a imagem para envio.');
+        showWarningDialog('Não foi possível carregar a imagem para envio.');
         hideModalSafe(modalCrop, '#modalCropEquip');
     };
     img.src = source;
@@ -9290,8 +9290,8 @@ document.getElementById('btnRotateRight')?.addEventListener('click', () => {
 btnCapturar?.addEventListener('click', () => {
     const context = canvasCamera.getContext('2d');
     if (!context || !videoCamera) {
-        console.error('[OS Nova] cÃ¢mera indisponivel para captura');
-        showWarningDialog('NÃ£o foi possÃ­vel capturar a foto pela cÃ¢mera.', 'CÃ¢mera indisponÃ­vel');
+        console.error('[OS Nova] câmera indisponivel para captura');
+        showWarningDialog('Não foi possível capturar a foto pela câmera.', 'Câmera indisponível');
         return;
     }
     canvasCamera.width  = videoCamera.videoWidth || 1280;
@@ -9300,25 +9300,25 @@ btnCapturar?.addEventListener('click', () => {
 
     const dataUrl = canvasCamera.toDataURL('image/jpeg');
     hideModalSafe(bootstrap.Modal.getOrCreateInstance(modalCameraEl), '#modalCamera');
-    if (cÃ¢meraCaptureContext.type === 'acessorio' && cÃ¢meraCaptureContext.entryId) {
-        acessorioCropEntryId = cÃ¢meraCaptureContext.entryId;
+    if (câmeraCaptureContext.type === 'acessorio' && câmeraCaptureContext.entryId) {
+        acessorioCropEntryId = câmeraCaptureContext.entryId;
         acessorioCropQueue = [];
         openCropper(dataUrl, { type: 'acessorio' });
         return;
     }
-    if (cÃ¢meraCaptureContext.type === 'estado_fisico' && cÃ¢meraCaptureContext.entryId) {
-        estadoFisicoCropEntryId = cÃ¢meraCaptureContext.entryId;
+    if (câmeraCaptureContext.type === 'estado_fisico' && câmeraCaptureContext.entryId) {
+        estadoFisicoCropEntryId = câmeraCaptureContext.entryId;
         estadoFisicoCropQueue = [];
         openCropper(dataUrl, { type: 'estado_fisico' });
         return;
     }
-    if (cÃ¢meraCaptureContext.type === 'checklist_entrada' && cÃ¢meraCaptureContext.entryId) {
-        checklistEntradaCropItemId = String(cÃ¢meraCaptureContext.entryId);
+    if (câmeraCaptureContext.type === 'checklist_entrada' && câmeraCaptureContext.entryId) {
+        checklistEntradaCropItemId = String(câmeraCaptureContext.entryId);
         checklistEntradaCropQueue = [];
         openCropper(dataUrl, { type: 'checklist_entrada' });
         return;
     }
-    if (cÃ¢meraCaptureContext.type === 'entrada') {
+    if (câmeraCaptureContext.type === 'entrada') {
         openCropper(dataUrl, { type: 'entrada' });
         return;
     }
@@ -9328,7 +9328,7 @@ btnCapturar?.addEventListener('click', () => {
 document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
     if (!cropper) return;
     const canvas = cropper.getCroppedCanvas({
-        width: 1024, // Limita o tamanho para nÃ£o sobrecarregar
+        width: 1024, // Limita o tamanho para não sobrecarregar
         height: 1024,
         imageSmoothingEnabled: true,
         imageSmoothingQuality: 'high',
@@ -9414,7 +9414,7 @@ document.getElementById('btnConfirmCrop')?.addEventListener('click', () => {
         novoEquipFotosDataTransfer.items.add(file);
         syncNovoEquipFotosInput();
 
-        detectDominantColorOS(canvas); // <--- Inicia a detecÃ§Ã£o de cor automÃ¡tica na OS
+        detectDominantColorOS(canvas); // <--- Inicia a detecção de cor automática na OS
 
         // Preview Final
         renderNovoEquipFotosNovas();
@@ -9442,7 +9442,7 @@ if (btnConfirmCropOriginal && btnConfirmCropOriginal.parentNode) {
 
         if (!canvas) {
             console.error('[OS Nova] getCroppedCanvas retornou vazio', cropContext);
-            showWarningDialog('NÃ£o foi possÃ­vel preparar a imagem selecionada.');
+            showWarningDialog('Não foi possível preparar a imagem selecionada.');
             return;
         }
 
@@ -9500,7 +9500,7 @@ async function deleteModalEquipFotoExistente(fotoId) {
         });
         const res = await response.json();
         if (!res || res.success !== true) {
-            throw new Error(res?.message || 'NÃ£o foi possÃ­vel excluir a foto.');
+            throw new Error(res?.message || 'Não foi possível excluir a foto.');
         }
 
         if (Array.isArray(res.fotos)) {
@@ -9526,7 +9526,7 @@ async function deleteModalEquipFotoExistente(fotoId) {
         renderModalEquipFotosExistentes(previousFotos);
         renderNovoEquipFotosNovas();
         syncSidebarFotosFromModal(previousFotos);
-        showWarningDialog(error?.message || 'NÃ£o foi possÃ­vel excluir a foto.', 'Falha na exclusÃ£o');
+        showWarningDialog(error?.message || 'Não foi possível excluir a foto.', 'Falha na exclusão');
     }
 }
 
@@ -9561,7 +9561,7 @@ async function definirModalEquipFotoPrincipal(fotoId) {
         });
         const res = await response.json();
         if (!res || res.success !== true) {
-            throw new Error(res?.message || 'NÃ£o foi possÃ­vel definir a foto principal.');
+            throw new Error(res?.message || 'Não foi possível definir a foto principal.');
         }
 
         const fotos = Array.isArray(res.fotos) ? res.fotos : [];
@@ -9571,7 +9571,7 @@ async function definirModalEquipFotoPrincipal(fotoId) {
         renderNovoEquipFotosNovas();
         syncSidebarFotosFromModal(fotos);
     } catch (error) {
-        showWarningDialog(error?.message || 'NÃ£o foi possÃ­vel definir a foto principal.', 'Falha ao atualizar');
+        showWarningDialog(error?.message || 'Não foi possível definir a foto principal.', 'Falha ao atualizar');
     }
 }
 
@@ -9615,7 +9615,7 @@ document.addEventListener('click', async function(event) {
     renderNovoEquipFotosNovas();
 });
 
-// --- Select2 H?brido: Modelos via API ---
+// --- Select2 Híbrido: Modelos via API ---
 function initModeloSelect2() {
     var modeloSel = $('#novoEquipModelo');
 
@@ -9629,7 +9629,7 @@ function initModeloSelect2() {
         placeholder: 'Busque ou selecione o modelo...',
         allowClear: true,
         dropdownParent: $('#modalNovoEquipamento'),
-            tags: true, // HABILITA EDI?O E NOVAS TAGS LIVRES
+            tags: true, // HABILITA EDIÇÃO E NOVAS TAGS LIVRES
         createTag: function(params) {
             var term = $.trim(params.term);
             if (term === '') return null;
@@ -9664,8 +9664,8 @@ function initModeloSelect2() {
                 return `Digite mais ${restante} caractere(s) para buscar...`;
             },
             searching: function() { return '<i class="bi bi-search me-1"></i> Buscando modelos...'; },
-            noResults: function()  { return 'Nenhuma sugestÃ£o encontrada. Use o botÃ£o <strong>+ Novo</strong> para cadastrar manualmente.'; },
-            errorLoading: function() { return 'Erro ao consultar. Verifique sua conexÃ£o.'; }
+            noResults: function()  { return 'Nenhuma sugestão encontrada. Use o botão <strong>+ Novo</strong> para cadastrar manualmente.'; },
+            errorLoading: function() { return 'Erro ao consultar. Verifique sua conexão.'; }
         },
         templateResult: function (data) {
             if (data.loading) return data.text;
@@ -9675,7 +9675,7 @@ function initModeloSelect2() {
                 return $(`
                 <div>
                     <strong class="d-block text-primary"><i class="bi bi-pencil-square me-1"></i> "${data.text}"</strong>
-                            <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (ediÃ§Ã£o manual)</small>
+                            <small class="text-muted" style="font-size: 0.75rem;">Usar este nome (edição manual)</small>
                 </div>`);
             }
 
@@ -9693,7 +9693,7 @@ function initModeloSelect2() {
     }).on('select2:select', function (e) {
         var data = e.params.data;
         // Armazena o nome real do modelo externo para auto-cadastro no backend
-        // Se for newTag, jÃ¡ vai salvar pelo pr?prio texto sendo o ID
+        // Se for newTag, já vai salvar pelo próprio texto sendo o ID
         if (data.id && String(data.id).indexOf('EXT|') === 0) {
             $('#novoEquipModeloNomeExt').val(data.text);
         } else {
@@ -9901,7 +9901,7 @@ function renderDefeitosSelecionadosCard() {
     if (!totalCatalogados) {
         container.innerHTML = '<span class="text-muted small">Selecione o equipamento para carregar os defeitos...</span>';
         if (defeitosHelperText) {
-            defeitosHelperText.textContent = 'Selecione os defeitos que se aplicam ao diagnÃ³stico atual.';
+            defeitosHelperText.textContent = 'Selecione os defeitos que se aplicam ao diagnóstico atual.';
         }
         return;
     }
@@ -10084,7 +10084,7 @@ function carregarDefeitos(tipoId) {
         }
         container.innerHTML = '<span class="text-muted small">Selecione o equipamento para carregar os defeitos...</span>';
         if (defeitosHelperText) {
-            defeitosHelperText.textContent = 'Selecione os defeitos que se aplicam ao diagnÃ³stico atual.';
+            defeitosHelperText.textContent = 'Selecione os defeitos que se aplicam ao diagnóstico atual.';
         }
         updateResumo();
         return;
@@ -10107,7 +10107,7 @@ function carregarDefeitos(tipoId) {
                 modalDefeitosComunsBody.innerHTML = `<span class="text-muted small">Nenhum defeito comum cadastrado para este tipo. <a href="${BASE_URL}equipamentosdefeitos" target="_blank">Cadastrar defeitos</a></span>`;
             }
             if (modalDefeitosHint) {
-                modalDefeitosHint.textContent = 'NÃ£o existem defeitos comuns cadastrados para o tipo selecionado.';
+                modalDefeitosHint.textContent = 'Não existem defeitos comuns cadastrados para o tipo selecionado.';
             }
             if (btnAdicionarDefeitosComuns) btnAdicionarDefeitosComuns.disabled = true;
             updateResumo();
@@ -10204,7 +10204,7 @@ function abrirProcedimentosViewOnly(defeitoId, nome) {
     });
 }
 
-// --- Modal de VisualizaÃ§Ã£o de Imagem (Lightbox) ---
+// --- Modal de Visualização de Imagem (Lightbox) ---
 updateResumo();
 document.addEventListener('DOMContentLoaded', function() {
     const modalInnerHtml = `

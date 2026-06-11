@@ -32,7 +32,7 @@ class Configuracoes extends BaseController
         }
 
         $data = [
-            'title' => 'ConfiguraÃ§Ãµes',
+            'title' => 'Configurações',
             'configs' => $configs,
         ];
 
@@ -231,9 +231,9 @@ class Configuracoes extends BaseController
             $this->clearWhatsAppConnectionStatus();
         }
 
-        LogModel::registrar('configuracao', 'ConfiguraÃ§Ãµes do sistema atualizadas');
+        LogModel::registrar('configuracao', 'Configurações do sistema atualizadas');
 
-        return redirect()->to('/configuracoes')->with('success', 'ConfiguraÃ§Ãµes salvas com sucesso.');
+        return redirect()->to('/configuracoes')->with('success', 'Configurações salvas com sucesso.');
     }
 
     public function sendEmailTest()
@@ -242,7 +242,7 @@ class Configuracoes extends BaseController
         if ($emailDestino === '' || !filter_var($emailDestino, FILTER_VALIDATE_EMAIL)) {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'Informe um e-mail de teste vÃ¡lido.',
+                'message' => 'Informe um e-mail de teste válido.',
             ]);
         }
 
@@ -278,7 +278,7 @@ class Configuracoes extends BaseController
                    <strong>Porta:</strong> ' . esc($porta !== '' ? $porta : '-') . '<br>
                    <strong>Criptografia:</strong> ' . esc($crypto !== '' ? strtoupper($crypto) : 'AUTO/NENHUMA') . '<br>
                    <strong>Timeout:</strong> ' . esc($timeout !== '' ? ($timeout . 's') : '-') . '</p>
-                <p>Se vocÃª recebeu este e-mail, o prÃ³ximo passo natural Ã© validar o envio real de orÃ§amentos e recuperaÃ§Ã£o de senha.</p>
+                <p>Se você recebeu este e-mail, o próximo passo natural é validar o envio real de orçamentos e recuperação de senha.</p>
             </div>';
 
         $result = $mailService->send($emailDestino, 'Teste de e-mail do ERP', $mensagem, null, $overrides);
@@ -333,14 +333,14 @@ class Configuracoes extends BaseController
         if (!empty($result['ok'])) {
             return $this->response->setJSON([
                 'ok' => true,
-                'message' => $result['message'] ?? 'ConexÃ£o validada com sucesso.',
+                'message' => $result['message'] ?? 'Conexão validada com sucesso.',
                 'response' => $result['response'] ?? null,
             ]);
         }
 
         return $this->response->setJSON([
             'ok' => false,
-            'message' => $result['message'] ?? 'Falha ao validar conexÃ£o do provedor WhatsApp.',
+            'message' => $result['message'] ?? 'Falha ao validar conexão do provedor WhatsApp.',
             'response' => $result['response'] ?? null,
             'status_code' => $result['status_code'] ?? null,
             'failure_type' => $result['failure_type'] ?? 'provider_unavailable',
@@ -360,7 +360,7 @@ class Configuracoes extends BaseController
         }
 
         if ($mensagem === '') {
-            $mensagem = '[Teste de integraÃ§Ã£o] Mensagem de teste enviada pelo ERP.';
+            $mensagem = '[Teste de integração] Mensagem de teste enviada pelo ERP.';
         }
 
         $providerType = trim((string) $this->request->getPost('provider'));
@@ -417,7 +417,7 @@ class Configuracoes extends BaseController
         if ($webhookToken === '') {
             return $this->response->setStatusCode(422)->setJSON([
                 'ok' => false,
-                'message' => 'Webhook Token (inbound) nÃ£o configurado no ERP.',
+                'message' => 'Webhook Token (inbound) não configurado no ERP.',
             ]);
         }
 
@@ -444,7 +444,7 @@ class Configuracoes extends BaseController
             'ok' => $allOk,
             'message' => $allOk
                 ? 'Self-check inbound validado com sucesso.'
-                : 'Self-check inbound encontrou pendÃªncias de configuraÃ§Ã£o ou comunicaÃ§Ã£o.',
+                : 'Self-check inbound encontrou pendências de configuração ou comunicação.',
             'checks' => [
                 'gateway_status' => [
                     'ok' => $statusOk,
@@ -535,7 +535,7 @@ class Configuracoes extends BaseController
         // Para Windows (XAMPP / Local)
         $apiPath = ROOTPATH . 'whatsapp-api';
         if (!is_dir($apiPath)) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Pasta whatsapp-api nÃ£o encontrada.']);
+            return $this->response->setJSON(['success' => false, 'message' => 'Pasta whatsapp-api não encontrada.']);
         }
 
         if ($isWindows) {
@@ -546,11 +546,11 @@ class Configuracoes extends BaseController
 
             return $this->response->setJSON([
                 'success' => true,
-                'message' => 'Comando de inicializaÃ§Ã£o enviado para o Windows. Aguarde alguns segundos.',
+                'message' => 'Comando de inicialização enviado para o Windows. Aguarde alguns segundos.',
             ]);
         }
 
-        return $this->response->setJSON(['success' => false, 'message' => 'Sistema operacional nÃ£o suportado para auto-start direto.']);
+        return $this->response->setJSON(['success' => false, 'message' => 'Sistema operacional não suportado para auto-start direto.']);
     }
 
     private function buildProviderOverrides(): array
@@ -708,7 +708,7 @@ class Configuracoes extends BaseController
             return [
                 'success' => false,
                 'status' => 'invalid_response',
-                'message' => 'Resposta invÃ¡lida do gateway.',
+                'message' => 'Resposta inválida do gateway.',
                 'error' => [
                     'body' => (string) $response->getBody(),
                     'status_code' => $response->getStatusCode(),
@@ -718,7 +718,7 @@ class Configuracoes extends BaseController
             return [
                 'success' => false,
                 'status' => 'gateway_unreachable',
-                'message' => 'Servidor do gateway inacessÃ­vel.',
+                'message' => 'Servidor do gateway inacessível.',
                 'error' => [
                     'detail' => $e->getMessage(),
                     'url' => $gateway['url'] . $path,
@@ -763,7 +763,7 @@ class Configuracoes extends BaseController
                     'status_code' => $statusCode,
                     'message' => is_array($decoded)
                         ? ((string) ($decoded['message'] ?? 'Webhook respondeu sem mensagem.'))
-                        : 'Resposta invÃ¡lida do webhook.',
+                        : 'Resposta inválida do webhook.',
                 ];
                 $attempts[] = $attemptInfo;
 

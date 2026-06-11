@@ -152,7 +152,7 @@ $routes->post('notificacoes/limpar-lidas', 'Notificacoes::clearRead');
     $routes->post('fornecedores/atualizar/(:num)','Fornecedores::update/$1',  ['filter' => 'permission:fornecedores:editar']);
     $routes->get('fornecedores/excluir/(:num)',   'Fornecedores::delete/$1',  ['filter' => 'permission:fornecedores:excluir']);
 
-    // -- FuncionÃ¡rios ------------------------------------------------------
+    // -- Funcionários ------------------------------------------------------
     $routes->get('funcionarios',                  'Funcionarios::index',      ['filter' => 'permission:funcionarios:visualizar']);
     $routes->get('funcionarios/novo',             'Funcionarios::create',     ['filter' => 'permission:funcionarios:criar']);
     $routes->post('funcionarios/salvar',          'Funcionarios::store',      ['filter' => 'permission:funcionarios:criar']);
@@ -318,7 +318,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->get('central-mensagens/configuracoes',         'CentralMensagens::configuracoes',               ['filter' => 'permission:atendimento_whatsapp:visualizar']);
     $routes->post('central-mensagens/configuracoes/salvar', 'CentralMensagens::salvarConfiguracoes',         ['filter' => 'permission:atendimento_whatsapp:editar']);
 
-    // -- Ordens de ServiÃ§o -------------------------------------------------
+    // -- Ordens de Serviço -------------------------------------------------
     $routes->get('os',                    'Os::index',              ['filter' => 'permission:os:visualizar']);
     $routes->post('os/datatable',         'Os::datatable',          ['filter' => 'permission:os:visualizar']);
     $routes->get('os/fotos/(:num)',      'Os::photos/$1',          ['filter' => 'permission:os:visualizar']);
@@ -364,7 +364,7 @@ $routes->post('central-mensagens/atualizar-meta',       'CentralMensagens::atual
     $routes->post('conhecimento/templates-whatsapp/salvar',   'ConhecimentoTemplates::saveWhatsapp', ['filter' => 'permission:os:editar']);
     $routes->post('conhecimento/templates-whatsapp/toggle/(:num)', 'ConhecimentoTemplates::toggleWhatsapp/$1', ['filter' => 'permission:os:editar']);
 
-    // -- ServiÃ§os ----------------------------------------------------------
+    // -- Serviços ----------------------------------------------------------
     $routes->get('servicos',                  'Servicos::index',            ['filter' => 'permission:servicos:visualizar']);
     $routes->get('servicos/novo',             'Servicos::create',           ['filter' => 'permission:servicos:criar']);
     $routes->post('servicos/salvar',          'Servicos::store',            ['filter' => 'permission:servicos:criar']);
@@ -465,7 +465,7 @@ $routes->post('orcamentos/central-mensagens/gerar-enviar', 'Orcamentos::quickCre
     $routes->get('financeiro/excluir/(:num)',   'Financeiro::delete/$1',['filter' => 'permission:financeiro:excluir']);
     $routes->post('financeiro/baixar/(:num)',   'Financeiro::pay/$1',   ['filter' => 'permission:financeiro:editar']);
 
-    // -- RelatÃ³rios --------------------------------------------------------
+    // -- Relatórios --------------------------------------------------------
     $routes->get('relatorios',             'Relatorios::index',      ['filter' => 'permission:relatorios:visualizar']);
     $routes->get('relatorios/os',          'Relatorios::osByPeriod', ['filter' => 'permission:relatorios:visualizar']);
     $routes->get('relatorios/financeiro',  'Relatorios::financial',  ['filter' => 'permission:relatorios:visualizar']);
@@ -474,7 +474,7 @@ $routes->post('orcamentos/central-mensagens/gerar-enviar', 'Orcamentos::quickCre
     $routes->get('relatorios/estoque',     'Relatorios::stock',      ['filter' => 'permission:relatorios:visualizar']);
     $routes->get('relatorios/clientes',    'Relatorios::clients',    ['filter' => 'permission:relatorios:visualizar']);
 
-    // -- ConfiguraÃ§Ãµes -----------------------------------------------------
+    // -- Configurações -----------------------------------------------------
     $routes->get('configuracoes',          'Configuracoes::index',   ['filter' => 'permission:configuracoes:visualizar']);
     $routes->post('configuracoes/salvar',  'Configuracoes::save',    ['filter' => 'permission:configuracoes:editar']);
     $routes->post('configuracoes/email/enviar-teste', 'Configuracoes::sendEmailTest', ['filter' => 'permission:configuracoes:editar']);
@@ -487,7 +487,7 @@ $routes->post('orcamentos/central-mensagens/gerar-enviar', 'Orcamentos::quickCre
     $routes->post('configuracoes/whatsapp/local-start', 'Configuracoes::whatsappLocalStart', ['filter' => 'permission:configuracoes:editar']);
     $routes->post('configuracoes/whatsapp/self-check-inbound', 'Configuracoes::whatsappInboundSelfCheck', ['filter' => 'permission:configuracoes:editar']);
 
-    // -- UsuÃ¡rios ----------------------------------------------------------
+    // -- Usuários ----------------------------------------------------------
     $routes->get('usuarios',                  'Usuarios::index',    ['filter' => 'permission:usuarios:visualizar']);
     $routes->post('usuarios/datatable',       'Usuarios::datatable',['filter' => 'permission:usuarios:visualizar']);
     $routes->get('usuarios/novo',             'Usuarios::create',   ['filter' => 'permission:usuarios:criar']);
@@ -496,14 +496,14 @@ $routes->post('orcamentos/central-mensagens/gerar-enviar', 'Orcamentos::quickCre
     $routes->post('usuarios/atualizar/(:num)','Usuarios::update/$1',['filter' => 'permission:usuarios:editar']);
     $routes->get('usuarios/excluir/(:num)',   'Usuarios::delete/$1',['filter' => 'permission:usuarios:excluir']);
 
-    // -- DocumentaÃ§Ã£o (Central de Conhecimento / Wiki) ---------------------
+    // -- Documentação (Central de Conhecimento / Wiki) ---------------------
     $routes->get('design-system',         'DesignSystem::index', ['filter' => 'permission:configuracoes:visualizar']);
     $routes->get('documentacao',          'Documentacao::index');
     $routes->get('documentacao/arquivo',  'Documentacao::arquivo');
     $routes->get('documentacao/buscar',   'Documentacao::buscar');
     $routes->get('documentacao/arvore',   'Documentacao::arvore');
 
-    // -- Upload (apenas usuÃ¡rios autenticados) -----------------------------
+    // -- Upload (apenas usuários autenticados) -----------------------------
     $routes->post('upload/imagem',         'Upload::image');
     // -- Busca Global ------------------------------------------------------
     $routes->get('api/busca-global', 'GlobalSearch::index');

@@ -27,7 +27,7 @@ $totalSubgrupos = count($dre_subgrupos ?? []);
 
 <div class="alert alert-light border shadow-sm mb-4">
     <strong>Governanca do financeiro gerencial.</strong>
-    <span class="d-block mt-1">Cadastre aqui as `categorias financeiras` que aparecem no lanÃ§amento e mantenha a estrutura de `grupo` e `subgrupo DRE` organizada para a operacao e para os relatorios.</span>
+    <span class="d-block mt-1">Cadastre aqui as `categorias financeiras` que aparecem no lançamento e mantenha a estrutura de `grupo` e `subgrupo DRE` organizada para a operacao e para os relatorios.</span>
 </div>
 
 <div class="row g-3 mb-4">

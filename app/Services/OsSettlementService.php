@@ -112,7 +112,7 @@ class OsSettlementService
         $this->financeiroModel->insert([
             'os_id' => $osId,
             'tipo' => 'receber',
-            'categoria' => 'ServiÃ§o',
+            'categoria' => 'Serviço',
             'descricao' => 'OS ' . trim((string) ($os['numero_os'] ?? ('#' . $osId))),
             'valor' => $valorFinal,
             'status' => 'pendente',
@@ -302,13 +302,13 @@ class OsSettlementService
 
         $numeroOs = trim((string) ($os['numero_os'] ?? ('#' . (int) ($os['id'] ?? 0))));
         $operadora = trim((string) ($simulation['operadora']['nome'] ?? 'Operadora'));
-        $modalidadeLabel = trim((string) ($simulation['modalidade_label'] ?? 'CartÃ£o'));
+        $modalidadeLabel = trim((string) ($simulation['modalidade_label'] ?? 'Cartão'));
         $parcelas = max(1, (int) ($simulation['parcelas'] ?? 1));
 
         $this->financeiroModel->insert([
             'os_id' => (int) ($os['id'] ?? 0) > 0 ? (int) $os['id'] : null,
             'tipo' => 'pagar',
-            'categoria' => 'Taxa de cartÃ£o',
+            'categoria' => 'Taxa de cartão',
             'descricao' => sprintf(
                 'Taxa %s - OS %s (%s%s)',
                 $operadora,
@@ -321,7 +321,7 @@ class OsSettlementService
             'data_vencimento' => substr($dataPagamento, 0, 10),
             'data_pagamento' => substr($dataPagamento, 0, 10),
             'forma_pagamento' => (string) ($simulation['modalidade'] ?? '') === 'debito' ? 'cartao_debito' : 'cartao_credito',
-            'observacoes' => 'Despesa criada automaticamente na baixa da OS para registrar o custo lÃ­quido da operadora.',
+            'observacoes' => 'Despesa criada automaticamente na baixa da OS para registrar o custo líquido da operadora.',
             'impacta_dre' => 1,
             'impacta_fluxo_caixa' => 1,
             'dre_fixo_mensal' => 0,
@@ -360,8 +360,8 @@ class OsSettlementService
         return $this->crmService->createFollowup([
             'cliente_id' => (int) ($os['cliente_id'] ?? 0) > 0 ? (int) $os['cliente_id'] : null,
             'os_id' => $osId,
-            'titulo' => 'Retorno pÃ³s-serviÃ§o da OS ' . trim((string) ($os['numero_os'] ?? ('#' . $osId))),
-            'descricao' => 'Retorno agendado automaticamente na baixa da OS para revisar satisfaÃ§Ã£o e novas necessidades do cliente.',
+            'titulo' => 'Retorno pós-serviço da OS ' . trim((string) ($os['numero_os'] ?? ('#' . $osId))),
+            'descricao' => 'Retorno agendado automaticamente na baixa da OS para revisar satisfação e novas necessidades do cliente.',
             'data_prevista' => $this->normalizeDateTimeOrDate($dataPrevista, '10:00:00'),
             'status' => 'pendente',
             'usuario_responsavel' => $usuarioId,
@@ -457,7 +457,7 @@ class OsSettlementService
             $osId,
             $statusFinal,
             $usuarioId,
-            'LiquidaÃ§Ã£o financeira da OS concluÃ­da automaticamente apÃ³s quitaÃ§Ã£o total.',
+            'Liquidação financeira da OS concluída automaticamente após quitação total.',
             [
                 'status_final_pendente_pagamento' => null,
             ]
@@ -468,11 +468,11 @@ class OsSettlementService
                 $osId,
                 'os_pagamento_regularizado',
                 'Pagamento regularizado',
-                'A OS foi encerrada definitivamente apÃ³s a quitaÃ§Ã£o total do tÃ­tulo financeiro.',
+                'A OS foi encerrada definitivamente após a quitação total do título financeiro.',
                 $usuarioId
             );
         } catch (\Throwable $e) {
-            log_message('warning', '[OsSettlementService] Falha ao registrar evento CRM de quitaÃ§Ã£o da OS {os_id}: {message}', [
+            log_message('warning', '[OsSettlementService] Falha ao registrar evento CRM de quitação da OS {os_id}: {message}', [
                 'os_id' => $osId,
                 'message' => $e->getMessage(),
             ]);
@@ -591,7 +591,7 @@ class OsSettlementService
         $numeroOs = trim((string) ($os['numero_os'] ?? ('#' . (int) ($os['id'] ?? 0))));
 
         return sprintf(
-            'OlÃ¡, %s. A OS %s jÃ¡ foi concluÃ­da e ainda consta um saldo pendente de R$ %s. Este Ã© um lembrete automÃ¡tico do %dÂº dia apÃ³s a entrega. Se preferir, responda esta mensagem para combinarmos a quitaÃ§Ã£o.',
+            'Olá, %s. A OS %s já foi concluída e ainda consta um saldo pendente de R$ %s. Este é um lembrete automático do %dº dia após a entrega. Se preferir, responda esta mensagem para combinarmos a quitação.',
             $cliente !== '' ? $cliente : 'cliente',
             $numeroOs,
             number_format($saldoAberto, 2, ',', '.'),

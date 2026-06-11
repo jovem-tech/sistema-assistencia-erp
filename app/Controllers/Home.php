@@ -15,7 +15,7 @@ class Home extends BaseController
         $mobileUrl = trim((string) get_config('mobile_pwa_url', '/atendimento-mobile-app/login'));
         $whatsAppHref = $this->buildWhatsAppHref(
             $whatsPhone,
-            'OlÃ¡! Quero agendar uma demonstraÃ§Ã£o do ERP de assistÃªncia tÃ©cnica.'
+            'Olá! Quero agendar uma demonstração do ERP de assistência técnica.'
         );
 
         return view('public/landing_page', [
@@ -30,7 +30,7 @@ class Home extends BaseController
             'mobileUrl' => $this->normalizeAppUrl($mobileUrl, base_url('login')),
             'whatsAppHref' => $whatsAppHref,
             'primaryCtaHref' => $whatsAppHref ?: '#recursos',
-            'primaryCtaLabel' => $whatsAppHref !== null ? 'Agendar demonstraÃ§Ã£o' : 'Ver mÃ³dulos principais',
+            'primaryCtaLabel' => $whatsAppHref !== null ? 'Agendar demonstração' : 'Ver módulos principais',
             'systemVersion' => get_system_version(),
         ]);
     }

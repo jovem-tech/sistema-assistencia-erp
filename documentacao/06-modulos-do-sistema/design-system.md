@@ -74,8 +74,8 @@ Padrao recente da listagem de OS em `layouts/os-list-layout.css`:
 - celula `Status / Orcamento` com badge principal, linha menor de orcamento e estado secundario oculto quando redundante;
 - celula `Valor` com mini resumo financeiro centrado em `Total OS`, seguido de `Recebido`, `Adiantamento` e `Saldo`;
 - larguras fixas proporcionais para `Foto / OS`, `Cliente`, `Equipamento`, `Datas`, `Status / Orcamento` e `Valor`, preservando leitura do financeiro sem invadir badges ou datas;
-- no modo card mobile, cada `td` vira uma linha flexivel com `data-label` aplicado pelo indice real da coluna, evitando sobreposicao quando `NÂº OS` fica oculto;
-- o card mobile nao usa mais a grade interna por areas para o bloco principal da OS, preferindo fluxo linear com rÃ³tulo e valor separados;
+- no modo card mobile, cada `td` vira uma linha flexivel com `data-label` aplicado pelo indice real da coluna, evitando sobreposicao quando `Nº OS` fica oculto;
+- o card mobile nao usa mais a grade interna por areas para o bloco principal da OS, preferindo fluxo linear com rótulo e valor separados;
 - modais operacionais rapidos da fila (`Datas`, `Orcamento`, `WhatsApp`, `Status` e `Baixa`) compartilhando a mesma estrutura de altura, scroll e rodape fixo.
 
 5. `patterns/`

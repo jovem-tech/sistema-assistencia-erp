@@ -65,7 +65,7 @@ class Precificacao extends BaseController
         $servicoOverrides = $this->servicoOverrideModel->getAtivos();
 
         $data = [
-            'title' => 'PrecificaÃ§Ã£o - ConfiguraÃ§Ã£o',
+            'title' => 'Precificação - Configuração',
             'configs' => $this->loadConfigSnapshot(),
             'parametrosTableReady' => $parametrosTableReady,
             'parametrosCategorias' => $categorias,
@@ -83,7 +83,7 @@ class Precificacao extends BaseController
         $componentesTableReady = $this->componenteModel->isTableReady();
 
         $data = [
-            'title' => 'PrecificaÃ§Ã£o - Simulador',
+            'title' => 'Precificação - Simulador',
             'configs' => $this->loadConfigSnapshot(),
             'componentesTableReady' => $componentesTableReady,
             'componentesPeca' => $componentesTableReady ? $this->componenteModel->getAtivosPorGrupo('encargo_peca_percentual', 'percentual') : [],
@@ -104,7 +104,7 @@ class Precificacao extends BaseController
 
         if (! $this->parametroModel->isTableReady()) {
             return redirect()->to('/precificacao/configuracao')
-                ->with('warning', 'Tabela precificacao_parametros nÃ£o encontrada. Execute as migraÃ§Ãµes.');
+                ->with('warning', 'Tabela precificacao_parametros não encontrada. Execute as migrações.');
         }
 
         $ids = (array) $this->request->getPost('parametro_id');
@@ -135,9 +135,9 @@ class Precificacao extends BaseController
         $this->syncCategoriasOverrides();
         $this->syncServicoOverrides();
 
-        LogModel::registrar('precificacao_configuracao_detalhada_salva', 'ParÃ¢metros detalhados de precificaÃ§Ã£o atualizados');
+        LogModel::registrar('precificacao_configuracao_detalhada_salva', 'Parâmetros detalhados de precificação atualizados');
 
-        return redirect()->to('/precificacao/configuracao')->with('success', 'ConfiguraÃ§Ã£o detalhada de precificaÃ§Ã£o atualizada com sucesso.');
+        return redirect()->to('/precificacao/configuracao')->with('success', 'Configuração detalhada de precificação atualizada com sucesso.');
     }
 
     public function categoriaEncargos(int $categoriaId = 0)
@@ -145,11 +145,11 @@ class Precificacao extends BaseController
         requirePermission('precificacao', 'visualizar');
 
         if ($categoriaId <= 0) {
-            return $this->response->setJSON(['ok' => false, 'message' => 'Categoria invÃ¡lida']);
+            return $this->response->setJSON(['ok' => false, 'message' => 'Categoria inválida']);
         }
 
         if (! $this->categoriaEncargoModel->isTableReady()) {
-            return $this->response->setJSON(['ok' => false, 'message' => 'Tabela de encargos nÃ£o encontrada']);
+            return $this->response->setJSON(['ok' => false, 'message' => 'Tabela de encargos não encontrada']);
         }
 
         $rows = $this->categoriaEncargoModel->getAtivosPorCategoria($categoriaId);
@@ -170,11 +170,11 @@ class Precificacao extends BaseController
         requirePermission('precificacao', 'editar');
 
         if ($categoriaId <= 0) {
-            return $this->response->setJSON(['ok' => false, 'message' => 'Categoria invÃ¡lida']);
+            return $this->response->setJSON(['ok' => false, 'message' => 'Categoria inválida']);
         }
 
         if (! $this->categoriaEncargoModel->isTableReady()) {
-            return $this->response->setJSON(['ok' => false, 'message' => 'Tabela de encargos nÃ£o encontrada']);
+            return $this->response->setJSON(['ok' => false, 'message' => 'Tabela de encargos não encontrada']);
         }
 
         $ids = (array) $this->request->getPost('encargo_id');
@@ -245,7 +245,7 @@ class Precificacao extends BaseController
         $categoriaNome = trim((string) $this->request->getGet('categoria'));
 
         if (!in_array($tipo, ['peca', 'servico', 'produto'], true)) {
-            return $this->response->setJSON(['ok' => false, 'message' => 'Tipo invÃ¡lido']);
+            return $this->response->setJSON(['ok' => false, 'message' => 'Tipo inválido']);
         }
 
         $categoriaKey = function_exists('mb_strtolower') ? mb_strtolower($categoriaNome) : strtolower($categoriaNome);
@@ -319,11 +319,11 @@ class Precificacao extends BaseController
             }
         }
 
-        LogModel::registrar('precificacao_atualizada', 'MÃ³dulo de precificaÃ§Ã£o atualizado');
+        LogModel::registrar('precificacao_atualizada', 'Módulo de precificação atualizado');
 
-        $redirect = redirect()->to('/precificacao')->with('success', 'ConfiguraÃ§Ãµes de precificaÃ§Ã£o salvas com sucesso.');
+        $redirect = redirect()->to('/precificacao')->with('success', 'Configurações de precificação salvas com sucesso.');
         if (! $componentesTableReady) {
-            return $redirect->with('warning', 'Tabela precificacao_componentes nÃ£o encontrada. Execute as migraÃ§Ãµes para habilitar componentes.');
+            return $redirect->with('warning', 'Tabela precificacao_componentes não encontrada. Execute as migrações para habilitar componentes.');
         }
 
         return $redirect;
@@ -536,7 +536,7 @@ class Precificacao extends BaseController
                     ['label' => 'Custo fornecedor', 'valor' => number_format((float) ($map['peca_custo_fornecedor_liquido'] ?? 0), 2, ',', '.')],
                     ['label' => 'Encargos totais', 'valor' => number_format((float) ($map['peca_encargos_total_percentual'] ?? 0), 2, ',', '.') . '%'],
                     ['label' => 'Margem', 'valor' => number_format((float) ($map['peca_margem_percentual'] ?? 0), 2, ',', '.') . '%'],
-                    ['label' => 'PreÃ§o recomendado', 'valor' => number_format((float) ($map['peca_preco_instalada_recomendado'] ?? 0), 2, ',', '.')],
+                    ['label' => 'Preço recomendado', 'valor' => number_format((float) ($map['peca_preco_instalada_recomendado'] ?? 0), 2, ',', '.')],
                 ];
                 continue;
             }
@@ -544,19 +544,19 @@ class Precificacao extends BaseController
             if ($categoria === 'servico') {
                 $resumos[$categoria] = [
                     ['label' => 'Custo hora', 'valor' => number_format((float) ($map['servico_custo_hora_produtiva'] ?? 0), 2, ',', '.')],
-                    ['label' => 'Tempo tÃ©cnico', 'valor' => number_format((float) ($map['servico_tempo_tecnico_horas'] ?? 0), 2, ',', '.') . 'h'],
-                    ['label' => 'PreÃ§o mÃ­nimo', 'valor' => number_format((float) ($map['servico_preco_minimo_tecnico'] ?? 0), 2, ',', '.')],
-                    ['label' => 'PreÃ§o tabela', 'valor' => number_format((float) ($map['servico_preco_tabela_referencia'] ?? 0), 2, ',', '.')],
+                    ['label' => 'Tempo técnico', 'valor' => number_format((float) ($map['servico_tempo_tecnico_horas'] ?? 0), 2, ',', '.') . 'h'],
+                    ['label' => 'Preço mínimo', 'valor' => number_format((float) ($map['servico_preco_minimo_tecnico'] ?? 0), 2, ',', '.')],
+                    ['label' => 'Preço tabela', 'valor' => number_format((float) ($map['servico_preco_tabela_referencia'] ?? 0), 2, ',', '.')],
                 ];
                 continue;
             }
 
             if ($categoria === 'produto') {
                 $resumos[$categoria] = [
-                    ['label' => 'Custo lÃ­quido', 'valor' => number_format((float) ($map['produto_custo_liquido'] ?? 0), 2, ',', '.')],
+                    ['label' => 'Custo líquido', 'valor' => number_format((float) ($map['produto_custo_liquido'] ?? 0), 2, ',', '.')],
                     ['label' => 'Encargos', 'valor' => number_format((float) ($map['produto_encargos_operacionais_percentual'] ?? 0), 2, ',', '.') . '%'],
                     ['label' => 'Margem', 'valor' => number_format((float) ($map['produto_margem_percentual'] ?? 0), 2, ',', '.') . '%'],
-                    ['label' => 'PreÃ§o sugerido', 'valor' => number_format((float) ($map['produto_preco_sugerido'] ?? 0), 2, ',', '.')],
+                    ['label' => 'Preço sugerido', 'valor' => number_format((float) ($map['produto_preco_sugerido'] ?? 0), 2, ',', '.')],
                 ];
                 continue;
             }

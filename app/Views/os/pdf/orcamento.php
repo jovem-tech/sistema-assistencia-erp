@@ -52,6 +52,6 @@
     <tr><td class="label">Desconto</td><td><?= esc(formatMoney($os['desconto'] ?? 0)) ?></td><td class="label">Valor final</td><td><strong><?= esc(formatMoney($os['valor_final'] ?? 0)) ?></strong></td></tr>
 </table>
 
-  <div class="footer">AprovaÃ§Ã£o deste orÃ§amento autoriza execuÃ§Ã£o do serviÃ§o descrito.</div>
+  <div class="footer">Aprovação deste orçamento autoriza execução do serviço descrito.</div>
 </body>
 </html>

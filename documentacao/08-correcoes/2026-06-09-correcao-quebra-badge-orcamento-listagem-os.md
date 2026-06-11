@@ -7,13 +7,13 @@ Versao: 2.23.18
 
 Na listagem `/os`, a coluna `Status / Orcamento` podia exibir status comerciais longos de orcamento em uma unica linha.
 
-Com textos como `Pendente de envio para aprovacao do cliente`, o badge avanÃ§ava visualmente para a coluna `Valor`, prejudicando a leitura da grade operacional.
+Com textos como `Pendente de envio para aprovacao do cliente`, o badge avançava visualmente para a coluna `Valor`, prejudicando a leitura da grade operacional.
 
 ## Ajuste realizado
 
 - Removido o comportamento de linha unica do badge de orcamento na listagem.
 - Aplicada quebra interna com `white-space: normal`, `overflow-wrap: anywhere`, `word-break: break-word` e `max-width: 100%`.
-- ReforÃ§ado `min-width: 0` no container do status para permitir que o flex respeite a largura real da celula.
+- Reforçado `min-width: 0` no container do status para permitir que o flex respeite a largura real da celula.
 - O ajuste fica restrito a `public/assets/css/design-system/layouts/os-list-layout.css`.
 
 ## Impacto operacional

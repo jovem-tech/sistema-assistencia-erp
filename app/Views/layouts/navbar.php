@@ -52,7 +52,7 @@ $notificationAppUrl = rtrim(site_url(), '/') . '/';
                 type="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
-                aria-label="Abrir NotificaÃ§Ãµes"
+                aria-label="Abrir Notificações"
             >
                 <i class="bi bi-bell"></i>
                 <span class="navbar-notification-badge d-none" id="navbarNotificationCount">0</span>
@@ -60,7 +60,7 @@ $notificationAppUrl = rtrim(site_url(), '/') . '/';
             <div class="dropdown-menu dropdown-menu-end navbar-notification-menu p-0">
                 <div class="navbar-notification-header">
                     <div>
-                        <strong>NotificaÃ§Ãµes</strong>
+                        <strong>Notificações</strong>
                         <small id="navbarNotificationMeta">Sincronizando...</small>
                     </div>
                     <div class="d-flex align-items-center gap-2">
@@ -88,7 +88,7 @@ $notificationAppUrl = rtrim(site_url(), '/') . '/';
                         <i class="bi bi-person-circle fs-4"></i>
                     <?php endif; ?>
                 </div>
-                <span class="d-none d-md-inline"><?= esc(session()->get('user_nome') ?? 'UsuÃ¡rio') ?></span>
+                <span class="d-none d-md-inline"><?= esc(session()->get('user_nome') ?? 'Usuário') ?></span>
                 <i class="bi bi-chevron-down ms-1"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">

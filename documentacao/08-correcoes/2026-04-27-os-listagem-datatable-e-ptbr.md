@@ -26,7 +26,7 @@ Ajustes aplicados:
 - versionamento do include `assets/js/os-list-filters.js` com `?v=filemtime`, evitando que o navegador reutilize uma copia antiga do script;
 - normalizacao reativa de textos renderizados no modal de status, timeline e painel de orcamento;
 - correcao do mapa `humanizeWorkflowMacro()` no backend da OS, alinhando as chaves tecnicas do workflow com os labels exibidos na timeline do modal, incluindo `Interrupção` e `Concluído`;
-- correcao dos textos fixos do modal `Alterar status da OS` e do painel embed de orcamento, incluindo `NÂº de serie`, abas, timeline, historico, resumo financeiro e mensagens operacionais;
+- correcao dos textos fixos do modal `Alterar status da OS` e do painel embed de orcamento, incluindo `Nº de serie`, abas, timeline, historico, resumo financeiro e mensagens operacionais;
 - ajuste dos seletores de e-mail dos modais para usar os IDs corretos do HTML e evitar hidratacao parcial do contexto;
 - normalizacao dos principais textos da listagem em pt-BR:
   - titulo da pagina;
@@ -43,7 +43,7 @@ Ajustes aplicados:
 - a grade deve voltar a carregar as linhas normalmente depois do bootstrap, sem ficar apenas com o cabecalho;
 - o modal `Alterar status da OS` deve voltar a abrir sem erro `500` no endpoint `status-meta`;
 - a busca global volta a renderizar `Cliente, equipamento, numero da OS ou OS legado...` sem mojibake;
-- o modal `Alterar status da OS` deve voltar a exibir `NÂº de serie`, `Acoes rapidas`, `Gerenciamento do Orcamento`, timeline e avisos sem caracteres quebrados;
+- o modal `Alterar status da OS` deve voltar a exibir `Nº de serie`, `Acoes rapidas`, `Gerenciamento do Orcamento`, timeline e avisos sem caracteres quebrados;
 - os principais textos da listagem voltam a aparecer corretamente para o operador.
 
 ## Validacao local

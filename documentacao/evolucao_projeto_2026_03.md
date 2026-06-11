@@ -1,241 +1,241 @@
-# Registro de EvoluÁ„o do Projeto - MarÁo 2026
+# Registro de Evolu√ß√£o do Projeto - Mar√ßo 2026
 
-Este documento registra as implementaÁıes, melhorias de arquitetura e decisıes de design tomadas recentemente para elevar a maturidade do sistema.
+Este documento registra as implementa√ß√µes, melhorias de arquitetura e decis√µes de design tomadas recentemente para elevar a maturidade do sistema.
 
-## 1. ImplementaÁ„o do Design System Interativo
-Para garantir a consistÍncia visual e agilizar o desenvolvimento de novas telas, foi criado um laboratÛrio de design vivo.
+## 1. Implementa√ß√£o do Design System Interativo
+Para garantir a consist√™ncia visual e agilizar o desenvolvimento de novas telas, foi criado um laborat√≥rio de design vivo.
 - **Arquivo:** `public/design-system.html`
-- **Conte˙do:** Cat·logo completo de componentes (Botıes Glow, Stat Cards, Glass Cards, Badges, Formul·rios e Alertas).
-- **Objetivo:** Servir de referÍncia r·pida para classes CSS customizadas e padrıes de UX.
+- **Conte√∫do:** Cat√°logo completo de componentes (Bot√µes Glow, Stat Cards, Glass Cards, Badges, Formul√°rios e Alertas).
+- **Objetivo:** Servir de refer√™ncia r√°pida para classes CSS customizadas e padr√µes de UX.
 
-## 2. RefatoraÁ„o da Arquitetura do Menu Lateral (Sidebar)
-O menu foi totalmente reorganizado com base em princÌpios de **UX/UI para Dashboards Administrativos**, focando em hierarquia lÛgica e reduÁ„o de carga cognitiva.
+## 2. Refatora√ß√£o da Arquitetura do Menu Lateral (Sidebar)
+O menu foi totalmente reorganizado com base em princ√≠pios de **UX/UI para Dashboards Administrativos**, focando em hierarquia l√≥gica e redu√ß√£o de carga cognitiva.
 
 ### Novos Agrupamentos Funcionais (V2):
-1.  **VIS√O GERAL:** Dashboard (Foco em KPIs).
+1.  **VIS√ÉO GERAL:** Dashboard (Foco em KPIs).
 2.  **OPERACIONAL:** 
-    *   **Ordens de ServiÁo**: Core operacional.
-    *   **ServiÁos**: Gest„o de cat·logo de serviÁos (Novo).
-    *   **Estoque de PeÁas**: Gest„o de insumos.
-    *   **Aparelhos / Equip.**: Gest„o tÈcnica de dispositivos (Movido de Comercial).
-    *   **Base de Defeitos**: Base de conhecimento tÈcnico.
+    *   **Ordens de Servi√ßo**: Core operacional.
+    *   **Servi√ßos**: Gest√£o de cat√°logo de servi√ßos (Novo).
+    *   **Estoque de Pe√ßas**: Gest√£o de insumos.
+    *   **Aparelhos / Equip.**: Gest√£o t√©cnica de dispositivos (Movido de Comercial).
+    *   **Base de Defeitos**: Base de conhecimento t√©cnico.
 3.  **COMERCIAL:**
-    *   **Submenu Pessoas**: Centraliza **Clientes**, **Equipe TÈcnico** e **Fornecedores**.
-    *   **Vendas**: MÛdulo para faturamento e pedidos (Placeholder).
-4.  **GEST√O & RESULTADOS:** Financeiro e RelatÛrios.
-5.  **CONFIGURA«’ES:** Dados da Empresa, Usu·rios e NÌveis de Acesso.
+    *   **Submenu Pessoas**: Centraliza **Clientes**, **Equipe T√©cnico** e **Fornecedores**.
+    *   **Vendas**: M√≥dulo para faturamento e pedidos (Placeholder).
+4.  **GEST√ÉO & RESULTADOS:** Financeiro e Relat√≥rios.
+5.  **CONFIGURA√á√ïES:** Dados da Empresa, Usu√°rios e N√≠veis de Acesso.
 
-## 3. PadronizaÁ„o de Elementos Visuais
-- **Iconografia:** TransiÁ„o completa para Ìcones sÛlidos (`-fill`) do Bootstrap Icons para maior unidade visual.
-- **Nomenclatura Profissional:** AtualizaÁ„o de labels para termos mais adequados ao mercado tecnolÛgico ("Funcion·rios" -> "Equipe TÈcnico", "Sistema" -> "Dados da Empresa", "Defeitos Comuns" -> "Base de Defeitos").
-- **UX Industrial:** AplicaÁ„o da regra de submenus para ocultar itens de configuraÁ„o de baixa frequÍncia (Auxiliares), mantendo a interface limpa.
+## 3. Padroniza√ß√£o de Elementos Visuais
+- **Iconografia:** Transi√ß√£o completa para √≠cones s√≥lidos (`-fill`) do Bootstrap Icons para maior unidade visual.
+- **Nomenclatura Profissional:** Atualiza√ß√£o de labels para termos mais adequados ao mercado tecnol√≥gico ("Funcion√°rios" -> "Equipe T√©cnico", "Sistema" -> "Dados da Empresa", "Defeitos Comuns" -> "Base de Defeitos").
+- **UX Industrial:** Aplica√ß√£o da regra de submenus para ocultar itens de configura√ß√£o de baixa frequ√™ncia (Auxiliares), mantendo a interface limpa.
 
-## 4. DocumentaÁ„o de InteligÍncia (Skill Antigravity)
-Foi criada uma "Skill" especÌfica para agentes de IA que trabalham no projeto.
+## 4. Documenta√ß√£o de Intelig√™ncia (Skill Antigravity)
+Foi criada uma "Skill" espec√≠fica para agentes de IA que trabalham no projeto.
 - **Local:** `.agents/skills/sistema_assistencia/SKILL.md`
-- **FunÁ„o:** Documentar padrıes de cÛdigo (CodeIgniter 4), convenÁıes de backend (Flashdata, RBAC) e diretrizes de frontend (Glassmorphism, estilos de tabela). Isso garante que qualquer assistÍncia futura siga rigorosamente os padrıes j· estabelecidos.
+- **Fun√ß√£o:** Documentar padr√µes de c√≥digo (CodeIgniter 4), conven√ß√µes de backend (Flashdata, RBAC) e diretrizes de frontend (Glassmorphism, estilos de tabela). Isso garante que qualquer assist√™ncia futura siga rigorosamente os padr√µes j√° estabelecidos.
 
-## 5. ManutenÁıes TÈcnicas e EstabilizaÁ„o
-- **CorreÁ„o da Porta de Acesso:** IdentificaÁ„o e documentaÁ„o do uso da porta `8080/8081` para o servidor Apache no ambiente XAMPP local.
-- **Melhoria na NavegaÁ„o Mobile:** Ajuste fino nos seletores e overlays da sidebar para garantir usabilidade em telas menores.
+## 5. Manuten√ß√µes T√©cnicas e Estabiliza√ß√£o
+- **Corre√ß√£o da Porta de Acesso:** Identifica√ß√£o e documenta√ß√£o do uso da porta `8080/8081` para o servidor Apache no ambiente XAMPP local.
+- **Melhoria na Navega√ß√£o Mobile:** Ajuste fino nos seletores e overlays da sidebar para garantir usabilidade em telas menores.
 
-## 6. ImplementaÁ„o da Permiss„o "Encerrar" (ConfiguraÁ„o Inicial)
-Foi estruturada a base para a nova funcionalidade de encerramento de entidades, visando manter histÛrico audit·vel sem deletar registros.
+## 6. Implementa√ß√£o da Permiss√£o "Encerrar" (Configura√ß√£o Inicial)
+Foi estruturada a base para a nova funcionalidade de encerramento de entidades, visando manter hist√≥rico audit√°vel sem deletar registros.
 
-### ?? MudanÁas na Estrutura
+### ?? Mudan√ßas na Estrutura
 - **Banco de Dados**:
-    - Nova permiss„o `encerrar` (slug) adicionada ‡ tabela de permissıes.
-    - Colunas `status` (default 'ativo') e `encerrado_em` (datetime) adicionadas ‡s tabelas `equipamentos` e `pecas`.
+    - Nova permiss√£o `encerrar` (slug) adicionada √† tabela de permiss√µes.
+    - Colunas `status` (default 'ativo') e `encerrado_em` (datetime) adicionadas √†s tabelas `equipamentos` e `pecas`.
 - **RBAC**:
-    - Grupo **Administrador** recebeu automaticamente a permiss„o de encerramento em todos os mÛdulos permitidos.
-    - **Regra de Exclus„o**: O mÛdulo de **Clientes** foi bloqueado para o encerramento na matriz de acesso, sugerindo que o USER pode querer manter histÛrico.
+    - Grupo **Administrador** recebeu automaticamente a permiss√£o de encerramento em todos os m√≥dulos permitidos.
+    - **Regra de Exclus√£o**: O m√≥dulo de **Clientes** foi bloqueado para o encerramento na matriz de acesso, sugerindo que o USER pode querer manter hist√≥rico.
 - **UI (Matriz de Acesso)**:
-    - Nova coluna disponÌvel na gest„o de **NÌveis de Acesso**.
-    - Õcone de bloqueio (`bi-dash-circle`) exibido na linha de Clientes para a coluna Encerrar.
+    - Nova coluna dispon√≠vel na gest√£o de **N√≠veis de Acesso**.
+    - √çcone de bloqueio (`bi-dash-circle`) exibido na linha de Clientes para a coluna Encerrar.
 
-### ? ImplementaÁ„o Visual e UX (ConcluÌdo)
-- **Bot„o de AÁ„o**: O Ìcone de arquivo (`bi-archive`) foi adicionado em todas as listagens operacionais (OS, Equipamentos, Estoque, Financeiro, Equipe TÈcnico e Fornecedores) na cor `warning` (amarelo), diferenciando-o visualmente da exclus„o definitiva.
-- **Ajuda ao Usu·rio**: Implementada funÁ„o Javascript `confirmarEncerramento()` em `public/assets/js/scripts.js` para garantir que aÁıes crÌticas exijam confirmaÁ„o deliberada.
-- **SincronizaÁ„o de Vocabul·rio**: O sistema agora utiliza o termo **"NÌveis de Acesso"** de ponta a ponta (Menu, Banco de Dados e TÌtulos de P·gina), eliminando ambiguidades com o termo genÈrico "Permissıes".
+### ? Implementa√ß√£o Visual e UX (Conclu√≠do)
+- **Bot√£o de A√ß√£o**: O √≠cone de arquivo (`bi-archive`) foi adicionado em todas as listagens operacionais (OS, Equipamentos, Estoque, Financeiro, Equipe T√©cnico e Fornecedores) na cor `warning` (amarelo), diferenciando-o visualmente da exclus√£o definitiva.
+- **Ajuda ao Usu√°rio**: Implementada fun√ß√£o Javascript `confirmarEncerramento()` em `public/assets/js/scripts.js` para garantir que a√ß√µes cr√≠ticas exijam confirma√ß√£o deliberada.
+- **Sincroniza√ß√£o de Vocabul√°rio**: O sistema agora utiliza o termo **"N√≠veis de Acesso"** de ponta a ponta (Menu, Banco de Dados e T√≠tulos de P√°gina), eliminando ambiguidades com o termo gen√©rico "Permiss√µes".
 
-### ? Guia de ImplementaÁ„o para Desenvolvedores
-Para as entidades que suportam encerramento (OS, Equipamentos, PeÁas):
-1. **Model**: Deve-se filtrar por `status != 'encerrado'` em listagens operacionais, permitindo visualizaÁ„o em relatÛrios histÛricos.
-2. **Controller**: Utilizar `can('modulo', 'encerrar')` para exibir botıes de aÁ„o na interface.
-3. **LÛgica TÈcnica**: Ao encerrar, setar `status = 'encerrado'` (ou valor customizado como 'condenado') e `encerrado_em = now()`.
+### ? Guia de Implementa√ß√£o para Desenvolvedores
+Para as entidades que suportam encerramento (OS, Equipamentos, Pe√ßas):
+1. **Model**: Deve-se filtrar por `status != 'encerrado'` em listagens operacionais, permitindo visualiza√ß√£o em relat√≥rios hist√≥ricos.
+2. **Controller**: Utilizar `can('modulo', 'encerrar')` para exibir bot√µes de a√ß√£o na interface.
+3. **L√≥gica T√©cnica**: Ao encerrar, setar `status = 'encerrado'` (ou valor customizado como 'condenado') e `encerrado_em = now()`.
 
 ## 7. Refinement of Visual Hierarchy and Sidebar UX
-Para suportar o crescimento da ·rvore de navegaÁ„o, o menu lateral foi redesenhado para fornecer uma vis„o clara de profundidade e estados de expans„o.
+Para suportar o crescimento da √°rvore de navega√ß√£o, o menu lateral foi redesenhado para fornecer uma vis√£o clara de profundidade e estados de expans√£o.
 
-### ? ¡rvore de NavegaÁ„o Premium
-- **Linhas de Guia Verticais**: Submenus agora possuem linhas de conex„o verticais sutis que facilitam o rastreamento visual da hierarquia (ex: Operacional -> Aparelhos -> Modelos).
+### ? √Årvore de Navega√ß√£o Premium
+- **Linhas de Guia Verticais**: Submenus agora possuem linhas de conex√£o verticais sutis que facilitam o rastreamento visual da hierarquia (ex: Operacional -> Aparelhos -> Modelos).
 - **Indicadores de Submenu (Chevrons)**:
-    - Todos os menus expansÌveis ganharam Ìcones de seta (`bi-chevron-down`).
-    - **AnimaÁ„o de RotaÁ„o**: Usando CSS transform, a seta gira 180∞ suavemente ao abrir/fechar a seÁ„o, fornecendo feedback imediato.
-- **Hierarquia de 3 NÌveis**:
-    - **NÌvel 1**: Õcones sÛlidos e coloridos (Dashboard, OS, Pessoas).
-    - **NÌvel 2**: IndentaÁ„o de 28px com linha conectora.
-    - **NÌvel 3 (Atributos)**: IndentaÁ„o adicional, tipografia menor (`small`) e Ìcones minimalistas para evitar poluiÁ„o visual.
+    - Todos os menus expans√≠veis ganharam √≠cones de seta (`bi-chevron-down`).
+    - **Anima√ß√£o de Rota√ß√£o**: Usando CSS transform, a seta gira 180¬∞ suavemente ao abrir/fechar a se√ß√£o, fornecendo feedback imediato.
+- **Hierarquia de 3 N√≠veis**:
+    - **N√≠vel 1**: √çcones s√≥lidos e coloridos (Dashboard, OS, Pessoas).
+    - **N√≠vel 2**: Indenta√ß√£o de 28px com linha conectora.
+    - **N√≠vel 3 (Atributos)**: Indenta√ß√£o adicional, tipografia menor (`small`) e √≠cones minimalistas para evitar polui√ß√£o visual.
 
 ### ? Feedback de Estado e Interatividade
-- **Active Glow**: Itens ativos agora possuem uma barra luminescente lateral (`box-shadow` e `glow`) que destaca a p·gina atual sem "gritar" visualmente.
-- **TransiÁıes Suaves**: Toda a movimentaÁ„o de abertura e fechamento de menus utiliza transiÁıes Bezier para uma sensaÁ„o de sistema fluido e moderno.
+- **Active Glow**: Itens ativos agora possuem uma barra luminescente lateral (`box-shadow` e `glow`) que destaca a p√°gina atual sem "gritar" visualmente.
+- **Transi√ß√µes Suaves**: Toda a movimenta√ß√£o de abertura e fechamento de menus utiliza transi√ß√µes Bezier para uma sensa√ß√£o de sistema fluido e moderno.
 
-## 8. Expans„o de MÛdulos: ServiÁos e Vendas
-Para suportar a evoluÁ„o para um ERP completo, a estrutura de dados e permissıes foi expandida.
+## 8. Expans√£o de M√≥dulos: Servi√ßos e Vendas
+Para suportar a evolu√ß√£o para um ERP completo, a estrutura de dados e permiss√µes foi expandida.
 
-### ?? MÛdulo de ServiÁos
-- **Funcionalidade**: Cadastro de serviÁos padronizados (ex: Troca de Tela, Reparo de Placa) com valores padr„o e descriÁıes tÈcnicas.
-- **IntegraÁ„o**: Preparado para ser selecionado diretamente dentro do fluxo de itens de uma OS.
-- **SeguranÁa**: Integrado ao RBAC com todas as 7 permissıes (Visualizar atÈ Encerrar).
+### ?? M√≥dulo de Servi√ßos
+- **Funcionalidade**: Cadastro de servi√ßos padronizados (ex: Troca de Tela, Reparo de Placa) com valores padr√£o e descri√ß√µes t√©cnicas.
+- **Integra√ß√£o**: Preparado para ser selecionado diretamente dentro do fluxo de itens de uma OS.
+- **Seguran√ßa**: Integrado ao RBAC com todas as 7 permiss√µes (Visualizar at√© Encerrar).
 
-### ? MÛdulo de Vendas (Infraestrutura)
-- **Status**: MÛdulo em desenvolvimento (Placeholder).
-- **PreparaÁ„o**: Criado controlador, rotas protegidas e entrada no banco de dados de mÛdulos. Isso permite que administradores j· configurem permissıes de acesso para grupos antes mesmo da funcionalidade core ser liberada, garantindo uma transiÁ„o suave.
+### ? M√≥dulo de Vendas (Infraestrutura)
+- **Status**: M√≥dulo em desenvolvimento (Placeholder).
+- **Prepara√ß√£o**: Criado controlador, rotas protegidas e entrada no banco de dados de m√≥dulos. Isso permite que administradores j√° configurem permiss√µes de acesso para grupos antes mesmo da funcionalidade core ser liberada, garantindo uma transi√ß√£o suave.
 
 ### ?? Infraestrutura de Banco de Dados
-- **Tabela `servicos`**: Implementada com suporte a Soft Deletes lÛgico (`status`) e auditoria.
-- **OtimizaÁ„o de MÛdulos**: Tabela `modulos` atualizada com campos `icone` e `ordem_menu` para permitir que o sidebar seja renderizado de forma mais din‚mica e organizada.
+- **Tabela `servicos`**: Implementada com suporte a Soft Deletes l√≥gico (`status`) e auditoria.
+- **Otimiza√ß√£o de M√≥dulos**: Tabela `modulos` atualizada com campos `icone` e `ordem_menu` para permitir que o sidebar seja renderizado de forma mais din√¢mica e organizada.
 
-## 9. Ferramentas de Gest„o Massiva (CSV)
-Foram implementadas ferramentas de produtividade para manipulaÁ„o de grandes volumes de dados nos mÛdulos operacionais.
+## 9. Ferramentas de Gest√£o Massiva (CSV)
+Foram implementadas ferramentas de produtividade para manipula√ß√£o de grandes volumes de dados nos m√≥dulos operacionais.
 
-### ? ExportaÁ„o AvanÁada
-- **MÛdulos**: ServiÁos e Estoque de PeÁas.
-- **FunÁ„o**: Gera arquivos CSV estruturados com headers amig·veis ao Excel.
-- **Auditoria**: Cada exportaÁ„o È registrada nos logs do sistema com o ID do respons·vel.
+### ? Exporta√ß√£o Avan√ßada
+- **M√≥dulos**: Servi√ßos e Estoque de Pe√ßas.
+- **Fun√ß√£o**: Gera arquivos CSV estruturados com headers amig√°veis ao Excel.
+- **Auditoria**: Cada exporta√ß√£o √© registrada nos logs do sistema com o ID do respons√°vel.
 
-### ? ImportaÁ„o em Lote via Modelos
-- **SeguranÁa e PadronizaÁ„o**: Disponibilizados arquivos modelo (Download Template) para garantir que o usu·rio envie os dados no formato esperado pelo banco de dados.
-- **NormalizaÁ„o Autom·tica**:
-    - Conversores de moeda inteligentes (tratam vÌrgulas e pontos automaticamente).
-    - Geradores de cÛdigos sequenciais (SKU/PC) para novos itens de estoque caso omitidos no arquivo.
-- **RBAC**: As funÁıes de importaÁ„o e exportaÁ„o s„o granulares, permitindo que o gestor decida quais usu·rios podem apenas visualizar ou tambÈm manipular o invent·rio massivamente.
+### ? Importa√ß√£o em Lote via Modelos
+- **Seguran√ßa e Padroniza√ß√£o**: Disponibilizados arquivos modelo (Download Template) para garantir que o usu√°rio envie os dados no formato esperado pelo banco de dados.
+- **Normaliza√ß√£o Autom√°tica**:
+    - Conversores de moeda inteligentes (tratam v√≠rgulas e pontos automaticamente).
+    - Geradores de c√≥digos sequenciais (SKU/PC) para novos itens de estoque caso omitidos no arquivo.
+- **RBAC**: As fun√ß√µes de importa√ß√£o e exporta√ß√£o s√£o granulares, permitindo que o gestor decida quais usu√°rios podem apenas visualizar ou tamb√©m manipular o invent√°rio massivamente.
 
-## 10. Gest„o AvanÁada de Imagens e Equipamentos
-Foi integrada uma camada de processamento de imagem profissional ao fluxo de cadastro de equipamentos para elevar a qualidade do banco de imagens tÈcnico.
+## 10. Gest√£o Avan√ßada de Imagens e Equipamentos
+Foi integrada uma camada de processamento de imagem profissional ao fluxo de cadastro de equipamentos para elevar a qualidade do banco de imagens t√©cnico.
 
-### ? Captura e EdiÁ„o Pro (Cropper.js)
-- **Editor de Imagem Integrado**: Ao tirar uma foto ou escolher da galeria, o sistema abre automaticamente um modal de ediÁ„o (Cropper).
-    - **Funcionalidades**: Corte livre, redimensionamento proporcional e rotaÁ„o (90∞).
-    - **OtimizaÁ„o**: Imagens s„o processadas em canvas e exportadas em alta qualidade (1024x1024) com tamanho de arquivo otimizado.
-- **IntegraÁ„o com C‚mera**: Implementado suporte nativo para captura via webcam/c‚mera do celular diretamente no navegador, com prioridade para c‚mera traseira (*environment*) em dispositivos mÛveis.
-- **Preview Din‚mico**: Gerenciamento de m˙ltiplos arquivos via `DataTransfer`, permitindo remover fotos antes do upload final.
+### ? Captura e Edi√ß√£o Pro (Cropper.js)
+- **Editor de Imagem Integrado**: Ao tirar uma foto ou escolher da galeria, o sistema abre automaticamente um modal de edi√ß√£o (Cropper).
+    - **Funcionalidades**: Corte livre, redimensionamento proporcional e rota√ß√£o (90¬∞).
+    - **Otimiza√ß√£o**: Imagens s√£o processadas em canvas e exportadas em alta qualidade (1024x1024) com tamanho de arquivo otimizado.
+- **Integra√ß√£o com C√¢mera**: Implementado suporte nativo para captura via webcam/c√¢mera do celular diretamente no navegador, com prioridade para c√¢mera traseira (*environment*) em dispositivos m√≥veis.
+- **Preview Din√¢mico**: Gerenciamento de m√∫ltiplos arquivos via `DataTransfer`, permitindo remover fotos antes do upload final.
 
-## 11. Refinamento de UX: Cadastros R·pidos
-Para reduzir interrupÁıes no fluxo de trabalho (context switching), o sistema de "Atalhos de Cadastro" foi padronizado.
+## 11. Refinamento de UX: Cadastros R√°pidos
+Para reduzir interrup√ß√µes no fluxo de trabalho (context switching), o sistema de "Atalhos de Cadastro" foi padronizado.
 
-### ? Botıes de AdiÁ„o In-Label
-- **Padr„o Visual**: Botıes de `+ Novo` foram movidos para dentro das labels dos campos de seleÁ„o (`<label>`), utilizando um design minimalista (amarelo sÛlido, tamanho extra pequeno).
+### ? Bot√µes de Adi√ß√£o In-Label
+- **Padr√£o Visual**: Bot√µes de `+ Novo` foram movidos para dentro das labels dos campos de sele√ß√£o (`<label>`), utilizando um design minimalista (amarelo s√≥lido, tamanho extra pequeno).
 - **Escopo**: Implementado para **Clientes**, **Marcas** e **Modelos** em:
-    - Modal de Equipamento (dentro da Ordem de ServiÁo).
-    - P·gina principal de Cadastro de Equipamento (`equipamentos/novo`).
-- **BenefÌcio**: Mais espaÁo horizontal para os campos de seleÁ„o (Select2) e uma interface mais limpa e focada.
+    - Modal de Equipamento (dentro da Ordem de Servi√ßo).
+    - P√°gina principal de Cadastro de Equipamento (`equipamentos/novo`).
+- **Benef√≠cio**: Mais espa√ßo horizontal para os campos de sele√ß√£o (Select2) e uma interface mais limpa e focada.
 
-## 12. Melhorias na Gest„o de Clientes e Equipamentos
-- **Cascata Inteligente**: LÛgica de "Marca -> Modelo" refatorada para ser mais reativa, desabilitando seletores automaticamente atÈ que o vÌnculo pai seja selecionado.
-- **PersistÍncia de Cores**: O seletor de cores agora traduz automaticamente o cÛdigo HEX para o nome da cor mais prÛxima em portuguÍs, facilitando a identificaÁ„o tÈcnica.
+## 12. Melhorias na Gest√£o de Clientes e Equipamentos
+- **Cascata Inteligente**: L√≥gica de "Marca -> Modelo" refatorada para ser mais reativa, desabilitando seletores automaticamente at√© que o v√≠nculo pai seja selecionado.
+- **Persist√™ncia de Cores**: O seletor de cores agora traduz automaticamente o c√≥digo HEX para o nome da cor mais pr√≥xima em portugu√™s, facilitando a identifica√ß√£o t√©cnica.
 
 ## 13. Interface Premium de Equipamentos (Abas e Cores)
-O mÛdulo de equipamentos recebeu uma atualizaÁ„o profunda de UX/UI para suportar volumes maiores de dados e oferecer uma experiÍncia de nÌvel industrial.
+O m√≥dulo de equipamentos recebeu uma atualiza√ß√£o profunda de UX/UI para suportar volumes maiores de dados e oferecer uma experi√™ncia de n√≠vel industrial.
 
-### ?? ReestruturaÁ„o em Abas (Tabs) e Sidebar
-O mÛdulo de equipamentos recebeu uma atualizaÁ„o profunda de UX/UI e foi movido para a seÁ„o **OPERACIONAL** do sidebar, logo apÛs o Estoque de PeÁas, para melhor alinhamento com o fluxo de trabalho tÈcnico.
-O formul·rio de cadastro e ediÁ„o foi dividido em 3 n˙cleos lÛgicos para reduzir o cansaÁo visual e organizar o fluxo de entrada do aparelho:
-- **InformaÁıes**: Focada em identificaÁ„o (Marca/Modelo/SÈrie), Senha (com altern‚ncia PIN/Texto) e AcessÛrios.
-- **Cor**: EspaÁo dedicado ‡ identidade visual do produto.
-- **Fotos**: Centraliza a documentaÁ„o por imagem com suporte a atÈ 4 arquivos.
+### ?? Reestrutura√ß√£o em Abas (Tabs) e Sidebar
+O m√≥dulo de equipamentos recebeu uma atualiza√ß√£o profunda de UX/UI e foi movido para a se√ß√£o **OPERACIONAL** do sidebar, logo ap√≥s o Estoque de Pe√ßas, para melhor alinhamento com o fluxo de trabalho t√©cnico.
+O formul√°rio de cadastro e edi√ß√£o foi dividido em 3 n√∫cleos l√≥gicos para reduzir o cansa√ßo visual e organizar o fluxo de entrada do aparelho:
+- **Informa√ß√µes**: Focada em identifica√ß√£o (Marca/Modelo/S√©rie), Senha (com altern√¢ncia PIN/Texto) e Acess√≥rios.
+- **Cor**: Espa√ßo dedicado √† identidade visual do produto.
+- **Fotos**: Centraliza a documenta√ß√£o por imagem com suporte a at√© 4 arquivos.
 
 ### ? Seletor de Cor Profissional (Accordion)
-EvoluÁ„o do sistema de cores para um cat·logo visual de alto nÌvel:
-- **OrganizaÁ„o por FamÌlias**: Cores agrupadas por tons (Neutras, Azuis, Verdes, etc.) utilizando um sistema de **Accordion (Sanfona)** com expans„o ˙nica.
+Evolu√ß√£o do sistema de cores para um cat√°logo visual de alto n√≠vel:
+- **Organiza√ß√£o por Fam√≠lias**: Cores agrupadas por tons (Neutras, Azuis, Verdes, etc.) utilizando um sistema de **Accordion (Sanfona)** com expans√£o √∫nica.
 - **Swatches Ampliados**: Indicadores de cor ampliados para 26px com nomes comerciais reais (Midnight, Titanium, Rose Gold).
-- **DetecÁ„o Inteligente**: O algoritmo agora destaca automaticamente a cor detectada por foto dentro do cat·logo, garantindo padronizaÁ„o na base de dados.
+- **Detec√ß√£o Inteligente**: O algoritmo agora destaca automaticamente a cor detectada por foto dentro do cat√°logo, garantindo padroniza√ß√£o na base de dados.
 
-### ? EficiÍncia TÈcnica (Atalhos e Senhas)
-- **AcessÛrios de Um Clique**: Adicionados botıes de atalho (Carregador, Cabo, Capa, etc.) que inserem o item no campo de texto instantaneamente, eliminando digitaÁ„o repetitiva.
-- **Sistema de Senhas Dual**: Altern‚ncia r·pida entre teclado numÈrico (PIN) e alfanumÈrico com placeholders contextuais, melhorando a precis„o do tÈcnico no balc„o.
-- **EstabilizaÁ„o Ajax**: UnificaÁ„o dos IDs de formul·rio e exposiÁ„o global de funÁıes `window.updateColorUI`, resolvendo conflitos de carregamento din‚mico entre p·ginas e modais.
+### ? Efici√™ncia T√©cnica (Atalhos e Senhas)
+- **Acess√≥rios de Um Clique**: Adicionados bot√µes de atalho (Carregador, Cabo, Capa, etc.) que inserem o item no campo de texto instantaneamente, eliminando digita√ß√£o repetitiva.
+- **Sistema de Senhas Dual**: Altern√¢ncia r√°pida entre teclado num√©rico (PIN) e alfanum√©rico com placeholders contextuais, melhorando a precis√£o do t√©cnico no balc√£o.
+- **Estabiliza√ß√£o Ajax**: Unifica√ß√£o dos IDs de formul√°rio e exposi√ß√£o global de fun√ß√µes `window.updateColorUI`, resolvendo conflitos de carregamento din√¢mico entre p√°ginas e modais.
 
-## 14. Expans„o de Campos na Ordem de ServiÁo
-Para aumentar a rastreabilidade na entrada de aparelhos e agilizar o faturamento, a tabela de Ordens de ServiÁo foi expandida.
+## 14. Expans√£o de Campos na Ordem de Servi√ßo
+Para aumentar a rastreabilidade na entrada de aparelhos e agilizar o faturamento, a tabela de Ordens de Servi√ßo foi expandida.
 
-### ?? Novos Campos TÈcnicos
-- **AcessÛrios (`acessorios`)**: Campo do tipo TEXT para registrar detalhadamente cabos, carregadores, capas e outros itens recebidos junto com o equipamento.
-- **Forma de Pagamento (`forma_pagamento`)**: Registro da preferÍncia de pagamento do cliente (Pix, Cart„o, Dinheiro), agilizando a emiss„o de notas e recebimentos na finalizaÁ„o.
+### ?? Novos Campos T√©cnicos
+- **Acess√≥rios (`acessorios`)**: Campo do tipo TEXT para registrar detalhadamente cabos, carregadores, capas e outros itens recebidos junto com o equipamento.
+- **Forma de Pagamento (`forma_pagamento`)**: Registro da prefer√™ncia de pagamento do cliente (Pix, Cart√£o, Dinheiro), agilizando a emiss√£o de notas e recebimentos na finaliza√ß√£o.
 
-### ? ImplementaÁ„o e MigraÁ„o
+### ? Implementa√ß√£o e Migra√ß√£o
 - **Script de Update**: Criado `update_os_campos.php` para garantir que as novas colunas sejam adicionadas de forma segura em ambientes existentes.
-- **PersistÍncia**: Atualizado o `OsModel.php` para incluir os novos campos na lista de `allowedFields`.
-- **UI**: Inseridos novos campos nas abas de "Relato e Detalhes" do formul·rio de OS, com suporte a rascunho autom·tico.
+- **Persist√™ncia**: Atualizado o `OsModel.php` para incluir os novos campos na lista de `allowedFields`.
+- **UI**: Inseridos novos campos nas abas de "Relato e Detalhes" do formul√°rio de OS, com suporte a rascunho autom√°tico.
 
-## 15. Melhoria da ExperiÍncia de Abertura de OS
+## 15. Melhoria da Experi√™ncia de Abertura de OS
 Foi refinado o fluxo de abertura de OS para reduzir retrabalho e aumentar a visibilidade do contexto durante o preenchimento.
 
 ### Resumo e Contexto Persistente
-- **Resumo lateral da OS** com cliente, equipamento, tÈcnico, prioridade, status, datas e contadores.
-- **Foto do equipamento e miniaturas** exibidas na lateral apÛs seleÁ„o do equipamento.
+- **Resumo lateral da OS** com cliente, equipamento, t√©cnico, prioridade, status, datas e contadores.
+- **Foto do equipamento e miniaturas** exibidas na lateral ap√≥s sele√ß√£o do equipamento.
 
-### Preenchimento Mais R·pido
-- **SeleÁ„o inteligente de equipamento** quando existe apenas um item vinculado ao cliente.
+### Preenchimento Mais R√°pido
+- **Sele√ß√£o inteligente de equipamento** quando existe apenas um item vinculado ao cliente.
 
-### ProteÁ„o contra Perda de Dados
-- **Rascunho autom·tico local** durante a criaÁ„o de OS.
-- **AÁıes de restaurar/descartar** e bot„o de limpeza manual do rascunho.
+### Prote√ß√£o contra Perda de Dados
+- **Rascunho autom√°tico local** durante a cria√ß√£o de OS.
+- **A√ß√µes de restaurar/descartar** e bot√£o de limpeza manual do rascunho.
 
 ## 16. Abas de Cadastro e Campos de Entrada na OS
-EvoluÁ„o do formul·rio de nova OS para reduzir erros e acelerar o preenchimento.
+Evolu√ß√£o do formul√°rio de nova OS para reduzir erros e acelerar o preenchimento.
 
-### OrganizaÁ„o em Abas
-- **Dados**, **Relato e Defeitos**, **Fotos** e **PeÁas e OrÁamento**.
+### Organiza√ß√£o em Abas
+- **Dados**, **Relato e Defeitos**, **Fotos** e **Pe√ßas e Or√ßamento**.
 
-### Campos de Entrada ReforÁados
-- **AcessÛrios na OS** para registrar itens recebidos na entrada.
-- **Prazo de entrega** com c·lculo autom·tico de data (1, 3, 7, 30 dias).
-- **Forma de pagamento** disponÌvel no cadastro.
-- **Upload de fotos** agora usa o mesmo card do cadastro de equipamentos, com ·rea clic·vel, drag/drop e miniaturas clic·veis.
+### Campos de Entrada Refor√ßados
+- **Acess√≥rios na OS** para registrar itens recebidos na entrada.
+- **Prazo de entrega** com c√°lculo autom√°tico de data (1, 3, 7, 30 dias).
+- **Forma de pagamento** dispon√≠vel no cadastro.
+- **Upload de fotos** agora usa o mesmo card do cadastro de equipamentos, com √°rea clic√°vel, drag/drop e miniaturas clic√°veis.
 
 ### Feedback Visual
 - **Indicadores de preenchimento** (??/?) no resumo lateral.
-- **Cor do equipamento** exibida mesmo quando n„o h· foto.
-- **EstabilizaÁ„o de Formul·rios**: Corrigido crash (Error 500) no cadastro/ediÁ„o de funcion·rios devido a checkboxes n„o marcados.
+- **Cor do equipamento** exibida mesmo quando n√£o h√° foto.
+- **Estabiliza√ß√£o de Formul√°rios**: Corrigido crash (Error 500) no cadastro/edi√ß√£o de funcion√°rios devido a checkboxes n√£o marcados.
 
-## 17. EvoluÁ„o da IntegraÁ„o WhatsApp e Webhook Universal
-Para garantir que o sistema nunca fique sem comunicaÁ„o, a arquitetura de mensagens foi expandida para suportar m˙ltiplos provedores e um canal de contingÍncia universal.
+## 17. Evolu√ß√£o da Integra√ß√£o WhatsApp e Webhook Universal
+Para garantir que o sistema nunca fique sem comunica√ß√£o, a arquitetura de mensagens foi expandida para suportar m√∫ltiplos provedores e um canal de conting√™ncia universal.
 
-### ? IntegraÁ„o Menuia (Refatorada)
-- **PadronizaÁ„o Multimedia**: O envio de PDFs (Ordens de ServiÁo) agora utiliza o padr„o oficial da Menuia com Base64 e nomenclatura de arquivos correta (`format`, `message`, `descricao`), resolvendo falhas de entrega de anexos.
-- **Protocolo JSON**: TransiÁ„o do formato `multipart/form-data` para JSON puro com cabeÁalhos de aceitaÁ„o e tipo de conte˙do, garantindo compatibilidade com os endpoints mais recentes da API.
-- **NormalizaÁ„o de Telefones**: Implementada sanitizaÁ„o autom·tica para incluir o prefixo internacional (`+55`), exigÍncia crÌtica para entrega em escala.
+### ? Integra√ß√£o Menuia (Refatorada)
+- **Padroniza√ß√£o Multimedia**: O envio de PDFs (Ordens de Servi√ßo) agora utiliza o padr√£o oficial da Menuia com Base64 e nomenclatura de arquivos correta (`format`, `message`, `descricao`), resolvendo falhas de entrega de anexos.
+- **Protocolo JSON**: Transi√ß√£o do formato `multipart/form-data` para JSON puro com cabe√ßalhos de aceita√ß√£o e tipo de conte√∫do, garantindo compatibilidade com os endpoints mais recentes da API.
+- **Normaliza√ß√£o de Telefones**: Implementada sanitiza√ß√£o autom√°tica para incluir o prefixo internacional (`+55`), exig√™ncia cr√≠tica para entrega em escala.
 
-### ? Segundo Canal: Webhook GenÈrico (Bulletproof Fallback)
-AlÈm da Menuia, o sistema agora conta com um **Provedor de Webhook GenÈrico**. Esta È a "segunda opÁ„o" definitiva que permite integrar com **qualquer API de WhatsApp do mercado** (Evolution API, Z-API, WPPConnect, etc.) sem alterar uma linha de cÛdigo.
-- **ConfiguraÁ„o Din‚mica**: O usu·rio define a URL, o mÈtodo HTTP (POST/GET/PUT) e os cabeÁalhos (ex: Bearer Tokens) diretamente na interface de configuraÁıes.
-- **Template de Payload**: Suporte a templates JSON customiz·veis utilizando vari·veis din‚micas `{{phone}}` e `{{message}}`.
-- **ResiliÍncia**: Caso o provedor principal falhe, o administrador pode alternar para o Webhook em segundos, garantindo a continuidade da operaÁ„o.
+### ? Segundo Canal: Webhook Gen√©rico (Bulletproof Fallback)
+Al√©m da Menuia, o sistema agora conta com um **Provedor de Webhook Gen√©rico**. Esta √© a "segunda op√ß√£o" definitiva que permite integrar com **qualquer API de WhatsApp do mercado** (Evolution API, Z-API, WPPConnect, etc.) sem alterar uma linha de c√≥digo.
+- **Configura√ß√£o Din√¢mica**: O usu√°rio define a URL, o m√©todo HTTP (POST/GET/PUT) e os cabe√ßalhos (ex: Bearer Tokens) diretamente na interface de configura√ß√µes.
+- **Template de Payload**: Suporte a templates JSON customiz√°veis utilizando vari√°veis din√¢micas `{{phone}}` e `{{message}}`.
+- **Resili√™ncia**: Caso o provedor principal falhe, o administrador pode alternar para o Webhook em segundos, garantindo a continuidade da opera√ß√£o.
 
-### ?? Painel de DiagnÛstico nas ConfiguraÁıes
-- **Testes em Tempo Real**: Novo sistema de testes que utiliza os dados preenchidos nos formul·rios (antes mesmo de salvar), permitindo validar credenciais e rotas sem sujar o banco de dados.
-- **Feedback de Erro Detalhado**: Captura de mensagens de erro originais das APIs (ex: "Appkey Invalida") para guiar o usu·rio na resoluÁ„o autÙnoma de problemas de credenciais.
-## 18. OtimizaÁ„o da Sidebar: Bot„o de Logout Direto
-Para polir a interface e remover redund‚ncias, o rodapÈ da sidebar foi simplificado.
+### ?? Painel de Diagn√≥stico nas Configura√ß√µes
+- **Testes em Tempo Real**: Novo sistema de testes que utiliza os dados preenchidos nos formul√°rios (antes mesmo de salvar), permitindo validar credenciais e rotas sem sujar o banco de dados.
+- **Feedback de Erro Detalhado**: Captura de mensagens de erro originais das APIs (ex: "Appkey Invalida") para guiar o usu√°rio na resolu√ß√£o aut√¥noma de problemas de credenciais.
+## 18. Otimiza√ß√£o da Sidebar: Bot√£o de Logout Direto
+Para polir a interface e remover redund√¢ncias, o rodap√© da sidebar foi simplificado.
 
-- **RemoÁ„o de Perfil**: O mini-card de perfil (nome/cargo/foto) foi removido da base da lateral, visto que estas informaÁıes j· constam no menu superior.
-- **Bot„o de Sair**: Implementado bot„o de logout (`Sair do Sistema`) em destaque com cor `danger`, fixado na base do menu para acesso imediato.
-- **Responsividade**: O bot„o se adapta automaticamente ao modo recolhido da sidebar, exibindo apenas o Ìcone de saÌda, mantendo a eleg‚ncia do Design System.
-## 19. OtimizaÁ„o de Performance: QR Code WhatsApp Local
-Para melhorar a experiÍncia de configuraÁ„o do Gateway WhatsApp Local (Node.js), implementamos otimizaÁıes de conectividade e interface.
+- **Remo√ß√£o de Perfil**: O mini-card de perfil (nome/cargo/foto) foi removido da base da lateral, visto que estas informa√ß√µes j√° constam no menu superior.
+- **Bot√£o de Sair**: Implementado bot√£o de logout (`Sair do Sistema`) em destaque com cor `danger`, fixado na base do menu para acesso imediato.
+- **Responsividade**: O bot√£o se adapta automaticamente ao modo recolhido da sidebar, exibindo apenas o √≠cone de sa√≠da, mantendo a eleg√¢ncia do Design System.
+## 19. Otimiza√ß√£o de Performance: QR Code WhatsApp Local
+Para melhorar a experi√™ncia de configura√ß√£o do Gateway WhatsApp Local (Node.js), implementamos otimiza√ß√µes de conectividade e interface.
 
-### ? ReduÁ„o de LatÍncia e Reatividade
-- **Polling Acelerado**: O intervalo de verificaÁ„o de status no modal de gerenciamento foi reduzido de **5 segundos para 2 segundos**, proporcionando um feedback muito mais r·pido sobre o estado da conex„o.
-- **Payload Unificado (Backend)**: O endpoint de status do gateway Node.js agora inclui o DataURL do QR Code diretamente na resposta (`/status`). Isso elimina a necessidade de uma segunda requisiÁ„o HTTP exclusiva para buscar a imagem (`/qr`), reduzindo a carga no servidor e o tempo de renderizaÁ„o na tela.
-- **RenderizaÁ„o Imediata**: O frontend foi atualizado para priorizar a exibiÁ„o do QR Code contido no payload de status, mantendo a chamada dedicada apenas como fallback de seguranÁa.
+### ? Redu√ß√£o de Lat√™ncia e Reatividade
+- **Polling Acelerado**: O intervalo de verifica√ß√£o de status no modal de gerenciamento foi reduzido de **5 segundos para 2 segundos**, proporcionando um feedback muito mais r√°pido sobre o estado da conex√£o.
+- **Payload Unificado (Backend)**: O endpoint de status do gateway Node.js agora inclui o DataURL do QR Code diretamente na resposta (`/status`). Isso elimina a necessidade de uma segunda requisi√ß√£o HTTP exclusiva para buscar a imagem (`/qr`), reduzindo a carga no servidor e o tempo de renderiza√ß√£o na tela.
+- **Renderiza√ß√£o Imediata**: O frontend foi atualizado para priorizar a exibi√ß√£o do QR Code contido no payload de status, mantendo a chamada dedicada apenas como fallback de seguran√ßa.
 
-> **BenefÌcio:** O usu·rio visualiza o cÛdigo para escaneamento assim que o Puppeteer o gera, sem os atrasos acumulados de m˙ltiplas requisiÁıes sequenciais.
+> **Benef√≠cio:** O usu√°rio visualiza o c√≥digo para escaneamento assim que o Puppeteer o gera, sem os atrasos acumulados de m√∫ltiplas requisi√ß√µes sequenciais.
  
-+## 20. PadronizaÁ„o de Nomenclatura: Central de Mensagens
++## 20. Padroniza√ß√£o de Nomenclatura: Central de Mensagens
 +Atendendo a requisitos de clareza operacional, o termo principal da caixa de entrada foi atualizado.
 +
-+- **Conversas ? WhatsApp OS**: A sub-seÁ„o principal da Central de Mensagens foi renomeada para **WhatsApp OS** em todas as interfaces (Sidebar e Menu Interno).
-+- **Objetivo**: Diferenciar claramente o inbox operacional do sistema (WhatsApp OS) de outras formas de comunicaÁ„o e alinhar com a identidade de ferramenta de trabalho (OS).
-+- **DocumentaÁ„o**: Todos os manuais tÈcnicos e funcionais foram atualizados para refletir a nova nomenclatura.
++- **Conversas ? WhatsApp OS**: A sub-se√ß√£o principal da Central de Mensagens foi renomeada para **WhatsApp OS** em todas as interfaces (Sidebar e Menu Interno).
++- **Objetivo**: Diferenciar claramente o inbox operacional do sistema (WhatsApp OS) de outras formas de comunica√ß√£o e alinhar com a identidade de ferramenta de trabalho (OS).
++- **Documenta√ß√£o**: Todos os manuais t√©cnicos e funcionais foram atualizados para refletir a nova nomenclatura.

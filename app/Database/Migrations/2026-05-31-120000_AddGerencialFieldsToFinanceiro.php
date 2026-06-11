@@ -161,18 +161,18 @@ class AddGerencialFieldsToFinanceiro extends Migration
     {
         $value = mb_strtolower(trim($value), 'UTF-8');
         $value = strtr($value, [
-            'Ã¡' => 'a',
-            'Ã ' => 'a',
-            'Ã£' => 'a',
-            'Ã¢' => 'a',
-            'Ã©' => 'e',
-            'Ãª' => 'e',
-            'Ã­' => 'i',
-            'Ã³' => 'o',
-            'Ã´' => 'o',
-            'Ãµ' => 'o',
-            'Ãº' => 'u',
-            'Ã§' => 'c',
+            'á' => 'a',
+            'à' => 'a',
+            'ã' => 'a',
+            'â' => 'a',
+            'é' => 'e',
+            'ê' => 'e',
+            'í' => 'i',
+            'ó' => 'o',
+            'ô' => 'o',
+            'õ' => 'o',
+            'ú' => 'u',
+            'ç' => 'c',
         ]);
 
         if (function_exists('iconv')) {

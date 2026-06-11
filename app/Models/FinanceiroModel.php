@@ -1202,7 +1202,7 @@ class FinanceiroModel extends Model
                 'movimento_id' => (int) ($row['movimento_id'] ?? 0),
                 'titulo_id' => (int) ($row['titulo_id'] ?? 0),
                 'tipo' => strtolower(trim((string) ($row['tipo'] ?? ''))),
-                'tipo_label' => strtolower(trim((string) ($row['tipo'] ?? ''))) === 'receber' ? 'Entrada' : 'SaÃ­da',
+                'tipo_label' => strtolower(trim((string) ($row['tipo'] ?? ''))) === 'receber' ? 'Entrada' : 'Saída',
                 'descricao' => trim((string) ($row['descricao'] ?? '')),
                 'categoria' => trim((string) ($row['categoria_exibicao'] ?? $row['categoria'] ?? '')),
                 'numero_os' => trim((string) ($row['numero_os'] ?? '')),
@@ -1231,7 +1231,7 @@ class FinanceiroModel extends Model
             $map[$key]['titulos_previstos'][] = [
                 'titulo_id' => (int) ($row['titulo_id'] ?? $row['id'] ?? 0),
                 'tipo' => strtolower(trim((string) ($row['tipo'] ?? ''))),
-                'tipo_label' => strtolower(trim((string) ($row['tipo'] ?? ''))) === 'receber' ? 'Entrada' : 'SaÃ­da',
+                'tipo_label' => strtolower(trim((string) ($row['tipo'] ?? ''))) === 'receber' ? 'Entrada' : 'Saída',
                 'descricao' => trim((string) ($row['descricao'] ?? '')),
                 'categoria' => trim((string) ($row['categoria_exibicao'] ?? $row['categoria'] ?? '')),
                 'numero_os' => trim((string) ($row['numero_os'] ?? '')),
@@ -1585,18 +1585,18 @@ class FinanceiroModel extends Model
     {
         $value = mb_strtolower(trim($value), 'UTF-8');
         $value = strtr($value, [
-            'ÃƒÂ¡' => 'a',
-            'ÃƒÂ ' => 'a',
-            'ÃƒÂ£' => 'a',
-            'ÃƒÂ¢' => 'a',
-            'ÃƒÂ©' => 'e',
-            'ÃƒÂª' => 'e',
-            'ÃƒÂ­' => 'i',
-            'ÃƒÂ³' => 'o',
-            'ÃƒÂ´' => 'o',
-            'ÃƒÂµ' => 'o',
-            'ÃƒÂº' => 'u',
-            'ÃƒÂ§' => 'c',
+            'á' => 'a',
+            'à' => 'a',
+            'ã' => 'a',
+            'â' => 'a',
+            'é' => 'e',
+            'ê' => 'e',
+            'í' => 'i',
+            'ó' => 'o',
+            'ô' => 'o',
+            'õ' => 'o',
+            'ú' => 'u',
+            'ç' => 'c',
         ]);
 
         if (function_exists('iconv')) {

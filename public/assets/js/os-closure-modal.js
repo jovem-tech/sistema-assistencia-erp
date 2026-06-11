@@ -67,10 +67,10 @@
         const paymentMethodOptions = [
             { value: 'dinheiro', label: 'Dinheiro' },
             { value: 'pix', label: 'Pix' },
-            { value: 'transferencia', label: 'TransferÃªncia' },
+            { value: 'transferencia', label: 'Transferência' },
             { value: 'boleto', label: 'Boleto' },
-            { value: 'cartao_credito', label: 'CartÃ£o de crÃ©dito' },
-            { value: 'cartao_debito', label: 'CartÃ£o de dÃ©bito' },
+            { value: 'cartao_credito', label: 'Cartão de crédito' },
+            { value: 'cartao_debito', label: 'Cartão de débito' },
         ];
 
         const receiptKindOptions = [
@@ -156,7 +156,7 @@
                 entregue_reparado: 'Entregue reparado',
                 devolvido_sem_reparo: 'Devolvido sem reparo',
                 descartado: 'Descartado',
-                entregue_pagamento_pendente: 'ConcluÃ­da com pagamento pendente',
+                entregue_pagamento_pendente: 'Concluída com pagamento pendente',
             };
             return map[String(code || '')] || '-';
         }
@@ -203,11 +203,11 @@
         }
 
         function getReceiptValueLabel(kind) {
-            return normalizeReceiptKind(kind) === 'baixa' ? 'Valor recebido' : 'Valor lanÃ§ado';
+            return normalizeReceiptKind(kind) === 'baixa' ? 'Valor recebido' : 'Valor lançado';
         }
 
         function getReceiptObservationLabel(kind) {
-            return normalizeReceiptKind(kind) === 'baixa' ? 'ObservaÃ§Ãµes do recebimento' : 'ObservaÃ§Ãµes do lanÃ§amento';
+            return normalizeReceiptKind(kind) === 'baixa' ? 'Observações do recebimento' : 'Observações do lançamento';
         }
 
         function getReceiptObservationPlaceholder(kind) {
@@ -217,10 +217,10 @@
             }
 
             if (normalized === 'sinal') {
-                return 'Ex.: sinal recebido na aprovaÃ§Ã£o do orÃ§amento ou na entrada do equipamento.';
+                return 'Ex.: sinal recebido na aprovação do orçamento ou na entrada do equipamento.';
             }
 
-            return 'Ex.: cliente parcelou no crÃ©dito, recibo emitido, observaÃ§Ã£o da maquininha.';
+            return 'Ex.: cliente parcelou no crédito, recibo emitido, observação da maquininha.';
         }
 
         function buildEmptyPayment(prefillValue, receiptKind) {
@@ -314,7 +314,7 @@
             if (!state.meta?.cartao?.disponivel) {
                 return {
                     ok: false,
-                    error: 'Configure primeiro as taxas de cartÃ£o em FinanÃ§as > CartÃµes e taxas.',
+                    error: 'Configure primeiro as taxas de cartão em Finanças > Cartões e taxas.',
                 };
             }
 
@@ -335,7 +335,7 @@
             if (!taxa) {
                 return {
                     ok: false,
-                    error: 'NÃ£o existe taxa ativa para a combinaÃ§Ã£o de operadora, bandeira e parcelas.',
+                    error: 'Não existe taxa ativa para a combinação de operadora, bandeira e parcelas.',
                 };
             }
 
@@ -358,7 +358,7 @@
                 taxa_fixa: taxaFixa,
                 parcelas: parcelas,
                 modalidade: modalidade,
-                modalidade_label: modalidade === 'debito' ? 'CartÃ£o de dÃ©bito' : 'CartÃ£o de crÃ©dito',
+                modalidade_label: modalidade === 'debito' ? 'Cartão de débito' : 'Cartão de crédito',
                 prazo_recebimento_dias: prazoDias,
                 data_prevista_recebimento: new Date(Date.now() + Math.max(0, prazoDias) * 86400000).toISOString().slice(0, 10),
                 operadora: operadora,
@@ -389,7 +389,7 @@
 
                 const simulation = simulateCardPayment(payment);
                 if (!simulation.ok) {
-                    cardErrors.push(`LanÃ§amento #${index + 1}: ${simulation.error}`);
+                    cardErrors.push(`Lançamento #${index + 1}: ${simulation.error}`);
                     return;
                 }
 
@@ -412,7 +412,7 @@
                 : String(state.meta?.os?.status || '');
             const projectedStatusLabel = shouldUpdateStatus
                 ? humanizeStatus(projectedStatus)
-                : 'Sem alteraÃ§Ã£o de status';
+                : 'Sem alteração de status';
             const lucroEstimado = Math.round((getFinalOsValue() - getTotalEstimatedCosts() - totalTaxas) * 100) / 100;
 
             return {
@@ -475,13 +475,13 @@
             references.clientEmail.textContent = `E-mail: ${os.cliente_email || '-'}`;
             references.equipmentName.textContent = os.equipamento_nome || '-';
             references.equipmentMeta.textContent = `Tipo: ${os.equip_tipo_label || '-'}`;
-            references.equipmentSerial.textContent = `NÂº de sÃ©rie: ${os.equip_serie || '-'}`;
+            references.equipmentSerial.textContent = `Nº de série: ${os.equip_serie || '-'}`;
 
             references.notify.checked = Boolean(state.meta?.encerramento?.comunicacao_cliente_disponivel);
             references.notify.disabled = !state.meta?.encerramento?.comunicacao_cliente_disponivel;
             references.notifyHelp.textContent = state.meta?.encerramento?.comunicacao_cliente_disponivel
-                ? 'O cliente serÃ¡ avisado usando o telefone cadastrado nesta OS. A mensagem segue com o PDF consolidado da impressÃ£o (A4).'
-                : 'NÃ£o existe telefone vÃ¡lido no cadastro do cliente para enviar a confirmaÃ§Ã£o.';
+                ? 'O cliente será avisado usando o telefone cadastrado nesta OS. A mensagem segue com o PDF consolidado da impressão (A4).'
+                : 'Não existe telefone válido no cadastro do cliente para enviar a confirmação.';
             references.notifyHelp.classList.toggle('text-danger', !state.meta?.encerramento?.comunicacao_cliente_disponivel);
 
             references.dataEntrega.value = String(os.data_entrega || new Date().toISOString().slice(0, 10));
@@ -534,19 +534,19 @@
                 if (cardMethod) {
                     simHtml = simulation && simulation.ok
                         ? `<div class="os-closure-card-sim mt-3">
-                                Taxa estimada: <strong>${escapeHtml(formatCurrency(simulation.valor_taxa))}</strong> Â·
-                                LÃ­quido: <strong>${escapeHtml(formatCurrency(simulation.valor_liquido))}</strong> Â·
+                                Taxa estimada: <strong>${escapeHtml(formatCurrency(simulation.valor_taxa))}</strong> ·
+                                Líquido: <strong>${escapeHtml(formatCurrency(simulation.valor_liquido))}</strong> ·
                                 Prazo: <strong>${escapeHtml(String(simulation.prazo_recebimento_dias || 0))} dia(s)</strong>
                            </div>`
-                        : `<div class="alert alert-warning py-2 px-3 mt-3 mb-0">${escapeHtml(simulation?.error || 'Configure a taxa deste cartÃ£o para continuar.')}</div>`;
+                        : `<div class="alert alert-warning py-2 px-3 mt-3 mb-0">${escapeHtml(simulation?.error || 'Configure a taxa deste cartão para continuar.')}</div>`;
                 }
 
                 return `
                     <div class="os-closure-payment-row" data-payment-index="${index}">
                         <div class="os-closure-payment-head">
                             <div>
-                                <strong>LanÃ§amento ${index + 1}</strong>
-                                <small>${escapeHtml(getReceiptKindLabel(receiptKind))} Â· ${escapeHtml(getPaymentMethodLabel(payment.forma_pagamento))}</small>
+                                <strong>Lançamento ${index + 1}</strong>
+                                <small>${escapeHtml(getReceiptKindLabel(receiptKind))} · ${escapeHtml(getPaymentMethodLabel(payment.forma_pagamento))}</small>
                             </div>
                             <button type="button" class="btn btn-outline-danger btn-sm" data-payment-remove="${index}">
                                 <i class="bi bi-trash3 me-1"></i>Remover
@@ -554,7 +554,7 @@
                         </div>
                         <div class="row g-3">
                             <div class="col-12 col-lg-3">
-                                <label class="form-label">ClassificaÃ§Ã£o</label>
+                                <label class="form-label">Classificação</label>
                                 <select class="form-select" data-payment-field="classificacao_recebimento" data-payment-index="${index}">
                                     ${receiptKindOptionsHtml}
                                 </select>
@@ -670,15 +670,15 @@
 
             if (!summary.shouldUpdateStatus) {
                 references.collectionsSummary.className = 'alert alert-info mt-3 mb-0';
-                references.collectionsSummary.textContent = 'Pagamento antecipado detectado. O valor serÃ¡ lanÃ§ado no Financeiro, Fluxo de Caixa e DRE, sem alterar o status da OS.';
+                references.collectionsSummary.textContent = 'Pagamento antecipado detectado. O valor será lançado no Financeiro, Fluxo de Caixa e DRE, sem alterar o status da OS.';
             } else if (summary.projectedStatus === 'entregue_pagamento_pendente') {
                 references.collectionsSummary.className = 'alert alert-warning mt-3 mb-0';
                 references.collectionsSummary.textContent = state.meta?.encerramento?.comunicacao_cliente_disponivel
-                    ? 'Saldo pendente detectado. A OS ficarÃ¡ concluÃ­da, mas permanecerÃ¡ em aberto para cobranÃ§a automÃ¡tica em 1, 3 e 5 dias.'
-                    : 'Saldo pendente detectado. A OS ficarÃ¡ concluÃ­da, mas permanecerÃ¡ em aberto. Cadastre um telefone vÃ¡lido para a cobranÃ§a automÃ¡tica funcionar corretamente.';
+                    ? 'Saldo pendente detectado. A OS ficará concluída, mas permanecerá em aberto para cobrança automática em 1, 3 e 5 dias.'
+                    : 'Saldo pendente detectado. A OS ficará concluída, mas permanecerá em aberto. Cadastre um telefone válido para a cobrança automática funcionar corretamente.';
             } else {
                 references.collectionsSummary.className = 'alert alert-success mt-3 mb-0';
-                references.collectionsSummary.textContent = 'Pagamento suficiente para encerramento definitivo. O saldo financeiro desta OS serÃ¡ considerado quitado.';
+                references.collectionsSummary.textContent = 'Pagamento suficiente para encerramento definitivo. O saldo financeiro desta OS será considerado quitado.';
             }
         }
 
@@ -705,7 +705,7 @@
 
         function validateBeforeSubmit() {
             if (!references.encerrarComo.value) {
-                throw new Error('Selecione como a OS deve ser concluÃ­da.');
+                throw new Error('Selecione como a OS deve ser concluída.');
             }
 
             if (!references.dataEntrega.value) {
@@ -722,7 +722,7 @@
             }
 
             if (summary.totalRecebido > summary.saldoAnterior + 0.001) {
-                throw new Error('O total lanÃ§ado nesta aÃ§Ã£o nÃ£o pode ultrapassar o saldo financeiro em aberto.');
+                throw new Error('O total lançado nesta ação não pode ultrapassar o saldo financeiro em aberto.');
             }
 
             return summary;
@@ -731,15 +731,15 @@
         function buildConfirmationHtml(summary, whatsappAvailable) {
             const whatsappNotice = summary.shouldUpdateStatus
                 ? (whatsappAvailable
-                    ? '<div class="alert alert-info py-2 px-3 mb-3">Se vocÃª confirmar, a mensagem do WhatsApp seguirÃ¡ com o PDF consolidado da impressÃ£o (A4) da OS.</div>'
-                    : '<div class="alert alert-secondary py-2 px-3 mb-3">NÃ£o hÃ¡ telefone vÃ¡lido para envio no WhatsApp. A baixa serÃ¡ registrada sem mensagem.</div>')
+                    ? '<div class="alert alert-info py-2 px-3 mb-3">Se você confirmar, a mensagem do WhatsApp seguirá com o PDF consolidado da impressão (A4) da OS.</div>'
+                    : '<div class="alert alert-secondary py-2 px-3 mb-3">Não há telefone válido para envio no WhatsApp. A baixa será registrada sem mensagem.</div>')
                 : '';
 
             return `
                 <div class="text-start">
                     ${whatsappNotice}
-                    <p class="mb-2"><strong>Status apÃ³s salvar:</strong> ${escapeHtml(summary.projectedStatusLabel)}</p>
-                    <p class="mb-2"><strong>LanÃ§ado nesta aÃ§Ã£o:</strong> ${escapeHtml(formatCurrency(summary.totalRecebido))}</p>
+                    <p class="mb-2"><strong>Status após salvar:</strong> ${escapeHtml(summary.projectedStatusLabel)}</p>
+                    <p class="mb-2"><strong>Lançado nesta ação:</strong> ${escapeHtml(formatCurrency(summary.totalRecebido))}</p>
                     <p class="mb-2"><strong>Taxas estimadas:</strong> ${escapeHtml(formatCurrency(summary.totalTaxas))}</p>
                     <p class="mb-2"><strong>Lucro estimado:</strong> ${escapeHtml(formatCurrency(summary.lucroEstimado))}</p>
                     <p class="mb-0"><strong>Saldo remanescente:</strong> ${escapeHtml(formatCurrency(summary.saldoProjetado))}</p>
@@ -765,7 +765,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'NÃ£o foi possÃ­vel carregar os dados da baixa da OS.');
+                    throw new Error(payload.message || 'Não foi possível carregar os dados da baixa da OS.');
                 }
 
                 resetState();
@@ -777,7 +777,7 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao abrir a baixa',
-                        text: error.message || 'NÃ£o foi possÃ­vel carregar os dados da OS.',
+                        text: error.message || 'Não foi possível carregar os dados da OS.',
                     });
                 }
             }
@@ -800,7 +800,7 @@
                     window.Swal.fire({
                         icon: 'info',
                         title: 'OS sem saldo pendente',
-                        text: 'Esta OS jÃ¡ estÃ¡ quitada financeiramente. VocÃª pode registrar a baixa sem adicionar recebimentos.',
+                        text: 'Esta OS já está quitada financeiramente. Você pode registrar a baixa sem adicionar recebimentos.',
                     });
                 }
                 return;
@@ -816,8 +816,8 @@
                 if (window.Swal && typeof window.Swal.fire === 'function') {
                     window.Swal.fire({
                         icon: 'info',
-                        title: 'OS jÃ¡ estÃ¡ toda lanÃ§ada',
-                        text: 'NÃ£o hÃ¡ saldo restante para registrar como adiantamento ou sinal nesta aÃ§Ã£o.',
+                        title: 'OS já está toda lançada',
+                        text: 'Não há saldo restante para registrar como adiantamento ou sinal nesta ação.',
                     });
                 }
                 return;
@@ -830,8 +830,8 @@
 
             const decision = await window.Swal.fire({
                 icon: 'question',
-                title: 'Como deseja lanÃ§ar esse valor antecipado?',
-                text: 'Adiantamento total preenche o saldo financeiro restante sem alterar o status da OS. Sinal cria um lanÃ§amento parcial antes da entrega.',
+                title: 'Como deseja lançar esse valor antecipado?',
+                text: 'Adiantamento total preenche o saldo financeiro restante sem alterar o status da OS. Sinal cria um lançamento parcial antes da entrega.',
                 showCancelButton: true,
                 showDenyButton: true,
                 confirmButtonText: 'Adiantamento total',
@@ -999,14 +999,14 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'NÃ£o foi possÃ­vel concluir a baixa da OS.');
+                    throw new Error(payload.message || 'Não foi possível concluir a baixa da OS.');
                 }
 
                 modal.hide();
                 if (window.Swal && typeof window.Swal.fire === 'function') {
                     await window.Swal.fire({
                         icon: payload.warning ? 'warning' : 'success',
-                        title: payload.status_unchanged ? 'Pagamento antecipado registrado' : (payload.status === 'entregue_pagamento_pendente' ? 'Baixa concluÃ­da com pendÃªncia' : 'Baixa concluÃ­da'),
+                        title: payload.status_unchanged ? 'Pagamento antecipado registrado' : (payload.status === 'entregue_pagamento_pendente' ? 'Baixa concluída com pendência' : 'Baixa concluída'),
                         html: `
                             <div class="text-start">
                                 <p class="mb-2">${escapeHtml(payload.message || 'Baixa registrada com sucesso.')}</p>
@@ -1025,7 +1025,7 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao registrar a baixa',
-                        text: error.message || 'NÃ£o foi possÃ­vel concluir a baixa desta OS.',
+                        text: error.message || 'Não foi possível concluir a baixa desta OS.',
                     });
                 }
             } finally {

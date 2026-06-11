@@ -27,8 +27,8 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
 <div class="container-fluid py-4">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
-            <h2 class="mb-1"><i class="bi bi-credit-card-2-front me-2"></i>CartÃµes e Taxas</h2>
-            <p class="text-muted mb-0">Configure operadoras, bandeiras, parcelas e simule o faturamento lÃ­quido das vendas em cartÃ£o.</p>
+            <h2 class="mb-1"><i class="bi bi-credit-card-2-front me-2"></i>Cartões e Taxas</h2>
+            <p class="text-muted mb-0">Configure operadoras, bandeiras, parcelas e simule o faturamento líquido das vendas em cartão.</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
             <a href="<?= base_url('financeiro') ?>" class="btn btn-outline-secondary">
@@ -42,7 +42,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
 
     <?php if (empty($cartaoConfigReady)): ?>
         <div class="alert alert-warning border-0 shadow-sm">
-            O cadastro de cartÃµes ainda depende das migraÃ§Ãµes desta entrega. Depois de migrar o banco, esta tela passa a operar normalmente.
+            O cadastro de cartões ainda depende das migrações desta entrega. Depois de migrar o banco, esta tela passa a operar normalmente.
         </div>
     <?php endif; ?>
 
@@ -57,7 +57,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
             <button class="nav-link" id="aba-taxa-parcela-tab" data-bs-toggle="tab" data-bs-target="#aba-taxa-parcela" type="button" role="tab" aria-controls="aba-taxa-parcela" aria-selected="false">Taxa por parcela</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="aba-simulador-tab" data-bs-toggle="tab" data-bs-target="#aba-simulador" type="button" role="tab" aria-controls="aba-simulador" aria-selected="false">Simulador de faturamento lÃ­quido</button>
+            <button class="nav-link" id="aba-simulador-tab" data-bs-toggle="tab" data-bs-target="#aba-simulador" type="button" role="tab" aria-controls="aba-simulador" aria-selected="false">Simulador de faturamento líquido</button>
         </li>
     </ul>
 
@@ -76,7 +76,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                             <input type="text" name="nome" id="operadoraNomeInput" class="form-control" placeholder="Ex.: Stone" required>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">DescriÃ§Ã£o</label>
+                            <label class="form-label">Descrição</label>
                             <input type="text" name="descricao" id="operadoraDescricaoInput" class="form-control" placeholder="Contexto interno opcional">
                         </div>
                         <div class="col-6">
@@ -84,7 +84,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                             <input type="number" min="0" name="ordem_exibicao" id="operadoraOrdemInput" class="form-control" value="0">
                         </div>
                         <div class="col-6">
-                            <label class="form-label">Prazo padrÃ£o (dias)</label>
+                            <label class="form-label">Prazo padrão (dias)</label>
                             <input type="number" min="0" name="prazo_padrao_dias" id="operadoraPrazoInput" class="form-control" value="30">
                         </div>
                         <div class="col-12">
@@ -106,7 +106,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                                     <th>Operadora</th>
                                     <th>Prazo</th>
                                     <th>Status</th>
-                                    <th class="text-end">AÃ§Ãµes</th>
+                                    <th class="text-end">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -124,7 +124,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                                                 <?= ((int) ($row['ativo'] ?? 0)) === 1 ? 'Ativa' : 'Inativa' ?>
                                             </span>
                                         </td>
-                                        <td data-label="AÃ§Ãµes" class="text-end">
+                                        <td data-label="Ações" class="text-end">
                                             <div class="d-inline-flex gap-2">
                                                 <button
                                                     type="button"
@@ -190,7 +190,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                                 <tr>
                                     <th>Bandeira</th>
                                     <th>Status</th>
-                                    <th class="text-end">AÃ§Ãµes</th>
+                                    <th class="text-end">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -205,7 +205,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                                                 <?= ((int) ($row['ativo'] ?? 0)) === 1 ? 'Ativa' : 'Inativa' ?>
                                             </span>
                                         </td>
-                                        <td data-label="AÃ§Ãµes" class="text-end">
+                                        <td data-label="Ações" class="text-end">
                                             <div class="d-inline-flex gap-2">
                                                 <button
                                                     type="button"
@@ -268,8 +268,8 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                         <div class="col-6">
                             <label class="form-label">Modalidade</label>
                             <select name="modalidade" id="taxaModalidadeInput" class="form-select" required>
-                                <option value="credito">CrÃ©dito</option>
-                                <option value="debito">DÃ©bito</option>
+                                <option value="credito">Crédito</option>
+                                <option value="debito">Débito</option>
                             </select>
                         </div>
                         <div class="col-3">
@@ -277,7 +277,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                             <input type="number" min="1" max="12" name="parcelas_inicial" id="taxaParcelasInicialInput" class="form-control" value="1">
                         </div>
                         <div class="col-3">
-                            <label class="form-label">atÃ©</label>
+                            <label class="form-label">até</label>
                             <input type="number" min="1" max="12" name="parcelas_final" id="taxaParcelasFinalInput" class="form-control" value="1">
                         </div>
                         <div class="col-4">
@@ -293,7 +293,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                             <input type="number" min="0" name="prazo_recebimento_dias" id="taxaPrazoInput" class="form-control" value="30">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">ObservaÃ§Ãµes</label>
+                            <label class="form-label">Observações</label>
                             <input type="text" name="observacoes" id="taxaObservacoesInput" class="form-control" placeholder="Ex.: taxa promocional da campanha">
                         </div>
                         <div class="col-12">
@@ -315,7 +315,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                             <div class="card shadow-sm h-100 w-100">
                         <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <strong>Taxas cadastradas</strong>
-                            <span class="text-muted small">Use as taxas daqui tanto na baixa da OS quanto nas simulaÃ§Ãµes internas.</span>
+                            <span class="text-muted small">Use as taxas daqui tanto na baixa da OS quanto nas simulações internas.</span>
                         </div>
                         <div class="card-body">
                             <?php if (!empty($taxasOperadorasFiltro)): ?>
@@ -352,9 +352,9 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                                             <th>Modalidade</th>
                                             <th>Faixa</th>
                                             <th>Taxa</th>
-                                            <th>LiquidaÃ§Ã£o</th>
+                                            <th>Liquidação</th>
                                             <th>Status</th>
-                                            <th class="text-end">AÃ§Ãµes</th>
+                                            <th class="text-end">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -367,7 +367,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                                             <tr data-operadora-id="<?= (int) ($row['operadora_id'] ?? 0) ?>">
                                                 <td data-label="Operadora"><?= esc((string) ($row['operadora_nome'] ?? '')) ?></td>
                                                 <td data-label="Bandeira"><?= esc((string) ($row['bandeira_nome'] ?? 'Todas')) ?></td>
-                                                <td data-label="Modalidade"><?= (string) ($row['modalidade'] ?? '') === 'debito' ? 'DÃ©bito' : 'CrÃ©dito' ?></td>
+                                                <td data-label="Modalidade"><?= (string) ($row['modalidade'] ?? '') === 'debito' ? 'Débito' : 'Crédito' ?></td>
                                                 <td data-label="Faixa">
                                                     <?= (int) ($row['parcelas_inicial'] ?? 1) ?>x
                                                     <?php if ((int) ($row['parcelas_final'] ?? 1) !== (int) ($row['parcelas_inicial'] ?? 1)): ?>
@@ -378,13 +378,13 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                                                     <div><?= number_format((float) ($row['taxa_percentual'] ?? 0), 4, ',', '.') ?>%</div>
                                                     <small class="text-muted">+ R$ <?= number_format((float) ($row['taxa_fixa'] ?? 0), 2, ',', '.') ?></small>
                                                 </td>
-                                                <td data-label="LiquidaÃ§Ã£o"><?= (int) ($row['prazo_recebimento_dias'] ?? 0) ?> dias</td>
+                                                <td data-label="Liquidação"><?= (int) ($row['prazo_recebimento_dias'] ?? 0) ?> dias</td>
                                                 <td data-label="Status">
                                                     <span class="badge <?= ((int) ($row['ativo'] ?? 0)) === 1 ? 'text-bg-success' : 'text-bg-secondary' ?>">
                                                         <?= ((int) ($row['ativo'] ?? 0)) === 1 ? 'Ativa' : 'Inativa' ?>
                                                     </span>
                                                 </td>
-                                                <td data-label="AÃ§Ãµes" class="text-end">
+                                                <td data-label="Ações" class="text-end">
                                                     <div class="d-inline-flex gap-2">
                                                         <button
                                                             type="button"
@@ -433,7 +433,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
             <div class="card shadow-sm w-100">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <strong>Taxas cadastradas</strong>
-                    <span class="text-muted small">Use as taxas daqui tanto na baixa da OS quanto nas simulaÃ§Ãµes internas.</span>
+                    <span class="text-muted small">Use as taxas daqui tanto na baixa da OS quanto nas simulações internas.</span>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -445,9 +445,9 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                                     <th>Modalidade</th>
                                     <th>Faixa</th>
                                     <th>Taxa</th>
-                                    <th>LiquidaÃ§Ã£o</th>
+                                    <th>Liquidação</th>
                                     <th>Status</th>
-                                    <th class="text-end">AÃ§Ãµes</th>
+                                    <th class="text-end">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -455,7 +455,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                                     <tr>
                                         <td data-label="Operadora"><?= esc((string) ($row['operadora_nome'] ?? '')) ?></td>
                                         <td data-label="Bandeira"><?= esc((string) ($row['bandeira_nome'] ?? 'Todas')) ?></td>
-                                        <td data-label="Modalidade"><?= (string) ($row['modalidade'] ?? '') === 'debito' ? 'DÃ©bito' : 'CrÃ©dito' ?></td>
+                                        <td data-label="Modalidade"><?= (string) ($row['modalidade'] ?? '') === 'debito' ? 'Débito' : 'Crédito' ?></td>
                                         <td data-label="Faixa">
                                             <?= (int) ($row['parcelas_inicial'] ?? 1) ?>x
                                             <?php if ((int) ($row['parcelas_final'] ?? 1) !== (int) ($row['parcelas_inicial'] ?? 1)): ?>
@@ -466,13 +466,13 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                                             <div><?= number_format((float) ($row['taxa_percentual'] ?? 0), 4, ',', '.') ?>%</div>
                                             <small class="text-muted">+ R$ <?= number_format((float) ($row['taxa_fixa'] ?? 0), 2, ',', '.') ?></small>
                                         </td>
-                                        <td data-label="LiquidaÃ§Ã£o"><?= (int) ($row['prazo_recebimento_dias'] ?? 0) ?> dias</td>
+                                        <td data-label="Liquidação"><?= (int) ($row['prazo_recebimento_dias'] ?? 0) ?> dias</td>
                                         <td data-label="Status">
                                             <span class="badge <?= ((int) ($row['ativo'] ?? 0)) === 1 ? 'text-bg-success' : 'text-bg-secondary' ?>">
                                                 <?= ((int) ($row['ativo'] ?? 0)) === 1 ? 'Ativa' : 'Inativa' ?>
                                             </span>
                                         </td>
-                                        <td data-label="AÃ§Ãµes" class="text-end">
+                                        <td data-label="Ações" class="text-end">
                                             <div class="d-inline-flex gap-2">
                                                 <button
                                                     type="button"
@@ -512,7 +512,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
         <div class="tab-pane fade" id="aba-simulador" role="tabpanel" aria-labelledby="aba-simulador-tab" tabindex="0">
             <div class="card shadow-sm w-100">
                 <div class="card-header bg-white">
-                    <strong>Simulador de Faturamento LÃ­quido</strong>
+                    <strong>Simulador de Faturamento Líquido</strong>
                 </div>
                 <div class="card-body">
                     <div class="row g-3 align-items-end">
@@ -533,8 +533,8 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                         <div class="col-12 col-lg-2">
                             <label class="form-label">Modalidade</label>
                             <select id="simuladorModalidadeInput" class="form-select">
-                                <option value="credito">CrÃ©dito</option>
-                                <option value="debito">DÃ©bito</option>
+                                <option value="credito">Crédito</option>
+                                <option value="debito">Débito</option>
                             </select>
                         </div>
                         <div class="col-12 col-lg-2">
@@ -571,7 +571,7 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                         </div>
                         <div class="col-12 col-md-6 col-xl-3">
                             <div class="simulator-metric">
-                                <span class="simulator-label">Valor lÃ­quido</span>
+                                <span class="simulator-label">Valor líquido</span>
                                 <strong id="simuladorValorLiquido">R$ 0,00</strong>
                             </div>
                         </div>
@@ -583,13 +583,13 @@ asort($taxasOperadorasFiltro, SORT_NATURAL | SORT_FLAG_CASE);
                         </div>
                         <div class="col-12 col-md-6 col-xl-3">
                             <div class="simulator-metric">
-                                <span class="simulator-label">PrevisÃ£o de recebimento</span>
+                                <span class="simulator-label">Previsão de recebimento</span>
                                 <strong id="simuladorRecebimento">-</strong>
                             </div>
                         </div>
                     </div>
                     <div class="text-muted small mt-3" id="simuladorResumoTexto">
-                        Preencha os dados da venda para estimar quanto a assistÃªncia realmente vai faturar apÃ³s as taxas da maquininha.
+                        Preencha os dados da venda para estimar quanto a assistência realmente vai faturar após as taxas da maquininha.
                     </div>
                 </div>
             </div>
@@ -860,7 +860,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const result = await window.Swal.fire({
                 icon: 'warning',
                 title: 'Desativar cadastro?',
-                text: 'O registro serÃ¡ mantido para histÃ³rico, mas deixarÃ¡ de ser usado nas novas simulaÃ§Ãµes e baixas.',
+                text: 'O registro será mantido para histórico, mas deixará de ser usado nas novas simulações e baixas.',
                 showCancelButton: true,
                 confirmButtonText: 'Desativar',
                 cancelButtonText: 'Cancelar',
@@ -902,7 +902,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const payload = await response.json();
             if (!response.ok || !payload.ok) {
-                throw new Error(payload.message || 'NÃ£o foi possÃ­vel simular a venda em cartÃ£o.');
+                throw new Error(payload.message || 'Não foi possível simular a venda em cartão.');
             }
 
             const simulation = payload.simulation || {};
@@ -911,19 +911,19 @@ document.addEventListener('DOMContentLoaded', function () {
             simuladorPercentual.textContent = `${Number(simulation.taxa_percentual || 0).toFixed(4).replace('.', ',')}%`;
             simuladorRecebimento.textContent = `${simulation.prazo_recebimento_dias || 0} dias`;
             simuladorResumoTexto.textContent =
-                `Venda bruta de ${money(simulation.valor_bruto || 0)} em ${simulation.modalidade_label || 'cartÃ£o'}`
+                `Venda bruta de ${money(simulation.valor_bruto || 0)} em ${simulation.modalidade_label || 'cartão'}`
                 + ` pela operadora ${simulation.operadora?.nome || '-'}`
                 + `${simulation.parcelas > 1 ? ` em ${simulation.parcelas}x` : ''}.`
-                + ` Valor lÃ­quido estimado: ${money(simulation.valor_liquido || 0)}.`;
+                + ` Valor líquido estimado: ${money(simulation.valor_liquido || 0)}.`;
         } catch (error) {
             simuladorTaxaTotal.textContent = 'R$ 0,00';
             simuladorValorLiquido.textContent = 'R$ 0,00';
             simuladorPercentual.textContent = '0,0000%';
             simuladorRecebimento.textContent = '-';
-            simuladorResumoTexto.textContent = error.message || 'NÃ£o foi possÃ­vel simular a venda.';
+            simuladorResumoTexto.textContent = error.message || 'Não foi possível simular a venda.';
 
             if (window.Swal && typeof window.Swal.fire === 'function') {
-                window.Swal.fire('Falha na simulaÃ§Ã£o', simuladorResumoTexto.textContent, 'error');
+                window.Swal.fire('Falha na simulação', simuladorResumoTexto.textContent, 'error');
             }
         }
     });

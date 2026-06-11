@@ -1,6 +1,6 @@
 <?php
-$pageTitle = $systemName . ' - ERP para assistÃªncia tÃ©cnica';
-$pageDescription = 'ERP operacional para assistÃªncia tÃ©cnica com OS, fotos, checklist, orÃ§amentos com link pÃºblico, WhatsApp, CRM, financeiro gerencial e coletor de bancada.';
+$pageTitle = $systemName . ' - ERP para assistência técnica';
+$pageDescription = 'ERP operacional para assistência técnica com OS, fotos, checklist, orçamentos com link público, WhatsApp, CRM, financeiro gerencial e coletor de bancada.';
 $contactLabel = $companyPhone !== '' ? $companyPhone : ($companyEmail !== '' ? $companyEmail : 'Fale com a equipe');
 $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $companyAddress]));
 ?>
@@ -851,7 +851,7 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
             </span>
             <span class="brand-copy">
                 <strong><?= esc($companyName) ?></strong>
-                <span><?= esc($systemName) ?> Â· versÃ£o <?= esc($systemVersion) ?></span>
+                <span><?= esc($systemName) ?> · versão <?= esc($systemVersion) ?></span>
             </span>
         </a>
         <nav class="nav-links" aria-label="Navegacao principal">
@@ -870,52 +870,52 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
     <section class="hero">
         <div class="wrap hero-grid">
             <article class="hero-copy surface reveal">
-                <span class="badge"><span class="badge-dot"></span>ERP operacional para assistÃªncia tÃ©cnica com OS, orÃ§amentos, WhatsApp, CRM, financeiro e PWA</span>
+                <span class="badge"><span class="badge-dot"></span>ERP operacional para assistência técnica com OS, orçamentos, WhatsApp, CRM, financeiro e PWA</span>
                 <h1>Do atendimento ao fechamento da OS, sem perder contexto no caminho</h1>
                 <p>
-                    O ERP da <?= esc($companyName) ?> organiza a rotina real da assistÃªncia tÃ©cnica:
-                    abertura de OS com fotos e checklist, orÃ§amentos com link pÃºblico,
-                    envio por WhatsApp, e-mail e PDF, histÃ³rico do equipamento,
+                    O ERP da <?= esc($companyName) ?> organiza a rotina real da assistência técnica:
+                    abertura de OS com fotos e checklist, orçamentos com link público,
+                    envio por WhatsApp, e-mail e PDF, histórico do equipamento,
                     financeiro gerencial e suporte a desktop/notebook com Coletor de Bancada.
                 </p>
                 <div class="btn-row">
                     <a href="<?= esc($primaryCtaHref) ?>" class="btn btn-primary"><?= esc($primaryCtaLabel) ?></a>
-                    <a href="#recursos" class="btn btn-secondary">Ver mÃ³dulos principais</a>
+                    <a href="#recursos" class="btn btn-secondary">Ver módulos principais</a>
                     <a href="<?= esc($loginUrl) ?>" class="btn btn-secondary">Entrar no ERP</a>
                 </div>
                 <div class="hero-proof">
-                    Produto real hoje: OS + link pÃºblico de orÃ§amento + WhatsApp OS + DRE/Fluxo de Caixa + app mobile/PWA.
+                    Produto real hoje: OS + link público de orçamento + WhatsApp OS + DRE/Fluxo de Caixa + app mobile/PWA.
                 </div>
             </article>
 
             <div class="hero-stack">
                 <aside class="feature-panel surface reveal">
-                    <span class="eyebrow">JÃ¡ disponÃ­vel</span>
+                    <span class="eyebrow">Já disponível</span>
                     <h2>O que a landing passa a refletir do produto atual</h2>
                     <p>
-                        Em vez de prometer um ERP genÃ©rico, a pÃ¡gina destaca o que o sistema entrega hoje para o balcÃ£o,
-                        a bancada, o atendimento e a gestÃ£o.
+                        Em vez de prometer um ERP genérico, a página destaca o que o sistema entrega hoje para o balcão,
+                        a bancada, o atendimento e a gestão.
                     </p>
                     <div class="signal-list">
                         <div class="signal">
                             <span class="signal-mark">OS</span>
                             <div>
                                 <strong>Fluxo de OS com fotos, checklist e status</strong>
-                                <span>RecepÃ§Ã£o, diagnÃ³stico, orÃ§amento, execuÃ§Ã£o, entrega e histÃ³rico reativo.</span>
+                                <span>Recepção, diagnóstico, orçamento, execução, entrega e histórico reativo.</span>
                             </div>
                         </div>
                         <div class="signal">
                             <span class="signal-mark">PUB</span>
                             <div>
-                                <strong>OrÃ§amento com link pÃºblico, PDF, e-mail e WhatsApp</strong>
-                                <span>AprovaÃ§Ã£o comercial sem tirar a equipe do contexto operacional.</span>
+                                <strong>Orçamento com link público, PDF, e-mail e WhatsApp</strong>
+                                <span>Aprovação comercial sem tirar a equipe do contexto operacional.</span>
                             </div>
                         </div>
                         <div class="signal">
                             <span class="signal-mark">BEN</span>
                             <div>
                                 <strong>Coletor de Bancada para desktop e notebook</strong>
-                                <span>InventÃ¡rio tÃ©cnico, snapshot local e enriquecimento automÃ¡tico do equipamento.</span>
+                                <span>Inventário técnico, snapshot local e enriquecimento automático do equipamento.</span>
                             </div>
                         </div>
                     </div>
@@ -924,28 +924,28 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
                 <aside class="contact-panel surface reveal" id="demo">
                     <span class="eyebrow">Contato comercial</span>
                     <p>
-                        A pÃ¡gina usa os dados institucionais configurados no ERP, sem rodapÃ© fictÃ­cio e sem CTA solto.
+                        A página usa os dados institucionais configurados no ERP, sem rodapé fictício e sem CTA solto.
                     </p>
                     <div class="contact-grid">
                         <div class="contact-card">
                             <small>Contato principal</small>
                             <strong><?= esc($contactLabel) ?></strong>
-                            <span><?= $whatsAppHref ? 'CTA pronto para WhatsApp.' : 'CTA pode ser refinado quando o nÃºmero comercial estiver definido.' ?></span>
+                            <span><?= $whatsAppHref ? 'CTA pronto para WhatsApp.' : 'CTA pode ser refinado quando o número comercial estiver definido.' ?></span>
                         </div>
                         <div class="contact-card">
                             <small>Acesso atual</small>
                             <strong><a href="<?= esc($loginUrl) ?>">Portal de login do ERP</a></strong>
-                            <span>Entrada operacional atual do sistema em produÃ§Ã£o ou homologaÃ§Ã£o.</span>
+                            <span>Entrada operacional atual do sistema em produção ou homologação.</span>
                         </div>
                         <div class="contact-card">
                             <small>App mobile/PWA</small>
                             <strong><a href="<?= esc($mobileUrl) ?>">Acesso mobile</a></strong>
-                            <span>Mesmo domÃ­nio operacional com foco em atendimento e rotina externa.</span>
+                            <span>Mesmo domínio operacional com foco em atendimento e rotina externa.</span>
                         </div>
                         <div class="contact-card">
                             <small>Release</small>
-                            <strong>VersÃ£o <?= esc($systemVersion) ?></strong>
-                            <span>Copy alinhada aos mÃ³dulos e entregas realmente documentados.</span>
+                            <strong>Versão <?= esc($systemVersion) ?></strong>
+                            <span>Copy alinhada aos módulos e entregas realmente documentados.</span>
                         </div>
                     </div>
                 </aside>
@@ -953,8 +953,8 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
                 <aside class="quote-panel reveal">
                     <span class="eyebrow">Posicionamento</span>
                     <p>
-                        Mais forte para assistÃªncias de informÃ¡tica, notebook, desktop e eletrÃ´nicos que precisam ligar atendimento,
-                        bancada, aprovaÃ§Ã£o comercial e visÃ£o financeira no mesmo fluxo.
+                        Mais forte para assistências de informática, notebook, desktop e eletrônicos que precisam ligar atendimento,
+                        bancada, aprovação comercial e visão financeira no mesmo fluxo.
                     </p>
                 </aside>
             </div>
@@ -966,16 +966,16 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
             <div class="pain-band reveal">
                 <div>
                     <span class="eyebrow">O problema real</span>
-                    <strong>A operaÃ§Ã£o da assistÃªncia se perde quando cada etapa mora em um lugar diferente</strong>
+                    <strong>A operação da assistência se perde quando cada etapa mora em um lugar diferente</strong>
                     <p style="color: var(--muted);">
-                        Papel no balcÃ£o, conversa no WhatsApp, foto fora da OS, orÃ§amento isolado, financeiro sem contexto e equipe sem visÃ£o Ãºnica do equipamento.
+                        Papel no balcão, conversa no WhatsApp, foto fora da OS, orçamento isolado, financeiro sem contexto e equipe sem visão única do equipamento.
                     </p>
                 </div>
                 <div class="pain-list">
-                    <span>OS sem histÃ³rico tÃ©cnico consistente</span>
-                    <span>AprovaÃ§Ã£o comercial lenta ou sem rastreio</span>
+                    <span>OS sem histórico técnico consistente</span>
+                    <span>Aprovação comercial lenta ou sem rastreio</span>
                     <span>Financeiro sem leitura clara por atendimento</span>
-                    <span>Desktop e notebook sem inventÃ¡rio padronizado</span>
+                    <span>Desktop e notebook sem inventário padronizado</span>
                 </div>
             </div>
         </div>
@@ -985,18 +985,18 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
         <div class="wrap">
             <div class="section-head reveal">
                 <span class="eyebrow">Recursos reais</span>
-                <h2>A pÃ¡gina comercial agora fala a lÃ­ngua do produto que jÃ¡ existe</h2>
+                <h2>A página comercial agora fala a língua do produto que já existe</h2>
                 <p>
-                    Em vez de vender "qualquer ERP", esta landing destaca os blocos que o sistema jÃ¡ entrega hoje no cÃ³digo e na documentaÃ§Ã£o:
-                    OS, orÃ§amentos, central de mensagens, CRM, financeiro gerencial, PWA e agente de bancada.
+                    Em vez de vender "qualquer ERP", esta landing destaca os blocos que o sistema já entrega hoje no código e na documentação:
+                    OS, orçamentos, central de mensagens, CRM, financeiro gerencial, PWA e agente de bancada.
                 </p>
             </div>
 
             <div class="flow-strip reveal">
                 <span>Abertura de OS</span>
                 <span>Fotos e checklist</span>
-                <span>Status configurÃ¡vel</span>
-                <span>OrÃ§amento com link pÃºblico</span>
+                <span>Status configurável</span>
+                <span>Orçamento com link público</span>
                 <span>WhatsApp e e-mail</span>
                 <span>CRM e follow-up</span>
                 <span>DRE e Fluxo de Caixa</span>
@@ -1007,63 +1007,63 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
             <div class="proof-grid" style="margin-top: 28px;">
                 <article class="proof-card surface reveal">
                     <strong>OS com contexto completo</strong>
-                    <p>Cliente, equipamento, defeito, fotos, checklist de entrada, status, histÃ³rico e documentos no mesmo fluxo.</p>
+                    <p>Cliente, equipamento, defeito, fotos, checklist de entrada, status, histórico e documentos no mesmo fluxo.</p>
                 </article>
                 <article class="proof-card surface reveal">
-                    <strong>OrÃ§amento conectado Ã  operaÃ§Ã£o</strong>
-                    <p>Link pÃºblico, PDF oficial, envio por WhatsApp/e-mail e reflexo comercial dentro da OS.</p>
+                    <strong>Orçamento conectado à operação</strong>
+                    <p>Link público, PDF oficial, envio por WhatsApp/e-mail e reflexo comercial dentro da OS.</p>
                 </article>
                 <article class="proof-card surface reveal">
                     <strong>Central de Mensagens + CRM</strong>
-                    <p>Inbox operacional, contatos, follow-ups, automaÃ§Ãµes e trilha de atendimento sem perder a conversa.</p>
+                    <p>Inbox operacional, contatos, follow-ups, automações e trilha de atendimento sem perder a conversa.</p>
                 </article>
                 <article class="proof-card surface reveal">
                     <strong>Financeiro com leitura gerencial</strong>
-                    <p>DRE, Fluxo de Caixa, categorias configurÃ¡veis, baixas parciais e despesas fixas mensais.</p>
+                    <p>DRE, Fluxo de Caixa, categorias configuráveis, baixas parciais e despesas fixas mensais.</p>
                 </article>
             </div>
 
             <div class="feature-grid" style="margin-top: 20px;">
                 <article class="feature-card surface reveal">
                     <span class="feature-no">01</span>
-                    <h3>Ordens de serviÃ§o para balcÃ£o e bancada</h3>
+                    <h3>Ordens de serviço para balcão e bancada</h3>
                     <p>
-                        Abertura e ediÃ§Ã£o de OS com checklist, acessÃ³rios, fotos, fluxo de status configurÃ¡vel e atualizaÃ§Ã£o reativa sem depender de refresh manual.
+                        Abertura e edição de OS com checklist, acessórios, fotos, fluxo de status configurável e atualização reativa sem depender de refresh manual.
                     </p>
                 </article>
                 <article class="feature-card surface reveal">
                     <span class="feature-no">02</span>
-                    <h3>OrÃ§amentos com aprovaÃ§Ã£o pÃºblica</h3>
+                    <h3>Orçamentos com aprovação pública</h3>
                     <p>
-                        O cliente pode receber PDF, e-mail ou link pÃºblico; a equipe acompanha a resposta e o reflexo operacional no ERP.
+                        O cliente pode receber PDF, e-mail ou link público; a equipe acompanha a resposta e o reflexo operacional no ERP.
                     </p>
                 </article>
                 <article class="feature-card surface reveal">
                     <span class="feature-no">03</span>
-                    <h3>WhatsApp OS e comunicaÃ§Ã£o rastreÃ¡vel</h3>
+                    <h3>WhatsApp OS e comunicação rastreável</h3>
                     <p>
                         Templates, central de mensagens, envios da OS, contexto de conversa e flexibilidade de provider no backend.
                     </p>
                 </article>
                 <article class="feature-card surface reveal">
                     <span class="feature-no">04</span>
-                    <h3>Equipamentos com histÃ³rico tÃ©cnico real</h3>
+                    <h3>Equipamentos com histórico técnico real</h3>
                     <p>
-                        Cadastro com fotos, deduplicaÃ§Ã£o por sÃ©rie/MAC/IMEI e resumo tÃ©cnico mais forte para desktop montado, notebook e bancada.
+                        Cadastro com fotos, deduplicação por série/MAC/IMEI e resumo técnico mais forte para desktop montado, notebook e bancada.
                     </p>
                 </article>
                 <article class="feature-card surface reveal">
                     <span class="feature-no">05</span>
                     <h3>Financeiro gerencial conectado a OS</h3>
                     <p>
-                        Receitas e despesas com classificaÃ§Ã£o DRE, fluxo de caixa, fornecedor, origem automÃ¡tica e leitura mais clara da operaÃ§Ã£o.
+                        Receitas e despesas com classificação DRE, fluxo de caixa, fornecedor, origem automática e leitura mais clara da operação.
                     </p>
                 </article>
                 <article class="feature-card surface reveal">
                     <span class="feature-no">06</span>
-                    <h3>PWA, API interna e notificaÃ§Ãµes</h3>
+                    <h3>PWA, API interna e notificações</h3>
                     <p>
-                        Base preparada para uso web e mobile, com stream SSE, API autenticada, notificaÃ§Ãµes e rotina operacional fora do escritÃ³rio.
+                        Base preparada para uso web e mobile, com stream SSE, API autenticada, notificações e rotina operacional fora do escritório.
                     </p>
                 </article>
             </div>
@@ -1074,10 +1074,10 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
         <div class="wrap">
             <div class="section-head reveal">
                 <span class="eyebrow">Fluxo comercial</span>
-                <h2>Da entrada do equipamento atÃ© o financeiro, com os mÃ³dulos falando entre si</h2>
+                <h2>Da entrada do equipamento até o financeiro, com os módulos falando entre si</h2>
                 <p>
-                    A copy agora posiciona o sistema como ERP operacional de assistÃªncia tÃ©cnica, sem esconder o que ele jÃ¡ faz melhor:
-                    integrar atendimento, diagnÃ³stico, aprovaÃ§Ã£o, execuÃ§Ã£o e resultado.
+                    A copy agora posiciona o sistema como ERP operacional de assistência técnica, sem esconder o que ele já faz melhor:
+                    integrar atendimento, diagnóstico, aprovação, execução e resultado.
                 </p>
             </div>
 
@@ -1085,22 +1085,22 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
                 <article class="step surface reveal">
                     <span class="step-no">1</span>
                     <h3>Recepcione com contexto</h3>
-                    <p>Abra a OS, registre defeito, acessÃ³rios, fotos, checklist de entrada e dados do cliente sem espalhar informaÃ§Ã£o fora do ERP.</p>
+                    <p>Abra a OS, registre defeito, acessórios, fotos, checklist de entrada e dados do cliente sem espalhar informação fora do ERP.</p>
                 </article>
                 <article class="step surface reveal">
                     <span class="step-no">2</span>
                     <h3>Diagnostique e orce</h3>
-                    <p>Monte o orÃ§amento, vincule peÃ§as e serviÃ§os, gere PDF e prepare o envio pÃºblico com rastreabilidade comercial.</p>
+                    <p>Monte o orçamento, vincule peças e serviços, gere PDF e prepare o envio público com rastreabilidade comercial.</p>
                 </article>
                 <article class="step surface reveal">
                     <span class="step-no">3</span>
                     <h3>Comunique e aprove</h3>
-                    <p>Use WhatsApp, e-mail e link pÃºblico para acelerar a decisÃ£o do cliente sem quebrar o fluxo operacional interno.</p>
+                    <p>Use WhatsApp, e-mail e link público para acelerar a decisão do cliente sem quebrar o fluxo operacional interno.</p>
                 </article>
                 <article class="step surface reveal">
                     <span class="step-no">4</span>
                     <h3>Execute, entregue e leia o resultado</h3>
-                    <p>Finalize a OS, acompanhe histÃ³rico, documentos, financeiro e a leitura gerencial do atendimento na mesma plataforma.</p>
+                    <p>Finalize a OS, acompanhe histórico, documentos, financeiro e a leitura gerencial do atendimento na mesma plataforma.</p>
                 </article>
             </div>
         </div>
@@ -1110,9 +1110,9 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
         <div class="wrap">
             <div class="section-head reveal">
                 <span class="eyebrow">Diferenciais</span>
-                <h2>Onde o ERP sai do genÃ©rico e ganha argumento de venda de verdade</h2>
+                <h2>Onde o ERP sai do genérico e ganha argumento de venda de verdade</h2>
                 <p>
-                    A adaptaÃ§Ã£o da landing prioriza os diferenciais documentados no sistema atual, especialmente para operaÃ§Ãµes de bancada e atendimento com histÃ³rico tÃ©cnico.
+                    A adaptação da landing prioriza os diferenciais documentados no sistema atual, especialmente para operações de bancada e atendimento com histórico técnico.
                 </p>
             </div>
 
@@ -1120,19 +1120,19 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
                 <article class="diff-card reveal">
                     <h3>Coletor de Bancada para desktop e notebook</h3>
                     <p>
-                        O sistema jÃ¡ trabalha com coleta tÃ©cnica local, snapshot em `C:\JovemTechBenchCollector`, enriquecimento da OS digital e preenchimento tÃ©cnico do equipamento.
+                        O sistema já trabalha com coleta técnica local, snapshot em `C:\JovemTechBenchCollector`, enriquecimento da OS digital e preenchimento técnico do equipamento.
                     </p>
                 </article>
                 <article class="diff-card reveal">
-                    <h3>Fluxo OS + OrÃ§amento + Documentos</h3>
+                    <h3>Fluxo OS + Orçamento + Documentos</h3>
                     <p>
-                        NÃ£o Ã© sÃ³ "abrir uma ordem": a plataforma conecta status, PDF, envio, aprovaÃ§Ã£o pÃºblica e contexto comercial dentro da rotina da equipe.
+                        Não é só "abrir uma ordem": a plataforma conecta status, PDF, envio, aprovação pública e contexto comercial dentro da rotina da equipe.
                     </p>
                 </article>
                 <article class="diff-card reveal">
                     <h3>CRM, RBAC e PWA no mesmo ecossistema</h3>
                     <p>
-                        O sistema jÃ¡ opera com mÃ³dulos independentes para CRM, atendimento WhatsApp e precificaÃ§Ã£o, alÃ©m de app mobile/PWA e API interna autenticada.
+                        O sistema já opera com módulos independentes para CRM, atendimento WhatsApp e precificação, além de app mobile/PWA e API interna autenticada.
                     </p>
                 </article>
             </div>
@@ -1143,7 +1143,7 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
         <div class="wrap">
             <div class="section-head reveal">
                 <span class="eyebrow">FAQ</span>
-                <h2>As dÃºvidas que a copy agora responde de forma mais honesta</h2>
+                <h2>As dúvidas que a copy agora responde de forma mais honesta</h2>
                 <p>
                     A ideia foi tirar exagero e alinhar expectativa comercial ao estado real do produto.
                 </p>
@@ -1151,27 +1151,27 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
 
             <div class="faq-grid">
                 <article class="faq-card surface reveal">
-                    <h3>Serve sÃ³ para celular?</h3>
+                    <h3>Serve só para celular?</h3>
                     <p>
-                        NÃ£o. O sistema cobre assistÃªncia tÃ©cnica em geral, mas ganha mais forÃ§a quando a operaÃ§Ã£o mistura celular, notebook, desktop e histÃ³rico tÃ©cnico detalhado.
+                        Não. O sistema cobre assistência técnica em geral, mas ganha mais força quando a operação mistura celular, notebook, desktop e histórico técnico detalhado.
                     </p>
                 </article>
                 <article class="faq-card surface reveal">
-                    <h3>Tem aprovaÃ§Ã£o pÃºblica de orÃ§amento?</h3>
+                    <h3>Tem aprovação pública de orçamento?</h3>
                     <p>
-                        Sim. A plataforma jÃ¡ possui link pÃºblico, envio por WhatsApp/e-mail e reflexo da resposta do cliente no ERP.
+                        Sim. A plataforma já possui link público, envio por WhatsApp/e-mail e reflexo da resposta do cliente no ERP.
                     </p>
                 </article>
                 <article class="faq-card surface reveal">
-                    <h3>O financeiro estÃ¡ sÃ³ no bÃ¡sico?</h3>
+                    <h3>O financeiro está só no básico?</h3>
                     <p>
-                        NÃ£o. O produto atual jÃ¡ trabalha com DRE, fluxo de caixa, grupos/subgrupos, baixas parciais, despesas fixas e origem operacional.
+                        Não. O produto atual já trabalha com DRE, fluxo de caixa, grupos/subgrupos, baixas parciais, despesas fixas e origem operacional.
                     </p>
                 </article>
                 <article class="faq-card surface reveal">
-                    <h3>O agente de bancada Ã© obrigatÃ³rio?</h3>
+                    <h3>O agente de bancada é obrigatório?</h3>
                     <p>
-                        NÃ£o. Ele entra como diferencial para desktop e notebook; a operaÃ§Ã£o principal do ERP continua funcionando sem depender desse coletor.
+                        Não. Ele entra como diferencial para desktop e notebook; a operação principal do ERP continua funcionando sem depender desse coletor.
                     </p>
                 </article>
             </div>
@@ -1183,9 +1183,9 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
             <div class="cta-band reveal">
                 <div>
                     <span class="eyebrow">Pronto para vender melhor</span>
-                    <h2>Uma landing que acompanha o produto real e ajuda a apresentar o ERP com mais seguranÃ§a</h2>
+                    <h2>Uma landing que acompanha o produto real e ajuda a apresentar o ERP com mais segurança</h2>
                     <p>
-                        O foco aqui foi adaptar o HTML para a situaÃ§Ã£o atual do sistema, destacando o que jÃ¡ estÃ¡ de pÃ© no ERP e evitando promessas que ainda nÃ£o viraram fluxo consolidado.
+                        O foco aqui foi adaptar o HTML para a situação atual do sistema, destacando o que já está de pé no ERP e evitando promessas que ainda não viraram fluxo consolidado.
                     </p>
                 </div>
                 <div class="btn-row">
@@ -1209,14 +1209,14 @@ $footerContact = array_values(array_filter([$companyPhone, $companyEmail, $compa
             </span>
             <span class="brand-copy">
                 <strong><?= esc($companyName) ?></strong>
-                <span><?= esc($systemName) ?> Â· versÃ£o <?= esc($systemVersion) ?></span>
+                <span><?= esc($systemName) ?> · versão <?= esc($systemVersion) ?></span>
             </span>
         </div>
         <div class="footer-meta">
             <?php foreach ($footerContact as $item): ?>
                 <span><?= esc($item) ?></span>
             <?php endforeach; ?>
-            <span>Landing pÃºblica: <a href="<?= esc(base_url('site')) ?>"><?= esc(base_url('site')) ?></a></span>
+            <span>Landing pública: <a href="<?= esc(base_url('site')) ?>"><?= esc(base_url('site')) ?></a></span>
             <span>&copy; <?= date('Y') ?> <?= esc($companyName) ?></span>
         </div>
     </div>

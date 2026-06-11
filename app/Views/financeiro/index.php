@@ -72,7 +72,7 @@ $buildFinanceiroFilterUrl = static function (array $overrides = []) use ($filtro
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('financeiro/cartoes') ?>" class="btn btn-sm btn-outline-primary">
-            <i class="bi bi-credit-card-2-front me-1"></i>CartÃµes e taxas
+            <i class="bi bi-credit-card-2-front me-1"></i>Cartões e taxas
         </a>
         <a href="<?= base_url('relatorios/dre') ?>" class="btn btn-sm btn-outline-primary">
             <i class="bi bi-bar-chart-line me-1"></i>DRE

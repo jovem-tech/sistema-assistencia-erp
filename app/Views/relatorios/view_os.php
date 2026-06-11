@@ -5,7 +5,7 @@
 <div class="page-header">
     <h2><i class="bi bi-tools me-2"></i><?= esc($title) ?></h2>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sobre RelatÃ³rios">
+        <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('relatorios')" title="Ajuda sobre Relatórios">
             <i class="bi bi-question-circle me-1"></i>Ajuda
         </button>
         <a href="<?= base_url('relatorios') ?>" class="btn btn-outline-secondary" data-back-default="<?= base_url('relatorios') ?>">
@@ -30,10 +30,10 @@
                 <select class="form-select" id="status" name="status">
                     <option value="todos" <?= $filtro_status === 'todos' ? 'selected' : '' ?>>Todos</option>
                     <option value="aberto" <?= $filtro_status === 'aberto' ? 'selected' : '' ?>>Aberto</option>
-                    <option value="aguardando_analise" <?= $filtro_status === 'aguardando_analise' ? 'selected' : '' ?>>Aguardando AnÃ¡lise</option>
+                    <option value="aguardando_analise" <?= $filtro_status === 'aguardando_analise' ? 'selected' : '' ?>>Aguardando Análise</option>
                     <option value="em_reparo" <?= $filtro_status === 'em_reparo' ? 'selected' : '' ?>>Em Reparo</option>
-                    <option value="aguardando_aprovacao" <?= $filtro_status === 'aguardando_aprovacao' ? 'selected' : '' ?>>Aguardando AprovaÃ§Ã£o</option>
-                    <option value="aguardando_peca" <?= $filtro_status === 'aguardando_peca' ? 'selected' : '' ?>>Aguardando PeÃ§a</option>
+                    <option value="aguardando_aprovacao" <?= $filtro_status === 'aguardando_aprovacao' ? 'selected' : '' ?>>Aguardando Aprovação</option>
+                    <option value="aguardando_peca" <?= $filtro_status === 'aguardando_peca' ? 'selected' : '' ?>>Aguardando Peça</option>
                     <option value="pronto" <?= $filtro_status === 'pronto' ? 'selected' : '' ?>>Pronto / Aguardando Retirada</option>
                     <option value="entregue" <?= $filtro_status === 'entregue' ? 'selected' : '' ?>>Entregue</option>
                     <option value="cancelado" <?= $filtro_status === 'cancelado' ? 'selected' : '' ?>>Cancelado / Sem Conserto</option>
@@ -57,12 +57,12 @@
             <table class="table table-hover datatable">
                 <thead>
                     <tr>
-                        <th>NÂº OS</th>
+                        <th>Nº OS</th>
                         <th>Cliente</th>
                         <th>Equipamento</th>
                         <th>Status</th>
                         <th>Entrada</th>
-                        <th>SaÃ­da</th>
+                        <th>Saída</th>
                         <th>Total</th>
                     </tr>
                 </thead>
@@ -83,7 +83,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="7" class="text-center">Nenhuma ordem de serviÃ§o encontrada com os filtros selecionados.</td>
+                            <td colspan="7" class="text-center">Nenhuma ordem de serviço encontrada com os filtros selecionados.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

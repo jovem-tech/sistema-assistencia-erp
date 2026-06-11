@@ -25,7 +25,7 @@ $historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLi
                         <div class="small text-body-secondary mb-1">
                             <?= esc($evento['data_label'] ?? '') ?>
                             <?php if (! empty($evento['usuario_nome'])): ?>
-                                <span class="mx-1">â€¢</span><?= esc($evento['usuario_nome']) ?>
+                                <span class="mx-1">•</span><?= esc($evento['usuario_nome']) ?>
                             <?php endif; ?>
                         </div>
                         <?php if (! empty($evento['status_transicao_label'])): ?>

@@ -1,43 +1,43 @@
-# Manual do Administrador â€” UsuÃ¡rios e PermissÃµes
+# Manual do Administrador — Usuários e Permissões
 
-## ðŸ‘¤ UsuÃ¡rios
+## 👤 Usuários
 
-**Caminho:** ConfiguraÃ§Ãµes â†’ UsuÃ¡rios
+**Caminho:** Configurações → Usuários
 
-### Criar Novo UsuÃ¡rio
+### Criar Novo Usuário
 
-| Campo | ObrigatÃ³rio | DescriÃ§Ã£o |
+| Campo | Obrigatório | Descrição |
 |-------|-------------|-----------|
-| **Nome** | Sim | Nome de exibiÃ§Ã£o |
-| **Email** | Sim | Login do usuÃ¡rio |
-| **Senha** | Sim | MÃ­nimo 8 caracteres |
-| NÃ­vel de Acesso | Sim | Grupo de permissÃµes |
-| Ativo | Sim | Ativa ou bloqueia o usuÃ¡rio |
+| **Nome** | Sim | Nome de exibição |
+| **Email** | Sim | Login do usuário |
+| **Senha** | Sim | Mínimo 8 caracteres |
+| Nível de Acesso | Sim | Grupo de permissões |
+| Ativo | Sim | Ativa ou bloqueia o usuário |
 
-> âš ï¸ O email deve ser Ãºnico no sistema.
+> ⚠️ O email deve ser único no sistema.
 
 ---
 
-## ðŸ” NÃ­veis de Acesso (RBAC)
+## 🔐 Níveis de Acesso (RBAC)
 
-**Caminho:** ConfiguraÃ§Ãµes â†’ NÃ­veis de Acesso
+**Caminho:** Configurações → Níveis de Acesso
 
-O sistema usa **RBAC (Role-Based Access Control)**. Cada usuÃ¡rio pertence a um **grupo** que tem um conjunto de **permissÃµes por mÃ³dulo**.
+O sistema usa **RBAC (Role-Based Access Control)**. Cada usuário pertence a um **grupo** que tem um conjunto de **permissões por módulo**.
 
-### Grupos PadrÃ£o
+### Grupos Padrão
 
-| Grupo | DescriÃ§Ã£o |
+| Grupo | Descrição |
 |-------|-----------|
-| **Administrador** | Acesso total a todos os mÃ³dulos e aÃ§Ãµes |
-| **TÃ©cnico** | Acesso operacional (OS, Equipamentos, Estoque) |
+| **Administrador** | Acesso total a todos os módulos e ações |
+| **Técnico** | Acesso operacional (OS, Equipamentos, Estoque) |
 | **Atendente** | Acesso a clientes, CRM, WhatsApp e abertura de OS |
-| **Financeiro** | Acesso ao mÃ³dulo financeiro e relatÃ³rios |
+| **Financeiro** | Acesso ao módulo financeiro e relatórios |
 
-### PermissÃµes por MÃ³dulo
+### Permissões por Módulo
 
-Cada mÃ³dulo pode ter as seguintes permissÃµes independentes:
+Cada módulo pode ter as seguintes permissões independentes:
 
-| PermissÃ£o | DescriÃ§Ã£o |
+| Permissão | Descrição |
 |-----------|-----------|
 | `visualizar` | Ver listagens e detalhes |
 | `criar` | Cadastrar novos registros |
@@ -47,7 +47,7 @@ Cada mÃ³dulo pode ter as seguintes permissÃµes independentes:
 | `exportar` | Exportar dados para CSV |
 | `encerrar` | Encerrar/arquivar registros |
 
-### MÃ³dulos com Controle de Acesso
+### Módulos com Controle de Acesso
 
 `dashboard`, `clientes`, `crm`, `atendimento_whatsapp`, `equipamentos`, `os`, `servicos`, `estoque`, `orcamentos`, `precificacao`, `financeiro`, `relatorios`, `usuarios`, `grupos`, `configuracoes`, `fornecedores`, `funcionarios`, `vendas`
 
@@ -68,24 +68,24 @@ Compatibilidade operacional:
 
 ## ðŸš« Bloqueios Especiais
 
-- **Clientes**: NÃ£o suporta permissÃ£o `encerrar` (clientes tÃªm histÃ³rico permanente)
+- **Clientes**: Não suporta permissão `encerrar` (clientes têm histórico permanente)
 - **Equipamentos**: a permissao `encerrar` fecha o ciclo de vida operacional do cadastro e tambem libera a acao `Reativar`; o equipamento continua no historico, mas deixa de aceitar novas OS e novos vinculos operacionais ate voltar para `ativo`
 - **Equipamentos com OS abertas**: a interface exibe o aviso `OS em andamento`, desabilita o botao `Encerrar` e o backend mantem o bloqueio ate concluir ou cancelar as ordens em andamento
-- **Dashboard**: Apenas permissÃ£o `visualizar` disponÃ­vel
-- **OS com baixa tÃ©cnica concluÃ­da**: alteraÃ§Ãµes em `forma_pagamento`, `valor_mao_obra`, `valor_pecas` e `desconto` exigem perfil administrativo ou autenticaÃ§Ã£o de um administrador no momento do salvamento
+- **Dashboard**: Apenas permissão `visualizar` disponível
+- **OS com baixa técnica concluída**: alterações em `forma_pagamento`, `valor_mao_obra`, `valor_pecas` e `desconto` exigem perfil administrativo ou autenticação de um administrador no momento do salvamento
 
 ---
 
-## ðŸ”§ VerificaÃ§Ã£o em CÃ³digo
+## 🔧 Verificação em Código
 
 No Controller, use sempre:
 ```php
-// Bloqueia todo acesso ao mÃ³dulo
+// Bloqueia todo acesso ao módulo
 requirePermission('crm');
 
-// Verifica aÃ§Ã£o especÃ­fica (retorna true/false)
+// Verifica ação específica (retorna true/false)
 if (can('os', 'criar')) {
-    // mostra botÃ£o de nova OS
+    // mostra botão de nova OS
 }
 ```
 

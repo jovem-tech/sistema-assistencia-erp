@@ -45,7 +45,7 @@ $historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLi
             class="btn btn-outline-warning disabled"
             disabled
             aria-disabled="true"
-            title="Bloqueado: hÃ¡ <?= $osAbertasCount ?> OS em andamento"
+            title="Bloqueado: há <?= $osAbertasCount ?> OS em andamento"
             data-equipment-encerrar-btn
             data-equipment-id="<?= (int) ($equipamento['id'] ?? 0) ?>"
             data-equipment-open-os-count="<?= $osAbertasCount ?>"
@@ -59,7 +59,7 @@ $historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLi
 </div>
 
 <div class="row g-4">
-    <!-- SeÃ§Ã£o 1: Foto e Card Principal -->
+    <!-- Seção 1: Foto e Card Principal -->
     <div class="col-md-4">
         <div class="card glass-card h-100">
             <div class="card-body text-center">
@@ -135,7 +135,7 @@ $historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLi
 
     <div class="col-md-8">
         <div class="row g-4 h-100">
-            <!-- SeÃ§Ã£o 2: InformaÃ§Ãµes do Equipamento e SeÃ§Ã£o 3: ProprietÃ¡rio -->
+            <!-- Seção 2: Informações do Equipamento e Seção 3: Proprietário -->
             <div class="col-12">
                 <div class="card glass-card">
                     <div class="card-body">
@@ -146,7 +146,7 @@ $historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLi
                                 <table class="table table-sm table-borderless mb-0" style="--bs-table-bg: transparent;">
                                     <tbody>
                                         <tr>
-                                            <th class="ps-0 w-40 text-body-secondary fw-normal">NÂº SÃ©rie:</th>
+                                            <th class="ps-0 w-40 text-body-secondary fw-normal">Nº Série:</th>
                                             <td class="fw-medium text-body"><?= !empty($equipamento['numero_serie']) ? esc($equipamento['numero_serie']) : '<span class="text-body-secondary opacity-50">N/I</span>' ?></td>
                                         </tr>
                                         <?php if (!empty($equipamento['desktop_modalidade_label'])): ?>
@@ -157,7 +157,7 @@ $historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLi
                                         <?php endif; ?>
                                         <?php if (!empty($equipamento['technical_summary'])): ?>
                                         <tr>
-                                            <th class="ps-0 text-body-secondary fw-normal">Resumo tÃƒÂ©cnico:</th>
+                                            <th class="ps-0 text-body-secondary fw-normal">Resumo técnico:</th>
                                             <td class="fw-medium text-body"><?= esc($equipamento['technical_summary']) ?></td>
                                         </tr>
                                         <?php endif; ?>
@@ -208,14 +208,14 @@ $historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLi
                             </div>
 
                             <div class="col-md-6 ps-md-4">
-                                <h5 class="text-primary mb-3"><i class="bi bi-person-badge me-2"></i>ProprietÃ¡rio e VÃ­nculos</h5>
+                                <h5 class="text-primary mb-3"><i class="bi bi-person-badge me-2"></i>Proprietário e Vínculos</h5>
                                 <div class="d-flex align-items-center mb-3">
-                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" title="ProprietÃ¡rio Principal" style="width:40px; height:40px;">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" title="Proprietário Principal" style="width:40px; height:40px;">
                                         <i class="bi bi-star-fill fs-5"></i>
                                     </div>
                                     <div class="flex-grow-1">
                                         <h6 class="mb-0 fw-bold"><a href="<?= base_url('clientes/visualizar/' . $equipamento['cliente_id']) ?>" class="text-decoration-none text-body"><?= esc($equipamento['cliente_nome']) ?></a></h6>
-                                        <small class="text-muted">ProprietÃ¡rio Principal</small>
+                                        <small class="text-muted">Proprietário Principal</small>
                                     </div>
                                 </div>
                                 <hr class="border-secondary opacity-25">
@@ -242,7 +242,7 @@ $historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLi
                                 </div>
 
                                 <?php if(empty($vinculados)): ?>
-                                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i>Nenhum outro cliente estÃ¡ vinculado a utilizar este equipamento.</p>
+                                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i>Nenhum outro cliente está vinculado a utilizar este equipamento.</p>
                                 <?php else: ?>
                                     <ul class="list-group list-group-flush bg-transparent">
                                         <?php foreach($vinculados as $vinc): ?>
@@ -452,21 +452,21 @@ $historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLi
                         <div class="mt-4 pt-4 border-top">
                             <?php if(!empty($equipamento['estado_fisico'])): ?>
                             <div class="mb-3">
-                                <h6 class="text-warning mb-1">Estado FÃ­sico</h6>
+                                <h6 class="text-warning mb-1">Estado Físico</h6>
                                 <p class="text-body-secondary small mb-0"><?= nl2br(esc($equipamento['estado_fisico'])) ?></p>
                             </div>
                             <?php endif; ?>
 
                             <?php if(!empty($equipamento['acessorios'])): ?>
                             <div class="mb-3">
-                                <h6 class="text-warning mb-1">AcessÃ³rios Informados</h6>
+                                <h6 class="text-warning mb-1">Acessórios Informados</h6>
                                 <p class="text-body-secondary small mb-0"><?= nl2br(esc($equipamento['acessorios'])) ?></p>
                             </div>
                             <?php endif; ?>
 
                             <?php if(!empty($equipamento['observacoes'])): ?>
                             <div class="mb-0">
-                                <h6 class="text-warning mb-1">ObservaÃ§Ãµes Adicionais</h6>
+                                <h6 class="text-warning mb-1">Observações Adicionais</h6>
                                 <p class="text-body-secondary small mb-0"><?= nl2br(esc($equipamento['observacoes'])) ?></p>
                             </div>
                             <?php endif; ?>
@@ -501,12 +501,12 @@ $historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLi
         </div>
     </div>
 
-            <!-- SeÃ§Ã£o 4: Ordens de ServiÃ§o -->
+            <!-- Seção 4: Ordens de Serviço -->
             <div class="col-12 pt-3">
                 <div class="card glass-card">
                     <div class="card-header border-bottom pb-3">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0 text-primary"><i class="bi bi-clipboard-data me-2"></i>Ordens de ServiÃ§o Vinculadas</h5>
+                            <h5 class="mb-0 text-primary"><i class="bi bi-clipboard-data me-2"></i>Ordens de Serviço Vinculadas</h5>
                             <?php if (!$isEncerrado): ?>
                             <a
                                 href="<?= base_url('os/nova?equipamento=' . $equipamento['id']) ?>"
@@ -531,7 +531,7 @@ $historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLi
                         <?php if(empty($ordens)): ?>
                             <div class="text-center p-5 text-body-secondary">
                                 <i class="bi bi-inbox fs-1 mb-2"></i>
-                                <p class="mb-0">Nenhuma Ordem de ServiÃ§o cadastrada para este equipamento.</p>
+                                <p class="mb-0">Nenhuma Ordem de Serviço cadastrada para este equipamento.</p>
                             </div>
                         <?php else: ?>
                             <div class="table-responsive">
@@ -541,8 +541,8 @@ $historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLi
                                             <th>OS</th>
                                             <th>Status</th>
                                             <th>Abertura</th>
-                                            <th>SÃ­ntese do Problema</th>
-                                            <th class="text-end">AÃ§Ã£o</th>
+                                            <th>Síntese do Problema</th>
+                                            <th class="text-end">Ação</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -600,7 +600,7 @@ $historicoLifecycleCount = (int) ($historicoLifecycleCount ?? count($historicoLi
                 <?= csrf_field() ?>
                 <input type="hidden" name="equipamento_id" value="<?= $equipamento['id'] ?>">
                 <div class="modal-body">
-                    <p class="text-muted small mb-3">Selecione um cliente para autorizar o uso deste equipamento. Ele passarÃ¡ a aparecer na lista de equipamentos do cliente ao abrir novas Ordens de ServiÃ§o.</p>
+                    <p class="text-muted small mb-3">Selecione um cliente para autorizar o uso deste equipamento. Ele passará a aparecer na lista de equipamentos do cliente ao abrir novas Ordens de Serviço.</p>
                     <div class="mb-3">
                         <label for="cliente_id" class="form-label text-body">Selecione o Cliente</label>
                         <select class="form-select" id="cliente_id" name="cliente_id" required>

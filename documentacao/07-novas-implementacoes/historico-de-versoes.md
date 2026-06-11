@@ -1,9 +1,11 @@
 # Historico de Versoes do Sistema
 
-Atualizado em: 10/06/2026
+Atualizado em: 11/06/2026
 Versao atual oficial: `2.23.29`
 
 ### 10/06/2026 - v2.23.29 / app 0.4.2
+- em 11/06/2026 foi executada uma verificacao global de linguagem pt-BR e encoding UTF-8 apos a recuperacao da versao, corrigindo arquivos salvos em Windows-1252 e trechos com mojibake em views, controllers, scripts e documentacao;
+- a manutencao passou a contar com o utilitario `scripts/maintenance/fix-ptbr-utf8.js`, criado para repetir a auditoria/correcao de texto com mais seguranca em futuras recuperacoes;
 - o modal `Baixa da OS` passou a perguntar, antes da confirmacao final, se o operador deseja enviar a mensagem pelo WhatsApp;
 - quando o envio e aceito, o backend anexa o PDF consolidado da impressao da OS em formato A4, reaproveitando o documento mais completo do fluxo operacional;
 - o comportamento de envio continua opcional: a baixa pode ser registrada com ou sem WhatsApp, sem sair da fila `/os`;
@@ -742,7 +744,7 @@ Estado documental atual do app:
 - a paginacao do A4 foi organizada em tres blocos: pagina 1 com resumo operacional, pagina 2 com relato/checklist/financeiro/orcamento e pagina 3 reservada para Fotos Anexadas;
 - o rodape do A4 passou a usar contagem coerente na pre-visualizacao e total real no PDF final gerado para envio;
 - paginas sem conteudo util passaram a ser suprimidas no PDF consolidado, evitando folha de Fotos Anexadas sem imagem valida;
-- o backend da OS teve alinhamento do mapa `humanizeWorkflowMacro()`, corrigindo labels de macrofases como `InterrupÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o` e `ConcluÃƒÆ’Ã‚Â­do`;
+- o backend da OS teve alinhamento do mapa `humanizeWorkflowMacro()`, corrigindo labels de macrofases como `Interrupção` e `Concluído`;
 - a documentacao oficial da release foi sincronizada com a nova versao do ERP;
 - versao oficial do ERP atualizada em `app/Config/SystemRelease.php` para `2.16.7`.
 
@@ -1521,7 +1523,7 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 ### v2.2.13 - Obrigatoriedade de cor e foto no cadastro de equipamento
 - Implementada a validacao obrigatoria de `Cor` e `Foto de Perfil` ao cadastrar novo equipamento via modal na OS.
 - O sistema agora redireciona automaticamente para a aba e campo pendentes (Info, Cor ou Foto) antes de permitir salvar o registro.
-- A cor inicial do cadastro foi resetada para "Nao selecionada" para forÃƒÆ’Ã‚Â§ar a identificacao visual correta pelo usuario.
+- A cor inicial do cadastro foi resetada para "Nao selecionada" para forçar a identificacao visual correta pelo usuario.
 
 ### v2.2.15 - Hotfix de empilhamento de alertas no Checklist da OS
 - O aviso `Checklist incompleto` e demais alertas de validacao passaram a calcular `z-index` dinamicamente com base na pilha ativa de `modals + backdrops`.
@@ -1552,7 +1554,7 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 ### v2.2.10 - Hardening da paginacao e busca global da listagem de OS
 - A listagem `POST /os/datatable` passou a paginar por IDs ordenados e carregar os detalhes da grade apenas para a pagina atual.
 - A busca global `q` deixou de depender de joins pesados na consulta principal e passou a priorizar numero de OS, cliente, equipamento e tecnico via subconsultas indexadas.
-- Novos indices foram adicionados para catÃƒÆ’Ã‚Â¡logos de lookup e para os caminhos cronologicos por `cliente_id` e `equipamento_id`.
+- Novos indices foram adicionados para catálogos de lookup e para os caminhos cronologicos por `cliente_id` e `equipamento_id`.
 
 ### v2.2.9 - Otimizacao da listagem de OS para alto volume
 - A listagem `POST /os/datatable` passou a separar contagem total, contagem filtrada e consulta paginada com builders mais enxutos.
@@ -1571,7 +1573,7 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 
 ### v2.2.7 - Alinhamento da Nova OS ao design system
 - A pagina `Nova Ordem de Servico` teve a camada visual consolidada com classes do design system, reduzindo dependencia de estilos inline na area visivel.
-- Sidebar, shell principal, painel de fotos, resumo lateral e titulos auxiliares passaram a seguir o mesmo vocabulÃƒÆ’Ã‚Â¡rio visual do DS.
+- Sidebar, shell principal, painel de fotos, resumo lateral e titulos auxiliares passaram a seguir o mesmo vocabulário visual do DS.
 - Os relatos rapidos visiveis passaram a seguir o padrao direto de botoes pequenos do sistema.
 
 ### v2.2.5 - Paleta azul/cinza suave na Nova OS

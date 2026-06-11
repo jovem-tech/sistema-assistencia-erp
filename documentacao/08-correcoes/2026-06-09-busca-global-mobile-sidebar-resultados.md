@@ -11,7 +11,7 @@ Causa raiz:
 
 - o componente `.search-results-container` foi reaproveitado do dropdown desktop;
 - ao virar `position: static` no contexto `.sidebar-search-wrapper`, ele passou a participar da mesma linha flex do `.search-input-group`;
-- como o container nao ocupava `100%` da linha nem forÃ§ava quebra, o painel disputava largura com o seletor `Tudo`, o icone e o input;
+- como o container nao ocupava `100%` da linha nem forçava quebra, o painel disputava largura com o seletor `Tudo`, o icone e o input;
 - titulos, subtitulos e badges dos resultados ainda tinham pouca tolerancia a wrap em telas muito compactas.
 
 ## Ajuste realizado

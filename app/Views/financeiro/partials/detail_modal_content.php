@@ -47,7 +47,7 @@ $formatDateTime = static function ($value): string {
         </div>
         <div class="text-md-end">
             <div class="finance-detail-amount <?= $isReceber ? 'text-success' : 'text-danger' ?>"><?= formatMoney($valorTitulo) ?></div>
-            <div class="small text-muted mt-2">Quitado <?= formatMoney($valorMovimentado) ?> â€¢ Em aberto <?= formatMoney($valorAberto) ?></div>
+            <div class="small text-muted mt-2">Quitado <?= formatMoney($valorMovimentado) ?> • Em aberto <?= formatMoney($valorAberto) ?></div>
             <div class="mt-2">
                 <?php if ($status === 'pago'): ?>
                     <span class="badge bg-success">Pago</span>

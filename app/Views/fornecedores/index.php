@@ -26,11 +26,11 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Nome Fantasia / RazÃ£o Social</th>
+                        <th>Nome Fantasia / Razão Social</th>
                         <th>CNPJ / CPF</th>
                         <th>Telefone</th>
                         <th>Status</th>
-                        <th class="text-end">AÃ§Ãµes</th>
+                        <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>

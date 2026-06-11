@@ -1046,14 +1046,14 @@ Configuracoes gerais relevantes persistidas em `POST /configuracoes/salvar`:
 
 | Metodo | Rota | Objetivo | Permissao |
 |---|---|---|---|
-| GET | `/api/busca-global` | Endpoint de busca AJAX multi-mÃ³dulo | `Autenticado` |
-| GET | `/busca/resultados` | PÃ¡gina dedicada de resultados (expandida) | `Autenticado` |
+| GET | `/api/busca-global` | Endpoint de busca AJAX multi-módulo | `Autenticado` |
+| GET | `/busca/resultados` | Página dedicada de resultados (expandida) | `Autenticado` |
 
 Notas da Busca Global:
-- O parÃ¢metro `q` Ã© obrigatÃ³rio para o termo de busca (mÃ­nimo 2 caracteres).
-- Suporta parÃ¢metro opcional `filter` (`all`, `os`, `clientes`, `whatsapp`, `equipamentos`, `servicos`, `pecas`, `modules`).
+- O parâmetro `q` é obrigatório para o termo de busca (mínimo 2 caracteres).
+- Suporta parâmetro opcional `filter` (`all`, `os`, `clientes`, `whatsapp`, `equipamentos`, `servicos`, `pecas`, `modules`).
 - Retorna JSON estruturado e agrupado por categorias.
-- Respeita permissÃµes `can(modulo, visualizar)` dinamicamente para cada grupo de resultados.
+- Respeita permissões `can(modulo, visualizar)` dinamicamente para cada grupo de resultados.
 
 Os proxies aceitam parametro `provider`:
 - `api_whats_local`

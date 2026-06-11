@@ -56,50 +56,98 @@
         return String(value ?? '').trim();
     }
 
-    const PTBR_MOJIBAKE_REPLACEMENTS = [
-        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§', 'ÃƒÂ§'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£', 'ÃƒÂ£'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âµ', 'ÃƒÂµ'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³', 'ÃƒÂ³'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡', 'ÃƒÂ¡'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©', 'ÃƒÂ©'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âª', 'ÃƒÂª'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­', 'ÃƒÂ­'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âº', 'ÃƒÂº'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â', 'ÃƒÂ'],
-        ['ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Âº', 'Ã‚Âº'],
-        ['ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âº', 'Ã‚Âº'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§', 'ÃƒÂ§'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£', 'ÃƒÂ£'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âµ', 'ÃƒÂµ'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³', 'ÃƒÂ³'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡', 'ÃƒÂ¡'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©', 'ÃƒÂ©'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âª', 'ÃƒÂª'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­', 'ÃƒÂ­'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âº', 'ÃƒÂº'],
-        ['ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â', 'ÃƒÂ'],
-        ['ÃƒÆ’Ã‚Â§', 'ÃƒÂ§'],
-        ['ÃƒÆ’Ã‚Â£', 'ÃƒÂ£'],
-        ['ÃƒÆ’Ã‚Âµ', 'ÃƒÂµ'],
-        ['ÃƒÆ’Ã‚Â³', 'ÃƒÂ³'],
-        ['ÃƒÆ’Ã‚Â¡', 'ÃƒÂ¡'],
-        ['ÃƒÆ’Ã‚Â©', 'ÃƒÂ©'],
-        ['ÃƒÆ’Ã‚Âª', 'ÃƒÂª'],
-        ['ÃƒÆ’Ã‚Â­', 'ÃƒÂ­'],
-        ['ÃƒÆ’Ã‚Âº', 'ÃƒÂº'],
-        ['ÃƒÆ’Ã‚Â', 'ÃƒÂ'],
-        ['ÃƒÂ¯Ã‚Â¿Ã‚Â½', ''],
-        ['Ã¯Â¿Â½', ''],
+    const WINDOWS_1252_PAIRS = [
+        [0x80, 0x20AC], [0x82, 0x201A], [0x83, 0x0192], [0x84, 0x201E], [0x85, 0x2026],
+        [0x86, 0x2020], [0x87, 0x2021], [0x88, 0x02C6], [0x89, 0x2030], [0x8A, 0x0160],
+        [0x8B, 0x2039], [0x8C, 0x0152], [0x8E, 0x017D], [0x91, 0x2018], [0x92, 0x2019],
+        [0x93, 0x201C], [0x94, 0x201D], [0x95, 0x2022], [0x96, 0x2013], [0x97, 0x2014],
+        [0x98, 0x02DC], [0x99, 0x2122], [0x9A, 0x0161], [0x9B, 0x203A], [0x9C, 0x0153],
+        [0x9E, 0x017E], [0x9F, 0x0178],
+    ];
+    const WINDOWS_1252_REVERSE_MAP = new Map(WINDOWS_1252_PAIRS.map(([byte, codePoint]) => [codePoint, byte]));
+    const UTF8_DECODER = new TextDecoder('utf-8');
+    const MOJIBAKE_PATTERNS = [
+        /\u00C3[^A-Za-z0-9\s]/g,
+        /\u00C2[^A-Za-z0-9\s]/g,
+        /\u00E2\u20AC\u2122/g,
+        /\u00E2\u20AC\u0153/g,
+        /\u00E2\u20AC\u009D/g,
+        /\u00E2\u20AC\u201C/g,
+        /\u00E2\u20AC\u201D/g,
+        /\u00E2\u20AC\u00A2/g,
+        /\u00E2\u20AC\u00A6/g,
+        /\u00E2\u201E\u00A2/g,
+        /\u00E2\u201A\u00AC/g,
+        /\u00E2\u20AC/g,
+        /\uFFFD/g,
+    ];
+    const MOJIBAKE_FALLBACKS = [
+        ["N?o","Não"],
+        ["n?o","não"],
+        ["Transfer?ncia","Transferência"],
+        ["?ltimos","Últimos"],
+        ["Discrep?ncia","Discrepância"],
+        ["Petr?leo","Petróleo"],
+        ["Lil?s","Lilás"],
+        ["Acess?rios","Acessórios"],
     ];
 
-    function normalizePtBrText(value) {
-        let normalized = String(value ?? '');
-        PTBR_MOJIBAKE_REPLACEMENTS.forEach(([from, to]) => {
-            normalized = normalized.split(from).join(to);
-        });
-        return normalized;
+    function encodeWindows1252(value) {
+        const bytes = [];
+
+        for (let index = 0; index < value.length; index++) {
+            const codePoint = value.codePointAt(index);
+            if (codePoint > 0xFFFF) {
+                index++;
+            }
+
+            if (codePoint <= 0xFF) {
+                bytes.push(codePoint);
+                continue;
+            }
+
+            bytes.push(WINDOWS_1252_REVERSE_MAP.get(codePoint) ?? 0x3F);
+        }
+
+        return new Uint8Array(bytes);
     }
+
+    function countMojibake(value) {
+        return MOJIBAKE_PATTERNS.reduce((total, pattern) => total + ((value.match(pattern) || []).length), 0);
+    }
+
+    function fixMojibakePass(value) {
+        try {
+            return UTF8_DECODER.decode(encodeWindows1252(value));
+        } catch (error) {
+            return value;
+        }
+    }
+
+    const normalizePtBrText = (value) => {
+        if (typeof value !== 'string' || value === '') {
+            return value;
+        }
+
+        let normalized = value;
+        let best = normalized;
+        let bestScore = countMojibake(normalized);
+
+        for (let pass = 0; pass < 4; pass++) {
+            normalized = fixMojibakePass(normalized);
+            const currentScore = countMojibake(normalized);
+            if (currentScore < bestScore) {
+                best = normalized;
+                bestScore = currentScore;
+            }
+        }
+
+        MOJIBAKE_FALLBACKS.forEach(([source, target]) => {
+            best = best.split(source).join(target);
+        });
+
+        return best;
+    };
 
     function normalizeRenderedText(root) {
         if (!(root instanceof Element)) {
@@ -414,7 +462,7 @@
             chips.push({
                 key: 'data_fim',
                 value: '',
-                text: `Abertura atÃƒÂ©: ${state.data_fim}`,
+                text: `Abertura até: ${state.data_fim}`,
             });
         }
 
@@ -422,7 +470,7 @@
             chips.push({
                 key: 'tecnico_id',
                 value: '',
-                text: `TÃƒÂ©cnico: ${getLabel('tecnicos', state.tecnico_id)}`,
+                text: `Técnico: ${getLabel('tecnicos', state.tecnico_id)}`,
             });
         }
 
@@ -430,7 +478,7 @@
             chips.push({
                 key: 'tipo_servico',
                 value: '',
-                text: `ServiÃƒÂ§o: ${state.tipo_servico}`,
+                text: `Serviço: ${state.tipo_servico}`,
             });
         }
 
@@ -438,7 +486,7 @@
             chips.push({
                 key: 'valor_min',
                 value: '',
-                text: `Valor mÃƒÂ­n.: ${state.valor_min}`,
+                text: `Valor mín.: ${state.valor_min}`,
             });
         }
 
@@ -446,7 +494,7 @@
             chips.push({
                 key: 'valor_max',
                 value: '',
-                text: `Valor mÃƒÂ¡x.: ${state.valor_max}`,
+                text: `Valor máx.: ${state.valor_max}`,
             });
         }
 
@@ -454,7 +502,7 @@
             chips.push({
                 key: 'situacao',
                 value: '',
-                text: `SituaÃƒÂ§ÃƒÂ£o: ${getLabel('situacao', state.situacao)}`,
+                text: `Situação: ${getLabel('situacao', state.situacao)}`,
             });
         }
 
@@ -1214,7 +1262,7 @@
                     && /Cannot reinitialise DataTable/i.test(normalizedMessage);
 
                 if (isOsReinitWarning) {
-                    console.warn('[OS list] Reutilizando instÃƒÂ¢ncia existente do DataTable.', {
+                    console.warn('[OS list] Reutilizando instância existente do DataTable.', {
                         techNote: techNote,
                         message: normalizedMessage,
                     });
@@ -1462,7 +1510,7 @@
 
             if (isAllQueueActive(activeState)) {
                 return {
-                    title: 'Todas as ordens de serviÃƒÂ§o',
+                    title: 'Todas as ordens de serviço',
                     subtitle: 'Exibindo OS abertas e fechadas sem o recorte padrao da fila.',
                     counterLabel: 'OS encontradas',
                 };
@@ -1675,7 +1723,7 @@
             }
 
             if (!Array.isArray(documents) || documents.length === 0) {
-                budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Nenhum orÃƒÂ§amento PDF registrado para esta OS.</p>';
+                budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Nenhum orçamento PDF registrado para esta OS.</p>';
                 return;
             }
 
@@ -1687,7 +1735,7 @@
                 return [
                     '<div class="os-budget-doc-item">',
                     '<div>',
-                    `<strong>OrÃƒÂ§amento v${version}</strong>`,
+                    `<strong>Orçamento v${version}</strong>`,
                     `<span>${escapeHtml(createdAt)}</span>`,
                     '</div>',
                     downloadUrl
@@ -1746,7 +1794,7 @@
             }
 
             const printDefaults = meta?.print_defaults || {};
-            const defaultLabel = String(printDefaults?.label || 'Gerar PDF consolidado da impressÃƒÂ£o (A4)').trim();
+            const defaultLabel = String(printDefaults?.label || 'Gerar PDF consolidado da impressão (A4)').trim();
             const defaultTemplate = String(printDefaults?.template_default || 'os_aberta').trim() || 'os_aberta';
             const defaultPrintFormat = String(printDefaults?.print_formato || 'a4').trim() || 'a4';
             const documents = Array.isArray(meta?.documents) ? meta.documents : [];
@@ -1872,7 +1920,7 @@
             whatsappModalMessage && (whatsappModalMessage.value = '');
             whatsappModalPhone && (whatsappModalPhone.value = '');
             whatsappModalSummary && (whatsappModalSummary.textContent = 'Carregando contexto do envio...');
-            whatsappModalDocumentHint && (whatsappModalDocumentHint.textContent = 'Carregando opÃƒÂ§ÃƒÂµes de documento...');
+            whatsappModalDocumentHint && (whatsappModalDocumentHint.textContent = 'Carregando opções de documento...');
             whatsappModalForm?.reset();
             setWhatsAppModalLoading(true);
             whatsappModal.show();
@@ -1886,7 +1934,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o envio por WhatsApp da OS.');
+                    throw new Error(payload.message || 'Não foi possível carregar o envio por WhatsApp da OS.');
                 }
 
                 hydrateWhatsAppModal(payload);
@@ -1896,10 +1944,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao carregar WhatsApp',
-                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o envio por WhatsApp da OS.',
+                        text: error.message || 'Não foi possível carregar o envio por WhatsApp da OS.',
                     });
                 } else {
-                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o envio por WhatsApp da OS.');
+                    alert(error.message || 'Não foi possível carregar o envio por WhatsApp da OS.');
                 }
             } finally {
                 setWhatsAppModalLoading(false);
@@ -1981,7 +2029,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar os prazos da OS.');
+                    throw new Error(payload.message || 'Não foi possível carregar os prazos da OS.');
                 }
 
                 hydrateDatesModal(payload);
@@ -1991,10 +2039,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao carregar prazos',
-                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar os prazos da OS.',
+                        text: error.message || 'Não foi possível carregar os prazos da OS.',
                     });
                 } else {
-                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar os prazos da OS.');
+                    alert(error.message || 'Não foi possível carregar os prazos da OS.');
                 }
             } finally {
                 setDatesModalLoading(false);
@@ -2037,10 +2085,10 @@
 
             if (budgetModalNotifyHelp) {
                 if (!canSend) {
-                    budgetModalNotifyHelp.textContent = 'Seu perfil atual nÃƒÂ£o possui permissÃƒÂ£o para envio do orÃƒÂ§amento ao cliente.';
+                    budgetModalNotifyHelp.textContent = 'Seu perfil atual não possui permissão para envio do orçamento ao cliente.';
                     budgetModalNotifyHelp.classList.add('text-danger');
                 } else if (!hasPhone) {
-                    budgetModalNotifyHelp.textContent = 'Cliente sem telefone cadastrado. Informe um nÃƒÂºmero abaixo se quiser enviar o orÃƒÂ§amento agora.';
+                    budgetModalNotifyHelp.textContent = 'Cliente sem telefone cadastrado. Informe um número abaixo se quiser enviar o orçamento agora.';
                     budgetModalNotifyHelp.classList.remove('text-danger');
                 } else {
                     budgetModalNotifyHelp.textContent = `Telefone atual para envio: ${phone}`;
@@ -2072,7 +2120,7 @@
             budgetModalValorFinal && (budgetModalValorFinal.textContent = 'R$ 0,00');
             budgetModalPhone && (budgetModalPhone.value = '');
             budgetModalMessage && (budgetModalMessage.value = '');
-            budgetModalDocsList && (budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Carregando orÃƒÂ§amentos...</p>');
+            budgetModalDocsList && (budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Carregando orçamentos...</p>');
             budgetModalForm?.reset();
             if (budgetModalNotify) {
                 budgetModalNotify.dataset.available = '0';
@@ -2090,7 +2138,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o orÃƒÂ§amento da OS.');
+                    throw new Error(payload.message || 'Não foi possível carregar o orçamento da OS.');
                 }
 
                 hydrateBudgetModal(payload);
@@ -2099,11 +2147,11 @@
                 if (window.Swal) {
                     window.Swal.fire({
                         icon: 'error',
-                        title: 'Falha ao carregar orÃƒÂ§amento',
-                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o orÃƒÂ§amento da OS.',
+                        title: 'Falha ao carregar orçamento',
+                        text: error.message || 'Não foi possível carregar o orçamento da OS.',
                     });
                 } else {
-                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o orÃƒÂ§amento da OS.');
+                    alert(error.message || 'Não foi possível carregar o orçamento da OS.');
                 }
             } finally {
                 setBudgetModalLoading(false);
@@ -2114,7 +2162,7 @@
             const key = String(state || 'upcoming').trim();
             if (key === 'completed') {
                 return {
-                    label: 'ConcluÃƒÂ­da',
+                    label: 'Concluída',
                     className: 'bg-success-subtle text-success-emphasis border border-success-subtle',
                 };
             }
@@ -2126,7 +2174,7 @@
             }
             if (key === 'probable') {
                 return {
-                    label: 'ProvÃƒÂ¡vel',
+                    label: 'Provável',
                     className: 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
                 };
             }
@@ -2210,11 +2258,11 @@
 
         const getStatusBudgetLoadingMarkup = (message) => `
             <div class="card os-tab-card os-status-modal-budget-card">
-                <div class="card-body p-4 text-muted small">${escapeHtml(message || 'Carregando gerenciamento do orÃƒÂ§amento...')}</div>
+                <div class="card-body p-4 text-muted small">${escapeHtml(message || 'Carregando gerenciamento do orçamento...')}</div>
             </div>
         `;
 
-        const setStatusBudgetPanelHtml = (html, emptyMessage = 'Nenhuma informaÃƒÂ§ÃƒÂ£o de orÃƒÂ§amento disponÃƒÂ­vel para esta OS.') => {
+        const setStatusBudgetPanelHtml = (html, emptyMessage = 'Nenhuma informação de orçamento disponível para esta OS.') => {
             if (!statusModalBudgetPanel) {
                 return;
             }
@@ -2271,7 +2319,7 @@
 
         const getStatusModalTechnicianLabel = () => {
             const label = String(activeStatusModalMeta?.os?.tecnico_nome || '').trim();
-            return label || 'NÃƒÂ£o atribuÃƒÂ­do';
+            return label || 'Não atribuído';
         };
 
         const renderStatusModalProceduresList = (items) => {
@@ -2325,7 +2373,7 @@
 
             const tecnicoNome = getStatusModalTechnicianLabel();
             const stamp = formatStatusProcedureTimestamp(new Date());
-            const line = `[${procedimentoBase} - ${stamp} - tÃƒÂ©cnico: ${tecnicoNome}]`;
+            const line = `[${procedimentoBase} - ${stamp} - técnico: ${tecnicoNome}]`;
             const items = parseStatusModalProcedures(statusModalProcedimentosInput.value);
             items.push(line);
             syncStatusModalProcedures(items);
@@ -2402,7 +2450,7 @@
             updateCsrfFromPayload(payload);
 
             if (!response.ok || !payload.ok) {
-                throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o fluxo de status.');
+                throw new Error(payload.message || 'Não foi possível carregar o fluxo de status.');
             }
 
             hydrateStatusModal(payload);
@@ -2419,7 +2467,7 @@
             }
 
             if (!Array.isArray(timeline) || timeline.length === 0) {
-                statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponÃƒÂ­vel para esta OS.</p>';
+                statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponível para esta OS.</p>';
                 return;
             }
 
@@ -2433,13 +2481,13 @@
                 const lastEventAt = formatStatusDateTime(stage?.last_event_at || '');
                 const lastUserName = String(stage?.last_user_name || '').trim();
 
-                let description = 'Etapa futura do fluxo da ordem de serviÃƒÂ§o.';
+                let description = 'Etapa futura do fluxo da ordem de serviço.';
                 if (stageState === 'current' && currentStatusName) {
                     description = `Etapa atual: ${escapeHtml(currentStatusName)}.`;
                 } else if (stageState === 'completed' && lastStatusName) {
                     description = `Passou por ${escapeHtml(lastStatusName)}.`;
                 } else if (stageState === 'probable' && nextStatusNames.length > 0) {
-                    description = `PrÃƒÂ³ximos movimentos provÃƒÂ¡veis: ${escapeHtml(nextStatusNames.join(', '))}.`;
+                    description = `Próximos movimentos prováveis: ${escapeHtml(nextStatusNames.join(', '))}.`;
                 }
 
                 const metaParts = [];
@@ -2476,7 +2524,7 @@
 
             if (!Array.isArray(history) || history.length === 0) {
                 statusModalHistoryWrap.classList.add('is-empty');
-                statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem histÃƒÂ³rico recente para esta OS.</p>';
+                statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem histórico recente para esta OS.</p>';
                 return;
             }
 
@@ -2544,7 +2592,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar as fotos da OS.');
+                    throw new Error(payload.message || 'Não foi possível carregar as fotos da OS.');
                 }
 
                 const numeroOs = payload.os?.numero_os ? `#${payload.os.numero_os}` : '-';
@@ -2569,7 +2617,7 @@
                 renderPhotoGallery(
                     photoViewerMap.entry,
                     entryPhotos,
-                    'Nenhuma foto foi registrada na abertura desta ordem de serviÃƒÂ§o.'
+                    'Nenhuma foto foi registrada na abertura desta ordem de serviço.'
                 );
 
                 if (window.bootstrap && photoModalTabs.equipmentButton && photoModalTabs.entryButton) {
@@ -2584,10 +2632,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao carregar fotos',
-                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar as fotos da OS.',
+                        text: error.message || 'Não foi possível carregar as fotos da OS.',
                     });
                 } else {
-                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar as fotos da OS.');
+                    alert(error.message || 'Não foi possível carregar as fotos da OS.');
                 }
             } finally {
                 setPhotoModalLoading(false);
@@ -2677,7 +2725,7 @@
                 statusModalEquipmentMeta.textContent = `Tipo: ${tipo} | Marca: ${marca} | Modelo: ${modelo}`;
             }
             if (statusModalEquipmentSerial) {
-                statusModalEquipmentSerial.textContent = `NÃ‚Âº de sÃƒÂ©rie: ${String(osMeta?.equip_serie || '').trim() || '-'}`;
+                statusModalEquipmentSerial.textContent = `Nº de série: ${String(osMeta?.equip_serie || '').trim() || '-'}`;
             }
 
             if (statusModalCurrentBadges) {
@@ -2696,7 +2744,7 @@
             if (statusModalPrimaryHint) {
                 statusModalPrimaryHint.innerHTML = primaryNextStatus?.nome
                     ? `Fluxo normal sugerido: <strong>${escapeHtml(primaryNextStatus.nome)}</strong>.`
-                    : 'Fluxo normal sugerido: <strong>indisponÃƒÂ­vel no momento</strong>.';
+                    : 'Fluxo normal sugerido: <strong>indisponível no momento</strong>.';
             }
 
             syncStatusModalProcedures(parseStatusModalProcedures(osMeta?.procedimentos_executados || ''));
@@ -2734,8 +2782,8 @@
 
             if (statusModalNotifyHelp) {
                 statusModalNotifyHelp.textContent = hasClientPhone
-                    ? `Telefone atual para comunicaÃƒÂ§ÃƒÂ£o: ${phoneLabel || 'nÃƒÂ£o informado'}.`
-                    : 'Cliente sem telefone cadastrado para comunicaÃƒÂ§ÃƒÂ£o automÃƒÂ¡tica.';
+                    ? `Telefone atual para comunicação: ${phoneLabel || 'não informado'}.`
+                    : 'Cliente sem telefone cadastrado para comunicação automática.';
                 statusModalNotifyHelp.classList.toggle('text-danger', !hasClientPhone);
             }
 
@@ -2775,19 +2823,19 @@
             statusModalClientEmail && (statusModalClientEmail.textContent = 'E-mail: -');
             statusModalEquipmentName && (statusModalEquipmentName.textContent = '-');
             statusModalEquipmentMeta && (statusModalEquipmentMeta.textContent = 'Tipo: -');
-            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'NÃ‚Âº de sÃƒÂ©rie: -');
+            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'Nº de série: -');
             statusModalCurrentBadges && (statusModalCurrentBadges.innerHTML = '');
             statusModalCurrentStatusHint && (statusModalCurrentStatusHint.textContent = 'Status atual da OS: aguardando contexto.');
             statusModalPrimaryHint && (statusModalPrimaryHint.textContent = 'Fluxo normal sugerido: aguardando contexto.');
             statusModalTargetHint && (statusModalTargetHint.textContent = 'Selecione um fluxo para continuar.');
             statusModalTimeline && (statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Carregando fluxo visual...</p>');
-            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Carregando histÃƒÂ³rico recente...</p>');
+            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Carregando histórico recente...</p>');
             statusModalHistoryWrap?.classList.remove('is-empty');
             syncStatusModalProcedures([]);
             statusModalProcedimentoTextoInput && (statusModalProcedimentoTextoInput.value = '');
             statusModalSolucaoInput && (statusModalSolucaoInput.value = '');
             statusModalDiagnosticoInput && (statusModalDiagnosticoInput.value = '');
-            setStatusBudgetPanelHtml('', 'Carregando gerenciamento do orÃƒÂ§amento...');
+            setStatusBudgetPanelHtml('', 'Carregando gerenciamento do orçamento...');
             activateStatusModalTab('#osStatusTabQuick');
             if (statusModalNotify) {
                 statusModalNotify.checked = false;
@@ -2795,7 +2843,7 @@
                 statusModalNotify.dataset.available = '0';
             }
             if (statusModalNotifyHelp) {
-                statusModalNotifyHelp.textContent = 'Verificando disponibilidade de comunicaÃƒÂ§ÃƒÂ£o com o cliente...';
+                statusModalNotifyHelp.textContent = 'Verificando disponibilidade de comunicação com o cliente...';
                 statusModalNotifyHelp.classList.remove('text-danger');
             }
             setStatusQuickButtonState(statusModalQuickNext, false, '', '', '');
@@ -2810,10 +2858,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao carregar status',
-                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o fluxo de status.',
+                        text: error.message || 'Não foi possível carregar o fluxo de status.',
                     });
                 } else {
-                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel carregar o fluxo de status.');
+                    alert(error.message || 'Não foi possível carregar o fluxo de status.');
                 }
             } finally {
                 setStatusModalLoading(false);
@@ -2920,8 +2968,8 @@
                 error: function (xhr) {
                     toggleLoadingOverlay(false);
                     const message = xhr?.status === 0
-                        ? 'Falha de conexÃƒÂ£o ao carregar OS.'
-                        : 'NÃƒÂ£o foi possÃƒÂ­vel aplicar os filtros no momento.';
+                        ? 'Falha de conexão ao carregar OS.'
+                        : 'Não foi possível aplicar os filtros no momento.';
                     if (window.Swal) {
                         window.Swal.fire({
                             icon: 'error',
@@ -3192,7 +3240,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel atualizar os prazos.');
+                    throw new Error(payload.message || 'Não foi possível atualizar os prazos.');
                 }
 
                 datesModal.hide();
@@ -3210,10 +3258,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao atualizar prazos',
-                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel atualizar os prazos da OS.',
+                        text: error.message || 'Não foi possível atualizar os prazos da OS.',
                     });
                 } else {
-                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel atualizar os prazos da OS.');
+                    alert(error.message || 'Não foi possível atualizar os prazos da OS.');
                 }
             } finally {
                 setDatesModalLoading(false);
@@ -3254,17 +3302,17 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel gerar o orÃƒÂ§amento da OS.');
+                    throw new Error(payload.message || 'Não foi possível gerar o orçamento da OS.');
                 }
 
                 budgetModal.hide();
                 if (window.Swal) {
                     await window.Swal.fire({
                         icon: payload.warning ? 'warning' : 'success',
-                        title: payload.warning ? 'OrÃƒÂ§amento gerado com ressalvas' : 'OrÃƒÂ§amento pronto',
+                        title: payload.warning ? 'Orçamento gerado com ressalvas' : 'Orçamento pronto',
                         text: payload.warning
                             ? `${payload.message || 'O PDF foi gerado.'} ${payload.warning}`
-                            : (payload.message || 'O PDF do orÃƒÂ§amento foi gerado com sucesso.'),
+                            : (payload.message || 'O PDF do orçamento foi gerado com sucesso.'),
                     });
                 }
 
@@ -3273,11 +3321,11 @@
                 if (window.Swal) {
                     window.Swal.fire({
                         icon: 'error',
-                        title: 'Falha ao gerar orÃƒÂ§amento',
-                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel gerar o orÃƒÂ§amento da OS.',
+                        title: 'Falha ao gerar orçamento',
+                        text: error.message || 'Não foi possível gerar o orçamento da OS.',
                     });
                 } else {
-                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel gerar o orÃƒÂ§amento da OS.');
+                    alert(error.message || 'Não foi possível gerar o orçamento da OS.');
                 }
             } finally {
                 setBudgetModalLoading(false);
@@ -3334,14 +3382,14 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel enviar o WhatsApp da OS.');
+                    throw new Error(payload.message || 'Não foi possível enviar o WhatsApp da OS.');
                 }
 
                 whatsappModal.hide();
                 if (window.Swal) {
                     await window.Swal.fire({
                         icon: payload.warning ? 'warning' : 'success',
-                        title: payload.warning ? 'Envio concluÃƒÂ­do com ressalvas' : 'WhatsApp enviado',
+                        title: payload.warning ? 'Envio concluído com ressalvas' : 'WhatsApp enviado',
                         text: payload.message || 'Mensagem enviada com sucesso.',
                     });
                 }
@@ -3350,10 +3398,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha no envio',
-                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel enviar o WhatsApp da OS.',
+                        text: error.message || 'Não foi possível enviar o WhatsApp da OS.',
                     });
                 } else {
-                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel enviar o WhatsApp da OS.');
+                    alert(error.message || 'Não foi possível enviar o WhatsApp da OS.');
                 }
             } finally {
                 setWhatsAppModalLoading(false);
@@ -3372,10 +3420,10 @@
                     window.Swal.fire({
                         icon: 'warning',
                         title: 'Selecione um status',
-                        text: 'Escolha o prÃƒÂ³ximo status permitido para continuar.',
+                        text: 'Escolha o próximo status permitido para continuar.',
                     });
                 } else {
-                    alert('Escolha o prÃƒÂ³ximo status permitido para continuar.');
+                    alert('Escolha o próximo status permitido para continuar.');
                 }
                 return;
             }
@@ -3410,7 +3458,7 @@
                 updateCsrfFromPayload(payload);
 
                 if (!response.ok || !payload.ok) {
-                    throw new Error(payload.message || 'NÃƒÂ£o foi possÃƒÂ­vel atualizar o status.');
+                    throw new Error(payload.message || 'Não foi possível atualizar o status.');
                 }
 
                 statusModal.hide();
@@ -3430,10 +3478,10 @@
                     window.Swal.fire({
                         icon: 'error',
                         title: 'Falha ao atualizar status',
-                        text: error.message || 'NÃƒÂ£o foi possÃƒÂ­vel atualizar o status.',
+                        text: error.message || 'Não foi possível atualizar o status.',
                     });
                 } else {
-                    alert(error.message || 'NÃƒÂ£o foi possÃƒÂ­vel atualizar o status.');
+                    alert(error.message || 'Não foi possível atualizar o status.');
                 }
             } finally {
                 setStatusModalLoading(false);
@@ -3455,19 +3503,19 @@
             statusModalClientEmail && (statusModalClientEmail.textContent = 'E-mail: -');
             statusModalEquipmentName && (statusModalEquipmentName.textContent = '-');
             statusModalEquipmentMeta && (statusModalEquipmentMeta.textContent = 'Tipo: -');
-            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'NÃ‚Âº de sÃƒÂ©rie: -');
+            statusModalEquipmentSerial && (statusModalEquipmentSerial.textContent = 'Nº de série: -');
             statusModalCurrentBadges && (statusModalCurrentBadges.innerHTML = '');
             statusModalCurrentStatusHint && (statusModalCurrentStatusHint.textContent = 'Status atual da OS: aguardando contexto.');
             statusModalPrimaryHint && (statusModalPrimaryHint.textContent = 'Fluxo normal sugerido: aguardando contexto.');
             statusModalTargetHint && (statusModalTargetHint.textContent = 'Selecione um fluxo para continuar.');
-            statusModalTimeline && (statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponÃƒÂ­vel para esta OS.</p>');
-            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem histÃƒÂ³rico recente para esta OS.</p>');
+            statusModalTimeline && (statusModalTimeline.innerHTML = '<p class="text-muted small mb-0">Fluxo visual indisponível para esta OS.</p>');
+            statusModalHistoryList && (statusModalHistoryList.innerHTML = '<p class="text-muted small mb-0">Sem histórico recente para esta OS.</p>');
             statusModalHistoryWrap?.classList.remove('is-empty');
             syncStatusModalProcedures([]);
             statusModalProcedimentoTextoInput && (statusModalProcedimentoTextoInput.value = '');
             statusModalSolucaoInput && (statusModalSolucaoInput.value = '');
             statusModalDiagnosticoInput && (statusModalDiagnosticoInput.value = '');
-            setStatusBudgetPanelHtml('', 'Gerenciamento do orÃƒÂ§amento serÃƒÂ¡ exibido aqui.');
+            setStatusBudgetPanelHtml('', 'Gerenciamento do orçamento será exibido aqui.');
             activateStatusModalTab('#osStatusTabQuick');
             setStatusQuickButtonState(statusModalQuickNext, false, '', '', '');
             setStatusQuickButtonState(statusModalQuickCancel, false, '', '', '');
@@ -3477,7 +3525,7 @@
                 statusModalNotify.dataset.available = '0';
             }
             if (statusModalNotifyHelp) {
-                statusModalNotifyHelp.textContent = 'O cliente serÃƒÂ¡ comunicado apenas se vocÃƒÂª mantiver esta opÃƒÂ§ÃƒÂ£o ativa.';
+                statusModalNotifyHelp.textContent = 'O cliente será comunicado apenas se você mantiver esta opção ativa.';
                 statusModalNotifyHelp.classList.remove('text-danger');
             }
             setStatusModalSubmitLabel('Salvar status');
@@ -3515,7 +3563,7 @@
             budgetModalPecas && (budgetModalPecas.textContent = 'R$ 0,00');
             budgetModalSubtotal && (budgetModalSubtotal.textContent = 'R$ 0,00');
             budgetModalValorFinal && (budgetModalValorFinal.textContent = 'R$ 0,00');
-            budgetModalDocsList && (budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Nenhum orÃƒÂ§amento PDF registrado para esta OS.</p>');
+            budgetModalDocsList && (budgetModalDocsList.innerHTML = '<p class="text-muted small mb-0">Nenhum orçamento PDF registrado para esta OS.</p>');
             if (budgetModalNotify) {
                 budgetModalNotify.checked = false;
                 budgetModalNotify.disabled = true;
@@ -3539,7 +3587,7 @@
             whatsappModalEquipmentName && (whatsappModalEquipmentName.textContent = '-');
             whatsappModalEquipmentMeta && (whatsappModalEquipmentMeta.textContent = 'Tipo: -');
             whatsappModalTemplate && (whatsappModalTemplate.innerHTML = '<option value="">Selecione um template ou escreva manualmente</option>');
-            whatsappModalDocument && (whatsappModalDocument.innerHTML = '<option value="">Gerar PDF consolidado da impressÃƒÂ£o (A4)</option>');
+            whatsappModalDocument && (whatsappModalDocument.innerHTML = '<option value="">Gerar PDF consolidado da impressão (A4)</option>');
             whatsappModalMessage && (whatsappModalMessage.value = '');
             whatsappModalPhone && (whatsappModalPhone.value = '');
             whatsappModalSummary && (whatsappModalSummary.textContent = 'Escolha um template pronto, escreva uma mensagem personalizada ou combine ambos com um documento salvo da OS.');
@@ -3587,21 +3635,21 @@
                     if (window.Swal && payload.message) {
                         window.Swal.fire({
                             icon: 'success',
-                            title: 'OrÃƒÂ§amento atualizado',
-                            text: String(payload.message || 'O resumo do orÃƒÂ§amento foi sincronizado na OS.'),
+                            title: 'Orçamento atualizado',
+                            text: String(payload.message || 'O resumo do orçamento foi sincronizado na OS.'),
                             timer: 1800,
                             showConfirmButton: false,
                         });
                     }
                 })
                 .catch((error) => {
-                    console.error('[OS status modal] Falha ao sincronizar o orÃƒÂ§amento apÃƒÂ³s ediÃƒÂ§ÃƒÂ£o.', error);
+                    console.error('[OS status modal] Falha ao sincronizar o orçamento após edição.', error);
                     detailsModal?.hide();
                     if (window.Swal) {
                         window.Swal.fire({
                             icon: 'warning',
-                            title: 'OrÃƒÂ§amento salvo com ressalvas',
-                            text: error?.message || 'O orÃƒÂ§amento foi salvo, mas o resumo da OS nÃƒÂ£o foi atualizado automaticamente.',
+                            title: 'Orçamento salvo com ressalvas',
+                            text: error?.message || 'O orçamento foi salvo, mas o resumo da OS não foi atualizado automaticamente.',
                         });
                     }
                 });
@@ -3628,7 +3676,7 @@
 
             if (activeStatusOsId && Number(activeStatusOsId) === osId) {
                 refreshStatusModalContext({ preserveDraft: true }).catch(function (error) {
-                    console.error('[OS status modal] Falha ao reidratar contexto apÃƒÂ³s notificaÃƒÂ§ÃƒÂ£o pÃƒÂºblica de orÃƒÂ§amento.', error);
+                    console.error('[OS status modal] Falha ao reidratar contexto após notificação pública de orçamento.', error);
                 });
             }
         }, 300);

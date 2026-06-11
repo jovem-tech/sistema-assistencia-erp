@@ -8,7 +8,7 @@ O modulo de `Pacotes de Servicos` organiza ofertas padronizadas com niveis de at
 
 O modulo reutiliza o RBAC comercial:
 
-- `orcamentos:visualizar` para listar e prÃ©-visualizar pacotes;
+- `orcamentos:visualizar` para listar e pré-visualizar pacotes;
 - `orcamentos:criar` para cadastrar novos pacotes;
 - `orcamentos:editar` para alterar pacotes existentes;
 - `orcamentos:excluir` para remover pacotes.

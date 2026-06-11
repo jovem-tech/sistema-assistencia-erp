@@ -35,7 +35,7 @@ $canViewWhatsapp = function_exists('can') ? can('atendimento_whatsapp', 'visuali
             <div class="card-body">
                 <div class="detail-group">
                     <div class="detail-label">Tipo</div>
-                    <div class="detail-value"><?= $cliente['tipo_pessoa'] === 'fisica' ? 'Pessoa FÃ­sica' : 'Pessoa JurÃ­dica' ?></div>
+                    <div class="detail-value"><?= $cliente['tipo_pessoa'] === 'fisica' ? 'Pessoa Física' : 'Pessoa Jurídica' ?></div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">CPF/CNPJ</div>
@@ -59,7 +59,7 @@ $canViewWhatsapp = function_exists('can') ? can('atendimento_whatsapp', 'visuali
                 </div>
                 <?php endif; ?>
                 <div class="detail-group">
-                    <div class="detail-label">EndereÃ§o</div>
+                    <div class="detail-label">Endereço</div>
                     <div class="detail-value">
                         <?= esc(($cliente['endereco'] ?? '') . ($cliente['numero'] ? ', ' . $cliente['numero'] : '')) ?>
                         <?= $cliente['complemento'] ? ' - ' . esc($cliente['complemento']) : '' ?><br>
@@ -69,7 +69,7 @@ $canViewWhatsapp = function_exists('can') ? can('atendimento_whatsapp', 'visuali
                 </div>
                 <?php if (!empty($cliente['observacoes'])): ?>
                 <div class="detail-group">
-                    <div class="detail-label">ObservaÃ§Ãµes</div>
+                    <div class="detail-label">Observações</div>
                     <div class="detail-value"><?= nl2br(esc($cliente['observacoes'])) ?></div>
                 </div>
                 <?php endif; ?>
@@ -85,7 +85,7 @@ $canViewWhatsapp = function_exists('can') ? can('atendimento_whatsapp', 'visuali
     <div class="col-md-8">
         <div class="card glass-card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0"><i class="bi bi-clipboard-check me-2"></i>Ordens de ServiÃ§o</h5>
+                <h5 class="card-title mb-0"><i class="bi bi-clipboard-check me-2"></i>Ordens de Serviço</h5>
                 <?php if (can('os', 'criar')): ?>
                 <a href="<?= base_url('os/nova?cliente_id=' . $cliente['id']) ?>" class="btn btn-glow btn-sm">
                     <i class="bi bi-plus-lg me-1"></i>Nova OS
@@ -97,7 +97,7 @@ $canViewWhatsapp = function_exists('can') ? can('atendimento_whatsapp', 'visuali
                     <table class="table table-hover mb-0">
                         <thead>
                             <tr>
-                                <th>NÂº OS</th>
+                                <th>Nº OS</th>
                                 <th>Equipamento</th>
                                 <th>Status</th>
                                 <th>Data</th>
@@ -139,7 +139,7 @@ $canViewWhatsapp = function_exists('can') ? can('atendimento_whatsapp', 'visuali
                                 <th>Tipo</th>
                                 <th>Marca</th>
                                 <th>Modelo</th>
-                                <th>NÂº SÃ©rie</th>
+                                <th>Nº Série</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -215,7 +215,7 @@ $canViewWhatsapp = function_exists('can') ? can('atendimento_whatsapp', 'visuali
                         <i class="bi bi-clock-history me-1"></i>Timeline
                     </a>
                     <a href="<?= base_url('crm/interacoes?cliente_id=' . $cliente['id']) ?>" class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-chat-left-text me-1"></i>InteraÃ§Ãµes
+                        <i class="bi bi-chat-left-text me-1"></i>Interações
                     </a>
                 </div>
                 <?php endif; ?>
@@ -231,7 +231,7 @@ $canViewWhatsapp = function_exists('can') ? can('atendimento_whatsapp', 'visuali
                     </div>
                     <div class="col-12 col-md-4">
                         <div class="border rounded p-2 h-100">
-                    <div class="small text-muted">InteraÃ§Ãµes CRM</div>
+                    <div class="small text-muted">Interações CRM</div>
                             <div class="fs-5 fw-bold"><?= (int) ($crmResumo['interacoes'] ?? 0) ?></div>
                         </div>
                     </div>
@@ -299,8 +299,8 @@ $canViewWhatsapp = function_exists('can') ? can('atendimento_whatsapp', 'visuali
                                     <tr>
                                         <th>Telefone</th>
                                         <th>Status</th>
-                            <th>NÃ£o lidas</th>
-                            <th>Ãšltima msg</th>
+                            <th>Não lidas</th>
+                            <th>Última msg</th>
                                         <th></th>
                                     </tr>
                                 </thead>

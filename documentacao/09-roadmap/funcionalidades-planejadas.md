@@ -50,7 +50,7 @@ Atualizado em 06/06/2026.
   - inbound com midia (imagem/PDF) persistido na thread
   - badges de operacao (SLA, prioridade, bot, aguardando humano)
   - motor de regras ERP dinamico para automacoes de mensagem/follow-up/evento
-  - busca global inteligente (navbar): OS, Clientes, Equipamentos, WhatsApp, MÃ³dulos, ServiÃ§os e PeÃ§as
+  - busca global inteligente (navbar): OS, Clientes, Equipamentos, WhatsApp, Módulos, Serviços e Peças
 
 ## Em andamento
 - unificacao de consulta entre `mensagens_whatsapp` e analiticos de atendimento

@@ -40,8 +40,8 @@ $historicoLista = is_array($historico ?? null) ? $historico : [];
 $enviosLista = is_array($envios ?? null) ? $envios : [];
 $aprovacoesLista = is_array($aprovacoes ?? null) ? $aprovacoes : [];
 ${"hist\xC3\x83\xC2\xB3rico"} = $historicoLista;
-$histÃƒÆ’Ã‚Â³rico = $historicoLista;
-$histÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³rico = $historicoLista;
+$histórico = $historicoLista;
+$histórico = $historicoLista;
 
 $tokenPublicoOrcamento = trim((string) ($orcamento['token_publico'] ?? ''));
 $linkPublicoOrcamento = $tokenPublicoOrcamento !== '' ? base_url('orcamento/' . $tokenPublicoOrcamento) : '';
@@ -1174,7 +1174,7 @@ $clienteTemContatoComplementar = $contatoNome !== ''
                                         <?php else: ?>
                                             <ul class="list-group list-group-flush">
                                                 <?php foreach ($aprovacoesLista as $ap): ?>
-                                                    <?php $aprovacaoAcao = (string) ($ap['acao'] ?? ($ap['aÃƒÂ§ÃƒÂ£o'] ?? '-')); ?>
+                                                    <?php $aprovacaoAcao = (string) ($ap['acao'] ?? ($ap['ação'] ?? '-')); ?>
                                                     <li class="list-group-item px-0 bg-transparent small">
                                                         <strong><?= esc(ucfirst($aprovacaoAcao)) ?></strong> -
                                                         <?= esc(formatDate($ap['created_at'] ?? null, true)) ?>

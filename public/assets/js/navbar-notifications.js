@@ -70,7 +70,7 @@
 
         function updateMetaLabel() {
             const countLabel = state.unreadCount > 0
-                ? state.unreadCount + ' nao lida(s)'
+                ? state.unreadCount + ' não lida(s)'
                 : 'Sem pendencias';
 
             const connectionLabel = state.connectionState === 'live'

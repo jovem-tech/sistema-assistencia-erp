@@ -6,7 +6,7 @@ A lista `Taxas cadastradas` dentro da aba `Taxa por parcela` precisava de uma fo
 
 ## O que mudou
 
-- foram adicionados botÃµes de filtro por operadora acima da tabela `Taxas cadastradas`;
+- foram adicionados botões de filtro por operadora acima da tabela `Taxas cadastradas`;
 - o filtro alterna as linhas da tabela imediatamente no navegador, sem recarregar a pagina;
 - a opcao `Todas` restaura a visualizacao completa da listagem;
 - quando o filtro selecionado nao encontra registros, a tabela exibe uma mensagem de retorno amigavel;

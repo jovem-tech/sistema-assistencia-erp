@@ -348,7 +348,7 @@ Regra de backfill:
 
 Uso operacional:
 - formularios de OS e Orcamento usam essa relacao para montar o filtro encadeado `Tipo -> Marca -> Modelo`;
-- quando a relacao ainda nao existir para um par novo, o sistema mantÃ©m fallback por marca (legado) e sincroniza a relacao ao salvar.
+- quando a relacao ainda nao existir para um par novo, o sistema mantém fallback por marca (legado) e sincroniza a relacao ao salvar.
 
 ## Atualizacoes de schema (09/04/2026) - Pacotes de Servicos
 Migration: `2026-04-09-101500_CreatePacotesServicosModule`
@@ -481,7 +481,7 @@ Objetivo dos compostos:
 - sustentar ordenacao por `data_abertura` com paginacao server-side
 - reduzir custo de filtros por `status`, `estado_fluxo`, `tecnico_id`, `cliente_id` e `equipamento_id` quando combinados com ordenacao cronologica
 - acelerar filtro por `tipo_servico` sem depender de scan amplo em `os_itens`
-- sustentar a busca global `q` por catÃ¡logos relacionados sem forcar joins amplos na query principal da listagem
+- sustentar a busca global `q` por catálogos relacionados sem forcar joins amplos na query principal da listagem
 - acelerar o fallback textual de `relato_cliente` sem depender de `LIKE '%...%'` como caminho principal
 
 ## Fluxo de OS (pre-CRM)
@@ -643,7 +643,7 @@ Tabelas complementares (sem duplicar `clientes`, `os`, `conversas_whatsapp` e `m
   - relaciona notificacao a alvos de dominio (`order`, `conversation`, `client`, `budget`);
   - no fluxo de orcamento publico, a mesma notificacao pode apontar simultaneamente para `budget` e `order`.
 - `mobile_event_outbox`
-  - fila de eventos para despacho assÃ­ncrono (`event_type`, `aggregate_type`, `status`, `tentativas`, `processado_em`).
+  - fila de eventos para despacho assíncrono (`event_type`, `aggregate_type`, `status`, `tentativas`, `processado_em`).
 
 Indices operacionais novos:
 

@@ -51,7 +51,7 @@ Estados esperados:
 - o frontend intercepta especificamente o warning de reinicializacao da `osTable`, registrando no console sem abrir alerta modal para o usuario;
 - o bootstrap jQuery/DataTables agora reutiliza defensivamente a instancia existente de `#osTable` mesmo quando outra rotina tocar a grade depois da carga inicial;
 - o modal de status passou a normalizar textos renderizados dinamicamente apos hidratar timeline, historico e painel de orcamento;
-- os textos fixos do modal `Alterar status da OS` e do embed de orcamento tambem foram normalizados em pt-BR, incluindo `NÂº de serie`, abas, cards e mensagens de apoio;
+- os textos fixos do modal `Alterar status da OS` e do embed de orcamento tambem foram normalizados em pt-BR, incluindo `Nº de serie`, abas, cards e mensagens de apoio;
 - `app/Views/os/index.php` teve os principais labels e placeholders da listagem normalizados novamente em pt-BR;
 - `public/assets/js/os-list-filters.js` passou a apontar para os IDs corretos de e-mail no contexto do modal, evitando hidratacao incompleta do resumo lateral;
 - o ajuste preserva o fluxo AJAX server-side existente e atua apenas como hardening de bootstrap da grade.
@@ -132,11 +132,11 @@ No modo card (`< 768px`):
 - a busca global deixa de ficar exposta na navbar mobile e passa a aparecer dentro do menu hamburger, reaproveitando o mesmo componente da busca desktop;
 - em 09/06/2026, o dropdown de resultados da busca global no menu mobile foi corrigido para ocupar a largura total do bloco de busca, sem disputar espaco horizontal com o input ou o seletor de filtro;
 - o CSS especifico da tela remove o espacamento extra que existia abaixo da navbar fixa, ja que o campo de busca nao ocupa mais o topo da listagem.
-- cada `td` da face principal do card passa a ser uma linha flexivel com rÃ³tulo separado do valor, evitando sobreposicao entre `Cliente` e `Equipamento`;
+- cada `td` da face principal do card passa a ser uma linha flexivel com rótulo separado do valor, evitando sobreposicao entre `Cliente` e `Equipamento`;
 - o bloco de `Cliente` passou a ocupar a largura completa do card no mobile, permitindo que nomes longos quebrem em linhas normais dentro do card em vez de ficarem presos em uma faixa curta com rolagem horizontal;
 - o telefone principal permanece em linha unica abaixo do nome, mantendo o atalho do WhatsApp, e o bloco de `Equipamento` segue compacto;
 - a barra superior mobile foi alinhada globalmente em `responsive-layout.css`, mantendo notificacoes e perfil na mesma linha visual do menu hamburger em todo o sistema;
-- o mapeamento de `data-label` da DataTable usa o indice real da coluna, entao a coluna oculta `NÂº OS` nao desloca os rÃ³tulos visiveis;
+- o mapeamento de `data-label` da DataTable usa o indice real da coluna, entao a coluna oculta `Nº OS` nao desloca os rótulos visiveis;
 - o card principal deixou de usar uma grade interna por areas e agora empilha os blocos com leitura linear, sem alterar o comportamento do desktop.
 - em 09/06/2026, os blocos `Cliente`, `Equipamento`, `Status`, `Valor` e `Acoes` foram reforcados para sempre quebrar linha dentro do card, removendo os ultimos pontos de `nowrap` e `overflow-x:auto` que ainda comprimiam o conteudo em telas `<= 430px`, `<= 390px`, `<= 360px` e `<= 320px`.
 
@@ -205,7 +205,7 @@ Observacao operacional obrigatoria:
 
 - para a regua de cobranca sair do estado `agendada` e realmente disparar as mensagens, o ambiente precisa executar periodicamente o comando `php spark os:cobrancas`;
 - em producao Linux, a recomendacao e agendar esse comando via `cron`;
-- em ambiente Windows local ou homologacao, a recomendacao e usar o `Agendador de Tarefas` com o mesmo comando no diretÃ³rio do ERP.
+- em ambiente Windows local ou homologacao, a recomendacao e usar o `Agendador de Tarefas` com o mesmo comando no diretório do ERP.
 
 ### Campo `Data de entrega` no formulario da OS
 
@@ -429,7 +429,7 @@ O seletor de equipamento passou a operar com contexto expandido:
 
 ### Modal inline de equipamento
 
-No formulario `app/Views/os/form.php`, a edicao inline do equipamento dentro da OS agora tambem expÃµe o campo `observacoes`.
+No formulario `app/Views/os/form.php`, a edicao inline do equipamento dentro da OS agora tambem expõe o campo `observacoes`.
 
 Regra tecnica atual:
 

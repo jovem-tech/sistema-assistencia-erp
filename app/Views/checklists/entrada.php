@@ -42,7 +42,7 @@
                         <input type="text" name="nome" class="form-control" required maxlength="160" value="<?= esc((string) ($selectedModelo['nome'] ?? 'Checklist de Entrada')) ?>">
                     </div>
                     <div class="col-12">
-                        <label class="form-label">DescriÃ§Ã£o</label>
+                        <label class="form-label">Descrição</label>
                         <textarea name="descricao" rows="2" class="form-control" placeholder="Ex: Conferencia visual inicial para equipamentos na recepcao."><?= esc((string) ($selectedModelo['descricao'] ?? '')) ?></textarea>
                     </div>
                     <div class="col-sm-4">
@@ -79,7 +79,7 @@
                                     <th>Tipo de equipamento</th>
                                     <th>Nome</th>
                                     <th class="text-center">Ativo</th>
-                                    <th class="text-end">AÃ§Ãµes</th>
+                                    <th class="text-end">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -95,7 +95,7 @@
                                         </td>
                                         <td class="text-center">
                                             <span class="badge <?= ((int) ($modelo['ativo'] ?? 0) === 1) ? 'bg-success' : 'bg-secondary' ?>">
-                                                <?= ((int) ($modelo['ativo'] ?? 0) === 1) ? 'Sim' : 'NÃ£o' ?>
+                                                <?= ((int) ($modelo['ativo'] ?? 0) === 1) ? 'Sim' : 'Não' ?>
                                             </span>
                                         </td>
                                         <td class="text-end">
@@ -130,7 +130,7 @@
                         <?= csrf_field() ?>
                         <input type="hidden" name="checklist_modelo_id" value="<?= esc((string) $selectedModeloId) ?>">
                         <div class="col-12 col-md-7">
-                            <label class="form-label">DescriÃ§Ã£o do item *</label>
+                            <label class="form-label">Descrição do item *</label>
                             <input type="text" name="descricao" class="form-control" maxlength="255" required placeholder="Ex: Tela sem trinca ou fissura">
                         </div>
                         <div class="col-6 col-md-2">
@@ -156,9 +156,9 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 80px;">Ordem</th>
-                                        <th>DescriÃ§Ã£o</th>
+                                        <th>Descrição</th>
                                         <th class="text-center" style="width: 110px;">Ativo</th>
-                                        <th class="text-end" style="width: 120px;">AÃ§Ãµes</th>
+                                        <th class="text-end" style="width: 120px;">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -168,7 +168,7 @@
                                             <td><?= esc((string) ($item['descricao'] ?? '-')) ?></td>
                                             <td class="text-center">
                                                 <span class="badge <?= ((int) ($item['ativo'] ?? 0) === 1) ? 'bg-success' : 'bg-secondary' ?>">
-                                                    <?= ((int) ($item['ativo'] ?? 0) === 1) ? 'Sim' : 'NÃ£o' ?>
+                                                    <?= ((int) ($item['ativo'] ?? 0) === 1) ? 'Sim' : 'Não' ?>
                                                 </span>
                                             </td>
                                             <td class="text-end">
@@ -203,7 +203,7 @@ document.querySelectorAll('.js-remove-checklist-item').forEach((form) => {
         const result = await Swal.fire({
             icon: 'warning',
             title: 'Remover item?',
-            text: 'Esta aÃ§Ã£o remove o item do checklist de entrada.',
+            text: 'Esta ação remove o item do checklist de entrada.',
             showCancelButton: true,
             confirmButtonText: 'Remover',
             cancelButtonText: 'Cancelar',

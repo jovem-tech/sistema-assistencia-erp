@@ -17,7 +17,7 @@ if ($statusClosedSelected !== '') {
 }
 $estadoFluxoOptions = [
     'em_atendimento' => 'Em atendimento',
-    'em_execucao' => 'Em execuÃ§Ã£o',
+    'em_execucao' => 'Em execução',
     'pausado' => 'Pausado',
     'pronto' => 'Pronto',
     'encerrado' => 'Encerrado',
@@ -39,7 +39,7 @@ foreach ($tecnicos as $tecnico) {
     if ($tecnicoId === '') {
         continue;
     }
-    $tecnicoLabels[$tecnicoId] = (string) ($tecnico['nome'] ?? ('TÃ©cnico #' . $tecnicoId));
+    $tecnicoLabels[$tecnicoId] = (string) ($tecnico['nome'] ?? ('Técnico #' . $tecnicoId));
 }
 
 $labelsMap = [
@@ -58,19 +58,19 @@ $labelsMap = [
 ];
 
 $tableTitleText = 'Ordens em aberto';
-$tableSubtitleText = 'A listagem inicia nas etapas abertas da oficina. Use "Ordens fechadas" para consultar entregas, devoluÃ§Ãµes e descartes.';
+$tableSubtitleText = 'A listagem inicia nas etapas abertas da oficina. Use "Ordens fechadas" para consultar entregas, devoluções e descartes.';
 
 if ($statusClosedSelected !== '') {
     if ($statusClosedSelected === 'fechadas') {
         $tableTitleText = 'Ordens fechadas';
-        $tableSubtitleText = 'Exibindo apenas OS encerradas por entrega, devoluÃ§Ã£o sem reparo ou descarte.';
+        $tableSubtitleText = 'Exibindo apenas OS encerradas por entrega, devolução sem reparo ou descarte.';
     } else {
         $tableTitleText = 'Fechadas: ' . ($statusClosedOptions[$statusClosedSelected] ?? $statusClosedSelected);
         $tableSubtitleText = 'Exibindo apenas um desfecho operacional da fila encerrada.';
     }
 } elseif ($statusScope === 'all') {
-    $tableTitleText = 'Todas as ordens de serviÃ§o';
-    $tableSubtitleText = 'Exibindo OS abertas e fechadas sem o recorte padrÃ£o da fila.';
+    $tableTitleText = 'Todas as ordens de serviço';
+    $tableSubtitleText = 'Exibindo OS abertas e fechadas sem o recorte padrão da fila.';
 } elseif (count($statusSelected) === 1) {
     $selectedCode = (string) $statusSelected[0];
     $tableTitleText = 'Ordens abertas: ' . ($statusLabels[$selectedCode] ?? $selectedCode);
@@ -87,8 +87,8 @@ if ($statusClosedSelected !== '') {
 <div class="os-list-page" data-sidebar-auto-collapse="hover">
     <div class="page-header">
         <div class="d-flex align-items-center gap-3 os-page-heading">
-            <h2><i class="bi bi-clipboard-check me-2"></i>Ordens de ServiÃ§o</h2>
-            <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')" title="Ajuda sobre este mÃ³dulo">
+            <h2><i class="bi bi-clipboard-check me-2"></i>Ordens de Serviço</h2>
+            <button type="button" class="btn btn-sm btn-outline-info rounded-pill" onclick="window.openDocPage('ordens-de-servico')" title="Ajuda sobre este módulo">
                 <i class="bi bi-question-circle me-1"></i> Ajuda
             </button>
         </div>
@@ -254,7 +254,7 @@ if ($statusClosedSelected !== '') {
                                     <?php $tecnicoId = (string) ($tecnico['id'] ?? ''); ?>
                                     <?php if ($tecnicoId === '') continue; ?>
                                     <option value="<?= esc($tecnicoId) ?>" <?= ((string) ($listFilters['tecnico_id'] ?? '') === $tecnicoId) ? 'selected' : '' ?>>
-                                        <?= esc((string) ($tecnico['nome'] ?? ('TÃ©cnico #' . $tecnicoId))) ?>
+                                        <?= esc((string) ($tecnico['nome'] ?? ('Técnico #' . $tecnicoId))) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -317,7 +317,7 @@ if ($statusClosedSelected !== '') {
                                 class="form-control"
                                 id="osFilterQMobile"
                                 data-filter-field="q"
-                                placeholder="Cliente, equipamento, telefone do cliente, nÃºmero da OS ou OS legado..."
+                                placeholder="Cliente, equipamento, telefone do cliente, número da OS ou OS legado..."
                                 value="<?= esc((string) ($listFilters['q'] ?? '')) ?>"
                                 autocomplete="off"
                             >
@@ -421,7 +421,7 @@ if ($statusClosedSelected !== '') {
                                 <?php $tecnicoId = (string) ($tecnico['id'] ?? ''); ?>
                                 <?php if ($tecnicoId === '') continue; ?>
                                 <option value="<?= esc($tecnicoId) ?>" <?= ((string) ($listFilters['tecnico_id'] ?? '') === $tecnicoId) ? 'selected' : '' ?>>
-                                    <?= esc((string) ($tecnico['nome'] ?? ('TÃ©cnico #' . $tecnicoId))) ?>
+                                    <?= esc((string) ($tecnico['nome'] ?? ('Técnico #' . $tecnicoId))) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -528,7 +528,7 @@ if ($statusClosedSelected !== '') {
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl modal-fullscreen-md-down">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="osCreateModalTitle">Nova Ordem de ServiÃ§o</h5>
+                    <h5 class="modal-title" id="osCreateModalTitle">Nova Ordem de Serviço</h5>
                     <button type="button" class="btn-close ms-auto" id="osCreateModalCloseBtn" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body p-0 position-relative">
@@ -536,7 +536,7 @@ if ($statusClosedSelected !== '') {
                         <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
                         <span>Carregando...</span>
                     </div>
-                    <iframe id="osCreateModalFrame" title="Nova Ordem de ServiÃ§o" class="dashboard-os-modal-frame" src="about:blank"></iframe>
+                    <iframe id="osCreateModalFrame" title="Nova Ordem de Serviço" class="dashboard-os-modal-frame" src="about:blank"></iframe>
                 </div>
             </div>
         </div>
@@ -618,7 +618,7 @@ if ($statusClosedSelected !== '') {
                                 </div>
                                 <div class="os-photo-viewer-empty d-none" id="osPhotosEntryEmpty">
                                     <i class="bi bi-camera text-muted"></i>
-                                    <span>Nenhuma foto foi registrada na abertura desta ordem de serviÃ§o.</span>
+                                    <span>Nenhuma foto foi registrada na abertura desta ordem de serviço.</span>
                                 </div>
                                 <div class="os-photo-viewer-grid" id="osPhotosEntryGrid"></div>
                             </div>
@@ -643,7 +643,7 @@ if ($statusClosedSelected !== '') {
                             <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
                                 <div>
                                     <div class="fw-semibold fs-4" id="osDatesModalNumero">-</div>
-                                    <div class="small text-muted mt-1">Atualize apenas a previsÃ£o sem sair da listagem. Entrada e entrega seguem o fluxo operacional correto.</div>
+                                    <div class="small text-muted mt-1">Atualize apenas a previsão sem sair da listagem. Entrada e entrega seguem o fluxo operacional correto.</div>
                                 </div>
                                 <div class="os-status-modal-badges" id="osDatesModalBadges"></div>
                             </div>
@@ -693,7 +693,7 @@ if ($statusClosedSelected !== '') {
                                     <div class="os-status-modal-section">
                                         <label class="form-label" for="osDatesModalEntrega">Entrega</label>
                                         <input type="text" class="form-control" id="osDatesModalEntrega" value="-" readonly disabled>
-                                        <div class="form-text">A data de entrega Ã© controlada automaticamente pela mudanÃ§a de status correta da OS.</div>
+                                        <div class="form-text">A data de entrega é controlada automaticamente pela mudança de status correta da OS.</div>
                                     </div>
 
                                     <div class="os-status-modal-section">
@@ -761,11 +761,11 @@ if ($statusClosedSelected !== '') {
                                             <strong id="osDatesModalEntregaAtual">-</strong>
                                         </div>
                                         <div class="os-inline-meta-item">
-                                            <span class="os-inline-meta-label">Dias entre entrada e previsÃ£o</span>
+                                            <span class="os-inline-meta-label">Dias entre entrada e previsão</span>
                                             <strong id="osDatesModalPrazoDias">-</strong>
                                         </div>
                                     </div>
-                                    <div class="form-text">A listagem serÃ¡ atualizada automaticamente apÃ³s salvar.</div>
+                                    <div class="form-text">A listagem será atualizada automaticamente após salvar.</div>
                                 </div>
                             </div>
                         </div>
@@ -786,7 +786,7 @@ if ($statusClosedSelected !== '') {
             <div class="modal-content">
                 <form id="osBudgetModalForm" class="os-status-modal-form" novalidate>
                     <div class="modal-header">
-            <h5 class="modal-title">OrÃ§amento da OS</h5>
+            <h5 class="modal-title">Orçamento da OS</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                     </div>
                     <div class="modal-body">
@@ -795,7 +795,7 @@ if ($statusClosedSelected !== '') {
                             <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
                                 <div>
                                     <div class="fw-semibold fs-4" id="osBudgetModalNumero">-</div>
-                <div class="small text-muted mt-1">Gere uma nova versÃ£o do PDF de orÃ§amento e envie para o cliente sem sair da listagem.</div>
+                <div class="small text-muted mt-1">Gere uma nova versão do PDF de orçamento e envie para o cliente sem sair da listagem.</div>
                                 </div>
                                 <div class="os-status-modal-badges" id="osBudgetModalBadges"></div>
                             </div>
@@ -825,12 +825,12 @@ if ($statusClosedSelected !== '') {
                                         <div class="os-status-modal-section-title">Resumo financeiro</div>
                                         <div class="os-budget-metrics">
                                             <div class="os-budget-metric-card">
-                                                <span class="os-budget-metric-label">MÃ£o de obra</span>
+                                                <span class="os-budget-metric-label">Mão de obra</span>
                                                 <strong id="osBudgetModalMaoObra">R$ 0,00</strong>
                                             </div>
                                             <div class="os-budget-metric-card">
-                                                <span class="os-budget-metric-label">PeÃ§as</span>
-                                                <strong id="osBudgetModalPeÃ§as">R$ 0,00</strong>
+                                                <span class="os-budget-metric-label">Peças</span>
+                                                <strong id="osBudgetModalPeças">R$ 0,00</strong>
                                             </div>
                                             <div class="os-budget-metric-card">
                                                 <span class="os-budget-metric-label">Subtotal</span>
@@ -841,14 +841,14 @@ if ($statusClosedSelected !== '') {
                                                 <strong id="osBudgetModalValorFinal">R$ 0,00</strong>
                                             </div>
                                         </div>
-                                    <div class="small text-muted">Ao salvar, o sistema gera uma nova versÃ£o do PDF de orÃ§amento desta OS.</div>
+                                    <div class="small text-muted">Ao salvar, o sistema gera uma nova versão do PDF de orçamento desta OS.</div>
                                     </div>
 
                                     <div class="os-status-modal-section">
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" role="switch" id="osBudgetModalNotify" name="enviar_cliente" value="1">
                                             <label class="form-check-label" for="osBudgetModalNotify">
-                                        Enviar o orÃ§amento ao cliente apÃ³s gerar o PDF
+                                        Enviar o orçamento ao cliente após gerar o PDF
                                             </label>
                                         </div>
                                         <div class="form-text" id="osBudgetModalNotifyHelp">O envio utiliza o telefone cadastrado do cliente.</div>
@@ -861,16 +861,16 @@ if ($statusClosedSelected !== '') {
 
                                     <div class="os-status-modal-section">
                                         <label class="form-label" for="osBudgetModalMessage">Mensagem opcional</label>
-                                <textarea id="osBudgetModalMessage" name="mensagem_manual" class="form-control" rows="4" placeholder="Se deixar em branco, o sistema usa o template padrÃ£o do orÃ§amento."></textarea>
+                                <textarea id="osBudgetModalMessage" name="mensagem_manual" class="form-control" rows="4" placeholder="Se deixar em branco, o sistema usa o template padrão do orçamento."></textarea>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="col-12 col-xl-5">
                                 <div class="os-status-modal-panel">
-                        <div class="os-status-modal-section-title">PDFs de orÃ§amento jÃ¡ gerados</div>
+                        <div class="os-status-modal-section-title">PDFs de orçamento já gerados</div>
                                     <div id="osBudgetModalDocsList" class="os-budget-docs-list">
-                                <p class="text-muted small mb-0">Nenhum orÃ§amento PDF registrado para esta OS.</p>
+                                <p class="text-muted small mb-0">Nenhum orçamento PDF registrado para esta OS.</p>
                                     </div>
                                 </div>
                             </div>
@@ -943,7 +943,7 @@ if ($statusClosedSelected !== '') {
 
                                     <div class="os-status-modal-section">
                                         <label class="form-label" for="osWhatsAppModalPhone">Telefone destino</label>
-                                        <input type="text" name="telefone" id="osWhatsAppModalPhone" class="form-control" placeholder="DDD + nÃºmero do cliente">
+                                        <input type="text" name="telefone" id="osWhatsAppModalPhone" class="form-control" placeholder="DDD + número do cliente">
                                     </div>
                                 </div>
                             </div>
@@ -953,7 +953,7 @@ if ($statusClosedSelected !== '') {
                                     <div class="os-status-modal-section">
                                         <div class="os-status-modal-section-title">Documento opcional</div>
                                         <select name="documento_id" class="form-select" id="osWhatsAppModalDocument">
-                                            <option value="">Gerar PDF consolidado da impressÃ£o (A4)</option>
+                                            <option value="">Gerar PDF consolidado da impressão (A4)</option>
                                         </select>
                                         <div class="form-text" id="osWhatsAppModalDocumentHint">Se nenhum documento salvo for escolhido, o sistema gera automaticamente o PDF consolidado da OS em A4.</div>
                                     </div>
@@ -994,7 +994,7 @@ if ($statusClosedSelected !== '') {
                             <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
                                 <div>
                                     <div class="fw-semibold fs-4" id="osClosureModalNumero">-</div>
-                                    <div class="small text-muted mt-1">Conclua a baixa tÃ©cnica, registre recebimentos parciais e confira o impacto real no lucro antes de encerrar.</div>
+                                    <div class="small text-muted mt-1">Conclua a baixa técnica, registre recebimentos parciais e confira o impacto real no lucro antes de encerrar.</div>
                                 </div>
                                 <div class="os-status-modal-badges" id="osClosureModalBadges"></div>
                             </div>
@@ -1012,7 +1012,7 @@ if ($statusClosedSelected !== '') {
                                         <div class="os-status-context-title">Equipamento</div>
                                         <div class="os-status-context-name" id="osClosureModalEquipmentName">-</div>
                                         <div class="os-status-context-meta" id="osClosureModalEquipmentMeta">Tipo: -</div>
-                                        <div class="os-status-context-meta" id="osClosureModalEquipmentSerial">NÂº de sÃ©rie: -</div>
+                                        <div class="os-status-context-meta" id="osClosureModalEquipmentSerial">Nº de série: -</div>
                                     </div>
                                 </div>
                             </div>
@@ -1038,13 +1038,13 @@ if ($statusClosedSelected !== '') {
                                     </div>
 
                                     <div class="os-status-modal-section">
-                                        <label class="form-label" for="osClosureModalObservacao">ObservaÃ§Ãµes da baixa</label>
+                                        <label class="form-label" for="osClosureModalObservacao">Observações da baixa</label>
                                         <textarea
                                             id="osClosureModalObservacao"
                                             name="observacao_encerramento"
                                             class="form-control"
                                             rows="4"
-                                            placeholder="Registre resumo da entrega, ressalvas, forma de acerto com o cliente ou qualquer observaÃ§Ã£o importante."
+                                            placeholder="Registre resumo da entrega, ressalvas, forma de acerto com o cliente ou qualquer observação importante."
                                         ></textarea>
                                     </div>
 
@@ -1055,7 +1055,7 @@ if ($statusClosedSelected !== '') {
                                                 Enviar WhatsApp com o PDF da OS
                                             </label>
                                         </div>
-                                        <div class="form-text" id="osClosureModalNotifyHelp">A comunicaÃ§Ã£o depende de um telefone vÃ¡lido no cadastro do cliente e, quando confirmada, segue com o PDF consolidado da impressÃ£o (A4).</div>
+                                        <div class="form-text" id="osClosureModalNotifyHelp">A comunicação depende de um telefone válido no cadastro do cliente e, quando confirmada, segue com o PDF consolidado da impressão (A4).</div>
                                     </div>
 
                                     <div class="os-status-modal-section">
@@ -1064,10 +1064,10 @@ if ($statusClosedSelected !== '') {
                                                 <div class="form-check form-switch">
                                                     <input class="form-check-input" type="checkbox" role="switch" id="osClosureModalReturnToggle" name="agendar_retorno" value="1">
                                                     <label class="form-check-label" for="osClosureModalReturnToggle">
-                                                        Agendar retorno pÃ³s-serviÃ§o
+                                                        Agendar retorno pós-serviço
                                                     </label>
                                                 </div>
-                                                <div class="form-text">Cria um acompanhamento futuro para revisar satisfaÃ§Ã£o ou nova necessidade do cliente.</div>
+                                                <div class="form-text">Cria um acompanhamento futuro para revisar satisfação ou nova necessidade do cliente.</div>
                                             </div>
                                             <div class="col-12 col-lg-6">
                                                 <label class="form-label" for="osClosureModalReturnDate">Data do retorno</label>
@@ -1080,7 +1080,7 @@ if ($statusClosedSelected !== '') {
                                         <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
                                             <div>
                                                 <div class="os-status-modal-section-title mb-1">Recebimentos e adiantamentos</div>
-                                                <p class="small text-muted mb-0">Use <strong>Adicionar recebimento</strong> com a classificaÃ§Ã£o <strong>Recebimento da baixa</strong> para entregar a OS. Use <strong>Adicionar adiantamento</strong> para registrar sinal ou pagamento antecipado; ele entra no Financeiro, Fluxo de Caixa e DRE, mas nÃ£o altera o status da OS.</p>
+                                                <p class="small text-muted mb-0">Use <strong>Adicionar recebimento</strong> com a classificação <strong>Recebimento da baixa</strong> para entregar a OS. Use <strong>Adicionar adiantamento</strong> para registrar sinal ou pagamento antecipado; ele entra no Financeiro, Fluxo de Caixa e DRE, mas não altera o status da OS.</p>
                                             </div>
                                             <div class="os-closure-payment-actions">
                                                 <button type="button" class="btn btn-outline-primary btn-sm" id="osClosureFillOpenBalance">
@@ -1101,7 +1101,7 @@ if ($statusClosedSelected !== '') {
                                                 <strong id="osClosureValorOs">R$ 0,00</strong>
                                             </div>
                                             <div class="os-closure-metric-card">
-                                                <span>Adiantamento jÃ¡ recebido</span>
+                                                <span>Adiantamento já recebido</span>
                                                 <strong id="osClosureValorRecebido">R$ 0,00</strong>
                                             </div>
                                             <div class="os-closure-metric-card">
@@ -1109,13 +1109,13 @@ if ($statusClosedSelected !== '') {
                                                 <strong id="osClosureValorAberto">R$ 0,00</strong>
                                             </div>
                                             <div class="os-closure-metric-card">
-                                                <span>LanÃ§ado nesta aÃ§Ã£o</span>
+                                                <span>Lançado nesta ação</span>
                                                 <strong id="osClosureValorBaixa">R$ 0,00</strong>
                                             </div>
                                         </div>
 
                                         <div id="osClosurePaymentsEmpty" class="os-closure-muted-box">
-                                            Nenhum recebimento ou adiantamento foi adicionado nesta aÃ§Ã£o. Se a OS tiver saldo financeiro em aberto, ela serÃ¡ concluÃ­da com pagamento pendente e entrarÃ¡ na rÃ©gua automÃ¡tica de cobranÃ§a.
+                                            Nenhum recebimento ou adiantamento foi adicionado nesta ação. Se a OS tiver saldo financeiro em aberto, ela será concluída com pagamento pendente e entrará na régua automática de cobrança.
                                         </div>
                                         <div id="osClosurePaymentsList"></div>
                                     </div>
@@ -1131,31 +1131,31 @@ if ($statusClosedSelected !== '') {
                                             <strong id="osClosureTypeSummary">-</strong>
                                         </div>
                                         <div class="os-closure-summary-item">
-                                            <span>Status projetado apÃ³s salvar</span>
+                                            <span>Status projetado após salvar</span>
                                             <strong id="osClosureStatusSummary">-</strong>
                                         </div>
                                         <div class="os-closure-summary-item">
-                                            <span>Adiantamento jÃ¡ recebido</span>
+                                            <span>Adiantamento já recebido</span>
                                             <strong id="osClosureReceivedSummary">R$ 0,00</strong>
                                         </div>
                                         <div class="os-closure-summary-item">
-                                            <span>LanÃ§ado nesta aÃ§Ã£o</span>
+                                            <span>Lançado nesta ação</span>
                                             <strong id="osClosureActionSummary">R$ 0,00</strong>
                                         </div>
                                         <div class="os-closure-summary-item">
-                                            <span>Saldo projetado apÃ³s salvar</span>
+                                            <span>Saldo projetado após salvar</span>
                                             <strong id="osClosureProjectedBalanceSummary">R$ 0,00</strong>
                                         </div>
                                         <div class="os-closure-summary-item">
-                                            <span>Custo estimado de peÃ§as/serviÃ§os</span>
+                                            <span>Custo estimado de peças/serviços</span>
                                             <strong id="osClosureCostSummary">R$ 0,00</strong>
                                         </div>
                                         <div class="os-closure-summary-item">
-                                            <span>Taxas de cartÃ£o nesta aÃ§Ã£o</span>
+                                            <span>Taxas de cartão nesta ação</span>
                                             <strong id="osClosureFeeSummary">R$ 0,00</strong>
                                         </div>
                                         <div class="os-closure-summary-item">
-                                            <span>Recebimento lÃ­quido previsto</span>
+                                            <span>Recebimento líquido previsto</span>
                                             <strong id="osClosureNetSummary">R$ 0,00</strong>
                                         </div>
                                         <div class="os-closure-summary-item os-closure-summary-highlight">
@@ -1165,7 +1165,7 @@ if ($statusClosedSelected !== '') {
                                     </div>
 
                                     <div class="alert alert-info mt-3 mb-0" id="osClosureCollectionsSummary">
-                                        Ao fechar a baixa com saldo pendente, o sistema agenda cobranÃ§as automÃ¡ticas em 1, 3 e 5 dias.
+                                        Ao fechar a baixa com saldo pendente, o sistema agenda cobranças automáticas em 1, 3 e 5 dias.
                                     </div>
                                 </div>
                             </div>
@@ -1216,7 +1216,7 @@ if ($statusClosedSelected !== '') {
                                         <div class="os-status-context-title">Equipamento</div>
                                         <div class="os-status-context-name" id="osStatusModalEquipmentName">-</div>
                                         <div class="os-status-context-meta" id="osStatusModalEquipmentMeta">Tipo: -</div>
-                                        <div class="os-status-context-meta" id="osStatusModalEquipmentSerial">NÂº de sÃ©rie: -</div>
+                                        <div class="os-status-context-meta" id="osStatusModalEquipmentSerial">Nº de série: -</div>
                                     </div>
                                 </div>
                             </div>
@@ -1228,17 +1228,17 @@ if ($statusClosedSelected !== '') {
                                     <ul class="nav nav-pills os-status-modal-tabs" id="osStatusModalTabs" role="tablist">
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link active" id="osStatusTabQuickBtn" data-bs-toggle="pill" data-bs-target="#osStatusTabQuick" type="button" role="tab" aria-controls="osStatusTabQuick" aria-selected="true">
-                                                AÃ§Ãµes rÃ¡pidas
+                                                Ações rápidas
                                             </button>
                                         </li>
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link" id="osStatusTabSolutionBtn" data-bs-toggle="pill" data-bs-target="#osStatusTabSolution" type="button" role="tab" aria-controls="osStatusTabSolution" aria-selected="false">
-                                                SoluÃ§Ã£o e diagnÃ³stico
+                                                Solução e diagnóstico
                                             </button>
                                         </li>
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link" id="osStatusTabBudgetBtn" data-bs-toggle="pill" data-bs-target="#osStatusTabBudget" type="button" role="tab" aria-controls="osStatusTabBudget" aria-selected="false">
-                                                Gerenciamento do OrÃ§amento
+                                                Gerenciamento do Orçamento
                                             </button>
                                         </li>
                                     </ul>
@@ -1246,10 +1246,10 @@ if ($statusClosedSelected !== '') {
                                     <div class="tab-content os-status-modal-tab-content" id="osStatusModalTabContent">
                                         <div class="tab-pane fade show active" id="osStatusTabQuick" role="tabpanel" aria-labelledby="osStatusTabQuickBtn" tabindex="0">
                                             <div class="os-status-modal-section">
-                                                <div class="os-status-modal-section-title">AÃ§Ãµes rÃ¡pidas</div>
+                                                <div class="os-status-modal-section-title">Ações rápidas</div>
                                                 <div class="os-status-modal-quick-actions">
                                                     <button type="button" class="btn btn-glow" id="osStatusModalQuickNext" disabled>
-                                                        <i class="bi bi-arrow-right-circle me-1"></i>PrÃ³xima etapa
+                                                        <i class="bi bi-arrow-right-circle me-1"></i>Próxima etapa
                                                     </button>
                                                     <button type="button" class="btn btn-outline-danger" id="osStatusModalQuickCancel" disabled>
                                                         <i class="bi bi-x-circle me-1"></i>Cancelar
@@ -1267,17 +1267,17 @@ if ($statusClosedSelected !== '') {
                                                 <select id="osStatusModalSelect" name="status" class="form-select" required>
                                                     <option value="">Selecione um status</option>
                                                 </select>
-                                                <div class="form-text">A lista respeita o fluxo de trabalho configurado para avanÃ§ar, retornar etapas ou cancelar o atendimento.</div>
+                                                <div class="form-text">A lista respeita o fluxo de trabalho configurado para avançar, retornar etapas ou cancelar o atendimento.</div>
                                             </div>
 
                                             <div class="os-status-modal-section">
-                                                <label class="form-label" for="osStatusModalObservacao">ObservaÃ§Ãµes</label>
+                                                <label class="form-label" for="osStatusModalObservacao">Observações</label>
                                                 <textarea
                                                     id="osStatusModalObservacao"
                                                     name="observacao_status"
                                                     class="form-control"
                                                     rows="4"
-                                                    placeholder="Registre contexto da mudanÃ§a, combinados com o cliente ou justificativa do cancelamento."
+                                                    placeholder="Registre contexto da mudança, combinados com o cliente ou justificativa do cancelamento."
                                                 ></textarea>
                                             </div>
 
@@ -1285,17 +1285,17 @@ if ($statusClosedSelected !== '') {
                                                 <div class="form-check form-switch">
                                                     <input class="form-check-input" type="checkbox" role="switch" id="osStatusModalNotify" name="comunicar_cliente" value="1">
                                                     <label class="form-check-label" for="osStatusModalNotify">
-                                                        Notificar o cliente sobre esta mudanÃ§a
+                                                        Notificar o cliente sobre esta mudança
                                                     </label>
                                                 </div>
-                                                <div class="form-text" id="osStatusModalNotifyHelp">O cliente serÃ¡ comunicado apenas se vocÃª mantiver esta opÃ§Ã£o ativa.</div>
+                                                <div class="form-text" id="osStatusModalNotifyHelp">O cliente será comunicado apenas se você mantiver esta opção ativa.</div>
                                             </div>
                                         </div>
 
                                         <div class="tab-pane fade" id="osStatusTabSolution" role="tabpanel" aria-labelledby="osStatusTabSolutionBtn" tabindex="0">
                                             <div class="os-status-modal-section">
-                                                <div class="os-status-modal-section-title">SoluÃ§Ã£o e diagnÃ³stico</div>
-                                                <p class="small text-muted mb-0">Registre os procedimentos executados e consolide a soluÃ§Ã£o aplicada sem sair da mudanÃ§a de status.</p>
+                                                <div class="os-status-modal-section-title">Solução e diagnóstico</div>
+                                                <p class="small text-muted mb-0">Registre os procedimentos executados e consolide a solução aplicada sem sair da mudança de status.</p>
                                             </div>
 
                                             <div class="os-status-modal-solution-card">
@@ -1312,12 +1312,12 @@ if ($statusClosedSelected !== '') {
                                                 </div>
                                                 <textarea name="procedimentos_executados" id="osStatusModalProcedimentosInput" class="d-none"></textarea>
                                                 <div id="osStatusModalProcedimentosLista" class="os-status-modal-procedure-list"></div>
-                                                <small class="text-muted d-block mt-2">Cada inserÃ§Ã£o registra automaticamente data/hora e tÃ©cnico selecionado.</small>
+                                                <small class="text-muted d-block mt-2">Cada inserção registra automaticamente data/hora e técnico selecionado.</small>
                                             </div>
 
                                             <div class="os-status-modal-solution-grid">
                                                 <div class="os-status-modal-field-card">
-                                                    <label class="form-label fw-semibold" for="osStatusModalSolucaoInput">SoluÃ§Ã£o aplicada</label>
+                                                    <label class="form-label fw-semibold" for="osStatusModalSolucaoInput">Solução aplicada</label>
                                                     <textarea name="solucao_aplicada" id="osStatusModalSolucaoInput" class="form-control" rows="5"></textarea>
                                                 </div>
                                                 <div class="os-status-modal-field-card">
@@ -1330,7 +1330,7 @@ if ($statusClosedSelected !== '') {
                                         <div class="tab-pane fade" id="osStatusTabBudget" role="tabpanel" aria-labelledby="osStatusTabBudgetBtn" tabindex="0">
                                             <div id="osStatusModalBudgetPanel" class="os-status-modal-budget-host">
                                                 <div class="card os-tab-card os-status-modal-budget-card">
-                                                    <div class="card-body p-4 text-muted small">Carregando gerenciamento do orÃ§amento...</div>
+                                                    <div class="card-body p-4 text-muted small">Carregando gerenciamento do orçamento...</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1340,7 +1340,7 @@ if ($statusClosedSelected !== '') {
 
                             <div class="col-12 col-xl-5">
                                 <div class="os-status-modal-panel os-status-modal-workflow">
-                                    <div class="os-status-modal-section-title">HistÃ³rico e progresso</div>
+                                    <div class="os-status-modal-section-title">Histórico e progresso</div>
                                     <p class="small text-muted mb-0">Etapas percorridas, etapa atual e provaveis proximos movimentos.</p>
 
                                     <div id="osStatusModalTimeline" class="os-status-modal-timeline-wrap">
@@ -1349,9 +1349,9 @@ if ($statusClosedSelected !== '') {
 
                                     <div class="os-status-modal-history-wrap" id="osStatusModalHistoryWrap">
                                         <div class="os-status-modal-divider"></div>
-                                        <div class="os-status-modal-section-title">Ãšltimas movimentaÃ§Ãµes</div>
+                                        <div class="os-status-modal-section-title">Últimas movimentações</div>
                                         <div id="osStatusModalHistoryList" class="os-status-modal-history-list">
-                                            <p class="text-muted small mb-0">Sem histÃ³rico recente.</p>
+                                            <p class="text-muted small mb-0">Sem histórico recente.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1412,7 +1412,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const result = await window.Swal.fire({
                 icon: normalized.icon || 'warning',
                 title: normalized.title || 'Fechar cadastro em andamento?',
-                text: normalized.text || 'Existe um registro de ordem de serviÃ§o em andamento. Deseja fechar mesmo assim?',
+                text: normalized.text || 'Existe um registro de ordem de serviço em andamento. Deseja fechar mesmo assim?',
                 showCancelButton: true,
                 confirmButtonText: normalized.confirmButtonText || 'Fechar mesmo assim',
                 cancelButtonText: normalized.cancelButtonText || 'Continuar cadastro',
@@ -1424,7 +1424,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         return window.confirm(
-            normalized.text || 'Existe um registro de ordem de serviÃ§o em andamento. Deseja fechar mesmo assim?'
+            normalized.text || 'Existe um registro de ordem de serviço em andamento. Deseja fechar mesmo assim?'
         );
     };
 
@@ -1548,12 +1548,12 @@ document.addEventListener('DOMContentLoaded', function () {
         loadingId: 'osCreateModalLoading',
         titleId: 'osCreateModalTitle',
         triggerSelector: '[data-os-modal-role="create"][data-os-modal-url]',
-        defaultTitle: 'Nova Ordem de ServiÃ§o',
+        defaultTitle: 'Nova Ordem de Serviço',
         closeButtonSelector: '#osCreateModalCloseBtn',
         closeConfirmOptions: {
             icon: 'warning',
             title: 'Fechar nova OS?',
-            text: 'Existe um registro de ordem de serviÃ§o em andamento. Se fechar agora, o preenchimento nÃ£o salvo serÃ¡ perdido.',
+            text: 'Existe um registro de ordem de serviço em andamento. Se fechar agora, o preenchimento não salvo será perdido.',
             confirmButtonText: 'Fechar mesmo assim',
             cancelButtonText: 'Continuar preenchendo',
         },

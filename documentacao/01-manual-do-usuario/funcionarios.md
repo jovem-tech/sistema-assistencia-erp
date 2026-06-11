@@ -1,37 +1,37 @@
-# Manual do UsuÃ¡rio â€” FuncionÃ¡rios
+# Manual do Usuário — Funcionários
 
-## ðŸ“‹ VisÃ£o Geral
+## 📋 Visão Geral
 
-Cadastro interno da equipe tÃ©cnica e administrativa, com dados pessoais, cargo e histÃ³rico.
-
----
-
-## ðŸ§­ NavegaÃ§Ã£o
-**Caminho:** COMERCIAL â†’ Pessoas â†’ FuncionÃ¡rios
+Cadastro interno da equipe técnica e administrativa, com dados pessoais, cargo e histórico.
 
 ---
 
-## âž• Cadastrar FuncionÃ¡rio
+## 🧭 Navegação
+**Caminho:** COMERCIAL → Pessoas → Funcionários
 
-Campos obrigatÃ³rios:
+---
+
+## ➕ Cadastrar Funcionário
+
+Campos obrigatórios:
 - **Nome Completo**
 - **CPF**
 - **Telefone**
 
 Campos opcionais:
-- RG, data de nascimento, cargo, salÃ¡rio, datas de admissÃ£o/demissÃ£o
-- Email e endereÃ§o completo
-- ObservaÃ§Ãµes internas
+- RG, data de nascimento, cargo, salário, datas de admissão/demissão
+- Email e endereço completo
+- Observações internas
 
 ---
 
 ## âœï¸ Editar / Atualizar
-Utilize **Editar** para manter dados corretos (cargo, salÃ¡rio, status, etc).
+Utilize **Editar** para manter dados corretos (cargo, salário, status, etc).
 
 ---
 
 ## ðŸ”’ Status
-FuncionÃ¡rios podem ser marcados como **Inativos** sem exclusÃ£o do histÃ³rico.
+Funcionários podem ser marcados como **Inativos** sem exclusão do histórico.
 ---
 
 ## ðŸ—‘ï¸ Exclusao

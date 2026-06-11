@@ -34,18 +34,18 @@ class OsPdfService
         if (!class_exists('Dompdf\\Dompdf')) {
             return [
                 'ok' => false,
-                'message' => 'Biblioteca Dompdf nÃ£o instalada. Execute: composer require dompdf/dompdf:^2.0',
+                'message' => 'Biblioteca Dompdf não instalada. Execute: composer require dompdf/dompdf:^2.0',
             ];
         }
 
         $os = $this->osModel->getComplete($osId);
         if (!$os) {
-            return ['ok' => false, 'message' => 'OS nÃ£o encontrada para gerar PDF.'];
+            return ['ok' => false, 'message' => 'OS não encontrada para gerar PDF.'];
         }
 
         $tipos = $this->tiposDisponiveis();
         if (!isset($tipos[$tipo])) {
-            return ['ok' => false, 'message' => 'Tipo de documento invÃ¡lido.'];
+            return ['ok' => false, 'message' => 'Tipo de documento inválido.'];
         }
 
         if ($tipo === 'orcamento') {
@@ -312,7 +312,7 @@ class OsPdfService
             $parts[] = 'ate ' . $this->formatDateTimeLabel($garantiaValidade, false);
         }
 
-        return !empty($parts) ? implode(' | ', $parts) : 'NÃ£o informada';
+        return !empty($parts) ? implode(' | ', $parts) : 'Não informada';
     }
 
     private function formatDateTimeLabel(string $value, bool $withTime = true): string
@@ -363,7 +363,7 @@ class OsPdfService
             return [
                 'ok' => false,
                 'needs_budget' => true,
-                'message' => 'Crie primeiro um orÃ§amento vinculado Ã  OS para gerar este PDF.',
+                'message' => 'Crie primeiro um orçamento vinculado à OS para gerar este PDF.',
             ];
         }
 
@@ -378,7 +378,7 @@ class OsPdfService
             return [
                 'ok' => false,
                 'needs_budget' => true,
-                'message' => 'Crie primeiro um orÃ§amento vinculado Ã  OS para gerar este PDF.',
+                'message' => 'Crie primeiro um orçamento vinculado à OS para gerar este PDF.',
             ];
         }
 

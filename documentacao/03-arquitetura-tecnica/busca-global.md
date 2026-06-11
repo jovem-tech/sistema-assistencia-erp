@@ -18,7 +18,7 @@ Regra tecnica obrigatoria para catalogo operacional:
 
 ### 2. GlobalSearch Controller (`app/Controllers/GlobalSearch.php`)
 
-- expÃµe `GET /api/busca-global` para AJAX;
+- expõe `GET /api/busca-global` para AJAX;
 - valida termo minimo antes de consultar o service;
 - retorna payload JSON agrupado.
 

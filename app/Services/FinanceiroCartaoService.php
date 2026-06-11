@@ -84,12 +84,12 @@ class FinanceiroCartaoService
     public function simulate(array $payload): array
     {
         if (! $this->isReady()) {
-            throw new \RuntimeException('O mÃ³dulo de recebimento em cartÃ£o ainda nÃ£o estÃ¡ configurado.');
+            throw new \RuntimeException('O módulo de recebimento em cartão ainda não está configurado.');
         }
 
         $valorBruto = round((float) ($payload['valor_bruto'] ?? $payload['valor'] ?? 0), 2);
         if ($valorBruto <= 0) {
-            throw new \RuntimeException('Informe um valor bruto vÃ¡lido para simular o recebimento.');
+            throw new \RuntimeException('Informe um valor bruto válido para simular o recebimento.');
         }
 
         $operadoraId = (int) ($payload['operadora_id'] ?? 0);
@@ -104,7 +104,7 @@ class FinanceiroCartaoService
         );
 
         if (! in_array($modalidade, ['credito', 'debito'], true)) {
-            throw new \RuntimeException('Selecione se a venda serÃ¡ no crÃ©dito ou no dÃ©bito.');
+            throw new \RuntimeException('Selecione se a venda será no crédito ou no débito.');
         }
 
         $parcelas = max(1, (int) ($payload['parcelas'] ?? 1));
@@ -114,7 +114,7 @@ class FinanceiroCartaoService
 
         $taxa = $this->findApplicableRate($operadoraId, $modalidade, $parcelas, $bandeiraId);
         if (! $taxa) {
-            throw new \RuntimeException('NÃ£o foi encontrada uma taxa ativa para a combinaÃ§Ã£o de operadora, bandeira e parcelas.');
+            throw new \RuntimeException('Não foi encontrada uma taxa ativa para a combinação de operadora, bandeira e parcelas.');
         }
 
         $operadora = $this->operadoraModel->find($operadoraId) ?? [];
@@ -134,7 +134,7 @@ class FinanceiroCartaoService
             'taxa_fixa' => $taxaFixa,
             'parcelas' => $parcelas,
             'modalidade' => $modalidade,
-            'modalidade_label' => $modalidade === 'debito' ? 'CartÃ£o de dÃ©bito' : 'CartÃ£o de crÃ©dito',
+            'modalidade_label' => $modalidade === 'debito' ? 'Cartão de débito' : 'Cartão de crédito',
             'prazo_recebimento_dias' => $prazoRecebimentoDias,
             'data_prevista_recebimento' => date('Y-m-d', strtotime('+' . max(0, $prazoRecebimentoDias) . ' days')),
             'operadora' => [

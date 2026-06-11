@@ -1,5 +1,5 @@
 <?php
-// FunÃ§Ã£o PHP para renderizar a Ã¡rvore HTML no servidor
+// Função PHP para renderizar a árvore HTML no servidor
 function renderTree(array $items): void {
     foreach ($items as $item) {
         if ($item['type'] === 'folder') {
@@ -40,7 +40,7 @@ function renderTree(array $items): void {
     overflow: hidden;
 }
 
-/* â”€â”€ Painel Esquerdo (Ãrvore) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Painel Esquerdo (Árvore) ───────────────────────── */
 .wiki-sidebar {
     width: 300px;
     min-width: 260px;
@@ -113,7 +113,7 @@ function renderTree(array $items): void {
 .wiki-tree::-webkit-scrollbar { width: 4px; }
 .wiki-tree::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
 
-/* Itens da Ã¡rvore */
+/* Itens da árvore */
 .tree-folder {
     user-select: none;
 }
@@ -177,7 +177,7 @@ function renderTree(array $items): void {
     text-overflow: ellipsis;
 }
 
-/* â”€â”€ Painel Direito (ConteÃºdo) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Painel Direito (Conteúdo) ──────────────────────── */
 .wiki-content {
     flex: 1;
     display: flex;
@@ -400,18 +400,18 @@ function renderTree(array $items): void {
 
 <div class="wiki-layout glass-card">
 
-    <!-- â”€â”€ PAINEL ESQUERDO: Ãrvore de NavegaÃ§Ã£o â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+    <!-- ── PAINEL ESQUERDO: Árvore de Navegação ───────────────────────── -->
     <div class="wiki-sidebar" id="wikiSidebar">
         <div class="wiki-sidebar-header">
             <div class="wiki-sidebar-title">
-                <span><i class="bi bi-folder2-open me-1"></i>NavegaÃ§Ã£o</span>
+                <span><i class="bi bi-folder2-open me-1"></i>Navegação</span>
                 <button class="wiki-collapse-btn" id="btnCollapseSidebar" title="Recolher">
                     <i class="bi bi-layout-sidebar-reverse"></i>
                 </button>
             </div>
             <div class="wiki-search position-relative">
                 <input type="text" id="wikiSearchInput" class="form-control form-control-sm"
-                       placeholder="ðŸ”Ž Buscar na documentaÃ§Ã£o..." autocomplete="off">
+                       placeholder="🔎 Buscar na documentação..." autocomplete="off">
                 <span class="search-kbd">âŒ˜K</span>
                 <div class="search-results-overlay" id="searchResultsOverlay"></div>
             </div>
@@ -421,7 +421,7 @@ function renderTree(array $items): void {
         </div>
     </div>
 
-    <!-- â”€â”€ PAINEL DIREITO: ConteÃºdo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+    <!-- ── PAINEL DIREITO: Conteúdo ──────────────────────────────────── -->
     <div class="wiki-content">
         <div class="wiki-content-header" id="docHeader" style="display:none;">
             <div class="flex-1">
@@ -437,11 +437,11 @@ function renderTree(array $items): void {
 
             <div class="wiki-empty" id="wikiEmpty">
                 <div class="wiki-empty-icon"><i class="bi bi-journal-richtext"></i></div>
-                <h4>Central de DocumentaÃ§Ã£o</h4>
-                <p>Selecione um documento na Ã¡rvore Ã  esquerda<br>ou use a busca para encontrar o que precisa.</p>
+                <h4>Central de Documentação</h4>
+                <p>Selecione um documento na árvore à esquerda<br>ou use a busca para encontrar o que precisa.</p>
                 <div class="mt-4 d-flex flex-wrap gap-2 justify-content-center" id="quickLinks">
                     <button class="btn btn-sm btn-outline-secondary" onclick="loadDoc('README.md')">
-                        <i class="bi bi-house me-1"></i>InÃ­cio
+                        <i class="bi bi-house me-1"></i>Início
                     </button>
                     <button class="btn btn-sm btn-outline-secondary" onclick="loadDoc('01-manual-do-usuario/ordens-de-servico.md')">
                         <i class="bi bi-clipboard-check me-1"></i>Manual de OS
@@ -450,7 +450,7 @@ function renderTree(array $items): void {
                         <i class="bi bi-map me-1"></i>Roadmap
                     </button>
                     <button class="btn btn-sm btn-outline-secondary" onclick="loadDoc('11-padroes/boas-praticas.md')">
-                        <i class="bi bi-patch-check me-1"></i>Boas PrÃ¡ticas
+                        <i class="bi bi-patch-check me-1"></i>Boas Práticas
                     </button>
                 </div>
             </div>
@@ -478,10 +478,10 @@ function renderTree(array $items): void {
                             $fluxo = [
                                 ['icon'=>'bi-person-badge','label'=>'Cliente','color'=>'#8b5cf6','url'=>'clientes'],
                                 ['icon'=>'bi-laptop','label'=>'Equipamento','color'=>'#3b82f6','url'=>'equipamentos'],
-                                ['icon'=>'bi-clipboard-check-fill','label'=>'Ordem de ServiÃ§o','color'=>'#f59e0b','url'=>'os'],
-                                ['icon'=>'bi-search','label'=>'DiagnÃ³stico','color'=>'#f59e0b','url'=>null],
-                                ['icon'=>'bi-gear-wide-connected','label'=>'ServiÃ§os','color'=>'#10b981','url'=>'servicos'],
-                                ['icon'=>'bi-box-seam-fill','label'=>'PeÃ§as / Estoque','color'=>'#06b6d4','url'=>'estoque'],
+                                ['icon'=>'bi-clipboard-check-fill','label'=>'Ordem de Serviço','color'=>'#f59e0b','url'=>'os'],
+                                ['icon'=>'bi-search','label'=>'Diagnóstico','color'=>'#f59e0b','url'=>null],
+                                ['icon'=>'bi-gear-wide-connected','label'=>'Serviços','color'=>'#10b981','url'=>'servicos'],
+                                ['icon'=>'bi-box-seam-fill','label'=>'Peças / Estoque','color'=>'#06b6d4','url'=>'estoque'],
                                 ['icon'=>'bi-cash-stack','label'=>'Financeiro','color'=>'#22c55e','url'=>'financeiro'],
                                 ['icon'=>'bi-check2-all','label'=>'Encerramento','color'=>'#a855f7','url'=>null],
                             ];
@@ -511,23 +511,23 @@ function renderTree(array $items): void {
                         </div>
                     </div>
                     <div class="col-md-7">
-                        <h6 class="text-muted text-uppercase mb-3" style="font-size:0.7rem; letter-spacing:0.1em;">Estrutura de MÃ³dulos</h6>
+                        <h6 class="text-muted text-uppercase mb-3" style="font-size:0.7rem; letter-spacing:0.1em;">Estrutura de Módulos</h6>
                         <div class="doc-render" style="font-size:0.8rem;">
                             <pre style="background:rgba(0,0,0,0.3); border-radius:10px; padding:1rem; font-size:0.75rem; line-height:1.8;">Clientes
    â””â”€â”€ Equipamentos
-         â””â”€â”€ Ordens de ServiÃ§o
-               â”œâ”€â”€ ServiÃ§os (catÃ¡logo)
-               â”œâ”€â”€ PeÃ§as (estoque)
+         └── Ordens de Serviço
+               ├── Serviços (catálogo)
+               ├── Peças (estoque)
                â””â”€â”€ Financeiro (receitas)
 
-ConfiguraÃ§Ãµes
+Configurações
    â”œâ”€â”€ Dados da Empresa
-   â”œâ”€â”€ UsuÃ¡rios
-   â””â”€â”€ NÃ­veis de Acesso (RBAC)
-         â””â”€â”€ PermissÃµes por mÃ³dulo
+   ├── Usuários
+   └── Níveis de Acesso (RBAC)
+         └── Permissões por módulo
 
-RelatÃ³rios
-   â”œâ”€â”€ OS por PerÃ­odo
+Relatórios
+   ├── OS por Período
    â”œâ”€â”€ Financeiro
    â”œâ”€â”€ Estoque
    â””â”€â”€ Clientes</pre>
@@ -542,11 +542,11 @@ RelatÃ³rios
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<!-- Marked.js â€” Markdown Renderer -->
+<!-- Marked.js — Markdown Renderer -->
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
-<!-- DOMPurify â€” Sanitiza HTML do markdown -->
+<!-- DOMPurify — Sanitiza HTML do markdown -->
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
-<!-- Highlight.js â€” Syntax highlighting de cÃ³digo -->
+<!-- Highlight.js — Syntax highlighting de código -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
 <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
 
@@ -619,11 +619,11 @@ function resolveDocPath(path) {
 // â”€â”€ Configurar Marked.js â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function setupMarked() {
     if (typeof marked === 'undefined') {
-        console.error('Erro: Biblioteca marked nÃ£o carregada.');
+        console.error('Erro: Biblioteca marked não carregada.');
         return false;
     }
 
-    // ConfiguraÃ§Ãµes globais (nas versÃµes novas algumas sÃ£o depreciadas via setOptions)
+    // Configurações globais (nas versões novas algumas são depreciadas via setOptions)
     try {
         marked.setOptions({
             breaks: true,
@@ -638,7 +638,7 @@ function setupMarked() {
 const renderer = new marked.Renderer();
 
 renderer.link = function(href, title, text) {
-    // Link interno: converte para navegaÃ§Ã£o no wiki
+    // Link interno: converte para navegação no wiki
     if (href && !href.startsWith('http') && !href.startsWith('#')) {
         return `<a href="#" class="doc-internal-link" data-path="${href}" title="${title || ''}">${text}</a>`;
     }
@@ -656,7 +656,7 @@ renderer.code = function(code, lang) {
             return `<pre><code>${hljs.highlightAuto(code).value}</code></pre>`;
         } catch(e) {}
     }
-    // Fallback se hljs falhar ou nÃ£o existir
+    // Fallback se hljs falhar ou não existir
     return `<pre><code>${escapeHtml(code)}</code></pre>`;
 };
 
@@ -670,7 +670,7 @@ if (typeof marked !== 'undefined' && typeof renderer !== 'undefined') {
 window.loadDoc = function(path) {
     currentPath = path;
 
-    // Marca item ativo na Ã¡rvore
+    // Marca item ativo na árvore
     document.querySelectorAll('.tree-file').forEach(el => el.classList.remove('active'));
     const link = document.querySelector(`.tree-file[data-path="${path}"]`);
     if (link) {
@@ -708,18 +708,18 @@ window.loadDoc = function(path) {
                 return;
             }
 
-            // TÃ­tulo e breadcrumb
+            // Título e breadcrumb
             const parts = data.path.split('/');
-            const breadcrumb = parts.slice(0, -1).map(p => formatFolderName(p)).join(' â€º ');
+            const breadcrumb = parts.slice(0, -1).map(p => formatFolderName(p)).join(' › ');
             const docName    = data.filename.replace(/\.(md|markdown|html|txt)$/i, '');
 
-            if (document.getElementById('docBreadcrumb')) document.getElementById('docBreadcrumb').innerHTML = `<i class="bi bi-journal-text me-1"></i>${breadcrumb || 'DocumentaÃ§Ã£o'}`;
+            if (document.getElementById('docBreadcrumb')) document.getElementById('docBreadcrumb').innerHTML = `<i class="bi bi-journal-text me-1"></i>${breadcrumb || 'Documentação'}`;
             if (document.getElementById('docTitle'))      document.getElementById('docTitle').textContent = formatFolderName(docName);
             if (document.getElementById('docMeta'))       document.getElementById('docMeta').innerHTML = `<i class="bi bi-clock me-1"></i>Atualizado: ${data.modified}`;
 
             if (document.getElementById('docHeader')) document.getElementById('docHeader').style.display = '';
 
-            // Renderiza conteÃºdo
+            // Renderiza conteúdo
             let html = '';
             try {
                 if (data.type === 'markdown') {
@@ -735,7 +735,7 @@ window.loadDoc = function(path) {
                     html = `<pre style="white-space:pre-wrap;">${escapeHtml(data.content)}</pre>`;
                 }
             } catch (err) {
-                console.error('Erro de renderizaÃ§Ã£o:', err);
+                console.error('Erro de renderização:', err);
                 html = `<div class="alert alert-danger">Erro ao renderizar o documento: ${err.message}</div><pre>${escapeHtml(data.content)}</pre>`;
             }
 
@@ -768,14 +768,14 @@ window.loadDoc = function(path) {
             const docError = document.getElementById('docError');
             if (docError) {
                 docError.innerHTML = `<div class="wiki-empty-icon"><i class="bi bi-wifi-off"></i></div>
-                                     <h4>Erro de carregamento</h4><p>NÃ£o foi possÃ­vel carregar o documento ou as bibliotecas de visualizaÃ§Ã£o.<br><small>${err.message}</small></p>
-                                     <button class="btn btn-sm btn-outline-primary mt-2" onclick="location.reload()">Recarregar PÃ¡gina</button>`;
+                                     <h4>Erro de carregamento</h4><p>Não foi possível carregar o documento ou as bibliotecas de visualização.<br><small>${err.message}</small></p>
+                                     <button class="btn btn-sm btn-outline-primary mt-2" onclick="location.reload()">Recarregar Página</button>`;
                 docError.style.display = 'flex';
             }
         });
 };
 
-// â”€â”€ Ãrvore â€” Toggle pasta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Árvore — Toggle pasta ───────────────────────────────────────────────────
 document.getElementById('wikiTree').addEventListener('click', function(e) {
     const folder = e.target.closest('.tree-folder-header');
     const file   = e.target.closest('.tree-file');
@@ -910,7 +910,7 @@ function formatFolderName(name) {
         .replace(/\.md$/i, '');
 }
 
-// â”€â”€ Carregar README por padrÃ£o â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Carregar README por padrão ───────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', function() {
     // Verifica hash na URL para deep link
     const hash = window.location.hash.replace('#', '');
@@ -918,7 +918,7 @@ window.addEventListener('DOMContentLoaded', function() {
         loadDoc(resolveDocPath(decodeURIComponent(hash)));
     }
 
-    // Exibe origem da ajuda quando disponÃ­vel
+    // Exibe origem da ajuda quando disponível
     const params = new URLSearchParams(window.location.search);
     const from = params.get('from');
     if (from) {
@@ -930,18 +930,18 @@ window.addEventListener('DOMContentLoaded', function() {
                     const path = url.pathname.startsWith('/') ? url.pathname.slice(1) : url.pathname;
                     const parts = path.split('/').filter(Boolean);
                     const moduleMap = {
-                        os: 'Ordens de ServiÃ§o',
+                        os: 'Ordens de Serviço',
                         clientes: 'Clientes',
                         equipamentos: 'Equipamentos',
-                        servicos: 'ServiÃ§os',
+                        servicos: 'Serviços',
                         estoque: 'Estoque',
                         financeiro: 'Financeiro',
-                        relatorios: 'RelatÃ³rios',
+                        relatorios: 'Relatórios',
                         fornecedores: 'Fornecedores',
-                        funcionarios: 'FuncionÃ¡rios',
-                        usuarios: 'UsuÃ¡rios',
+                        funcionarios: 'Funcionários',
+                        usuarios: 'Usuários',
                         grupos: 'Grupos',
-                        configuracoes: 'ConfiguraÃ§Ãµes',
+                        configuracoes: 'Configurações',
                         vendas: 'Vendas',
                         perfil: 'Perfil',
                         'atendimento-mobile': 'App Mobile/PWA',
@@ -958,12 +958,12 @@ window.addEventListener('DOMContentLoaded', function() {
                 }
             }
         } catch (e) {
-            // ignora se from invÃ¡lido
+            // ignora se from inválido
         }
     }
 });
 
-// â”€â”€ Ajuda contextual: botÃµes â“ em outras pÃ¡ginas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Ajuda contextual: botões ❓ em outras páginas ──────────────────────────
 window.openDocPage = function(path) {
     const resolvedPath = resolveDocPath(path);
     const from = encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);

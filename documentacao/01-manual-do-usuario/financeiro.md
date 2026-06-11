@@ -53,7 +53,7 @@ Na tela `Financeiro`, o usuario encontra:
 
 ### Responsividade do painel
 
-O cabeÃ§alho da tela `Financeiro` foi ajustado para manter os botoes de acao acessiveis mesmo em janelas mais estreitas:
+O cabeçalho da tela `Financeiro` foi ajustado para manter os botoes de acao acessiveis mesmo em janelas mais estreitas:
 
 - o atalho principal `+ Novo lancamento` passou a ficar mais compacto e continua visivel no topo da pagina;
 - em telas pequenas, o botao de criar lancamento pode reduzir para a leitura apenas do `+`, preservando o acesso rapido sem apertar o restante da barra;
@@ -100,7 +100,7 @@ Em `Financas -> Cartoes e taxas`, o sistema agora concentra a configuracao do re
 
 ### Organizacao em abas
 
-A tela foi reorganizada em quatro abas visÃ­veis para reduzir rolagem e separar melhor os contextos operacionais:
+A tela foi reorganizada em quatro abas visíveis para reduzir rolagem e separar melhor os contextos operacionais:
 
 - `Operadora de maquininha`
 - `Bandeiras`
@@ -112,9 +112,9 @@ Uso pratico:
 - cada aba concentra apenas o que o usuario precisa editar naquele momento;
 - o cadastro de operadoras e bandeiras fica separado do simulador e da lista consolidada de taxas;
 - em telas menores, as abas podem ser roladas horizontalmente sem quebrar o layout;
-- as tabelas e formulÃ¡rios de cada aba ocupam toda a largura disponivel do painel, mantendo leitura clara em desktop, notebook, tablet e celular;
+- as tabelas e formulários de cada aba ocupam toda a largura disponivel do painel, mantendo leitura clara em desktop, notebook, tablet e celular;
 - dentro da aba `Taxa por parcela`, o formulario de cadastro e a lista `Taxas cadastradas` aparecem no mesmo painel, em colunas lado a lado no desktop e empilhados no mobile.
-- a lista `Taxas cadastradas` ganhou botÃµes de filtro por operadora, permitindo localizar rapidamente as regras de uma marca especifica sem sair da aba.
+- a lista `Taxas cadastradas` ganhou botões de filtro por operadora, permitindo localizar rapidamente as regras de uma marca especifica sem sair da aba.
 
 Cadastros disponiveis:
 
@@ -335,7 +335,7 @@ O modulo financeiro se conecta a tres relatorios:
    - mostra saldo inicial, realizado, previsto e saldo projetado
    - organiza o conteudo em cinco abas: `Grade diaria`, `Movimentos`, `Titulos previstos`, `Resumo` e `Dashboard`
    - mantem os `cards de resumo` sempre visiveis acima das abas
-   - agora inclui uma `grade diÃ¡ria operacional`, com `entradas`, `saÃ­das`, `saldo do dia` e `acumulado do mÃªs`
+   - agora inclui uma `grade diária operacional`, com `entradas`, `saídas`, `saldo do dia` e `acumulado do mês`
    - concentra os filtros por categoria dentro das abas `Movimentos` e `Titulos previstos`
    - o `realizado` agora usa cada movimento de baixa
    - movimentos com `cartao de credito` ou `cartao de debito` passam a exibir, na propria referencia da linha, a `taxa da operadora` vinculada ao recebimento

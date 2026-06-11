@@ -246,37 +246,105 @@
         });
     };
 
+    const WINDOWS_1252_PAIRS = [
+        [0x80, 0x20AC], [0x82, 0x201A], [0x83, 0x0192], [0x84, 0x201E], [0x85, 0x2026],
+        [0x86, 0x2020], [0x87, 0x2021], [0x88, 0x02C6], [0x89, 0x2030], [0x8A, 0x0160],
+        [0x8B, 0x2039], [0x8C, 0x0152], [0x8E, 0x017D], [0x91, 0x2018], [0x92, 0x2019],
+        [0x93, 0x201C], [0x94, 0x201D], [0x95, 0x2022], [0x96, 0x2013], [0x97, 0x2014],
+        [0x98, 0x02DC], [0x99, 0x2122], [0x9A, 0x0161], [0x9B, 0x203A], [0x9C, 0x0153],
+        [0x9E, 0x017E], [0x9F, 0x0178],
+    ];
+    const WINDOWS_1252_REVERSE_MAP = new Map(WINDOWS_1252_PAIRS.map(([byte, codePoint]) => [codePoint, byte]));
+    const UTF8_DECODER = new TextDecoder('utf-8');
+    const MOJIBAKE_PATTERNS = [
+        /\u00C3[^A-Za-z0-9\s]/g,
+        /\u00C2[^A-Za-z0-9\s]/g,
+        /\u00E2\u20AC\u2122/g,
+        /\u00E2\u20AC\u0153/g,
+        /\u00E2\u20AC\u009D/g,
+        /\u00E2\u20AC\u201C/g,
+        /\u00E2\u20AC\u201D/g,
+        /\u00E2\u20AC\u00A2/g,
+        /\u00E2\u20AC\u00A6/g,
+        /\u00E2\u201E\u00A2/g,
+        /\u00E2\u201A\u00AC/g,
+        /\u00E2\u20AC/g,
+        /\uFFFD/g,
+    ];
+    const MOJIBAKE_FALLBACKS = [
+        ["N?o","Não"],
+        ["n?o","não"],
+        ["V?deo","Vídeo"],
+        ["v?deo","vídeo"],
+        ["Respons?vel","Responsável"],
+        ["respons?vel","responsável"],
+        ["c?mera","câmera"],
+        ["permiss?es","permissões"],
+        ["for?ado","forçado"],
+        ["a??es","ações"],
+        ["op??es","opções"],
+        ["Pr?xima","Próxima"],
+        ["Visualiza??o","Visualização"],
+        ["r?pidas","rápidas"],
+        ["Or?amento","Orçamento"],
+        ["â€¢","|"],
+    ];
+
+    function encodeWindows1252(value) {
+        const bytes = [];
+
+        for (let index = 0; index < value.length; index++) {
+            const codePoint = value.codePointAt(index);
+            if (codePoint > 0xFFFF) {
+                index++;
+            }
+
+            if (codePoint <= 0xFF) {
+                bytes.push(codePoint);
+                continue;
+            }
+
+            bytes.push(WINDOWS_1252_REVERSE_MAP.get(codePoint) ?? 0x3F);
+        }
+
+        return new Uint8Array(bytes);
+    }
+
+    function countMojibake(value) {
+        return MOJIBAKE_PATTERNS.reduce((total, pattern) => total + ((value.match(pattern) || []).length), 0);
+    }
+
+    function fixMojibakePass(value) {
+        try {
+            return UTF8_DECODER.decode(encodeWindows1252(value));
+        } catch (error) {
+            return value;
+        }
+    }
+
     const normalizeMojibake = (value) => {
         if (typeof value !== 'string' || value === '') {
             return value;
         }
 
-        const replacements = [
-            ['NÃƒÆ’Ã‚Â£o', 'NÃ£o'],
-            ['nÃƒÆ’Ã‚Â£o', 'nÃ£o'],
-            ['ÃƒÆ’Ã‚Âudio', 'Ãudio'],
-            ['ÃƒÆ’Ã‚Â¡udio', 'Ã¡udio'],
-            ['VÃƒÆ’Ã‚Â­deo', 'VÃ­deo'],
-            ['vÃƒÆ’Ã‚Â­deo', 'vÃ­deo'],
-            ['ResponsÃƒÆ’Ã‚Â¡vel', 'ResponsÃ¡vel'],
-            ['responsÃƒÆ’Ã‚Â¡vel', 'responsÃ¡vel'],
-            ['cÃƒÆ’Ã‚Â¢mera', 'cÃ¢mera'],
-            ['permissÃƒÆ’Ã‚Âµes', 'permissÃµes'],
-            ['forÃƒÆ’Ã‚Â§ado', 'forÃ§ado'],
-            ['aÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes', 'aÃ§Ãµes'],
-            ['opÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes', 'opÃ§Ãµes'],
-            ['PrÃƒÆ’Ã‚Â³xima', 'PrÃ³xima'],
-            ['VisualizaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o', 'VisualizaÃ§Ã£o'],
-            ['rÃƒÆ’Ã‚Â¡pidas', 'rÃ¡pidas'],
-            ['OrÃƒÆ’Ã‚Â§amento', 'OrÃ§amento'],
-            ['ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢', '|'],
-        ];
-
         let normalized = value;
-        replacements.forEach(([source, target]) => {
-            normalized = normalized.split(source).join(target);
+        let best = normalized;
+        let bestScore = countMojibake(normalized);
+
+        for (let pass = 0; pass < 4; pass++) {
+            normalized = fixMojibakePass(normalized);
+            const currentScore = countMojibake(normalized);
+            if (currentScore < bestScore) {
+                best = normalized;
+                bestScore = currentScore;
+            }
+        }
+
+        MOJIBAKE_FALLBACKS.forEach(([source, target]) => {
+            best = best.split(source).join(target);
         });
-        return normalized;
+
+        return best;
     };
 
     const swal = (options) => {
@@ -1028,7 +1096,7 @@
         if (filters.status) chips.push(`Status: ${filters.status}`);
         if (filters.responsavel_id) chips.push('Responsável filtrado');
         if (filters.tag_id) chips.push('Tag filtrada');
-        if (filters.nao_lidas === '1') chips.push('NÃ£o lidas');
+        if (filters.nao_lidas === '1') chips.push('Não lidas');
         if (filters.com_os_aberta === '1') chips.push('Com OS aberta');
         if (filters.clientes_novos === '1') chips.push('Clientes novos');
 
@@ -1387,7 +1455,7 @@
             try {
                 state.streamSource.close();
             } catch (error) {
-                    // Ignora falha no fechamento forÃ§ado.
+                    // Ignora falha no fechamento forçado.
             }
             state.streamSource = null;
         }
@@ -1546,7 +1614,7 @@
                 : 'Sem mensagens');
         const ultimaMensagem = `<span class="cm-conversa-preview">${previewPrefix}${escapeHtml(ultimaMensagemBruta)}</span>`;
         const ultimaData = formatDateTime(conversaMovementAt(item));
-        const responsavel = item.responsavel_nome || 'NÃ£o atribuÃ­do';
+        const responsavel = item.responsavel_nome || 'Não atribuído';
 
         const prioridadeBadge = `<span class="badge ${priorityBadgeClass(prioridade)}">${escapeHtml(prioridade)}</span>`;
         const flags = [
@@ -1623,7 +1691,7 @@
             await swal({
                 icon: 'warning',
                 title: 'Conversa nao encontrada',
-                text: 'NÃ£o foi possÃ­vel localizar os dados da conversa para cadastro.',
+                text: 'Não foi possível localizar os dados da conversa para cadastro.',
             });
             return;
         }
@@ -1684,7 +1752,7 @@
             await swal({
                 icon: 'error',
                 title: 'Falha ao salvar contato',
-                text: error?.message || 'NÃ£o foi possÃ­vel salvar o contato nesta conversa.',
+                text: error?.message || 'Não foi possível salvar o contato nesta conversa.',
             });
         }
     };
@@ -1823,7 +1891,7 @@
             listEl.innerHTML = `
                 <div class="cm-empty-state">
                     <i class="bi bi-exclamation-triangle text-danger"></i>
-                    <p class="mb-0 text-danger">${escapeHtml(error?.message || 'NÃ£o foi possÃ­vel carregar as conversas no momento.')}</p>
+                    <p class="mb-0 text-danger">${escapeHtml(error?.message || 'Não foi possível carregar as conversas no momento.')}</p>
                 </div>
             `;
             return [];
@@ -2226,7 +2294,7 @@
         const telefone = String(conversa?.telefone || '').trim();
         updateThreadAvatar(conversa, state.currentContext);
         threadTitle.textContent = nome;
-        threadSubtitle.textContent = [telefone, responsavel ? ('ResponsÃ¡vel: ' + responsavel) : 'NÃ£o atribuÃ­da']
+        threadSubtitle.textContent = [telefone, responsavel ? ('Responsável: ' + responsavel) : 'Não atribuída']
             .filter(Boolean)
             .join(' | ');
         applyThreadStatusBadge(conversa?.status || 'aberta');
@@ -3074,7 +3142,7 @@
             await swal({
                 icon: 'warning',
                 title: 'Sem conversa ativa',
-                text: 'Abra uma conversa antes de gerar o orÃ§amento rÃ¡pido.',
+                text: 'Abra uma conversa antes de gerar o orçamento rápido.',
             });
             return;
         }
@@ -3082,8 +3150,8 @@
         if (!cfg.endpointOrcamentoGerarEnviar || !cfg.canCreateOrcamento) {
             await swal({
                 icon: 'warning',
-                title: 'PermissÃ£o insuficiente',
-                text: 'Seu usuÃ¡rio nÃ£o possui acesso para criar/enviar orÃ§amentos.',
+                title: 'Permissão insuficiente',
+                text: 'Seu usuário não possui acesso para criar/enviar orçamentos.',
             });
             return;
         }
@@ -3091,8 +3159,8 @@
         if (!window.Swal) {
             await swal({
                 icon: 'warning',
-                title: 'Recurso indisponÃ­vel',
-                text: 'NÃ£o foi possÃ­vel abrir o formulÃ¡rio rÃ¡pido de orÃ§amento.',
+                title: 'Recurso indisponível',
+                text: 'Não foi possível abrir o formulário rápido de orçamento.',
             });
             return;
         }
@@ -3113,17 +3181,17 @@
         ).trim();
         const telefone = String(contato.telefone_normalizado || contato.telefone || '').replace(/\D+/g, '');
         const tituloDefault = osId > 0
-            ? ('OrÃ§amento rÃ¡pido da OS ' + (osNumero || ('#' + osId)))
-            : 'OrÃ§amento rÃ¡pido via conversa';
+            ? ('Orçamento rápido da OS ' + (osNumero || ('#' + osId)))
+            : 'Orçamento rápido via conversa';
 
         const result = await window.Swal.fire({
-            title: 'Gerar e enviar orÃ§amento rÃ¡pido',
+            title: 'Gerar e enviar orçamento rápido',
             html: `
                 <div class="text-start">
-                    <label class="form-label small mb-1" for="swOrcTitulo">TÃ­tulo</label>
-                    <input id="swOrcTitulo" class="swal2-input" value="${escapeHtml(tituloDefault)}" placeholder="TÃ­tulo do orÃ§amento">
-                    <label class="form-label small mb-1 mt-1" for="swOrcItemDescricao">DescriÃ§Ã£o do item</label>
-                    <input id="swOrcItemDescricao" class="swal2-input" value="ServiÃ§o tÃ©cnico" placeholder="Ex.: Troca de tela original">
+                    <label class="form-label small mb-1" for="swOrcTitulo">Título</label>
+                    <input id="swOrcTitulo" class="swal2-input" value="${escapeHtml(tituloDefault)}" placeholder="Título do orçamento">
+                    <label class="form-label small mb-1 mt-1" for="swOrcItemDescricao">Descrição do item</label>
+                    <input id="swOrcItemDescricao" class="swal2-input" value="Serviço técnico" placeholder="Ex.: Troca de tela original">
                     <label class="form-label small mb-1 mt-1" for="swOrcItemValor">Valor (R$)</label>
                     <input id="swOrcItemValor" class="swal2-input" value="0,00" placeholder="Ex.: 350,00">
                     <label class="form-label small mb-1 mt-1" for="swOrcValidadeDias">Validade (dias)</label>
@@ -3150,11 +3218,11 @@
 
                 const valor = Number(String(valorRaw).replace(/\./g, '').replace(',', '.'));
                 if (!descricao) {
-                    window.Swal.showValidationMessage('Informe a descriÃ§Ã£o do item.');
+                    window.Swal.showValidationMessage('Informe a descrição do item.');
                     return false;
                 }
                 if (!Number.isFinite(valor) || valor <= 0) {
-                    window.Swal.showValidationMessage('Informe um valor vÃ¡lido maior que zero.');
+                    window.Swal.showValidationMessage('Informe um valor válido maior que zero.');
                     return false;
                 }
                 if (!Number.isFinite(validadeDias) || validadeDias < 1 || validadeDias > 60) {
@@ -3190,8 +3258,8 @@
             const response = await postForm(cfg.endpointOrcamentoGerarEnviar, payload);
             await swal({
                 icon: 'success',
-                title: 'OrÃ§amento enviado',
-                text: response?.message || 'OrÃ§amento rÃ¡pido gerado e enviado com sucesso.',
+                title: 'Orçamento enviado',
+                text: response?.message || 'Orçamento rápido gerado e enviado com sucesso.',
             });
             await openConversa(state.currentConversaId, false);
             await safeLoadConversas(true);
@@ -3199,7 +3267,7 @@
             await swal({
                 icon: 'error',
                 title: 'Falha ao gerar/enviar',
-                text: error?.message || 'NÃ£o foi possÃ­vel gerar e enviar o orÃ§amento rÃ¡pido.',
+                text: error?.message || 'Não foi possível gerar e enviar o orçamento rápido.',
             });
         }
     };
@@ -3264,7 +3332,7 @@
         clearInlineOrcamentoLoadTimeout();
         setInlineOrcamentoLoading(true);
         if (inlineOrcamentoModalTitle) {
-            inlineOrcamentoModalTitle.textContent = modalTitle || 'Novo OrÃ§amento';
+            inlineOrcamentoModalTitle.textContent = modalTitle || 'Novo Orçamento';
         }
 
         if (inlineOrcamentoOpenFullLink) {
@@ -3313,7 +3381,7 @@
         btnNovoOrcamento?.addEventListener('click', (event) => {
             event.preventDefault();
             const url = String(btnNovoOrcamento.getAttribute('data-orcamento-url') || '').trim();
-            openInlineOrcamentoModal(url, 'Novo OrÃ§amento');
+            openInlineOrcamentoModal(url, 'Novo Orçamento');
         });
 
         btnVincular?.addEventListener('click', async () => {
@@ -3417,8 +3485,8 @@
         if (!window.Swal) {
             await swal({
                 icon: 'warning',
-                title: 'Recurso indisponÃ­vel',
-                text: 'NÃ£o foi possÃ­vel abrir o modal de status neste navegador.',
+                title: 'Recurso indisponível',
+                text: 'Não foi possível abrir o modal de status neste navegador.',
             });
             return;
         }
@@ -3479,8 +3547,8 @@
         if (!window.Swal) {
             await swal({
                 icon: 'warning',
-                title: 'Recurso indisponÃ­vel',
-                text: 'NÃ£o foi possÃ­vel abrir o modal de atribuiÃ§Ã£o neste navegador.',
+                title: 'Recurso indisponível',
+                text: 'Não foi possível abrir o modal de atribuição neste navegador.',
             });
             return;
         }
@@ -3491,13 +3559,13 @@
             await swal({
                 icon: 'warning',
                 title: 'Sem responsaveis',
-                text: 'NÃ£o hÃ¡ usuÃ¡rios ativos disponÃ­veis para atribuiÃ§Ã£o.',
+                text: 'Não há usuários ativos disponíveis para atribuição.',
             });
             return;
         }
 
         const currentResponsavelId = Number(meta.responsavel_id || 0);
-        const optionsHtml = ['<option value="0">NÃ£o atribuÃ­do</option>'].concat(
+        const optionsHtml = ['<option value="0">Não atribuído</option>'].concat(
             responsaveis.map((item) => {
                 const id = Number(item?.id || 0);
                 const selected = id === currentResponsavelId ? 'selected' : '';
@@ -3554,8 +3622,8 @@
         if (!window.Swal) {
             await swal({
                 icon: 'warning',
-                title: 'Recurso indisponÃ­vel',
-                text: 'NÃ£o foi possÃ­vel abrir o modal de prioridade neste navegador.',
+                title: 'Recurso indisponível',
+                text: 'Não foi possível abrir o modal de prioridade neste navegador.',
             });
             return;
         }
@@ -3743,7 +3811,7 @@
                     </li>
                 `;
             }).join('')
-            : '<li class="text-muted">Sem orÃ§amentos relacionados.</li>';
+            : '<li class="text-muted">Sem orçamentos relacionados.</li>';
 
         const clienteUrl = cliente?.id ? (cfg.urlClienteVisualizarPrefix + '/' + cliente.id) : '';
         const osPrincipalContexto = (ctx && typeof ctx.os_principal === 'object' && ctx.os_principal) ? ctx.os_principal : null;
@@ -3851,7 +3919,7 @@
             return `<option value="${escapeHtml(s)}" ${selected}>${escapeHtml(label)}</option>`;
         }).join('');
 
-        const responsaveisHtml = ['<option value="">NÃ£o atribuÃ­do</option>'].concat(
+        const responsaveisHtml = ['<option value="">Não atribuído</option>'].concat(
             responsaveis.map((u) => {
                 const id = Number(u.id || 0);
                 const selected = id === responsavelAtual ? 'selected' : '';
@@ -3890,7 +3958,7 @@
                 ${clienteHtml}
             </div>
             <div class="cm-context-section">
-                <div class="cm-context-section-title">GestÃ£o da conversa</div>
+                <div class="cm-context-section-title">Gestão da conversa</div>
                 <div class="mb-2">
                     <label class="form-label form-label-sm mb-1">Status da conversa</label>
                     <select class="form-select form-select-sm" id="contextStatusSelect">${statusOptionsHtml}</select>
@@ -3933,19 +4001,19 @@
                 <ul class="cm-context-list">${followupsHtml}</ul>
             </div>
             <div class="cm-context-section">
-                <div class="cm-context-section-title">OrÃ§amentos relacionados</div>
+                <div class="cm-context-section-title">Orçamentos relacionados</div>
                 <ul class="cm-context-list">${orcamentosHtml}</ul>
             </div>
             <div class="cm-context-actions mt-2">
                 ${clienteUrl ? `<a class="btn btn-sm btn-outline-primary" href="${clienteUrl}" target="_blank" rel="noopener">Abrir cliente</a>` : ''}
                 ${osUrl ? `<a class="btn btn-sm btn-outline-secondary" href="${osUrl}" target="_blank" rel="noopener">Abrir OS</a>` : ''}
                 <a class="btn btn-sm btn-outline-success" href="${escapeHtml(novaOsUrl)}" target="_blank" rel="noopener">Nova OS</a>
-                <a class="btn btn-sm btn-outline-dark" href="${escapeHtml(painelOrcamentosUrl)}" target="_blank" rel="noopener">Painel de orÃ§amentos</a>
+                <a class="btn btn-sm btn-outline-dark" href="${escapeHtml(painelOrcamentosUrl)}" target="_blank" rel="noopener">Painel de orçamentos</a>
                 ${(cfg.canCreateOrcamento && cfg.endpointOrcamentoGerarEnviar)
-                    ? '<button type="button" class="btn btn-sm btn-warning" id="btnGerarOrcamentoRapidoConversa">Gerar e enviar orÃ§amento</button>'
+                    ? '<button type="button" class="btn btn-sm btn-warning" id="btnGerarOrcamentoRapidoConversa">Gerar e enviar orçamento</button>'
                     : ''}
                 ${(cfg.canCreateOrcamento && novoOrcamentoUrl)
-                    ? `<button type="button" class="btn btn-sm btn-outline-warning" id="btnNovoOrcamentoConversa" data-orcamento-url="${escapeHtml(novoOrcamentoUrl)}">Novo orÃ§amento</button>`
+                    ? `<button type="button" class="btn btn-sm btn-outline-warning" id="btnNovoOrcamentoConversa" data-orcamento-url="${escapeHtml(novoOrcamentoUrl)}">Novo orçamento</button>`
                     : ''}
             </div>
         `;
@@ -4014,7 +4082,7 @@
             threadMessages.innerHTML = `
                 <div class="cm-empty-state cm-empty-state-sm">
                     <i class="bi bi-exclamation-triangle text-danger"></i>
-                    <p class="mb-0 text-danger">NÃ£o foi possÃ­vel carregar esta conversa.</p>
+                    <p class="mb-0 text-danger">Não foi possível carregar esta conversa.</p>
                 </div>
             `;
             if (showErrors) {
@@ -4216,7 +4284,7 @@
                 <div class="mb-3">
                     <i class="bi bi-${type === 'audio' ? 'mic' : 'camera-video'} fs-1 text-primary"></i>
                 </div>
-                <h5>Gravando ${type === 'audio' ? 'Ãudio' : 'VÃ­deo'}</h5>
+                <h5>Gravando ${type === 'audio' ? 'Áudio' : 'Vídeo'}</h5>
                 <div class="mb-3 h4"><span class="btn-record-dot"></span> <span id="cmRecordTimer">00:00</span></div>
                 ${type === 'video' ? '<video id="cmRecordPreview" autoplay muted class="cm-capture-video border"></video>' : ''}
                 <div class="cm-capture-controls">
@@ -4281,7 +4349,7 @@
             return swal({
                 icon: 'error',
                 title: 'Acesso negado',
-                text: 'NÃ£o foi possÃ­vel acessar a cÃ¢mera ou microfone. Verifique as permissÃµes do navegador.',
+                text: 'Não foi possível acessar a câmera ou microfone. Verifique as permissões do navegador.',
             });
         }
     };
@@ -4322,7 +4390,7 @@
         
         capturePanel.innerHTML = `
             <div class="text-center w-100 p-4">
-                <h5 class="mb-4">Revisar ${type === 'audio' ? 'Ãudio' : 'VÃ­deo'}</h5>
+                <h5 class="mb-4">Revisar ${type === 'audio' ? 'Áudio' : 'Vídeo'}</h5>
                 <div class="mb-4">
                     ${type === 'video' 
                         ? `<video controls src="${url}" class="cm-capture-video border"></video>` 
@@ -4427,7 +4495,7 @@
                 title: providerUnavailable ? 'Gateway indisponivel' : 'Falha no envio',
                 text: timeoutAbort
                     ? `O envio excedeu o tempo limite de ${Math.round(sendTimeoutMs / 1000)}s. Verifique o gateway e tente novamente.`
-                    : (error.message || 'NÃ£o foi possÃ­vel enviar.'),
+                    : (error.message || 'Não foi possível enviar.'),
                 footer: providerUnavailable
                     ? 'Verifique Configuracoes > WhatsApp e confirme se o gateway esta em execucao.'
                     : undefined,
@@ -4563,7 +4631,7 @@
                 await openConversa(Number(data.conversa_id), false);
             }
         } catch (error) {
-            await swal({ icon: 'error', title: 'Falha', text: error.message || 'NÃ£o foi possÃ­vel iniciar conversa.' });
+            await swal({ icon: 'error', title: 'Falha', text: error.message || 'Não foi possível iniciar conversa.' });
         }
     };
 
@@ -4762,7 +4830,7 @@
                 await swal({
                     icon: 'warning',
                     title: 'Usuario invalido',
-                    text: 'NÃ£o foi possÃ­vel identificar seu usuÃ¡rio para assumir a conversa.',
+                    text: 'Não foi possível identificar seu usuário para assumir a conversa.',
                 });
                 return;
             }
@@ -4779,7 +4847,7 @@
                 await swal({
                     icon: 'error',
                     title: 'Falha ao assumir',
-                    text: error?.message || 'NÃ£o foi possÃ­vel assumir a conversa no momento.',
+                    text: error?.message || 'Não foi possível assumir a conversa no momento.',
                 });
             }
         });
@@ -4797,7 +4865,7 @@
                 await swal({
                     icon: 'error',
                     title: 'Falha ao alterar bot',
-                    text: error?.message || 'NÃ£o foi possÃ­vel atualizar o modo de atendimento.',
+                    text: error?.message || 'Não foi possível atualizar o modo de atendimento.',
                 });
             }
         });
@@ -4809,7 +4877,7 @@
                 await swal({
                     icon: 'error',
                     title: 'Falha ao alterar modo humano',
-                    text: error?.message || 'NÃ£o foi possÃ­vel atualizar o modo de atendimento.',
+                    text: error?.message || 'Não foi possível atualizar o modo de atendimento.',
                 });
             }
         });
@@ -4849,7 +4917,7 @@
                 await swal({
                     icon: 'error',
                     title: 'Falha ao encerrar',
-                    text: error?.message || 'NÃ£o foi possÃ­vel encerrar a conversa.',
+                    text: error?.message || 'Não foi possível encerrar a conversa.',
                 });
             }
         });

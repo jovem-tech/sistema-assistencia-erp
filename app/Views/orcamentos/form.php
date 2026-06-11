@@ -1543,7 +1543,7 @@ if (empty($itens)) {
                     if (item.codigo) metaParts.push(item.codigo);
                     if (item.categoria) metaParts.push(item.categoria);
                     if (item.tipo_equipamento) metaParts.push(item.tipo_equipamento);
-                    const metaLabel = metaParts.length ? metaParts.join(' â€¢ ') : '';
+                    const metaLabel = metaParts.length ? metaParts.join(' • ') : '';
                     const infoLine = [priceLabel, estoqueLabel].filter(Boolean).join(' | ');
                     return `
                         <div class="d-flex flex-column">

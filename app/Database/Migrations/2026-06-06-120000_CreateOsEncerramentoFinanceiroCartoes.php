@@ -434,10 +434,10 @@ class CreateOsEncerramentoFinanceiroCartoes extends Migration
         $now = date('Y-m-d H:i:s');
 
         $operadoras = [
-            ['nome' => 'Mercado Pago', 'descricao' => 'Operadora padrÃ£o para recebimentos em cartÃ£o.', 'ordem_exibicao' => 10, 'prazo_padrao_dias' => 30],
-            ['nome' => 'Stone', 'descricao' => 'ConfiguraÃ§Ã£o padrÃ£o para maquininha Stone.', 'ordem_exibicao' => 20, 'prazo_padrao_dias' => 30],
-            ['nome' => 'PagBank', 'descricao' => 'ConfiguraÃ§Ã£o padrÃ£o para maquininha PagBank.', 'ordem_exibicao' => 30, 'prazo_padrao_dias' => 30],
-            ['nome' => 'Cielo', 'descricao' => 'ConfiguraÃ§Ã£o padrÃ£o para maquininha Cielo.', 'ordem_exibicao' => 40, 'prazo_padrao_dias' => 30],
+            ['nome' => 'Mercado Pago', 'descricao' => 'Operadora padrão para recebimentos em cartão.', 'ordem_exibicao' => 10, 'prazo_padrao_dias' => 30],
+            ['nome' => 'Stone', 'descricao' => 'Configuração padrão para maquininha Stone.', 'ordem_exibicao' => 20, 'prazo_padrao_dias' => 30],
+            ['nome' => 'PagBank', 'descricao' => 'Configuração padrão para maquininha PagBank.', 'ordem_exibicao' => 30, 'prazo_padrao_dias' => 30],
+            ['nome' => 'Cielo', 'descricao' => 'Configuração padrão para maquininha Cielo.', 'ordem_exibicao' => 40, 'prazo_padrao_dias' => 30],
         ];
 
         foreach ($operadoras as $item) {
@@ -506,7 +506,7 @@ class CreateOsEncerramentoFinanceiroCartoes extends Migration
                 'taxa_percentual' => 1.9900,
                 'taxa_fixa' => 0,
                 'prazo_recebimento_dias' => 1,
-                'observacoes' => 'Taxa inicial sugerida para dÃ©bito Ã  vista.',
+                'observacoes' => 'Taxa inicial sugerida para débito à vista.',
             ],
             [
                 'operadora_id' => $operadoraId,
@@ -517,7 +517,7 @@ class CreateOsEncerramentoFinanceiroCartoes extends Migration
                 'taxa_percentual' => 3.1900,
                 'taxa_fixa' => 0,
                 'prazo_recebimento_dias' => 30,
-                'observacoes' => 'Taxa inicial sugerida para crÃ©dito Ã  vista.',
+                'observacoes' => 'Taxa inicial sugerida para crédito à vista.',
             ],
             [
                 'operadora_id' => $operadoraId,
@@ -528,7 +528,7 @@ class CreateOsEncerramentoFinanceiroCartoes extends Migration
                 'taxa_percentual' => 3.7900,
                 'taxa_fixa' => 0,
                 'prazo_recebimento_dias' => 30,
-                'observacoes' => 'Faixa inicial sugerida para crÃ©dito parcelado.',
+                'observacoes' => 'Faixa inicial sugerida para crédito parcelado.',
             ],
             [
                 'operadora_id' => $operadoraId,
@@ -539,7 +539,7 @@ class CreateOsEncerramentoFinanceiroCartoes extends Migration
                 'taxa_percentual' => 4.2900,
                 'taxa_fixa' => 0,
                 'prazo_recebimento_dias' => 30,
-                'observacoes' => 'Faixa inicial sugerida para crÃ©dito parcelado longo.',
+                'observacoes' => 'Faixa inicial sugerida para crédito parcelado longo.',
             ],
         ];
 
@@ -572,7 +572,7 @@ class CreateOsEncerramentoFinanceiroCartoes extends Migration
         }
 
         $categoria = $this->db->table('financeiro_categorias')
-            ->where('nome', 'Taxa de cartÃ£o')
+            ->where('nome', 'Taxa de cartão')
             ->whereIn('tipo', ['pagar', 'ambos'])
             ->get()
             ->getRowArray();
@@ -603,7 +603,7 @@ class CreateOsEncerramentoFinanceiroCartoes extends Migration
 
         $now = date('Y-m-d H:i:s');
         $this->db->table('financeiro_categorias')->insert([
-            'nome' => 'Taxa de cartÃ£o',
+            'nome' => 'Taxa de cartão',
             'tipo' => 'pagar',
             'dre_grupo_id' => $grupoId,
             'dre_subgrupo_id' => $subgrupoId,

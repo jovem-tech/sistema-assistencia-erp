@@ -23,7 +23,7 @@ class Crm extends BaseController
         requirePermission('crm', 'visualizar');
     }
 
-    // SeÃ§Ã£o CRM e Central de Mensagens
+    // Seção CRM e Central de Mensagens
 
     public function clientes()
     {
@@ -36,7 +36,7 @@ class Crm extends BaseController
         $q = trim((string) $this->request->getGet('q'));
         $status = trim((string) $this->request->getGet('status'));
 
-        // Query para buscar clientes e a Ãºltima interaÃ§Ã£o
+        // Query para buscar clientes e a última interação
         $builder = $db->table('clientes c');
         $builder->select('c.id, c.nome_razao, c.telefone1, c.email, c.cpf_cnpj');
         $builder->select('(SELECT data_interacao FROM crm_interacoes WHERE cliente_id = c.id ORDER BY data_interacao DESC LIMIT 1) as ultima_interacao');
@@ -52,7 +52,7 @@ class Crm extends BaseController
 
         $clientesRaw = $builder->orderBy('c.nome_razao', 'ASC')->get()->getResultArray();
 
-        // Filtragem por Status (Calculado via PHP para ser mais flexÃ­vel)
+        // Filtragem por Status (Calculado via PHP para ser mais flexível)
         $clientes = [];
         $agora = time();
         foreach ($clientesRaw as $c) {
@@ -71,7 +71,7 @@ class Crm extends BaseController
         }
 
         $data = [
-            'title' => 'CRM - GestÃ£o de Clientes',
+            'title' => 'CRM - Gestão de Clientes',
             'clientes' => $clientes,
             'filtro_q' => $q,
             'filtro_status' => $status,

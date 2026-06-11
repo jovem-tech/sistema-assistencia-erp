@@ -127,7 +127,7 @@ Pelo presente instrumento particular, de um lado **[NOME DA CONTRATADA]**, inscr
 - aumento relevante do numero de ativos ou usuarios;
 - mudanca de complexidade operacional;
 - inclusao de filiais, novos ambientes ou servicos criticos;
-- consumo recorrente incompatÃ­vel com o plano contratado.
+- consumo recorrente incompatível com o plano contratado.
 
 11.2. A reprecificacao sera apresentada por escrito, com justificativa tecnica e comercial.
 

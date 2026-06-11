@@ -5,7 +5,7 @@ Migracao: nao houve alteracao de schema
 
 ## Problema
 
-Na aba `Dashboard` de `Relatorios -> Fluxo de Caixa`, os graficos podiam inflar a altura total da pagina quando a aba era aberta ou recalculada. O efeito mais visivel era um canvas exageradamente alto, com a tela ficando quase toda em branco e os traÃ§os do grafico aparecendo esticados ao longo de uma rolagem vertical muito grande.
+Na aba `Dashboard` de `Relatorios -> Fluxo de Caixa`, os graficos podiam inflar a altura total da pagina quando a aba era aberta ou recalculada. O efeito mais visivel era um canvas exageradamente alto, com a tela ficando quase toda em branco e os traços do grafico aparecendo esticados ao longo de uma rolagem vertical muito grande.
 
 ## Causa raiz
 

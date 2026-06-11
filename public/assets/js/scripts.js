@@ -1,3 +1,128 @@
+function confirmarReativacao(modulo, id, csrfName = '', csrfHash = '') {
+    const titulos = {
+        'os': 'Ordem de Servico',
+        'equipamentos': 'Equipamento',
+        'estoque': 'Peca/Item'
+    };
+
+    if (modulo !== 'equipamentos' || Number(id) <= 0) {
+        const nome = titulos[modulo] || 'registro';
+
+        if (window.Swal && typeof window.Swal.fire === 'function') {
+            window.Swal.fire({
+                icon: 'info',
+                title: 'Fluxo dedicado',
+                text: `A funcionalidade de reativacao para ${nome} ainda usa um fluxo especifico neste modulo.`,
+                confirmButtonText: 'Ok'
+            });
+        } else {
+            window.alert(`A funcionalidade de reativacao para ${nome} ainda usa um fluxo especifico neste modulo.`);
+        }
+
+        return;
+    }
+
+    const csrfState = ensureEquipmentClosureCsrfState(csrfName, csrfHash);
+    const baseUrl = document.querySelector('meta[name="base-url"]')?.content || window.location.origin + '/';
+    const reasonOptions = getEquipmentReactivationReasonOptions();
+
+    if (!(window.Swal && typeof window.Swal.fire === 'function')) {
+        const confirmed = window.confirm('Deseja reativar este equipamento? Ele voltara a receber novas OS e novos vinculos operacionais.');
+        if (confirmed) {
+            window.alert('SweetAlert2 nao esta disponivel neste contexto.');
+        }
+        return;
+    }
+
+    const optionsHtml = buildEquipmentLifecycleReasonOptionsHtml(reasonOptions);
+
+    window.Swal.fire({
+        icon: 'question',
+        title: 'Voltar à operação?',
+        html: `
+            <p class="text-start mb-3">
+                O equipamento voltara a aceitar novas OS e novos vinculos operacionais.
+            </p>
+            <div class="text-start">
+                <label for="swal-equipment-reactivation-reason" class="form-label fw-semibold">Motivo da reativacao *</label>
+                <select id="swal-equipment-reactivation-reason" class="form-select">
+                    <option value="">Selecione...</option>
+                    ${optionsHtml}
+                </select>
+            </div>
+            <div class="text-start mt-3">
+                <label for="swal-equipment-reactivation-note" class="form-label fw-semibold">Observacao interna</label>
+                <textarea id="swal-equipment-reactivation-note" class="form-control" rows="3" placeholder="Detalhes complementares para o historico de reativacao do equipamento."></textarea>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Voltar à operação',
+        cancelButtonText: 'Cancelar',
+        focusConfirm: false,
+        showLoaderOnConfirm: true,
+        allowOutsideClick: () => !window.Swal.isLoading(),
+        preConfirm: async () => {
+            const motivo = document.getElementById('swal-equipment-reactivation-reason')?.value || '';
+            const observacao = document.getElementById('swal-equipment-reactivation-note')?.value || '';
+
+            if (!motivo) {
+                window.Swal.showValidationMessage('Selecione o motivo da reativacao.');
+                return false;
+            }
+
+            const payload = new URLSearchParams();
+            payload.set('motivo_reativacao', motivo);
+            payload.set('observacao_reativacao', observacao);
+            if (csrfState.name && csrfState.hash) {
+                payload.set(csrfState.name, csrfState.hash);
+            }
+
+            const response = await fetch(`${baseUrl}equipamentos/reativar/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: payload.toString()
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (data?.csrfHash) {
+                ensureEquipmentClosureCsrfState(csrfState.name, data.csrfHash);
+            }
+
+            if (!response.ok || data?.status !== 'success') {
+                window.Swal.showValidationMessage(data?.message || 'Nao foi possivel reativar o equipamento agora.');
+                return false;
+            }
+
+            return data;
+        }
+    }).then((result) => {
+        if (!result?.isConfirmed || !result.value?.equipamento) {
+            return;
+        }
+
+        applyEquipmentReactivationUI(result.value.equipamento);
+        if (Object.prototype.hasOwnProperty.call(result.value, 'lifecycle_history_html')) {
+            updateEquipmentLifecycleHistoryUI(
+                result.value.equipamento?.id || id,
+                result.value.lifecycle_history_html || '',
+                result.value.lifecycle_history_count
+            );
+        }
+
+        window.Swal.fire({
+            icon: 'success',
+            title: 'Equipamento reativado',
+            text: result.value.message || 'O equipamento voltou a aceitar novas OS.',
+            confirmButtonText: 'Ok'
+        });
+    });
+}
+
+window.confirmarReativacao = confirmarReativacao;
+
 /**
  * Sistema de Assistência Técnica - Main Scripts
  */
@@ -11,11 +136,63 @@
         return [options.title || '', options.text || ''].filter(Boolean).join('\n\n');
     };
 
+    const hasAriaHiddenAncestor = function (element) {
+        let current = element;
+        while (current && current !== window.document.body) {
+            if (current.getAttribute && current.getAttribute('aria-hidden') === 'true') {
+                return true;
+            }
+            current = current.parentElement;
+        }
+        return false;
+    };
+
+    const findSafeFocusTarget = function () {
+        const modal = window.document.querySelector('.modal.show');
+        if (!modal) {
+            return null;
+        }
+
+        return modal.querySelector('[data-bs-dismiss="modal"], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href], [tabindex]:not([tabindex="-1"])');
+    };
+
+    const restoreFocusSafely = function (previousElement) {
+        window.setTimeout(function () {
+            const target = previousElement && previousElement.isConnected && !hasAriaHiddenAncestor(previousElement)
+                ? previousElement
+                : findSafeFocusTarget();
+
+            if (!target || typeof target.focus !== 'function' || hasAriaHiddenAncestor(target)) {
+                return;
+            }
+
+            try {
+                target.focus({ preventScroll: true });
+            } catch (error) {
+                target.focus();
+            }
+        }, 40);
+    };
+
     const fire = function (options) {
         const normalized = options && typeof options === 'object' ? { ...options } : {};
 
         if (hasSwal()) {
-            return window.Swal.fire(normalized);
+            const previousElement = window.document.activeElement;
+            if (previousElement && previousElement !== window.document.body && typeof previousElement.blur === 'function') {
+                previousElement.blur();
+            }
+            if (!Object.prototype.hasOwnProperty.call(normalized, 'returnFocus')) {
+                normalized.returnFocus = false;
+            }
+
+            return Promise.resolve(window.Swal.fire(normalized)).then(function (result) {
+                restoreFocusSafely(previousElement);
+                return result;
+            }, function (error) {
+                restoreFocusSafely(previousElement);
+                throw error;
+            });
         }
 
         const message = buildMessage(normalized);
@@ -956,12 +1133,38 @@ $(document).ready(function () {
     // =====================================================
     $(document).on('click', '.btn-delete', function (e) {
         e.preventDefault();
-        const url = $(this).attr('href');
+        const url = $(this).attr('href') || $(this).data('url') || '';
         const nome = $(this).data('nome') || 'este registro';
 
-        if (confirm(`Tem certeza que deseja excluir "${nome}"? Esta ação não pode ser desfeita.`)) {
-            window.location.href = url;
+        if (!url) {
+            console.error('[DeleteFlow] URL de exclusao ausente no botao.', {
+                element: this,
+                classes: this.className,
+                path: window.location.pathname,
+            });
+
+            window.DSFeedback.fire({
+                icon: 'error',
+                title: 'Nao foi possivel excluir',
+                text: 'A acao de exclusao esta sem rota configurada. Atualize a pagina e tente novamente.',
+                confirmButtonText: 'Entendi',
+            });
+            return;
         }
+
+        window.DSFeedback.confirm({
+            icon: 'warning',
+            title: 'Confirmar exclusao',
+            text: `Tem certeza que deseja excluir "${nome}"? Esta acao nao pode ser desfeita.`,
+            confirmButtonText: 'Sim, excluir',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            focusCancel: true,
+        }).then(function (confirmed) {
+            if (confirmed) {
+                window.location.href = url;
+            }
+        });
     });
 
     // =====================================================
@@ -1062,20 +1265,342 @@ document.addEventListener('click', function (e) {
  * @param {string} modulo - O slug do módulo (os, equipamentos, estoque)
  * @param {number} id - O ID do registro
  */
-function confirmarEncerramento(modulo, id) {
-    const titulos = {
-        'os': 'Ordem de Serviço',
-        'equipamentos': 'Equipamento',
-        'estoque': 'Peça/Item'
+function escapeEquipmentLifecycleHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function getEquipmentClosureReasonOptions() {
+    return {
+        retirada_pecas: 'Retirada de pecas',
+        irreparavel: 'Problema irreparavel',
+        descartado: 'Descartado',
+        pecas_vendidas: 'Pecas vendidas para outros clientes',
+        outro: 'Outro motivo'
     };
-    const nome = titulos[modulo] || 'registro';
-    
-    if (confirm(`Deseja realmente encerrar este ${nome}? O registro será mantido para histórico, mas não estará mais disponível para novas operações.`)) {
-        // Redirecionamento ou chamada AJAX para a lógica de encerramento
-        // Por enquanto exibe alerta conforme status da evolução do projeto
-        alert(`A funcionalidade de processamento de encerramento para ${nome} está em fase de implementação técnica. O controle de acesso atual já valida sua permissão para esta ação.`);
+}
+
+function getEquipmentReactivationReasonOptions() {
+    return {
+        recuperado: 'Recuperado',
+        recondicionado: 'Recondicionado',
+        reparado: 'Reparado',
+        voltou_operacao: 'Voltou a funcionar',
+        outro: 'Outro motivo'
+    };
+}
+
+function buildEquipmentLifecycleReasonOptionsHtml(reasonOptions) {
+    return Object.entries(reasonOptions || {}).map(([value, label]) => (
+        `<option value="${escapeEquipmentLifecycleHtml(value)}">${escapeEquipmentLifecycleHtml(label)}</option>`
+    )).join('');
+}
+
+function ensureEquipmentClosureCsrfState(name, hash) {
+    if (!window.__ERP_EQUIPAMENTO_ENCERRAMENTO_CSRF) {
+        window.__ERP_EQUIPAMENTO_ENCERRAMENTO_CSRF = { name: '', hash: '' };
+    }
+
+    if (name) {
+        window.__ERP_EQUIPAMENTO_ENCERRAMENTO_CSRF.name = String(name);
+    }
+    if (hash) {
+        window.__ERP_EQUIPAMENTO_ENCERRAMENTO_CSRF.hash = String(hash);
+    }
+
+    return window.__ERP_EQUIPAMENTO_ENCERRAMENTO_CSRF;
+}
+
+function renderEquipmentLifecycleBadgeHtml(equipment, context = 'detail', openOsCount = 0) {
+    const isEncerrado = Boolean(equipment?.is_encerrado);
+    const count = Number.isFinite(openOsCount) ? Number(openOsCount) : 0;
+    const motivo = String(equipment?.motivo_encerramento_label || '').trim();
+
+    if (isEncerrado) {
+        return `
+            <span class="badge text-bg-dark">Encerrado</span>
+            ${motivo ? `<span class="text-muted ms-2">${escapeEquipmentLifecycleHtml(motivo)}</span>` : ''}
+        `;
+    }
+
+    if (context === 'detail') {
+        return `
+            <span class="badge text-bg-success">Ativo</span>
+            ${count > 0 ? `<span class="badge text-bg-warning text-dark ms-2">${count === 1 ? '1 OS em andamento' : `${count} OS em andamento`}</span>` : ''}
+        `;
+    }
+
+    if (count > 0) {
+        return `
+            <span class="badge text-bg-warning text-dark">${count === 1 ? '1 OS em andamento' : `${count} OS em andamento`}</span>
+            <span class="text-muted ms-2">Encerramento bloqueado</span>
+        `;
+    }
+
+    return '';
+}
+
+function getEquipmentOpenOsCount(equipmentId) {
+    const normalizedId = String(equipmentId || '').trim();
+    if (!normalizedId) {
+        return 0;
+    }
+
+    const element = document.querySelector(`[data-equipment-open-os-count][data-equipment-id="${normalizedId}"]`);
+    if (!element) {
+        return 0;
+    }
+
+    const parsedCount = Number.parseInt(element.dataset.equipmentOpenOsCount || '0', 10);
+    return Number.isFinite(parsedCount) && parsedCount > 0 ? parsedCount : 0;
+}
+
+function buildEquipmentOpenOsBlockMessage(openOsCount) {
+    const count = Number.isFinite(openOsCount) ? Number(openOsCount) : 0;
+    if (count <= 0) {
+        return '';
+    }
+
+    const label = count === 1 ? '1 OS em andamento' : `${count} OS em andamento`;
+    return `Este equipamento possui ${label}. Finalize ou cancele as ordens antes de encerrar sua vida util.`;
+}
+
+function applyEquipmentLifecycleUI(equipment) {
+    const equipmentId = String(equipment?.id || '').trim();
+    if (!equipmentId) {
+        return;
+    }
+
+    const isEncerrado = Boolean(equipment?.is_encerrado);
+    const openOsCount = getEquipmentOpenOsCount(equipmentId);
+
+    document.querySelectorAll(`[data-equipment-lifecycle-badge][data-equipment-id="${equipmentId}"]`).forEach((element) => {
+        const context = String(element.dataset.equipmentLifecycleContext || 'detail').trim() || 'detail';
+        const lifecycleHtml = renderEquipmentLifecycleBadgeHtml(equipment, context, openOsCount);
+        if (lifecycleHtml) {
+            element.classList.remove('d-none');
+            element.innerHTML = lifecycleHtml;
+        } else {
+            element.classList.add('d-none');
+            element.innerHTML = '';
+        }
+    });
+
+    document.querySelectorAll(`[data-equipment-active-only][data-equipment-id="${equipmentId}"]`).forEach((element) => {
+        element.classList.toggle('d-none', isEncerrado);
+    });
+
+    document.querySelectorAll(`[data-equipment-closed-only][data-equipment-id="${equipmentId}"]`).forEach((element) => {
+        element.classList.toggle('d-none', !isEncerrado);
+    });
+
+    document.querySelectorAll(`[data-equipment-row][data-equipment-id="${equipmentId}"]`).forEach((element) => {
+        element.classList.toggle('table-secondary', isEncerrado);
+    });
+
+    const fields = {
+        motivo_label: String(equipment?.motivo_encerramento_label || '').trim(),
+        encerrado_em_label: String(equipment?.encerrado_em_label || '').trim(),
+        observacao: String(equipment?.observacao_encerramento || '').trim()
+    };
+
+    Object.entries(fields).forEach(([field, value]) => {
+        document.querySelectorAll(`[data-equipment-field="${field}"][data-equipment-id="${equipmentId}"]`).forEach((element) => {
+            element.textContent = value;
+        });
+    });
+
+    document.querySelectorAll(`[data-equipment-field-wrap="observacao"][data-equipment-id="${equipmentId}"]`).forEach((element) => {
+        if (fields.observacao) {
+            element.classList.remove('d-none');
+        } else {
+            element.classList.add('d-none');
+        }
+    });
+}
+
+function applyEquipmentClosureUI(equipment) {
+    applyEquipmentLifecycleUI(equipment);
+}
+
+function applyEquipmentReactivationUI(equipment) {
+    applyEquipmentLifecycleUI(equipment);
+}
+
+function updateEquipmentLifecycleHistoryUI(equipmentId, historyHtml = '', historyCount = null) {
+    const normalizedId = String(equipmentId || '').trim();
+    if (!normalizedId) {
+        return;
+    }
+
+    const containerSelector = `[data-equipment-lifecycle-history-container][data-equipment-id="${normalizedId}"]`;
+    document.querySelectorAll(containerSelector).forEach((element) => {
+        if (typeof historyHtml === 'string') {
+            element.innerHTML = historyHtml;
+        }
+    });
+
+    if (historyCount !== null && historyCount !== undefined) {
+        const normalizedCount = Number.isFinite(Number(historyCount))
+            ? String(Number(historyCount))
+            : String(historyCount);
+
+        document.querySelectorAll(`[data-equipment-lifecycle-history-count][data-equipment-id="${normalizedId}"]`).forEach((element) => {
+            element.textContent = normalizedCount;
+        });
     }
 }
+
+window.updateEquipmentLifecycleHistoryUI = updateEquipmentLifecycleHistoryUI;
+
+function confirmarEncerramento(modulo, id, csrfName = '', csrfHash = '') {
+    const titulos = {
+        'os': 'Ordem de Servico',
+        'equipamentos': 'Equipamento',
+        'estoque': 'Peca/Item'
+    };
+
+    if (modulo !== 'equipamentos' || Number(id) <= 0) {
+        const nome = titulos[modulo] || 'registro';
+
+        if (window.Swal && typeof window.Swal.fire === 'function') {
+            window.Swal.fire({
+                icon: 'info',
+                title: 'Fluxo dedicado',
+                text: `A funcionalidade de processamento de encerramento para ${nome} esta em fase de implementacao tecnica. O controle de acesso atual ja valida sua permissao para esta acao.`,
+                confirmButtonText: 'Ok'
+            });
+        } else {
+            window.alert(`A funcionalidade de processamento de encerramento para ${nome} esta em fase de implementacao tecnica. O controle de acesso atual ja valida sua permissao para esta acao.`);
+        }
+
+        return;
+    }
+
+    const openOsCount = getEquipmentOpenOsCount(id);
+    if (openOsCount > 0) {
+        const blockMessage = buildEquipmentOpenOsBlockMessage(openOsCount);
+
+        if (window.Swal && typeof window.Swal.fire === 'function') {
+            window.Swal.fire({
+                icon: 'warning',
+                title: 'Encerramento bloqueado',
+                text: blockMessage,
+                confirmButtonText: 'Ok'
+            });
+        } else {
+            window.alert(blockMessage);
+        }
+
+        return;
+    }
+
+    const csrfState = ensureEquipmentClosureCsrfState(csrfName, csrfHash);
+    const baseUrl = document.querySelector('meta[name="base-url"]')?.content || window.location.origin + '/';
+    const reasonOptions = getEquipmentClosureReasonOptions();
+
+    if (!(window.Swal && typeof window.Swal.fire === 'function')) {
+        const confirmed = window.confirm('Deseja encerrar este equipamento? Ele permanecera no historico, mas nao podera receber novas OS.');
+        if (confirmed) {
+            window.alert('SweetAlert2 nao esta disponivel neste contexto.');
+        }
+        return;
+    }
+
+    const optionsHtml = Object.entries(reasonOptions).map(([value, label]) => (
+        `<option value="${escapeEquipmentLifecycleHtml(value)}">${escapeEquipmentLifecycleHtml(label)}</option>`
+    )).join('');
+
+    window.Swal.fire({
+        icon: 'warning',
+        title: 'Encerrar equipamento?',
+        html: `
+            <p class="text-start mb-3">
+                O equipamento continuara no historico do cliente, mas ficara indisponivel para novas OS e novos vinculos operacionais.
+            </p>
+            <div class="text-start">
+                <label for="swal-equipment-close-reason" class="form-label fw-semibold">Motivo do encerramento *</label>
+                <select id="swal-equipment-close-reason" class="form-select">
+                    <option value="">Selecione...</option>
+                    ${optionsHtml}
+                </select>
+            </div>
+            <div class="text-start mt-3">
+                <label for="swal-equipment-close-note" class="form-label fw-semibold">Observacao interna</label>
+                <textarea id="swal-equipment-close-note" class="form-control" rows="3" placeholder="Detalhes complementares para o historico do equipamento."></textarea>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Encerrar equipamento',
+        cancelButtonText: 'Cancelar',
+        focusConfirm: false,
+        showLoaderOnConfirm: true,
+        allowOutsideClick: () => !window.Swal.isLoading(),
+        preConfirm: async () => {
+            const motivo = document.getElementById('swal-equipment-close-reason')?.value || '';
+            const observacao = document.getElementById('swal-equipment-close-note')?.value || '';
+
+            if (!motivo) {
+                window.Swal.showValidationMessage('Selecione o motivo do encerramento.');
+                return false;
+            }
+
+            const payload = new URLSearchParams();
+            payload.set('motivo_encerramento', motivo);
+            payload.set('observacao_encerramento', observacao);
+            if (csrfState.name && csrfState.hash) {
+                payload.set(csrfState.name, csrfState.hash);
+            }
+
+            const response = await fetch(`${baseUrl}equipamentos/encerrar/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: payload.toString()
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (data?.csrfHash) {
+                ensureEquipmentClosureCsrfState(csrfState.name, data.csrfHash);
+            }
+
+            if (!response.ok || data?.status !== 'success') {
+                window.Swal.showValidationMessage(data?.message || 'Nao foi possivel encerrar o equipamento agora.');
+                return false;
+            }
+
+            return data;
+        }
+    }).then((result) => {
+        if (!result?.isConfirmed || !result.value?.equipamento) {
+            return;
+        }
+
+        applyEquipmentClosureUI(result.value.equipamento);
+        if (Object.prototype.hasOwnProperty.call(result.value, 'lifecycle_history_html')) {
+            updateEquipmentLifecycleHistoryUI(
+                result.value.equipamento?.id || id,
+                result.value.lifecycle_history_html || '',
+                result.value.lifecycle_history_count
+            );
+        }
+
+        window.Swal.fire({
+            icon: 'success',
+            title: 'Equipamento encerrado',
+            text: result.value.message || 'O equipamento foi encerrado com sucesso.',
+            confirmButtonText: 'Ok'
+        });
+    });
+}
+
+window.confirmarEncerramento = confirmarEncerramento;
 
 /**
  * Abre a página de documentação correspondente na mesma aba.
@@ -1100,7 +1625,9 @@ function openDocPage(page) {
         'funcionarios': '01-manual-do-usuario/funcionarios.md',
         'servicos': '01-manual-do-usuario/servicos.md',
         'orcamentos': '01-manual-do-usuario/orcamentos.md',
-        'pacotes-servicos': '01-manual-do-usuario/pacotes-de-servicos.md',
+        'pacotes-servicos': '06-modulos-do-sistema/pacotes-servicos.md',
+        'precificacao': '06-modulos-do-sistema/precificacao.md',
+        'checklists': '06-modulos-do-sistema/checklists.md',
         'usuarios': '02-manual-administrador/usuarios-e-permissoes.md',
         'grupos': '02-manual-administrador/usuarios-e-permissoes.md',
         'configuracoes': '02-manual-administrador/configuracao-do-sistema.md',
@@ -1130,7 +1657,7 @@ function openDocPage(page) {
         'central-mobile': '12-app-mobile-pwa/README.md',
         'app-mobile-pwa': '12-app-mobile-pwa/README.md',
         'app-mobile-versionamento': '12-app-mobile-pwa/09-versionamento-e-releases/politica-de-versoes.md',
-        'app-mobile-design-system': '12-app-mobile-pwa/06-design-system/fundamentos.md',
+        'app-mobile-design-system': '12-app-mobile-pwa/README.md',
         'central-mensagens': '06-modulos-do-sistema/central-de-mensagens.md',
         'central-mensagens-chatbot': '06-modulos-do-sistema/central-de-mensagens.md#chatbot',
         'central-mensagens-metricas': '06-modulos-do-sistema/central-de-mensagens.md#metricas',
@@ -1145,6 +1672,8 @@ function openDocPage(page) {
         'templates-whatsapp-os': '06-modulos-do-sistema/ordens-de-servico.md#templates-de-whatsapp-para-documentos',
         'deploy-vps': '10-deploy/manual-tecnico-oficial-vps-ubuntu-24-ci4.md',
         'deploy-vps-script': '10-deploy/scripts/install_erp.sh',
+        'deploy-vemfazer-setup': '10-deploy/integracao-setup-vemfazer.md',
+        'deploy-vemfazer-stack': '10-deploy/integracao-setup-vemfazer.md',
         'deploy-vps-guia': '10-deploy/linux-vps-deployment.md',
         'deploy-vps-atualizacao': '10-deploy/atualizacao-vps-sem-downtime.md',
         'deploy-vps-ubuntu26': '10-deploy/atualizacao-vps-sem-downtime.md',

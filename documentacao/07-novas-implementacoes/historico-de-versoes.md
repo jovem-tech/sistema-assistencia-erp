@@ -1,7 +1,20 @@
-﻿# Historico de Versoes do Sistema
+# Historico de Versoes do Sistema
 
-Atualizado em: 19/05/2026  
-Versao atual oficial: `2.16.41`
+Atualizado em: 10/06/2026
+Versao atual oficial: `2.23.29`
+
+### 10/06/2026 - v2.23.29 / app 0.4.2
+- o modal `Baixa da OS` passou a perguntar, antes da confirmacao final, se o operador deseja enviar a mensagem pelo WhatsApp;
+- quando o envio e aceito, o backend anexa o PDF consolidado da impressao da OS em formato A4, reaproveitando o documento mais completo do fluxo operacional;
+- o comportamento de envio continua opcional: a baixa pode ser registrada com ou sem WhatsApp, sem sair da fila `/os`;
+- a grade principal do `Financeiro` passou a usar larguras proporcionais fixas por coluna no desktop, impedindo que `Descricao` colapse o card clicavel e quebre o titulo letra a letra;
+- `Classificacao` e `Acoes` continuam visiveis no mesmo grid sem disputar largura de forma agressiva, enquanto o card da descricao preserva o chip `Ver detalhes` alinhado e legivel;
+- a aba `Dashboard` de `Relatorios -> Fluxo de Caixa` passou a usar alturas controladas para os canvases e um recalculo dos graficos apos a aba ficar visivel;
+- com isso, a tela deixou de esticar verticalmente em excesso ao abrir o dashboard e manteve leitura responsiva tambem em `<= 430px`, `<= 390px`, `<= 360px` e `<= 320px`, sem overflow horizontal;
+- a listagem `/os` passou a reduzir o peso tipografico do telefone dentro da coluna `Cliente`, preservando o nome como referencia principal da linha;
+- as linhas `Conclusao` e `Entrega` na coluna `Datas` deixaram de reutilizar o fundo colorido do pill de `Prazo`, mantendo o destaque visual apenas para o atraso operacional;
+- a documentacao de usuario, a documentacao tecnica do modulo e a referencia de API foram atualizadas para refletir o novo fluxo;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.29`, renovando o cache dos assets CSS/JS.
 
 ## Observacao sobre o App Mobile/PWA
 
@@ -17,9 +30,473 @@ Estado documental atual do app:
 
 - versao do app: `0.4.2`
 - ERP minimo compativel: `2.11.5`
-- documentacao exclusiva aprofundada em 04/04/2026
+- documentacao exclusiva consolidada em 04/04/2026, com hub oficial em `documentacao/12-app-mobile-pwa/`
 
 ## Release ERP + App
+
+### 10/06/2026 - v2.23.28 / app 0.4.2
+- a pagina `Financeiro` passou a manter os botoes de acao visiveis em telas menores, com a coluna `Acoes` quebrando os icones em linhas quando necessario;
+- o cabeçalho do modulo ganhou um atalho `+ Novo lancamento` mais compacto, preservando a acao principal sem esconder os demais botoes da tela;
+- o comportamento responsivo foi ajustado para reduzir o corte lateral da lista e melhorar a leitura operacional em desktop estreito, notebook e mobile;
+- a documentacao de usuario do modulo financeiro foi atualizada para refletir a nova leitura de responsividade;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.28`, renovando o cache dos assets CSS/JS.
+
+### 09/06/2026 - v2.23.27 / app 0.4.2
+- a tela de abertura, edicao e visualizacao da OS passou a seguir a mesma regra para `Data de Entrega`, exibindo o campo logo abaixo do status quando o operador seleciona `entregue_reparado`, `devolvido_sem_reparo`, `descartado`, `entregue_pagamento_pendente` ou o alias `entregue`;
+- o campo tambem reaparece automaticamente quando a OS volta a um status final, mantendo o valor no rascunho e permitindo ajuste manual antes de salvar;
+- a regra de negocio compartilhada passou a considerar `descartado` como status que exige data de entrega, alinhando formulario, edicao e baixa automatica;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.27`, renovando o cache dos assets CSS/JS.
+
+### 09/06/2026 - v2.23.26 / app 0.4.2
+- a listagem `Taxas cadastradas` dentro da aba `Taxa por parcela` passou a exibir botões de filtro por operadora, agilizando a consulta das taxas registradas por marca;
+- os filtros funcionam sem recarregar a tela, ocultando e exibindo as linhas da tabela imediatamente no navegador;
+- a documentação do modulo financeiro foi atualizada para refletir a nova filtragem operacional;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.26`, renovando o cache dos assets CSS/JS.
+
+### 09/06/2026 - v2.23.25 / app 0.4.2
+- a tela `Financas -> Cartoes e taxas` passou a exibir a listagem de `Taxas cadastradas` dentro da propria aba `Taxa por parcela`, eliminando a aba separada;
+- a interface passou a manter apenas quatro abas visiveis, com `Taxa por parcela` concentrando cadastro e consulta no mesmo painel;
+- a aba `Taxa por parcela` distribui formulario e tabela lado a lado em desktop e em pilha em telas menores;
+- a documentacao do modulo financeiro foi atualizada para refletir a nova organizacao visual;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.25`, renovando o cache dos assets CSS/JS.
+
+### 09/06/2026 - v2.23.24 / app 0.4.2
+- a tela `Financas -> Cartoes e taxas` foi reorganizada em cinco abas para separar melhor operadoras, bandeiras, faixa de taxas, listagem consolidada e simulador;
+- a navegação horizontal das abas foi preparada para caber em telas pequenas sem quebrar o layout da pagina;
+- a documentacao do modulo financeiro foi atualizada para refletir a nova organizacao visual;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.24`, renovando o cache dos assets CSS/JS.
+
+### 09/06/2026 - v2.23.23 / app 0.4.2
+- o painel `Resumo financeiro e lucro` do modal `Baixa da OS` passou a exibir tambem `Adiantamento ja recebido`, `Lancado nesta acao` e `Saldo projetado apos salvar`;
+- os valores desse resumo agora reagem imediatamente durante a digitacao dos pagamentos, sem depender de sair do campo para atualizar;
+- a leitura operacional da baixa ficou consistente com os cards de recebimentos, evitando que o resumo lateral aparente `R$ 0,00` enquanto o operador ainda esta preenchendo a baixa;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.23`, renovando o cache dos assets CSS/JS.
+
+### 09/06/2026 - v2.23.22 / app 0.4.2
+- a `Grade diaria operacional` do `Fluxo de Caixa` deixou de listar lancamentos diretamente na celula do dia, reduzindo a poluicao visual em datas com muitos registros;
+- a grade ganhou a coluna `Acoes`, com botao `Visualizar` para abrir um modal por dia;
+- o novo modal concentra `movimentos realizados` e `titulos previstos` do dia, mantendo a grade principal mais dinamica e operacional;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.22`, renovando o cache dos assets CSS/JS.
+
+### 09/06/2026 - v2.23.21 / app 0.4.2
+- o modal `Baixa da OS` passou a separar pagamentos antecipados da baixa operacional: `Adiantamento` e `Sinal` registram valor no Financeiro, Fluxo de Caixa e DRE sem alterar o status da OS;
+- somente lançamentos classificados como `Recebimento da baixa` alteram o status da OS;
+- baixa operacional parcial leva a OS para `entregue_pagamento_pendente` e mantém a ordem aberta para cobrança;
+- baixa operacional integral aplica o status final selecionado pelo operador, como `entregue_reparado`, `devolvido_sem_reparo` ou `descartado`;
+- a interface do modal passou a exibir `Sem alteração de status` quando a ação contém apenas pagamento antecipado;
+- a versão oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.21`, renovando o cache dos assets CSS/JS.
+
+### 09/06/2026 - v2.23.20 / app 0.4.2
+- envios de PDF por WhatsApp pela tela `/os/visualizar/{id}` passaram a tratar falhas operacionais do provider com HTTP `200` e `ok:false`, evitando `Failed to load resource 422` no console quando a Evolution rejeita a mensagem;
+- o provider `EvolutionApiProvider` agora adiciona automaticamente o DDI `55` em telefones brasileiros sem codigo de pais, alinhando o comportamento ao gateway local;
+- respostas da Evolution priorizam detalhes internos como `response.message`; quando vier apenas `Bad Request`, passam a exibir uma mensagem orientativa sobre DDI, instancia conectada e aceite do arquivo;
+- o wrapper global `DSFeedback.fire` desfoca o elemento ativo antes de abrir SweetAlert2 e restaura foco seguro depois, reduzindo avisos de acessibilidade por `aria-hidden`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.20`, renovando o cache dos assets CSS/JS.
+
+### 09/06/2026 - v2.23.19 / app 0.4.2
+- os diagnosticos de WhatsApp em `Configuracoes` passaram a retornar HTTP `200` com `ok:false` para falhas operacionais esperadas do provider/gateway, evitando `Failed to load resource 422` no console;
+- `422` continua reservado para validacoes reais de formulario, como telefone de teste vazio;
+- o modal `Gerenciar Gateway` remove o foco do botao ativo antes de abrir SweetAlert2 e restaura foco seguro apos o alerta, evitando aviso de acessibilidade por `aria-hidden` com descendente focado;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.19`, renovando o cache dos assets CSS/JS.
+
+### 09/06/2026 - v2.23.18 / app 0.4.2
+- a coluna `Status / Orcamento` da listagem `/os` passou a quebrar badges comerciais longos dentro da propria celula;
+- status como `Pendente de envio para aprovacao do cliente` deixam de invadir a coluna `Valor`;
+- o CSS do badge de orcamento recebeu `max-width: 100%`, `white-space: normal`, `overflow-wrap: anywhere` e `word-break: break-word`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.18`, renovando o cache dos assets CSS/JS.
+
+### 08/06/2026 - v2.23.17 / app 0.4.2
+- a aba `Envio do orcamento`, inclusive quando aberta em modal pela OS, passou a exibir o bloco `Status do envio` logo abaixo do link publico;
+- o resumo mostra o ultimo resultado comercial registrado em `orcamento_envios`, com canal, data, destino, provedor e erro tecnico quando houver;
+- a tela tambem separa o ultimo status por `WhatsApp` e por `E-mail`, deixando evidente se o envio foi concluido, duplicado, ainda nao tentado ou falhou;
+- a responsividade do novo bloco cobre os breakpoints `<= 430px`, `<= 390px`, `<= 360px` e `<= 320px`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.17`, renovando o cache dos assets CSS/JS.
+
+### 08/06/2026 - v2.23.16 / app 0.4.2
+- o historico do ciclo de vida do equipamento passou a receber um backfill automatico dos eventos antigos ja existentes em `logs`, preenchendo a timeline mesmo para equipamentos que foram encerrados antes da nova tabela existir;
+- a migration `2026-06-08-130000_BackfillEquipamentoLifecycleHistoricoFromLogs` consolida encerramentos, reativacoes e encerramentos automaticos sem quebrar a integridade referencial;
+- registros de equipamentos que nao existem mais na tabela `equipamentos` sao ignorados no backfill para preservar as chaves estrangeiras da timeline;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.16`, renovando o cache dos assets CSS/JS.
+
+### 08/06/2026 - v2.23.15 / app 0.4.2
+- a ficha do equipamento passou a exibir um historico proprio do ciclo de vida, com encerramentos manuais, reativacoes e encerramentos automaticos por OS descartada;
+- cada encerramento e cada volta a operacao ficam persistidos em uma timeline dedicada, sem depender apenas da tabela de logs tecnicos;
+- o bloco `Ordens de Servico Vinculadas` continua exibindo o historico completo de OS, inclusive quando o equipamento estiver encerrado;
+- as respostas AJAX de `encerrar` e `reativar` passaram a devolver o HTML atualizado do historico para manter a tela sincronizada sem refresh manual;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.15`, renovando o cache dos assets CSS/JS.
+
+### 08/06/2026 - v2.23.14 / app 0.4.2
+- quando uma OS e finalizada com status `descartado`, o ERP encerra automaticamente o equipamento vinculado usando o mesmo ciclo de vida operacional do cadastro;
+- o equipamento encerrado por descarte continua no historico do cliente, mas fica indisponivel para novas OS e novos vinculos operacionais;
+- a ficha do equipamento ganhou o botao `Reativar`, permitindo voltar o cadastro para `ativo` quando o bem for recuperado, recondicionado ou reparado;
+- o backend e o servico de quitacao financeira passaram a registrar essa sincronizacao automaticamente, sem depender de acao manual do usuario na ficha do equipamento;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.14`, renovando o cache dos assets CSS/JS.
+
+### 08/06/2026 - v2.23.13 / app 0.4.2
+- o modulo de `Equipamentos` ganhou o botao `Encerrar`, voltado para retirada de pecas, problemas irreparaveis, descarte e demais cenarios de fim de vida util;
+- o encerramento agora exige `motivo`, aceita `observacao interna`, grava `data/hora` do fechamento e preserva o cadastro apenas como historico do cliente;
+- equipamentos encerrados deixaram de aparecer nas listas operacionais de abertura de `OS` e `Orcamentos`, sem quebrar a edicao de registros historicos que ja apontavam para esse equipamento;
+- a ficha do equipamento passou a bloquear `Nova OS` e novos vinculos operacionais, exibindo badges de historico e o motivo do encerramento em tempo real;
+- a listagem e a ficha detalhada passaram a sinalizar `OS em andamento` e desabilitar o botao `Encerrar` quando ainda houver ordens abertas para o equipamento, evitando o 422 antes do envio;
+- foi criada a migration `2026-06-08-101500_AddLifecycleFieldsToEquipamentos`, adicionando as colunas `status_operacional`, `motivo_encerramento`, `observacao_encerramento` e `encerrado_em`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.13`, renovando o cache dos assets CSS/JS.
+
+### 08/06/2026 - v2.23.12 / app 0.4.2
+- o modal de cadastro/edicao de equipamento dentro da tela `/os/editar/{id}` passou a exibir o campo `Observacoes do equipamento` na aba `Info`;
+- o tecnico agora consegue destacar peculiaridades, avarias visiveis e alertas operacionais do aparelho sem sair do contexto da OS;
+- a hidratacao do modal e do seletor de equipamento passou a sincronizar esse campo tambem no cache/frontend da OS, preservando a observacao ao reabrir o modal;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.12`, renovando o cache dos assets CSS/JS.
+
+### 07/06/2026 - v2.23.11 / app 0.4.2
+- a busca global deixou de ser exibida na navbar mobile para manter a barra superior compacta e alinhada ao menu hamburger;
+- o mesmo componente de busca passou a ser renderizado no topo do sidebar mobile, acessivel ao abrir o menu hamburger;
+- `public/assets/js/global-search.js` agora inicializa multiplas instancias independentes da busca global, evitando conflito entre a busca desktop e a busca do menu mobile;
+- o espacamento extra da listagem `/os` abaixo da navbar foi reduzido, ja que o campo de busca nao ocupa mais o topo da pagina;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.11`, renovando o cache dos assets CSS/JS.
+
+### 07/06/2026 - v2.23.10 / app 0.4.2
+- o card mobile da listagem `/os` passou a exibir nomes longos de cliente usando toda a largura util do card, com quebra normal de linha em vez de uma faixa curta com rolagem horizontal;
+- o telefone principal do cliente permanece em linha unica abaixo do nome, preservando o atalho do modal rapido de WhatsApp;
+- o alinhamento da navbar mobile foi movido para a responsividade global, mantendo menu hamburger, titulo, notificacoes e perfil na mesma linha visual em todo o sistema;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.10`, renovando o cache dos assets CSS.
+
+### 07/06/2026 - v2.23.9 / app 0.4.2
+- a listagem `/os` passou a calcular os `data-labels` do card mobile com base no indice real da coluna na DataTable, evitando o deslocamento de `Cliente` para `Equipamento` quando `Nº OS` fica oculto;
+- o card mobile da grade `/os` deixou de usar a antiga malha interna e passou a renderizar cada `td` como linha flexivel, eliminando a sobreposicao visual entre rótulo, nome do cliente e bloco de equipamento;
+- a coluna `Cliente`, o telefone principal e o bloco de `Equipamento` passaram a permanecer em uma unica linha no mobile, com rolagem horizontal interna apenas quando o texto excede a largura do card;
+- o bloco de `Cliente` passou a ocupar a largura inteira do card no mobile, evitando uma faixa estreita ao lado do nome e do telefone e concentrando a rolagem horizontal na linha longa do nome;
+- a barra superior da listagem `/os` foi compactada no mobile para trazer notificacoes, perfil e busca mais para o topo da tela, com alinhamento visual do hamburger e dos icones da direita;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.9`.
+
+### 07/06/2026 - v2.23.8 / app 0.4.2
+- a coluna `Cliente` da listagem `/os` voltou a exibir o telefone principal como linha visivel abaixo do nome, sem truncar o numero com `...`, mantendo o atalho para o modal rapido de WhatsApp;
+- a coluna `Status / Orcamento` foi reorganizada em um status principal, uma linha menor de orcamento e um estado secundario oculto quando redundante com a leitura principal;
+- a coluna `Valor` passou a destacar `Total OS` em negrito e simplificou as linhas secundarias para `Recebido`, `Adiantamento` e `Saldo`, reduzindo o corte dos valores monetarios;
+- a largura das colunas da grade `/os` foi reajustada para preservar a leitura das colunas novas sem mexer no restante do layout;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.8`.
+
+### 07/06/2026 - v2.23.7 / app 0.4.2
+- a grade `/os` recebeu nova distribuicao de larguras para `Foto / OS`, `Cliente`, `Equipamento`, `Datas`, `Status / Orcamento` e `Valor`, evitando que o resumo financeiro seja comprimido ou sobreposto;
+- a coluna `Cliente` passou a renderizar nomes longos em linhas de ate `3 palavras`, preservando o telefone clicavel logo abaixo do nome;
+- a linha `Equip.` da coluna `Equipamento` passou a renderizar descricoes tecnicas em blocos de ate `3 palavras`, mantendo separadores `|` junto ao termo anterior para leituras como `Mini Tower | H610 |`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.7`.
+
+### 07/06/2026 - v2.23.6 / app 0.4.2
+- a coluna `Cliente` da listagem `/os` passou a exibir tambem o telefone principal do cadastro, com atalho visual direto para contato;
+- clicar no telefone agora abre um modal rapido de WhatsApp na propria fila de OS, com suporte a `template pronto`, `mensagem personalizada` e envio de `documento salvo da OS` ou `PDF consolidado da impressao`;
+- a listagem ganhou a rota `GET /os/whatsapp-meta/{id}` para hidratar esse modal sem sair da tela;
+- a coluna `Valor` deixou de mostrar apenas o total final e passou a exibir um mini resumo financeiro da OS, destacando `recebido`, `adiantamento`, `saldo` e `total`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.6`.
+
+### 07/06/2026 - ajuste visual interno da listagem de OS (sem mudanca de versao oficial)
+- a grade `/os` passou a exibir o numero principal da ordem logo abaixo da foto do equipamento, concentrando a identificacao no mesmo bloco visual;
+- a coluna `N OS` deixou de disputar largura na tabela principal e segue apenas no payload tecnico da DataTable;
+- a linha `Equip.` da coluna `Equipamento` foi reduzida em `40%` para liberar espaco horizontal sem remover o resumo tecnico.
+
+### 07/06/2026 - v2.23.5 / app 0.4.2
+- o modal `Baixa da OS` ganhou o botao `Adicionar adiantamento`, ao lado de `Adicionar recebimento`, para registrar pagamentos antecipados sem sair da fila operacional;
+- esse novo fluxo abre uma escolha rapida entre `Adiantamento total` e `Sinal`, preenchendo o saldo restante quando fizer sentido e preservando a classificacao no proprio lancamento;
+- cada linha financeira da baixa agora pode ser classificada como `Recebimento da baixa`, `Adiantamento` ou `Sinal`, e essa informacao passa a viajar em `recebimentos_json`;
+- nota de compatibilidade `2.23.21`: `Adiantamento` e `Sinal` sao apenas lancamentos financeiros e nao alteram o status operacional da OS;
+- a aba `Valores` da visualizacao da OS agora diferencia os badges do historico financeiro entre `Adiantamento` e `Sinal`, em vez de tratar tudo apenas como adiantamento generico;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.5`.
+
+### 07/06/2026 - v2.23.4 / app 0.4.2
+- o modal `Baixa da OS` passou a usar o `valor efetivo` da ordem quando os campos financeiros da tabela `os` ainda estiverem zerados;
+- esse valor efetivo agora cai automaticamente para o `orcamento aprovado` ou `convertido` mais recente vinculado, mantendo coerencia com a listagem operacional;
+- a aba `Valores` da visualizacao da OS e o modal auxiliar de orcamento tambem passaram a usar a mesma base financeira;
+- a criacao automatica do titulo `A receber` no fechamento passou a respeitar esse fallback, evitando OS concluida com valor exibido mas titulo zerado;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.4`.
+
+### 07/06/2026 - v2.23.3 / app 0.4.2
+- a aba `Valores` da visualizacao da `OS` passou a exibir `adiantamento recebido`, `total recebido`, `saldo financeiro pendente` e o `historico de recebimentos`;
+- o backend da OS agora consolida um resumo financeiro proprio do titulo `A receber`, com status resolvido, percentual quitado, ultimo recebimento e classificacao dos lancamentos tratados como adiantamento;
+- o modal `Baixa da OS` passou a rotular explicitamente `Adiantamento ja recebido`, alinhando a linguagem do financeiro com a operacao de balcao;
+- a rota AJAX de encerramento da OS passou a expor `valor_adiantamento`, `valor_recebido_total`, `percentual_quitado`, `ultimo_recebimento_em` e `formas_pagamento_resumo`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.3`.
+
+### 07/06/2026 - v2.23.2 / app 0.4.2
+- o card `Resumo do período` do relatório `Fluxo de Caixa` passou a exibir a composicao visual de `entradas previstas` e `saidas previstas`;
+- cada composicao agora mostra `descricao`, `vencimento`, `OS` quando houver vinculo, valor `ja recebido/pago` e saldo `em aberto`, eliminando a leitura implicita do numero resumido;
+- a `Grade diaria operacional` tambem passou a listar, em cada dia com previsao, quais titulos compoem o valor previsto daquela data;
+- a view `app/Views/relatorios/view_fluxo_caixa.php` foi saneada em UTF-8 para reforcar a acentuacao correta em `pt_BR`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.2`.
+
+### 06/06/2026 - v2.23.1 / app 0.4.2
+- o relatório `Fluxo de Caixa` ganhou uma `grade diária operacional`, destacando por dia `entradas`, `saídas`, `saldo do dia` e `acumulado do mês`;
+- a curva diária anterior foi reorganizada para uma leitura mais operacional, mantendo o suporte interno a `saldo realizado`, `saldo projetado` e previsões por vencimento;
+- o backend passou a calcular `saldo_do_dia` e `acumulado_mes` dentro de `FinanceiroModel::buildCashFlowDailyRows()`, reaproveitando os mesmos movimentos e títulos já usados no relatório;
+- a tela do fluxo também recebeu revisão textual em `pt_BR`, corrigindo acentuação de labels e mensagens como `Mês`, `Saídas`, `Descrição`, `Referência`, `Classificação` e `Títulos`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.23.1`.
+
+### 06/06/2026 - landing comercial publica alinhada ao estado atual do ERP
+- foi criada uma landing publica nas rotas `/site` e `/apresentacao`, sem alterar a rota raiz atual de login do sistema;
+- a nova pagina passou a usar dados institucionais configurados no ERP (`empresa_nome`, `empresa_telefone`, `empresa_email`, `empresa_endereco`, logo e favicon), evitando CTA e rodape ficticios;
+- a copy e os blocos comerciais foram reescritos para refletir os modulos reais do produto hoje: `OS`, `Orcamentos` com `link publico`, `WhatsApp OS`, `CRM`, `Financeiro gerencial`, `PWA` e `Coletor de Bancada`;
+- na rodada seguinte, a pagina tambem passou por normalizacao textual para pt-BR, com acentuacao correta em titulos, CTA, FAQ, prova comercial e mensagem pre-preenchida do WhatsApp.
+
+### 06/06/2026 - reorganizacao do link publico na visualizacao de Orcamentos
+- a tela `Visualizar Orcamento` passou a exibir o bloco `Link publico e referencia comercial` dentro da aba `Envio do orcamento`, junto de PDF, WhatsApp e e-mail;
+- a aba `Financeiro do orcamento` ficou focada apenas no resumo monetario (`subtotal`, `desconto`, `acrescimo` e `total final`);
+- o ajuste foi aplicado em `app/Views/orcamentos/show.php`, sem alterar IDs de copiar/abrir o link publico nem os fluxos existentes de envio.
+
+### 06/06/2026 - correcao do lookup de OS abertas no formulario de Orcamentos
+- o endpoint `GET /orcamentos/os-abertas/cliente` deixou de falhar com `500` ao serializar OS abertas de clientes cujo equipamento possuia `marca` e/ou `modelo` ausentes no formatter;
+- `App\Controllers\Orcamentos::formatOsAbertaLookupResult()` voltou a preencher `equip_marca` e `equip_modelo` explicitamente antes de montar `search_text` e o payload do card `Vinculo OS`;
+- foi adicionada cobertura de regressao em `tests/unit/OrcamentosLookupTest.php` para garantir que o lookup continue funcionando mesmo com cadastro parcial do equipamento.
+
+### 05/06/2026 - evolucao do RBAC para modulos independentes
+- o sistema de permissoes passou a tratar `crm`, `atendimento_whatsapp` e `precificacao` como modulos proprios, em vez de depender apenas de `clientes` e `orcamentos`;
+- foi criada a migration `2026-06-05-160000_SyncEvolvedRbacModules`, responsavel por criar os slugs novos em `modulos` e replicar permissao inicial equivalente para os grupos existentes;
+- as rotas de `CRM`, `Central de Mensagens` e `Precificacao` foram atualizadas para usar filtros dedicados (`permission:crm:*`, `permission:atendimento_whatsapp:*` e `permission:precificacao:*`);
+- a sidebar, a busca global e a ficha do cliente passaram a respeitar a visibilidade desses modulos separadamente, evitando liberar ou esconder funcionalidades pelo dominio errado.
+
+### 05/06/2026 - v2.22.13 / app 0.4.2
+- a tela principal do `Financeiro` ganhou o filtro `Despesas fixas`, voltado para contas `A pagar` marcadas como `Despesa fixa mensal na DRE`;
+- o novo filtro foi integrado a mesma barra de `tipo` e `status`, permitindo combinar `despesas fixas` com `Pendentes`, `Parciais`, `Pagos` e `Cancelados`;
+- os links de filtro da grade passaram a preservar melhor o contexto atual entre `tipo`, `status` e recorrencia fixa, evitando perder a combinacao a cada clique;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.13`.
+
+### 05/06/2026 - v2.22.12 / app 0.4.2
+- o formulario de `Novo lancamento` e `Editar lancamento` do `Financeiro` foi reorganizado para exibir `Data vencimento`, `Mes/ano de competencia` e `Data de pagamento` lado a lado no desktop;
+- `Origem automatica` foi reposicionada para a linha superior, preservando o mesmo comportamento de leitura automatica sem alterar a regra de negocio do modulo;
+- a alteracao foi apenas de layout, sem impacto em persistencia, calculo de `DRE` ou `fluxo de caixa`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.12`.
+
+### 05/06/2026 - v2.22.11 / app 0.4.2
+- corrigido o modal de detalhamento do `Financeiro` para titulos sem `OS` vinculada, que antes podiam disparar erro ao tentar montar o bloco de equipamento a partir de valor nulo;
+- a partial `detail_modal_content` passou a tratar defensivamente a ausencia de `osDetalhes`, exibindo apenas o contexto financeiro da conta quando nao houver ordem relacionada;
+- o endpoint `GET /financeiro/detalhes/{id}` passou a responder JSON estruturado mesmo em falha interna de renderizacao, preservando o tratamento amigavel no frontend;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.11`.
+
+### 05/06/2026 - v2.22.10 / app 0.4.2
+- corrigida a coluna `Descricao` da grade do `Financeiro`, que em alguns cenarios do desktop estava quebrando o texto letra a letra e comprimindo excessivamente o card clicavel;
+- a view do modulo passou a sobrescrever a regra global agressiva de `word-break` apenas dentro da tabela financeira e ganhou largura minima operacional para a celula de `Descricao`;
+- o card interno da descricao agora respeita melhor quebra por palavra, mantendo `cliente`, `fornecedor`, `equipamento` e resumo contextual legiveis sem desconfigurar a linha;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.10`.
+
+### 05/06/2026 - v2.22.9 / app 0.4.2
+- a coluna `Equipamento` da listagem `/os` passou a encurtar automaticamente nomes tecnicos muito longos de `Desktop montado`;
+- quando o resumo completo extrapola a leitura ideal da grade, a celula agora prioriza `tipo de gabinete`, `chipset` e `processador`;
+- o modal/ficha do equipamento continua exibindo o nome completo e os demais detalhes tecnicos sem perda de informacao;
+- foi adicionada a funcao auxiliar `equipamento_resumo_tecnico_essencial()` para apoiar esse resumo compacto;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.9`.
+
+### 05/06/2026 - v2.22.8 / app 0.4.2
+- o cadastro completo de `Equipamentos`, o modal rapido da `OS` e a API interna de equipamentos passaram a bloquear duplicidade por `numero de serie`, `MAC` e `IMEI`;
+- quando o identificador ja pertence ao mesmo cliente, o sistema orienta a reutilizar o equipamento existente em vez de criar outro cadastro;
+- quando o identificador ja pertence a outro cliente, o ERP oferece vincular o cliente atual ao mesmo equipamento, preservando um historico unico do bem fisico;
+- foi criado o `EquipamentoIdentidadeService`, centralizando normalizacao dos identificadores, comparacao e vinculacao segura de clientes ao cadastro existente;
+- a migration `2026-06-05-120000_AddEquipamentoIdentityIndexes` adicionou indices de apoio em `equipamentos.numero_serie` e `equipamentos.imei`, removeu pares duplicados antigos em `equipamento_clientes` e aplicou unicidade operacional em `(equipamento_id, cliente_id)`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.8`.
+
+### 05/06/2026 - v2.22.7 / app 0.4.2
+- o grafico principal do `Dashboard` passou a comparar duas series mensais no mesmo eixo: `OS abertas` e `OS entregues reparadas`;
+- o endpoint `GET /admin/stats` agora devolve `os_abertas_ano[].entregues_reparadas`, permitindo que o frontend plote a segunda linha sem recarregar a pagina inteira;
+- a linha de `OS entregues reparadas` foi padronizada em verde para leitura comparativa rapida no painel operacional;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.7`.
+
+### 05/06/2026 - v2.22.6 / app 0.4.2
+- a importacao local do `Coletor de Bancada` passou a priorizar o valor de `chipset` no campo catalogado `Modelo` tanto no cadastro completo de `Equipamentos` quanto no modal rapido de equipamento da `OS`;
+- quando o snapshot nao trouxer `chipset`, o sistema usa o `model` detectado no inventario apenas como fallback, evitando manter `System Product Name` ou rotulos genericos como identificacao principal quando houver chipset disponivel;
+- o `model` original do inventario continua preservado dentro do snapshot/`OS digital`, sem perder o dado bruto vindo da BIOS/fabricante;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.6`.
+
+### 04/06/2026 - v2.22.5 / app 0.4.2
+- o snapshot local do `Coletor de Bancada` passou a usar o numero da `OS` no nome do arquivo sempre que esse contexto estiver disponivel, no padrao `C:\JovemTechBenchCollector\inf_<numero_os>.json`;
+- sem `OS`, o fallback continua sendo `C:\JovemTechBenchCollector\last-snapshot.json`, preservando o uso tecnico fora do fluxo da ordem;
+- o botao `Buscar do agente (C:\)` agora envia esse contexto de `OS` para o executavel local antes da coleta, permitindo que o proprio coletor ja grave no nome final esperado;
+- depois que a coleta automatica local termina com sucesso e o JSON e enriquecido com a `OS digital`, o ERP remove `JovemTechBenchCollector.exe` e `README.md` da pasta `C:\JovemTechBenchCollector`, deixando apenas o arquivo final util;
+- as mensagens de sucesso do formulario de `Equipamentos` e do modal de equipamento da `OS` passaram a informar essa limpeza dos arquivos temporarios;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.5`.
+
+### 04/06/2026 - v2.22.4 / app 0.4.2
+- o `last-snapshot.json` do `Coletor de Bancada` passou a registrar no topo `collectedAtUtc`, `collectedAtLocal`, `savedAtUtc` e `savedAtLocal`, deixando a data da coleta visivel mesmo em leitura local pura;
+- quando a coleta local e disparada pelos formularios do ERP, o backend agora enriquece esse arquivo como uma `OS digital`, adicionando os blocos `serviceOrder`, `customer` e `company`;
+- no contexto da `OS`, o snapshot local pode guardar `numero da OS`, `status`, `prioridade`, `tecnico`, `relato do cliente`, `datas principais`, `equipamento` e `link publico do selo`, alem do nome/telefone/email do cliente;
+- os dados configurados da Jovem Tech (`empresa_nome`, `empresa_telefone`, `empresa_email`, `empresa_endereco`) passam a acompanhar o snapshot local enriquecido, facilitando o uso do arquivo como ficha digital salva no PC do cliente;
+- os botoes `Buscar do agente (C:\)` no cadastro de `Equipamentos` e no modal de equipamento da `OS` passaram a enviar automaticamente o contexto disponivel para essa montagem do documento local;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.4`.
+
+### 04/06/2026 - v2.22.3 / app 0.4.2
+- corrigido o fluxo do `Coletor de Bancada` em `--dry-run`, que ainda tentava criar o cliente HTTP antes de verificar o modo local e podia falhar com `Invalid URI` quando o botao `Buscar do agente (C:\)` executava a coleta sem contexto de `ERP`;
+- o executavel agora so instancia `ErpAgentClient` quando realmente vai fazer `bootstrap/check-in`, preservando a coleta local pura para o botao do formulario;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.3`.
+
+### 04/06/2026 - v2.22.2 / app 0.4.2
+- o botao `Buscar do agente (C:\)` passou a atender `Desktop` e `Notebook` no cadastro completo e no modal de equipamento da `OS`;
+- quando o coletor ainda nao existe em `C:\JovemTechBenchCollector`, o ERP agora copia automaticamente `JovemTechBenchCollector.exe`, executa uma coleta local nova e reaproveita o snapshot gerado logo em seguida;
+- a importacao local passou a preencher tambem `marca` e `modelo`, especialmente util para `Notebook`, onde esses dados costumam vir da BIOS/fabricante;
+- o numero de serie do inventario agora prioriza a `BIOS` e usa o `MAC` da placa de rede como fallback quando a BIOS nao trouxer uma serie confiavel, tanto no coletor `C#` quanto no script PowerShell de fallback;
+- o `JovemTechBenchCollector.exe` passou a aceitar `--dry-run` sem exigir contexto de `ERP`, `OS` e `email`, permitindo leitura local pura na bancada;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.2`.
+
+### 04/06/2026 - v2.22.1 / app 0.4.2
+- o `Coletor de Bancada` passou a salvar o ultimo snapshot local em `C:\JovemTechBenchCollector\last-snapshot.json`, para reaproveitamento imediato na bancada;
+- foi criada a rota protegida `GET /equipamentos/bench-collector/snapshot-local`, que le esse arquivo local e devolve os campos tecnicos ja normalizados para o formulario do equipamento;
+- o cadastro completo de `Equipamentos` e o modal de equipamento dentro da `OS` ganharam o botao `Buscar do agente (C:\)`, que preenche automaticamente `serie`, `placa-mae`, `chipset`, `processador`, `memoria`, `armazenamento`, `placa de video` e sugestao de `gabinete`;
+- o coletor foi endurecido para nao abortar a execucao inteira caso a gravacao local do snapshot falhe por permissao no `C:\`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.1`.
+
+### 04/06/2026 - v2.22.0 / app 0.4.2
+- o fluxo de inventario tecnico de `Desktop` e `Notebook` ganhou um `Coletor de Bancada` portatil em `C#`, publicado como `public/assets/agents/JovemTechBenchCollector-win-x64.zip`;
+- o executavel `JovemTechBenchCollector.exe` roda sem instalacao no computador do cliente, faz `bootstrap` pela `OS`, coleta hardware local via `WMI` e envia um `check-in` unico por padrao;
+- o coletor passou a suportar uso interativo no console, `--dry-run` para teste local sem envio ao ERP e modo `--continuous` para repeticao de check-ins quando necessario;
+- foi criado o script `scripts/agents/publish-bench-collector.ps1`, que instala um SDK .NET local quando preciso e publica o artefato self-contained dentro de `public/assets/agents/bench-collector/win-x64/`;
+- a ficha do equipamento agora prioriza o download do pacote `.zip` do coletor e deixa o comando em `PowerShell` apenas como fallback tecnico;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.22.0`.
+
+### 04/06/2026 - v2.21.0 / app 0.4.2
+- o cadastro de `Equipamentos` passou a tratar `Desktop` em dois modos: `Desktop de marca/OEM` e `Desktop montado`;
+- no modo `Desktop montado`, `Marca` e `Modelo` deixam de ser a identificacao principal e o ERP passa a montar um `resumo tecnico` com `gabinete`, `chipset`, `processador`, `memoria`, `armazenamento`, `GPU` e `fonte`;
+- a tela de `Equipamentos` e o modal inline da `Nova OS` ganharam o painel tecnico de desktop, incluindo ajuda para `Como identificar?` o tipo de gabinete;
+- o backend recebeu `EquipamentoProfileService`, responsavel por validar o fluxo de desktop montado, aplicar o catalogo padrao `Montado > Desktop montado`, gerar `display_name/display_label` e sincronizar a configuracao tecnica;
+- a API interna de equipamentos (`/api/v1/equipments*`) passou a aceitar e devolver os novos campos tecnicos;
+- foi publicado o agente `public/assets/agents/jovemtec-monitor-agent.ps1`, capaz de provisionar e fazer `check-in` de inventario para `Desktop` e `Notebook`;
+- o endpoint `POST /api/v1/agents/check-in` agora grava snapshots do inventario e sincroniza automaticamente `placa_mae`, `chipset`, `processador`, `memoria_ram`, `armazenamento` e `placa_video` no equipamento vinculado;
+- a exibicao do equipamento foi alinhada em OS, PDFs, impressao, dashboard, relatorios, busca global, financeiro e ficha do equipamento para respeitar o novo `resumo_tecnico`;
+- a migration `2026-06-04-090000_AddDesktopProfilesAndAgentInventoryToEquipamentos` adicionou os campos tecnicos em `equipamentos` e ampliou `monitor_agents`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.21.0`.
+
+### 02/06/2026 - v2.20.5 / app 0.4.2
+- o formulario de `Novo Orcamento` e `Editar Orcamento` ganhou cadastro rapido inline de `Peca` e `Servico` dentro da propria linha do item, evitando que a equipe precise sair para os modulos de `Estoque` e `Servicos`;
+- quando a linha estiver como `Peca` ou `Servico`, a area de catalogo passa a mostrar o botao `Cadastrar`, que abre um modal reativo de cadastro rapido sem recarregar a pagina;
+- o backend recebeu os endpoints `POST /estoque/salvar_ajax` e `POST /servicos/salvar_ajax`, ambos retornando o item salvo no mesmo formato usado pelo `GET /orcamentos/item/catalogo`;
+- apos sucesso, o item e inserido imediatamente no Select2 da linha atual e o orcamento recebe descricao, referencia, valor e metadados de precificacao sem perder o contexto da tela;
+- em `Peca`, o cadastro rapido ja respeita a logica de `peca instalada`, incluindo valor recomendado e piso minimo operacional;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.20.5`.
+
+### 02/06/2026 - v2.20.4 / app 0.4.2
+- corrigido o retorno das acoes `Documentos PDF -> Gerar`, `Enviar por WhatsApp` e `Enviar por E-mail` na visualizacao da OS, que antes podiam recarregar a pagina e deixar a interface cair novamente na aba inicial `Informacoes`;
+- `POST /os/pdf/{id}/gerar`, `POST /os/whatsapp/{id}` e `POST /os/email/{id}/enviar` agora redirecionam explicitamente para `#tab-documentos` nos fluxos HTML da aba `Documentos`;
+- a propria `app/Views/os/show.php` continua lendo o hash da URL e reativando automaticamente a aba correspondente ao carregar;
+- com isso, apos gerar ou enviar um documento pela aba `Documentos`, o operador permanece no mesmo contexto visual do card de documentos;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.20.4`.
+
+### 02/06/2026 - v2.20.2 / app 0.4.2
+- a aba `Documentos` da visualizacao da OS passou a perguntar, via SweetAlert2, se o `Comprovante de abertura` salvo deve levar `fotos de perfil`, `fotos de entrada` ou nenhuma foto adicional;
+- essa escolha agora alimenta o endpoint oficial `POST /os/pdf/{id}/gerar`, permitindo que a nova versao persistida em `os_documentos` saia com o anexo fotografico correto;
+- o `OsPdfService` passou a aceitar `include_photos` e `photo_groups` para o documento `abertura`, reaproveitando o contexto consolidado do `OsPrintService`;
+- o comprovante oficial de abertura passou a anexar os grupos selecionados tambem quando o HTML vier de template dinamico, nao apenas da view legada;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.20.2`.
+
+### 02/06/2026 - v2.20.1 / app 0.4.2
+- a prompt exibida logo apos abrir uma nova OS recebeu refinamento de UX para ficar mais operacional no balcao;
+- o modal agora oferece tres caminhos claros: `Enviar agora`, `Gerar sem abrir WhatsApp` e `Enviar depois`;
+- a escolha de `fotos de perfil` e `fotos de entrada` continua no mesmo passo e passa a alimentar tanto o envio imediato quanto a pre-visualizacao aberta sem WhatsApp;
+- ao optar por `Gerar sem abrir WhatsApp`, a tela abre diretamente a pre-visualizacao `A4` com os grupos de foto selecionados, sem obrigar o operador a entrar no fluxo de mensageria;
+- quando o operador seguir para `Enviar agora`, o modal de WhatsApp continua sendo preconfigurado com `template os_aberta`, `A4` e os grupos de foto escolhidos;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.20.1`.
+
+### 01/06/2026 - v2.20.0 / app 0.4.2
+- o `PDF de abertura` da OS voltou a refletir corretamente `relato do cliente`, `acessorios recebidos` e `estado fisico`, corrigindo o payload usado pelos modelos documentais;
+- o fluxo de abertura e edicao da OS voltou a persistir `estado_fisico_data` no backend, evitando perda silenciosa dessas informacoes ao salvar;
+- o `Checklist de entrada` ganhou o campo livre `Observacoes do estado na entrada`, persistido em `checklist_execucoes.observacoes_estado`;
+- no documento de abertura e no consolidado `A4`, o bloco `Estado do aparelho` agora combina pendencias do checklist e essa observacao manual da recepcao;
+- logo apos criar uma nova OS, a visualizacao pode abrir uma prompt SweetAlert2 para preparar o envio do `PDF de abertura`, incluindo opcionalmente `fotos de perfil` e `fotos de entrada` no arquivo temporario enviado por WhatsApp;
+- o endpoint de impressao e o envio consolidado por WhatsApp passaram a aceitar `grupos_fotos`, permitindo restringir o PDF temporario aos grupos desejados;
+- a tabela `checklist_execucoes` recebeu a coluna `observacoes_estado` por migration dedicada;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.20.0`.
+
+### 01/06/2026 - v2.19.6 / app 0.4.2
+- o formulario de `Novo lancamento` e `Editar lancamento` do modulo `Financeiro` passou a usar o campo `Mes/ano de competencia` para lancamentos manuais, em vez de pedir uma data cheia que confundia a leitura gerencial;
+- quando a equipe informa apenas `mes/ano`, o backend converte automaticamente para `data_competencia = 01/mm/aaaa`, preservando compatibilidade com o campo `DATE` no banco;
+- lancamentos automaticos de `OS` continuam mantendo a `data completa` de entrega na competencia, sem perder a rastreabilidade exata da receita operacional;
+- a listagem do `Financeiro`, o modal detalhado e o relatorio operacional passaram a exibir `competencia` como `mes/ano` nos lancamentos manuais e `data cheia` apenas quando a origem automatica for `OS`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.19.6`.
+
+### 01/06/2026 - v2.19.5 / app 0.4.2
+- o formulario de `Novo lancamento` e `Editar lancamento` do modulo `Financeiro` deixou de expor o campo manual de `Origem`, que agora passa a ser sempre definida automaticamente pelo backend;
+- a tela passou a mostrar uma previa somente leitura de `Origem automatica`, explicando para a equipe se o titulo sera tratado como `Lancamento manual`, `Ordem de servico`, `Compra para estoque`, `Compra para OS` ou `Despesa vinculada a OS`;
+- a ajuda textual de `Data de competencia` foi reforcada com exemplo pratico de conta de junho paga em julho, deixando claro que o campo representa o mes economico da DRE;
+- quando `data_competencia` vier vazia, o backend passa a usar primeiro `data_vencimento` e deixa `data_pagamento` apenas como fallback final; em receitas de `OS`, a prioridade continua sendo `data_entrega`;
+- listagens e modal detalhado passaram a exibir a `origem` com rotulo humano em vez do codigo tecnico bruto;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.19.5`.
+
+### 01/06/2026 - v2.19.4 / app 0.4.2
+- corrigido o fluxo de exclusao acionado pelos botoes da listagem de `Fornecedores` e `Funcionarios`, que antes podia navegar para `/undefined` quando a acao era renderizada com `data-url`;
+- o handler global `.btn-delete` passou a aceitar tanto botoes com `data-url` quanto links com `href`, mantendo compatibilidade com os outros modulos do ERP;
+- a confirmacao de exclusao dessas acoes passou a usar `SweetAlert2` via `window.DSFeedback.confirm`, substituindo o `confirm()` nativo nesse fluxo central;
+- quando um botao de exclusao vier sem rota configurada, o sistema agora registra erro tecnico no console e mostra feedback amigavel em tela, evitando o redirecionamento quebrado;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.19.4`.
+
+### 01/06/2026 - v2.19.3 / app 0.4.2
+- o cadastro de `Fornecedores` passou a consultar dados publicos por `CNPJ` e preencher automaticamente razao social, nome fantasia, contatos e endereco quando essas informacoes estiverem disponiveis;
+- foi criada a rota protegida `GET /fornecedores/consultar-cnpj`, reaproveitando o `CnpjLookupService` ja usado no modulo de clientes;
+- o formulario de fornecedor ganhou feedback contextual abaixo do campo `CNPJ`, spinner durante a consulta e alerta SweetAlert2 quando o provedor estiver indisponivel ou o documento for invalido;
+- o `CnpjLookupService` passou a enriquecer o resultado com campos faltantes vindos de provedores secundarios e agora tambem tenta resolver `inscricao estadual` (`ie_rg`) quando esse dado estiver disponivel;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.19.3`.
+
+### 01/06/2026 - v2.19.2 / app 0.4.2
+- corrigida a persistencia do campo `ativo` no modulo `Fornecedores`, que antes nao gravava corretamente quando o switch era desligado na edicao;
+- o formulario passou a enviar explicitamente `0` ou `1` no campo `ativo`, eliminando a dependencia do comportamento nativo do checkbox;
+- o controller `Fornecedores` passou a normalizar o payload antes de salvar, garantindo consistencia mesmo em requests incompletos;
+- com isso, alternar entre `Ativo` e `Inativo` volta a refletir corretamente na listagem e no cadastro do fornecedor;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.19.2`.
+
+### 01/06/2026 - v2.19.1 / app 0.4.2
+- o formulario de `Novo lancamento` e `Editar lancamento` do modulo `Financeiro` passou a exibir o campo `Fornecedor` apenas quando o `Tipo` for `A pagar`;
+- o vinculo passou a usar o cadastro oficial do modulo `Fornecedores`, evitando texto livre e mantendo consistencia entre despesa e parceiro comercial;
+- quando o titulo for `A receber`, o campo fica oculto e o backend limpa qualquer `fornecedor_id` para impedir associacao indevida de receita a fornecedor;
+- a grade e o modal de detalhamento financeiro passaram a exibir o fornecedor vinculado nas despesas quando esse relacionamento existir;
+- a tabela `financeiro` recebeu a coluna `fornecedor_id` por migration dedicada;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.19.1`.
+
+### 01/06/2026 - v2.19.0 / app 0.4.2
+- implementado suporte a `baixa parcial` e `multiplos movimentos por titulo` no modulo `Financeiro`;
+- criada a tabela `financeiro_movimentos`, e titulos antigos `pagos` passaram por backfill para preservar o `fluxo de caixa realizado`;
+- o status do titulo agora pode ficar `parcial`, com recalculo automatico de `quitado`, `saldo em aberto`, `ultima baixa` e `formas de pagamento`;
+- a acao `Registrar baixa` da listagem passou a aceitar valor parcial, manter historico de movimentos e liquidar o titulo somente quando o saldo chegar a zero;
+- o modal de detalhamento financeiro passou a mostrar `historico de baixas`, alem do resumo financeiro completo do titulo;
+- o relatorio `Movimentacoes Financeiras` passou a exibir `valor total`, `quitado`, `aberto` e quantidade de baixas por titulo;
+- o `Fluxo de Caixa` passou a usar cada `movimento realizado` no bloco de realizados e apenas o `saldo em aberto` nos titulos previstos;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.19.0`.
+
+### 01/06/2026 - v2.18.1 / app 0.4.2
+- o relatorio `Movimentacoes Financeiras` passou a consumir o catalogo configurado de `categorias`, `grupos DRE` e `subgrupos DRE`, inclusive para enriquecer registros legados;
+- a tela operacional ganhou resumos de `entradas por categoria` e `saidas por categoria`, mantendo a mesma classificacao usada no modulo `Financeiro`;
+- o `Fluxo de Caixa` passou a exibir `realizado por categoria` e `previsto por categoria`, alem de mostrar a classificacao gerencial nas listas de movimentos;
+- a navegacao central de `Relatorios` foi ajustada para deixar explicita a leitura por categoria nos atalhos financeiro e fluxo;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.18.1`.
+
+### 01/06/2026 - v2.18.0 / app 0.4.2
+- o menu lateral deixou de tratar `Financeiro` como item isolado e passou a concentrar a navegacao em `Financas`, com atalhos dedicados para `Financeiro`, `DRE Gerencial`, `Fluxo de Caixa` e `Configuracoes`;
+- foi criada a tela `Financas -> Configuracoes`, centralizando o cadastro de `categorias financeiras`, `grupos DRE` e `subgrupos DRE`;
+- o formulario de lancamento financeiro passou a usar dropdowns estruturados para `Categoria`, `Grupo DRE` e `Subgrupo DRE`, com links rapidos para configuracao;
+- as categorias financeiras agora podem sugerir defaults de `grupo`, `subgrupo`, impacto em `DRE`, impacto em `Caixa` e recorrencia de `despesa fixa mensal na DRE`;
+- foram criadas as tabelas `financeiro_categorias`, `financeiro_dre_grupos` e `financeiro_dre_subgrupos`, com seed inicial e backfill a partir do que ja existia no financeiro;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.18.0`.
+
+### 01/06/2026 - v2.17.2 / app 0.4.2
+- o formulario de `Novo lancamento` e `Editar lancamento` passou a oferecer a chave `Despesa fixa mensal na DRE` para titulos do tipo `A pagar`;
+- quando essa opcao e marcada, a despesa passa a entrar automaticamente na `DRE` de todos os meses seguintes a partir da `data_competencia`, sem novo cadastro manual mes a mes;
+- a regra foi aplicada com a nova coluna `financeiro.dre_fixo_mensal` e leitura automatica no `FinanceiroModel::getDreReport()`;
+- a listagem do `Financeiro`, o modal de detalhamento e o proprio relatorio `DRE Gerencial` passaram a sinalizar esse comportamento recorrente;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.17.2`.
+
+### 31/05/2026 - v2.17.1 / app 0.4.2
+- a listagem do modulo `Financeiro` ganhou uma coluna `Descricao` mais rica, exibindo contexto de `categoria`, `OS`, `cliente`, `equipamento` e resumo do servico ou observacao principal;
+- clicar em `Receber`, `Pagar`, na `Descricao` ou no novo icone de `visualizacao` agora abre um modal detalhado do lancamento sem tirar o operador da grade;
+- quando o titulo estiver vinculado a uma `OS`, o modal passa a mostrar `cliente`, `equipamento`, `relato do cliente`, `diagnostico tecnico`, `solucao aplicada`, `procedimentos executados`, itens/servicos e defeitos registrados;
+- para contas a pagar sem OS, o modal centraliza o cadastro financeiro do titulo para consulta rapida, incluindo datas, classificacao, impacto gerencial e observacoes;
+- foi criada a rota protegida `GET /financeiro/detalhes/{id}` para abastecer o modal com carregamento assincrono;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.17.1`.
+
+### 31/05/2026 - v2.17.0 / app 0.4.2
+- implementado o baseline do financeiro gerencial no ERP, com novos campos na tabela `financeiro` para `data_competencia`, `origem`, `grupo/subgrupo DRE` e flags de impacto em `DRE` e `Caixa`;
+- a camada de modelo passou a classificar automaticamente lancamentos de `receita operacional`, `outras receitas`, `despesas operacionais` e `custo direto (OS)`, com backfill inicial na migration;
+- criado o relatorio `DRE Gerencial`, com receita liquida por `data_entrega`, custos diretos vindos de `os_itens` e consolidacao de outras receitas e despesas operacionais por `data_competencia`;
+- criado o relatorio `Fluxo de Caixa`, com `saldo inicial`, realizados por `data_pagamento`, previstos por `data_vencimento`, curva diaria e `saldo projetado`;
+- o painel `Financeiro`, o relatorio operacional e o `Dashboard` passaram a chamar o indicador de caixa de `Resultado de caixa`, evitando confundir caixa realizado com lucro contabil;
+- a ajuda contextual da documentacao recebeu um mapa de aliases para abrir corretamente os manuais de `Financeiro`, `Relatorios`, `Dashboard` e modulos correlatos;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.17.0`.
+
+### 27/05/2026 - v2.16.42 / app 0.4.2
+- adicionada uma trilha oficial para integrar o ERP ao `Setup Vem Fazer`, reaproveitando Swarm, Traefik e a rede ja provisionados na VPS;
+- criado `scripts/docker/install-vemfazer-stack.sh` para clonar/atualizar o repositorio do ERP, gerar o env do stack, buildar a imagem localmente e publicar a stack com `docker stack deploy`;
+- criado `docker/swarm/setup-vemfazer-stack.yml`, com labels do Traefik parametrizadas por `STACK_SLUG`, e `docker/swarm/setup-vemfazer.env.example` para servir de baseline ao deploy;
+- criada documentacao dedicada em `documentacao/10-deploy/integracao-setup-vemfazer.md`, incluindo o snippet de menu para encaixar o ERP como opcao do `setup-vemfazer.sh`;
+- a versao oficial do ERP foi atualizada em `app/Config/SystemRelease.php` para `2.16.42`.
 
 ### 19/05/2026 - ajuste operacional da coluna `Datas` (em homologacao)
 - a listagem `/os` passou a interromper a contagem de atraso na `data_conclusao` quando a manutencao ja estiver encerrada, evitando que status como `Reparo Concluido`, `Reparado, Disponivel na Loja`, `Irreparavel` e `Reparo Recusado` continuem parecendo OS em execucao;
@@ -577,12 +1054,12 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 ### v2.11.4 - App mobile/PWA: consolidacao operacional, documentacao exclusiva e release oficial 0.4.0
 - O app mobile/PWA passou da linha local `0.4.0-dev` para a release oficial `0.4.0`, com ERP minimo compativel `2.11.4`.
 - Consolidado o fluxo mobile de OS com cliente, equipamento, fotos, crop, acessorios estruturados, busca inteligente e galerias de perfil.
-- A documentacao exclusiva do app foi fechada em `documentacao/12-app-mobile-pwa/`, incluindo API detalhada, design system, padroes de desenvolvimento, skills e governanca de versionamento.
+- A documentacao exclusiva do app foi centralizada em `documentacao/12-app-mobile-pwa/`, com README, politica de versoes e historico de releases.
 - O build de producao do app foi endurecido para publicacao, eliminando bloqueio de hook naming na tela de nova OS.
 - O deploy da VPS foi executado em modo seguro, sem sincronizacao de dados de teste nem de `public/uploads/`.
 
 ### 04/04/2026 - App mobile/PWA: documentacao exclusiva aprofundada + skills reais
-- O hub `documentacao/12-app-mobile-pwa/` foi expandido com manuais tela por tela, arquitetura complementar, API detalhada por modulo, banco campo a campo e design system aprofundado.
+- O hub `documentacao/12-app-mobile-pwa/` passou a concentrar a entrada oficial do app e a governanca de versionamento, sem duplicar a documentacao do ERP.
 - O app passou a ter skills reais versionadas no proprio repositorio para guiar futuras alteracoes de mobile/PWA.
 - A versao do app deixou de ficar apenas no login e passou a ficar explicita tambem na navegacao autenticada do mobile.
 
@@ -1150,3 +1627,33 @@ Padrao adotado: `MAJOR.MINOR.PATCH`
 - A listagem `/os` teve ajuste fino manual nas colunas `Foto` e `N OS`, reduzindo o espaco dessas areas para o tamanho estritamente necessario ao thumb e ao numero operacional.
 - As colunas `Cliente` e `Valor Total` passaram a se ajustar automaticamente pela maior celula visivel na pagina atual, em vez de depender de larguras fixas excessivas.
 - A coluna `Relato` passou a mostrar preview de ate `3 palavras por linha` em no maximo `3 linhas`, mantendo o texto completo disponivel no hover da celula.
+
+### v2.23.0 - Baixa tecnica da OS, cartoes e cobranca automatica
+- A listagem `/os` ganhou o modal `Baixa da OS`, permitindo concluir a ordem sem sair da fila operacional.
+- A baixa passou a mostrar `custos estimados`, `taxas de cartao`, `valor liquido`, `saldo projetado` e `lucro estimado` antes da confirmacao final.
+- O fluxo agora aceita `recebimento parcial`: nesse caso, a OS fica em `entregue_pagamento_pendente`, ou seja, concluida tecnicamente, mas ainda aberta para cobranca.
+- Foi criada a memoria de `status_final_pendente_pagamento`, usada para encerrar a OS automaticamente no destino correto quando o titulo financeiro for totalmente quitado.
+- O modulo `Financas -> Cartoes e taxas` foi adicionado para cadastro de `operadoras`, `bandeiras`, `taxas`, `parcelas` e `prazos de recebimento`, com simulador de venda liquida.
+- Recebimentos em `cartao de credito` e `cartao de debito` passaram a registrar metadados da operadora e a gerar despesa automatica de `Taxa de cartao`, reduzindo corretamente o resultado liquido.
+- Foi criada a fila `os_cobranca_agendamentos` com regua automatica em `1`, `3` e `5` dias para OS entregues com pagamento pendente.
+- O formulario `/os/editar/{id}` agora bloqueia alteracoes em `forma_pagamento`, `valor_mao_obra`, `valor_pecas` e `desconto` quando a OS ja teve baixa tecnica, exigindo perfil administrador ou autenticacao administrativa no ato do salvamento.
+
+### v2.23.1 - Correcao de scroll e responsividade no modal de baixa da OS
+- O modal `Baixa da OS` passou a herdar o mesmo regime de altura, overflow interno e rodape fixo aplicado aos demais modais operacionais da listagem `/os`.
+- A area central agora libera rolagem interna quando a janela tiver pouca altura, evitando corte do bloco de `Recebimentos`, `Resumo financeiro` e botoes finais.
+- O layout recebeu reforco responsivo adicional para `767px`, `575px`, `430px`, `390px`, `360px` e `320px`, com melhor empilhamento de cards, botoes e linhas-resumo.
+
+### 07/06/2026 - refinamento tecnico da listagem de OS
+- A listagem `/os` foi reorganizada para seguir a ordem tecnica `Foto / OS`, `Cliente`, `Equipamento`, `Datas`, `Status / Orcamento`, `Valor`, `Relato` e `Acoes`.
+- O numero da OS passou a ficar consolidado abaixo da foto na leitura principal, deixando a antiga coluna `N OS` recolhida para liberar largura util da grade.
+- O numero operacional abaixo da foto deixou de exibir `#`, recebeu reforco visual de fonte e ficou alinhado ao bloco tecnico da coluna `Foto / OS`.
+- A responsividade da tabela foi simplificada para um comportamento deterministico: fora do mobile, a coluna `Acoes` recolhe primeiro para o painel `+` e `Relato` passou a ficar permanentemente no detalhe expandivel, com o texto integral preservado.
+- `Cliente` ganhou mais largura util, fonte menor, truncamento em linha unica e padding vertical adicional; `Equipamento` passou a manter o nome tecnico sem quebra para reduzir variacao visual causada por zoom.
+- A busca global da listagem passou a localizar tambem qualquer sequencia numerica presente no telefone principal do cliente, inclusive quando a busca e feita apenas pelos digitos.
+- `Status / Orcamento` deixou de mostrar `Orcamento ORC-...` e o texto auxiliar `Alterar status`, passando a usar o fallback `Orcamento indisponivel` quando a OS nao tiver orcamento vinculado.
+- `Valor` foi compactado novamente em largura interna e no cabeçalho, com alinhamento a direita e padding lateral minimo, para aproximar ao maximo a borda da coluna do numero exibido; o titulo da coluna tambem recebeu largura visual menor.
+- No mobile, a face principal do card passou a exibir somente `Foto / OS`, `Cliente`, `Tipo + Equip.` e o botao `+`, levando `Datas`, `Status / Orcamento`, `Valor`, `Relato` e `Acoes` para o detalhe expandido.
+- O detalhe expandido do `+` passou a usar sempre o texto completo do relato, evitando repetir apenas o preview resumido da grade principal.
+- A navbar da tela `/os` passou a manter a busca global visivel tambem no celular, com espacamento extra na pagina para evitar sobreposicao com o conteudo.
+- A view da listagem e a navbar receberam nova rodada de saneamento pontual de labels/placeholder em `pt-BR`, priorizando trechos visiveis e seguros para nao afetar identificadores ou regras de negocio.
+- O `datatable` da listagem recebeu reforco de compatibilidade no resumo de `Status / Orcamento`, evitando regressao por chamada interna antiga do helper de fluxo e prevenindo `500` no carregamento da grade.
